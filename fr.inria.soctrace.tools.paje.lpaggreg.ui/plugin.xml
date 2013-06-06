@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="fr.inria.soctrace.tools.paje.lpaggreg.ui.category"
+            name="Paje Tools">
+      </category>
+      <view
+            category="fr.inria.soctrace.tools.paje.lpaggreg.ui.category"
+            class="fr.inria.soctrace.tools.paje.lpaggreg.ui.views.LPAggregView"
+            icon="icons/1366759976_white_tiger.png"
+            id="fr.inria.soctrace.tools.paje.lpaggreg.ui.LPAggregView"
+            name="LP Aggregation"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="fr.inria.soctrace.framesoc.core.tool">
+      <tool
+            class="fr.inria.soctrace.tools.paje.lpaggreg.ui.LPAggregTool"
+            doc="No launching arguments needed."
+            name="LP Aggregation Tool"
+            type="ANALYSIS">
+      </tool>
+   </extension>
+
+</plugin>
