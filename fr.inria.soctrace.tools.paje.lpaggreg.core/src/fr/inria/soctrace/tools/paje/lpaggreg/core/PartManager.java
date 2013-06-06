@@ -88,7 +88,7 @@ public class PartManager {
 		System.out.println("Time region:  ["+traceRegion.getTimeStampStart()+" - "+traceRegion.getTimeStampEnd()+"] - duration: "+traceRegion.getTimeDuration());
 		System.out.println("Time slice number: "+timeSliceNumber);
 		System.out.println("Aggregation operator: "+lpaggregCore.lpaggregParameters.getAggOperator());
-		System.out.println("Gain/Loss parameter p: "+timeSliceNumber);
+		System.out.println("Gain/Loss parameter p: "+lpaggregCore.lpaggregParameters.getParameter());
 		System.out.println("*******************");
 		System.out.println("");
 		System.out.println("Aggregation timestamps:");
