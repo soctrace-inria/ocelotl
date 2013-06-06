@@ -96,7 +96,8 @@ public class LPAggregCore {
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.PARAMETER) {
 			lpaggregManager.computeParts();
 			lpaggregManager.printParts();
-			//partManager = new PartManager(lpaggregManager);
+			partManager = new PartManager(this);
+			partManager.print();
 		}
 
 	}

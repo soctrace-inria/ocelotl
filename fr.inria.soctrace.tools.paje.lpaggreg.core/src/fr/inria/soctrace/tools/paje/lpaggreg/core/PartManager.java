@@ -23,40 +23,80 @@ import java.util.List;
 
 public class PartManager {
 
-	private TimeSliceManager	timeSliceManager;
-	private LPAggregManager		lpaggregManager;
-	private List<TimeSlice>		timeSlices	= new ArrayList<TimeSlice>();
+	private LPAggregCore		lpaggregCore;
+	private ILPAggregManager	lpaggregManager;
+	private List<TimeRegion>	timeStamps	= new ArrayList<TimeRegion>();
+	private TimeRegion			traceRegion;
+	private int					timeSliceNumber;
 
-	public PartManager(LPAggregManager lpaggregManager) {
+	public PartManager(LPAggregCore lpaggregCore) {
 		super();
-		this.lpaggregManager = lpaggregManager;
-		//timeSliceManager = lpaggregManager.getTimeSliceMatrix().getTimeSlicesManager();
-		setTimeSlices();
+		this.lpaggregCore = lpaggregCore;
+		this.lpaggregManager = lpaggregCore.getLpaggregManager();
+		this.timeSliceNumber = lpaggregManager.getParts().size();
+		this.traceRegion = lpaggregCore.getLpaggregParameters().getTimeRegion();
+		computeTimeStamps();
 	}
 
-	public LPAggregManager getLpaggregManager() {
+	private void computeTimeStamps(){
+		int oldPart=0;
+		timeStamps.add(new TimeRegion(traceRegion.getTimeStampStart(), traceRegion.getTimeStampEnd()));
+		for (int i=1; i<lpaggregManager.getParts().size()-1; i++){
+			if (lpaggregManager.getParts().get(i)!=oldPart){
+				timeStamps.get(timeStamps.size()-1).setTimeStampEnd(traceRegion.getTimeStampStart()+(traceRegion.getTimeDuration()*i/timeSliceNumber));
+				timeStamps.add(new TimeRegion(traceRegion.getTimeStampStart()+(traceRegion.getTimeDuration()*i/timeSliceNumber), traceRegion.getTimeStampStart()+(traceRegion.getTimeDuration()*i/timeSliceNumber)));
+				oldPart=lpaggregManager.getParts().get(i);
+			}
+		}
+		timeStamps.get(timeStamps.size()-1).setTimeStampEnd(traceRegion.getTimeStampEnd());
+	}
+
+	public LPAggregCore getLpaggregCore() {
+		return lpaggregCore;
+	}
+
+	public void setLpaggregCore(LPAggregCore lpaggregCore) {
+		this.lpaggregCore = lpaggregCore;
+		this.lpaggregManager = lpaggregCore.getLpaggregManager();
+		this.timeSliceNumber = lpaggregManager.getParts().size();
+		this.traceRegion = lpaggregCore.getLpaggregParameters().getTimeRegion();
+		computeTimeStamps();
+	}
+
+	public ILPAggregManager getLpaggregManager() {
 		return lpaggregManager;
 	}
 
-	public List<TimeSlice> getTimeSlices() {
-		return timeSlices;
+	public List<TimeRegion> getTimeStamps() {
+		return timeStamps;
 	}
 
-	public TimeSliceManager getTimeSlicesManager() {
-		return timeSliceManager;
+	public TimeRegion getTraceRegion() {
+		return traceRegion;
 	}
 
-	public void setTimeSlices() {
-		timeSliceManager.setValues(lpaggregManager.getParts());
-		int j = 0;
-		timeSlices.add(new TimeSlice(new TimeRegion(timeSliceManager.getTimeSlices().get(j).getTimeRegion().getTimeStampStart(), timeSliceManager.getTimeSlices().get(j).getTimeRegion().getTimeStampEnd()), j, timeSliceManager.getTimeSlices().get(j).getValue()));
-		for (int i = 1; i < timeSliceManager.getTimeSlices().size(); i++)
-			if (timeSliceManager.getTimeSlices().get(i).getValue() == timeSliceManager.getTimeSlices().get(i - 1).getValue())
-				timeSlices.get(j).getTimeRegion().setTimeStampEnd(timeSliceManager.getTimeSlices().get(i).getTimeRegion().getTimeStampEnd());
-			else {
-				j++;
-				timeSlices.add(new TimeSlice(new TimeRegion(timeSliceManager.getTimeSlices().get(i).getTimeRegion().getTimeStampStart(), timeSliceManager.getTimeSlices().get(i).getTimeRegion().getTimeStampEnd()), j, timeSliceManager.getTimeSlices().get(i).getValue()));
-			}
+	public int getTimeSliceNumber() {
+		return timeSliceNumber;
 	}
+	
+	public void print(){
+		System.out.println("");
+		System.out.println("*******************");
+		System.out.println("AGGREGATION RESULTS");
+		System.out.println("*******************");
+		System.out.println("");
+		System.out.println("Time region:  ["+traceRegion.getTimeStampStart()+" - "+traceRegion.getTimeStampEnd()+"] - duration: "+traceRegion.getTimeDuration());
+		System.out.println("Time slice number: "+timeSliceNumber);
+		System.out.println("Aggregation operator: "+lpaggregCore.lpaggregParameters.getAggOperator());
+		System.out.println("Gain/Loss parameter p: "+timeSliceNumber);
+		System.out.println("*******************");
+		System.out.println("");
+		System.out.println("Aggregation timestamps:");
+		for (TimeRegion tr: timeStamps)
+			System.out.print(tr.getTimeStampStart()+", ");
+		System.out.print(timeStamps.get(timeStamps.size()-1).getTimeStampEnd());
+	}
+	
+
 
 }
