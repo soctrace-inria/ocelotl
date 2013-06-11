@@ -19,6 +19,7 @@
 package fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,13 +46,15 @@ public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix{
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
+		Map<Integer, List<Event>> eventList = new HashMap<Integer, List<Event>>();
+		for (EventProducer ep : eventProducers)
+			eventList.put(ep.getId(), new ArrayList<Event>());
+		for (Event e : fullEvents)
+			eventList.get(e.getEventProducer().getId()).add(e);
 		for (EventProducer ep : eventProducers) {
 			List<State> state = new ArrayList<State>();
-			List<Event> events = new ArrayList<Event>();
-			for (Event e : fullEvents)
-				if (e.getEventProducer().getId() == ep.getId())
-					events.add(e);
-			for (int i = 0; i < events.size() - 1; i++){
+			List<Event> events = eventList.get(ep.getId());
+			for (int i=0; i<events.size()-1; i++){
 				state.add(new State(events.get(i), events.get(i + 1), timeSliceManager));
 				if (queries.getLpaggregParameters().getSleepingStates().contains(state.get(state.size()-1).getStateType()))
 					state.remove(state.size()-1);
