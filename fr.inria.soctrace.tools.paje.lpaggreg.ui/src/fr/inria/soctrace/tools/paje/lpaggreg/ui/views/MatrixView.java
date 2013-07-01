@@ -168,7 +168,7 @@ public class MatrixView {
 					//TODO manage parts
 					PartFigure part = new PartFigure(new TimeRegion(), i, i, colors.getColors().get(j % colors.getColors().size()));
 					figures.add(part);
-					root.add(part, new Rectangle(new Point(j * (root.getSize().width) / parts.size(), root.getSize().height / 2 - partHeight / 2), new Point(((j + aggParts.get(i)) * root.getSize().width)/ parts.size() - Space, root.getSize().height / 2 + partHeight / 2)));
+					root.add(part, new Rectangle(new Point(j * (root.getSize().width-2*Border) / parts.size()+Border, root.getSize().height / 2 - partHeight / 2), new Point(((j + aggParts.get(i)) * (root.getSize().width-2*Border))/ parts.size() - Space+Border, root.getSize().height / 2 + partHeight / 2)));
 					j= j + aggParts.get(i);
 					part.getUpdateManager().performUpdate();
 					part.init();

@@ -19,34 +19,28 @@
 
 package fr.inria.soctrace.tools.paje.lpaggreg.ui.views;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.Polyline;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.RoundedRectangle;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.XYLayout;
-import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.paje.lpaggreg.core.TimeRegion;
+import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 /** 
  * Matrix View : part representation, according to LP algorithm result
@@ -60,24 +54,97 @@ public class TimeAxisView {
 	TimeRegion 			time;
 	final static int	Height	= 100;
 	final static int	Border	= 10;
-	int	Space	= 6;
+	final static int	TimeAxisWidth = 1;
+	final static long	Divide = 10;
+	long 				GradNumber = 10;
+	final static long	GradWidthMin=50;
+	double				GradWidth = 50;
+	final static int	GradHeight = 8;
+	final static int	TextWidth = 50;
+	final static int	TextHeight = 20;
+	final static long	MiniDivide = 5;
+	final static int	MiniGradHeight = 4;
+	int					Space	= 6;
 
 	final ColorManager	colors	= new ColorManager();
 
-	public void draw() {
+	public void drawMainLine() {
 		RectangleFigure rectangle = new RectangleFigure();
-		root.add(rectangle, new Rectangle(new Point(0, root.getSize().height()/2-3), new Point(root.getSize().width(), root.getSize().height()/2+3)));
-		rectangle.setBackgroundColor(ColorConstants.black);
-		rectangle.setForegroundColor(ColorConstants.black);
-		rectangle.setLineWidth(15);	
+		root.add(rectangle, new Rectangle(new Point(Border, root.getSize().height()/3+TimeAxisWidth), new Point(root.getSize().width()-Border, root.getSize().height()/3)));
+		rectangle.setBackgroundColor(ColorConstants.darkGray);
+		rectangle.setForegroundColor(ColorConstants.darkGray);
+		rectangle.setLineWidth(1);	
 	}
+	
+	public void grads() {
+		long duration = time.getTimeDuration();
+		long temp=duration;
+		int i;
+		for (i=1; temp>10; i++)
+			temp/=10;
+		long factor = temp==1?Divide:temp;
+		for (int j=1; j<i; j++)
+			temp*=10;
+		long gradDuration=temp/factor;
+		GradNumber=duration/gradDuration;
+		GradWidth=(root.getSize().width-(2*Border)-1)/GradNumber;
+		while (GradWidth<GradWidthMin&&GradNumber>6){
+			GradNumber/=2;
+			GradWidth*=2;
+		}
+		
+	}
+	
+	public void drawGrads() {
+		grads();
+		NumberFormat formatter = null;
+		formatter=java.text.NumberFormat.getInstance(java.util.Locale.US);
+		formatter = new DecimalFormat("0.0E0");
+		for (int i=0; i<GradNumber+1; i++){
+			RectangleFigure rectangle = new RectangleFigure();
+			root.add(rectangle, new Rectangle(new Point((int)(i*GradWidth)+Border, root.getSize().height()/3), new Point(new Point((int)(i*GradWidth)+Border+TimeAxisWidth, root.getSize().height()/3-(int)GradHeight))));
+			rectangle.setBackgroundColor(ColorConstants.darkGray);
+			rectangle.setForegroundColor(ColorConstants.darkGray);
+			rectangle.setLineWidth(1);	
+			RectangleFigure rectangleText = new RectangleFigure();
+			if (i!=GradNumber)
+				root.add(rectangleText, new Rectangle(new Point((int)(i*GradWidth), root.getSize().height()/3+2), new Point(new Point((int)(i*GradWidth)+TimeAxisWidth+TextWidth, root.getSize().height()/3+2+TextHeight))));
+			else
+				root.add(rectangleText, new Rectangle(new Point((int)(i*GradWidth)-Border*3, root.getSize().height()/3+2), new Point(new Point((int)(i*GradWidth)+TimeAxisWidth+TextWidth, root.getSize().height()/3+2+TextHeight))));
+			rectangleText.setBackgroundColor(ColorConstants.white);
+			rectangleText.setForegroundColor(ColorConstants.white);
+			long value = (i*time.getTimeDuration()/GradNumber);
+			String text = formatter.format(value);
+			//text.replace(',', '.');
+			Label label = new Label(text);
+			label.setLabelAlignment(SWT.CENTER);
+			label.setForegroundColor(ColorConstants.darkGray);
+			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight/2, SWT.NORMAL));
+			rectangleText.setLineWidth(1);
+			rectangleText.add(label);
+			ToolbarLayout layout = new ToolbarLayout();
+			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
+			//rectangleText.setConstraint(rectangleText, rectangleText.getBounds());
+			rectangleText.setLayoutManager(layout);
+			for (int j=1; j<5; j++){
+				RectangleFigure rectangle2 = new RectangleFigure();
+				root.add(rectangle2, new Rectangle(new Point((int)(i*GradWidth)+Border+(int)((j*GradWidth)/MiniDivide), root.getSize().height()/3), new Point(new Point((int)(i*GradWidth)+Border+(int)((j*GradWidth)/MiniDivide), root.getSize().height()/3-(int)MiniGradHeight))));
+				rectangle2.setBackgroundColor(ColorConstants.gray);
+				rectangle2.setForegroundColor(ColorConstants.gray);
+				rectangle2.setLineWidth(1);
+			}
+		}
+	}
+	
 	
 	public void createDiagram(TimeRegion time) {
 		root.removeAll();
-		draw();
-		canvas.update();
 		this.time=time;
-
+		if (time!=null){
+			drawMainLine();
+			drawGrads();
+		}
+		canvas.update();
 	}
 
 	public Canvas initDiagram(Composite parent) {
@@ -107,7 +174,7 @@ public class TimeAxisView {
 			@Override
 			public void controlResized(ControlEvent arg0) {
 				canvas.redraw();
-			 root.repaint();
+				root.repaint();
 				resizeDiagram();
 			}
 		});

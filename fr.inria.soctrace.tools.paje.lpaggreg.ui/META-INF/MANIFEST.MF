@@ -17,3 +17,4 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.tools.paje.lpaggreg.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
+Import-Package: fr.inria.soctrace.tools.paje.tracemanager.common.constants
