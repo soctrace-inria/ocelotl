@@ -881,9 +881,10 @@ public class LPAggregView extends ViewPart {
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 		matrix = new MatrixView();
 
-		SashForm sashForm_3 = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
+		timeAxis = new TimeAxisView();
+		//sashForm.setWeights(new int[] {220, 295});
 		
-		SashForm sashForm_5 = new SashForm(sashForm_3, SWT.BORDER | SWT.VERTICAL);
+		SashForm sashForm_5 = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
 		sashForm_5.setSashWidth(1);
 		// @SuppressWarnings("unused")
 		Composite compositeVisu = new Composite(sashForm_5, SWT.NONE);
@@ -895,15 +896,12 @@ public class LPAggregView extends ViewPart {
 		compositeVisu.setSize(500, 500);
 		Canvas canvas = matrix.initDiagram(compositeVisu);
 		canvas.setLayoutData(new GridData(GridData.FILL_BOTH));
-		timeAxis = new TimeAxisView();
 		Composite composite_4 = new Composite(sashForm_5, SWT.NONE);
-		sashForm_5.setWeights(new int[] {20, 1});
-		sashForm_3.setWeights(new int[] { 257 });
-		sashForm.setWeights(new int[] {220, 371});
-
-		GridLayout gl_compositeTime = new GridLayout();
-		composite_4.setLayout(gl_compositeTime);
-		Canvas canvas2= timeAxis.initDiagram(composite_4);
+		//TODO right proportions
+				GridLayout gl_compositeTime = new GridLayout();
+				composite_4.setLayout(gl_compositeTime);
+				Canvas canvas2= timeAxis.initDiagram(composite_4);
+				sashForm_5.setWeights(new int[] {398, 60});
 		canvas2.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		// clean all

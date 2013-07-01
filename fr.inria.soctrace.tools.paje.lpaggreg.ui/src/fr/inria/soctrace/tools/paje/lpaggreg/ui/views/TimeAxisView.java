@@ -57,6 +57,7 @@ public class TimeAxisView {
 	final static int	TimeAxisWidth = 1;
 	final static long	Divide = 10;
 	long 				GradNumber = 10;
+	long				GradDuration = 10;
 	final static long	GradWidthMin=50;
 	double				GradWidth = 50;
 	final static int	GradHeight = 8;
@@ -85,12 +86,13 @@ public class TimeAxisView {
 		long factor = temp==1?Divide:temp;
 		for (int j=1; j<i; j++)
 			temp*=10;
-		long gradDuration=temp/factor;
-		GradNumber=duration/gradDuration;
+		GradDuration=temp/factor;
+		GradNumber=duration/GradDuration;
 		GradWidth=(root.getSize().width-(2*Border)-1)/GradNumber;
 		while (GradWidth<GradWidthMin&&GradNumber>6){
 			GradNumber/=2;
 			GradWidth*=2;
+			GradDuration*=2;
 		}
 		
 	}
@@ -113,7 +115,7 @@ public class TimeAxisView {
 				root.add(rectangleText, new Rectangle(new Point((int)(i*GradWidth)-Border*3, root.getSize().height()/3+2), new Point(new Point((int)(i*GradWidth)+TimeAxisWidth+TextWidth, root.getSize().height()/3+2+TextHeight))));
 			rectangleText.setBackgroundColor(ColorConstants.white);
 			rectangleText.setForegroundColor(ColorConstants.white);
-			long value = (i*time.getTimeDuration()/GradNumber);
+			long value = (i*GradDuration+time.getTimeStampStart());
 			String text = formatter.format(value);
 			//text.replace(',', '.');
 			Label label = new Label(text);
@@ -126,6 +128,7 @@ public class TimeAxisView {
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 			//rectangleText.setConstraint(rectangleText, rectangleText.getBounds());
 			rectangleText.setLayoutManager(layout);
+			if (i!=GradNumber)
 			for (int j=1; j<5; j++){
 				RectangleFigure rectangle2 = new RectangleFigure();
 				root.add(rectangle2, new Rectangle(new Point((int)(i*GradWidth)+Border+(int)((j*GradWidth)/MiniDivide), root.getSize().height()/3), new Point(new Point((int)(i*GradWidth)+Border+(int)((j*GradWidth)/MiniDivide), root.getSize().height()/3-(int)MiniGradHeight))));
