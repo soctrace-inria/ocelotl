@@ -33,6 +33,8 @@ public interface ILPAggregManager {
 	public List<Float> getParameters();
 	
 	public List<Integer> getParts();
+	
+	public List<Quality> getQualities();
 
 	public void printParameters();
 

@@ -34,6 +34,7 @@ public abstract class LPAggregManager implements ILPAggregManager{
 	}
 
 	protected List<Integer>		parts		= new ArrayList<Integer>();
+	protected List<Quality>		qualities	= new ArrayList<Quality>();
 	protected List<Float>			parameters	= new ArrayList<Float>();
 	protected List<List<Boolean>>	eqMatrix;
 
@@ -49,6 +50,11 @@ public abstract class LPAggregManager implements ILPAggregManager{
 
 	public abstract void fillVectors();
 
+	
+	public List<Quality> getQualities() {
+		return qualities;
+	}
+	
 	public List<Float> getParameters() {
 		return parameters;
 	}

@@ -24,7 +24,6 @@ import fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators.ActivityTime
 import fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators.ActivityTimeMatrix;
 import fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators.ActivityTimeProbabilityDistributionMatrix;
 import fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators.AggregationOperators;
-import fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators.ITimeSliceMatrix;
 
 public class LPAggregCore {
 

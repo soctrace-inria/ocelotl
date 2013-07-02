@@ -18,14 +18,9 @@
 
 package fr.inria.soctrace.tools.paje.lpaggreg.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.paje.lpaggreg.core.jni.MLPAggregWrapper;
-import fr.inria.soctrace.tools.paje.lpaggreg.core.jni.VLPAggregWrapper;
 import fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators.ITimeSliceCubicMatrix;
-import fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators.ITimeSliceMatrix;
 
 public class MLPAggregManager extends LPAggregManager{
 
@@ -43,9 +38,12 @@ public class MLPAggregManager extends LPAggregManager{
 		DeltaManager dm = new DeltaManager();
 		dm.start();
 		parameters.clear();
+		qualities.clear();
 		lpaggregWrapper.computeDichotomy(timeSliceMatrix.getQueries().getLpaggregParameters().getThreshold());
-		for (int i = 0; i < lpaggregWrapper.getParameterNumber(); i++)
+		for (int i = 0; i < lpaggregWrapper.getParameterNumber(); i++){
 			parameters.add(lpaggregWrapper.getParameter(i));
+			qualities.add(new Quality(lpaggregWrapper.getGainByIndex(i), lpaggregWrapper.getLossByIndex(i), lpaggregWrapper.getParameter(i)));
+		}
 		dm.end("LPAGGREG - PARAMETERS LIST");
 	}
 

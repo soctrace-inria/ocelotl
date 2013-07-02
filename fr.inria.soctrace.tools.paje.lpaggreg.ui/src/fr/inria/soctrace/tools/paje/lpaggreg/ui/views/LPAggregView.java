@@ -73,8 +73,7 @@ import fr.inria.soctrace.tools.paje.lpaggreg.core.TimeRegion;
 import fr.inria.soctrace.tools.paje.lpaggreg.core.tsaggregoperators.AggregationOperators;
 import fr.inria.soctrace.tools.paje.lpaggreg.ui.Activator;
 import fr.inria.soctrace.tools.paje.lpaggreg.ui.loaders.ConfDataLoader;
-import org.eclipse.swt.widgets.ExpandBar;
-import org.eclipse.swt.widgets.ExpandItem;
+
 import org.eclipse.swt.custom.ScrolledComposite;
 
 /**
@@ -145,6 +144,7 @@ public class LPAggregView extends ViewPart {
 								list.removeAll();
 								for (float it : core.getLpaggregManager().getParameters())
 									list.add(Float.toString(it));
+								qualityView.createDiagram(core.getLpaggregManager().getQualities(), -1);
 							}
 						});
 					} catch (Exception e) {
@@ -352,6 +352,7 @@ public class LPAggregView extends ViewPart {
 								matrix.deleteDiagram();
 								matrix.createDiagram(core.getLpaggregManager().getParts(), params.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
 								timeAxis.createDiagram(params.getTimeRegion());
+								qualityView.createDiagram(core.getLpaggregManager().getQualities(), core.getLpaggregParameters().getParameter());
 							}
 						});
 					} catch (Exception e) {
@@ -486,6 +487,7 @@ public class LPAggregView extends ViewPart {
 	private LPAggregParameters				params;
 	private MatrixView						matrix;
 	private TimeAxisView					timeAxis;
+	private QualityView						qualityView;
 	private Combo 							comboTraces;
 
 	final Map<Integer, Trace>				traceMap	= new HashMap<Integer, Trace>();
@@ -530,6 +532,8 @@ public class LPAggregView extends ViewPart {
 		matrix = new MatrixView();
 
 		timeAxis = new TimeAxisView();
+		
+		qualityView = new QualityView();
 		//sashForm.setWeights(new int[] {220, 295});
 
 		SashForm sashForm_5 = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
@@ -567,7 +571,7 @@ public class LPAggregView extends ViewPart {
 		comboTraces = new Combo(composite_2, SWT.READ_ONLY);
 		comboTraces.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		
+
 		int index = 0;
 		for (Trace t : loader.getTraces()) {
 			comboTraces.add(t.getAlias(), index);
@@ -593,42 +597,42 @@ public class LPAggregView extends ViewPart {
 		gd_listProd.heightHint = 79;
 		gd_listProd.widthHint = 120;
 		listProd.setLayoutData(gd_listProd);
-		
+
 		ScrolledComposite scrolledComposite = new ScrolledComposite(groupProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
-		
-				Composite composite_1 = new Composite(scrolledComposite, SWT.NONE);
-				composite_1.setLayout(new GridLayout(1, false));
-				Button btnAddProdFilter = new Button(composite_1, SWT.NONE);
-				btnAddProdFilter.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-				btnAddProdFilter.setText("Add");
-				btnAddProdFilter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-				btnAddProdFilter.setImage(null);
-				
-						Button btnAddAll = new Button(composite_1, SWT.NONE);
-						btnAddAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-						btnAddAll.setText("Add All");
-						btnAddAll.setImage(null);
-						btnAddAll.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						btnAddAll.addSelectionListener(new AllFilterAdapter());
-						
-								Button btnAddResult = new Button(composite_1, SWT.NONE);
-								btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-								btnAddResult.setText("Add Result");
-								btnAddResult.setImage(null);
-								btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								btnAddResult.addSelectionListener(new ResultsFilterAdapter());
-								Button btnRemoveProd = new Button(composite_1, SWT.NONE);
-								btnRemoveProd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-								btnRemoveProd.setText("Reset");
-								btnRemoveProd.addSelectionListener(new ResetSelectionAdapter(listViewerProducers));
-								btnRemoveProd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								btnRemoveProd.setImage(null);
-								scrolledComposite.setContent(composite_1);
-								scrolledComposite.setMinSize(composite_1.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-								btnAddProdFilter.addSelectionListener(new ProducersFilterAdapter());
+
+		Composite composite_1 = new Composite(scrolledComposite, SWT.NONE);
+		composite_1.setLayout(new GridLayout(1, false));
+		Button btnAddProdFilter = new Button(composite_1, SWT.NONE);
+		btnAddProdFilter.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddProdFilter.setText("Add");
+		btnAddProdFilter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddProdFilter.setImage(null);
+
+		Button btnAddAll = new Button(composite_1, SWT.NONE);
+		btnAddAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnAddAll.setText("Add All");
+		btnAddAll.setImage(null);
+		btnAddAll.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddAll.addSelectionListener(new AllFilterAdapter());
+
+		Button btnAddResult = new Button(composite_1, SWT.NONE);
+		btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddResult.setText("Add Result");
+		btnAddResult.setImage(null);
+		btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddResult.addSelectionListener(new ResultsFilterAdapter());
+		Button btnRemoveProd = new Button(composite_1, SWT.NONE);
+		btnRemoveProd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnRemoveProd.setText("Reset");
+		btnRemoveProd.addSelectionListener(new ResetSelectionAdapter(listViewerProducers));
+		btnRemoveProd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRemoveProd.setImage(null);
+		scrolledComposite.setContent(composite_1);
+		scrolledComposite.setMinSize(composite_1.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		btnAddProdFilter.addSelectionListener(new ProducersFilterAdapter());
 		Group groupTypes = new Group(sashForm_6, SWT.NONE);
 		groupTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTypes.setText("Event Types");
@@ -643,30 +647,30 @@ public class LPAggregView extends ViewPart {
 		List listTypes = listViewerTypes.getList();
 		listTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		listTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		
+
 		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(groupTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		scrolledComposite_1.setExpandHorizontal(true);
 		scrolledComposite_1.setExpandVertical(true);
-		
-				Composite compositeBtnTypes = new Composite(scrolledComposite_1, SWT.NONE);
-				compositeBtnTypes.setLayout(new GridLayout(1, false));
-				
-						Button btnAddTypes = new Button(compositeBtnTypes, SWT.NONE);
-						btnAddTypes.setText("Add");
-						btnAddTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						btnAddTypes.setImage(null);
-						btnAddTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-						btnAddTypes.addSelectionListener(new TypesSelectionAdapter());
-						
-								Button btnRemoveTypes = new Button(compositeBtnTypes, SWT.NONE);
-								btnRemoveTypes.setText("Remove");
-								btnRemoveTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								btnRemoveTypes.setImage(null);
-								btnRemoveTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-								scrolledComposite_1.setContent(compositeBtnTypes);
-								scrolledComposite_1.setMinSize(compositeBtnTypes.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-								btnRemoveTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerTypes));
+
+		Composite compositeBtnTypes = new Composite(scrolledComposite_1, SWT.NONE);
+		compositeBtnTypes.setLayout(new GridLayout(1, false));
+
+		Button btnAddTypes = new Button(compositeBtnTypes, SWT.NONE);
+		btnAddTypes.setText("Add");
+		btnAddTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddTypes.setImage(null);
+		btnAddTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddTypes.addSelectionListener(new TypesSelectionAdapter());
+
+		Button btnRemoveTypes = new Button(compositeBtnTypes, SWT.NONE);
+		btnRemoveTypes.setText("Remove");
+		btnRemoveTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRemoveTypes.setImage(null);
+		btnRemoveTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		scrolledComposite_1.setContent(compositeBtnTypes);
+		scrolledComposite_1.setMinSize(compositeBtnTypes.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		btnRemoveTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerTypes));
 		Group groupIdle = new Group(sashForm_6, SWT.NONE);
 		groupIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupIdle.setText("Idle States");
@@ -683,30 +687,30 @@ public class LPAggregView extends ViewPart {
 		gd_listIdle.widthHint = 203;
 		listIdle.setLayoutData(gd_listIdle);
 		listIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		
+
 		ScrolledComposite scrolledComposite_2 = new ScrolledComposite(groupIdle, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite_2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		scrolledComposite_2.setExpandHorizontal(true);
 		scrolledComposite_2.setExpandVertical(true);
-		
-				Composite compositeBtnIdle = new Composite(scrolledComposite_2, SWT.NONE);
-				compositeBtnIdle.setLayout(new GridLayout(1, false));
-				
-						Button btnAddIdle = new Button(compositeBtnIdle, SWT.NONE);
-						btnAddIdle.setText("Add");
-						btnAddIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						btnAddIdle.setImage(null);
-						btnAddIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-						btnAddIdle.addSelectionListener(new IdlesSelectionAdapter());
-						
-								Button btnRemoveIdle = new Button(compositeBtnIdle, SWT.NONE);
-								btnRemoveIdle.setText("Remove");
-								btnRemoveIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								btnRemoveIdle.setImage(null);
-								btnRemoveIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-								scrolledComposite_2.setContent(compositeBtnIdle);
-								scrolledComposite_2.setMinSize(compositeBtnIdle.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-								btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdles));
+
+		Composite compositeBtnIdle = new Composite(scrolledComposite_2, SWT.NONE);
+		compositeBtnIdle.setLayout(new GridLayout(1, false));
+
+		Button btnAddIdle = new Button(compositeBtnIdle, SWT.NONE);
+		btnAddIdle.setText("Add");
+		btnAddIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddIdle.setImage(null);
+		btnAddIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddIdle.addSelectionListener(new IdlesSelectionAdapter());
+
+		Button btnRemoveIdle = new Button(compositeBtnIdle, SWT.NONE);
+		btnRemoveIdle.setText("Remove");
+		btnRemoveIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRemoveIdle.setImage(null);
+		btnRemoveIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		scrolledComposite_2.setContent(compositeBtnIdle);
+		scrolledComposite_2.setMinSize(compositeBtnIdle.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdles));
 		sashForm_6.setWeights(new int[] {1, 1, 1});
 		sashForm_3.setWeights(new int[] {41, 189});
 		comboTraces.addSelectionListener(new SelectionAdapter() {
@@ -814,7 +818,7 @@ public class LPAggregView extends ViewPart {
 		spinnerTimeSlices.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		spinnerTimeSlices.setMaximum(10000);
 		spinnerTimeSlices.setMinimum(1);
-		spinnerTimeSlices.setSelection(20);
+		spinnerTimeSlices.setSelection(200);
 		spinnerTimeSlices.addModifyListener(new ConfModificationListener());
 
 		btnNormalize = new Button(compositeNormalize, SWT.CHECK);
@@ -883,6 +887,13 @@ public class LPAggregView extends ViewPart {
 		new Label(group, SWT.NONE);
 
 		Composite composite_5 = new Composite(sashForm_1, SWT.NONE);
+		composite_5.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		composite_5.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		//compositeVisu.setToolTipText("test");
+		GridLayout gl_compositeQuality = new GridLayout();
+		composite_5.setLayout(gl_compositeQuality);
+		Canvas canvas3 = qualityView.initDiagram(composite_5);
+		canvas3.setLayoutData(new GridData(GridData.FILL_BOTH));
 		sashForm_1.setWeights(new int[] {97, 153, 332});
 		list.addSelectionListener(new SelectSelectionListener());
 

@@ -128,6 +128,7 @@ public class TraceSearchLPAggreg extends TraceSearch {
 		traceDB = new TraceDBObject(t.getDbName(), DBMode.DB_OPEN);
 	}
 	
+	@SuppressWarnings("unused")
 	private LogicalCondition buildIntervalCondition(IntervalDesc interval) {
 		LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 		and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, String.valueOf(interval.t1)));
