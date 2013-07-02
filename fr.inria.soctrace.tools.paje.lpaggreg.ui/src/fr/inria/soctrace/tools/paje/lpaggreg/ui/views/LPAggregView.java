@@ -860,30 +860,30 @@ public class LPAggregView extends ViewPart {
 		gd_list.widthHint = 330;
 		list.setLayoutData(gd_list);
 		new Label(group, SWT.NONE);
-						Group groupAggreg = new Group(group, SWT.NONE);
-						groupAggreg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-						groupAggreg.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						groupAggreg.setLayout(new GridLayout(3, false));
-						groupAggreg.setText("Perform Best-Cut Partition");
-						
-								Label lblParam = new Label(groupAggreg, SWT.NONE);
-								lblParam.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								lblParam.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-								lblParam.setText("Gain/loss parameter");
-								
-										param = new Text(groupAggreg, SWT.BORDER);
-										param.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-										param.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-										param.addModifyListener(new ParamModificationListener());
-										btnRun = new Button(groupAggreg, SWT.NONE);
-										btnRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-										btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-										btnRun.setText("Process");
-										btnRun.addSelectionListener(new RunSelectionListener());
-						new Label(group, SWT.NONE);
-						
-						Composite composite_5 = new Composite(sashForm_1, SWT.NONE);
-						sashForm_1.setWeights(new int[] {97, 153, 332});
+		Group groupAggreg = new Group(group, SWT.NONE);
+		groupAggreg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		groupAggreg.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupAggreg.setLayout(new GridLayout(3, false));
+		groupAggreg.setText("Perform Best-Cut Partition");
+
+		Label lblParam = new Label(groupAggreg, SWT.NONE);
+		lblParam.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblParam.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblParam.setText("Gain/loss parameter");
+
+		param = new Text(groupAggreg, SWT.BORDER);
+		param.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		param.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		param.addModifyListener(new ParamModificationListener());
+		btnRun = new Button(groupAggreg, SWT.NONE);
+		btnRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRun.setText("Process");
+		btnRun.addSelectionListener(new RunSelectionListener());
+		new Label(group, SWT.NONE);
+
+		Composite composite_5 = new Composite(sashForm_1, SWT.NONE);
+		sashForm_1.setWeights(new int[] {97, 153, 332});
 		list.addSelectionListener(new SelectSelectionListener());
 
 		btnRun_1.addSelectionListener(new DichotomySelectionListener());
