@@ -157,7 +157,7 @@ public class TimeAxisView {
 		XYLayout layout = new XYLayout();
 		root.setLayoutManager(layout);
 		canvas = new Canvas(parent, SWT.DOUBLE_BUFFERED);
-		canvas.setBackground(ColorConstants.lightGray);
+		canvas.setBackground(ColorConstants.gray);
 		canvas.setSize(parent.getSize());
 		LightweightSystem lws = new LightweightSystem(canvas);
 		lws.setContents(root);
