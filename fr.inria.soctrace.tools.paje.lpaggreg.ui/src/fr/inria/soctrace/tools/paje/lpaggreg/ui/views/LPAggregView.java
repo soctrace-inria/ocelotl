@@ -402,6 +402,7 @@ public class LPAggregView extends ViewPart {
 									matrix.deleteDiagram();
 									timeAxis.createDiagram(params.getTimeRegion());
 									matrix.createDiagram(core.getLpaggregManager().getParts(), params.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
+									qualityView.createDiagram(core.getLpaggregManager().getQualities(), core.getLpaggregParameters().getParameter());
 								}
 							});
 						} catch (Exception e) {
@@ -554,7 +555,7 @@ public class LPAggregView extends ViewPart {
 		GridLayout gl_compositeTime = new GridLayout();
 		composite_4.setLayout(gl_compositeTime);
 		Canvas canvas2= timeAxis.initDiagram(composite_4);
-		sashForm_5.setWeights(new int[] {398, 60});
+		sashForm_5.setWeights(new int[] {125, 36});
 
 		TabFolder tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
@@ -569,7 +570,9 @@ public class LPAggregView extends ViewPart {
 		composite_2.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 		composite_2.setLayout(new GridLayout(1, false));
 		comboTraces = new Combo(composite_2, SWT.READ_ONLY);
-		comboTraces.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
+		gd_comboTraces.widthHint = 327;
+		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
 		int index = 0;
@@ -712,7 +715,7 @@ public class LPAggregView extends ViewPart {
 		scrolledComposite_2.setMinSize(compositeBtnIdle.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdles));
 		sashForm_6.setWeights(new int[] {1, 1, 1});
-		sashForm_3.setWeights(new int[] {41, 189});
+		sashForm_3.setWeights(new int[] {23, 226});
 		comboTraces.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -820,17 +823,16 @@ public class LPAggregView extends ViewPart {
 		spinnerTimeSlices.setMinimum(1);
 		spinnerTimeSlices.setSelection(200);
 		spinnerTimeSlices.addModifyListener(new ConfModificationListener());
-
-		btnNormalize = new Button(compositeNormalize, SWT.CHECK);
-		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnNormalize.setLayoutData(new GridData(SWT.LEFT, SWT.BORDER, true, false, 1, 1));
-		btnNormalize.setSelection(false);
-		btnNormalize.setText("Normalize");
-		new Label(compositeNormalize, SWT.NONE);
 		Group groupDichotomy = new Group(sashForm_1, SWT.NONE);
 		groupDichotomy.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupDichotomy.setLayout(new GridLayout(1, false));
 		groupDichotomy.setText("Get Best-Cut Partition Gain/Loss Parameter List");
+		
+				btnNormalize = new Button(groupDichotomy, SWT.CHECK);
+				btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				btnNormalize.setSelection(false);
+				btnNormalize.setText("Normalize Qualities");
+				btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 
 		Composite composite_3 = new Composite(groupDichotomy, SWT.NONE);
 		composite_3.setLayout(new GridLayout(3, false));
@@ -849,42 +851,43 @@ public class LPAggregView extends ViewPart {
 		Button btnRun_1 = new Button(composite_3, SWT.NONE);
 		btnRun_1.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRun_1.setText("Get");
-
-		Group group = new Group(groupDichotomy, SWT.NONE);
-		group.setLayout(new GridLayout(2, false));
-		GridData gd_group = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_group.heightHint = 119;
-		gd_group.widthHint = 277;
-		group.setLayoutData(gd_group);
-
-		list = new List(group, SWT.BORDER | SWT.V_SCROLL);
-		list.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		GridData gd_list = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_list.heightHint = 132;
-		gd_list.widthHint = 330;
-		list.setLayoutData(gd_list);
-		new Label(group, SWT.NONE);
-		Group groupAggreg = new Group(group, SWT.NONE);
-		groupAggreg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		groupAggreg.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupAggreg.setLayout(new GridLayout(3, false));
-		groupAggreg.setText("Perform Best-Cut Partition");
-
-		Label lblParam = new Label(groupAggreg, SWT.NONE);
-		lblParam.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblParam.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblParam.setText("Gain/loss parameter");
-
-		param = new Text(groupAggreg, SWT.BORDER);
-		param.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		param.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		param.addModifyListener(new ParamModificationListener());
-		btnRun = new Button(groupAggreg, SWT.NONE);
-		btnRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRun.setText("Process");
-		btnRun.addSelectionListener(new RunSelectionListener());
-		new Label(group, SWT.NONE);
+		
+				Group group = new Group(groupDichotomy, SWT.NONE);
+				group.setLayout(new GridLayout(2, false));
+				GridData gd_group = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+				gd_group.heightHint = 119;
+				gd_group.widthHint = 277;
+				group.setLayoutData(gd_group);
+				
+						list = new List(group, SWT.BORDER | SWT.V_SCROLL);
+						list.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+						GridData gd_list = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+						gd_list.heightHint = 132;
+						gd_list.widthHint = 330;
+						list.setLayoutData(gd_list);
+						new Label(group, SWT.NONE);
+						Group groupAggreg = new Group(group, SWT.NONE);
+						groupAggreg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+						groupAggreg.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+						groupAggreg.setLayout(new GridLayout(3, false));
+						groupAggreg.setText("Perform Best-Cut Partition");
+						
+								Label lblParam = new Label(groupAggreg, SWT.NONE);
+								lblParam.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+								lblParam.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+								lblParam.setText("Gain/loss parameter");
+								
+										param = new Text(groupAggreg, SWT.BORDER);
+										param.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+										param.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+										param.addModifyListener(new ParamModificationListener());
+										btnRun = new Button(groupAggreg, SWT.NONE);
+										btnRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+										btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+										btnRun.setText("Process");
+										btnRun.addSelectionListener(new RunSelectionListener());
+										new Label(group, SWT.NONE);
+										list.addSelectionListener(new SelectSelectionListener());
 
 		Composite composite_5 = new Composite(sashForm_1, SWT.NONE);
 		composite_5.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -895,7 +898,6 @@ public class LPAggregView extends ViewPart {
 		Canvas canvas3 = qualityView.initDiagram(composite_5);
 		canvas3.setLayoutData(new GridData(GridData.FILL_BOTH));
 		sashForm_1.setWeights(new int[] {97, 153, 332});
-		list.addSelectionListener(new SelectSelectionListener());
 
 		btnRun_1.addSelectionListener(new DichotomySelectionListener());
 		threshold.addModifyListener(new ThresholdModificationListener());
@@ -946,8 +948,7 @@ public class LPAggregView extends ViewPart {
 		btnShowNumbers.setSelection(false);
 		btnShowNumbers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		sashForm_4.setWeights(new int[] {112, 374});
-		sashForm.setWeights(new int[] {292, 166});
-		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
+		sashForm.setWeights(new int[] {172, 286});
 		canvas2.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// clean all
