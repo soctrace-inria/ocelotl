@@ -133,7 +133,7 @@ public class QualityView {
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 			//rectangleText.setConstraint(rectangleText, rectangleText.getBounds());
 			rectangleText.setLayoutManager(layout);
-			if (i!=(int)XGrads&&(width/MiniDivide)>yGradWidth/10)
+			if (i!=(int)XGrads&&(width/MiniDivide)>YGradWidthMin/2)
 				for (int j=1; j<5; j++){
 					PolylineConnection lineDash = new PolylineConnection();
 					lineDash.setEndpoints(new Point((int)(i*width+AxisBorder)+(int)((j*width)/MiniDivide), root.getSize().height()-AxisBorder), new Point(new Point((int)(i*width+AxisBorder)+(int)((j*width)/MiniDivide), AxisBorder)));
@@ -216,14 +216,14 @@ public class QualityView {
 			lineLoss2.setEndpoints(new Point((int)(AxisBorder+(width*cParam)), (int)(yOff-(height*nloss)/maxValue)), new Point((int)(AxisBorder+(width*nParam)), (int)(yOff-(height*nloss)/maxValue)));
 			lineGain1.setForegroundColor(ColorConstants.green);
 			lineLoss1.setForegroundColor(ColorConstants.red);
-			lineGain1.setLineWidthFloat((float) 1.7);
-			lineLoss1.setLineWidthFloat((float) 1.7);
+			lineGain1.setLineWidthFloat((float) 2);
+			lineLoss1.setLineWidthFloat((float) 2);
 			root.add(lineGain1);
 			root.add(lineLoss1);
 			lineGain2.setForegroundColor(ColorConstants.green);
 			lineLoss2.setForegroundColor(ColorConstants.red);
-			lineGain2.setLineWidthFloat((float) 1.7);
-			lineLoss2.setLineWidthFloat((float) 1.7);
+			lineGain2.setLineWidthFloat((float) 2);
+			lineLoss2.setLineWidthFloat((float) 2);
 			root.add(lineGain2);
 			root.add(lineLoss2);
 		}
@@ -246,7 +246,7 @@ public class QualityView {
 		PolylineConnection line = new PolylineConnection();
 		line.setEndpoints(new Point((int)(AxisBorder+(width*(1-currentParameter))), (int)(yOff)), new Point((int)(AxisBorder+(width*(1-currentParameter))), AxisBorder));
 		line.setForegroundColor(ColorConstants.blue);
-		line.setLineWidthFloat((float) 1.7);
+		line.setLineWidthFloat((float) 1.8);
 		root.add(line);
 		//}
 		//}
