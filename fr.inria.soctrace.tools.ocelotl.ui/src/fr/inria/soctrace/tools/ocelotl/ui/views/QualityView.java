@@ -27,7 +27,6 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
@@ -38,7 +37,6 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -55,7 +53,8 @@ public class QualityView {
 
 	private Figure				root;
 	private Canvas				canvas;
-	private final static int	Border				= 50;
+	private final static int	Border				= 10;
+	private final static int	LeftBorder			= 50;
 	private final static int	AxisWidth			= 1;
 	private final static int	YGradDefaultNumber	= 10;
 	private double				yGradNumber			= 10.0;

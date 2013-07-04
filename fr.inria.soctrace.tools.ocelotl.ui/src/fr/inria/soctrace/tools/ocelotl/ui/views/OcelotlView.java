@@ -84,15 +84,73 @@ import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
  */
 public class OcelotlView extends ViewPart {
 
-	private class AllFilterAdapter extends SelectionAdapter {
+	private class AddAllEventProducersAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (loader.getCurrentTrace() == null)
+			if (confDataLoader.getCurrentTrace() == null)
 				return;
 			producers.clear();
-			producers.addAll(loader.getProducers());
-			listViewerProducers.setInput(producers);
+			producers.addAll(confDataLoader.getProducers());
+			listViewerEventProducers.setInput(producers);
+			hasChanged = HasChanged.ALL;
+		}
+	}
+
+	private class AddEventProducersAdapter extends SelectionAdapter {
+
+		// all - input
+		java.util.List<Object> diff(final java.util.List<EventProducer> all, final java.util.List<EventProducer> input) {
+			final java.util.List<Object> tmp = new LinkedList<>();
+			for (final Object oba : all)
+				tmp.add(oba);
+			tmp.removeAll(input);
+			return tmp;
+		}
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (confDataLoader.getCurrentTrace() == null)
+				return;
+
+			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new EventProducerLabelProvider());
+			dialog.setTitle("Select Event Producers");
+			dialog.setMessage("Select a String (* = any string, ? = any char):");
+			dialog.setElements(diff(confDataLoader.getProducers(), producers).toArray());
+			dialog.setMultipleSelection(true);
+			if (dialog.open() == Window.CANCEL)
+				return;
+			for (final Object o : dialog.getResult())
+				producers.add((EventProducer) o);
+			listViewerEventProducers.setInput(producers);
+			hasChanged = HasChanged.ALL;
+		}
+	}
+
+	private class AddResultsEventProducersAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (confDataLoader.getCurrentTrace() == null)
+				return;
+
+			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new AnalysisResultLabelProvider());
+			dialog.setTitle("Select a Result");
+			dialog.setMessage("Select a String (* = any string, ? = any char):");
+			dialog.setElements(confDataLoader.getResults().toArray());
+			dialog.setMultipleSelection(false);
+			if (dialog.open() == Window.CANCEL)
+				return;
+			for (final Object o : dialog.getResult())
+				try {
+					for (final EventProducer ep : confDataLoader.getProducersFromResult((AnalysisResult) o))
+						if (!producers.contains(ep))
+							producers.add(ep);
+				} catch (final SoCTraceException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			listViewerEventProducers.setInput(producers);
 			hasChanged = HasChanged.ALL;
 		}
 	}
@@ -110,67 +168,22 @@ public class OcelotlView extends ViewPart {
 		@Override
 		public void modifyText(final ModifyEvent e) {
 			hasChanged = HasChanged.ALL;
-			if (loader.getCurrentTrace() == null)
+			if (confDataLoader.getCurrentTrace() == null)
 				return;
 			try {
-				if (Long.parseLong(timestampEnd.getText()) > loader.getMaxTimestamp() || Long.parseLong(timestampEnd.getText()) < loader.getMinTimestamp())
-					timestampEnd.setText(String.valueOf(loader.getMaxTimestamp()));
+				if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp())
+					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
 			} catch (final NumberFormatException err) {
-				timestampEnd.setText("0");
+				textTimestampEnd.setText("0");
 			}
 			try {
-				if (Long.parseLong(timestampStart.getText()) < loader.getMinTimestamp() || Long.parseLong(timestampStart.getText()) > loader.getMaxTimestamp())
-					timestampStart.setText(String.valueOf(loader.getMinTimestamp()));
+				if (Long.parseLong(textTimestampStart.getText()) < confDataLoader.getMinTimestamp() || Long.parseLong(textTimestampStart.getText()) > confDataLoader.getMaxTimestamp())
+					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 			} catch (final NumberFormatException err) {
-				timestampStart.setText("0");
+				textTimestampStart.setText("0");
 			}
 		}
 
-	}
-
-	private class DichotomySelectionListener extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (loader.getCurrentTrace() == null)
-				return;
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER || hasChanged == HasChanged.EQ)
-				hasChanged = HasChanged.THRESHOLD;
-			setConfiguration();
-			final String title = "Getting parameters...";
-			final Job job = new Job(title) {
-
-				@Override
-				protected IStatus run(final IProgressMonitor monitor) {
-					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-					try {
-						core.computeDichotomy(hasChanged);
-
-						monitor.done();
-						Display.getDefault().syncExec(new Runnable() {
-
-							@Override
-							public void run() {
-								// MessageDialog.openInformation(getSite().getShell(),
-								// "Parameters", "Parameters retrieved");
-								hasChanged = HasChanged.NOTHING;
-								list.removeAll();
-								for (int i =core.getLpaggregManager().getParameters().size()-1; i>=0; i--)
-									list.add(Float.toString(core.getLpaggregManager().getParameters().get(i)));
-								list.select(0);
-								qualityView.createDiagram();
-							}
-						});
-					} catch (final Exception e) {
-						e.printStackTrace();
-						return Status.CANCEL_STATUS;
-					}
-					return Status.OK_STATUS;
-				}
-			};
-			job.setUser(true);
-			job.schedule();
-		}
 	}
 
 	private class EventProducerLabelProvider extends LabelProvider {
@@ -189,6 +202,98 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
+	private class GetAggregationAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (confDataLoader.getCurrentTrace() == null)
+				return;
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
+				hasChanged = HasChanged.PARAMETER;
+			else
+				listParameters.removeAll();
+			setConfiguration();
+			final String title = "Computing parts...";
+			final Job job = new Job(title) {
+
+				@Override
+				protected IStatus run(final IProgressMonitor monitor) {
+					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
+					try {
+						ocelotlCore.computeParts(hasChanged);
+						monitor.done();
+						Display.getDefault().syncExec(new Runnable() {
+
+							@Override
+							public void run() {
+								// MessageDialog.openInformation(getSite().getShell(),
+								// "Parts", "Parts processing finished");
+								hasChanged = HasChanged.NOTHING;
+								matrixView.deleteDiagram();
+								matrixView.createDiagram(ocelotlCore.getLpaggregManager().getParts(), ocelotlParameters.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
+								timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
+								qualityView.createDiagram();
+							}
+						});
+					} catch (final Exception e) {
+						e.printStackTrace();
+						return Status.CANCEL_STATUS;
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setUser(true);
+			job.schedule();
+
+		}
+	}
+
+	private class GetParametersAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (confDataLoader.getCurrentTrace() == null)
+				return;
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER || hasChanged == HasChanged.EQ)
+				hasChanged = HasChanged.THRESHOLD;
+			setConfiguration();
+			final String title = "Getting parameters...";
+			final Job job = new Job(title) {
+
+				@Override
+				protected IStatus run(final IProgressMonitor monitor) {
+					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
+					try {
+						ocelotlCore.computeDichotomy(hasChanged);
+
+						monitor.done();
+						Display.getDefault().syncExec(new Runnable() {
+
+							@Override
+							public void run() {
+								// MessageDialog.openInformation(getSite().getShell(),
+								// "Parameters", "Parameters retrieved");
+								hasChanged = HasChanged.NOTHING;
+								listParameters.removeAll();
+								for (int i =ocelotlCore.getLpaggregManager().getParameters().size()-1; i>=0; i--)
+									listParameters.add(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(i)));
+								listParameters.select(0);
+								listParameters.notifyListeners(SWT.Selection, new Event());
+								qualityView.createDiagram();
+							}
+						});
+					} catch (final Exception e) {
+						e.printStackTrace();
+						return Status.CANCEL_STATUS;
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setUser(true);
+			job.schedule();
+		}
+	}
+
 	private class IdlesSelectionAdapter extends SelectionAdapter {
 
 		@Override
@@ -197,7 +302,7 @@ public class OcelotlView extends ViewPart {
 			if (dialog.open() == Window.CANCEL)
 				return;
 			idles.add(dialog.getValue());
-			listViewerIdles.setInput(idles);
+			listViewerIdleStates.setInput(idles);
 			hasChanged = HasChanged.ALL;
 		}
 	}
@@ -211,52 +316,22 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class ParamModificationListener implements ModifyListener {
+	private class ParameterModifyListener implements ModifyListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			if (loader.getCurrentTrace() == null)
+			if (confDataLoader.getCurrentTrace() == null)
 				return;
 			try {
-				if (Float.parseFloat(param.getText()) < 0 || Float.parseFloat(param.getText()) > 1)
-					param.setText("0");
+				if (Float.parseFloat(textRun.getText()) < 0 || Float.parseFloat(textRun.getText()) > 1)
+					textRun.setText("0");
 			} catch (final NumberFormatException err) {
-				param.setText("0");
+				textRun.setText("0");
 			}
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ)
 				hasChanged = HasChanged.PARAMETER;
 		}
 
-	}
-
-	private class ProducersFilterAdapter extends SelectionAdapter {
-
-		// all - input
-		java.util.List<Object> diff(final java.util.List<EventProducer> all, final java.util.List<EventProducer> input) {
-			final java.util.List<Object> tmp = new LinkedList<>();
-			for (final Object oba : all)
-				tmp.add(oba);
-			tmp.removeAll(input);
-			return tmp;
-		}
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (loader.getCurrentTrace() == null)
-				return;
-
-			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new EventProducerLabelProvider());
-			dialog.setTitle("Select Event Producers");
-			dialog.setMessage("Select a String (* = any string, ? = any char):");
-			dialog.setElements(diff(loader.getProducers(), producers).toArray());
-			dialog.setMultipleSelection(true);
-			if (dialog.open() == Window.CANCEL)
-				return;
-			for (final Object o : dialog.getResult())
-				producers.add((EventProducer) o);
-			listViewerProducers.setInput(producers);
-			hasChanged = HasChanged.ALL;
-		}
 	}
 
 	private class RemoveSelectionAdapter extends SelectionAdapter {
@@ -295,93 +370,19 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class ResultsFilterAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (loader.getCurrentTrace() == null)
-				return;
-
-			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new AnalysisResultLabelProvider());
-			dialog.setTitle("Select a Result");
-			dialog.setMessage("Select a String (* = any string, ? = any char):");
-			dialog.setElements(loader.getResults().toArray());
-			dialog.setMultipleSelection(false);
-			if (dialog.open() == Window.CANCEL)
-				return;
-			for (final Object o : dialog.getResult())
-				try {
-					for (final EventProducer ep : loader.getProducersFromResult((AnalysisResult) o))
-						if (!producers.contains(ep))
-							producers.add(ep);
-				} catch (final SoCTraceException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			listViewerProducers.setInput(producers);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
-	private class RunSelectionListener extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (loader.getCurrentTrace() == null)
-				return;
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
-				hasChanged = HasChanged.PARAMETER;
-			else
-				list.removeAll();
-			setConfiguration();
-			final String title = "Computing parts...";
-			final Job job = new Job(title) {
-
-				@Override
-				protected IStatus run(final IProgressMonitor monitor) {
-					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-					try {
-						core.computeParts(hasChanged);
-						monitor.done();
-						Display.getDefault().syncExec(new Runnable() {
-
-							@Override
-							public void run() {
-								// MessageDialog.openInformation(getSite().getShell(),
-								// "Parts", "Parts processing finished");
-								hasChanged = HasChanged.NOTHING;
-								matrix.deleteDiagram();
-								matrix.createDiagram(core.getLpaggregManager().getParts(), params.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
-								timeAxis.createDiagram(params.getTimeRegion());
-								qualityView.createDiagram();
-							}
-						});
-					} catch (final Exception e) {
-						e.printStackTrace();
-						return Status.CANCEL_STATUS;
-					}
-					return Status.OK_STATUS;
-				}
-			};
-			job.setUser(true);
-			job.schedule();
-
-		}
-	}
-
-	private class SelectSelectionListener extends SelectionAdapter {
+	private class SelectSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			try {
-				if (loader.getCurrentTrace() == null)
+				if (confDataLoader.getCurrentTrace() == null)
 					return;
-				if (list.getSelectionCount() > 0)
-					param.setText(list.getSelection()[0]);
+				if (listParameters.getSelectionCount() > 0)
+					textRun.setText(listParameters.getSelection()[0]);
 				if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
 					hasChanged = HasChanged.PARAMETER;
 				else
-					list.removeAll();
+					listParameters.removeAll();
 				setConfiguration();
 				final String title = "Computing parts...";
 				final Job job = new Job(title) {
@@ -390,7 +391,7 @@ public class OcelotlView extends ViewPart {
 					protected IStatus run(final IProgressMonitor monitor) {
 						monitor.beginTask(title, IProgressMonitor.UNKNOWN);
 						try {
-							core.computeParts(hasChanged);
+							ocelotlCore.computeParts(hasChanged);
 							monitor.done();
 							Display.getDefault().syncExec(new Runnable() {
 
@@ -399,9 +400,9 @@ public class OcelotlView extends ViewPart {
 									// MessageDialog.openInformation(getSite().getShell(),
 									// "Parts", "Parts processing finished");
 									hasChanged = HasChanged.NOTHING;
-									matrix.deleteDiagram();
-									timeAxis.createDiagram(params.getTimeRegion());
-									matrix.createDiagram(core.getLpaggregManager().getParts(), params.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
+									matrixView.deleteDiagram();
+									timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
+									matrixView.createDiagram(ocelotlCore.getLpaggregManager().getParts(), ocelotlParameters.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
 									qualityView.createDiagram();
 								}
 							});
@@ -421,17 +422,17 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class ThresholdModificationListener implements ModifyListener {
+	private class ThresholdModifyListener implements ModifyListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			if (loader.getCurrentTrace() == null)
+			if (confDataLoader.getCurrentTrace() == null)
 				return;
 			try {
-				if (Float.parseFloat(threshold.getText()) < Float.MIN_VALUE || Float.parseFloat(threshold.getText()) > 1)
-					threshold.setText("0.001");
+				if (Float.parseFloat(textThreshold.getText()) < Float.MIN_VALUE || Float.parseFloat(textThreshold.getText()) > 1)
+					textThreshold.setText("0.001");
 			} catch (final NumberFormatException err) {
-				threshold.setText("0.001");
+				textThreshold.setText("0.001");
 			}
 		}
 	}
@@ -449,486 +450,474 @@ public class OcelotlView extends ViewPart {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (loader.getCurrentTrace() == null)
+			if (confDataLoader.getCurrentTrace() == null)
 				return;
-			final ListSelectionDialog dialog = new ListSelectionDialog(getSite().getShell(), diff(loader.getTypes(), types), new ArrayContentProvider(), new EventTypeLabelProvider(), "Select Event Types");
+			final ListSelectionDialog dialog = new ListSelectionDialog(getSite().getShell(), diff(confDataLoader.getTypes(), types), new ArrayContentProvider(), new EventTypeLabelProvider(), "Select Event Types");
 			if (dialog.open() == Window.CANCEL)
 				return;
 			for (final Object o : dialog.getResult())
 				types.add((EventType) o);
-			listViewerTypes.setInput(types);
+			listViewerEventTypes.setInput(types);
 			hasChanged = HasChanged.ALL;
 		}
 	}
 
-	public static final String					PLUGIN_ID	= Activator.PLUGIN_ID;
 	public static final String					ID			= "fr.inria.soctrace.tools.ocelotl.ui.Ocelotl"; //$NON-NLS-1$
-	private HasChanged							hasChanged	= HasChanged.ALL;
-	/** Loader to interact with the DB */
-	private final ConfDataLoader				loader		= new ConfDataLoader();
-	private Text								timestampStart;
-	private Text								timestampEnd;
-	private Text								threshold;
-	private Text								param;
-	private ListViewer							listViewerProducers;
-	private ListViewer							listViewerTypes;
-	private ListViewer							listViewerIdles;
-	private List								list;
-
-	private final java.util.List<EventProducer>	producers	= new LinkedList<EventProducer>();
-	private final java.util.List<EventType>		types		= new LinkedList<EventType>();
-	private final java.util.List<String>		idles		= new LinkedList<String>();
-	private Button								btnNormalize;
-	private Spinner								spinnerTimeSlices;
-	private Spinner								maxEventProducers;
-	private Combo								comboAggOperator;
-	private Button								btnRun;
+	public static final String					PLUGIN_ID	= Activator.PLUGIN_ID;
 	private Button								btnMergeAggregatedParts;
-	private Button								btnShowNumbers;
-	private final OcelotlCore					core;
-	private final OcelotlParameters				params;
-	private MatrixView							matrix;
-	private TimeAxisView						timeAxis;
-	private QualityView							qualityView;
-	private Combo								comboTraces;
 
+	private Button								btnNormalize;
+	private Button								btnRun;
+	private Button								btnShowNumbers;
+	private Combo								comboAggregationOperator;
+	private Combo								comboTraces;
+	private final ConfDataLoader				confDataLoader		= new ConfDataLoader();
+	private HasChanged							hasChanged	= HasChanged.ALL;
+	private final java.util.List<String>		idles		= new LinkedList<String>();
+	private List								listParameters;
+	private ListViewer							listViewerIdleStates;
+	private ListViewer							listViewerEventProducers;
+	private ListViewer							listViewerEventTypes;
+	private MatrixView							matrixView;
+	private final OcelotlCore					ocelotlCore;
+	private final OcelotlParameters				ocelotlParameters;
+	private Text								textRun;
+	private final java.util.List<EventProducer>	producers	= new LinkedList<EventProducer>();
+	private QualityView							qualityView;
+	private Spinner								spinnerDivideDbQuery;
+	private Spinner								spinnerTSNumber;
+	private Text								textThreshold;
+	private TimeAxisView						timeAxisView;
+	private Text								textTimestampEnd;
+	private Text								textTimestampStart;
 	final Map<Integer, Trace>					traceMap	= new HashMap<Integer, Trace>();
+	private final java.util.List<EventType>		types		= new LinkedList<EventType>();
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
 		try {
-			loader.loadTraces();
+			confDataLoader.loadTraces();
 		} catch (final SoCTraceException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
-		params = new OcelotlParameters();
-		core = new OcelotlCore(params);
+		ocelotlParameters = new OcelotlParameters();
+		ocelotlCore = new OcelotlCore(ocelotlParameters);
 	}
 
 	private void cleanAll() {
 		hasChanged = HasChanged.ALL;
-		threshold.setText("0.001");
-		timestampStart.setText("0");
-		timestampEnd.setText("0");
+		textThreshold.setText("0.001");
+		textTimestampStart.setText("0");
+		textTimestampEnd.setText("0");
 		btnNormalize.setSelection(false);
-		spinnerTimeSlices.setSelection(20);
-		maxEventProducers.setSelection(0);
-		param.setText("0");
+		spinnerTSNumber.setSelection(200);
+		spinnerDivideDbQuery.setSelection(0);
+		textRun.setText("0");
 		btnMergeAggregatedParts.setSelection(true);
-		// lists
 		producers.clear();
 		types.clear();
 		idles.clear();
-		listViewerProducers.setInput(producers);
-		listViewerTypes.setInput(types);
-		listViewerIdles.setInput(idles);
+		listViewerEventProducers.setInput(producers);
+		listViewerEventTypes.setInput(types);
+		listViewerIdleStates.setInput(idles);
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		// Highest Component
-		final SashForm sashForm = new SashForm(parent, SWT.VERTICAL);
-
-		matrix = new MatrixView();
-
-		timeAxis = new TimeAxisView();
-
+		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
+		matrixView = new MatrixView();
+		timeAxisView = new TimeAxisView();
 		qualityView = new QualityView(this);
-		// sashForm.setWeights(new int[] {220, 295});
+		final SashForm sashFormView = new SashForm(sashFormGlobal, SWT.BORDER | SWT.VERTICAL);
+		sashFormView.setSashWidth(1);
+		final Composite compositeMatrixView = new Composite(sashFormView, SWT.NONE);
+		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		final GridLayout gl_compositeMatrixView = new GridLayout();
+		compositeMatrixView.setLayout(gl_compositeMatrixView);
+		compositeMatrixView.setSize(500, 500);
+		final Canvas canvasMatrixView = matrixView.initDiagram(compositeMatrixView);
+		canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
+		final Composite compositeTimeAxisView = new Composite(sashFormView, SWT.NONE);
+		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		final GridLayout gl_compositeTimeAxisView = new GridLayout();
+		compositeTimeAxisView.setLayout(gl_compositeTimeAxisView);
+		final Canvas canvasTimeAxisView = timeAxisView.initDiagram(compositeTimeAxisView);
+		sashFormView.setWeights(new int[] { 125, 36 });
 
-		final SashForm sashForm_5 = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
-		sashForm_5.setSashWidth(1);
-		// @SuppressWarnings("unused")
-		final Composite compositeVisu = new Composite(sashForm_5, SWT.NONE);
-		compositeVisu.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		compositeVisu.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		// compositeVisu.setToolTipText("test");
-		final GridLayout gl_compositeVisu = new GridLayout();
-		compositeVisu.setLayout(gl_compositeVisu);
-		compositeVisu.setSize(500, 500);
-		final Canvas canvas = matrix.initDiagram(compositeVisu);
-		canvas.setLayoutData(new GridData(GridData.FILL_BOTH));
-		final Composite composite_4 = new Composite(sashForm_5, SWT.NONE);
-		composite_4.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		// TODO right proportions
-		final GridLayout gl_compositeTime = new GridLayout();
-		composite_4.setLayout(gl_compositeTime);
-		final Canvas canvas2 = timeAxis.initDiagram(composite_4);
-		sashForm_5.setWeights(new int[] { 125, 36 });
-
-		final TabFolder tabFolder = new TabFolder(sashForm, SWT.NONE);
+		final TabFolder tabFolder = new TabFolder(sashFormGlobal, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
 		final TabItem tbtmTraceParameters = new TabItem(tabFolder, SWT.NONE);
 		tbtmTraceParameters.setText("Trace Parameters");
 
-		final SashForm sashForm_3 = new SashForm(tabFolder, SWT.VERTICAL);
-		tbtmTraceParameters.setControl(sashForm_3);
+		final SashForm sashFormTraceParameter = new SashForm(tabFolder, SWT.VERTICAL);
+		tbtmTraceParameters.setControl(sashFormTraceParameter);
 
-		final Composite composite_2 = new Composite(sashForm_3, SWT.NONE);
-		composite_2.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
-		composite_2.setLayout(new GridLayout(1, false));
-		comboTraces = new Combo(composite_2, SWT.READ_ONLY);
+		final Composite sashFormComboTrace = new Composite(sashFormTraceParameter, SWT.NONE);
+		sashFormComboTrace.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
+		sashFormComboTrace.setLayout(new GridLayout(1, false));
+		comboTraces = new Combo(sashFormComboTrace, SWT.READ_ONLY);
 		final GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
 		gd_comboTraces.widthHint = 327;
 		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
 		int index = 0;
-		for (final Trace t : loader.getTraces()) {
+		for (final Trace t : confDataLoader.getTraces()) {
 			comboTraces.add(t.getAlias(), index);
 			traceMap.put(index, t);
 			index++;
 		}
 		;
 
-		final SashForm sashForm_6 = new SashForm(sashForm_3, SWT.NONE);
-		final Group groupProducers = new Group(sashForm_6, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		groupProducers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupProducers.setText("Event Producers");
-		final GridLayout gl_groupProducers = new GridLayout(2, false);//
-		gl_groupProducers.horizontalSpacing = 0;
-		groupProducers.setLayout(gl_groupProducers);
+		final SashForm sashFormList = new SashForm(sashFormTraceParameter, SWT.NONE);
+		final Group groupEventProducers = new Group(sashFormList, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		groupEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupEventProducers.setText("Event Producers");
+		final GridLayout gl_groupEventProducers = new GridLayout(2, false);//
+		gl_groupEventProducers.horizontalSpacing = 0;
+		groupEventProducers.setLayout(gl_groupEventProducers);
 
-		listViewerProducers = new ListViewer(groupProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		listViewerProducers.setContentProvider(new ArrayContentProvider());
-		listViewerProducers.setLabelProvider(new EventProducerLabelProvider());
-		listViewerProducers.setComparator(new ViewerComparator());
-		final List listProd = listViewerProducers.getList();
-		listProd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		final GridData gd_listProd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_listProd.heightHint = 79;
-		gd_listProd.widthHint = 120;
-		listProd.setLayoutData(gd_listProd);
+		listViewerEventProducers = new ListViewer(groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		listViewerEventProducers.setContentProvider(new ArrayContentProvider());
+		listViewerEventProducers.setLabelProvider(new EventProducerLabelProvider());
+		listViewerEventProducers.setComparator(new ViewerComparator());
+		final List listEventProducers = listViewerEventProducers.getList();
+		listEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		final GridData gd_listEventProducers = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_listEventProducers.heightHint = 79;
+		gd_listEventProducers.widthHint = 120;
+		listEventProducers.setLayoutData(gd_listEventProducers);
 
-		final ScrolledComposite scrolledComposite = new ScrolledComposite(groupProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		scrolledComposite.setExpandHorizontal(true);
-		scrolledComposite.setExpandVertical(true);
+		final ScrolledComposite scrCompositeEventProducerButtons = new ScrolledComposite(groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrCompositeEventProducerButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		scrCompositeEventProducerButtons.setExpandHorizontal(true);
+		scrCompositeEventProducerButtons.setExpandVertical(true);
 
-		final Composite composite_1 = new Composite(scrolledComposite, SWT.NONE);
-		composite_1.setLayout(new GridLayout(1, false));
-		final Button btnAddProdFilter = new Button(composite_1, SWT.NONE);
-		btnAddProdFilter.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		btnAddProdFilter.setText("Add");
-		btnAddProdFilter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnAddProdFilter.setImage(null);
+		final Composite compositeEventProducerButtons = new Composite(scrCompositeEventProducerButtons, SWT.NONE);
+		compositeEventProducerButtons.setLayout(new GridLayout(1, false));
+		final Button btnAddEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
+		btnAddEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddEventProducer.setText("Add");
+		btnAddEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddEventProducer.setImage(null);
 
-		final Button btnAddAll = new Button(composite_1, SWT.NONE);
-		btnAddAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnAddAll.setText("Add All");
-		btnAddAll.setImage(null);
-		btnAddAll.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnAddAll.addSelectionListener(new AllFilterAdapter());
+		final Button btnAddAllEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
+		btnAddAllEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnAddAllEventProducer.setText("Add All");
+		btnAddAllEventProducer.setImage(null);
+		btnAddAllEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddAllEventProducer.addSelectionListener(new AddAllEventProducersAdapter());
 
-		final Button btnAddResult = new Button(composite_1, SWT.NONE);
+		final Button btnAddResult = new Button(compositeEventProducerButtons, SWT.NONE);
 		btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnAddResult.setText("Add Result");
 		btnAddResult.setImage(null);
 		btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnAddResult.addSelectionListener(new ResultsFilterAdapter());
-		final Button btnRemoveProd = new Button(composite_1, SWT.NONE);
-		btnRemoveProd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		btnRemoveProd.setText("Reset");
-		btnRemoveProd.addSelectionListener(new ResetSelectionAdapter(listViewerProducers));
-		btnRemoveProd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRemoveProd.setImage(null);
-		scrolledComposite.setContent(composite_1);
-		scrolledComposite.setMinSize(composite_1.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		btnAddProdFilter.addSelectionListener(new ProducersFilterAdapter());
-		final Group groupTypes = new Group(sashForm_6, SWT.NONE);
-		groupTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupTypes.setText("Event Types");
-		final GridLayout gl_groupTypes = new GridLayout(2, false);
-		gl_groupTypes.horizontalSpacing = 0;
-		groupTypes.setLayout(gl_groupTypes);
+		btnAddResult.addSelectionListener(new AddResultsEventProducersAdapter());
+		final Button btnRemoveEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
+		btnRemoveEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnRemoveEventProducer.setText("Reset");
+		btnRemoveEventProducer.addSelectionListener(new ResetSelectionAdapter(listViewerEventProducers));
+		btnRemoveEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRemoveEventProducer.setImage(null);
+		scrCompositeEventProducerButtons.setContent(compositeEventProducerButtons);
+		scrCompositeEventProducerButtons.setMinSize(compositeEventProducerButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		btnAddEventProducer.addSelectionListener(new AddEventProducersAdapter());
+		final Group groupEventTypes = new Group(sashFormList, SWT.NONE);
+		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupEventTypes.setText("Event Types");
+		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
+		gl_groupEventTypes.horizontalSpacing = 0;
+		groupEventTypes.setLayout(gl_groupEventTypes);
 
-		listViewerTypes = new ListViewer(groupTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		listViewerTypes.setContentProvider(new ArrayContentProvider());
-		listViewerTypes.setLabelProvider(new EventTypeLabelProvider());
-		listViewerTypes.setComparator(new ViewerComparator());
-		final List listTypes = listViewerTypes.getList();
-		listTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		listTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		listViewerEventTypes = new ListViewer(groupEventTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		listViewerEventTypes.setContentProvider(new ArrayContentProvider());
+		listViewerEventTypes.setLabelProvider(new EventTypeLabelProvider());
+		listViewerEventTypes.setComparator(new ViewerComparator());
+		final List listEventTypes = listViewerEventTypes.getList();
+		listEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		listEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		final ScrolledComposite scrolledComposite_1 = new ScrolledComposite(groupTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		scrolledComposite_1.setExpandHorizontal(true);
-		scrolledComposite_1.setExpandVertical(true);
+		final ScrolledComposite scrCompositeEventTypeButtons = new ScrolledComposite(groupEventTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrCompositeEventTypeButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		scrCompositeEventTypeButtons.setExpandHorizontal(true);
+		scrCompositeEventTypeButtons.setExpandVertical(true);
 
-		final Composite compositeBtnTypes = new Composite(scrolledComposite_1, SWT.NONE);
-		compositeBtnTypes.setLayout(new GridLayout(1, false));
+		final Composite compositeEventTypeButtons = new Composite(scrCompositeEventTypeButtons, SWT.NONE);
+		compositeEventTypeButtons.setLayout(new GridLayout(1, false));
 
-		final Button btnAddTypes = new Button(compositeBtnTypes, SWT.NONE);
-		btnAddTypes.setText("Add");
-		btnAddTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnAddTypes.setImage(null);
-		btnAddTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		btnAddTypes.addSelectionListener(new TypesSelectionAdapter());
+		final Button btnAddEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
+		btnAddEventTypes.setText("Add");
+		btnAddEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddEventTypes.setImage(null);
+		btnAddEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddEventTypes.addSelectionListener(new TypesSelectionAdapter());
 
-		final Button btnRemoveTypes = new Button(compositeBtnTypes, SWT.NONE);
-		btnRemoveTypes.setText("Remove");
-		btnRemoveTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRemoveTypes.setImage(null);
-		btnRemoveTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		scrolledComposite_1.setContent(compositeBtnTypes);
-		scrolledComposite_1.setMinSize(compositeBtnTypes.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		btnRemoveTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerTypes));
-		final Group groupIdle = new Group(sashForm_6, SWT.NONE);
-		groupIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupIdle.setText("Idle States");
-		final GridLayout gl_groupIdle = new GridLayout(2, false);
-		gl_groupIdle.horizontalSpacing = 0;
-		gl_groupIdle.verticalSpacing = 0;
-		groupIdle.setLayout(gl_groupIdle);
+		final Button btnRemoveEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
+		btnRemoveEventTypes.setText("Remove");
+		btnRemoveEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRemoveEventTypes.setImage(null);
+		btnRemoveEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		scrCompositeEventTypeButtons.setContent(compositeEventTypeButtons);
+		scrCompositeEventTypeButtons.setMinSize(compositeEventTypeButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		btnRemoveEventTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerEventTypes));
+		final Group groupIdleStates = new Group(sashFormList, SWT.NONE);
+		groupIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupIdleStates.setText("Idle States");
+		final GridLayout gl_groupIdleStates = new GridLayout(2, false);
+		gl_groupIdleStates.horizontalSpacing = 0;
+		gl_groupIdleStates.verticalSpacing = 0;
+		groupIdleStates.setLayout(gl_groupIdleStates);
 
-		listViewerIdles = new ListViewer(groupIdle, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		listViewerIdles.setContentProvider(new ArrayContentProvider());
-		listViewerIdles.setComparator(new ViewerComparator());
-		final List listIdle = listViewerIdles.getList();
-		final GridData gd_listIdle = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_listIdle.widthHint = 203;
-		listIdle.setLayoutData(gd_listIdle);
-		listIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		listViewerIdleStates = new ListViewer(groupIdleStates, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		listViewerIdleStates.setContentProvider(new ArrayContentProvider());
+		listViewerIdleStates.setComparator(new ViewerComparator());
+		final List listIdleStates = listViewerIdleStates.getList();
+		final GridData gd_listIdleStates = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_listIdleStates.widthHint = 203;
+		listIdleStates.setLayoutData(gd_listIdleStates);
+		listIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
-		final ScrolledComposite scrolledComposite_2 = new ScrolledComposite(groupIdle, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite_2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		scrolledComposite_2.setExpandHorizontal(true);
-		scrolledComposite_2.setExpandVertical(true);
+		final ScrolledComposite scrCompositeIdleStateButton = new ScrolledComposite(groupIdleStates, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrCompositeIdleStateButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		scrCompositeIdleStateButton.setExpandHorizontal(true);
+		scrCompositeIdleStateButton.setExpandVertical(true);
 
-		final Composite compositeBtnIdle = new Composite(scrolledComposite_2, SWT.NONE);
-		compositeBtnIdle.setLayout(new GridLayout(1, false));
+		final Composite compositeIdleStateButtons = new Composite(scrCompositeIdleStateButton, SWT.NONE);
+		compositeIdleStateButtons.setLayout(new GridLayout(1, false));
 
-		final Button btnAddIdle = new Button(compositeBtnIdle, SWT.NONE);
-		btnAddIdle.setText("Add");
-		btnAddIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnAddIdle.setImage(null);
-		btnAddIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		btnAddIdle.addSelectionListener(new IdlesSelectionAdapter());
+		final Button btnAddIdleStates = new Button(compositeIdleStateButtons, SWT.NONE);
+		btnAddIdleStates.setText("Add");
+		btnAddIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddIdleStates.setImage(null);
+		btnAddIdleStates.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddIdleStates.addSelectionListener(new IdlesSelectionAdapter());
 
-		final Button btnRemoveIdle = new Button(compositeBtnIdle, SWT.NONE);
+		final Button btnRemoveIdle = new Button(compositeIdleStateButtons, SWT.NONE);
 		btnRemoveIdle.setText("Remove");
 		btnRemoveIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRemoveIdle.setImage(null);
 		btnRemoveIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		scrolledComposite_2.setContent(compositeBtnIdle);
-		scrolledComposite_2.setMinSize(compositeBtnIdle.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdles));
-		sashForm_6.setWeights(new int[] { 1, 1, 1 });
-		sashForm_3.setWeights(new int[] { 23, 226 });
+		scrCompositeIdleStateButton.setContent(compositeIdleStateButtons);
+		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
+		sashFormList.setWeights(new int[] { 1, 1, 1 });
+		sashFormTraceParameter.setWeights(new int[] { 23, 226 });
 		comboTraces.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				cleanAll();
 				try {
-					loader.load(traceMap.get(comboTraces.getSelectionIndex()));
-					timestampStart.setText(String.valueOf(loader.getMinTimestamp()));
-					timestampEnd.setText(String.valueOf(loader.getMaxTimestamp()));
-					for (int i = 0; i < loader.getTypes().size(); i++)
-						if (loader.getTypes().get(i).getName().contains("PajeSetState")) {
-							types.add(loader.getTypes().get(i));
+					confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
+					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
+					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
+					for (int i = 0; i < confDataLoader.getTypes().size(); i++)
+						if (confDataLoader.getTypes().get(i).getName().contains("PajeSetState")) {
+							types.add(confDataLoader.getTypes().get(i));
 							break;
 						}
-					listViewerTypes.setInput(types);
+					listViewerEventTypes.setInput(types);
 					idles.add("IDLE");
-					listViewerIdles.setInput(idles);
+					listViewerIdleStates.setInput(idles);
 				} catch (final SoCTraceException e1) {
 					MessageDialog.openError(getSite().getShell(), "Exception", e1.getMessage());
 				}
 			}
 		});
 
-		final TabItem tbtmAggregationParameters = new TabItem(tabFolder, SWT.NONE);
-		tbtmAggregationParameters.setText("Time Aggregation Parameters");
+		final TabItem tbtmTimeAggregationParameters = new TabItem(tabFolder, SWT.NONE);
+		tbtmTimeAggregationParameters.setText("Time Aggregation Parameters");
 
-		final SashForm sashForm_1 = new SashForm(tabFolder, SWT.NONE);
-		tbtmAggregationParameters.setControl(sashForm_1);
+		final SashForm sashFormTimeAggregationParameters = new SashForm(tabFolder, SWT.NONE);
+		tbtmTimeAggregationParameters.setControl(sashFormTimeAggregationParameters);
 
-		final Group groupParameters = new Group(sashForm_1, SWT.NONE);
-		groupParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupParameters.setText("Time Slicing Parameters ");
-		groupParameters.setLayout(new GridLayout(1, false));
+		final Group groupTSParameters = new Group(sashFormTimeAggregationParameters, SWT.NONE);
+		groupTSParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupTSParameters.setText("Time Slicing Parameters ");
+		groupTSParameters.setLayout(new GridLayout(1, false));
 
-		final Group grpAggregationOperator = new Group(groupParameters, SWT.NONE);
-		grpAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpAggregationOperator.setText("Aggregation Operator");
-		grpAggregationOperator.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		grpAggregationOperator.setLayout(new GridLayout(1, false));
+		final Group groupAggregationOperator = new Group(groupTSParameters, SWT.NONE);
+		groupAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupAggregationOperator.setText("Aggregation Operator");
+		groupAggregationOperator.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		groupAggregationOperator.setLayout(new GridLayout(1, false));
 
-		final Composite composite = new Composite(grpAggregationOperator, SWT.NONE);
-		composite.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		composite.setLayout(new GridLayout(1, false));
-		final GridData gd_composite = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-		gd_composite.widthHint = 85;
-		composite.setLayoutData(gd_composite);
+		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
+		compositeAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		compositeAggregationOperator.setLayout(new GridLayout(1, false));
+		final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		gd_compositeAggregationOperator.widthHint = 85;
+		compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
 
-		comboAggOperator = new Combo(composite, SWT.READ_ONLY);
-		comboAggOperator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-		comboAggOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		comboAggOperator.addSelectionListener(new SelectionAdapter() {
+		comboAggregationOperator = new Combo(compositeAggregationOperator, SWT.READ_ONLY);
+		comboAggregationOperator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		comboAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		comboAggregationOperator.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				if (loader.getCurrentTrace() == null)
+				if (confDataLoader.getCurrentTrace() == null)
 					return;
 				hasChanged = HasChanged.ALL;
 			}
 		});
 		for (final String op : AggregationOperators.List)
-			comboAggOperator.add(op);
-		comboAggOperator.setText(AggregationOperators.List.get(0));
+			comboAggregationOperator.add(op);
+		comboAggregationOperator.setText(AggregationOperators.List.get(0));
 
-		final Group groupTime = new Group(groupParameters, SWT.NONE);
-		final GridData gd_groupTime = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-		gd_groupTime.widthHint = 200;
-		groupTime.setLayoutData(gd_groupTime);
-		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupTime.setText("Time Interval");
-		groupTime.setLayout(new GridLayout(2, false));
+		final Group groupTimeInterval = new Group(groupTSParameters, SWT.NONE);
+		final GridData gd_groupTimeInterval = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		gd_groupTimeInterval.widthHint = 200;
+		groupTimeInterval.setLayoutData(gd_groupTimeInterval);
+		groupTimeInterval.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupTimeInterval.setText("Time Interval");
+		groupTimeInterval.setLayout(new GridLayout(2, false));
 
-		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
+		final Label lblStartTimestamp = new Label(groupTimeInterval, SWT.NONE);
 		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblStartTimestamp.setText("Start Timestamp");
 
-		timestampStart = new Text(groupTime, SWT.BORDER);
-		timestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		timestampStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		timestampStart.addModifyListener(new ConfModificationListener());
+		textTimestampStart = new Text(groupTimeInterval, SWT.BORDER);
+		textTimestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		textTimestampStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textTimestampStart.addModifyListener(new ConfModificationListener());
 
-		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
+		final Label lblEndTimestamp = new Label(groupTimeInterval, SWT.NONE);
 		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblEndTimestamp.setText("End Timestamp");
 
-		timestampEnd = new Text(groupTime, SWT.BORDER);
-		timestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		timestampEnd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		timestampEnd.addModifyListener(new ConfModificationListener());
-		final Composite compositeNormalize = new Composite(groupParameters, SWT.NONE);
-		compositeNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		compositeNormalize.setLayout(new GridLayout(2, false));
-		compositeNormalize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		textTimestampEnd = new Text(groupTimeInterval, SWT.BORDER);
+		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		textTimestampEnd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textTimestampEnd.addModifyListener(new ConfModificationListener());
+		final Composite compositeTSNumber = new Composite(groupTSParameters, SWT.NONE);
+		compositeTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		compositeTSNumber.setLayout(new GridLayout(2, false));
+		compositeTSNumber.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
-		final Label lblNumberOfTime = new Label(compositeNormalize, SWT.NONE);
-		lblNumberOfTime.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
-		lblNumberOfTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblNumberOfTime.setText("Number of time slices");
+		final Label lblTSNumber = new Label(compositeTSNumber, SWT.NONE);
+		lblTSNumber.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		lblTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblTSNumber.setText("Number of time slices");
 
-		spinnerTimeSlices = new Spinner(compositeNormalize, SWT.BORDER);
-		final GridData gd_spinnerTimeSlices = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
-		gd_spinnerTimeSlices.widthHint = 36;
-		spinnerTimeSlices.setLayoutData(gd_spinnerTimeSlices);
-		spinnerTimeSlices.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerTimeSlices.setMaximum(10000);
-		spinnerTimeSlices.setMinimum(1);
-		spinnerTimeSlices.setSelection(200);
-		spinnerTimeSlices.addModifyListener(new ConfModificationListener());
-		final Group groupDichotomy = new Group(sashForm_1, SWT.NONE);
-		groupDichotomy.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupDichotomy.setLayout(new GridLayout(1, false));
-		groupDichotomy.setText("Get Best-Cut Partition Gain/Loss Parameter List");
+		spinnerTSNumber = new Spinner(compositeTSNumber, SWT.BORDER);
+		final GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		gd_spinnerTSNumber.widthHint = 36;
+		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
+		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		spinnerTSNumber.setMaximum(10000);
+		spinnerTSNumber.setMinimum(1);
+		spinnerTSNumber.setSelection(200);
+		spinnerTSNumber.addModifyListener(new ConfModificationListener());
+		final Group groupLPAParameters = new Group(sashFormTimeAggregationParameters, SWT.NONE);
+		groupLPAParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupLPAParameters.setLayout(new GridLayout(1, false));
+		groupLPAParameters.setText("Get Best-Cut Partition Gain/Loss Parameter List");
 
-		btnNormalize = new Button(groupDichotomy, SWT.CHECK);
+		btnNormalize = new Button(groupLPAParameters, SWT.CHECK);
 		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnNormalize.setSelection(false);
 		btnNormalize.setText("Normalize Qualities");
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 
-		final Composite composite_3 = new Composite(groupDichotomy, SWT.NONE);
-		composite_3.setLayout(new GridLayout(3, false));
-		composite_3.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		final Composite compositeGetParameters = new Composite(groupLPAParameters, SWT.NONE);
+		compositeGetParameters.setLayout(new GridLayout(3, false));
+		compositeGetParameters.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
-		final Label lblThreshold = new Label(composite_3, SWT.NONE);
+		final Label lblThreshold = new Label(compositeGetParameters, SWT.NONE);
 		lblThreshold.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblThreshold.setText("Threshold");
 
-		threshold = new Text(composite_3, SWT.BORDER);
-		final GridData gd_threshold = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_threshold.widthHint = 342;
-		threshold.setLayoutData(gd_threshold);
-		threshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		final Button btnRun_1 = new Button(composite_3, SWT.NONE);
-		btnRun_1.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRun_1.setText("Get");
+		textThreshold = new Text(compositeGetParameters, SWT.BORDER);
+		final GridData gd_textThreshold = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_textThreshold.widthHint = 342;
+		textThreshold.setLayoutData(gd_textThreshold);
+		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		final Button btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
+		btnGetParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnGetParameters.setText("Get");
 
-		final Group group = new Group(groupDichotomy, SWT.NONE);
-		group.setLayout(new GridLayout(2, false));
-		final GridData gd_group = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_group.heightHint = 119;
-		gd_group.widthHint = 277;
-		group.setLayoutData(gd_group);
+		final Group groupParameters = new Group(groupLPAParameters, SWT.NONE);
+		groupParameters.setLayout(new GridLayout(2, false));
+		final GridData gd_groupParameters = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_groupParameters.heightHint = 119;
+		gd_groupParameters.widthHint = 277;
+		groupParameters.setLayoutData(gd_groupParameters);
 
-		list = new List(group, SWT.BORDER | SWT.V_SCROLL);
-		list.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		listParameters = new List(groupParameters, SWT.BORDER | SWT.V_SCROLL);
+		listParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		final GridData gd_list = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_list.heightHint = 132;
 		gd_list.widthHint = 330;
-		list.setLayoutData(gd_list);
-		new Label(group, SWT.NONE);
-		final Group groupAggreg = new Group(group, SWT.NONE);
-		groupAggreg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		groupAggreg.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupAggreg.setLayout(new GridLayout(3, false));
-		groupAggreg.setText("Perform Best-Cut Partition");
+		listParameters.setLayoutData(gd_list);
+		new Label(groupParameters, SWT.NONE);
+		final Group groupRun = new Group(groupParameters, SWT.NONE);
+		groupRun.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		groupRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupRun.setLayout(new GridLayout(3, false));
+		groupRun.setText("Perform Best-Cut Partition");
 
-		final Label lblParam = new Label(groupAggreg, SWT.NONE);
-		lblParam.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblParam.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblParam.setText("Gain/loss parameter");
+		final Label lblRun = new Label(groupRun, SWT.NONE);
+		lblRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblRun.setText("Gain/loss parameter");
 
-		param = new Text(groupAggreg, SWT.BORDER);
-		param.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		param.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		param.addModifyListener(new ParamModificationListener());
-		btnRun = new Button(groupAggreg, SWT.NONE);
+		textRun = new Text(groupRun, SWT.BORDER);
+		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		textRun.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textRun.addModifyListener(new ParameterModifyListener());
+		btnRun = new Button(groupRun, SWT.NONE);
 		btnRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRun.setText("Process");
-		btnRun.addSelectionListener(new RunSelectionListener());
-		new Label(group, SWT.NONE);
-		list.addSelectionListener(new SelectSelectionListener());
+		btnRun.addSelectionListener(new GetAggregationAdapter());
+		new Label(groupParameters, SWT.NONE);
+		listParameters.addSelectionListener(new SelectSelectionAdapter());
 
-		final Composite composite_5 = new Composite(sashForm_1, SWT.NONE);
-		composite_5.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		composite_5.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		final Composite compositeQualityView = new Composite(sashFormTimeAggregationParameters, SWT.NONE);
+		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		// compositeVisu.setToolTipText("test");
-		final GridLayout gl_compositeQuality = new GridLayout();
-		composite_5.setLayout(gl_compositeQuality);
-		final Canvas canvas3 = qualityView.initDiagram(composite_5);
-		canvas3.setLayoutData(new GridData(GridData.FILL_BOTH));
-		sashForm_1.setWeights(new int[] { 97, 153, 332 });
+		final GridLayout gl_compositeQualityView = new GridLayout();
+		compositeQualityView.setLayout(gl_compositeQualityView);
+		final Canvas canvasQualityView = qualityView.initDiagram(compositeQualityView);
+		canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashFormTimeAggregationParameters.setWeights(new int[] { 97, 153, 332 });
 
-		btnRun_1.addSelectionListener(new DichotomySelectionListener());
-		threshold.addModifyListener(new ThresholdModificationListener());
+		btnGetParameters.addSelectionListener(new GetParametersAdapter());
+		textThreshold.addModifyListener(new ThresholdModifyListener());
 
-		final TabItem tbtmSystemConfiguration = new TabItem(tabFolder, 0);
-		tbtmSystemConfiguration.setText("Advanced Parameters");
+		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
+		tbtmAdvancedParameters.setText("Advanced Parameters");
 
-		final SashForm sashForm_4 = new SashForm(tabFolder, SWT.VERTICAL);
-		sashForm_4.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		tbtmSystemConfiguration.setControl(sashForm_4);
+		final SashForm sashFormAdvancedParameters = new SashForm(tabFolder, SWT.VERTICAL);
+		sashFormAdvancedParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		tbtmAdvancedParameters.setControl(sashFormAdvancedParameters);
 
-		final Group grpEventProducersMax = new Group(sashForm_4, SWT.NONE);
-		grpEventProducersMax.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpEventProducersMax.setText("Memory Management");
-		grpEventProducersMax.setLayout(new GridLayout(2, false));
+		final Group grpDivideDbQuery = new Group(sashFormAdvancedParameters, SWT.NONE);
+		grpDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		grpDivideDbQuery.setText("Memory Management");
+		grpDivideDbQuery.setLayout(new GridLayout(2, false));
 
-		final Label lblDivideDbQueries = new Label(grpEventProducersMax, SWT.NONE);
+		final Label lblDivideDbQueries = new Label(grpDivideDbQuery, SWT.NONE);
 		lblDivideDbQueries.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblDivideDbQueries.setText("Divide DB query (Event Producers per query, inactive if 0)");
 
-		maxEventProducers = new Spinner(grpEventProducersMax, SWT.BORDER);
-		maxEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
-		final GridData gd_maxEventProducers = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
-		gd_maxEventProducers.widthHint = 99;
-		maxEventProducers.setLayoutData(gd_maxEventProducers);
-		maxEventProducers.addModifyListener(new ConfModificationListener());
-		maxEventProducers.setMinimum(0);
-		maxEventProducers.setSelection(0);
+		spinnerDivideDbQuery = new Spinner(grpDivideDbQuery, SWT.BORDER);
+		spinnerDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
+		final GridData gd_spinnerDivideDbQuery = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		gd_spinnerDivideDbQuery.widthHint = 99;
+		spinnerDivideDbQuery.setLayoutData(gd_spinnerDivideDbQuery);
+		spinnerDivideDbQuery.addModifyListener(new ConfModificationListener());
+		spinnerDivideDbQuery.setMinimum(0);
+		spinnerDivideDbQuery.setSelection(0);
 
-		final Group grpVisualizationSettings = new Group(sashForm_4, SWT.NONE);
+		final Group grpVisualizationSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
 		grpVisualizationSettings.setText("Visualization settings");
 		grpVisualizationSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		grpVisualizationSettings.setLayout(new GridLayout(1, false));
@@ -949,9 +938,9 @@ public class OcelotlView extends ViewPart {
 		btnShowNumbers.setText("Show Part Numbers");
 		btnShowNumbers.setSelection(false);
 		btnShowNumbers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		sashForm_4.setWeights(new int[] { 112, 374 });
-		sashForm.setWeights(new int[] { 172, 286 });
-		canvas2.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
+		sashFormGlobal.setWeights(new int[] { 172, 286 });
+		canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// clean all
 		cleanAll();
@@ -963,36 +952,36 @@ public class OcelotlView extends ViewPart {
 	}
 
 	public OcelotlCore getCore() {
-		return core;
+		return ocelotlCore;
 	}
 
 	public List getList() {
-		return list;
+		return listParameters;
 	}
 
 	public Text getParam() {
-		return param;
+		return textRun;
 	}
 
 	public OcelotlParameters getParams() {
-		return params;
+		return ocelotlParameters;
 	}
 
 	public void setConfiguration() {
 
-		params.setTrace(loader.getCurrentTrace());
-		params.setEventProducers(producers);
-		params.setEventTypes(types);
-		params.setSleepingStates(idles);
-		params.setNormalize(btnNormalize.getSelection());
-		params.setTimeSlicesNumber(spinnerTimeSlices.getSelection());
-		params.setMaxEventProducers(maxEventProducers.getSelection());
-		params.setAggOperator(comboAggOperator.getText());
+		ocelotlParameters.setTrace(confDataLoader.getCurrentTrace());
+		ocelotlParameters.setEventProducers(producers);
+		ocelotlParameters.setEventTypes(types);
+		ocelotlParameters.setSleepingStates(idles);
+		ocelotlParameters.setNormalize(btnNormalize.getSelection());
+		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
+		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
+		ocelotlParameters.setAggOperator(comboAggregationOperator.getText());
 		// TODO manage number format exception
 		try {
-			params.setThreshold(Double.valueOf(threshold.getText()).floatValue());
-			params.setParameter(Double.valueOf(param.getText()).floatValue());
-			params.setTimeRegion(new TimeRegion(Long.valueOf(timestampStart.getText()), Long.valueOf(timestampEnd.getText())));
+			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());
+			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());
+			ocelotlParameters.setTimeRegion(new TimeRegion(Long.valueOf(textTimestampStart.getText()), Long.valueOf(textTimestampEnd.getText())));
 		} catch (final NumberFormatException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
