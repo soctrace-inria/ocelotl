@@ -1,0 +1,73 @@
+/* ===========================================================
+ * LPAggreg core module
+ * =====================================================================
+ * 
+ * This module is a FrameSoC plug in which enables to visualize a Paje
+ * trace across an aggregated representation.
+ *
+ * (C) Copyright 2013 INRIA
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ */
+
+package fr.inria.soctrace.tools.ocelotl.core;
+
+import java.util.Map;
+
+import fr.inria.soctrace.lib.model.Event;
+import fr.inria.soctrace.lib.model.EventProducer;
+
+public class State {
+
+	private String				stateType	= null;
+	private TimeRegion			timeRegion;
+	private EventProducer		eventProducer;
+	private Event				eventStart;
+	private Event				eventEnd;
+	private TimeSliceManager	timeSliceManager;
+
+	public State(Event eventStart, Event eventEnd, TimeSliceManager timeSliceManager) {// TODO use TimeRegion
+		super();
+		this.eventStart = eventStart;
+		this.eventEnd = eventEnd;
+		timeRegion = new TimeRegion(eventStart.getTimestamp(), eventEnd.getTimestamp());
+		eventProducer = eventStart.getEventProducer();
+		for (int i = 0; i < eventStart.getType().getEventParamTypes().size(); i++)
+			if (eventStart.getType().getEventParamTypes().get(i).getName().equals("Value")) {
+				stateType = eventStart.getEventParams().get(i).getValue();
+				break;
+			}
+		this.timeSliceManager = timeSliceManager;
+	}
+
+	public Event getEventEnd() {
+		return eventEnd;
+	}
+
+	public EventProducer getEventProducer() {
+		return eventProducer;
+	}
+
+	public Event getEventStart() {
+		return eventStart;
+	}
+
+	public String getStateType() {
+		return stateType;
+	}
+
+	public TimeRegion getTimeRegion() {
+		return timeRegion;
+	}
+
+	public Map<Long, Long> getTimeSlicesDistribution() {
+		return timeSliceManager.getTimeSlicesDistribution(timeRegion);
+	}
+
+}

@@ -4,24 +4,24 @@
    <extension
          point="org.eclipse.ui.views">
       <category
-            id="fr.inria.soctrace.tools.paje.lpaggreg.ui.category"
-            name="Paje Tools">
+            id="fr.inria.soctrace.tools.ocelotl.ui.category"
+            name="Ocelotl">
       </category>
       <view
-            category="fr.inria.soctrace.tools.paje.lpaggreg.ui.category"
-            class="fr.inria.soctrace.tools.paje.lpaggreg.ui.views.LPAggregView"
+            category="fr.inria.soctrace.tools.ocelotl.ui.category"
+            class="fr.inria.soctrace.tools.ocelotl.ui.views.LPAggregView"
             icon="icons/1366759976_white_tiger.png"
-            id="fr.inria.soctrace.tools.paje.lpaggreg.ui.LPAggregView"
-            name="LP Aggregation"
+            id="fr.inria.soctrace.tools.ocelotl.ui.LPAggregView"
+            name="Ocelotl"
             restorable="true">
       </view>
    </extension>
    <extension
          point="fr.inria.soctrace.framesoc.core.tool">
       <tool
-            class="fr.inria.soctrace.tools.paje.lpaggreg.ui.LPAggregTool"
+            class="fr.inria.soctrace.tools.ocelotl.ui.LPAggregTool"
             doc="No launching arguments needed."
-            name="LP Aggregation Tool"
+            name="Ocelotl"
             type="ANALYSIS">
       </tool>
    </extension>
