@@ -9,7 +9,7 @@
       </category>
       <view
             category="fr.inria.soctrace.tools.ocelotl.ui.category"
-            class="fr.inria.soctrace.tools.ocelotl.ui.views.LPAggregView"
+            class="fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView"
             icon="icons/1366759976_white_tiger.png"
             id="fr.inria.soctrace.tools.ocelotl.ui.LPAggregView"
             name="Ocelotl"
@@ -19,7 +19,7 @@
    <extension
          point="fr.inria.soctrace.framesoc.core.tool">
       <tool
-            class="fr.inria.soctrace.tools.ocelotl.ui.LPAggregTool"
+            class="fr.inria.soctrace.tools.ocelotl.ui.OcelotlTool"
             doc="No launching arguments needed."
             name="Ocelotl"
             type="ANALYSIS">

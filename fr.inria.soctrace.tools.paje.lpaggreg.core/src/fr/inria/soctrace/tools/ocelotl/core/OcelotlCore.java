@@ -43,39 +43,38 @@ public class OcelotlCore {
 		return TEST;
 	}
 
-	OcelotlParameters	lpaggregParameters;
+	OcelotlParameters	ocelotlParameters;
 	Query				query;
 	ILPAggregManager	lpaggregManager;
-	PartManager		partManager;
+	PartManager			partManager;
 
 	public OcelotlCore() {
 		super();
 	}
 
-	public OcelotlCore(OcelotlParameters lpaggregParameters) throws SoCTraceException {
+	public OcelotlCore(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
 		super();
-		init(lpaggregParameters);
+		init(ocelotlParameters);
 	}
 
-	public void compute(HasChanged hasChanged) throws SoCTraceException {
-		if (hasChanged == HasChanged.ALL){
-			if (lpaggregParameters.getAggOperator().equals(AggregationOperators.ActivityTime))
+	public void compute(final HasChanged hasChanged) throws SoCTraceException {
+		if (hasChanged == HasChanged.ALL)
+			if (ocelotlParameters.getAggOperator().equals(AggregationOperators.ActivityTime))
 				lpaggregManager = new VLPAggregManager(new ActivityTimeMatrix(query));
-			else if (lpaggregParameters.getAggOperator().equals(AggregationOperators.ActivityTimeProbabilityDistribution))
+			else if (ocelotlParameters.getAggOperator().equals(AggregationOperators.ActivityTimeProbabilityDistribution))
 				lpaggregManager = new VLPAggregManager(new ActivityTimeProbabilityDistributionMatrix(query));
-			else if (lpaggregParameters.getAggOperator().equals(AggregationOperators.ActivityTimeByStateType))
+			else if (ocelotlParameters.getAggOperator().equals(AggregationOperators.ActivityTimeByStateType))
 				lpaggregManager = new MLPAggregManager(new ActivityTimeCubicMatrix(query));
 			else
-				lpaggregManager = new VLPAggregManager(new ActivityTimeMatrix(query)); //default
-			//vectors.print();
-		}
+				lpaggregManager = new VLPAggregManager(new ActivityTimeMatrix(query)); // default
+		// vectors.print();
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE)
 			lpaggregManager.computeQualities();
-		//TODO clean dicho & parts
+		// TODO clean dicho & parts
 
 	}
 
-	public void computeDichotomy(HasChanged hasChanged) throws SoCTraceException {
+	public void computeDichotomy(final HasChanged hasChanged) throws SoCTraceException {
 		compute(hasChanged);
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
 			lpaggregManager.computeDichotomy();
@@ -84,18 +83,7 @@ public class OcelotlCore {
 
 	}
 
-//	public void computeEqParts(HasChanged hasChanged) throws SoCTraceException {
-//		compute(hasChanged);
-//		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.PARAMETER || hasChanged == HasChanged.EQ) {
-//			lpaggregManager.computeParts();
-//			lpaggregManager.printParts();
-//			//partManager = new PartManager(lpaggregManager);
-//		}
-//		lpaggregManager.computeEqParts();
-//		lpaggregManager.printParts();
-//	}
-
-	public void computeParts(HasChanged hasChanged) throws SoCTraceException {
+	public void computeParts(final HasChanged hasChanged) throws SoCTraceException {
 		compute(hasChanged);
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.PARAMETER) {
 			lpaggregManager.computeParts();
@@ -110,8 +98,8 @@ public class OcelotlCore {
 		return lpaggregManager;
 	}
 
-	public OcelotlParameters getLpaggregParameters() {
-		return lpaggregParameters;
+	public OcelotlParameters getOcelotlParameters() {
+		return ocelotlParameters;
 	}
 
 	public PartManager getPartsManager() {
@@ -122,17 +110,13 @@ public class OcelotlCore {
 		return query;
 	}
 
-//	public ITimeSliceMatrix getMatrix() {
-//		return lpaggregManager.get;
-//	}
-
-	public void init(OcelotlParameters lpaggregParameters) throws SoCTraceException {
-		setLpaggregParameters(lpaggregParameters);
-		query = new Query(lpaggregParameters);
+	public void init(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
+		setOcelotlParameters(ocelotlParameters);
+		query = new Query(ocelotlParameters);
 	}
 
-	public void setLpaggregParameters(OcelotlParameters lpaggregParameters) {
-		this.lpaggregParameters = lpaggregParameters;
+	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {
+		this.ocelotlParameters = ocelotlParameters;
 	}
 
 }

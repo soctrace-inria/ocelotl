@@ -27,15 +27,15 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class TimeSliceManager {
 
-	private List<TimeSlice>	timeSlices	= new ArrayList<TimeSlice>();
-	private TimeRegion		timeRegion;
-	private long			slicesNumber;
+	private final List<TimeSlice>	timeSlices	= new ArrayList<TimeSlice>();
+	private final TimeRegion		timeRegion;
+	private long					slicesNumber;
 
-	private long			sliceDuration;
+	private long					sliceDuration;
 
-	public TimeSliceManager(TimeRegion timeRegion, long slicesNumber) {// TODO
-																		// use
-																		// region
+	public TimeSliceManager(final TimeRegion timeRegion, final long slicesNumber) {// TODO
+		// use
+		// region
 		super();
 		this.timeRegion = timeRegion;
 		this.slicesNumber = slicesNumber;
@@ -61,11 +61,11 @@ public class TimeSliceManager {
 		return timeSlices;
 	}
 
-	public Map<Long, Long> getTimeSlicesDistribution(TimeRegion testedTimeRegion) {
-		Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
+	public Map<Long, Long> getTimeSlicesDistribution(final TimeRegion testedTimeRegion) {
+		final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
 		long startSlice = 0;
 		long temp = 0;
-		for (TimeSlice it : timeSlices)
+		for (final TimeSlice it : timeSlices)
 			if (it.startIsInsideMe(testedTimeRegion.getTimeStampStart())) {
 				startSlice = it.getNumber();
 				break;
@@ -84,7 +84,7 @@ public class TimeSliceManager {
 		System.out.println("TimeSliceManager: " + slicesNumber + " slices, " + sliceDuration + " ns duration");
 	}
 
-	public void setValues(List<Integer> values) {
+	public void setValues(final List<Integer> values) {
 		for (int i = 0; i < values.size(); i++)
 			timeSlices.get(i).setValue(values.get(i));
 	}

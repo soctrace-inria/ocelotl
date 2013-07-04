@@ -26,14 +26,16 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class State {
 
-	private String				stateType	= null;
-	private TimeRegion			timeRegion;
-	private EventProducer		eventProducer;
-	private Event				eventStart;
-	private Event				eventEnd;
-	private TimeSliceManager	timeSliceManager;
+	private String					stateType	= null;
+	private final TimeRegion		timeRegion;
+	private final EventProducer		eventProducer;
+	private final Event				eventStart;
+	private final Event				eventEnd;
+	private final TimeSliceManager	timeSliceManager;
 
-	public State(Event eventStart, Event eventEnd, TimeSliceManager timeSliceManager) {// TODO use TimeRegion
+	public State(final Event eventStart, final Event eventEnd, final TimeSliceManager timeSliceManager) {// TODO
+		// use
+		// TimeRegion
 		super();
 		this.eventStart = eventStart;
 		this.eventEnd = eventEnd;

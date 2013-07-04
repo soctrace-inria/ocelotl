@@ -21,20 +21,20 @@ package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class LPAggregManager implements ILPAggregManager{
+public abstract class LPAggregManager implements ILPAggregManager {
 
 	static {
 		try {
 			System.loadLibrary("lpaggregjni");
-		} catch (UnsatisfiedLinkError e) {
+		} catch (final UnsatisfiedLinkError e) {
 			System.err.println("Native code library failed to load. \n" + e);
 			System.exit(1);
 		}
 		System.err.println("Native code library loaded. \n");
 	}
 
-	protected List<Integer>		parts		= new ArrayList<Integer>();
-	protected List<Quality>		qualities	= new ArrayList<Quality>();
+	protected List<Integer>			parts		= new ArrayList<Integer>();
+	protected List<Quality>			qualities	= new ArrayList<Quality>();
 	protected List<Float>			parameters	= new ArrayList<Float>();
 	protected List<List<Boolean>>	eqMatrix;
 
@@ -42,43 +42,52 @@ public abstract class LPAggregManager implements ILPAggregManager{
 		super();
 	}
 
+	@Override
 	public abstract void computeDichotomy();
-	
+
+	@Override
 	public abstract void computeParts();
 
+	@Override
 	public abstract void computeQualities();
 
+	@Override
 	public abstract void fillVectors();
 
-	
-	public List<Quality> getQualities() {
-		return qualities;
-	}
-	
+	@Override
 	public List<Float> getParameters() {
 		return parameters;
 	}
 
+	@Override
 	public List<Integer> getParts() {
 		return parts;
 	}
 
+	@Override
+	public List<Quality> getQualities() {
+		return qualities;
+	}
+
+	@Override
 	public void printParameters() {
 		System.out.println();
 		System.out.println("Parameters :");
-		for (float i : parameters)
+		for (final float i : parameters)
 			System.out.print(i + " ");
 		System.out.println();
 	}
 
+	@Override
 	public void printParts() {
 		System.out.println();
 		System.out.println("Parts :");
-		for (int i : parts)
+		for (final int i : parts)
 			System.out.print(i + " ");
 		System.out.println();
 	}
 
+	@Override
 	public abstract void reset();
 
 }

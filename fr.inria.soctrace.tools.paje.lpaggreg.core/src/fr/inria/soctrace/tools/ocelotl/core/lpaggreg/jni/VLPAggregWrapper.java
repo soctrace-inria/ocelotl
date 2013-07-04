@@ -9,66 +9,71 @@
 package fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni;
 
 public class VLPAggregWrapper extends LPAggregWrapper {
-  private long swigCPtr;
+	protected static long getCPtr(final VLPAggregWrapper obj) {
+		return obj == null ? 0 : obj.swigCPtr;
+	}
 
-  protected VLPAggregWrapper(long cPtr, boolean cMemoryOwn) {
-    super(lpaggregJNI.VLPAggregWrapper_SWIGUpcast(cPtr), cMemoryOwn);
-    swigCPtr = cPtr;
-  }
+	private long	swigCPtr;
 
-  protected static long getCPtr(VLPAggregWrapper obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
+	public VLPAggregWrapper() {
+		this(lpaggregJNI.new_VLPAggregWrapper(), true);
+	}
 
-  protected void finalize() {
-    delete();
-  }
+	protected VLPAggregWrapper(final long cPtr, final boolean cMemoryOwn) {
+		super(lpaggregJNI.VLPAggregWrapper_SWIGUpcast(cPtr), cMemoryOwn);
+		swigCPtr = cPtr;
+	}
 
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        lpaggregJNI.delete_VLPAggregWrapper(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-    super.delete();
-  }
+	public void addToVector(final double element) {
+		lpaggregJNI.VLPAggregWrapper_addToVector__SWIG_0(swigCPtr, this, element);
+	}
 
-  public VLPAggregWrapper() {
-    this(lpaggregJNI.new_VLPAggregWrapper(), true);
-  }
+	public void addToVector(final double element, final int index) {
+		lpaggregJNI.VLPAggregWrapper_addToVector__SWIG_1(swigCPtr, this, element, index);
+	}
 
-  public void newVector() {
-    lpaggregJNI.VLPAggregWrapper_newVector(swigCPtr, this);
-  }
+	@Override
+	public void computeDichotomy(final float threshold) {
+		lpaggregJNI.VLPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
+	}
 
-  public void addToVector(double element) {
-    lpaggregJNI.VLPAggregWrapper_addToVector__SWIG_0(swigCPtr, this, element);
-  }
+	@Override
+	public void computeParts(final float parameter) {
+		lpaggregJNI.VLPAggregWrapper_computeParts(swigCPtr, this, parameter);
+	}
 
-  public void addToVector(double element, int index) {
-    lpaggregJNI.VLPAggregWrapper_addToVector__SWIG_1(swigCPtr, this, element, index);
-  }
+	@Override
+	public void computeQualities(final boolean normalization) {
+		lpaggregJNI.VLPAggregWrapper_computeQualities(swigCPtr, this, normalization);
+	}
 
-  public void computeQualities(boolean normalization) {
-    lpaggregJNI.VLPAggregWrapper_computeQualities(swigCPtr, this, normalization);
-  }
+	@Override
+	public synchronized void delete() {
+		if (swigCPtr != 0) {
+			if (swigCMemOwn) {
+				swigCMemOwn = false;
+				lpaggregJNI.delete_VLPAggregWrapper(swigCPtr);
+			}
+			swigCPtr = 0;
+		}
+		super.delete();
+	}
 
-  public void computeParts(float parameter) {
-    lpaggregJNI.VLPAggregWrapper_computeParts(swigCPtr, this, parameter);
-  }
+	@Override
+	protected void finalize() {
+		delete();
+	}
 
-  public void computeDichotomy(float threshold) {
-    lpaggregJNI.VLPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
-  }
+	public int getVectorNumber() {
+		return lpaggregJNI.VLPAggregWrapper_getVectorNumber(swigCPtr, this);
+	}
 
-  public int getVectorNumber() {
-    return lpaggregJNI.VLPAggregWrapper_getVectorNumber(swigCPtr, this);
-  }
+	public int getVectorSize() {
+		return lpaggregJNI.VLPAggregWrapper_getVectorSize(swigCPtr, this);
+	}
 
-  public int getVectorSize() {
-    return lpaggregJNI.VLPAggregWrapper_getVectorSize(swigCPtr, this);
-  }
+	public void newVector() {
+		lpaggregJNI.VLPAggregWrapper_newVector(swigCPtr, this);
+	}
 
 }

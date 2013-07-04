@@ -38,26 +38,14 @@ public class OcelotlParameters {
 	private float				threshold			= (float) 0.001;
 	private Trace				trace				= null;
 	private int					maxEventProducers	= 0;
-	private String 				aggOperator;
+	private String				aggOperator;
 
 	public OcelotlParameters() {
 		super();
 	}
 
-	public int getMaxEventProducers() {
-		return maxEventProducers;
-	}
-
-	public void setMaxEventProducers(int maxEventProducers) {
-		this.maxEventProducers = maxEventProducers;
-	}
-
 	public String getAggOperator() {
 		return aggOperator;
-	}
-
-	public void setAggOperator(String aggOperator) {
-		this.aggOperator = aggOperator;
 	}
 
 	public List<EventProducer> getEventProducers() {
@@ -66,6 +54,10 @@ public class OcelotlParameters {
 
 	public List<EventType> getEventTypes() {
 		return eventTypes;
+	}
+
+	public int getMaxEventProducers() {
+		return maxEventProducers;
 	}
 
 	public float getParameter() {
@@ -96,53 +88,56 @@ public class OcelotlParameters {
 		return normalize;
 	}
 
-	public void setEventProducers(List<EventProducer> eventProducers) {
+	public void setAggOperator(final String aggOperator) {
+		this.aggOperator = aggOperator;
+	}
+
+	public void setEventProducers(final List<EventProducer> eventProducers) {
 		this.eventProducers = eventProducers;
 	}
 
-	public void setEventTypes(List<EventType> eventTypes) {
+	public void setEventTypes(final List<EventType> eventTypes) {
 		this.eventTypes = eventTypes;
 	}
 
-	public void setNormalize(boolean normalize) {
+	public void setMaxEventProducers(final int maxEventProducers) {
+		this.maxEventProducers = maxEventProducers;
+	}
+
+	public void setNormalize(final boolean normalize) {
 		this.normalize = normalize;
 	}
 
-	public void setParameter(float parameter) {
+	public void setParameter(final float parameter) {
 		this.parameter = parameter;
 	}
 
-	public void setSleepingStates(List<String> sleepingStates) {
+	public void setSleepingStates(final List<String> sleepingStates) {
 		this.sleepingStates = sleepingStates;
 	}
 
-	public void setThreshold(float threshold) {
+	public void setThreshold(final float threshold) {
 		this.threshold = threshold;
 	}
 
-	public void setTimeRegion(TimeRegion timeRegion) {
+	public void setTimeRegion(final TimeRegion timeRegion) {
 		this.timeRegion = timeRegion;
 	}
 
-	public void setTimeSlicesNumber(int timeSlicesNumber) {
+	public void setTimeSlicesNumber(final int timeSlicesNumber) {
 		this.timeSlicesNumber = timeSlicesNumber;
 	}
 
-
-	public void setTrace(Trace trace) {
+	public void setTrace(final Trace trace) {
 		this.trace = trace;
 	}
-	
-	
 
 	@Override
-	public String toString() { //TODO update this
-		StringBuilder builder = new StringBuilder();
-		builder.append("OcelotlParameters \n[\neventProducers=").append(eventProducers).append("\neventTypes=").append(eventTypes).append("\nsleepingStates=").append(sleepingStates).append("\ntimeSlicesNumber=").append(timeSlicesNumber).append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold)
-		.append("\ntrace=").append(trace).append("\n]");
+	public String toString() { // TODO update this
+		final StringBuilder builder = new StringBuilder();
+		builder.append("OcelotlParameters \n[\neventProducers=").append(eventProducers).append("\neventTypes=").append(eventTypes).append("\nsleepingStates=").append(sleepingStates).append("\ntimeSlicesNumber=").append(timeSlicesNumber)
+				.append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold).append("\ntrace=").append(trace).append("\n]");
 		return builder.toString();
 	}
-
-	
 
 }

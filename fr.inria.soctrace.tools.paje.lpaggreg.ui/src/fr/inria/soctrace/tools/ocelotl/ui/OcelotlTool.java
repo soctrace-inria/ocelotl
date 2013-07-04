@@ -23,29 +23,29 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import fr.inria.soctrace.framesoc.core.tools.model.FramesocTool;
-import fr.inria.soctrace.tools.ocelotl.ui.views.LPAggregView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-/** 
+/**
  * The main tool class
  * 
- * @author "Generoso Pagano <generoso.pagano@inria.fr>" 
+ * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class LPAggregTool extends FramesocTool {
+public class OcelotlTool extends FramesocTool {
 
-	public LPAggregTool() {
+	public OcelotlTool() {
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
-	public void launch(String[] args) {
+	public void launch(final String[] args) {
 		System.out.println("Arguments");
-		for (String s : args)
+		for (final String s : args)
 			System.out.println(s);
 
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		try {
-			window.getActivePage().showView(LPAggregView.ID);
-		} catch (Exception e) {
+			window.getActivePage().showView(OcelotlView.ID);
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 

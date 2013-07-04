@@ -8,13 +8,21 @@ import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
 public interface ITimeSliceCubicMatrix {
-	public void initVectors() throws SoCTraceException;
 	public void computeVectors();
-	public void print();
-	public void setQueries(Query query);
-	public Query getQueries();
-	public TimeSliceManager getTimeSlicesManager();
-	public int getVectorSize();
-	public int getVectorsNumber();
+
 	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
+
+	public Query getQueries();
+
+	public TimeSliceManager getTimeSlicesManager();
+
+	public int getVectorSize();
+
+	public int getVectorsNumber();
+
+	public void initVectors() throws SoCTraceException;
+
+	public void print();
+
+	public void setQueries(Query query);
 }

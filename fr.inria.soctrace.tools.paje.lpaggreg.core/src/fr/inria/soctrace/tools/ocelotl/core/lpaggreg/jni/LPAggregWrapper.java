@@ -9,74 +9,76 @@
 package fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni;
 
 public class LPAggregWrapper {
-  private long swigCPtr;
-  protected boolean swigCMemOwn;
+	protected static long getCPtr(final LPAggregWrapper obj) {
+		return obj == null ? 0 : obj.swigCPtr;
+	}
 
-  protected LPAggregWrapper(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
+	private long		swigCPtr;
 
-  protected static long getCPtr(LPAggregWrapper obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
+	protected boolean	swigCMemOwn;
 
-  protected void finalize() {
-    delete();
-  }
+	protected LPAggregWrapper(final long cPtr, final boolean cMemoryOwn) {
+		swigCMemOwn = cMemoryOwn;
+		swigCPtr = cPtr;
+	}
 
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        lpaggregJNI.delete_LPAggregWrapper(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-  }
+	public void computeDichotomy(final float threshold) {
+		lpaggregJNI.LPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
+	}
 
-  public void computeQualities(boolean normalization) {
-    lpaggregJNI.LPAggregWrapper_computeQualities(swigCPtr, this, normalization);
-  }
+	public void computeParts(final float parameter) {
+		lpaggregJNI.LPAggregWrapper_computeParts(swigCPtr, this, parameter);
+	}
 
-  public void computeParts(float parameter) {
-    lpaggregJNI.LPAggregWrapper_computeParts(swigCPtr, this, parameter);
-  }
+	public void computeQualities(final boolean normalization) {
+		lpaggregJNI.LPAggregWrapper_computeQualities(swigCPtr, this, normalization);
+	}
 
-  public void computeDichotomy(float threshold) {
-    lpaggregJNI.LPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
-  }
+	public synchronized void delete() {
+		if (swigCPtr != 0) {
+			if (swigCMemOwn) {
+				swigCMemOwn = false;
+				lpaggregJNI.delete_LPAggregWrapper(swigCPtr);
+			}
+			swigCPtr = 0;
+		}
+	}
 
-  public int getPart(int index) {
-    return lpaggregJNI.LPAggregWrapper_getPart(swigCPtr, this, index);
-  }
+	@Override
+	protected void finalize() {
+		delete();
+	}
 
-  public int getPartNumber() {
-    return lpaggregJNI.LPAggregWrapper_getPartNumber(swigCPtr, this);
-  }
+	public double getGainByIndex(final int index) {
+		return lpaggregJNI.LPAggregWrapper_getGainByIndex(swigCPtr, this, index);
+	}
 
-  public float getParameter(int index) {
-    return lpaggregJNI.LPAggregWrapper_getParameter(swigCPtr, this, index);
-  }
+	public double getGainByParameter(final float parameter) {
+		return lpaggregJNI.LPAggregWrapper_getGainByParameter(swigCPtr, this, parameter);
+	}
 
-  public int getParameterNumber() {
-    return lpaggregJNI.LPAggregWrapper_getParameterNumber(swigCPtr, this);
-  }
+	public double getLossByIndex(final int index) {
+		return lpaggregJNI.LPAggregWrapper_getLossByIndex(swigCPtr, this, index);
+	}
 
-  public double getGainByIndex(int index) {
-    return lpaggregJNI.LPAggregWrapper_getGainByIndex(swigCPtr, this, index);
-  }
+	public double getLossByParameter(final float parameter) {
+		return lpaggregJNI.LPAggregWrapper_getLossByParameter(swigCPtr, this, parameter);
+	}
 
-  public double getGainByParameter(float parameter) {
-    return lpaggregJNI.LPAggregWrapper_getGainByParameter(swigCPtr, this, parameter);
-  }
+	public float getParameter(final int index) {
+		return lpaggregJNI.LPAggregWrapper_getParameter(swigCPtr, this, index);
+	}
 
-  public double getLossByIndex(int index) {
-    return lpaggregJNI.LPAggregWrapper_getLossByIndex(swigCPtr, this, index);
-  }
+	public int getParameterNumber() {
+		return lpaggregJNI.LPAggregWrapper_getParameterNumber(swigCPtr, this);
+	}
 
-  public double getLossByParameter(float parameter) {
-    return lpaggregJNI.LPAggregWrapper_getLossByParameter(swigCPtr, this, parameter);
-  }
+	public int getPart(final int index) {
+		return lpaggregJNI.LPAggregWrapper_getPart(swigCPtr, this, index);
+	}
+
+	public int getPartNumber() {
+		return lpaggregJNI.LPAggregWrapper_getPartNumber(swigCPtr, this);
+	}
 
 }

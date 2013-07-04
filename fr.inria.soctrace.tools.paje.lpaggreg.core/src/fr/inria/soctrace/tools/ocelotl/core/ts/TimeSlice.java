@@ -26,13 +26,13 @@ public class TimeSlice {
 	private long		number;
 	private long		value	= -1;
 
-	public TimeSlice(TimeRegion timeRegion, long number) {
+	public TimeSlice(final TimeRegion timeRegion, final long number) {
 		super();
 		this.timeRegion = timeRegion;
 		this.number = number;
 	}
 
-	public TimeSlice(TimeRegion timeRegion, long number, long value) {
+	public TimeSlice(final TimeRegion timeRegion, final long number, final long value) {
 		super();
 		this.timeRegion = timeRegion;
 		this.number = number;
@@ -51,7 +51,7 @@ public class TimeSlice {
 		return value;
 	}
 
-	public long regionInsideMe(TimeRegion testedTimeRegion) {
+	public long regionInsideMe(final TimeRegion testedTimeRegion) {
 		if (testedTimeRegion.getTimeStampStart() >= timeRegion.getTimeStampStart() && testedTimeRegion.getTimeStampStart() <= timeRegion.getTimeStampEnd()) {
 			if (testedTimeRegion.getTimeStampEnd() < timeRegion.getTimeStampEnd())
 				return testedTimeRegion.getTimeStampEnd() - testedTimeRegion.getTimeStampStart();
@@ -65,19 +65,19 @@ public class TimeSlice {
 		return 0;
 	}
 
-	public void setNumber(long number) {
+	public void setNumber(final long number) {
 		this.number = number;
 	}
 
-	public void setTimeRegion(TimeRegion timeRegion) {
+	public void setTimeRegion(final TimeRegion timeRegion) {
 		this.timeRegion = timeRegion;
 	}
 
-	public void setValue(long value) {
+	public void setValue(final long value) {
 		this.value = value;
 	}
 
-	public boolean startIsInsideMe(long eventStart) {
+	public boolean startIsInsideMe(final long eventStart) {
 		return eventStart >= timeRegion.getTimeStampStart() && eventStart <= timeRegion.getTimeStampEnd();
 	}
 

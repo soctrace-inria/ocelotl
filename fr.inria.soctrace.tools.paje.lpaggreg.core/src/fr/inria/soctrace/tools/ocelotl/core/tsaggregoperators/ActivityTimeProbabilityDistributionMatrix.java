@@ -30,46 +30,46 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 
-public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix{
+public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix {
 
-
-	public ActivityTimeProbabilityDistributionMatrix(Query query) throws SoCTraceException {
+	public ActivityTimeProbabilityDistributionMatrix(final Query query) throws SoCTraceException {
 		super(query);
 		System.out.println("Activity Time Probability Distribution Matrix");
 	}
-	
-	protected void computeSubMatrix(List<EventProducer> eventProducers) throws SoCTraceException {
+
+	@Override
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		List<Event> fullEvents = query.getEvents(eventProducers);
+		final List<Event> fullEvents = query.getEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
-		Map<Integer, List<Event>> eventList = new HashMap<Integer, List<Event>>();
-		for (EventProducer ep : eventProducers)
+		final Map<Integer, List<Event>> eventList = new HashMap<Integer, List<Event>>();
+		for (final EventProducer ep : eventProducers)
 			eventList.put(ep.getId(), new ArrayList<Event>());
-		for (Event e : fullEvents)
+		for (final Event e : fullEvents)
 			eventList.get(e.getEventProducer().getId()).add(e);
-		for (EventProducer ep : eventProducers) {
-			List<State> state = new ArrayList<State>();
-			List<Event> events = eventList.get(ep.getId());
-			for (int i=0; i<events.size()-1; i++){
+		for (final EventProducer ep : eventProducers) {
+			final List<State> state = new ArrayList<State>();
+			final List<Event> events = eventList.get(ep.getId());
+			for (int i = 0; i < events.size() - 1; i++) {
 				state.add(new State(events.get(i), events.get(i + 1), timeSliceManager));
-				if (query.getLpaggregParameters().getSleepingStates().contains(state.get(state.size()-1).getStateType()))
-					state.remove(state.size()-1);
-				else{
-					Map<Long, Long> distrib = state.get(state.size()-1).getTimeSlicesDistribution();
-					for (long it : distrib.keySet())
+				if (query.getLpaggregParameters().getSleepingStates().contains(state.get(state.size() - 1).getStateType()))
+					state.remove(state.size() - 1);
+				else {
+					final Map<Long, Long> distrib = state.get(state.size() - 1).getTimeSlicesDistribution();
+					for (final long it : distrib.keySet())
 						matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
 				}
 			}
-			long total=0;
-			for (int i=0; i<matrix.size(); i++)
-				total=matrix.get(i).get(ep.getName())+total;
-			if (total!=0)
-				for (int i=0; i<matrix.size(); i++)
-					matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName())*1000000000/total);		
+			long total = 0;
+			for (int i = 0; i < matrix.size(); i++)
+				total = matrix.get(i).get(ep.getName()) + total;
+			if (total != 0)
+				for (int i = 0; i < matrix.size(); i++)
+					matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
 		}
 		dm.end("VECTORS COMPUTATION : " + query.getLpaggregParameters().getTimeSlicesNumber() + " timeslices");
 	}

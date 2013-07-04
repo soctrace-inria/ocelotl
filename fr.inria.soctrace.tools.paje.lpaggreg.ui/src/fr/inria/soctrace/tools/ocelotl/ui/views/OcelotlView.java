@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -66,28 +67,39 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators.AggregationOperators;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 
-import org.eclipse.swt.custom.ScrolledComposite;
-
 /**
  * Main view for LPAggreg Paje Tool
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
- * @author "Generoso Pagano <generoso.pagano@inria.fr>" 
+ * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class LPAggregView extends ViewPart {
+public class OcelotlView extends ViewPart {
+
+	private class AllFilterAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (loader.getCurrentTrace() == null)
+				return;
+			producers.clear();
+			producers.addAll(loader.getProducers());
+			listViewerProducers.setInput(producers);
+			hasChanged = HasChanged.ALL;
+		}
+	}
 
 	private class AnalysisResultLabelProvider extends LabelProvider {
 
 		@Override
-		public String getText(Object element) {
+		public String getText(final Object element) {
 			return ((AnalysisResult) element).getDescription();
 		}
 	}
@@ -95,20 +107,20 @@ public class LPAggregView extends ViewPart {
 	private class ConfModificationListener implements ModifyListener {
 
 		@Override
-		public void modifyText(ModifyEvent e) {
+		public void modifyText(final ModifyEvent e) {
 			hasChanged = HasChanged.ALL;
 			if (loader.getCurrentTrace() == null)
 				return;
 			try {
 				if (Long.parseLong(timestampEnd.getText()) > loader.getMaxTimestamp() || Long.parseLong(timestampEnd.getText()) < loader.getMinTimestamp())
 					timestampEnd.setText(String.valueOf(loader.getMaxTimestamp()));
-			} catch (NumberFormatException err) {
+			} catch (final NumberFormatException err) {
 				timestampEnd.setText("0");
 			}
 			try {
 				if (Long.parseLong(timestampStart.getText()) < loader.getMinTimestamp() || Long.parseLong(timestampStart.getText()) > loader.getMaxTimestamp())
 					timestampStart.setText(String.valueOf(loader.getMinTimestamp()));
-			} catch (NumberFormatException err) {
+			} catch (final NumberFormatException err) {
 				timestampStart.setText("0");
 			}
 		}
@@ -118,17 +130,17 @@ public class LPAggregView extends ViewPart {
 	private class DichotomySelectionListener extends SelectionAdapter {
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
+		public void widgetSelected(final SelectionEvent e) {
 			if (loader.getCurrentTrace() == null)
 				return;
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER || hasChanged == HasChanged.EQ)
 				hasChanged = HasChanged.THRESHOLD;
 			setConfiguration();
 			final String title = "Getting parameters...";
-			Job job = new Job(title) {
+			final Job job = new Job(title) {
 
 				@Override
-				protected IStatus run(IProgressMonitor monitor) {
+				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
 					try {
 						core.computeDichotomy(hasChanged);
@@ -142,12 +154,12 @@ public class LPAggregView extends ViewPart {
 								// "Parameters", "Parameters retrieved");
 								hasChanged = HasChanged.NOTHING;
 								list.removeAll();
-								for (float it : core.getLpaggregManager().getParameters())
+								for (final float it : core.getLpaggregManager().getParameters())
 									list.add(Float.toString(it));
 								qualityView.createDiagram();
 							}
 						});
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						return Status.CANCEL_STATUS;
 					}
@@ -162,7 +174,7 @@ public class LPAggregView extends ViewPart {
 	private class EventProducerLabelProvider extends LabelProvider {
 
 		@Override
-		public String getText(Object element) {
+		public String getText(final Object element) {
 			return ((EventProducer) element).getName();
 		}
 	}
@@ -170,7 +182,7 @@ public class LPAggregView extends ViewPart {
 	private class EventTypeLabelProvider extends LabelProvider {
 
 		@Override
-		public String getText(Object element) {
+		public String getText(final Object element) {
 			return ((EventType) element).getName();
 		}
 	}
@@ -178,8 +190,8 @@ public class LPAggregView extends ViewPart {
 	private class IdlesSelectionAdapter extends SelectionAdapter {
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
-			InputDialog dialog = new InputDialog(getSite().getShell(), "Type Idle State", "Select Idle state", "", null);
+		public void widgetSelected(final SelectionEvent e) {
+			final InputDialog dialog = new InputDialog(getSite().getShell(), "Type Idle State", "Select Idle state", "", null);
 			if (dialog.open() == Window.CANCEL)
 				return;
 			idles.add(dialog.getValue());
@@ -191,7 +203,7 @@ public class LPAggregView extends ViewPart {
 	private class NormalizeSelectionAdapter extends SelectionAdapter {
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
+		public void widgetSelected(final SelectionEvent e) {
 			if (hasChanged != HasChanged.ALL)
 				hasChanged = HasChanged.NORMALIZE;
 		}
@@ -200,13 +212,13 @@ public class LPAggregView extends ViewPart {
 	private class ParamModificationListener implements ModifyListener {
 
 		@Override
-		public void modifyText(ModifyEvent e) {
+		public void modifyText(final ModifyEvent e) {
 			if (loader.getCurrentTrace() == null)
 				return;
 			try {
 				if (Float.parseFloat(param.getText()) < 0 || Float.parseFloat(param.getText()) > 1)
 					param.setText("0");
-			} catch (NumberFormatException err) {
+			} catch (final NumberFormatException err) {
 				param.setText("0");
 			}
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ)
@@ -218,27 +230,27 @@ public class LPAggregView extends ViewPart {
 	private class ProducersFilterAdapter extends SelectionAdapter {
 
 		// all - input
-		java.util.List<Object> diff(java.util.List<EventProducer> all, java.util.List<EventProducer> input) {
-			java.util.List<Object> tmp = new LinkedList<>();
-			for (Object oba : all)
+		java.util.List<Object> diff(final java.util.List<EventProducer> all, final java.util.List<EventProducer> input) {
+			final java.util.List<Object> tmp = new LinkedList<>();
+			for (final Object oba : all)
 				tmp.add(oba);
 			tmp.removeAll(input);
 			return tmp;
 		}
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
+		public void widgetSelected(final SelectionEvent e) {
 			if (loader.getCurrentTrace() == null)
 				return;
 
-			ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new EventProducerLabelProvider());
+			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new EventProducerLabelProvider());
 			dialog.setTitle("Select Event Producers");
 			dialog.setMessage("Select a String (* = any string, ? = any char):");
 			dialog.setElements(diff(loader.getProducers(), producers).toArray());
 			dialog.setMultipleSelection(true);
 			if (dialog.open() == Window.CANCEL)
 				return;
-			for (Object o : dialog.getResult())
+			for (final Object o : dialog.getResult())
 				producers.add((EventProducer) o);
 			listViewerProducers.setInput(producers);
 			hasChanged = HasChanged.ALL;
@@ -247,17 +259,17 @@ public class LPAggregView extends ViewPart {
 
 	private class RemoveSelectionAdapter extends SelectionAdapter {
 
-		private ListViewer	viewer;
+		private final ListViewer	viewer;
 
-		public RemoveSelectionAdapter(ListViewer viewer) {
+		public RemoveSelectionAdapter(final ListViewer viewer) {
 			this.viewer = viewer;
 		}
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
-			IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-			Object obj = selection.getFirstElement();
-			Collection<?> c = (Collection<?>) viewer.getInput();
+		public void widgetSelected(final SelectionEvent e) {
+			final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+			final Object obj = selection.getFirstElement();
+			final Collection<?> c = (Collection<?>) viewer.getInput();
 			c.remove(obj);
 			viewer.refresh(false);
 			hasChanged = HasChanged.ALL;
@@ -266,15 +278,15 @@ public class LPAggregView extends ViewPart {
 
 	private class ResetSelectionAdapter extends SelectionAdapter {
 
-		private ListViewer	viewer;
+		private final ListViewer	viewer;
 
-		public ResetSelectionAdapter(ListViewer viewer) {
+		public ResetSelectionAdapter(final ListViewer viewer) {
 			this.viewer = viewer;
 		}
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
-			Collection<?> c = (Collection<?>) viewer.getInput();
+		public void widgetSelected(final SelectionEvent e) {
+			final Collection<?> c = (Collection<?>) viewer.getInput();
 			c.clear();
 			viewer.refresh(false);
 			hasChanged = HasChanged.ALL;
@@ -284,23 +296,23 @@ public class LPAggregView extends ViewPart {
 	private class ResultsFilterAdapter extends SelectionAdapter {
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
+		public void widgetSelected(final SelectionEvent e) {
 			if (loader.getCurrentTrace() == null)
 				return;
 
-			ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new AnalysisResultLabelProvider());
+			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new AnalysisResultLabelProvider());
 			dialog.setTitle("Select a Result");
 			dialog.setMessage("Select a String (* = any string, ? = any char):");
 			dialog.setElements(loader.getResults().toArray());
 			dialog.setMultipleSelection(false);
 			if (dialog.open() == Window.CANCEL)
 				return;
-			for (Object o : dialog.getResult())
+			for (final Object o : dialog.getResult())
 				try {
-					for (EventProducer ep : loader.getProducersFromResult((AnalysisResult) o))
+					for (final EventProducer ep : loader.getProducersFromResult((AnalysisResult) o))
 						if (!producers.contains(ep))
 							producers.add(ep);
-				} catch (SoCTraceException e1) {
+				} catch (final SoCTraceException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -309,23 +321,10 @@ public class LPAggregView extends ViewPart {
 		}
 	}
 
-	private class AllFilterAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			if (loader.getCurrentTrace() == null)
-				return;
-			producers.clear();
-			producers.addAll(loader.getProducers());
-			listViewerProducers.setInput(producers);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
 	private class RunSelectionListener extends SelectionAdapter {
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
+		public void widgetSelected(final SelectionEvent e) {
 			if (loader.getCurrentTrace() == null)
 				return;
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
@@ -334,10 +333,10 @@ public class LPAggregView extends ViewPart {
 				list.removeAll();
 			setConfiguration();
 			final String title = "Computing parts...";
-			Job job = new Job(title) {
+			final Job job = new Job(title) {
 
 				@Override
-				protected IStatus run(IProgressMonitor monitor) {
+				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
 					try {
 						core.computeParts(hasChanged);
@@ -355,7 +354,7 @@ public class LPAggregView extends ViewPart {
 								qualityView.createDiagram();
 							}
 						});
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						return Status.CANCEL_STATUS;
 					}
@@ -371,23 +370,22 @@ public class LPAggregView extends ViewPart {
 	private class SelectSelectionListener extends SelectionAdapter {
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
+		public void widgetSelected(final SelectionEvent e) {
 			try {
 				if (loader.getCurrentTrace() == null)
 					return;
-				if (list.getSelectionCount() > 0){
+				if (list.getSelectionCount() > 0)
 					param.setText(list.getSelection()[0]);
-				}
 				if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
 					hasChanged = HasChanged.PARAMETER;
 				else
 					list.removeAll();
 				setConfiguration();
 				final String title = "Computing parts...";
-				Job job = new Job(title) {
+				final Job job = new Job(title) {
 
 					@Override
-					protected IStatus run(IProgressMonitor monitor) {
+					protected IStatus run(final IProgressMonitor monitor) {
 						monitor.beginTask(title, IProgressMonitor.UNKNOWN);
 						try {
 							core.computeParts(hasChanged);
@@ -405,7 +403,7 @@ public class LPAggregView extends ViewPart {
 									qualityView.createDiagram();
 								}
 							});
-						} catch (Exception e) {
+						} catch (final Exception e) {
 							e.printStackTrace();
 							return Status.CANCEL_STATUS;
 						}
@@ -414,7 +412,7 @@ public class LPAggregView extends ViewPart {
 				};
 				job.setUser(true);
 				job.schedule();
-			} catch (NumberFormatException e1) {
+			} catch (final NumberFormatException e1) {
 
 			}
 
@@ -424,13 +422,13 @@ public class LPAggregView extends ViewPart {
 	private class ThresholdModificationListener implements ModifyListener {
 
 		@Override
-		public void modifyText(ModifyEvent e) {
+		public void modifyText(final ModifyEvent e) {
 			if (loader.getCurrentTrace() == null)
 				return;
 			try {
 				if (Float.parseFloat(threshold.getText()) < Float.MIN_VALUE || Float.parseFloat(threshold.getText()) > 1)
 					threshold.setText("0.001");
-			} catch (NumberFormatException err) {
+			} catch (final NumberFormatException err) {
 				threshold.setText("0.001");
 			}
 		}
@@ -439,92 +437,70 @@ public class LPAggregView extends ViewPart {
 	private class TypesSelectionAdapter extends SelectionAdapter {
 
 		// all - input
-		java.util.List<Object> diff(java.util.List<EventType> all, java.util.List<EventType> input) {
-			java.util.List<Object> tmp = new LinkedList<>();
-			for (Object oba : all)
+		java.util.List<Object> diff(final java.util.List<EventType> all, final java.util.List<EventType> input) {
+			final java.util.List<Object> tmp = new LinkedList<>();
+			for (final Object oba : all)
 				tmp.add(oba);
 			tmp.removeAll(input);
 			return tmp;
 		}
 
 		@Override
-		public void widgetSelected(SelectionEvent e) {
+		public void widgetSelected(final SelectionEvent e) {
 			if (loader.getCurrentTrace() == null)
 				return;
-			ListSelectionDialog dialog = new ListSelectionDialog(getSite().getShell(), diff(loader.getTypes(), types), new ArrayContentProvider(), new EventTypeLabelProvider(), "Select Event Types");
+			final ListSelectionDialog dialog = new ListSelectionDialog(getSite().getShell(), diff(loader.getTypes(), types), new ArrayContentProvider(), new EventTypeLabelProvider(), "Select Event Types");
 			if (dialog.open() == Window.CANCEL)
 				return;
-			for (Object o : dialog.getResult())
+			for (final Object o : dialog.getResult())
 				types.add((EventType) o);
 			listViewerTypes.setInput(types);
 			hasChanged = HasChanged.ALL;
 		}
 	}
 
-	public static final String				PLUGIN_ID	= Activator.PLUGIN_ID;
-	public static final String				ID			= "fr.inria.soctrace.tools.ocelotl.ui.LPAggregView";	//$NON-NLS-1$
-	private HasChanged						hasChanged	= HasChanged.ALL;
+	public static final String					PLUGIN_ID	= Activator.PLUGIN_ID;
+	public static final String					ID			= "fr.inria.soctrace.tools.ocelotl.ui.Ocelotl"; //$NON-NLS-1$
+	private HasChanged							hasChanged	= HasChanged.ALL;
 	/** Loader to interact with the DB */
-	private ConfDataLoader					loader		= new ConfDataLoader();
-	private Text							timestampStart;
-	private Text							timestampEnd;
-	private Text							threshold;
-	private Text							param;
-	private ListViewer						listViewerProducers;
-	private ListViewer						listViewerTypes;
-	private ListViewer						listViewerIdles;
-	private List							list;
+	private final ConfDataLoader				loader		= new ConfDataLoader();
+	private Text								timestampStart;
+	private Text								timestampEnd;
+	private Text								threshold;
+	private Text								param;
+	private ListViewer							listViewerProducers;
+	private ListViewer							listViewerTypes;
+	private ListViewer							listViewerIdles;
+	private List								list;
 
+	private final java.util.List<EventProducer>	producers	= new LinkedList<EventProducer>();
+	private final java.util.List<EventType>		types		= new LinkedList<EventType>();
+	private final java.util.List<String>		idles		= new LinkedList<String>();
+	private Button								btnNormalize;
+	private Spinner								spinnerTimeSlices;
+	private Spinner								maxEventProducers;
+	private Combo								comboAggOperator;
+	private Button								btnRun;
+	private Button								btnMergeAggregatedParts;
+	private Button								btnShowNumbers;
+	private final OcelotlCore					core;
+	private final OcelotlParameters				params;
+	private MatrixView							matrix;
+	private TimeAxisView						timeAxis;
+	private QualityView							qualityView;
+	private Combo								comboTraces;
 
-	private java.util.List<EventProducer>	producers	= new LinkedList<EventProducer>();
-	private java.util.List<EventType>		types		= new LinkedList<EventType>();
-	private java.util.List<String>			idles		= new LinkedList<String>();
-	private Button							btnNormalize;
-	private Spinner							spinnerTimeSlices;
-	private Spinner							maxEventProducers;
-	private Combo							comboAggOperator;
-	private Button 							btnRun;
-	private Button 							btnMergeAggregatedParts;
-	private Button 							btnShowNumbers;
-	private OcelotlCore					core;
-	private OcelotlParameters				params;
-	private MatrixView						matrix;
-	private TimeAxisView					timeAxis;
-	private QualityView						qualityView;
-	private Combo 							comboTraces;
-
-	final Map<Integer, Trace>				traceMap	= new HashMap<Integer, Trace>();
+	final Map<Integer, Trace>					traceMap	= new HashMap<Integer, Trace>();
 
 	/** @throws SoCTraceException */
-	public LPAggregView() throws SoCTraceException {
+	public OcelotlView() throws SoCTraceException {
 		try {
 			loader.loadTraces();
-		} catch (SoCTraceException e) {
+		} catch (final SoCTraceException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
 		params = new OcelotlParameters();
 		core = new OcelotlCore(params);
-	}
-	
-	
-	public List getList() {
-		return list;
-	}
-	
-	public Text getParam() {
-		return param;
-	}
-
-	
-	public Button getBtnRun() {
-		return btnRun;
-	}
-	public OcelotlCore getCore() {
-		return core;
-	}
-	
-	public OcelotlParameters getParams() {
-		return params;
 	}
 
 	private void cleanAll() {
@@ -547,69 +523,69 @@ public class LPAggregView extends ViewPart {
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
+	public void createPartControl(final Composite parent) {
 
 		// Highest Component
-		SashForm sashForm = new SashForm(parent, SWT.VERTICAL);
-
+		final SashForm sashForm = new SashForm(parent, SWT.VERTICAL);
 
 		matrix = new MatrixView();
 
 		timeAxis = new TimeAxisView();
-		
-		qualityView = new QualityView(this);
-		//sashForm.setWeights(new int[] {220, 295});
 
-		SashForm sashForm_5 = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
+		qualityView = new QualityView(this);
+		// sashForm.setWeights(new int[] {220, 295});
+
+		final SashForm sashForm_5 = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
 		sashForm_5.setSashWidth(1);
 		// @SuppressWarnings("unused")
-		Composite compositeVisu = new Composite(sashForm_5, SWT.NONE);
+		final Composite compositeVisu = new Composite(sashForm_5, SWT.NONE);
 		compositeVisu.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeVisu.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		//compositeVisu.setToolTipText("test");
-		GridLayout gl_compositeVisu = new GridLayout();
+		// compositeVisu.setToolTipText("test");
+		final GridLayout gl_compositeVisu = new GridLayout();
 		compositeVisu.setLayout(gl_compositeVisu);
 		compositeVisu.setSize(500, 500);
-		Canvas canvas = matrix.initDiagram(compositeVisu);
+		final Canvas canvas = matrix.initDiagram(compositeVisu);
 		canvas.setLayoutData(new GridData(GridData.FILL_BOTH));
-		Composite composite_4 = new Composite(sashForm_5, SWT.NONE);
+		final Composite composite_4 = new Composite(sashForm_5, SWT.NONE);
 		composite_4.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		//TODO right proportions
-		GridLayout gl_compositeTime = new GridLayout();
+		// TODO right proportions
+		final GridLayout gl_compositeTime = new GridLayout();
 		composite_4.setLayout(gl_compositeTime);
-		Canvas canvas2= timeAxis.initDiagram(composite_4);
-		sashForm_5.setWeights(new int[] {125, 36});
+		final Canvas canvas2 = timeAxis.initDiagram(composite_4);
+		sashForm_5.setWeights(new int[] { 125, 36 });
 
-		TabFolder tabFolder = new TabFolder(sashForm, SWT.NONE);
+		final TabFolder tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
-		TabItem tbtmTraceParameters = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tbtmTraceParameters = new TabItem(tabFolder, SWT.NONE);
 		tbtmTraceParameters.setText("Trace Parameters");
 
-		SashForm sashForm_3 = new SashForm(tabFolder, SWT.VERTICAL);
+		final SashForm sashForm_3 = new SashForm(tabFolder, SWT.VERTICAL);
 		tbtmTraceParameters.setControl(sashForm_3);
 
-		Composite composite_2 = new Composite(sashForm_3, SWT.NONE);
+		final Composite composite_2 = new Composite(sashForm_3, SWT.NONE);
 		composite_2.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 		composite_2.setLayout(new GridLayout(1, false));
 		comboTraces = new Combo(composite_2, SWT.READ_ONLY);
-		GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
+		final GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
 		gd_comboTraces.widthHint = 327;
 		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
 		int index = 0;
-		for (Trace t : loader.getTraces()) {
+		for (final Trace t : loader.getTraces()) {
 			comboTraces.add(t.getAlias(), index);
 			traceMap.put(index, t);
 			index++;
-		};
+		}
+		;
 
-		SashForm sashForm_6 = new SashForm(sashForm_3, SWT.NONE);
-		Group groupProducers = new Group(sashForm_6, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		final SashForm sashForm_6 = new SashForm(sashForm_3, SWT.NONE);
+		final Group groupProducers = new Group(sashForm_6, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		groupProducers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupProducers.setText("Event Producers");
-		GridLayout gl_groupProducers = new GridLayout(2, false);//
+		final GridLayout gl_groupProducers = new GridLayout(2, false);//
 		gl_groupProducers.horizontalSpacing = 0;
 		groupProducers.setLayout(gl_groupProducers);
 
@@ -617,40 +593,40 @@ public class LPAggregView extends ViewPart {
 		listViewerProducers.setContentProvider(new ArrayContentProvider());
 		listViewerProducers.setLabelProvider(new EventProducerLabelProvider());
 		listViewerProducers.setComparator(new ViewerComparator());
-		List listProd = listViewerProducers.getList();
+		final List listProd = listViewerProducers.getList();
 		listProd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		GridData gd_listProd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		final GridData gd_listProd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_listProd.heightHint = 79;
 		gd_listProd.widthHint = 120;
 		listProd.setLayoutData(gd_listProd);
 
-		ScrolledComposite scrolledComposite = new ScrolledComposite(groupProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		final ScrolledComposite scrolledComposite = new ScrolledComposite(groupProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 
-		Composite composite_1 = new Composite(scrolledComposite, SWT.NONE);
+		final Composite composite_1 = new Composite(scrolledComposite, SWT.NONE);
 		composite_1.setLayout(new GridLayout(1, false));
-		Button btnAddProdFilter = new Button(composite_1, SWT.NONE);
+		final Button btnAddProdFilter = new Button(composite_1, SWT.NONE);
 		btnAddProdFilter.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnAddProdFilter.setText("Add");
 		btnAddProdFilter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnAddProdFilter.setImage(null);
 
-		Button btnAddAll = new Button(composite_1, SWT.NONE);
+		final Button btnAddAll = new Button(composite_1, SWT.NONE);
 		btnAddAll.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnAddAll.setText("Add All");
 		btnAddAll.setImage(null);
 		btnAddAll.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnAddAll.addSelectionListener(new AllFilterAdapter());
 
-		Button btnAddResult = new Button(composite_1, SWT.NONE);
+		final Button btnAddResult = new Button(composite_1, SWT.NONE);
 		btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnAddResult.setText("Add Result");
 		btnAddResult.setImage(null);
 		btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnAddResult.addSelectionListener(new ResultsFilterAdapter());
-		Button btnRemoveProd = new Button(composite_1, SWT.NONE);
+		final Button btnRemoveProd = new Button(composite_1, SWT.NONE);
 		btnRemoveProd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnRemoveProd.setText("Reset");
 		btnRemoveProd.addSelectionListener(new ResetSelectionAdapter(listViewerProducers));
@@ -659,10 +635,10 @@ public class LPAggregView extends ViewPart {
 		scrolledComposite.setContent(composite_1);
 		scrolledComposite.setMinSize(composite_1.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnAddProdFilter.addSelectionListener(new ProducersFilterAdapter());
-		Group groupTypes = new Group(sashForm_6, SWT.NONE);
+		final Group groupTypes = new Group(sashForm_6, SWT.NONE);
 		groupTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTypes.setText("Event Types");
-		GridLayout gl_groupTypes = new GridLayout(2, false);
+		final GridLayout gl_groupTypes = new GridLayout(2, false);
 		gl_groupTypes.horizontalSpacing = 0;
 		groupTypes.setLayout(gl_groupTypes);
 
@@ -670,26 +646,26 @@ public class LPAggregView extends ViewPart {
 		listViewerTypes.setContentProvider(new ArrayContentProvider());
 		listViewerTypes.setLabelProvider(new EventTypeLabelProvider());
 		listViewerTypes.setComparator(new ViewerComparator());
-		List listTypes = listViewerTypes.getList();
+		final List listTypes = listViewerTypes.getList();
 		listTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		listTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(groupTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		final ScrolledComposite scrolledComposite_1 = new ScrolledComposite(groupTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		scrolledComposite_1.setExpandHorizontal(true);
 		scrolledComposite_1.setExpandVertical(true);
 
-		Composite compositeBtnTypes = new Composite(scrolledComposite_1, SWT.NONE);
+		final Composite compositeBtnTypes = new Composite(scrolledComposite_1, SWT.NONE);
 		compositeBtnTypes.setLayout(new GridLayout(1, false));
 
-		Button btnAddTypes = new Button(compositeBtnTypes, SWT.NONE);
+		final Button btnAddTypes = new Button(compositeBtnTypes, SWT.NONE);
 		btnAddTypes.setText("Add");
 		btnAddTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnAddTypes.setImage(null);
 		btnAddTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnAddTypes.addSelectionListener(new TypesSelectionAdapter());
 
-		Button btnRemoveTypes = new Button(compositeBtnTypes, SWT.NONE);
+		final Button btnRemoveTypes = new Button(compositeBtnTypes, SWT.NONE);
 		btnRemoveTypes.setText("Remove");
 		btnRemoveTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRemoveTypes.setImage(null);
@@ -697,10 +673,10 @@ public class LPAggregView extends ViewPart {
 		scrolledComposite_1.setContent(compositeBtnTypes);
 		scrolledComposite_1.setMinSize(compositeBtnTypes.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerTypes));
-		Group groupIdle = new Group(sashForm_6, SWT.NONE);
+		final Group groupIdle = new Group(sashForm_6, SWT.NONE);
 		groupIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupIdle.setText("Idle States");
-		GridLayout gl_groupIdle = new GridLayout(2, false);
+		final GridLayout gl_groupIdle = new GridLayout(2, false);
 		gl_groupIdle.horizontalSpacing = 0;
 		gl_groupIdle.verticalSpacing = 0;
 		groupIdle.setLayout(gl_groupIdle);
@@ -708,28 +684,28 @@ public class LPAggregView extends ViewPart {
 		listViewerIdles = new ListViewer(groupIdle, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		listViewerIdles.setContentProvider(new ArrayContentProvider());
 		listViewerIdles.setComparator(new ViewerComparator());
-		List listIdle = listViewerIdles.getList();
-		GridData gd_listIdle = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		final List listIdle = listViewerIdles.getList();
+		final GridData gd_listIdle = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_listIdle.widthHint = 203;
 		listIdle.setLayoutData(gd_listIdle);
 		listIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
-		ScrolledComposite scrolledComposite_2 = new ScrolledComposite(groupIdle, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		final ScrolledComposite scrolledComposite_2 = new ScrolledComposite(groupIdle, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		scrolledComposite_2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		scrolledComposite_2.setExpandHorizontal(true);
 		scrolledComposite_2.setExpandVertical(true);
 
-		Composite compositeBtnIdle = new Composite(scrolledComposite_2, SWT.NONE);
+		final Composite compositeBtnIdle = new Composite(scrolledComposite_2, SWT.NONE);
 		compositeBtnIdle.setLayout(new GridLayout(1, false));
 
-		Button btnAddIdle = new Button(compositeBtnIdle, SWT.NONE);
+		final Button btnAddIdle = new Button(compositeBtnIdle, SWT.NONE);
 		btnAddIdle.setText("Add");
 		btnAddIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnAddIdle.setImage(null);
 		btnAddIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnAddIdle.addSelectionListener(new IdlesSelectionAdapter());
 
-		Button btnRemoveIdle = new Button(compositeBtnIdle, SWT.NONE);
+		final Button btnRemoveIdle = new Button(compositeBtnIdle, SWT.NONE);
 		btnRemoveIdle.setText("Remove");
 		btnRemoveIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRemoveIdle.setImage(null);
@@ -737,12 +713,12 @@ public class LPAggregView extends ViewPart {
 		scrolledComposite_2.setContent(compositeBtnIdle);
 		scrolledComposite_2.setMinSize(compositeBtnIdle.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdles));
-		sashForm_6.setWeights(new int[] {1, 1, 1});
-		sashForm_3.setWeights(new int[] {23, 226});
+		sashForm_6.setWeights(new int[] { 1, 1, 1 });
+		sashForm_3.setWeights(new int[] { 23, 226 });
 		comboTraces.addSelectionListener(new SelectionAdapter() {
 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				cleanAll();
 				try {
 					loader.load(traceMap.get(comboTraces.getSelectionIndex()));
@@ -756,33 +732,33 @@ public class LPAggregView extends ViewPart {
 					listViewerTypes.setInput(types);
 					idles.add("IDLE");
 					listViewerIdles.setInput(idles);
-				} catch (SoCTraceException e1) {
+				} catch (final SoCTraceException e1) {
 					MessageDialog.openError(getSite().getShell(), "Exception", e1.getMessage());
 				}
 			}
 		});
 
-		TabItem tbtmAggregationParameters = new TabItem(tabFolder, SWT.NONE);
+		final TabItem tbtmAggregationParameters = new TabItem(tabFolder, SWT.NONE);
 		tbtmAggregationParameters.setText("Time Aggregation Parameters");
 
-		SashForm sashForm_1 = new SashForm(tabFolder, SWT.NONE);
+		final SashForm sashForm_1 = new SashForm(tabFolder, SWT.NONE);
 		tbtmAggregationParameters.setControl(sashForm_1);
 
-		Group groupParameters = new Group(sashForm_1, SWT.NONE);
+		final Group groupParameters = new Group(sashForm_1, SWT.NONE);
 		groupParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupParameters.setText("Time Slicing Parameters ");
 		groupParameters.setLayout(new GridLayout(1, false));
 
-		Group grpAggregationOperator = new Group(groupParameters, SWT.NONE);
+		final Group grpAggregationOperator = new Group(groupParameters, SWT.NONE);
 		grpAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		grpAggregationOperator.setText("Aggregation Operator");
 		grpAggregationOperator.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		grpAggregationOperator.setLayout(new GridLayout(1, false));
 
-		Composite composite = new Composite(grpAggregationOperator, SWT.NONE);
+		final Composite composite = new Composite(grpAggregationOperator, SWT.NONE);
 		composite.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		composite.setLayout(new GridLayout(1, false));
-		GridData gd_composite = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		final GridData gd_composite = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		gd_composite.widthHint = 85;
 		composite.setLayoutData(gd_composite);
 
@@ -792,25 +768,25 @@ public class LPAggregView extends ViewPart {
 		comboAggOperator.addSelectionListener(new SelectionAdapter() {
 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				if (loader.getCurrentTrace() == null)
 					return;
 				hasChanged = HasChanged.ALL;
 			}
 		});
-		for (String op : AggregationOperators.List)
+		for (final String op : AggregationOperators.List)
 			comboAggOperator.add(op);
 		comboAggOperator.setText(AggregationOperators.List.get(0));
 
-		Group groupTime = new Group(groupParameters, SWT.NONE);
-		GridData gd_groupTime = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		final Group groupTime = new Group(groupParameters, SWT.NONE);
+		final GridData gd_groupTime = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 		gd_groupTime.widthHint = 200;
 		groupTime.setLayoutData(gd_groupTime);
 		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTime.setText("Time Interval");
 		groupTime.setLayout(new GridLayout(2, false));
 
-		Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
+		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblStartTimestamp.setText("Start Timestamp");
 
@@ -819,7 +795,7 @@ public class LPAggregView extends ViewPart {
 		timestampStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		timestampStart.addModifyListener(new ConfModificationListener());
 
-		Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
+		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
 		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblEndTimestamp.setText("End Timestamp");
 
@@ -827,18 +803,18 @@ public class LPAggregView extends ViewPart {
 		timestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		timestampEnd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		timestampEnd.addModifyListener(new ConfModificationListener());
-		Composite compositeNormalize = new Composite(groupParameters, SWT.NONE);
+		final Composite compositeNormalize = new Composite(groupParameters, SWT.NONE);
 		compositeNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		compositeNormalize.setLayout(new GridLayout(2, false));
 		compositeNormalize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
-		Label lblNumberOfTime = new Label(compositeNormalize, SWT.NONE);
+		final Label lblNumberOfTime = new Label(compositeNormalize, SWT.NONE);
 		lblNumberOfTime.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
 		lblNumberOfTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblNumberOfTime.setText("Number of time slices");
 
 		spinnerTimeSlices = new Spinner(compositeNormalize, SWT.BORDER);
-		GridData gd_spinnerTimeSlices = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		final GridData gd_spinnerTimeSlices = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
 		gd_spinnerTimeSlices.widthHint = 36;
 		spinnerTimeSlices.setLayoutData(gd_spinnerTimeSlices);
 		spinnerTimeSlices.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -846,111 +822,111 @@ public class LPAggregView extends ViewPart {
 		spinnerTimeSlices.setMinimum(1);
 		spinnerTimeSlices.setSelection(200);
 		spinnerTimeSlices.addModifyListener(new ConfModificationListener());
-		Group groupDichotomy = new Group(sashForm_1, SWT.NONE);
+		final Group groupDichotomy = new Group(sashForm_1, SWT.NONE);
 		groupDichotomy.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupDichotomy.setLayout(new GridLayout(1, false));
 		groupDichotomy.setText("Get Best-Cut Partition Gain/Loss Parameter List");
-		
-				btnNormalize = new Button(groupDichotomy, SWT.CHECK);
-				btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-				btnNormalize.setSelection(false);
-				btnNormalize.setText("Normalize Qualities");
-				btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 
-		Composite composite_3 = new Composite(groupDichotomy, SWT.NONE);
+		btnNormalize = new Button(groupDichotomy, SWT.CHECK);
+		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnNormalize.setSelection(false);
+		btnNormalize.setText("Normalize Qualities");
+		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
+
+		final Composite composite_3 = new Composite(groupDichotomy, SWT.NONE);
 		composite_3.setLayout(new GridLayout(3, false));
 		composite_3.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
-		Label lblThreshold = new Label(composite_3, SWT.NONE);
+		final Label lblThreshold = new Label(composite_3, SWT.NONE);
 		lblThreshold.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblThreshold.setText("Threshold");
 
 		threshold = new Text(composite_3, SWT.BORDER);
-		GridData gd_threshold = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		final GridData gd_threshold = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_threshold.widthHint = 342;
 		threshold.setLayoutData(gd_threshold);
 		threshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		Button btnRun_1 = new Button(composite_3, SWT.NONE);
+		final Button btnRun_1 = new Button(composite_3, SWT.NONE);
 		btnRun_1.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRun_1.setText("Get");
-		
-				Group group = new Group(groupDichotomy, SWT.NONE);
-				group.setLayout(new GridLayout(2, false));
-				GridData gd_group = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-				gd_group.heightHint = 119;
-				gd_group.widthHint = 277;
-				group.setLayoutData(gd_group);
-				
-						list = new List(group, SWT.BORDER | SWT.V_SCROLL);
-						list.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						GridData gd_list = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-						gd_list.heightHint = 132;
-						gd_list.widthHint = 330;
-						list.setLayoutData(gd_list);
-						new Label(group, SWT.NONE);
-						Group groupAggreg = new Group(group, SWT.NONE);
-						groupAggreg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-						groupAggreg.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						groupAggreg.setLayout(new GridLayout(3, false));
-						groupAggreg.setText("Perform Best-Cut Partition");
-						
-								Label lblParam = new Label(groupAggreg, SWT.NONE);
-								lblParam.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								lblParam.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-								lblParam.setText("Gain/loss parameter");
-								
-										param = new Text(groupAggreg, SWT.BORDER);
-										param.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-										param.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-										param.addModifyListener(new ParamModificationListener());
-										btnRun = new Button(groupAggreg, SWT.NONE);
-										btnRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-										btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-										btnRun.setText("Process");
-										btnRun.addSelectionListener(new RunSelectionListener());
-										new Label(group, SWT.NONE);
-										list.addSelectionListener(new SelectSelectionListener());
 
-		Composite composite_5 = new Composite(sashForm_1, SWT.NONE);
+		final Group group = new Group(groupDichotomy, SWT.NONE);
+		group.setLayout(new GridLayout(2, false));
+		final GridData gd_group = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_group.heightHint = 119;
+		gd_group.widthHint = 277;
+		group.setLayoutData(gd_group);
+
+		list = new List(group, SWT.BORDER | SWT.V_SCROLL);
+		list.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		final GridData gd_list = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gd_list.heightHint = 132;
+		gd_list.widthHint = 330;
+		list.setLayoutData(gd_list);
+		new Label(group, SWT.NONE);
+		final Group groupAggreg = new Group(group, SWT.NONE);
+		groupAggreg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		groupAggreg.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupAggreg.setLayout(new GridLayout(3, false));
+		groupAggreg.setText("Perform Best-Cut Partition");
+
+		final Label lblParam = new Label(groupAggreg, SWT.NONE);
+		lblParam.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblParam.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblParam.setText("Gain/loss parameter");
+
+		param = new Text(groupAggreg, SWT.BORDER);
+		param.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		param.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		param.addModifyListener(new ParamModificationListener());
+		btnRun = new Button(groupAggreg, SWT.NONE);
+		btnRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRun.setText("Process");
+		btnRun.addSelectionListener(new RunSelectionListener());
+		new Label(group, SWT.NONE);
+		list.addSelectionListener(new SelectSelectionListener());
+
+		final Composite composite_5 = new Composite(sashForm_1, SWT.NONE);
 		composite_5.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		composite_5.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		//compositeVisu.setToolTipText("test");
-		GridLayout gl_compositeQuality = new GridLayout();
+		// compositeVisu.setToolTipText("test");
+		final GridLayout gl_compositeQuality = new GridLayout();
 		composite_5.setLayout(gl_compositeQuality);
-		Canvas canvas3 = qualityView.initDiagram(composite_5);
+		final Canvas canvas3 = qualityView.initDiagram(composite_5);
 		canvas3.setLayoutData(new GridData(GridData.FILL_BOTH));
-		sashForm_1.setWeights(new int[] {97, 153, 332});
+		sashForm_1.setWeights(new int[] { 97, 153, 332 });
 
 		btnRun_1.addSelectionListener(new DichotomySelectionListener());
 		threshold.addModifyListener(new ThresholdModificationListener());
 
-		TabItem tbtmSystemConfiguration = new TabItem(tabFolder, 0);
+		final TabItem tbtmSystemConfiguration = new TabItem(tabFolder, 0);
 		tbtmSystemConfiguration.setText("Advanced Parameters");
 
-		SashForm sashForm_4 = new SashForm(tabFolder, SWT.VERTICAL);
+		final SashForm sashForm_4 = new SashForm(tabFolder, SWT.VERTICAL);
 		sashForm_4.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		tbtmSystemConfiguration.setControl(sashForm_4);
 
-		Group grpEventProducersMax = new Group(sashForm_4, SWT.NONE);
+		final Group grpEventProducersMax = new Group(sashForm_4, SWT.NONE);
 		grpEventProducersMax.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		grpEventProducersMax.setText("Memory Management");
 		grpEventProducersMax.setLayout(new GridLayout(2, false));
 
-		Label lblDivideDbQueries = new Label(grpEventProducersMax, SWT.NONE);
+		final Label lblDivideDbQueries = new Label(grpEventProducersMax, SWT.NONE);
 		lblDivideDbQueries.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblDivideDbQueries.setText("Divide DB query (Event Producers per query, inactive if 0)");
 
 		maxEventProducers = new Spinner(grpEventProducersMax, SWT.BORDER);
 		maxEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
-		GridData gd_maxEventProducers = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		final GridData gd_maxEventProducers = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
 		gd_maxEventProducers.widthHint = 99;
 		maxEventProducers.setLayoutData(gd_maxEventProducers);
 		maxEventProducers.addModifyListener(new ConfModificationListener());
 		maxEventProducers.setMinimum(0);
 		maxEventProducers.setSelection(0);
 
-		Group grpVisualizationSettings = new Group(sashForm_4, SWT.NONE);
+		final Group grpVisualizationSettings = new Group(sashForm_4, SWT.NONE);
 		grpVisualizationSettings.setText("Visualization settings");
 		grpVisualizationSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		grpVisualizationSettings.setLayout(new GridLayout(1, false));
@@ -963,15 +939,16 @@ public class LPAggregView extends ViewPart {
 
 		btnShowNumbers = new Button(grpVisualizationSettings, SWT.CHECK);
 		btnShowNumbers.addSelectionListener(new SelectionAdapter() {
+
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 			}
 		});
 		btnShowNumbers.setText("Show Part Numbers");
 		btnShowNumbers.setSelection(false);
 		btnShowNumbers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		sashForm_4.setWeights(new int[] {112, 374});
-		sashForm.setWeights(new int[] {172, 286});
+		sashForm_4.setWeights(new int[] { 112, 374 });
+		sashForm.setWeights(new int[] { 172, 286 });
 		canvas2.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// clean all
@@ -979,7 +956,27 @@ public class LPAggregView extends ViewPart {
 
 	}
 
-	private void setConfiguration() {
+	public Button getBtnRun() {
+		return btnRun;
+	}
+
+	public OcelotlCore getCore() {
+		return core;
+	}
+
+	public List getList() {
+		return list;
+	}
+
+	public Text getParam() {
+		return param;
+	}
+
+	public OcelotlParameters getParams() {
+		return params;
+	}
+
+	public void setConfiguration() {
 
 		params.setTrace(loader.getCurrentTrace());
 		params.setEventProducers(producers);
@@ -994,7 +991,7 @@ public class LPAggregView extends ViewPart {
 			params.setThreshold(Double.valueOf(threshold.getText()).floatValue());
 			params.setParameter(Double.valueOf(param.getText()).floatValue());
 			params.setTimeRegion(new TimeRegion(Long.valueOf(timestampStart.getText()), Long.valueOf(timestampEnd.getText())));
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
 	}

@@ -9,82 +9,87 @@
 package fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni;
 
 public class MLPAggregWrapper extends LPAggregWrapper {
-  private long swigCPtr;
+	protected static long getCPtr(final MLPAggregWrapper obj) {
+		return obj == null ? 0 : obj.swigCPtr;
+	}
 
-  protected MLPAggregWrapper(long cPtr, boolean cMemoryOwn) {
-    super(lpaggregJNI.MLPAggregWrapper_SWIGUpcast(cPtr), cMemoryOwn);
-    swigCPtr = cPtr;
-  }
+	private long	swigCPtr;
 
-  protected static long getCPtr(MLPAggregWrapper obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
+	public MLPAggregWrapper() {
+		this(lpaggregJNI.new_MLPAggregWrapper(), true);
+	}
 
-  protected void finalize() {
-    delete();
-  }
+	protected MLPAggregWrapper(final long cPtr, final boolean cMemoryOwn) {
+		super(lpaggregJNI.MLPAggregWrapper_SWIGUpcast(cPtr), cMemoryOwn);
+		swigCPtr = cPtr;
+	}
 
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        lpaggregJNI.delete_MLPAggregWrapper(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-    super.delete();
-  }
+	public void addToMatrix(final double element, final int i) {
+		lpaggregJNI.MLPAggregWrapper_addToMatrix__SWIG_0(swigCPtr, this, element, i);
+	}
 
-  public MLPAggregWrapper() {
-    this(lpaggregJNI.new_MLPAggregWrapper(), true);
-  }
+	public void addToMatrix(final double element, final int i, final int j) {
+		lpaggregJNI.MLPAggregWrapper_addToMatrix__SWIG_1(swigCPtr, this, element, i, j);
+	}
 
-  public void newMatrix() {
-    lpaggregJNI.MLPAggregWrapper_newMatrix(swigCPtr, this);
-  }
+	public void addToVector(final double element) {
+		lpaggregJNI.MLPAggregWrapper_addToVector__SWIG_0(swigCPtr, this, element);
+	}
 
-  public void addToMatrix(double element, int i) {
-    lpaggregJNI.MLPAggregWrapper_addToMatrix__SWIG_0(swigCPtr, this, element, i);
-  }
+	public void addToVector(final double element, final int index) {
+		lpaggregJNI.MLPAggregWrapper_addToVector__SWIG_1(swigCPtr, this, element, index);
+	}
 
-  public void addToMatrix(double element, int i, int j) {
-    lpaggregJNI.MLPAggregWrapper_addToMatrix__SWIG_1(swigCPtr, this, element, i, j);
-  }
+	@Override
+	public void computeDichotomy(final float threshold) {
+		lpaggregJNI.MLPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
+	}
 
-  public void newVector() {
-    lpaggregJNI.MLPAggregWrapper_newVector(swigCPtr, this);
-  }
+	@Override
+	public void computeParts(final float parameter) {
+		lpaggregJNI.MLPAggregWrapper_computeParts(swigCPtr, this, parameter);
+	}
 
-  public void addToVector(double element) {
-    lpaggregJNI.MLPAggregWrapper_addToVector__SWIG_0(swigCPtr, this, element);
-  }
+	@Override
+	public void computeQualities(final boolean normalization) {
+		lpaggregJNI.MLPAggregWrapper_computeQualities(swigCPtr, this, normalization);
+	}
 
-  public void addToVector(double element, int index) {
-    lpaggregJNI.MLPAggregWrapper_addToVector__SWIG_1(swigCPtr, this, element, index);
-  }
+	@Override
+	public synchronized void delete() {
+		if (swigCPtr != 0) {
+			if (swigCMemOwn) {
+				swigCMemOwn = false;
+				lpaggregJNI.delete_MLPAggregWrapper(swigCPtr);
+			}
+			swigCPtr = 0;
+		}
+		super.delete();
+	}
 
-  public void computeQualities(boolean normalization) {
-    lpaggregJNI.MLPAggregWrapper_computeQualities(swigCPtr, this, normalization);
-  }
+	@Override
+	protected void finalize() {
+		delete();
+	}
 
-  public void computeParts(float parameter) {
-    lpaggregJNI.MLPAggregWrapper_computeParts(swigCPtr, this, parameter);
-  }
+	public int getMatrixNumber() {
+		return lpaggregJNI.MLPAggregWrapper_getMatrixNumber(swigCPtr, this);
+	}
 
-  public void computeDichotomy(float threshold) {
-    lpaggregJNI.MLPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
-  }
+	public int getMatrixSize() {
+		return lpaggregJNI.MLPAggregWrapper_getMatrixSize(swigCPtr, this);
+	}
 
-  public int getMatrixNumber() {
-    return lpaggregJNI.MLPAggregWrapper_getMatrixNumber(swigCPtr, this);
-  }
+	public int getVectorSize() {
+		return lpaggregJNI.MLPAggregWrapper_getVectorSize(swigCPtr, this);
+	}
 
-  public int getMatrixSize() {
-    return lpaggregJNI.MLPAggregWrapper_getMatrixSize(swigCPtr, this);
-  }
+	public void newMatrix() {
+		lpaggregJNI.MLPAggregWrapper_newMatrix(swigCPtr, this);
+	}
 
-  public int getVectorSize() {
-    return lpaggregJNI.MLPAggregWrapper_getVectorSize(swigCPtr, this);
-  }
+	public void newVector() {
+		lpaggregJNI.MLPAggregWrapper_newVector(swigCPtr, this);
+	}
 
 }

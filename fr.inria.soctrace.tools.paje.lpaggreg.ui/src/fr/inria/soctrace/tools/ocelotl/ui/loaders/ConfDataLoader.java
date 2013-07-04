@@ -41,11 +41,11 @@ import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 
-/** 
+/**
  * Convenience class to load Trace data related to LPAggreg configuration.
  * 
- * @author "Generoso Pagano <generoso.pagano@inria.fr>" 
- * @author "Damien Dosimont <damien.dosimont@imag.fr>" 
+ * @author "Generoso Pagano <generoso.pagano@inria.fr>"
+ * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 public class ConfDataLoader {
 
@@ -85,17 +85,17 @@ public class ConfDataLoader {
 		return producers;
 	}
 
-	public List<EventProducer> getProducersFromResult(AnalysisResult result) throws SoCTraceException {
-		ITraceSearch traceSearch = new TraceSearch().initialize();
+	public List<EventProducer> getProducersFromResult(final AnalysisResult result) throws SoCTraceException {
+		final ITraceSearch traceSearch = new TraceSearch().initialize();
 		traceSearch.getAnalysisResultData(currentTrace, result);
 		traceSearch.uninitialize();
-		AnalysisResultSearchData data = (AnalysisResultSearchData) result.getData();
-		List<ISearchable> search = data.getElements();
-		List<Integer> id = new ArrayList<Integer>();
-		List<EventProducer> prodFromResult = new ArrayList<EventProducer>();
-		for (ISearchable s : search)
+		final AnalysisResultSearchData data = (AnalysisResultSearchData) result.getData();
+		final List<ISearchable> search = data.getElements();
+		final List<Integer> id = new ArrayList<Integer>();
+		final List<EventProducer> prodFromResult = new ArrayList<EventProducer>();
+		for (final ISearchable s : search)
 			id.add(s.getId());
-		for (EventProducer ep : producers)
+		for (final EventProducer ep : producers)
 			if (id.contains(ep.getId()))
 				prodFromResult.add(ep);
 		return prodFromResult;
@@ -115,29 +115,31 @@ public class ConfDataLoader {
 		return types;
 	}
 
-	/** Load the information related to the new Trace.
+	/**
+	 * Load the information related to the new Trace.
 	 * 
 	 * @param trace
 	 *            trace to consider
-	 * @throws SoCTraceException */
+	 * @throws SoCTraceException
+	 */
 	public void load(final Trace trace) throws SoCTraceException {
 		clean();
 		currentTrace = trace;
-		TraceDBObject traceDB = new TraceDBObject(trace.getDbName(), DBMode.DB_OPEN);
-		EventProducerQuery pQuery = new EventProducerQuery(traceDB);
+		final TraceDBObject traceDB = new TraceDBObject(trace.getDbName(), DBMode.DB_OPEN);
+		final EventProducerQuery pQuery = new EventProducerQuery(traceDB);
 		producers = pQuery.getList();
-		EventTypeQuery tQuery = new EventTypeQuery(traceDB);
+		final EventTypeQuery tQuery = new EventTypeQuery(traceDB);
 		types = tQuery.getList();
 		minTimestamp = Math.max(0, traceDB.getMinTimestamp());
 		maxTimestamp = Math.max(0, traceDB.getMaxTimestamp());
-		AnalysisResultQuery aQuery = new AnalysisResultQuery(traceDB);
+		final AnalysisResultQuery aQuery = new AnalysisResultQuery(traceDB);
 		results = aQuery.getList();
 		traceDB.close();
 	}
 
 	public List<Trace> loadTraces() throws SoCTraceException {
-		SystemDBObject sysDB = FramesocManager.getInstance().getSystemDB();
-		TraceQuery tQuery = new TraceQuery(sysDB);
+		final SystemDBObject sysDB = FramesocManager.getInstance().getSystemDB();
+		final TraceQuery tQuery = new TraceQuery(sysDB);
 		traces = tQuery.getList();
 		sysDB.close();
 		return traces;

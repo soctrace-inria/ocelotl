@@ -27,7 +27,7 @@ public class TimeRegion {
 		super();
 	}
 
-	public TimeRegion(long timeStampStart, long timeStampEnd) {
+	public TimeRegion(final long timeStampStart, final long timeStampEnd) {
 		super();
 		setTimeStampStart(timeStampStart);
 		setTimeStampEnd(timeStampEnd);
@@ -45,19 +45,19 @@ public class TimeRegion {
 		return timeStampStart;
 	}
 
-	public void setTimeStampEnd(long timeStampEnd) {
+	public void setTimeStampEnd(final long timeStampEnd) {
 		if (timeStampEnd >= timeStampStart)
 			this.timeStampEnd = timeStampEnd;
 	}
 
-	public void setTimeStamps(long timeStampStart, long timeStampEnd) {
+	public void setTimeStamps(final long timeStampStart, final long timeStampEnd) {
 		if (timeStampStart <= timeStampEnd) {
 			this.timeStampStart = timeStampStart;
 			this.timeStampEnd = timeStampEnd;
 		}
 	}
 
-	public void setTimeStampStart(long timeStampStart) {
+	public void setTimeStampStart(final long timeStampStart) {
 		if (timeStampStart <= timeStampEnd)
 			this.timeStampStart = timeStampStart;
 	}
