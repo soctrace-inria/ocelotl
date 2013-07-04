@@ -44,8 +44,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import fr.inria.soctrace.tools.ocelotl.core.Quality;
-import fr.inria.soctrace.tools.ocelotl.core.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.Quality;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 /** 
  * Matrix View : part representation, according to LP algorithm result

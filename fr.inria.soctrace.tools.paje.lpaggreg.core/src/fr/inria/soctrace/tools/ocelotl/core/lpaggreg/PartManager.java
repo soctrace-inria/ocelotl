@@ -16,20 +16,23 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core;
+package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+
 public class PartManager {
 
-	private LPAggregCore		lpaggregCore;
+	private OcelotlCore		lpaggregCore;
 	private ILPAggregManager	lpaggregManager;
 	private List<TimeRegion>	timeStamps	= new ArrayList<TimeRegion>();
 	private TimeRegion			traceRegion;
 	private int					timeSliceNumber;
 
-	public PartManager(LPAggregCore lpaggregCore) {
+	public PartManager(OcelotlCore lpaggregCore) {
 		super();
 		this.lpaggregCore = lpaggregCore;
 		this.lpaggregManager = lpaggregCore.getLpaggregManager();
@@ -51,11 +54,11 @@ public class PartManager {
 		timeStamps.get(timeStamps.size()-1).setTimeStampEnd(traceRegion.getTimeStampEnd());
 	}
 
-	public LPAggregCore getLpaggregCore() {
+	public OcelotlCore getLpaggregCore() {
 		return lpaggregCore;
 	}
 
-	public void setLpaggregCore(LPAggregCore lpaggregCore) {
+	public void setLpaggregCore(OcelotlCore lpaggregCore) {
 		this.lpaggregCore = lpaggregCore;
 		this.lpaggregManager = lpaggregCore.getLpaggregManager();
 		this.timeSliceNumber = lpaggregManager.getParts().size();
@@ -87,8 +90,8 @@ public class PartManager {
 		System.out.println("");
 		System.out.println("Time region:  ["+traceRegion.getTimeStampStart()+" - "+traceRegion.getTimeStampEnd()+"] - duration: "+traceRegion.getTimeDuration());
 		System.out.println("Time slice number: "+timeSliceNumber);
-		System.out.println("Aggregation operator: "+lpaggregCore.lpaggregParameters.getAggOperator());
-		System.out.println("Gain/Loss parameter p: "+lpaggregCore.lpaggregParameters.getParameter());
+		System.out.println("Aggregation operator: "+lpaggregCore.getLpaggregParameters().getAggOperator());
+		System.out.println("Gain/Loss parameter p: "+lpaggregCore.getLpaggregParameters().getParameter());
 		System.out.println("*******************");
 		System.out.println("");
 		System.out.println("Aggregation timestamps:");

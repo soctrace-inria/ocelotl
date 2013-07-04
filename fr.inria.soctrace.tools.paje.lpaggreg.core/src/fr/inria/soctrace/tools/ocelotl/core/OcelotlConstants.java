@@ -18,28 +18,10 @@
 
 package fr.inria.soctrace.tools.ocelotl.core;
 
-import java.util.List;
+public class OcelotlConstants {
 
-public interface ILPAggregManager {
-
-	public void computeDichotomy();
-
-	public void computeParts();
-
-	public void computeQualities();
-
-	public void fillVectors();
-
-	public List<Float> getParameters();
-	
-	public List<Integer> getParts();
-	
-	public List<Quality> getQualities();
-
-	public void printParameters();
-
-	public void printParts();
-
-	public void reset();
+	static public enum HasChanged {
+		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
+	}
 
 }

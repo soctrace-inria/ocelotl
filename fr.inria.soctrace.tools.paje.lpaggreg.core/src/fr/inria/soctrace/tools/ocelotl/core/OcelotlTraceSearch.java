@@ -19,8 +19,9 @@ import fr.inria.soctrace.lib.search.TraceSearch;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class TraceSearchLPAggreg extends TraceSearch {
+public class OcelotlTraceSearch extends TraceSearch {
 
 	public List<Event> getEventsByEventTypesAndIntervalsAndEventProducers(
 			Trace t, List<EventType> eventTypes, List<IntervalDesc> intervals,

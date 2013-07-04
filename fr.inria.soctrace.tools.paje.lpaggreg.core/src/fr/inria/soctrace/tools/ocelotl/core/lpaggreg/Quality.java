@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.core;
+package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 
 public class Quality {
 	

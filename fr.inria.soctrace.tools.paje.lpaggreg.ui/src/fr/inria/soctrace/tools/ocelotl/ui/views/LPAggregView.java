@@ -66,10 +66,10 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.LPAggregCore;
-import fr.inria.soctrace.tools.ocelotl.core.LPAggregParameters;
-import fr.inria.soctrace.tools.ocelotl.core.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.LPAggregConstants.HasChanged;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators.AggregationOperators;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
@@ -486,8 +486,8 @@ public class LPAggregView extends ViewPart {
 	private Button 							btnRun;
 	private Button 							btnMergeAggregatedParts;
 	private Button 							btnShowNumbers;
-	private LPAggregCore					core;
-	private LPAggregParameters				params;
+	private OcelotlCore					core;
+	private OcelotlParameters				params;
 	private MatrixView						matrix;
 	private TimeAxisView					timeAxis;
 	private QualityView						qualityView;
@@ -502,8 +502,8 @@ public class LPAggregView extends ViewPart {
 		} catch (SoCTraceException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
-		params = new LPAggregParameters();
-		core = new LPAggregCore(params);
+		params = new OcelotlParameters();
+		core = new OcelotlCore(params);
 	}
 	
 	
@@ -519,11 +519,11 @@ public class LPAggregView extends ViewPart {
 	public Button getBtnRun() {
 		return btnRun;
 	}
-	public LPAggregCore getCore() {
+	public OcelotlCore getCore() {
 		return core;
 	}
 	
-	public LPAggregParameters getParams() {
+	public OcelotlParameters getParams() {
 		return params;
 	}
 
@@ -939,7 +939,7 @@ public class LPAggregView extends ViewPart {
 
 		Label lblDivideDbQueries = new Label(grpEventProducersMax, SWT.NONE);
 		lblDivideDbQueries.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblDivideDbQueries.setText("Divide DB queries (Event Producers per query, inactive if 0)");
+		lblDivideDbQueries.setText("Divide DB query (Event Producers per query, inactive if 0)");
 
 		maxEventProducers = new Spinner(grpEventProducersMax, SWT.BORDER);
 		maxEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));

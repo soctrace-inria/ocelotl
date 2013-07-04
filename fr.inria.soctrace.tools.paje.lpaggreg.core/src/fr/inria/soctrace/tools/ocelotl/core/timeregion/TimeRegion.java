@@ -16,7 +16,7 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core;
+package fr.inria.soctrace.tools.ocelotl.core.timeregion;
 
 public class TimeRegion {
 

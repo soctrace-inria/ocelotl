@@ -16,7 +16,7 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core;
+package fr.inria.soctrace.tools.ocelotl.core.query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +29,14 @@ import fr.inria.soctrace.lib.search.ITraceSearch;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlTraceSearch;
 
-public class Queries {
+public class Query {
 
-	private LPAggregParameters	lpaggregParameters;
+	private OcelotlParameters	lpaggregParameters;
 
-	public Queries(LPAggregParameters lpaggregParameters) throws SoCTraceException {
+	public Query(OcelotlParameters lpaggregParameters) throws SoCTraceException {
 		super();
 		this.lpaggregParameters = lpaggregParameters;
 	}
@@ -55,7 +57,7 @@ public class Queries {
 		if ((eventProducers.size()==getAllEventProducers().size())){
 			return getAllEvents();
 		}else {
-			ITraceSearch traceSearch = new TraceSearchLPAggreg().initialize();
+			ITraceSearch traceSearch = new OcelotlTraceSearch().initialize();
 			List<IntervalDesc> time= new ArrayList<IntervalDesc>();
 			time.add(new IntervalDesc(lpaggregParameters.getTimeRegion().getTimeStampStart(), lpaggregParameters.getTimeRegion().getTimeStampEnd()));
 			List<Event> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducers(lpaggregParameters.getTrace(), lpaggregParameters.getEventTypes(), time , eventProducers);
@@ -64,12 +66,12 @@ public class Queries {
 		}
 	}	
 
-	public LPAggregParameters getLpaggregParameters() {
+	public OcelotlParameters getLpaggregParameters() {
 		return lpaggregParameters;
 	}
 	
 	public List<Event> getAllEvents() throws SoCTraceException{
-		ITraceSearch traceSearch = new TraceSearchLPAggreg().initialize();
+		ITraceSearch traceSearch = new OcelotlTraceSearch().initialize();
 		List<IntervalDesc> time= new ArrayList<IntervalDesc>();
 		time.add(new IntervalDesc(lpaggregParameters.getTimeRegion().getTimeStampStart(), lpaggregParameters.getTimeRegion().getTimeStampEnd()));
 		List<Event> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducers(lpaggregParameters.getTrace(), lpaggregParameters.getEventTypes(), time, null);

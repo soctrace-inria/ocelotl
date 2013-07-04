@@ -16,12 +16,13 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core;
+package fr.inria.soctrace.tools.ocelotl.core.ts;
 
 import java.util.Map;
 
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class State {
 

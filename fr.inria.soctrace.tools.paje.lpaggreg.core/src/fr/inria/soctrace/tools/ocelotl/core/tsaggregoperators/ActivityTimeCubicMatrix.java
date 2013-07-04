@@ -27,22 +27,22 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.Queries;
-import fr.inria.soctrace.tools.ocelotl.core.State;
-import fr.inria.soctrace.tools.ocelotl.core.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.ts.State;
+import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
 public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix{
 
-	protected Queries						queries;
+	protected Query						query;
 	protected List<HashMap<String, HashMap<String, Long>>>	matrix	= new ArrayList<HashMap<String, HashMap<String, Long>>>();
 	protected int							eventsNumber;
 	protected TimeSliceManager				timeSliceManager;
 
-	public ActivityTimeCubicMatrix(Queries queries) throws SoCTraceException {
+	public ActivityTimeCubicMatrix(Query query) throws SoCTraceException {
 		super();
-		this.queries = queries;
-		queries.checkTimeStamps();
-		timeSliceManager = new TimeSliceManager(queries.getLpaggregParameters().getTimeRegion(), queries.getLpaggregParameters().getTimeSlicesNumber());
+		this.query = query;
+		query.checkTimeStamps();
+		timeSliceManager = new TimeSliceManager(query.getLpaggregParameters().getTimeRegion(), query.getLpaggregParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
 	}
@@ -50,7 +50,7 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix{
 	protected void computeSubMatrix(List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		List<Event> fullEvents = queries.getEvents(eventProducers);
+		List<Event> fullEvents = query.getEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -65,7 +65,7 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix{
 			List<Event> events = eventList.get(ep.getId());
 			for (int i=0; i<events.size()-1; i++){
 				state.add(new State(events.get(i), events.get(i + 1), timeSliceManager));
-				if (queries.getLpaggregParameters().getSleepingStates().contains(state.get(state.size()-1).getStateType()))
+				if (query.getLpaggregParameters().getSleepingStates().contains(state.get(state.size()-1).getStateType()))
 					state.remove(state.size()-1);
 				else{
 					Map<Long, Long> distrib = state.get(state.size()-1).getTimeSlicesDistribution();
@@ -83,7 +83,7 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix{
 				}
 			}
 		}
-		dm.end("VECTORS COMPUTATION : " + queries.getLpaggregParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTORS COMPUTATION : " + query.getLpaggregParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 
@@ -91,13 +91,13 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix{
 		eventsNumber = 0;
 		DeltaManager dm = new DeltaManager();
 		dm.start();	
-		int epsize = queries.getLpaggregParameters().getEventProducers().size();
-		if ((queries.getLpaggregParameters().getMaxEventProducers()==0) || (epsize<queries.getLpaggregParameters().getMaxEventProducers())){
-			computeSubMatrix(queries.getLpaggregParameters().getEventProducers());
+		int epsize = query.getLpaggregParameters().getEventProducers().size();
+		if ((query.getLpaggregParameters().getMaxEventProducers()==0) || (epsize<query.getLpaggregParameters().getMaxEventProducers())){
+			computeSubMatrix(query.getLpaggregParameters().getEventProducers());
 		}else{
-			List<EventProducer> producers = (queries.getLpaggregParameters().getEventProducers().size() == 0) ? queries.getAllEventProducers() : queries.getLpaggregParameters().getEventProducers();
-			for (int i=0; i<epsize; i=i+queries.getLpaggregParameters().getMaxEventProducers()){
-				computeSubMatrix(producers.subList(i, Math.min(epsize-1, i+queries.getLpaggregParameters().getMaxEventProducers())));
+			List<EventProducer> producers = (query.getLpaggregParameters().getEventProducers().size() == 0) ? query.getAllEventProducers() : query.getLpaggregParameters().getEventProducers();
+			for (int i=0; i<epsize; i=i+query.getLpaggregParameters().getMaxEventProducers()){
+				computeSubMatrix(producers.subList(i, Math.min(epsize-1, i+query.getLpaggregParameters().getMaxEventProducers())));
 			}
 		}
 
@@ -108,8 +108,8 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix{
 		return matrix;
 	}
 
-	public Queries getQueries() {
-		return queries;
+	public Query getQueries() {
+		return query;
 	}
 
 	public TimeSliceManager getTimeSlicesManager() {
@@ -125,7 +125,7 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix{
 	}
 
 	public void initVectors() throws SoCTraceException {
-		List<EventProducer> producers = queries.getLpaggregParameters().getEventProducers();
+		List<EventProducer> producers = query.getLpaggregParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
 			matrix.add(new HashMap<String, HashMap<String, Long>>());
 
@@ -147,8 +147,8 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix{
 		}
 	}
 
-	public void setQueries(Queries queries) {
-		this.queries = queries;
+	public void setQueries(Query query) {
+		this.query = query;
 	}
 
 	@Override

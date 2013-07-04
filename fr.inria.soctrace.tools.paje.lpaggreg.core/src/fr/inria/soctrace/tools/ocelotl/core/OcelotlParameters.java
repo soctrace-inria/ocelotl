@@ -24,8 +24,9 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class LPAggregParameters {
+public class OcelotlParameters {
 
 	private List<EventProducer>	eventProducers		= new ArrayList<EventProducer>();
 	private List<EventType>		eventTypes			= new ArrayList<EventType>();		;
@@ -39,7 +40,7 @@ public class LPAggregParameters {
 	private int					maxEventProducers	= 0;
 	private String 				aggOperator;
 
-	public LPAggregParameters() {
+	public OcelotlParameters() {
 		super();
 	}
 
@@ -137,7 +138,7 @@ public class LPAggregParameters {
 	@Override
 	public String toString() { //TODO update this
 		StringBuilder builder = new StringBuilder();
-		builder.append("LPAggregParameters \n[\neventProducers=").append(eventProducers).append("\neventTypes=").append(eventTypes).append("\nsleepingStates=").append(sleepingStates).append("\ntimeSlicesNumber=").append(timeSlicesNumber).append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold)
+		builder.append("OcelotlParameters \n[\neventProducers=").append(eventProducers).append("\neventTypes=").append(eventTypes).append("\nsleepingStates=").append(sleepingStates).append("\ntimeSlicesNumber=").append(timeSlicesNumber).append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold)
 		.append("\ntrace=").append(trace).append("\n]");
 		return builder.toString();
 	}

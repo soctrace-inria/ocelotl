@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package fr.inria.soctrace.tools.ocelotl.core.jni;
+package fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni;
 
 public class lpaggreg {
 }

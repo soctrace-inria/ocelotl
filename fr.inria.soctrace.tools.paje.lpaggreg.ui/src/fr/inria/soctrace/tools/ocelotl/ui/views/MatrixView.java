@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import fr.inria.soctrace.tools.ocelotl.core.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 /** 
  * Matrix View : part representation, according to LP algorithm result

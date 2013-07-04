@@ -16,10 +16,10 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core;
+package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.jni.MLPAggregWrapper;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.MLPAggregWrapper;
 import fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators.ITimeSliceCubicMatrix;
 
 public class MLPAggregManager extends LPAggregManager{

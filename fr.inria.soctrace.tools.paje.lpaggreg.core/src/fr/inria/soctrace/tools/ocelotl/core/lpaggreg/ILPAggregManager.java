@@ -16,12 +16,30 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core;
+package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 
-public class LPAggregConstants {
+import java.util.List;
 
-	static public enum HasChanged {
-		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
-	}
+public interface ILPAggregManager {
+
+	public void computeDichotomy();
+
+	public void computeParts();
+
+	public void computeQualities();
+
+	public void fillVectors();
+
+	public List<Float> getParameters();
+	
+	public List<Integer> getParts();
+	
+	public List<Quality> getQualities();
+
+	public void printParameters();
+
+	public void printParts();
+
+	public void reset();
 
 }
