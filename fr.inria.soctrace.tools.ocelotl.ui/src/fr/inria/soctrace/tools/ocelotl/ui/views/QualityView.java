@@ -186,7 +186,7 @@ public class QualityView {
 	public void drawXYLines() {
 		final RectangleFigure rectangleX = new RectangleFigure();
 		final RectangleFigure rectangleY = new RectangleFigure();
-		root.add(rectangleX, new Rectangle(new Point(XBorder, root.getSize().height() - YBorder - AxisWidth), new Point(root.getSize().width()- Border, root.getSize().height() - YBorder)));
+		root.add(rectangleX, new Rectangle(new Point(XBorder, root.getSize().height() - YBorder + AxisWidth), new Point(root.getSize().width()- Border, root.getSize().height() - YBorder)));
 		rectangleX.setBackgroundColor(ColorConstants.darkGray);
 		rectangleX.setForegroundColor(ColorConstants.darkGray);
 		root.add(rectangleY, new Rectangle(new Point(XBorder - AxisWidth, Border), new Point(XBorder, root.getSize().height() - YBorder)));
@@ -200,7 +200,7 @@ public class QualityView {
 		YGrads();
 		NumberFormat formatter = null;
 		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
-		formatter = new DecimalFormat("0.00E0");
+		formatter = new DecimalFormat("0.0E0");
 		final double width = root.getSize().width -  XBorder - Border;
 		final double height = root.getSize().height - YBorder;
 		for (int i = 0; i < (int) yGradNumber + 1; i++) {
@@ -215,8 +215,10 @@ public class QualityView {
 			rectangleText.setBackgroundColor(ColorConstants.white);
 			rectangleText.setForegroundColor(ColorConstants.white);
 			final double max = Math.max(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss());
-			final double value = i == yGradNumber ? max : (double) ((long) (i * qualityWidth * 10) / 10.0);
-			final String text = formatter.format(value);
+			final double value = i == yGradNumber ? max : (double) ((long) (i * qualityWidth * 10) / 10.0);			
+			String text = formatter.format(value);
+			if (value<1000)
+				text=String.valueOf(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(ColorConstants.darkGray);

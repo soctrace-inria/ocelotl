@@ -62,6 +62,12 @@ public class TimeRegion {
 		if (timeStampStart <= timeStampEnd)
 			this.timeStampStart = timeStampStart;
 	}
+	
+	public boolean containsTimeStamp(final long timeStamp) {
+		if (timeStamp<timeStampStart||timeStamp>timeStampEnd)
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {
