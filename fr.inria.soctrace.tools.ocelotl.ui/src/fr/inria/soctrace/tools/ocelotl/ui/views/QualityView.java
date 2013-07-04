@@ -19,6 +19,8 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
@@ -53,8 +55,9 @@ public class QualityView {
 
 	private Figure				root;
 	private Canvas				canvas;
-	private final static int	Border				= 10;
-	private final static int	LeftBorder			= 50;
+	private final static int	XBorder				= 50;
+	private final static int	YBorder				= 25;
+	private final static int	Border				= 15;
 	private final static int	AxisWidth			= 1;
 	private final static int	YGradDefaultNumber	= 10;
 	private double				yGradNumber			= 10.0;
@@ -96,10 +99,10 @@ public class QualityView {
 	public void drawParam() {
 		if (currentParameter == -1)
 			return;
-		final int width = root.getSize().width - 2 * Border;
-		final int yOff = root.getSize().height() - Border;
+		final int width = root.getSize().width - XBorder - Border;
+		final int yOff = root.getSize().height() - YBorder;
 		final PolylineConnection line = new PolylineConnection();
-		line.setEndpoints(new Point((int) (Border + width * (1 - currentParameter)), yOff), new Point((int) (Border + width * (1 - currentParameter)), Border));
+		line.setEndpoints(new Point((int) (XBorder + width * (1 - currentParameter)), yOff), new Point((int) (XBorder + width * (1 - currentParameter)), Border));
 		line.setForegroundColor(ColorConstants.blue);
 		line.setLineWidthFloat(ParamLineWidth);
 		root.add(line);
@@ -108,9 +111,9 @@ public class QualityView {
 	public void drawQualities() {
 		int i;
 		final double maxValue = Math.max(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss());
-		final int width = root.getSize().width - 2 * Border;
-		final int yOff = root.getSize().height() - Border;
-		final int height = root.getSize().height() - 2 * Border;
+		final int width = root.getSize().width -  XBorder - Border;
+		final int yOff = root.getSize().height() - YBorder;
+		final int height = root.getSize().height() - YBorder - Border;
 		qualities.add(new Quality(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss(), 1));
 		for (i = 1; i < qualities.size(); i++) {
 			final float cParam = 1 - qualities.get(i).getParameter();
@@ -120,13 +123,13 @@ public class QualityView {
 			final double closs = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i).getLoss();
 			final double nloss = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i - 1).getLoss();
 			final PolylineConnection lineGain1 = new PolylineConnection();
-			lineGain1.setEndpoints(new Point((int) (Border + width * cParam), (int) (yOff - height * cgain / maxValue)), new Point((int) (Border + width * cParam), (int) (yOff - height * ngain / maxValue)));
+			lineGain1.setEndpoints(new Point((int) (XBorder + width * cParam), (int) (yOff - height * cgain / maxValue)), new Point((int) (XBorder + width * cParam), (int) (yOff - height * ngain / maxValue)));
 			final PolylineConnection lineLoss1 = new PolylineConnection();
-			lineLoss1.setEndpoints(new Point((int) (Border + width * cParam), (int) (yOff - height * closs / maxValue)), new Point((int) (Border + width * cParam), (int) (yOff - height * nloss / maxValue)));
+			lineLoss1.setEndpoints(new Point((int) (XBorder + width * cParam), (int) (yOff - height * closs / maxValue)), new Point((int) (XBorder + width * cParam), (int) (yOff - height * nloss / maxValue)));
 			final PolylineConnection lineGain2 = new PolylineConnection();
-			lineGain2.setEndpoints(new Point((int) (Border + width * cParam), (int) (yOff - height * ngain / maxValue)), new Point((int) (Border + width * nParam), (int) (yOff - height * ngain / maxValue)));
+			lineGain2.setEndpoints(new Point((int) (XBorder + width * cParam), (int) (yOff - height * ngain / maxValue)), new Point((int) (XBorder + width * nParam), (int) (yOff - height * ngain / maxValue)));
 			final PolylineConnection lineLoss2 = new PolylineConnection();
-			lineLoss2.setEndpoints(new Point((int) (Border + width * cParam), (int) (yOff - height * nloss / maxValue)), new Point((int) (Border + width * nParam), (int) (yOff - height * nloss / maxValue)));
+			lineLoss2.setEndpoints(new Point((int) (XBorder + width * cParam), (int) (yOff - height * nloss / maxValue)), new Point((int) (XBorder + width * nParam), (int) (yOff - height * nloss / maxValue)));
 			lineGain1.setForegroundColor(ColorConstants.green);
 			lineLoss1.setForegroundColor(ColorConstants.red);
 			lineGain1.setLineWidthFloat(QualityLineWidth);
@@ -144,17 +147,17 @@ public class QualityView {
 	}
 
 	public void drawXGrads() {
-		final double width = (root.getSize().width - 2 * Border) / XGradNumber;
+		final double width = (root.getSize().width - XBorder - Border) / XGradNumber;
 		for (int i = 0; i < XGradNumber + 1; i++) {
 			final PolylineConnection line = new PolylineConnection();
-			line.setEndpoints(new Point((int) (i * width + Border), root.getSize().height() - Border), new Point(new Point((int) (i * width + Border), Border)));
+			line.setEndpoints(new Point((int) (i * width + XBorder), root.getSize().height() - YBorder), new Point(new Point((int) (i * width + XBorder), Border)));
 			line.setBackgroundColor(ColorConstants.lightGray);
 			line.setForegroundColor(ColorConstants.lightGray);
 			line.setLineWidth(1);
 			root.add(line);
 			final RectangleFigure rectangleText = new RectangleFigure();
-			root.add(rectangleText, new Rectangle(new Point((int) (i * width + Border - TextWidth / 2), root.getSize().height() - Border + TextOffset), new Point(new Point((int) (i * width + Border + AxisWidth + TextWidth / 2), root.getSize().height()
-					- Border - AxisWidth + TextHeight + TextOffset))));
+			root.add(rectangleText, new Rectangle(new Point((int) (i * width + XBorder - TextWidth / 2), root.getSize().height() - YBorder + TextOffset), new Point(new Point((int) (i * width + XBorder + AxisWidth + TextWidth / 2), root.getSize().height()
+					- YBorder - AxisWidth + TextHeight + TextOffset))));
 			final float value = (float) ((10 - i) * 0.1);
 			final Label label = new Label("" + value);
 			label.setLabelAlignment(SWT.CENTER);
@@ -170,7 +173,7 @@ public class QualityView {
 			if (i != (int) XGradNumber && width / MiniDivide > YGradWidthMin / 2)
 				for (int j = 1; j < 5; j++) {
 					final PolylineConnection lineDash = new PolylineConnection();
-					lineDash.setEndpoints(new Point((int) (i * width + Border) + (int) (j * width / MiniDivide), root.getSize().height() - Border), new Point(new Point((int) (i * width + Border) + (int) (j * width / MiniDivide), Border)));
+					lineDash.setEndpoints(new Point((int) (i * width + XBorder) + (int) (j * width / MiniDivide), root.getSize().height() - YBorder), new Point(new Point((int) (i * width + XBorder) + (int) (j * width / MiniDivide), Border)));
 					lineDash.setBackgroundColor(ColorConstants.lightGray);
 					lineDash.setForegroundColor(ColorConstants.lightGray);
 					lineDash.setLineWidth(1);
@@ -183,10 +186,10 @@ public class QualityView {
 	public void drawXYLines() {
 		final RectangleFigure rectangleX = new RectangleFigure();
 		final RectangleFigure rectangleY = new RectangleFigure();
-		root.add(rectangleX, new Rectangle(new Point(Border, root.getSize().height() - Border - AxisWidth), new Point(root.getSize().width() - Border, root.getSize().height() - Border)));
+		root.add(rectangleX, new Rectangle(new Point(XBorder, root.getSize().height() - YBorder - AxisWidth), new Point(root.getSize().width()- Border, root.getSize().height() - YBorder)));
 		rectangleX.setBackgroundColor(ColorConstants.darkGray);
 		rectangleX.setForegroundColor(ColorConstants.darkGray);
-		root.add(rectangleY, new Rectangle(new Point(Border - AxisWidth, Border), new Point(Border, root.getSize().height() - Border)));
+		root.add(rectangleY, new Rectangle(new Point(XBorder - AxisWidth, Border), new Point(XBorder, root.getSize().height() - YBorder)));
 		rectangleY.setBackgroundColor(ColorConstants.darkGray);
 		rectangleY.setForegroundColor(ColorConstants.darkGray);
 		rectangleX.setLineWidth(1);
@@ -195,22 +198,26 @@ public class QualityView {
 
 	public void drawYGrads() {
 		YGrads();
-		final double width = root.getSize().width - 2 * Border;
-		final double height = root.getSize().height - 2 * Border;
+		NumberFormat formatter = null;
+		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
+		formatter = new DecimalFormat("0.00E0");
+		final double width = root.getSize().width -  XBorder - Border;
+		final double height = root.getSize().height - YBorder;
 		for (int i = 0; i < (int) yGradNumber + 1; i++) {
 			final PolylineConnection line = new PolylineConnection();
-			line.setEndpoints(new Point(Border, (int) (height + Border - i * yGradWidth)), new Point((int) (width + Border), (int) (height + Border - i * yGradWidth)));
+			line.setEndpoints(new Point(XBorder, (int) (height - i * yGradWidth)), new Point((int) (width + XBorder), (int) (height - i * yGradWidth)));
 			line.setBackgroundColor(ColorConstants.lightGray);
 			line.setForegroundColor(ColorConstants.lightGray);
 			line.setLineWidth(1);
 			root.add(line);
 			final RectangleFigure rectangleText = new RectangleFigure();
-			root.add(rectangleText, new Rectangle(new Point(Border - TextWidth - TextOffset, (int) (height + Border - i * yGradWidth) + TextHeight / 3), new Point(new Point(Border - TextOffset, (int) (height + Border - i * yGradWidth - TextHeight / 1.5)))));
+			root.add(rectangleText, new Rectangle(new Point(XBorder - TextWidth - TextOffset, (int) (height - i * yGradWidth) + TextHeight / 3), new Point(new Point(XBorder - TextOffset, (int) (height - i * yGradWidth - TextHeight / 1.5)))));
 			rectangleText.setBackgroundColor(ColorConstants.white);
 			rectangleText.setForegroundColor(ColorConstants.white);
 			final double max = Math.max(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss());
 			final double value = i == yGradNumber ? max : (double) ((long) (i * qualityWidth * 10) / 10.0);
-			final Label label = new Label("" + value);
+			final String text = formatter.format(value);
+			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(ColorConstants.darkGray);
 			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
@@ -277,8 +284,8 @@ public class QualityView {
 	public void mousePressed(final MouseEvent arg0) {
 		state = State.PRESSED;
 		if (qualities != null)
-			if (arg0.x > Border && arg0.x < root.getSize().width() - Border) {
-				final float param = 1 - (float) (arg0.x - Border) / (root.getSize().width() - 2 * Border);
+			if (arg0.x > XBorder && arg0.x < root.getSize().width() - Border) {
+				final float param = 1 - (float) (arg0.x - XBorder) / (root.getSize().width() - XBorder - Border);
 				ocelotlView.getParam().setText(String.valueOf(param));
 				ocelotlView.setConfiguration();
 				createDiagram();
@@ -309,7 +316,7 @@ public class QualityView {
 			temp *= 10;
 		qualityWidth = (double) temp / (double) factor;
 		yGradNumber = maxValue / qualityWidth;
-		yGradWidth = (root.getSize().height - 2 * Border - 1) / yGradNumber;
+		yGradWidth = (root.getSize().height - YBorder - Border) / yGradNumber;
 		while (yGradWidth < YGradWidthMin && yGradNumber > 6) {
 			yGradNumber /= 2;
 			yGradWidth *= 2;
