@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.Quality;
 
 /**
@@ -118,10 +119,17 @@ public class QualityView {
 		for (i = 1; i < qualities.size(); i++) {
 			final float cParam = 1 - qualities.get(i).getParameter();
 			final float nParam = 1 - qualities.get(i - 1).getParameter();
-			final double cgain = qualities.get(qualities.size() - 1).getGain()-qualities.get(i).getGain();
-			final double ngain = qualities.get(qualities.size() - 1).getGain()-qualities.get(i - 1).getGain();
-			final double closs = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i).getLoss();
-			final double nloss = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i - 1).getLoss();
+			double cgain = qualities.get(qualities.size() - 1).getGain()-qualities.get(i).getGain();
+			double ngain = qualities.get(qualities.size() - 1).getGain()-qualities.get(i - 1).getGain();
+			double closs = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i).getLoss();
+			double nloss = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i - 1).getLoss();
+			if (!ocelotlView.getParams().isGrowingQualities()){
+				cgain = qualities.get(i).getGain();
+				ngain = qualities.get(i - 1).getGain();
+				closs = qualities.get(i).getLoss();
+				nloss = qualities.get(i - 1).getLoss();
+			}
+			
 			final PolylineConnection lineGain1 = new PolylineConnection();
 			lineGain1.setEndpoints(new Point((int) (XBorder + width * cParam), (int) (yOff - height * cgain / maxValue)), new Point((int) (XBorder + width * cParam), (int) (yOff - height * ngain / maxValue)));
 			final PolylineConnection lineLoss1 = new PolylineConnection();

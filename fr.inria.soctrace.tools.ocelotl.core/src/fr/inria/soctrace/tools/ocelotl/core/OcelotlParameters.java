@@ -40,6 +40,15 @@ public class OcelotlParameters {
 	private Trace				trace				= null;
 	private int					maxEventProducers	= 0;
 	private String				aggOperator;
+	private boolean				growingQualities	=true;
+
+	public boolean isGrowingQualities() {
+		return growingQualities;
+	}
+
+	public void setGrowingQualities(boolean growingQualities) {
+		this.growingQualities = growingQualities;
+	}
 
 	public OcelotlParameters() {
 		super();

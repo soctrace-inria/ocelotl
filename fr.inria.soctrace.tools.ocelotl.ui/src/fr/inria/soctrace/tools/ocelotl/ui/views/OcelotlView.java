@@ -313,6 +313,31 @@ public class OcelotlView extends ViewPart {
 		public void widgetSelected(final SelectionEvent e) {
 			if (hasChanged != HasChanged.ALL)
 				hasChanged = HasChanged.NORMALIZE;
+			btnGetParameters.notifyListeners(SWT.Selection, new Event());
+		}
+	}
+	
+	private class GrowingQualityRadioSelectionAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (btnGrowingQualities.getSelection()){
+				btnDecreasingQualities.setSelection(false);
+				ocelotlParameters.setGrowingQualities(true);
+				qualityView.createDiagram();
+			}
+		}
+	}
+	
+	private class DecreasingQualityRadioSelectionAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (btnDecreasingQualities.getSelection()){
+				btnGrowingQualities.setSelection(false);
+				ocelotlParameters.setGrowingQualities(false);
+				qualityView.createDiagram();
+			}
 		}
 	}
 
@@ -465,10 +490,12 @@ public class OcelotlView extends ViewPart {
 	public static final String					ID			= "fr.inria.soctrace.tools.ocelotl.ui.Ocelotl"; //$NON-NLS-1$
 	public static final String					PLUGIN_ID	= Activator.PLUGIN_ID;
 	private Button								btnMergeAggregatedParts;
-
+	private Button 								btnGetParameters;
 	private Button								btnNormalize;
 	private Button								btnRun;
 	private Button								btnShowNumbers;
+	private Button 								btnGrowingQualities;
+	private Button 								btnDecreasingQualities;
 	private Combo								comboAggregationOperator;
 	private Combo								comboTraces;
 	private final ConfDataLoader				confDataLoader		= new ConfDataLoader();
@@ -510,6 +537,8 @@ public class OcelotlView extends ViewPart {
 		textTimestampStart.setText("0");
 		textTimestampEnd.setText("0");
 		btnNormalize.setSelection(false);
+		btnGrowingQualities.setSelection(true);
+		btnDecreasingQualities.setSelection(false);
 		spinnerTSNumber.setSelection(200);
 		spinnerDivideDbQuery.setSelection(0);
 		textRun.setText("0");
@@ -559,7 +588,7 @@ public class OcelotlView extends ViewPart {
 		sashFormComboTrace.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 		sashFormComboTrace.setLayout(new GridLayout(1, false));
 		comboTraces = new Combo(sashFormComboTrace, SWT.READ_ONLY);
-		final GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
+		final GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
 		gd_comboTraces.widthHint = 327;
 		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -705,7 +734,7 @@ public class OcelotlView extends ViewPart {
 		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
 		sashFormList.setWeights(new int[] { 1, 1, 1 });
-		sashFormTraceParameter.setWeights(new int[] { 23, 226 });
+		sashFormTraceParameter.setWeights(new int[] {34, 344});
 		comboTraces.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -735,7 +764,11 @@ public class OcelotlView extends ViewPart {
 		final SashForm sashFormTimeAggregationParameters = new SashForm(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setControl(sashFormTimeAggregationParameters);
 
-		final Group groupTSParameters = new Group(sashFormTimeAggregationParameters, SWT.NONE);
+
+		SashForm sashFormTSandCurve = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
+		sashFormTSandCurve.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		final Group groupTSParameters = new Group(sashFormTSandCurve, SWT.NONE);
 		groupTSParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTSParameters.setText("Time Slicing Parameters ");
 		groupTSParameters.setLayout(new GridLayout(1, false));
@@ -768,6 +801,7 @@ public class OcelotlView extends ViewPart {
 		for (final String op : AggregationOperators.List)
 			comboAggregationOperator.add(op);
 		comboAggregationOperator.setText(AggregationOperators.List.get(0));
+
 
 		final Group groupTimeInterval = new Group(groupTSParameters, SWT.NONE);
 		final GridData gd_groupTimeInterval = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
@@ -812,17 +846,33 @@ public class OcelotlView extends ViewPart {
 		spinnerTSNumber.setMaximum(10000);
 		spinnerTSNumber.setMinimum(1);
 		spinnerTSNumber.setSelection(200);
-		spinnerTSNumber.addModifyListener(new ConfModificationListener());
+
+		Group groupQualityCurveSettings = new Group(sashFormTSandCurve, SWT.NONE);
+		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupQualityCurveSettings.setText("Quality Curve Settings");
+		groupQualityCurveSettings.setLayout(new GridLayout(1, false));
+
+		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
+		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnNormalize.setSelection(false);
+		btnNormalize.setText("Normalize Qualities");
+
+		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
+		btnGrowingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnGrowingQualities.setText("Complexity (green), Information (red)");
+		btnGrowingQualities.setSelection(true);
+		btnGrowingQualities.addSelectionListener(new GrowingQualityRadioSelectionAdapter());
+
+		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
+		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
+		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnGrowingQualities.setSelection(false);
+		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
+		sashFormTSandCurve.setWeights(new int[] {227, 151});
 		final Group groupLPAParameters = new Group(sashFormTimeAggregationParameters, SWT.NONE);
 		groupLPAParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupLPAParameters.setLayout(new GridLayout(1, false));
 		groupLPAParameters.setText("Get Best-Cut Partition Gain/Loss Parameter List");
-
-		btnNormalize = new Button(groupLPAParameters, SWT.CHECK);
-		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnNormalize.setSelection(false);
-		btnNormalize.setText("Normalize Qualities");
-		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 
 		final Composite compositeGetParameters = new Composite(groupLPAParameters, SWT.NONE);
 		compositeGetParameters.setLayout(new GridLayout(3, false));
@@ -838,7 +888,7 @@ public class OcelotlView extends ViewPart {
 		gd_textThreshold.widthHint = 342;
 		textThreshold.setLayoutData(gd_textThreshold);
 		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		final Button btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
+		btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
 		btnGetParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnGetParameters.setText("Get");
 
@@ -877,20 +927,21 @@ public class OcelotlView extends ViewPart {
 		btnRun.setText("Process");
 		btnRun.addSelectionListener(new GetAggregationAdapter());
 		new Label(groupParameters, SWT.NONE);
-		listParameters.addSelectionListener(new SelectSelectionAdapter());
 
 		final Composite compositeQualityView = new Composite(sashFormTimeAggregationParameters, SWT.NONE);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		// compositeVisu.setToolTipText("test");
 		final GridLayout gl_compositeQualityView = new GridLayout();
 		compositeQualityView.setLayout(gl_compositeQualityView);
 		final Canvas canvasQualityView = qualityView.initDiagram(compositeQualityView);
-		canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
-		sashFormTimeAggregationParameters.setWeights(new int[] { 97, 153, 332 });
+		listParameters.addSelectionListener(new SelectSelectionAdapter());
 
 		btnGetParameters.addSelectionListener(new GetParametersAdapter());
 		textThreshold.addModifyListener(new ThresholdModifyListener());
+		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
+		spinnerTSNumber.addModifyListener(new ConfModificationListener());
+		canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashFormTimeAggregationParameters.setWeights(new int[] { 194, 153, 332 });
 
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
 		tbtmAdvancedParameters.setText("Advanced Parameters");
