@@ -27,6 +27,8 @@ import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
@@ -39,6 +41,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.paje.lpaggreg.core.Quality;
@@ -69,6 +72,7 @@ public class QualityView {
 	final static double	XGrads = 10;
 	List<Quality> 		qualities;
 	float 				currentParameter;
+	LPAggregView 		lpaggregView;
 
 	final ColorManager	colors	= new ColorManager();
 
@@ -255,10 +259,11 @@ public class QualityView {
 
 
 
-	public void createDiagram(List<Quality> qualities, float currentParameter) {
+	public void createDiagram() {
 		root.removeAll();
-		this.qualities=qualities;
-		this.currentParameter=currentParameter;
+		if (lpaggregView.getCore().getLpaggregManager()!=null){
+		this.qualities=lpaggregView.getCore().getLpaggregManager().getQualities();
+		this.currentParameter=lpaggregView.getCore().getLpaggregParameters().getParameter();
 		if (qualities!=null){
 			drawXGrads();
 			drawYGrads();
@@ -267,6 +272,14 @@ public class QualityView {
 			drawParam();
 		}
 		canvas.update();
+		}
+	}
+	
+	
+
+	public QualityView(LPAggregView lpaggregView) {
+		super();
+		this.lpaggregView=lpaggregView;
 	}
 
 	public Canvas initDiagram(Composite parent) {
@@ -300,13 +313,42 @@ public class QualityView {
 				resizeDiagram();
 			}
 		});
+		
+		root.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseDoubleClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				if (qualities!=null){
+					if (arg0.x>AxisBorder && arg0.x<(root.getSize().width()-AxisBorder)){
+						float param=1-(float)(arg0.x-AxisBorder)/(root.getSize().width()-2*AxisBorder);
+					lpaggregView.getParam().setText(String.valueOf(param));					
+					}
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				lpaggregView.getBtnRun().notifyListeners(SWT.Selection, new Event());
+				
+			}
+			
+		});
 
 		return canvas;
 	}
 
 	public void resizeDiagram() {
-		createDiagram(qualities, currentParameter);
+		createDiagram();
 		root.repaint();
 	}
+	
+	
 
 }

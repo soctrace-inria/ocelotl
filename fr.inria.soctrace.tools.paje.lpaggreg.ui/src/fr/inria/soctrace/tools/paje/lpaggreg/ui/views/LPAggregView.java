@@ -144,7 +144,7 @@ public class LPAggregView extends ViewPart {
 								list.removeAll();
 								for (float it : core.getLpaggregManager().getParameters())
 									list.add(Float.toString(it));
-								qualityView.createDiagram(core.getLpaggregManager().getQualities(), -1);
+								qualityView.createDiagram();
 							}
 						});
 					} catch (Exception e) {
@@ -352,7 +352,7 @@ public class LPAggregView extends ViewPart {
 								matrix.deleteDiagram();
 								matrix.createDiagram(core.getLpaggregManager().getParts(), params.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
 								timeAxis.createDiagram(params.getTimeRegion());
-								qualityView.createDiagram(core.getLpaggregManager().getQualities(), core.getLpaggregParameters().getParameter());
+								qualityView.createDiagram();
 							}
 						});
 					} catch (Exception e) {
@@ -402,7 +402,7 @@ public class LPAggregView extends ViewPart {
 									matrix.deleteDiagram();
 									timeAxis.createDiagram(params.getTimeRegion());
 									matrix.createDiagram(core.getLpaggregManager().getParts(), params.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
-									qualityView.createDiagram(core.getLpaggregManager().getQualities(), core.getLpaggregParameters().getParameter());
+									qualityView.createDiagram();
 								}
 							});
 						} catch (Exception e) {
@@ -474,6 +474,8 @@ public class LPAggregView extends ViewPart {
 	private ListViewer						listViewerTypes;
 	private ListViewer						listViewerIdles;
 	private List							list;
+
+
 	private java.util.List<EventProducer>	producers	= new LinkedList<EventProducer>();
 	private java.util.List<EventType>		types		= new LinkedList<EventType>();
 	private java.util.List<String>			idles		= new LinkedList<String>();
@@ -502,6 +504,27 @@ public class LPAggregView extends ViewPart {
 		}
 		params = new LPAggregParameters();
 		core = new LPAggregCore(params);
+	}
+	
+	
+	public List getList() {
+		return list;
+	}
+	
+	public Text getParam() {
+		return param;
+	}
+
+	
+	public Button getBtnRun() {
+		return btnRun;
+	}
+	public LPAggregCore getCore() {
+		return core;
+	}
+	
+	public LPAggregParameters getParams() {
+		return params;
 	}
 
 	private void cleanAll() {
@@ -534,7 +557,7 @@ public class LPAggregView extends ViewPart {
 
 		timeAxis = new TimeAxisView();
 		
-		qualityView = new QualityView();
+		qualityView = new QualityView(this);
 		//sashForm.setWeights(new int[] {220, 295});
 
 		SashForm sashForm_5 = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
