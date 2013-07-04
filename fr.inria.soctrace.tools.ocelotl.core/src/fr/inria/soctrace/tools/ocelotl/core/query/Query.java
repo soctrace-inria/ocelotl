@@ -1,9 +1,9 @@
 /* ===========================================================
- * LPAggreg core module
+ * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * This module is a FrameSoC plug in which enables to visualize a Paje
- * trace across an aggregated representation.
+ * Ocelotl is a FrameSoC plug in which enables to visualize a trace 
+ * under an aggregated representation form.
  *
  * (C) Copyright 2013 INRIA
  *
@@ -14,6 +14,7 @@
  *
  * Contributors:
  *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
 package fr.inria.soctrace.tools.ocelotl.core.query;

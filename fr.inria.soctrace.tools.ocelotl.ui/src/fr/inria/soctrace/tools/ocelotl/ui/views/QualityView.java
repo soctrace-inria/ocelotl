@@ -1,9 +1,9 @@
 /* ===========================================================
- * LPAggreg UI module
+ * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * This module is a FrameSoC plug in which enables to visualize a Paje
- * trace across an aggregated representation.
+ * Ocelotl is a FrameSoC plug in which enables to visualize a trace 
+ * under an aggregated representation form.
  *
  * (C) Copyright 2013 INRIA
  *
@@ -27,6 +27,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
@@ -37,6 +38,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -68,7 +70,8 @@ public class QualityView {
 	private List<Quality>		qualities;
 	private float				currentParameter;
 	private final OcelotlView	ocelotlView;
-	private final static float	paramLineWidth		= 1.8F;
+	private final static float	ParamLineWidth		= 1.8F;
+	private final static float	QualityLineWidth	= 2.0F;
 
 	public QualityView(final OcelotlView lpaggregView) {
 		super();
@@ -99,7 +102,7 @@ public class QualityView {
 		final PolylineConnection line = new PolylineConnection();
 		line.setEndpoints(new Point((int) (Border + width * (1 - currentParameter)), yOff), new Point((int) (Border + width * (1 - currentParameter)), Border));
 		line.setForegroundColor(ColorConstants.blue);
-		line.setLineWidthFloat(paramLineWidth);
+		line.setLineWidthFloat(ParamLineWidth);
 		root.add(line);
 	}
 
@@ -113,10 +116,10 @@ public class QualityView {
 		for (i = 1; i < qualities.size(); i++) {
 			final float cParam = 1 - qualities.get(i).getParameter();
 			final float nParam = 1 - qualities.get(i - 1).getParameter();
-			final double cgain = qualities.get(i).getGain();
-			final double ngain = qualities.get(i - 1).getGain();
-			final double closs = qualities.get(i).getLoss();
-			final double nloss = qualities.get(i - 1).getLoss();
+			final double cgain = qualities.get(qualities.size() - 1).getGain()-qualities.get(i).getGain();
+			final double ngain = qualities.get(qualities.size() - 1).getGain()-qualities.get(i - 1).getGain();
+			final double closs = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i).getLoss();
+			final double nloss = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i - 1).getLoss();
 			final PolylineConnection lineGain1 = new PolylineConnection();
 			lineGain1.setEndpoints(new Point((int) (Border + width * cParam), (int) (yOff - height * cgain / maxValue)), new Point((int) (Border + width * cParam), (int) (yOff - height * ngain / maxValue)));
 			final PolylineConnection lineLoss1 = new PolylineConnection();
@@ -127,14 +130,14 @@ public class QualityView {
 			lineLoss2.setEndpoints(new Point((int) (Border + width * cParam), (int) (yOff - height * nloss / maxValue)), new Point((int) (Border + width * nParam), (int) (yOff - height * nloss / maxValue)));
 			lineGain1.setForegroundColor(ColorConstants.green);
 			lineLoss1.setForegroundColor(ColorConstants.red);
-			lineGain1.setLineWidthFloat(2);
-			lineLoss1.setLineWidthFloat(2);
+			lineGain1.setLineWidthFloat(QualityLineWidth);
+			lineLoss1.setLineWidthFloat(QualityLineWidth);
 			root.add(lineGain1);
 			root.add(lineLoss1);
 			lineGain2.setForegroundColor(ColorConstants.green);
 			lineLoss2.setForegroundColor(ColorConstants.red);
-			lineGain2.setLineWidthFloat(2);
-			lineLoss2.setLineWidthFloat(2);
+			lineGain2.setLineWidthFloat(QualityLineWidth);
+			lineLoss2.setLineWidthFloat(QualityLineWidth);
 			root.add(lineGain2);
 			root.add(lineLoss2);
 		}
@@ -254,36 +257,42 @@ public class QualityView {
 			}
 		});
 
-		root.addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseDoubleClicked(final MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void mousePressed(final MouseEvent arg0) {
-				if (qualities != null)
-					if (arg0.x > Border && arg0.x < root.getSize().width() - Border) {
-						final float param = 1 - (float) (arg0.x - Border) / (root.getSize().width() - 2 * Border);
-						ocelotlView.getParam().setText(String.valueOf(param));
-						createDiagram();
-						ocelotlView.setConfiguration();
-					}
-			}
-
-			@Override
-			public void mouseReleased(final MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
-
-			}
-
-		});
+		root.addMouseListener(new ParamMouseListener());
 
 		return canvas;
 	}
+	
+	static public enum State {
+		PRESSED, RELEASED;
+	}
+	
+	class ParamMouseListener implements MouseListener{
+		
+		State state = State.RELEASED;
+	
+	public void mouseDoubleClicked(final MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void mousePressed(final MouseEvent arg0) {
+		state = State.PRESSED;
+		if (qualities != null)
+			if (arg0.x > Border && arg0.x < root.getSize().width() - Border) {
+				final float param = 1 - (float) (arg0.x - Border) / (root.getSize().width() - 2 * Border);
+				ocelotlView.getParam().setText(String.valueOf(param));
+				ocelotlView.setConfiguration();
+				createDiagram();
+			}
+	}
+
+	public void mouseReleased(final MouseEvent arg0) {
+		state= State.RELEASED;
+		ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
+		
+	}
+
+		}
 
 	public void resizeDiagram() {
 		createDiagram();

@@ -1,9 +1,9 @@
 /* ===========================================================
- * LPAggreg UI module
+ * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * This module is a FrameSoC plug in which enables to visualize a Paje
- * trace across an aggregated representation.
+ * Ocelotl is a FrameSoC plug in which enables to visualize a trace 
+ * under an aggregated representation form.
  *
  * (C) Copyright 2013 INRIA
  *
@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
@@ -154,8 +155,9 @@ public class OcelotlView extends ViewPart {
 								// "Parameters", "Parameters retrieved");
 								hasChanged = HasChanged.NOTHING;
 								list.removeAll();
-								for (final float it : core.getLpaggregManager().getParameters())
-									list.add(Float.toString(it));
+								for (int i =core.getLpaggregManager().getParameters().size()-1; i>=0; i--)
+									list.add(Float.toString(core.getLpaggregManager().getParameters().get(i)));
+								list.select(0);
 								qualityView.createDiagram();
 							}
 						});

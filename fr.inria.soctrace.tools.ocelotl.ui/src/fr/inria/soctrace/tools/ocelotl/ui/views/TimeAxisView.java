@@ -1,9 +1,9 @@
 /* ===========================================================
- * LPAggreg UI module
+ * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * This module is a FrameSoC plug in which enables to visualize a Paje
- * trace across an aggregated representation.
+ * Ocelotl is a FrameSoC plug in which enables to visualize a trace 
+ * under an aggregated representation form.
  *
  * (C) Copyright 2013 INRIA
  *
@@ -99,7 +99,6 @@ public class TimeAxisView {
 			rectangleText.setForegroundColor(root.getBackgroundColor());
 			final long value = (long) (i * GradDuration + time.getTimeStampStart());
 			final String text = formatter.format(value);
-			// text.replace(',', '.');
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(ColorConstants.darkGray);
@@ -108,10 +107,7 @@ public class TimeAxisView {
 			rectangleText.add(label);
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			// rectangleText.setConstraint(rectangleText,
-			// rectangleText.getBounds());
 			rectangleText.setLayoutManager(layout);
-			// if (i!=(int)GradNumber)
 			for (int j = 1; j < 5; j++) {
 				final RectangleFigure rectangle2 = new RectangleFigure();
 				if ((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide) > root.getSize().width() - Border)
