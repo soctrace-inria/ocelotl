@@ -22,5 +22,14 @@
             type="ANALYSIS">
       </tool>
    </extension>
+   <extension
+         point="fr.inria.soctrace.framesoc.ui.tclAdapter">
+      <tclAdapter
+            contentProvider="fr.inria.soctrace.tools.paje.tracemanager.tcladapter.PajeTclContentProvider"
+            labelProvider="fr.inria.soctrace.tools.paje.tracemanager.tcladapter.PajeTclLabelProvider"
+            modelInput="fr.inria.soctrace.tools.paje.tracemanager.tcladapter.PajeTclInput"
+            traceTypeName="inria.paje.0.0">
+      </tclAdapter>
+   </extension>
 
 </plugin>
