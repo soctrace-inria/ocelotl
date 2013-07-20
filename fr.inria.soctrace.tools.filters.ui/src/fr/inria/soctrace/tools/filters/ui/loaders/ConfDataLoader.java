@@ -46,6 +46,7 @@ public class ConfDataLoader {
 	private List<Trace> traces;
 	private long minTimestamp;
 	private long maxTimestamp;
+	private TraceDBObject traceDB = null;
 	
 	/**
 	 * The constructor.
@@ -71,7 +72,7 @@ public class ConfDataLoader {
 	public void load(final Trace trace) throws SoCTraceException {
 		clean();
 		currentTrace = trace;
-		TraceDBObject traceDB = new TraceDBObject(trace.getDbName(), DBMode.DB_OPEN);
+		traceDB = new TraceDBObject(trace.getDbName(), DBMode.DB_OPEN);
 		minTimestamp = Math.max(0, traceDB.getMinTimestamp());
 		maxTimestamp = Math.max(0, traceDB.getMaxTimestamp());
 		traceDB.close();
