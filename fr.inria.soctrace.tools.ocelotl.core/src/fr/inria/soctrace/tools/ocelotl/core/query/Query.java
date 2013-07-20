@@ -74,6 +74,28 @@ public class Query {
 			return elist;
 		}
 	}
+	
+	public List<EventProxy> getAllEventsProxy() throws SoCTraceException {
+		final OcelotlTraceSearch traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
+		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+		time.add(new IntervalDesc(lpaggregParameters.getTimeRegion().getTimeStampStart(), lpaggregParameters.getTimeRegion().getTimeStampEnd()));
+		final List<EventProxy> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducersProxy(lpaggregParameters.getTrace(), lpaggregParameters.getEventTypes(), time, null);
+		traceSearch.uninitialize();
+		return elist;
+	}
+
+	public List<EventProxy> getEventsProxy(final List<EventProducer> eventProducers) throws SoCTraceException {
+		if (eventProducers.size() == getAllEventProducers().size())
+			return getAllEventsProxy();
+		else {
+			final OcelotlTraceSearch traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
+			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+			time.add(new IntervalDesc(lpaggregParameters.getTimeRegion().getTimeStampStart(), lpaggregParameters.getTimeRegion().getTimeStampEnd()));
+			final List<EventProxy> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducersProxy(lpaggregParameters.getTrace(), lpaggregParameters.getEventTypes(), time, eventProducers);
+			traceSearch.uninitialize();
+			return elist;
+		}
+	}
 
 	public OcelotlParameters getLpaggregParameters() {
 		return lpaggregParameters;

@@ -29,7 +29,7 @@ public class PajeTclRow implements ITChartsRow {
 	private final static int DEFAULT_ROW_HEIGHT = 15;
 	
 	public PajeTclRow(String name, Image img, ITChartsRow parent, int order) {
-		this.name = "paje_" + name; // XXX just to test we are using the correct model 
+		this.name = name; // XXX just to test we are using the correct model 
 		this.img = img;
 		this.parent = parent;
 		this.items = new ArrayList<ITChartsRow>();

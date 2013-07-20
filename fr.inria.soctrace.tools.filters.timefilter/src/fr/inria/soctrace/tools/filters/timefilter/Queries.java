@@ -41,6 +41,7 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
 
 public class Queries {
 	private TimeFilterParameters timeFilterParameters;
+	final static boolean PAGE=true;
 
 	public Queries(TimeFilterParameters timeFilterParameters)
 			throws SoCTraceException {
@@ -49,10 +50,17 @@ public class Queries {
 	}
 	
 	public List<EventProducer> getEventProducers() throws SoCTraceException{
+		if (PAGE){
+			if (timeFilterParameters.isInclude())
+				return getIncludedEventProducersPerPage();
+			else
+				return getExcludedEventProducersPerPage();
+		}else{
 		if (timeFilterParameters.isInclude())
 			return getIncludedEventProducers();
 		else
 			return getExcludedEventProducers();
+		}
 	}
 	
 	public List<EventProducer> getAllEventProducers() throws SoCTraceException{
@@ -80,6 +88,33 @@ public class Queries {
 		for (Event e : elist){
 			if (!ieplist.contains(e.getEventProducer()))
 				ieplist.add(e.getEventProducer());
+		}
+		traceDB.close();
+		return ieplist;
+	}
+	
+	
+	public List<EventProducer> getIncludedEventProducersPerPage() throws SoCTraceException{
+		TraceDBObject traceDB = new TraceDBObject(timeFilterParameters.getTrace().getDbName(), DBMode.DB_OPEN);
+		List<EventProducer> ieplist = new ArrayList<EventProducer>();
+		for (long i=0; i<=traceDB.getMaxPage(); i++){
+			EventQuery eventQuery = new EventQuery(traceDB);
+			LogicalCondition where = new LogicalCondition(LogicalOperation.AND);
+			where.addCondition(new SimpleCondition("TIMESTAMP",
+					ComparisonOperation.GE, String.valueOf(timeFilterParameters
+							.getTimeRegion().getTimeStampStart())));
+			where.addCondition(new SimpleCondition("TIMESTAMP",
+					ComparisonOperation.LE, String.valueOf(timeFilterParameters
+							.getTimeRegion().getTimeStampEnd())));
+			where.addCondition(new SimpleCondition("PAGE",
+					ComparisonOperation.EQ, String.valueOf(i)));
+			eventQuery.setElementWhere(where);
+			eventQuery.setOrderBy("TIMESTAMP", OrderBy.ASC);
+			List<Event> elist = eventQuery.getList();
+			for (Event e : elist){
+				if (!ieplist.contains(e.getEventProducer()))
+					ieplist.add(e.getEventProducer());
+			}
 		}
 		traceDB.close();
 		return ieplist;
@@ -113,7 +148,36 @@ public class Queries {
 		return eeplist;
 	}
 	
-	
+	public List<EventProducer> getExcludedEventProducersPerPage() throws SoCTraceException{
+		TraceDBObject traceDB = new TraceDBObject(timeFilterParameters.getTrace().getDbName(), DBMode.DB_OPEN);
+		List<EventProducer> eeplist = new ArrayList<EventProducer>();
+		eeplist.addAll(getAllEventProducers());
+		for (long i=0; i<=traceDB.getMaxPage(); i++){
+			EventQuery eventQuery = new EventQuery(traceDB);
+			LogicalCondition where = new LogicalCondition(LogicalOperation.AND);
+			where.addCondition(new SimpleCondition("TIMESTAMP",
+					ComparisonOperation.GE, String.valueOf(timeFilterParameters
+							.getTimeRegion().getTimeStampStart())));
+			where.addCondition(new SimpleCondition("TIMESTAMP",
+					ComparisonOperation.LE, String.valueOf(timeFilterParameters
+							.getTimeRegion().getTimeStampEnd())));
+			where.addCondition(new SimpleCondition("PAGE",
+					ComparisonOperation.EQ, String.valueOf(i)));
+			eventQuery.setElementWhere(where);
+			eventQuery.setOrderBy("TIMESTAMP", OrderBy.ASC);
+			List<Event> elist = eventQuery.getList();
+			for (Event e : elist){
+				for (EventProducer ep : eeplist){
+					if (ep.getId()==e.getEventProducer().getId()){
+						eeplist.remove(ep);
+						break;
+					}
+				}
+			}
+		}
+		traceDB.close();
+		return eeplist;
+	}
 	
 	
 	
