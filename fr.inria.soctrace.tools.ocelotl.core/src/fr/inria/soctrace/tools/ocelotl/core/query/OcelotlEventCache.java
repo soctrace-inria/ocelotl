@@ -21,7 +21,7 @@ public class OcelotlEventCache {
 	HashMap<Integer, Event> cache= new HashMap<Integer, Event>();
 	ITraceSearch traceSearch;
 	String trace;
-	final int PAGE = 7;
+	final int PAGE = 20;
 	int MISS=0;
 	int HIT=0;
 	

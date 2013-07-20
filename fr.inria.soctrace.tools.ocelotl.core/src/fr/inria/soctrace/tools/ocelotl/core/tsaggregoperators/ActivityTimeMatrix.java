@@ -91,7 +91,7 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 			State state;
 			final List<EventProxy> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
-				state=(new State(cache.getEventPageEPCache(events.get(i)), cache.getEventPageEPCache(events.get(i + 1)), timeSliceManager));
+				state=(new State(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
 				if (!query.getLpaggregParameters().getSleepingStates().contains(state.getStateType())){
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					for (final long it : distrib.keySet())
