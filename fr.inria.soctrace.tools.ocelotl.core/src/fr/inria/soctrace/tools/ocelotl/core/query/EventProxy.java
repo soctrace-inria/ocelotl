@@ -9,5 +9,9 @@ public class EventProxy {
 		ID=event.getId();
 	}
 	
+	public EventProxy(int id) {
+		ID=id;
+	}
+	
 	
 }

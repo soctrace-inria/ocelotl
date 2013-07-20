@@ -28,18 +28,17 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.query.EventQuery;
 import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.ComparisonOperation;
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.LogicalOperation;
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.OrderBy;
 import fr.inria.soctrace.lib.query.conditions.LogicalCondition;
 import fr.inria.soctrace.lib.query.conditions.SimpleCondition;
-import fr.inria.soctrace.lib.search.ITraceSearch;
 import fr.inria.soctrace.lib.search.TraceSearch;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
+import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlTraceSearch extends TraceSearch {
@@ -55,7 +54,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 	@Override
 	public List<Event> getEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		openTraceDBObject(t);
-		final EventQuery query = new EventQuery(traceDB);
+		final EventIDQuery query = new EventIDQuery(traceDB);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 
@@ -91,10 +90,12 @@ public class OcelotlTraceSearch extends TraceSearch {
 			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
 		query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+		traceDB.close();
 		return query.getList();
 	}
 	
 	public List<EventProxy> getEventsByEventTypesAndIntervalsAndEventProducersProxy(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+		DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
 		List<EventProxy> proxy=new ArrayList<EventProxy>();
@@ -108,10 +109,10 @@ public class OcelotlTraceSearch extends TraceSearch {
 			if (eventProducers.size() == 0)
 				return proxy;
 		}
-		for (int i=0; i<=traceDB.getMaxPage(); i++){
-			EventQuery query = new EventQuery(traceDB);
-			LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
-			and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, Long.toString(i)));
+		dm.start();
+		EventIDQuery query = new EventIDQuery(traceDB);
+		LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+		//and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, Long.toString(i)));
 			
 			// intervals
 			if (region != null) {
@@ -137,12 +138,15 @@ public class OcelotlTraceSearch extends TraceSearch {
 					vls.addValue(String.valueOf(ep.getId()));
 				and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.IN, vls.getValueString()));
 			}
+			
+			if (and.getNumberOfConditions() == 1)
+				and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
 			query.setElementWhere(and);
 			query.setOrderBy("TIMESTAMP", OrderBy.ASC);
-			List<Event> e=query.getList();
-			for (Event event :e)
+			List<Integer> e=query.getIDList();
+			for (int event :e)
 				proxy.add(new EventProxy(event));
-		}
+		traceDB.close();
 		return proxy;
 	}
 	
@@ -150,7 +154,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 	@Deprecated
 	public List<Event> getEventsByEventTypesAndIntervalsAndEventProducersT(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		openTraceDBObject(t);
-		final EventQuery query = new EventQuery(traceDB);
+		final EventIDQuery query = new EventIDQuery(traceDB);
 		List<Event> events=query.getList();
 		List<Event> eventsToRemove=new ArrayList<Event>();
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);

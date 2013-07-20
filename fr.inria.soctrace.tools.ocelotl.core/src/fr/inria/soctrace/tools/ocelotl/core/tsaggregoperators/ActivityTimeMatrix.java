@@ -27,7 +27,11 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.storage.TraceDBObject;
+import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 
@@ -38,8 +42,8 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		System.out.println("Activity Time Matrix");
 	}
 
-	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
+	
+	protected void computeSubMatrixO(final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
 		final List<Event> fullEvents = query.getEvents(eventProducers);
@@ -65,6 +69,36 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 						matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
 				}
 			}
+		}
+		dm.end("VECTORS COMPUTATION : " + query.getLpaggregParameters().getTimeSlicesNumber() + " timeslices");
+	}
+	
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
+		DeltaManager dm = new DeltaManager();
+		dm.start();
+		OcelotlEventCache cache = new OcelotlEventCache(query.getLpaggregParameters().getTrace().getDbName());
+		final List<EventProxy> fullEvents = query.getEventsProxy(eventProducers);
+		eventsNumber = fullEvents.size();
+		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
+		DeltaManager dm2 = new DeltaManager();
+		final Map<Integer, List<EventProxy>> eventList = new HashMap<Integer, List<EventProxy>>();
+		for (final EventProducer ep : eventProducers)
+			eventList.put(ep.getId(), new ArrayList<EventProxy>());
+		for (final EventProxy e : fullEvents)
+			eventList.get(cache.getEventMultiPageCache(e).getEventProducer().getId()).add(e);
+		for (final EventProducer ep : eventProducers) {
+			dm2.start();
+			State state;
+			final List<EventProxy> events = eventList.get(ep.getId());
+			for (int i = 0; i < events.size() - 1; i++) {
+				state=(new State(cache.getEventPageEPCache(events.get(i)), cache.getEventPageEPCache(events.get(i + 1)), timeSliceManager));
+				if (!query.getLpaggregParameters().getSleepingStates().contains(state.getStateType())){
+					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+					for (final long it : distrib.keySet())
+						matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
+				}
+			}
+			dm2.end("EP VECTORS : " + ep.getName());
 		}
 		dm.end("VECTORS COMPUTATION : " + query.getLpaggregParameters().getTimeSlicesNumber() + " timeslices");
 	}
