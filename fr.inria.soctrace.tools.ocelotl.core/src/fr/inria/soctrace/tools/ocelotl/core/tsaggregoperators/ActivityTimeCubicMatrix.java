@@ -89,8 +89,8 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 						System.out.println("Adding " + state.getStateType() + " state");
 						for (int incr = 0; incr < matrix.size(); incr++)
-							for (final EventProducer epname : eventProducers)
-								matrix.get(incr).get(epname.getName()).put(state.getStateType(), 0L);
+							for (final String epstring : matrix.get(incr).keySet())
+								matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
 					}
 					for (final long it : distrib.keySet())
 						matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
@@ -124,8 +124,8 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 						System.out.println("Adding " + state.getStateType() + " state");
 						for (int incr = 0; incr < matrix.size(); incr++)
-							for (final EventProducer epname : eventProducers)
-								matrix.get(incr).get(epname.getName()).put(state.getStateType(), 0L);
+							for (final String epstring : matrix.get(incr).keySet())
+								matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
 					}
 					for (final long it : distrib.keySet())
 						matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
