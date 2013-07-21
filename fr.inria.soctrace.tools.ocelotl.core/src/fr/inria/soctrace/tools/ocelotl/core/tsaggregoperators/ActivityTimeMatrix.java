@@ -43,7 +43,7 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 	}
 
 	
-	protected void computeSubMatrixO(final List<EventProducer> eventProducers) throws SoCTraceException {
+	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
 		final List<Event> fullEvents = query.getEvents(eventProducers);
@@ -57,26 +57,24 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		for (final Event e : fullEvents)
 			eventList.get(e.getEventProducer().getId()).add(e);
 		for (final EventProducer ep : eventProducers) {
-			final List<State> state = new ArrayList<State>();
 			final List<Event> events = eventList.get(ep.getId());
+			State state;
 			for (int i = 0; i < events.size() - 1; i++) {
-				state.add(new State(events.get(i), events.get(i + 1), timeSliceManager));
-				if (query.getLpaggregParameters().getSleepingStates().contains(state.get(state.size() - 1).getStateType()))
-					state.remove(state.size() - 1);
-				else {
-					final Map<Long, Long> distrib = state.get(state.size() - 1).getTimeSlicesDistribution();
+				state=(new State(events.get(i), events.get(i + 1), timeSliceManager));
+				if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())){
+					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					for (final long it : distrib.keySet())
 						matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
 				}
 			}
 		}
-		dm.end("VECTORS COMPUTATION : " + query.getLpaggregParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 	
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
+	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		OcelotlEventCache cache = new OcelotlEventCache(query.getLpaggregParameters().getTrace().getDbName());
+		OcelotlEventCache cache = new OcelotlEventCache(query.getOcelotlParameters());
 		final List<EventProxy> fullEvents = query.getEventsProxy(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
@@ -85,14 +83,14 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		for (final EventProducer ep : eventProducers)
 			eventList.put(ep.getId(), new ArrayList<EventProxy>());
 		for (final EventProxy e : fullEvents)
-			eventList.get(cache.getEventMultiPageCache(e).getEventProducer().getId()).add(e);
+			eventList.get(e.EP).add(e);
 		for (final EventProducer ep : eventProducers) {
 			dm2.start();
 			State state;
 			final List<EventProxy> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
 				state=(new State(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-				if (!query.getLpaggregParameters().getSleepingStates().contains(state.getStateType())){
+				if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())){
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					for (final long it : distrib.keySet())
 						matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
@@ -100,6 +98,14 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 			}
 			dm2.end("EP VECTORS : " + ep.getName());
 		}
-		dm.end("VECTORS COMPUTATION : " + query.getLpaggregParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+	
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
+		if (query.getOcelotlParameters().isCache()){
+			computeSubMatrixCached(eventProducers);
+		}else{
+			computeSubMatrixNonCached(eventProducers);
+		}
 	}
 }

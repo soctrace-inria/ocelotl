@@ -275,7 +275,7 @@ public class OcelotlView extends ViewPart {
 								// "Parameters", "Parameters retrieved");
 								hasChanged = HasChanged.NOTHING;
 								listParameters.removeAll();
-								for (int i =ocelotlCore.getLpaggregManager().getParameters().size()-1; i>=0; i--)
+								for (int i = ocelotlCore.getLpaggregManager().getParameters().size() - 1; i >= 0; i--)
 									listParameters.add(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(i)));
 								listParameters.select(0);
 								listParameters.notifyListeners(SWT.Selection, new Event());
@@ -316,24 +316,24 @@ public class OcelotlView extends ViewPart {
 			btnGetParameters.notifyListeners(SWT.Selection, new Event());
 		}
 	}
-	
+
 	private class GrowingQualityRadioSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (btnGrowingQualities.getSelection()){
+			if (btnGrowingQualities.getSelection()) {
 				btnDecreasingQualities.setSelection(false);
 				ocelotlParameters.setGrowingQualities(true);
 				qualityView.createDiagram();
 			}
 		}
 	}
-	
+
 	private class DecreasingQualityRadioSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (btnDecreasingQualities.getSelection()){
+			if (btnDecreasingQualities.getSelection()) {
 				btnGrowingQualities.setSelection(false);
 				ocelotlParameters.setGrowingQualities(false);
 				qualityView.createDiagram();
@@ -487,20 +487,21 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	public static final String					ID			= "fr.inria.soctrace.tools.ocelotl.ui.Ocelotl"; //$NON-NLS-1$
-	public static final String					PLUGIN_ID	= Activator.PLUGIN_ID;
+	public static final String					ID				= "fr.inria.soctrace.tools.ocelotl.ui.Ocelotl"; //$NON-NLS-1$
+	public static final String					PLUGIN_ID		= Activator.PLUGIN_ID;
 	private Button								btnMergeAggregatedParts;
-	private Button 								btnGetParameters;
+	private Button								btnCache;
+	private Button								btnGetParameters;
 	private Button								btnNormalize;
 	private Button								btnRun;
 	private Button								btnShowNumbers;
-	private Button 								btnGrowingQualities;
-	private Button 								btnDecreasingQualities;
+	private Button								btnGrowingQualities;
+	private Button								btnDecreasingQualities;
 	private Combo								comboAggregationOperator;
 	private Combo								comboTraces;
-	private final ConfDataLoader				confDataLoader		= new ConfDataLoader();
-	private HasChanged							hasChanged	= HasChanged.ALL;
-	private final java.util.List<String>		idles		= new LinkedList<String>();
+	private final ConfDataLoader				confDataLoader	= new ConfDataLoader();
+	private HasChanged							hasChanged		= HasChanged.ALL;
+	private final java.util.List<String>		idles			= new LinkedList<String>();
 	private List								listParameters;
 	private ListViewer							listViewerIdleStates;
 	private ListViewer							listViewerEventProducers;
@@ -509,16 +510,18 @@ public class OcelotlView extends ViewPart {
 	private final OcelotlCore					ocelotlCore;
 	private final OcelotlParameters				ocelotlParameters;
 	private Text								textRun;
-	private final java.util.List<EventProducer>	producers	= new LinkedList<EventProducer>();
+	private final java.util.List<EventProducer>	producers		= new LinkedList<EventProducer>();
 	private QualityView							qualityView;
 	private Spinner								spinnerDivideDbQuery;
+	private Spinner								spinnerPageSize;
+	private Spinner								spinnerEPPageSize;
 	private Spinner								spinnerTSNumber;
 	private Text								textThreshold;
 	private TimeAxisView						timeAxisView;
 	private Text								textTimestampEnd;
 	private Text								textTimestampStart;
-	final Map<Integer, Trace>					traceMap	= new HashMap<Integer, Trace>();
-	private final java.util.List<EventType>		types		= new LinkedList<EventType>();
+	final Map<Integer, Trace>					traceMap		= new HashMap<Integer, Trace>();
+	private final java.util.List<EventType>		types			= new LinkedList<EventType>();
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -539,8 +542,11 @@ public class OcelotlView extends ViewPart {
 		btnNormalize.setSelection(false);
 		btnGrowingQualities.setSelection(true);
 		btnDecreasingQualities.setSelection(false);
+		btnCache.setSelection(false);
 		spinnerTSNumber.setSelection(200);
 		spinnerDivideDbQuery.setSelection(0);
+		spinnerPageSize.setSelection(50);
+		spinnerPageSize.setSelection(100);
 		textRun.setText("0");
 		btnMergeAggregatedParts.setSelection(true);
 		producers.clear();
@@ -734,7 +740,7 @@ public class OcelotlView extends ViewPart {
 		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
 		sashFormList.setWeights(new int[] { 1, 1, 1 });
-		sashFormTraceParameter.setWeights(new int[] {34, 344});
+		sashFormTraceParameter.setWeights(new int[] { 34, 344 });
 		comboTraces.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -763,7 +769,6 @@ public class OcelotlView extends ViewPart {
 
 		final SashForm sashFormTimeAggregationParameters = new SashForm(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setControl(sashFormTimeAggregationParameters);
-
 
 		SashForm sashFormTSandCurve = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
 		sashFormTSandCurve.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -801,7 +806,6 @@ public class OcelotlView extends ViewPart {
 		for (final String op : AggregationOperators.List)
 			comboAggregationOperator.add(op);
 		comboAggregationOperator.setText(AggregationOperators.List.get(0));
-
 
 		final Group groupTimeInterval = new Group(groupTSParameters, SWT.NONE);
 		final GridData gd_groupTimeInterval = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
@@ -868,7 +872,7 @@ public class OcelotlView extends ViewPart {
 		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnGrowingQualities.setSelection(false);
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
-		sashFormTSandCurve.setWeights(new int[] {227, 151});
+		sashFormTSandCurve.setWeights(new int[] { 227, 151 });
 		final Group groupLPAParameters = new Group(sashFormTimeAggregationParameters, SWT.NONE);
 		groupLPAParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupLPAParameters.setLayout(new GridLayout(1, false));
@@ -950,17 +954,51 @@ public class OcelotlView extends ViewPart {
 		sashFormAdvancedParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		tbtmAdvancedParameters.setControl(sashFormAdvancedParameters);
 
+		final Group grpCacheManagement = new Group(sashFormAdvancedParameters, SWT.NONE);
+		grpCacheManagement.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		grpCacheManagement.setText("Cache Management");
+		grpCacheManagement.setLayout(new GridLayout(5, false));
+
+		btnCache = new Button(grpCacheManagement, SWT.CHECK);
+		btnCache.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		// btnCache.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true,
+		// false, 1, 1));
+		btnCache.setText("Activate Cache");
+		btnCache.setSelection(false);
+
+		final Label lblPageSize = new Label(grpCacheManagement, SWT.NONE);
+		lblPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblPageSize.setText("Cache Page Size");
+
+		spinnerPageSize = new Spinner(grpCacheManagement, SWT.BORDER);
+		spinnerPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		spinnerPageSize.addModifyListener(new ConfModificationListener());
+		spinnerPageSize.setMinimum(1);
+		spinnerPageSize.setMaximum(1000000);
+		spinnerPageSize.setSelection(50);
+
+		final Label lblEPPageSize = new Label(grpCacheManagement, SWT.NONE);
+		lblEPPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblEPPageSize.setText("EP Cache Page Size");
+
+		spinnerEPPageSize = new Spinner(grpCacheManagement, SWT.BORDER);
+		spinnerEPPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		spinnerEPPageSize.addModifyListener(new ConfModificationListener());
+		spinnerEPPageSize.setMinimum(1);
+		spinnerEPPageSize.setMaximum(1000000);
+		spinnerEPPageSize.setSelection(100);
+
 		final Group grpDivideDbQuery = new Group(sashFormAdvancedParameters, SWT.NONE);
 		grpDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpDivideDbQuery.setText("Memory Management");
+		grpDivideDbQuery.setText("Query Management");
 		grpDivideDbQuery.setLayout(new GridLayout(2, false));
 
 		final Label lblDivideDbQueries = new Label(grpDivideDbQuery, SWT.NONE);
 		lblDivideDbQueries.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblDivideDbQueries.setText("Divide DB query (Event Producers per query, inactive if 0)");
+		lblDivideDbQueries.setText("Event Producers per query (0=All)");
 
 		spinnerDivideDbQuery = new Spinner(grpDivideDbQuery, SWT.BORDER);
-		spinnerDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
+		spinnerDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		final GridData gd_spinnerDivideDbQuery = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
 		gd_spinnerDivideDbQuery.widthHint = 99;
 		spinnerDivideDbQuery.setLayoutData(gd_spinnerDivideDbQuery);
@@ -989,8 +1027,8 @@ public class OcelotlView extends ViewPart {
 		btnShowNumbers.setText("Show Part Numbers");
 		btnShowNumbers.setSelection(false);
 		btnShowNumbers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
-		sashFormGlobal.setWeights(new int[] { 172, 286 });
+		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
+		// sashFormGlobal.setWeights(new int[] { 172, 286 });
 		canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// clean all
@@ -1028,6 +1066,9 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
 		ocelotlParameters.setAggOperator(comboAggregationOperator.getText());
+		ocelotlParameters.setCache(btnCache.getSelection());
+		ocelotlParameters.setEpCache(spinnerEPPageSize.getSelection());
+		ocelotlParameters.setPageCache(spinnerPageSize.getSelection());
 		// TODO manage number format exception
 		try {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());

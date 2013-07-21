@@ -143,9 +143,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 				and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
 			query.setElementWhere(and);
 			query.setOrderBy("TIMESTAMP", OrderBy.ASC);
-			List<Integer> e=query.getIDList();
-			for (int event :e)
-				proxy.add(new EventProxy(event));
+			proxy=query.getIDList();
 		traceDB.close();
 		return proxy;
 	}

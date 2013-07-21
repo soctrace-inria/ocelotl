@@ -34,11 +34,11 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 
 public class Query {
 
-	private final OcelotlParameters	lpaggregParameters;
+	private final OcelotlParameters	ocelotlParameters;
 
-	public Query(final OcelotlParameters lpaggregParameters) throws SoCTraceException {
+	public Query(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
 		super();
-		this.lpaggregParameters = lpaggregParameters;
+		this.ocelotlParameters = ocelotlParameters;
 	}
 
 	public void checkTimeStamps() {
@@ -46,7 +46,7 @@ public class Query {
 	}
 
 	public List<EventProducer> getAllEventProducers() throws SoCTraceException {
-		final TraceDBObject traceDB = new TraceDBObject(lpaggregParameters.getTrace().getDbName(), DBMode.DB_OPEN);
+		final TraceDBObject traceDB = new TraceDBObject(ocelotlParameters.getTrace().getDbName(), DBMode.DB_OPEN);
 		final EventProducerQuery eventProducerQuery = new EventProducerQuery(traceDB);
 		final List<EventProducer> eplist = eventProducerQuery.getList();
 		traceDB.close();
@@ -56,8 +56,8 @@ public class Query {
 	public List<Event> getAllEvents() throws SoCTraceException {
 		final ITraceSearch traceSearch = new OcelotlTraceSearch().initialize();
 		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(lpaggregParameters.getTimeRegion().getTimeStampStart(), lpaggregParameters.getTimeRegion().getTimeStampEnd()));
-		final List<Event> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducers(lpaggregParameters.getTrace(), lpaggregParameters.getEventTypes(), time, null);
+		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+		final List<Event> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getEventTypes(), time, null);
 		traceSearch.uninitialize();
 		return elist;
 	}
@@ -68,8 +68,8 @@ public class Query {
 		else {
 			final ITraceSearch traceSearch = new OcelotlTraceSearch().initialize();
 			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(lpaggregParameters.getTimeRegion().getTimeStampStart(), lpaggregParameters.getTimeRegion().getTimeStampEnd()));
-			final List<Event> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducers(lpaggregParameters.getTrace(), lpaggregParameters.getEventTypes(), time, eventProducers);
+			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+			final List<Event> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getEventTypes(), time, eventProducers);
 			traceSearch.uninitialize();
 			return elist;
 		}
@@ -78,8 +78,8 @@ public class Query {
 	public List<EventProxy> getAllEventsProxy() throws SoCTraceException {
 		final OcelotlTraceSearch traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
 		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(lpaggregParameters.getTimeRegion().getTimeStampStart(), lpaggregParameters.getTimeRegion().getTimeStampEnd()));
-		final List<EventProxy> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducersProxy(lpaggregParameters.getTrace(), lpaggregParameters.getEventTypes(), time, null);
+		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+		final List<EventProxy> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducersProxy(ocelotlParameters.getTrace(), ocelotlParameters.getEventTypes(), time, null);
 		traceSearch.uninitialize();
 		return elist;
 	}
@@ -90,15 +90,15 @@ public class Query {
 		else {
 			final OcelotlTraceSearch traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
 			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(lpaggregParameters.getTimeRegion().getTimeStampStart(), lpaggregParameters.getTimeRegion().getTimeStampEnd()));
-			final List<EventProxy> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducersProxy(lpaggregParameters.getTrace(), lpaggregParameters.getEventTypes(), time, eventProducers);
+			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+			final List<EventProxy> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducersProxy(ocelotlParameters.getTrace(), ocelotlParameters.getEventTypes(), time, eventProducers);
 			traceSearch.uninitialize();
 			return elist;
 		}
 	}
 
-	public OcelotlParameters getLpaggregParameters() {
-		return lpaggregParameters;
+	public OcelotlParameters getOcelotlParameters() {
+		return ocelotlParameters;
 	}
 
 }

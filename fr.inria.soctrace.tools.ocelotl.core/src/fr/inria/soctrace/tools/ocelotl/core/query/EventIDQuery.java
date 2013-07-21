@@ -197,7 +197,7 @@ public class EventIDQuery extends SelfDefiningElementQuery {
 
 	}
 	
-public List<Integer> getIDList() throws SoCTraceException {
+public List<EventProxy> getIDList() throws SoCTraceException {
 		
 		try {
 			DeltaManager dm = new DeltaManager();
@@ -259,7 +259,7 @@ public List<Integer> getIDList() throws SoCTraceException {
 			Statement stm = dbObj.getConnection().createStatement();
 			
 			ResultSet rs = stm.executeQuery(query);
-			List<Integer> elist = null;
+			List<EventProxy> elist = null;
 			if (USE_JOIN) {
 				elist = rebuildEventIDJoin(rs);
 			} else {
@@ -403,13 +403,13 @@ public List<Integer> getIDList() throws SoCTraceException {
 	}
 	
 
-	private List<Integer> rebuildEventID(ResultSet rs) throws SoCTraceException {
+	private List<EventProxy> rebuildEventID(ResultSet rs) throws SoCTraceException {
 				
-		List<Integer> list = new LinkedList<Integer>();
+		List<EventProxy> list = new LinkedList<EventProxy>();
 		try {		
 		
 			while (rs.next()) {
-				list.add(rs.getInt(1));
+				list.add(new EventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID")));
 			}
 			return list;
 		} catch (SQLException e) {
@@ -417,13 +417,17 @@ public List<Integer> getIDList() throws SoCTraceException {
 		}
 	}
 
-	private List<Integer> rebuildEventIDJoin(ResultSet rs) throws SoCTraceException {
-		List<Integer> list = new LinkedList<Integer>();
+	private List<EventProxy> rebuildEventIDJoin(ResultSet rs) throws SoCTraceException {
+		List<EventProxy> list = new LinkedList<EventProxy>();
+		Map<Integer, EventProxy> tmp = new HashMap<Integer, EventProxy>();
 		try {		
 			while (rs.next()) {
-				int id = rs.getInt(1); 
-				if (!list.contains(id))
-					list.add(id);
+				int id = rs.getInt("ID"); 
+				if (!tmp.containsKey(id)){
+					EventProxy epr= new EventProxy(id, rs.getInt("EVENT_PRODUCER_ID"));
+					tmp.put(id, epr);
+					list.add(epr);
+				}
 			}
 			return list;
 		} catch (SQLException e) {

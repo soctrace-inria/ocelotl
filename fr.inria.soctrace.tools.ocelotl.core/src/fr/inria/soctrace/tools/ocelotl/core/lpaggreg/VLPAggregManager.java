@@ -44,7 +44,7 @@ public class VLPAggregManager extends LPAggregManager {
 		dm.start();
 		parameters.clear();
 		qualities.clear();
-		lpaggregWrapper.computeDichotomy(timeSliceMatrix.getQueries().getLpaggregParameters().getThreshold());
+		lpaggregWrapper.computeDichotomy(timeSliceMatrix.getQueries().getOcelotlParameters().getThreshold());
 		for (int i = 0; i < lpaggregWrapper.getParameterNumber(); i++) {
 			parameters.add(lpaggregWrapper.getParameter(i));
 			qualities.add(new Quality(lpaggregWrapper.getGainByIndex(i), lpaggregWrapper.getLossByIndex(i), lpaggregWrapper.getParameter(i)));
@@ -70,8 +70,8 @@ public class VLPAggregManager extends LPAggregManager {
 						for (final String key : timeSliceMatrix.getMatrix().get(k).keySet())
 							lpaggregWrapperTemp.addToVector(timeSliceMatrix.getMatrix().get(k).get(key));
 					}
-				lpaggregWrapperTemp.computeQualities(timeSliceMatrix.getQueries().getLpaggregParameters().isNormalize());
-				lpaggregWrapperTemp.computeParts(timeSliceMatrix.getQueries().getLpaggregParameters().getParameter());
+				lpaggregWrapperTemp.computeQualities(timeSliceMatrix.getQueries().getOcelotlParameters().isNormalize());
+				lpaggregWrapperTemp.computeParts(timeSliceMatrix.getQueries().getOcelotlParameters().getParameter());
 				boolean eq = true;
 				for (int l = 0; l < lpaggregWrapperTemp.getPartNumber(); l++)
 					if (l > 0 && lpaggregWrapperTemp.getPart(l) != lpaggregWrapperTemp.getPart(l - 1)) {
@@ -98,7 +98,7 @@ public class VLPAggregManager extends LPAggregManager {
 		parts.clear();
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		lpaggregWrapper.computeParts(timeSliceMatrix.getQueries().getLpaggregParameters().getParameter());
+		lpaggregWrapper.computeParts(timeSliceMatrix.getQueries().getOcelotlParameters().getParameter());
 		for (int i = 0; i < lpaggregWrapper.getPartNumber(); i++)
 			parts.add(lpaggregWrapper.getPart(i));
 		dm.end("LPAGGREG - COMPUTE PARTS");
@@ -108,7 +108,7 @@ public class VLPAggregManager extends LPAggregManager {
 	public void computeQualities() {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		lpaggregWrapper.computeQualities(timeSliceMatrix.getQueries().getLpaggregParameters().isNormalize());
+		lpaggregWrapper.computeQualities(timeSliceMatrix.getQueries().getOcelotlParameters().isNormalize());
 		dm.end("LPAGGREG - COMPUTE QUALITIES");
 	}
 

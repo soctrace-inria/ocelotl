@@ -41,6 +41,9 @@ public class OcelotlParameters {
 	private int					maxEventProducers	= 0;
 	private String				aggOperator;
 	private boolean				growingQualities	=true;
+	private boolean				cache				=true;
+	private int					epCache				=100;
+	private int					pageCache			=20;
 
 	public boolean isGrowingQualities() {
 		return growingQualities;
@@ -52,6 +55,30 @@ public class OcelotlParameters {
 
 	public OcelotlParameters() {
 		super();
+	}
+
+	public boolean isCache() {
+		return cache;
+	}
+
+	public void setCache(boolean cache) {
+		this.cache = cache;
+	}
+
+	public int getEpCache() {
+		return epCache;
+	}
+
+	public void setEpCache(int epCache) {
+		this.epCache = epCache;
+	}
+
+	public int getPageCache() {
+		return pageCache;
+	}
+
+	public void setPageCache(int pageCache) {
+		this.pageCache = pageCache;
 	}
 
 	public String getAggOperator() {
@@ -149,5 +176,7 @@ public class OcelotlParameters {
 				.append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold).append("\ntrace=").append(trace).append("\n]");
 		return builder.toString();
 	}
+
+
 
 }

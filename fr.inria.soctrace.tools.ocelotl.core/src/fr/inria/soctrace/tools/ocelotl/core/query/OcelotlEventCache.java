@@ -16,19 +16,23 @@ import fr.inria.soctrace.lib.search.TraceSearch;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 
 public class OcelotlEventCache {
-	HashMap<Integer, Event> cache= new HashMap<Integer, Event>();
-	ITraceSearch traceSearch;
-	String trace;
-	final int PAGE = 20;
-	int MISS=0;
-	int HIT=0;
+	private HashMap<Integer, Event> cache= new HashMap<Integer, Event>();
+	private ITraceSearch traceSearch;
+	private String trace;
+	private int EPPAGE = 100;
+	private int PAGE = 8;
+	private int MISS=0;
+	private int HIT=0;
 	
-	public OcelotlEventCache(String trace) throws SoCTraceException {
+	public OcelotlEventCache(OcelotlParameters parameters) throws SoCTraceException {
 		super();
 		this.traceSearch = new TraceSearch().initialize();
-		this.trace = trace;
+		this.trace = parameters.getTrace().getDbName();
+		this.EPPAGE = parameters.getEpCache();
+		this.PAGE = parameters.getPageCache();
 	}
 	
 	public Event getEvent(EventProxy event) throws SoCTraceException{
@@ -116,7 +120,7 @@ public class OcelotlEventCache {
 			query = new EventQuery(traceDB);
 			final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 			final ValueListString vls = new ValueListString();
-			for (int i=0; i<PAGE; i++)	
+			for (int i=0; i<EPPAGE; i++)	
 				vls.addValue(String.valueOf(elist.get(0).getPage()+i));
 			and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.IN, String.valueOf(vls.getValueString())));
 			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(elist.get(0).getEventProducer().getId())));

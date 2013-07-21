@@ -40,7 +40,7 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 		super();
 		this.query = query;
 		query.checkTimeStamps();
-		timeSliceManager = new TimeSliceManager(query.getLpaggregParameters().getTimeRegion(), query.getLpaggregParameters().getTimeSlicesNumber());
+		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
 	}
@@ -49,13 +49,13 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		final int epsize = query.getLpaggregParameters().getEventProducers().size();
-		if (query.getLpaggregParameters().getMaxEventProducers() == 0 || epsize < query.getLpaggregParameters().getMaxEventProducers())
-			computeSubMatrix(query.getLpaggregParameters().getEventProducers());
+		final int epsize = query.getOcelotlParameters().getEventProducers().size();
+		if (query.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < query.getOcelotlParameters().getMaxEventProducers())
+			computeSubMatrix(query.getOcelotlParameters().getEventProducers());
 		else {
-			final List<EventProducer> producers = query.getLpaggregParameters().getEventProducers().size() == 0 ? query.getAllEventProducers() : query.getLpaggregParameters().getEventProducers();
-			for (int i = 0; i < epsize; i = i + query.getLpaggregParameters().getMaxEventProducers())
-				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getLpaggregParameters().getMaxEventProducers())));
+			final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers().size() == 0 ? query.getAllEventProducers() : query.getOcelotlParameters().getEventProducers();
+			for (int i = 0; i < epsize; i = i + query.getOcelotlParameters().getMaxEventProducers())
+				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getOcelotlParameters().getMaxEventProducers())));
 		}
 
 		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
@@ -96,7 +96,7 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 
 	@Override
 	public void initVectors() throws SoCTraceException {
-		final List<EventProducer> producers = query.getLpaggregParameters().getEventProducers();
+		final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
 			matrix.add(new HashMap<String, Long>());
 

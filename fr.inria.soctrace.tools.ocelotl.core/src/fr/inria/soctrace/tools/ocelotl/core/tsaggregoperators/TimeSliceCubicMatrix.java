@@ -43,7 +43,7 @@ public class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
 		super();
 		this.query = query;
 		query.checkTimeStamps();
-		timeSliceManager = new TimeSliceManager(query.getLpaggregParameters().getTimeRegion(), query.getLpaggregParameters().getTimeSlicesNumber());
+		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
 	}
@@ -52,13 +52,13 @@ public class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		final int epsize = query.getLpaggregParameters().getEventProducers().size();
-		if (query.getLpaggregParameters().getMaxEventProducers() == 0 || epsize < query.getLpaggregParameters().getMaxEventProducers())
-			computeSubMatrix(query.getLpaggregParameters().getEventProducers());
+		final int epsize = query.getOcelotlParameters().getEventProducers().size();
+		if (query.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < query.getOcelotlParameters().getMaxEventProducers())
+			computeSubMatrix(query.getOcelotlParameters().getEventProducers());
 		else {
-			final List<EventProducer> producers = query.getLpaggregParameters().getEventProducers().size() == 0 ? query.getAllEventProducers() : query.getLpaggregParameters().getEventProducers();
-			for (int i = 0; i < epsize; i = i + query.getLpaggregParameters().getMaxEventProducers())
-				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getLpaggregParameters().getMaxEventProducers())));
+			final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers().size() == 0 ? query.getAllEventProducers() : query.getOcelotlParameters().getEventProducers();
+			for (int i = 0; i < epsize; i = i + query.getOcelotlParameters().getMaxEventProducers())
+				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getOcelotlParameters().getMaxEventProducers())));
 		}
 
 		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
@@ -80,7 +80,7 @@ public class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
 					events.add(e);
 			for (int i = 0; i < events.size() - 1; i++) {
 				state.add(new State(events.get(i), events.get(i + 1), timeSliceManager));
-				if (query.getLpaggregParameters().getSleepingStates().contains(state.get(state.size() - 1).getStateType()))
+				if (query.getOcelotlParameters().getSleepingStates().contains(state.get(state.size() - 1).getStateType()))
 					state.remove(state.size() - 1);
 				else {
 					final Map<Long, Long> distrib = state.get(state.size() - 1).getTimeSlicesDistribution();
@@ -93,7 +93,7 @@ public class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
 				}
 			}
 		}
-		dm.end("VECTORS COMPUTATION : " + query.getLpaggregParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
 
 	@Override
 	public void initVectors() throws SoCTraceException {
-		final List<EventProducer> producers = query.getLpaggregParameters().getEventProducers();
+		final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
 			matrix.add(new HashMap<String, HashMap<String, Long>>());
 

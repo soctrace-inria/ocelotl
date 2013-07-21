@@ -41,7 +41,7 @@ public class MLPAggregManager extends LPAggregManager {
 		dm.start();
 		parameters.clear();
 		qualities.clear();
-		lpaggregWrapper.computeDichotomy(timeSliceMatrix.getQueries().getLpaggregParameters().getThreshold());
+		lpaggregWrapper.computeDichotomy(timeSliceMatrix.getQueries().getOcelotlParameters().getThreshold());
 		for (int i = 0; i < lpaggregWrapper.getParameterNumber(); i++) {
 			parameters.add(lpaggregWrapper.getParameter(i));
 			qualities.add(new Quality(lpaggregWrapper.getGainByIndex(i), lpaggregWrapper.getLossByIndex(i), lpaggregWrapper.getParameter(i)));
@@ -54,7 +54,7 @@ public class MLPAggregManager extends LPAggregManager {
 		parts.clear();
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		lpaggregWrapper.computeParts(timeSliceMatrix.getQueries().getLpaggregParameters().getParameter());
+		lpaggregWrapper.computeParts(timeSliceMatrix.getQueries().getOcelotlParameters().getParameter());
 		for (int i = 0; i < lpaggregWrapper.getPartNumber(); i++)
 			parts.add(lpaggregWrapper.getPart(i));
 		dm.end("LPAGGREG - COMPUTE PARTS");
@@ -64,7 +64,7 @@ public class MLPAggregManager extends LPAggregManager {
 	public void computeQualities() {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		lpaggregWrapper.computeQualities(timeSliceMatrix.getQueries().getLpaggregParameters().isNormalize());
+		lpaggregWrapper.computeQualities(timeSliceMatrix.getQueries().getOcelotlParameters().isNormalize());
 		dm.end("LPAGGREG - COMPUTE QUALITIES");
 	}
 
