@@ -51,7 +51,10 @@ public class TimeFilter {
 	}
 
 	public void compute() throws SoCTraceException {
-		results.saveEventSearchResult();
+		if (params.isEvent())
+			results.saveEventSearchResult();
+		else
+			results.saveEventProducerSearchResult();
 	}
 
 }

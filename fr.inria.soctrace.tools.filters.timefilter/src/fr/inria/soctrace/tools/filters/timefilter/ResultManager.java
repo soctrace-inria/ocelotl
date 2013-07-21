@@ -5,6 +5,7 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.AnalysisResultData.AnalysisResultType;
 import fr.inria.soctrace.lib.model.AnalysisResultSearchData;
+import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Tool;
 import fr.inria.soctrace.lib.model.Trace;
@@ -45,7 +46,7 @@ public class ResultManager {
 		this.timeFilterParameters = timeFilterParameters;
 	}
 	
-	public void saveEventSearchResult() throws SoCTraceException {
+	public void saveEventProducerSearchResult() throws SoCTraceException {
 		
 			ITraceSearch traceSearch = new TraceSearch().initialize();
 			Tool tool = traceSearch.getToolByName(TimeFilterConstants.TOOL_NAME);
@@ -62,6 +63,24 @@ public class ResultManager {
 			result.setType("SEARCH");
 			saveResult(timeFilterParameters.getTrace(), result, AnalysisResultType.TYPE_SEARCH);	
 	}
+	
+	public void saveEventSearchResult() throws SoCTraceException {
+		
+		ITraceSearch traceSearch = new TraceSearch().initialize();
+		Tool tool = traceSearch.getToolByName(TimeFilterConstants.TOOL_NAME);
+		traceSearch.uninitialize();
+//		Tool tool = ToolContributionManager.getTool("fr.inria.soctrace.tools.filters.ui"); // XXX experimental
+		
+		AnalysisResultSearchData searchData = new AnalysisResultSearchData(Event.class);
+		List<Event> list = queries.getEvent(); 
+		searchData.setElements(list);
+		searchData.setSearchCommand(timeFilterParameters.getLabel()+"_cmd");
+		AnalysisResult result = new AnalysisResult(searchData, tool);
+		result.setDescription(timeFilterParameters.getLabel());
+		result.setId(idManager.getNextId());
+		result.setType("SEARCH");
+		saveResult(timeFilterParameters.getTrace(), result, AnalysisResultType.TYPE_SEARCH);	
+}
 	
 	private static void saveResult(Trace trace,	AnalysisResult result, AnalysisResultType type)  
 			throws SoCTraceException {

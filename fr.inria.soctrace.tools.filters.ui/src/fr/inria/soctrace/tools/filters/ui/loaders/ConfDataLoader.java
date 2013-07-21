@@ -25,8 +25,10 @@ package fr.inria.soctrace.tools.filters.ui.loaders;
 import java.util.List;
 
 import fr.inria.soctrace.framesoc.core.FramesocManager;
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.query.EventTypeQuery;
 import fr.inria.soctrace.lib.query.TraceQuery;
 import fr.inria.soctrace.lib.search.utils.Printer;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
@@ -47,6 +49,7 @@ public class ConfDataLoader {
 	private long minTimestamp;
 	private long maxTimestamp;
 	private TraceDBObject traceDB = null;
+	private List<EventType>			types;
 	
 	/**
 	 * The constructor.
@@ -75,6 +78,8 @@ public class ConfDataLoader {
 		traceDB = new TraceDBObject(trace.getDbName(), DBMode.DB_OPEN);
 		minTimestamp = Math.max(0, traceDB.getMinTimestamp());
 		maxTimestamp = Math.max(0, traceDB.getMaxTimestamp());
+		final EventTypeQuery tQuery = new EventTypeQuery(traceDB);
+		types = tQuery.getList();
 		traceDB.close();
 	}
 	
@@ -107,5 +112,15 @@ public class ConfDataLoader {
 		System.out.println("min ts: " + minTimestamp);
 		System.out.println("max ts: " + maxTimestamp);
 	}
+
+	public List<EventType> getTypes() {
+		return types;
+	}
+
+	public void setTypes(List<EventType> types) {
+		this.types = types;
+	}
+	
+	
 	
 }

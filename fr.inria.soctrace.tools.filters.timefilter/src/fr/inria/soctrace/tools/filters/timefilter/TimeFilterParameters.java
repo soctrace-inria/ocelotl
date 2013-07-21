@@ -24,16 +24,38 @@
 package fr.inria.soctrace.tools.filters.timefilter;
 
 import fr.inria.soctrace.lib.model.Trace;
+import java.util.List;
+import fr.inria.soctrace.lib.model.EventType;
 
 public class TimeFilterParameters {
 
 	private String label;
 	private boolean include;
+	private boolean event;
 	private TimeRegion timeRegion;
 	private Trace trace = null;
+	private List<EventType> eventTypes= null;
+	private List<String> values=null;
+	
 
 	public TimeFilterParameters() {
 		super();
+	}
+
+	public List<EventType> getEventTypes() {
+		return eventTypes;
+	}
+
+	public void setEventTypes(List<EventType> eventTypes) {
+		this.eventTypes = eventTypes;
+	}
+
+	public List<String> getValues() {
+		return values;
+	}
+
+	public void setValues(List<String> values) {
+		this.values = values;
 	}
 
 	public String getLabel() {
@@ -58,6 +80,14 @@ public class TimeFilterParameters {
 
 	public void setTimeRegion(TimeRegion timeRegion) {
 		this.timeRegion = timeRegion;
+	}
+
+	public boolean isEvent() {
+		return event;
+	}
+
+	public void setEvent(boolean event) {
+		this.event = event;
 	}
 
 	public Trace getTrace() {
