@@ -546,7 +546,7 @@ public class OcelotlView extends ViewPart {
 		spinnerTSNumber.setSelection(200);
 		spinnerDivideDbQuery.setSelection(0);
 		spinnerPageSize.setSelection(50);
-		spinnerPageSize.setSelection(100);
+		spinnerEPPageSize.setSelection(100);
 		textRun.setText("0");
 		btnMergeAggregatedParts.setSelection(true);
 		producers.clear();
@@ -1004,6 +1004,7 @@ public class OcelotlView extends ViewPart {
 		spinnerDivideDbQuery.setLayoutData(gd_spinnerDivideDbQuery);
 		spinnerDivideDbQuery.addModifyListener(new ConfModificationListener());
 		spinnerDivideDbQuery.setMinimum(0);
+		spinnerDivideDbQuery.setMaximum(1000000);
 		spinnerDivideDbQuery.setSelection(0);
 
 		final Group grpVisualizationSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
