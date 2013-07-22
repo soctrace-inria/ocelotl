@@ -97,6 +97,15 @@ public class Queries {
 		eventQuery.setElementWhere(where);
 		eventQuery.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		List<Event> elist = eventQuery.getList();
+		if (timeFilterParameters.getValues() != null) {
+			if (timeFilterParameters.getValues().size() != 0) {
+				for (int i=elist.size()-1; i>=0; i--){
+					if (timeFilterParameters.getValues().contains(elist.get(i).getParamMap().get("Value").getValue()))
+						elist.remove(i);
+				}
+					
+			}
+		}
 		traceDB.close();
 		return elist;
 	}
@@ -120,6 +129,15 @@ public class Queries {
 		eventQuery.setElementWhere(where);
 		eventQuery.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		List<Event> elist = eventQuery.getList();
+		if (timeFilterParameters.getValues() != null) {
+			if (timeFilterParameters.getValues().size() != 0) {
+				for (int i=elist.size()-1; i>=0; i--){
+					if (timeFilterParameters.getValues().contains(elist.get(i).getParamMap().get("Value").getValue()))
+						elist.remove(i);
+				}
+					
+			}
+		}
 		for (Event e : elist) {
 			for (EventProducer ep : eeplist) {
 				if (ep.getId() == e.getEventProducer().getId()) {
@@ -154,6 +172,15 @@ public class Queries {
 			eventQuery.setElementWhere(where);
 			eventQuery.setOrderBy("TIMESTAMP", OrderBy.ASC);
 			List<Event> elist = eventQuery.getList();
+			if (timeFilterParameters.getValues() != null) {
+				if (timeFilterParameters.getValues().size() != 0) {
+					for (int j=elist.size()-1; j>=0; j--){
+						if (timeFilterParameters.getValues().contains(elist.get(j).getParamMap().get("Value").getValue()))
+							elist.remove(j);
+					}
+						
+				}
+			}
 			for (Event e : elist) {
 				for (EventProducer ep : eeplist) {
 					if (ep.getId() == e.getEventProducer().getId()) {
@@ -184,6 +211,15 @@ public class Queries {
 		eventQuery.setElementWhere(where);
 		eventQuery.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		List<Event> elist = eventQuery.getList();
+		if (timeFilterParameters.getValues() != null) {
+			if (timeFilterParameters.getValues().size() != 0) {
+				for (int i=elist.size()-1; i>=0; i--){
+					if (timeFilterParameters.getValues().contains(elist.get(i).getParamMap().get("Value").getValue()))
+						elist.remove(i);
+				}
+					
+			}
+		}
 		traceDB.close();
 		return elist;
 	}
@@ -206,6 +242,15 @@ public class Queries {
 		eventQuery.setElementWhere(where);
 		eventQuery.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		List<Event> elist = eventQuery.getList();
+		if (timeFilterParameters.getValues() != null) {
+			if (timeFilterParameters.getValues().size() != 0) {
+				for (int i=elist.size()-1; i>=0; i--){
+					if (timeFilterParameters.getValues().contains(elist.get(i).getParamMap().get("Value").getValue()))
+						elist.remove(i);
+				}
+					
+			}
+		}
 		for (Event e : elist) {
 			if (!ieplist.contains(e.getEventProducer()))
 				ieplist.add(e.getEventProducer());
@@ -234,6 +279,15 @@ public class Queries {
 			eventQuery.setElementWhere(where);
 			eventQuery.setOrderBy("TIMESTAMP", OrderBy.ASC);
 			List<Event> elist = eventQuery.getList();
+			if (timeFilterParameters.getValues() != null) {
+				if (timeFilterParameters.getValues().size() != 0) {
+					for (int j=elist.size()-1; j>=0; j--){
+						if (timeFilterParameters.getValues().contains(elist.get(j).getParamMap().get("Value").getValue()))
+							elist.remove(j);
+					}
+						
+				}
+			}
 			for (Event e : elist) {
 				if (!ieplist.contains(e.getEventProducer()))
 					ieplist.add(e.getEventProducer());
