@@ -25,10 +25,10 @@ public class PajeTclEvent implements ITChartsEvent {
 	private final long endTime;
 	private List<ITChartsEvent> outlinkedEvents;
 	
-	public PajeTclEvent(long timestamp) {
-		this.figure = createRect(ColorConstants.blue, DEFAULT_EVENT_HEIGHT);
-		this.startTime = timestamp;
-		this.endTime = timestamp;
+	public PajeTclEvent(long startTime, long endTime) {
+		this.figure = createRect(ColorConstants.red, DEFAULT_EVENT_HEIGHT);
+		this.startTime = startTime;
+		this.endTime = endTime;
 		this.outlinkedEvents = new ArrayList<ITChartsEvent>();
 	}
 

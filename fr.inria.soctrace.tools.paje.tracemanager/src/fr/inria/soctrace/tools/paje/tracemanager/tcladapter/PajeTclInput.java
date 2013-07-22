@@ -7,11 +7,18 @@ import java.util.Map;
 
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsInput;
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsRow;
+import fr.inria.soctrace.lib.model.AnalysisResult;
+import fr.inria.soctrace.lib.model.AnalysisResultData.AnalysisResultType;
+import fr.inria.soctrace.lib.model.AnalysisResultSearchData;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.lib.model.ISearchable;
+import fr.inria.soctrace.lib.model.Tool;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.query.EventProducerQuery;
+import fr.inria.soctrace.lib.search.ITraceSearch;
+import fr.inria.soctrace.lib.search.TraceSearch;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 /**
  * Paje implementation of Tcl input.
@@ -77,6 +84,11 @@ public class PajeTclInput implements ITChartsInput {
 	@Override
 	public void loadPage(Trace trace, List<Event> elist) {
 		
+		// XXX Hard coded result: used for the article
+		// Ignore the passed list, and use the result one.
+		elist.clear();
+		elist = getArticleList(trace);
+		
 		// load all producers
 		Map<Integer, EventProducer> eps = new HashMap<Integer, EventProducer>();
 		try {
@@ -97,6 +109,9 @@ public class PajeTclInput implements ITChartsInput {
 		Map<Integer, ITChartsRow> main = new HashMap<Integer, ITChartsRow>();
 		
 		// iterate over all page events 
+		Event lastEvent = null;
+		ITChartsRow lastProducerRow = null;
+		
 		for (Event e: elist) {
 			// get the map containing all the rows for this CPU
 			if (!rows.containsKey(e.getCpu())) {
@@ -111,9 +126,44 @@ public class PajeTclInput implements ITChartsInput {
 				cpuMap.put(e.getEventProducer().getId(), getNewEventProducerRow(e.getEventProducer(), eps, cpuMap, main.get(e.getCpu())));		
 			ITChartsRow producerRow = cpuMap.get(e.getEventProducer().getId()); 
 			
-			// finally add the event
-			producerRow.addEvent(new PajeTclEvent(e.getTimestamp()));			
+			// finally add the event if I'm on the end
+			if (lastEvent!=null) {
+				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp(), e.getTimestamp()));	
+			}
+			
+			lastEvent = e;
+			lastProducerRow = producerRow;
 		}
+	}
+	
+	private List<Event> getArticleList(Trace trace) {
+		
+		// Result label: the first result with this label is loaded. Take care.
+		final String FILTER_RESULT_LABEL = "ARTICLE_LABEL";
+		// Filter tool name
+		final String FILTER_NAME = "Filter Tool";
+		
+		try {
+			ITraceSearch search = new TraceSearch().initialize();
+			Tool filter = search.getToolByName(FILTER_NAME);
+			List<AnalysisResult> alist = search.getAnalysisResultsByToolAndType(trace, filter, AnalysisResultType.TYPE_SEARCH);
+			AnalysisResult ar = null;
+			for (AnalysisResult a: alist) {
+				if (a.getDescription().equals(FILTER_RESULT_LABEL)) {
+					ar = a;
+					break;
+				}
+			}
+			if (ar==null)
+				return null;
+			AnalysisResultSearchData data = (AnalysisResultSearchData) search.getAnalysisResultData(trace, ar);
+			@SuppressWarnings("unchecked")
+			List<Event> elist = (List<Event>) (List<? extends ISearchable>) data.getElements();
+			return elist;
+		} catch (SoCTraceException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	private ITChartsRow getNewEventProducerRow(EventProducer ep, Map<Integer, EventProducer> eps, Map<Integer, ITChartsRow> cpuRows, ITChartsRow cpuRow) {
