@@ -111,6 +111,7 @@ public class PajeTclInput implements ITChartsInput {
 		// iterate over all page events 
 		Event lastEvent = null;
 		ITChartsRow lastProducerRow = null;
+
 		
 		for (Event e: elist) {
 			// get the map containing all the rows for this CPU
@@ -127,19 +128,21 @@ public class PajeTclInput implements ITChartsInput {
 			ITChartsRow producerRow = cpuMap.get(e.getEventProducer().getId()); 
 			
 			// finally add the event if I'm on the end
+			final long OFFSET = 296000000000L;
 			if (lastEvent!=null) {
-				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp(), e.getTimestamp()));	
+				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp()-OFFSET, e.getTimestamp()-OFFSET));	
 			}
 			
 			lastEvent = e;
 			lastProducerRow = producerRow;
+			
 		}
 	}
 	
 	private List<Event> getArticleList(Trace trace) {
 		
 		// Result label: the first result with this label is loaded. Take care.
-		final String FILTER_RESULT_LABEL = "ARTICLE_LABEL";
+		final String FILTER_RESULT_LABEL = "xxx";
 		// Filter tool name
 		final String FILTER_NAME = "Filter Tool";
 		
@@ -159,6 +162,7 @@ public class PajeTclInput implements ITChartsInput {
 			AnalysisResultSearchData data = (AnalysisResultSearchData) search.getAnalysisResultData(trace, ar);
 			@SuppressWarnings("unchecked")
 			List<Event> elist = (List<Event>) (List<? extends ISearchable>) data.getElements();
+			search.uninitialize();
 			return elist;
 		} catch (SoCTraceException e) {
 			e.printStackTrace();
