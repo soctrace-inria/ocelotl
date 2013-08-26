@@ -22,6 +22,10 @@ package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
+
 public abstract class LPAggregManager implements ILPAggregManager {
 
 	static {
@@ -38,19 +42,49 @@ public abstract class LPAggregManager implements ILPAggregManager {
 	protected List<Quality>			qualities	= new ArrayList<Quality>();
 	protected List<Float>			parameters	= new ArrayList<Float>();
 	protected List<List<Boolean>>	eqMatrix;
+	protected LPAggregWrapper		lpaggregWrapper;
+	protected OcelotlParameters		ocelotlParameters;
 
-	public LPAggregManager() {
+	public LPAggregManager(OcelotlParameters ocelotlParameters) {
 		super();
+		this.ocelotlParameters=ocelotlParameters;
 	}
 
 	@Override
-	public abstract void computeDichotomy();
+	public void computeDichotomy(){
+		final DeltaManager dm = new DeltaManager();
+		dm.start();
+		parameters.clear();
+		qualities.clear();
+		lpaggregWrapper.computeDichotomy(ocelotlParameters.getThreshold());
+		for (int i = 0; i < lpaggregWrapper.getParameterNumber(); i++) {
+			parameters.add(lpaggregWrapper.getParameter(i));
+			qualities.add(new Quality(lpaggregWrapper.getGainByIndex(i), lpaggregWrapper.getLossByIndex(i), lpaggregWrapper.getParameter(i)));
+		}
+		dm.end("LPAGGREG - PARAMETERS LIST");
+
+	
+	}
 
 	@Override
-	public abstract void computeParts();
+	public void computeParts(){
+		parts.clear();
+		final DeltaManager dm = new DeltaManager();
+		dm.start();
+		lpaggregWrapper.computeParts(ocelotlParameters.getParameter());
+		for (int i = 0; i < lpaggregWrapper.getPartNumber(); i++)
+			parts.add(lpaggregWrapper.getPart(i));
+		dm.end("LPAGGREG - COMPUTE PARTS");
+	}
 
+	
 	@Override
-	public abstract void computeQualities();
+	public void computeQualities(){
+		final DeltaManager dm = new DeltaManager();
+		dm.start();
+		lpaggregWrapper.computeQualities(ocelotlParameters.isNormalize());
+		dm.end("LPAGGREG - COMPUTE QUALITIES");
+	}
 
 	@Override
 	public abstract void fillVectors();

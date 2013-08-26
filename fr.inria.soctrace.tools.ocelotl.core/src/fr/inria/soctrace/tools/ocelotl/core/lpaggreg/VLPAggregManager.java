@@ -22,35 +22,18 @@ package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.VLPAggregWrapper;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
 import fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators.ITimeSliceMatrix;
 
 public class VLPAggregManager extends LPAggregManager {
 
-	VLPAggregWrapper	lpaggregWrapper;
 	ITimeSliceMatrix	timeSliceMatrix;
 
 	public VLPAggregManager(final ITimeSliceMatrix timeSliceMatrix) {
-		super();
+		super(timeSliceMatrix.getQueries().getOcelotlParameters());
 		this.timeSliceMatrix = timeSliceMatrix;
-		lpaggregWrapper = new VLPAggregWrapper();
+		lpaggregWrapper = new LPAggregWrapper(2);
 		fillVectors();
-	}
-
-	@Override
-	public void computeDichotomy() {
-		final DeltaManager dm = new DeltaManager();
-		dm.start();
-		parameters.clear();
-		qualities.clear();
-		lpaggregWrapper.computeDichotomy(timeSliceMatrix.getQueries().getOcelotlParameters().getThreshold());
-		for (int i = 0; i < lpaggregWrapper.getParameterNumber(); i++) {
-			parameters.add(lpaggregWrapper.getParameter(i));
-			qualities.add(new Quality(lpaggregWrapper.getGainByIndex(i), lpaggregWrapper.getLossByIndex(i), lpaggregWrapper.getParameter(i)));
-		}
-		dm.end("LPAGGREG - PARAMETERS LIST");
-
 	}
 
 	public void computeEqMatrix() {
@@ -63,12 +46,12 @@ public class VLPAggregManager extends LPAggregManager {
 		}
 		for (int i = 0; i < max - 1; i++)
 			for (int j = i + 2; j <= max; j++) {
-				final VLPAggregWrapper lpaggregWrapperTemp = new VLPAggregWrapper();
+				final LPAggregWrapper lpaggregWrapperTemp = new LPAggregWrapper(2);
 				for (int k = 0; k < parts.size(); k++)
 					if (parts.get(k) == i || parts.get(k) == j) {
-						lpaggregWrapperTemp.newVector();
+						lpaggregWrapperTemp.addVector();
 						for (final String key : timeSliceMatrix.getMatrix().get(k).keySet())
-							lpaggregWrapperTemp.addToVector(timeSliceMatrix.getMatrix().get(k).get(key));
+							lpaggregWrapperTemp.push_back(timeSliceMatrix.getMatrix().get(k).get(key));
 					}
 				lpaggregWrapperTemp.computeQualities(timeSliceMatrix.getQueries().getOcelotlParameters().isNormalize());
 				lpaggregWrapperTemp.computeParts(timeSliceMatrix.getQueries().getOcelotlParameters().getParameter());
@@ -94,30 +77,11 @@ public class VLPAggregManager extends LPAggregManager {
 	}
 
 	@Override
-	public void computeParts() {
-		parts.clear();
-		final DeltaManager dm = new DeltaManager();
-		dm.start();
-		lpaggregWrapper.computeParts(timeSliceMatrix.getQueries().getOcelotlParameters().getParameter());
-		for (int i = 0; i < lpaggregWrapper.getPartNumber(); i++)
-			parts.add(lpaggregWrapper.getPart(i));
-		dm.end("LPAGGREG - COMPUTE PARTS");
-	}
-
-	@Override
-	public void computeQualities() {
-		final DeltaManager dm = new DeltaManager();
-		dm.start();
-		lpaggregWrapper.computeQualities(timeSliceMatrix.getQueries().getOcelotlParameters().isNormalize());
-		dm.end("LPAGGREG - COMPUTE QUALITIES");
-	}
-
-	@Override
 	public void fillVectors() {
 		for (int i = 0; i < timeSliceMatrix.getVectorsNumber(); i++) {
-			lpaggregWrapper.newVector();
+			lpaggregWrapper.addVector();
 			for (final String key : timeSliceMatrix.getMatrix().get(i).keySet())
-				lpaggregWrapper.addToVector(timeSliceMatrix.getMatrix().get(i).get(key));
+				lpaggregWrapper.push_back(timeSliceMatrix.getMatrix().get(i).get(key));
 		}
 
 	}
@@ -128,7 +92,7 @@ public class VLPAggregManager extends LPAggregManager {
 
 	@Override
 	public void reset() {
-		lpaggregWrapper = new VLPAggregWrapper();
+		lpaggregWrapper = new LPAggregWrapper(2);
 		fillVectors();
 	}
 
