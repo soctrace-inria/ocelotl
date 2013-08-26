@@ -9,10 +9,8 @@
 package fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni;
 
 public class lpaggregJNI {
+  public final static native long new_LPAggregWrapper(int jarg1);
   public final static native void delete_LPAggregWrapper(long jarg1);
-  public final static native void LPAggregWrapper_computeQualities(long jarg1, LPAggregWrapper jarg1_, boolean jarg2);
-  public final static native void LPAggregWrapper_computeParts(long jarg1, LPAggregWrapper jarg1_, float jarg2);
-  public final static native void LPAggregWrapper_computeDichotomy(long jarg1, LPAggregWrapper jarg1_, float jarg2);
   public final static native int LPAggregWrapper_getPart(long jarg1, LPAggregWrapper jarg1_, int jarg2);
   public final static native int LPAggregWrapper_getPartNumber(long jarg1, LPAggregWrapper jarg1_);
   public final static native float LPAggregWrapper_getParameter(long jarg1, LPAggregWrapper jarg1_, int jarg2);
@@ -21,30 +19,16 @@ public class lpaggregJNI {
   public final static native double LPAggregWrapper_getGainByParameter(long jarg1, LPAggregWrapper jarg1_, float jarg2);
   public final static native double LPAggregWrapper_getLossByIndex(long jarg1, LPAggregWrapper jarg1_, int jarg2);
   public final static native double LPAggregWrapper_getLossByParameter(long jarg1, LPAggregWrapper jarg1_, float jarg2);
-  public final static native long new_VLPAggregWrapper();
-  public final static native void delete_VLPAggregWrapper(long jarg1);
-  public final static native void VLPAggregWrapper_newVector(long jarg1, VLPAggregWrapper jarg1_);
-  public final static native void VLPAggregWrapper_addToVector__SWIG_0(long jarg1, VLPAggregWrapper jarg1_, double jarg2);
-  public final static native void VLPAggregWrapper_addToVector__SWIG_1(long jarg1, VLPAggregWrapper jarg1_, double jarg2, int jarg3);
-  public final static native void VLPAggregWrapper_computeQualities(long jarg1, VLPAggregWrapper jarg1_, boolean jarg2);
-  public final static native void VLPAggregWrapper_computeParts(long jarg1, VLPAggregWrapper jarg1_, float jarg2);
-  public final static native void VLPAggregWrapper_computeDichotomy(long jarg1, VLPAggregWrapper jarg1_, float jarg2);
-  public final static native int VLPAggregWrapper_getVectorNumber(long jarg1, VLPAggregWrapper jarg1_);
-  public final static native int VLPAggregWrapper_getVectorSize(long jarg1, VLPAggregWrapper jarg1_);
-  public final static native long new_MLPAggregWrapper();
-  public final static native void delete_MLPAggregWrapper(long jarg1);
-  public final static native void MLPAggregWrapper_newMatrix(long jarg1, MLPAggregWrapper jarg1_);
-  public final static native void MLPAggregWrapper_addToMatrix__SWIG_0(long jarg1, MLPAggregWrapper jarg1_, double jarg2, int jarg3);
-  public final static native void MLPAggregWrapper_addToMatrix__SWIG_1(long jarg1, MLPAggregWrapper jarg1_, double jarg2, int jarg3, int jarg4);
-  public final static native void MLPAggregWrapper_newVector(long jarg1, MLPAggregWrapper jarg1_);
-  public final static native void MLPAggregWrapper_addToVector__SWIG_0(long jarg1, MLPAggregWrapper jarg1_, double jarg2);
-  public final static native void MLPAggregWrapper_addToVector__SWIG_1(long jarg1, MLPAggregWrapper jarg1_, double jarg2, int jarg3);
-  public final static native void MLPAggregWrapper_computeQualities(long jarg1, MLPAggregWrapper jarg1_, boolean jarg2);
-  public final static native void MLPAggregWrapper_computeParts(long jarg1, MLPAggregWrapper jarg1_, float jarg2);
-  public final static native void MLPAggregWrapper_computeDichotomy(long jarg1, MLPAggregWrapper jarg1_, float jarg2);
-  public final static native int MLPAggregWrapper_getMatrixNumber(long jarg1, MLPAggregWrapper jarg1_);
-  public final static native int MLPAggregWrapper_getMatrixSize(long jarg1, MLPAggregWrapper jarg1_);
-  public final static native int MLPAggregWrapper_getVectorSize(long jarg1, MLPAggregWrapper jarg1_);
-  public final static native long VLPAggregWrapper_SWIGUpcast(long jarg1);
-  public final static native long MLPAggregWrapper_SWIGUpcast(long jarg1);
+  public final static native void LPAggregWrapper_computeQualities(long jarg1, LPAggregWrapper jarg1_, boolean jarg2);
+  public final static native void LPAggregWrapper_computeParts(long jarg1, LPAggregWrapper jarg1_, float jarg2);
+  public final static native void LPAggregWrapper_computeDichotomy(long jarg1, LPAggregWrapper jarg1_, float jarg2);
+  public final static native void LPAggregWrapper_setValue__SWIG_0(long jarg1, LPAggregWrapper jarg1_, int jarg2, double jarg3);
+  public final static native void LPAggregWrapper_push_back__SWIG_0(long jarg1, LPAggregWrapper jarg1_, double jarg2);
+  public final static native void LPAggregWrapper_addVector__SWIG_0(long jarg1, LPAggregWrapper jarg1_);
+  public final static native void LPAggregWrapper_setValue__SWIG_1(long jarg1, LPAggregWrapper jarg1_, int jarg2, int jarg3, double jarg4);
+  public final static native void LPAggregWrapper_push_back__SWIG_1(long jarg1, LPAggregWrapper jarg1_, int jarg2, double jarg3);
+  public final static native void LPAggregWrapper_addMatrix(long jarg1, LPAggregWrapper jarg1_);
+  public final static native void LPAggregWrapper_setValue__SWIG_2(long jarg1, LPAggregWrapper jarg1_, int jarg2, int jarg3, int jarg4, double jarg5);
+  public final static native void LPAggregWrapper_addVector__SWIG_1(long jarg1, LPAggregWrapper jarg1_, int jarg2);
+  public final static native void LPAggregWrapper_push_back__SWIG_2(long jarg1, LPAggregWrapper jarg1_, int jarg2, int jarg3, double jarg4);
 }

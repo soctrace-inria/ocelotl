@@ -35,16 +35,8 @@ public class LPAggregWrapper {
     }
   }
 
-  public void computeQualities(boolean normalization) {
-    lpaggregJNI.LPAggregWrapper_computeQualities(swigCPtr, this, normalization);
-  }
-
-  public void computeParts(float parameter) {
-    lpaggregJNI.LPAggregWrapper_computeParts(swigCPtr, this, parameter);
-  }
-
-  public void computeDichotomy(float threshold) {
-    lpaggregJNI.LPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
+  public LPAggregWrapper(int dimension) {
+    this(lpaggregJNI.new_LPAggregWrapper(dimension), true);
   }
 
   public int getPart(int index) {
@@ -77,6 +69,54 @@ public class LPAggregWrapper {
 
   public double getLossByParameter(float parameter) {
     return lpaggregJNI.LPAggregWrapper_getLossByParameter(swigCPtr, this, parameter);
+  }
+
+  public void computeQualities(boolean normalization) {
+    lpaggregJNI.LPAggregWrapper_computeQualities(swigCPtr, this, normalization);
+  }
+
+  public void computeParts(float parameter) {
+    lpaggregJNI.LPAggregWrapper_computeParts(swigCPtr, this, parameter);
+  }
+
+  public void computeDichotomy(float threshold) {
+    lpaggregJNI.LPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
+  }
+
+  public void setValue(int i, double value) {
+    lpaggregJNI.LPAggregWrapper_setValue__SWIG_0(swigCPtr, this, i, value);
+  }
+
+  public void push_back(double value) {
+    lpaggregJNI.LPAggregWrapper_push_back__SWIG_0(swigCPtr, this, value);
+  }
+
+  public void addVector() {
+    lpaggregJNI.LPAggregWrapper_addVector__SWIG_0(swigCPtr, this);
+  }
+
+  public void setValue(int i, int j, double value) {
+    lpaggregJNI.LPAggregWrapper_setValue__SWIG_1(swigCPtr, this, i, j, value);
+  }
+
+  public void push_back(int i, double value) {
+    lpaggregJNI.LPAggregWrapper_push_back__SWIG_1(swigCPtr, this, i, value);
+  }
+
+  public void addMatrix() {
+    lpaggregJNI.LPAggregWrapper_addMatrix(swigCPtr, this);
+  }
+
+  public void setValue(int i, int j, int k, double value) {
+    lpaggregJNI.LPAggregWrapper_setValue__SWIG_2(swigCPtr, this, i, j, k, value);
+  }
+
+  public void addVector(int i) {
+    lpaggregJNI.LPAggregWrapper_addVector__SWIG_1(swigCPtr, this, i);
+  }
+
+  public void push_back(int i, int j, double value) {
+    lpaggregJNI.LPAggregWrapper_push_back__SWIG_2(swigCPtr, this, i, j, value);
   }
 
 }
