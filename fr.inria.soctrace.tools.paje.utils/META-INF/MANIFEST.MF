@@ -5,4 +5,4 @@ Bundle-SymbolicName: fr.inria.soctrace.tools.paje.utils
 Bundle-Version: 1.0.0.qualifier
 Export-Package: fr.inria.soctrace.tools.paje.utils.argumentmanager
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: fr.inria.soctrace.lib.model;bundle-version="1.0.0"
+Require-Bundle: fr.inria.soctrace.lib.model

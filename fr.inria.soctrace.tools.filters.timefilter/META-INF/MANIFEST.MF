@@ -7,12 +7,12 @@ Bundle-Activator: fr.inria.soctrace.tools.filters.timefilter.Activator
 Bundle-Vendor: INRIA
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- fr.inria.soctrace.lib.model;bundle-version="1.0.0",
- fr.inria.soctrace.lib.query;bundle-version="1.0.0",
- fr.inria.soctrace.lib.storage;bundle-version="1.0.0",
- fr.inria.soctrace.lib.search;bundle-version="1.0.0",
- fr.inria.soctrace.lib.utils;bundle-version="1.0.0",
- fr.inria.soctrace.framesoc.core;bundle-version="1.0.0"
+ fr.inria.soctrace.lib.model,
+ fr.inria.soctrace.lib.query,
+ fr.inria.soctrace.lib.storage,
+ fr.inria.soctrace.lib.search,
+ fr.inria.soctrace.lib.utils,
+ fr.inria.soctrace.framesoc.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.filters.timefilter

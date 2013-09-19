@@ -11,7 +11,7 @@
             category="fr.inria.soctrace.tools.ocelotl.ui.category"
             class="fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView"
             icon="icons/1366759976_white_tiger.png"
-            id="fr.inria.soctrace.tools.ocelotl.ui.LPAggregView"
+            id="fr.inria.soctrace.tools.ocelotl.ui.Ocelotl"
             name="Ocelotl"
             restorable="true">
       </view>
