@@ -197,7 +197,7 @@ public class ReducedEventQuery extends SelfDefiningElementQuery {
 
 	}
 	
-public List<EventProxy> getIDList() throws SoCTraceException {
+public List<ReducedEvent> getReducedEventList() throws SoCTraceException {
 		
 		try {
 			DeltaManager dm = new DeltaManager();
@@ -259,11 +259,11 @@ public List<EventProxy> getIDList() throws SoCTraceException {
 			Statement stm = dbObj.getConnection().createStatement();
 			
 			ResultSet rs = stm.executeQuery(query);
-			List<EventProxy> elist = null;
+			List<ReducedEvent> elist = null;
 			if (USE_JOIN) {
-				elist = rebuildEventIDJoin(rs);
+				elist = rebuildReducedEventJoin(rs);
 			} else {
-				elist = rebuildEventID(rs);
+				elist = rebuildReducedEvent(rs);
 			}
 
 			debug(dm.endMessage("EventQuery.getList()"));
@@ -403,22 +403,30 @@ public List<EventProxy> getIDList() throws SoCTraceException {
 	}
 	
 
-	private List<EventProxy> rebuildEventID(ResultSet rs) throws SoCTraceException {
+	private List<ReducedEvent> rebuildReducedEvent(ResultSet rs) throws SoCTraceException {
 				
-		List<EventProxy> list = new LinkedList<EventProxy>();
+		List<ReducedEvent> list = new LinkedList<ReducedEvent>();
+		ValueListString vls = new ValueListString();
 		try {		
 		
 			while (rs.next()) {
-				list.add(new EventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID")));
+				ReducedEvent re = new ReducedEvent(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), null);
+				list.add(re);
+				vls.addValue(String.valueOf(re.ID));
 			}
+			
+			Statement stm = dbObj.getConnection().createStatement();
+			ResultSet prs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM + 
+					" WHERE EVENT_ID IN " + vls.getValueString() + " WHERE EVENT_PARAM_TYPE_ID EQUALS");
+			
 			return list;
 		} catch (SQLException e) {
 			throw new SoCTraceException(e);
 		}
 	}
 
-	private List<EventProxy> rebuildEventIDJoin(ResultSet rs) throws SoCTraceException {
-		List<EventProxy> list = new LinkedList<EventProxy>();
+	private List<ReducedEvent> rebuildReducedEventJoin(ResultSet rs) throws SoCTraceException {
+		List<ReducedEvent> list = new LinkedList<ReducedEvent>();
 		Map<Integer, EventProxy> tmp = new HashMap<Integer, EventProxy>();
 		try {		
 			while (rs.next()) {
