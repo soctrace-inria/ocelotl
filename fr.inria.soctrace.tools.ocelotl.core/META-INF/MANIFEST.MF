@@ -19,3 +19,4 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.lpaggreg,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
  fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators
+Import-Package: fr.inria.soctrace.tools.paje.tracemanager.common.constants

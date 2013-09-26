@@ -31,6 +31,9 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
+import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
@@ -69,21 +72,21 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		final List<Event> fullEvents = query.getEvents(eventProducers);
+		final List<ReducedEvent> fullEvents = query.getEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
-		final Map<Integer, List<Event>> eventList = new HashMap<Integer, List<Event>>();
+		final Map<Integer, List<ReducedEvent>> eventList = new HashMap<Integer, List<ReducedEvent>>();
 		for (final EventProducer ep : eventProducers)
-			eventList.put(ep.getId(), new ArrayList<Event>());
-		for (final Event e : fullEvents)
-			eventList.get(e.getEventProducer().getId()).add(e);
+			eventList.put(ep.getId(), new ArrayList<ReducedEvent>());
+		for (final ReducedEvent e : fullEvents)
+			eventList.get(e.EP).add(e);
 		for (final EventProducer ep : eventProducers) {
-			State state;
-			final List<Event> events = eventList.get(ep.getId());
+			IState state;
+			final List<ReducedEvent> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
-				state=new State(events.get(i), events.get(i + 1), timeSliceManager);
+				state=new PajeState(events.get(i), events.get(i + 1), timeSliceManager);
 				if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())){
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
@@ -101,6 +104,7 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 	}
 	
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException {
+		int count = 0;
 		DeltaManager dm = new DeltaManager();
 		dm.start();
 		OcelotlEventCache cache = new OcelotlEventCache(query.getOcelotlParameters());
@@ -108,6 +112,7 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
+		DeltaManager dm2 = new DeltaManager();
 		dm.start();
 		final Map<Integer, List<EventProxy>> eventList = new HashMap<Integer, List<EventProxy>>();
 		for (final EventProducer ep : eventProducers)
@@ -115,10 +120,11 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 		for (final EventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
 		for (final EventProducer ep : eventProducers) {
-			State state;
+			dm2.start();
+			IState state;
 			final List<EventProxy> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
-				state=(new State(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
+				state=(new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
 				if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())){
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
@@ -131,6 +137,8 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 						matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
 				}
 			}
+			dm2.end("EP VECTORS (" + count++ + "): " + ep.getName());
+
 		}
 		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}

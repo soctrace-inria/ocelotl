@@ -1,9 +1,9 @@
 /* ===========================================================
- * Ocelotl Visualization Tool
+ * Paje Trace Manager module
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in which enables to visualize a trace 
- * under an aggregated representation form.
+ * This module is a FrameSoC plug in which enables to import, export and
+ * process Pajé trace files
  *
  * (C) Copyright 2013 INRIA
  *
@@ -17,13 +17,10 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core;
+package fr.inria.soctrace.tools.paje.tracemanager.common.constants;
 
-public class OcelotlConstants {
+public abstract class PajeExternalConstants {
 
-	static public enum HasChanged {
-		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
-	}
-
+	public final static String PajeStateValue = "Value";
 
 }

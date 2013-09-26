@@ -19,40 +19,47 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 
 public class OcelotlEventCache {
-	private HashMap<Integer, Event> cache= new HashMap<Integer, Event>();
-	private ITraceSearch traceSearch;
+	private HashMap<Integer, ReducedEvent> cache= new HashMap<Integer, ReducedEvent>();
 	private String trace;
 	private int EPPAGE = 100;
 	private int PAGE = 8;
 	private int MISS=0;
+	public int getMISS() {
+		return MISS;
+	}
+
+	public int getHIT() {
+		return HIT;
+	}
+
 	private int HIT=0;
+	final static boolean DEBUG=false;
 	
 	public OcelotlEventCache(OcelotlParameters parameters) throws SoCTraceException {
 		super();
-		this.traceSearch = new TraceSearch().initialize();
 		this.trace = parameters.getTrace().getDbName();
 		this.EPPAGE = parameters.getEpCache();
 		this.PAGE = parameters.getPageCache();
 	}
 	
-	public Event getEvent(EventProxy event) throws SoCTraceException{
-		if (cache.containsKey(event.ID)){
+	public ReducedEvent getEvent(EventProxy event) throws SoCTraceException{
+		if (cache.containsKey(event.ID)) {
 			HIT++;
 			return cache.get(event.ID);
 		}
 		cache.clear();
 		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		EventQuery query = new EventQuery(traceDB);
+		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<Event> elist =query.getList();
+		List<ReducedEvent> elist =query.getReducedEventList();
 		traceDB.close();
-		for (Event e: elist)
-			cache.put(e.getId(), e);
+		for (ReducedEvent e: elist)
+			cache.put(e.ID, e);
 		return cache.get(event.ID);
 	}
 	
-	public Event getEventPageCache(EventProxy event) throws SoCTraceException{
-		if (cache.containsKey(event.ID)){
+	public ReducedEvent getEventPageCache(EventProxy event) throws SoCTraceException{
+		if (cache.containsKey(event.ID)) {
 			HIT++;
 			return cache.get(event.ID);
 		}
@@ -60,24 +67,24 @@ public class OcelotlEventCache {
 //		dm.start();
 		cache.clear();
 		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		EventQuery query = new EventQuery(traceDB);
+		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<Event> elist =query.getList();
+		List<ReducedEvent> elist =query.getReducedEventList();
 		if (!elist.isEmpty()){
-			query = new EventQuery(traceDB);
-			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, String.valueOf(elist.get(0).getPage())));
-			elist=query.getList();
+			query = new ReducedEventQuery(traceDB);
+			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, String.valueOf(elist.get(0).PAGE)));
+			elist=query.getReducedEventList();
 		traceDB.close();
-		for (Event e: elist)
-			cache.put(e.getId(), e);
+		for (ReducedEvent e: elist)
+			cache.put(e.ID, e);
 		//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
 		return cache.get(event.ID);
 	}
 		return null;
 	}
 	
-	public Event getEventMultiPageCache(EventProxy event) throws SoCTraceException{
-		if (cache.containsKey(event.ID)){
+	public ReducedEvent getEventMultiPageCache(EventProxy event) throws SoCTraceException{
+		if (cache.containsKey(event.ID)) {
 			HIT++;
 			return cache.get(event.ID);
 		}
@@ -85,27 +92,27 @@ public class OcelotlEventCache {
 //		dm.start();
 		cache.clear();
 		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		EventQuery query = new EventQuery(traceDB);
+		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<Event> elist =query.getList();
+		List<ReducedEvent> elist =query.getReducedEventList();
 		if (!elist.isEmpty()){
-			query = new EventQuery(traceDB);
+			query = new ReducedEventQuery(traceDB);
 			final ValueListString vls = new ValueListString();
 			for (int i=0; i<PAGE; i++)	
-				vls.addValue(String.valueOf(elist.get(0).getPage()+i));
+				vls.addValue(String.valueOf(elist.get(0).PAGE+i));
 			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, vls.getValueString()));
-			elist=query.getList();
+			elist=query.getReducedEventList();
 		traceDB.close();
-		for (Event e: elist)
-			cache.put(e.getId(), e);
+		for (ReducedEvent e: elist)
+			cache.put(e.ID, e);
 		//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
 		return cache.get(event.ID);
 		}
 		return null;
 	}
 	
-	public Event getEventMultiPageEPCache(EventProxy event) throws SoCTraceException{
-		if (cache.containsKey(event.ID)){
+	public ReducedEvent getEventMultiPageEPCache(EventProxy event) throws SoCTraceException{
+		if (cache.containsKey(event.ID)) {
 			HIT++;
 			return cache.get(event.ID);
 		}
@@ -113,30 +120,30 @@ public class OcelotlEventCache {
 //		dm.start();
 		cache.clear();
 		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		EventQuery query = new EventQuery(traceDB);
+		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<Event> elist =query.getList();
+		List<ReducedEvent> elist =query.getReducedEventList();
 		if (!elist.isEmpty()){
-			query = new EventQuery(traceDB);
+			query = new ReducedEventQuery(traceDB);
 			final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 			final ValueListString vls = new ValueListString();
 			for (int i=0; i<EPPAGE; i++)	
-				vls.addValue(String.valueOf(elist.get(0).getPage()+i));
+				vls.addValue(String.valueOf(elist.get(0).PAGE+i));
 			and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.IN, String.valueOf(vls.getValueString())));
-			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(elist.get(0).getEventProducer().getId())));
+			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(elist.get(0).EP)));
 			query.setElementWhere(and);
-			elist=query.getList();
+			elist=query.getReducedEventList();
 			traceDB.close();
-			for (Event e: elist)
-			cache.put(e.getId(), e);
+			for (ReducedEvent e: elist)
+			cache.put(e.ID, e);
 			//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
 			return cache.get(event.ID);
 		}
 		return null;
 	}
 	
-	public Event getEventPageEPCache(EventProxy event) throws SoCTraceException{
-		if (cache.containsKey(event.ID)){
+	public ReducedEvent getEventPageEPCache(EventProxy event) throws SoCTraceException{
+		if (cache.containsKey(event.ID)) {
 			HIT++;
 			return cache.get(event.ID);
 		}
@@ -144,19 +151,19 @@ public class OcelotlEventCache {
 //		dm.start();
 		cache.clear();
 		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		EventQuery query = new EventQuery(traceDB);
+		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<Event> elist =query.getList();
+		List<ReducedEvent> elist =query.getReducedEventList();
 		if (!elist.isEmpty()){
-			query = new EventQuery(traceDB);
+			query = new ReducedEventQuery(traceDB);
 			final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
-			and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, String.valueOf(elist.get(0).getPage())));
-			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(elist.get(0).getEventProducer().getId())));
+			and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, String.valueOf(elist.get(0).PAGE)));
+			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(elist.get(0).EP)));
 			query.setElementWhere(and);
-			elist=query.getList();
+			elist=query.getReducedEventList();
 			traceDB.close();
-			for (Event e: elist)
-			cache.put(e.getId(), e);
+			for (ReducedEvent e: elist)
+			cache.put(e.ID, e);
 			//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
 			return cache.get(event.ID);
 		}

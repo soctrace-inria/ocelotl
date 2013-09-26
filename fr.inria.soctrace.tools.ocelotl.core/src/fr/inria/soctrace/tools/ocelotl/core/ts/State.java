@@ -23,43 +23,22 @@ import java.util.Map;
 
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class State {
+public abstract class State implements IState{
 
-	private String					stateType	= null;
-	private final TimeRegion		timeRegion;
-	private final EventProducer		eventProducer;
-	private final Event				eventStart;
-	private final Event				eventEnd;
-	private final TimeSliceManager	timeSliceManager;
+	protected String					stateType	= null;
+	protected TimeRegion				timeRegion = null;
+	protected int		eventProducerID = -1;
+	protected final TimeSliceManager	timeSliceManager;
 
-	public State(final Event eventStart, final Event eventEnd, final TimeSliceManager timeSliceManager) {// TODO
-		// use
-		// TimeRegion
-		super();
-		this.eventStart = eventStart;
-		this.eventEnd = eventEnd;
-		timeRegion = new TimeRegion(eventStart.getTimestamp(), eventEnd.getTimestamp());
-		eventProducer = eventStart.getEventProducer();
-		for (int i = 0; i < eventStart.getType().getEventParamTypes().size(); i++)
-			if (eventStart.getType().getEventParamTypes().get(i).getName().equals("Value")) {
-				stateType = eventStart.getEventParams().get(i).getValue();
-				break;
-			}
+	public State(final TimeSliceManager timeSliceManager) {// TODO
 		this.timeSliceManager = timeSliceManager;
 	}
 
-	public Event getEventEnd() {
-		return eventEnd;
-	}
-
-	public EventProducer getEventProducer() {
-		return eventProducer;
-	}
-
-	public Event getEventStart() {
-		return eventStart;
+	public int getEventProducerID() {
+		return eventProducerID;
 	}
 
 	public String getStateType() {

@@ -93,6 +93,60 @@ public class OcelotlTraceSearch extends TraceSearch {
 		traceDB.close();
 		return query.getList();
 	}
+	public List<ReducedEvent> getEventsByEventTypesAndIntervalsAndEventProducersReducedEvent(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+		DeltaManager dm = new DeltaManager();
+		openTraceDBObject(t);
+		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
+		List<ReducedEvent> proxy=new ArrayList<ReducedEvent>();
+
+		// types
+		if (eventTypes != null) {
+			if (eventTypes.size() == 0)
+				return proxy;
+		}
+		if (eventProducers != null) {
+			if (eventProducers.size() == 0)
+				return proxy;
+		}
+		dm.start();
+		ReducedEventQuery query = new ReducedEventQuery(traceDB);
+		LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+		//and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, Long.toString(i)));
+			
+			// intervals
+			if (region != null) {
+				if (traceDB.getMaxTimestamp() != region.getTimeStampEnd())
+					and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
+				if (traceDB.getMinTimestamp() != region.getTimeStampStart())
+					and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
+			}
+			
+			if (eventTypes != null) {
+				final ValueListString vls = new ValueListString();
+				for (final EventType et : eventTypes)
+					vls.addValue(String.valueOf(et.getId()));
+				and.addCondition(new SimpleCondition("EVENT_TYPE_ID", ComparisonOperation.IN, vls.getValueString()));
+			}
+
+
+
+			// eventProducers
+			if (eventProducers != null) {
+				final ValueListString vls = new ValueListString();
+				for (final EventProducer ep : eventProducers)
+					vls.addValue(String.valueOf(ep.getId()));
+				and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.IN, vls.getValueString()));
+			}
+			
+			if (and.getNumberOfConditions() == 1)
+				and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
+			query.setElementWhere(and);
+			query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+			proxy=query.getReducedEventList();
+		traceDB.close();
+		return proxy;
+	}
+	
 	
 	public List<EventProxy> getEventsByEventTypesAndIntervalsAndEventProducersProxy(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
@@ -148,24 +202,6 @@ public class OcelotlTraceSearch extends TraceSearch {
 		return proxy;
 	}
 	
-	///!\ non time ordered
-	@Deprecated
-	public List<Event> getEventsByEventTypesAndIntervalsAndEventProducersT(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
-		openTraceDBObject(t);
-		final EventIDQuery query = new EventIDQuery(traceDB);
-		List<Event> events=query.getList();
-		List<Event> eventsToRemove=new ArrayList<Event>();
-		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
-		for (Event e : events)
-			if ((eventTypes != null)&&!eventTypes.contains(e.getType()))
-				eventsToRemove.add(e);
-			else if ((region != null)&&!region.containsTimeStamp(e.getTimestamp()))
-				eventsToRemove.add(e);
-			else if ((eventProducers != null)&&!eventProducers.contains(e.getEventProducer()))
-				eventsToRemove.add(e);
-			events.removeAll(eventsToRemove);
-		return events;
-	}
 
 	protected void openTraceDBObject(final Trace t) throws SoCTraceException {
 		if (traceDB != null)

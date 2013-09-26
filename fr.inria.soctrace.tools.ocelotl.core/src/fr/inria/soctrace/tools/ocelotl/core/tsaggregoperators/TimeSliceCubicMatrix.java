@@ -29,6 +29,9 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
+import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
@@ -67,19 +70,19 @@ public class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		final List<Event> fullEvents = query.getEvents(eventProducers);
+		final List<ReducedEvent> fullEvents = query.getEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
 		for (final EventProducer ep : eventProducers) {
-			final List<State> state = new ArrayList<State>();
-			final List<Event> events = new ArrayList<Event>();
-			for (final Event e : fullEvents)
-				if (e.getEventProducer().getId() == ep.getId())
+			final List<IState> state = new ArrayList<IState>();
+			final List<ReducedEvent> events = new ArrayList<ReducedEvent>();
+			for (final ReducedEvent e : fullEvents)
+				if (e.EP == ep.getId())
 					events.add(e);
 			for (int i = 0; i < events.size() - 1; i++) {
-				state.add(new State(events.get(i), events.get(i + 1), timeSliceManager));
+				state.add(new PajeState(events.get(i), events.get(i + 1), timeSliceManager));
 				if (query.getOcelotlParameters().getSleepingStates().contains(state.get(state.size() - 1).getStateType()))
 					state.remove(state.size() - 1);
 				else {
