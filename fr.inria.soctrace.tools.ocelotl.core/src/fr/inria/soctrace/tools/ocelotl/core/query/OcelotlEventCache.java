@@ -44,7 +44,7 @@ public class OcelotlEventCache {
 	
 	public ReducedEvent getEvent(EventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
-			HIT++;
+		//	HIT++;
 			return cache.get(event.ID);
 		}
 		cache.clear();
@@ -60,7 +60,7 @@ public class OcelotlEventCache {
 	
 	public ReducedEvent getEventPageCache(EventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
-			HIT++;
+		//	HIT++;
 			return cache.get(event.ID);
 		}
 //		DeltaManager dm = new DeltaManager();
@@ -85,7 +85,7 @@ public class OcelotlEventCache {
 	
 	public ReducedEvent getEventMultiPageCache(EventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
-			HIT++;
+		//	HIT++;
 			return cache.get(event.ID);
 		}
 //		DeltaManager dm = new DeltaManager();
@@ -113,7 +113,7 @@ public class OcelotlEventCache {
 	
 	public ReducedEvent getEventMultiPageEPCache(EventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
-			HIT++;
+			//HIT++;
 			return cache.get(event.ID);
 		}
 //		DeltaManager dm = new DeltaManager();
@@ -144,7 +144,7 @@ public class OcelotlEventCache {
 	
 	public ReducedEvent getEventPageEPCache(EventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
-			HIT++;
+		//	HIT++;
 			return cache.get(event.ID);
 		}
 //		DeltaManager dm = new DeltaManager();

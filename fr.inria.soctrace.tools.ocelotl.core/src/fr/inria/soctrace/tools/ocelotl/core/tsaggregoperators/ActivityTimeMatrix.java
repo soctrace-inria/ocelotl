@@ -40,7 +40,8 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 
 public class ActivityTimeMatrix extends TimeSliceMatrix {
 
-	int	count	= 0;
+	int					count			= 0;
+	final static int	THREADNUMBER	= 5;
 
 	public ActivityTimeMatrix(final Query query) throws SoCTraceException {
 		super(query);
@@ -86,9 +87,9 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 			eventList.put(ep.getId(), new ArrayList<EventProxy>());
 		for (final EventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
-		List<OcelotlCachedThread> threadlist = new ArrayList<OcelotlCachedThread>();
-		for (int t = 0; t < 8; t++) {
-			threadlist.add(new OcelotlCachedThread(eventProducers, eventList, 8, t));
+		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		for (int t = 0; t < THREADNUMBER; t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, THREADNUMBER, t));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
@@ -98,7 +99,7 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 
 	@Deprecated
 	protected void computeSubMatrixCachedOld(final List<EventProducer> eventProducers) throws SoCTraceException {
-		int count = 0;
+		count = 0;
 		DeltaManager dm = new DeltaManager();
 		dm.start();
 		OcelotlEventCache cache = new OcelotlEventCache(query.getOcelotlParameters());
@@ -150,53 +151,6 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		return count - 1;
 	}
 
-	class OcelotlCachedThread extends Thread {
-
-		List<EventProducer>				eventProducers;
-		Map<Integer, List<EventProxy>>	eventList;
-		int								threadNumber;
-		int								thread;
-
-		@Override
-		public void run() {
-			for (int t = thread; t < eventProducers.size(); t = t + threadNumber) {
-				DeltaManager dm2 = new DeltaManager();
-				dm2.start();
-				EventProducer ep = eventProducers.get(t);
-				OcelotlEventCache cache;
-				try {
-					cache = new OcelotlEventCache(query.getOcelotlParameters());
-
-					IState state;
-					final List<EventProxy> events = eventList.get(ep.getId());
-					for (int i = 0; i < events.size() - 1; i++) {
-						state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-						if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
-							final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-							for (final long it : distrib.keySet())
-								matrixWrite(it, ep, distrib);
-						}
-					}
-				} catch (SoCTraceException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				dm2.end("THREAD " + thread + " - EP VECTORS (" + t + "): " + ep.getName());
-			}
-
-		}
-
-		public OcelotlCachedThread(List<EventProducer> eventProducers, Map<Integer, List<EventProxy>> eventList, int threadNumber, int thread) {
-			super();
-			this.eventProducers = eventProducers;
-			this.eventList = eventList;
-			this.threadNumber = threadNumber;
-			this.thread = thread;
-			start();
-		}
-
-	}
-
 	class OcelotlThread extends Thread {
 
 		List<EventProducer>				eventProducers;
@@ -228,7 +182,7 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				dm2.end("THREAD " + thread + " - EP VECTORS (" + t + "): " + ep.getName());
+				dm2.end("THREAD " + thread + " - EP VECTORS (EP " + t + " - N " + getCount() + "): " + ep.getName());
 			}
 
 		}
