@@ -35,6 +35,11 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 	protected List<HashMap<String, Long>>	matrix	= new ArrayList<HashMap<String, Long>>();
 	protected int							eventsNumber;
 	protected TimeSliceManager				timeSliceManager;
+	int										count			= 0;
+	int										epit			= 0;
+	final static int						THREADNUMBER	= 7;
+	final static int						THREADNUMBERCACHE	= 25;
+	DeltaManager							dm;
 
 	public TimeSliceMatrix(final Query query) throws SoCTraceException {
 		super();
@@ -51,18 +56,42 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 		dm.start();
 		final int epsize = query.getOcelotlParameters().getEventProducers().size();
 		if (query.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < query.getOcelotlParameters().getMaxEventProducers())
-			computeSubMatrix(query.getOcelotlParameters().getEventProducers());
+			try {
+				computeSubMatrix(query.getOcelotlParameters().getEventProducers());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		else {
 			final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers().size() == 0 ? query.getAllEventProducers() : query.getOcelotlParameters().getEventProducers();
 			for (int i = 0; i < epsize; i = i + query.getOcelotlParameters().getMaxEventProducers())
-				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getOcelotlParameters().getMaxEventProducers())));
+				try {
+					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getOcelotlParameters().getMaxEventProducers())));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 
 		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
 	}
 
-	protected abstract void computeSubMatrix(List<EventProducer> eventProducers) throws SoCTraceException;
+	protected abstract void computeSubMatrix(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
 
+	public synchronized int getCount() {
+		count++;
+		return count - 1;
+	}
+
+	public synchronized void total() {
+		dm.end("                                                               Total Time:");
+	}
+
+	public synchronized int getEP() {
+		epit++;
+		return epit - 1;
+	}
+	
 	@Override
 	public void computeVectors() {
 		// TODO Auto-generated method stub

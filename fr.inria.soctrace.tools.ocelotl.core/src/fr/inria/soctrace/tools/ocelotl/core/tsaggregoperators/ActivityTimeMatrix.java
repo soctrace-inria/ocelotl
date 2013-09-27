@@ -40,16 +40,13 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 
 public class ActivityTimeMatrix extends TimeSliceMatrix {
 
-	int					count			= 0;
-	final static int	THREADNUMBER	= 5;
-
 	public ActivityTimeMatrix(final Query query) throws SoCTraceException {
 		super(query);
 		System.out.println("Activity Time Matrix");
 	}
 
-	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException {
-		DeltaManager dm = new DeltaManager();
+	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
+		dm = new DeltaManager();
 		dm.start();
 		final List<ReducedEvent> fullEvents = query.getEvents(eventProducers);
 		eventsNumber = fullEvents.size();
@@ -61,23 +58,17 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 			eventList.put(ep.getId(), new ArrayList<ReducedEvent>());
 		for (final ReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
-		for (final EventProducer ep : eventProducers) {
-			final List<ReducedEvent> events = eventList.get(ep.getId());
-			IState state;
-			for (int i = 0; i < events.size() - 1; i++) {
-				state = (new PajeState(events.get(i), events.get(i + 1), timeSliceManager));
-				if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
-					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-					for (final long it : distrib.keySet())
-						matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
-				}
-			}
+		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		for (int t = 0; t < THREADNUMBER; t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, THREADNUMBER, t, false));
 		}
+		for (Thread thread : threadlist)
+			thread.join();
 		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
-		DeltaManager dm = new DeltaManager();
+		dm = new DeltaManager();
 		dm.start();
 		final List<EventProxy> fullEvents = query.getEventsProxy(eventProducers);
 		eventsNumber = fullEvents.size();
@@ -88,55 +79,17 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		for (final EventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < THREADNUMBER; t++) {
-			threadlist.add(new OcelotlThread(eventProducers, eventList, THREADNUMBER, t));
+		for (int t = 0; t < THREADNUMBERCACHE; t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, THREADNUMBERCACHE, t, true));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
-
 		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
-	@Deprecated
-	protected void computeSubMatrixCachedOld(final List<EventProducer> eventProducers) throws SoCTraceException {
-		count = 0;
-		DeltaManager dm = new DeltaManager();
-		dm.start();
-		OcelotlEventCache cache = new OcelotlEventCache(query.getOcelotlParameters());
-		final List<EventProxy> fullEvents = query.getEventsProxy(eventProducers);
-		eventsNumber = fullEvents.size();
-		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
-		DeltaManager dm2 = new DeltaManager();
-		final Map<Integer, List<EventProxy>> eventList = new HashMap<Integer, List<EventProxy>>();
-		for (final EventProducer ep : eventProducers)
-			eventList.put(ep.getId(), new ArrayList<EventProxy>());
-		for (final EventProxy e : fullEvents)
-			eventList.get(e.EP).add(e);
-		for (final EventProducer ep : eventProducers) {
-			dm2.start();
-			IState state;
-			final List<EventProxy> events = eventList.get(ep.getId());
-			for (int i = 0; i < events.size() - 1; i++) {
-				state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-				if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
-					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-					for (final long it : distrib.keySet())
-						matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
-				}
-			}
-			dm2.end("EP VECTORS (" + count++ + "): " + ep.getName());
-		}
-		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
-	}
-
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		if (query.getOcelotlParameters().isCache()) {
-			try {
-				computeSubMatrixCached(eventProducers);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			computeSubMatrixCached(eventProducers);
 		} else {
 			computeSubMatrixNonCached(eventProducers);
 		}
@@ -146,30 +99,33 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
 	}
 
-	synchronized int getCount() {
-		count++;
-		return count - 1;
-	}
-
 	class OcelotlThread extends Thread {
 
-		List<EventProducer>				eventProducers;
-		Map<Integer, List<EventProxy>>	eventList;
-		int								threadNumber;
-		int								thread;
+		List<EventProducer>					eventProducers;
+		Map<Integer, List<EventProxy>>		eventProxyList;
+		Map<Integer, List<ReducedEvent>>	eventList;
+		int									threadNumber;
+		int									thread;
+		boolean								cached;
 
 		@Override
 		public void run() {
-			for (int t = thread; t < eventProducers.size(); t = t + threadNumber) {
+			if (cached)
+				cacheRun();
+			else
+				noCacheRun();
+		}
+
+		private void cacheRun() {
+			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
 				DeltaManager dm2 = new DeltaManager();
 				dm2.start();
 				EventProducer ep = eventProducers.get(t);
 				OcelotlEventCache cache;
 				try {
 					cache = new OcelotlEventCache(query.getOcelotlParameters());
-
 					IState state;
-					final List<EventProxy> events = eventList.get(ep.getId());
+					final List<EventProxy> events = eventProxyList.get(ep.getId());
 					for (int i = 0; i < events.size() - 1; i++) {
 						state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
 						if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
@@ -183,16 +139,45 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 					e.printStackTrace();
 				}
 				dm2.end("THREAD " + thread + " - EP VECTORS (EP " + t + " - N " + getCount() + "): " + ep.getName());
+				total();
 			}
 
 		}
 
-		public OcelotlThread(List<EventProducer> eventProducers, Map<Integer, List<EventProxy>> eventList, int threadNumber, int thread) {
+		private void noCacheRun() {
+			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
+				DeltaManager dm2 = new DeltaManager();
+				dm2.start();
+				EventProducer ep = eventProducers.get(t);
+				final List<ReducedEvent> events = eventList.get(ep.getId());
+				IState state;
+				for (int i = 0; i < events.size() - 1; i++) {
+					state = (new PajeState(events.get(i), events.get(i + 1), timeSliceManager));
+					if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
+						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+						for (final long it : distrib.keySet())
+							matrixWrite(it, ep, distrib);
+					}
+				}
+				// dm2.end("THREAD " + thread + " - EP VECTORS (EP " + t +
+				// " - N " + getCount() + "): " + ep.getName());
+				// total();
+			}
+
+		}
+
+		@SuppressWarnings("unchecked")
+		public OcelotlThread(List<EventProducer> eventProducers, Object eventList, int threadNumber, int thread, boolean cached) {
 			super();
 			this.eventProducers = eventProducers;
-			this.eventList = eventList;
+			this.cached = cached;
+			if (cached)
+				this.eventProxyList = (Map<Integer, List<EventProxy>>) eventList;
+			else
+				this.eventList = (Map<Integer, List<ReducedEvent>>) eventList;
 			this.threadNumber = threadNumber;
 			this.thread = thread;
+
 			start();
 		}
 

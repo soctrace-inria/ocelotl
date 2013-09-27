@@ -90,6 +90,8 @@ public class PartManager {
 		for (final TimeRegion tr : timeStamps)
 			System.out.print(tr.getTimeStampStart() + ", ");
 		System.out.print(timeStamps.get(timeStamps.size() - 1).getTimeStampEnd());
+		System.out.println();
+		System.out.println();
 	}
 
 	public void setLpaggregCore(final OcelotlCore lpaggregCore) {
