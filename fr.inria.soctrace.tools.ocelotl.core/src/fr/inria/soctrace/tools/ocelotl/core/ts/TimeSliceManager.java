@@ -64,13 +64,15 @@ public class TimeSliceManager {
 
 	public Map<Long, Long> getTimeSlicesDistribution(final TimeRegion testedTimeRegion) {
 		final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
-		long startSlice = 0;
+		long startSlice = Math.max(0, (testedTimeRegion.getTimeStampStart()/sliceDuration)-1);
 		long temp = 0;
-		for (final TimeSlice it : timeSlices)
+		for (long i = startSlice; i< timeSlices.size(); i++){
+			TimeSlice it=timeSlices.get((int)i);
 			if (it.startIsInsideMe(testedTimeRegion.getTimeStampStart())) {
 				startSlice = it.getNumber();
 				break;
 			}
+		}
 		for (long i = startSlice; i < slicesNumber; i++) {
 			temp = timeSlices.get((int) i).regionInsideMe(testedTimeRegion);
 			if (temp == 0)
