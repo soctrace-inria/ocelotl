@@ -487,7 +487,7 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	public static final String					ID				= "fr.inria.soctrace.tools.ocelotl.ui.Ocelotl"; //$NON-NLS-1$
+	public static final String					ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
 	public static final String					PLUGIN_ID		= Activator.PLUGIN_ID;
 	private Button								btnMergeAggregatedParts;
 	private Button								btnCache;
