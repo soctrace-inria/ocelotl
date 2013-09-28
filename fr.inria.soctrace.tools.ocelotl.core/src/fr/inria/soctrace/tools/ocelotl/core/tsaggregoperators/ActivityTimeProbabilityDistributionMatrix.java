@@ -58,12 +58,12 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 		for (final ReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < THREADNUMBER; t++) {
-			threadlist.add(new OcelotlThread(eventProducers, eventList, THREADNUMBER, t, false));
+		for (int t = 0; t < query.getOcelotlParameters().getThreadNonCached(); t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThreadNonCached(), t, false));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
-		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTOR COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
@@ -78,12 +78,12 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 		for (final EventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < THREADNUMBERCACHE; t++) {
-			threadlist.add(new OcelotlThread(eventProducers, eventList, THREADNUMBERCACHE, t, true));
+		for (int t = 0; t < query.getOcelotlParameters().getThreadCached(); t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThreadCached(), t, false));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
-		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTOR COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	class OcelotlThread extends Thread {
@@ -98,18 +98,21 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 		@Override
 		public void run() {
 			if (cached)
-				cacheRun();
+				try {
+					cacheRun();
+				} catch (SoCTraceException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			else
 				noCacheRun();
 		}
 
-		private void cacheRun() {
+		private void cacheRun() throws SoCTraceException {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				DeltaManager dm2 = new DeltaManager();
-				dm2.start();
-				EventProducer ep = eventProducers.get(t);
 				OcelotlEventCache cache;
-				try {
+				cache = new OcelotlEventCache(query.getOcelotlParameters());
+				EventProducer ep = eventProducers.get(t);
 					cache = new OcelotlEventCache(query.getOcelotlParameters());
 					IState state;
 					final List<EventProxy> events = eventProxyList.get(ep.getId());
@@ -127,21 +130,19 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 					if (total != 0)
 						for (int i = 0; i < matrix.size(); i++)
 							matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
-				} catch (SoCTraceException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				 dm2.end("THREAD " + thread + " - EP VECTORS (EP " + t +
-				 " - N " + getCount() + "): " + ep.getName());
-				 total();
+					
+					cache.close();
+					int c = getCount();
+					if (c % EPCOUNT == 0)
+						total(c);
+					
+				 
 			}
 
 		}
 
 		private void noCacheRun() {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				DeltaManager dm2 = new DeltaManager();
-				dm2.start();
 				EventProducer ep = eventProducers.get(t);
 				final List<ReducedEvent> events = eventList.get(ep.getId());
 				IState state;
@@ -159,9 +160,9 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 				if (total != 0)
 					for (int i = 0; i < matrix.size(); i++)
 						matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
-				// dm2.end("THREAD " + thread + " - EP VECTORS (EP " + t +
-				// " - N " + getCount() + "): " + ep.getName());
-				// total();
+				int c = getCount();
+				if (c % EPCOUNT == 0)
+					total(c);
 			}
 
 		}

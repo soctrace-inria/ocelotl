@@ -44,6 +44,8 @@ public class OcelotlParameters {
 	private boolean				cache				=true;
 	private int					epCache				=100;
 	private int					pageCache			=20;
+	private int					threadNonCached		=5;
+	private int					threadCached		=30;
 
 	public boolean isGrowingQualities() {
 		return growingQualities;
@@ -175,6 +177,22 @@ public class OcelotlParameters {
 		builder.append("OcelotlParameters \n[\neventProducers=").append(eventProducers).append("\neventTypes=").append(eventTypes).append("\nsleepingStates=").append(sleepingStates).append("\ntimeSlicesNumber=").append(timeSlicesNumber)
 				.append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold).append("\ntrace=").append(trace).append("\n]");
 		return builder.toString();
+	}
+
+	public int getThreadNonCached() {
+		return threadNonCached;
+	}
+
+	public void setThreadNonCached(int threadNonCached) {
+		this.threadNonCached = threadNonCached;
+	}
+
+	public int getThreadCached() {
+		return threadCached;
+	}
+
+	public void setThreadCached(int threadCached) {
+		this.threadCached = threadCached;
 	}
 
 

@@ -37,9 +37,8 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 	protected TimeSliceManager				timeSliceManager;
 	int										count			= 0;
 	int										epit			= 0;
-	final static int						THREADNUMBER	= 7;
-	final static int						THREADNUMBERCACHE	= 25;
 	DeltaManager							dm;
+	final static int 						EPCOUNT			= 200;			
 
 	public TimeSliceMatrix(final Query query) throws SoCTraceException {
 		super();
@@ -52,8 +51,8 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 
 	public void computeMatrix() throws SoCTraceException {
 		eventsNumber = 0;
-		final DeltaManager dm = new DeltaManager();
-		dm.start();
+		final DeltaManager dmt = new DeltaManager();
+		dmt.start();
 		final int epsize = query.getOcelotlParameters().getEventProducers().size();
 		if (query.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < query.getOcelotlParameters().getMaxEventProducers())
 			try {
@@ -73,18 +72,18 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 				}
 		}
 
-		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
+		dmt.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
 	}
 
 	protected abstract void computeSubMatrix(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
 
 	public synchronized int getCount() {
 		count++;
-		return count - 1;
+		return count;
 	}
 
-	public synchronized void total() {
-		dm.end("                                                               Total Time:");
+	public void total(int rows) {
+		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
 	}
 
 	public synchronized int getEP() {

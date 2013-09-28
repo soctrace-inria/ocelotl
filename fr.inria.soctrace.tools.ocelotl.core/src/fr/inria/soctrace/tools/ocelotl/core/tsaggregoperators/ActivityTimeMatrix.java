@@ -24,11 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.storage.TraceDBObject;
-import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
@@ -36,7 +33,6 @@ import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
-import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 
 public class ActivityTimeMatrix extends TimeSliceMatrix {
 
@@ -59,12 +55,12 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		for (final ReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < THREADNUMBER; t++) {
-			threadlist.add(new OcelotlThread(eventProducers, eventList, THREADNUMBER, t, false));
+		for (int t = 0; t < query.getOcelotlParameters().getThreadNonCached(); t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThreadNonCached(), t, false));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
-		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTOR COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
@@ -79,12 +75,12 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		for (final EventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < THREADNUMBERCACHE; t++) {
-			threadlist.add(new OcelotlThread(eventProducers, eventList, THREADNUMBERCACHE, t, true));
+		for (int t = 0; t < query.getOcelotlParameters().getThreadCached(); t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThreadCached(), t, true));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
-		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTOR COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
@@ -95,8 +91,10 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		}
 	}
 
-	synchronized void matrixWrite(long it, EventProducer ep, Map<Long, Long> distrib) {
-		matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
+	void matrixWrite(long it, EventProducer ep, Map<Long, Long> distrib) {
+		synchronized (matrix) {
+			matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
+		}
 	}
 
 	class OcelotlThread extends Thread {
@@ -111,43 +109,41 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		@Override
 		public void run() {
 			if (cached)
-				cacheRun();
-			else
-				noCacheRun();
-		}
-
-		private void cacheRun() {
-			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				DeltaManager dm2 = new DeltaManager();
-				dm2.start();
-				EventProducer ep = eventProducers.get(t);
-				OcelotlEventCache cache;
 				try {
-					cache = new OcelotlEventCache(query.getOcelotlParameters());
-					IState state;
-					final List<EventProxy> events = eventProxyList.get(ep.getId());
-					for (int i = 0; i < events.size() - 1; i++) {
-						state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-						if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
-							final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-							for (final long it : distrib.keySet())
-								matrixWrite(it, ep, distrib);
-						}
-					}
+					cacheRun();
 				} catch (SoCTraceException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				dm2.end("THREAD " + thread + " - EP VECTORS (EP " + t + " - N " + getCount() + "): " + ep.getName());
-				total();
+			else
+				noCacheRun();
+		}
+
+		private void cacheRun() throws SoCTraceException {
+			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
+				OcelotlEventCache cache;
+				cache = new OcelotlEventCache(query.getOcelotlParameters());
+				EventProducer ep = eventProducers.get(t);
+				IState state;
+				final List<EventProxy> events = eventProxyList.get(ep.getId());
+				for (int i = 0; i < events.size() - 1; i++) {
+					state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
+					if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
+						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+						for (final long it : distrib.keySet())
+							matrixWrite(it, ep, distrib);
+					}
+				}
+				cache.close();
+				int c = getCount();
+				if (c % EPCOUNT == 0)
+					total(c);
 			}
 
 		}
 
 		private void noCacheRun() {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				DeltaManager dm2 = new DeltaManager();
-				dm2.start();
 				EventProducer ep = eventProducers.get(t);
 				final List<ReducedEvent> events = eventList.get(ep.getId());
 				IState state;
@@ -159,9 +155,9 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 							matrixWrite(it, ep, distrib);
 					}
 				}
-				// dm2.end("THREAD " + thread + " - EP VECTORS (EP " + t +
-				// " - N " + getCount() + "): " + ep.getName());
-				// total();
+				int c = getCount();
+				if (c % EPCOUNT == 0)
+					total(c);
 			}
 
 		}

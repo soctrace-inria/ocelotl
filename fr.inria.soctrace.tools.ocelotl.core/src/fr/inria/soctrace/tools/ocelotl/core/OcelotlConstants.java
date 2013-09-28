@@ -24,6 +24,9 @@ public class OcelotlConstants {
 	static public enum HasChanged {
 		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
 	}
+	
+	public final static int						THREADNUMBER	= 7;
+	public final static int						THREADNUMBERCACHE	= 25;
 
 
 }

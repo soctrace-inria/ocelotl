@@ -21,6 +21,7 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 public class OcelotlEventCache {
 	private HashMap<Integer, ReducedEvent> cache= new HashMap<Integer, ReducedEvent>();
 	private String trace;
+	private TraceDBObject traceDB;
 	private int EPPAGE = 100;
 	private int PAGE = 8;
 	private int MISS=0;
@@ -35,11 +36,17 @@ public class OcelotlEventCache {
 	private int HIT=0;
 	final static boolean DEBUG=false;
 	
+	private void openDB(OcelotlParameters parameters) throws SoCTraceException{
+			trace = parameters.getTrace().getDbName();
+			traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
+	}
+	
 	public OcelotlEventCache(OcelotlParameters parameters) throws SoCTraceException {
 		super();
-		this.trace = parameters.getTrace().getDbName();
 		this.EPPAGE = parameters.getEpCache();
 		this.PAGE = parameters.getPageCache();
+		openDB(parameters);
+
 	}
 	
 	public ReducedEvent getEvent(EventProxy event) throws SoCTraceException{
@@ -48,11 +55,11 @@ public class OcelotlEventCache {
 			return cache.get(event.ID);
 		}
 		cache.clear();
-		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
+		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
 		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
 		List<ReducedEvent> elist =query.getReducedEventList();
-		traceDB.close();
+	//	traceDB.close();
 		for (ReducedEvent e: elist)
 			cache.put(e.ID, e);
 		return cache.get(event.ID);
@@ -66,7 +73,7 @@ public class OcelotlEventCache {
 //		DeltaManager dm = new DeltaManager();
 //		dm.start();
 		cache.clear();
-		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
+		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
 		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
 		List<ReducedEvent> elist =query.getReducedEventList();
@@ -74,7 +81,7 @@ public class OcelotlEventCache {
 			query = new ReducedEventQuery(traceDB);
 			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, String.valueOf(elist.get(0).PAGE)));
 			elist=query.getReducedEventList();
-		traceDB.close();
+	//	traceDB.close();
 		for (ReducedEvent e: elist)
 			cache.put(e.ID, e);
 		//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
@@ -91,7 +98,7 @@ public class OcelotlEventCache {
 //		DeltaManager dm = new DeltaManager();
 //		dm.start();
 		cache.clear();
-		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
+		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
 		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
 		List<ReducedEvent> elist =query.getReducedEventList();
@@ -102,7 +109,7 @@ public class OcelotlEventCache {
 				vls.addValue(String.valueOf(elist.get(0).PAGE+i));
 			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, vls.getValueString()));
 			elist=query.getReducedEventList();
-		traceDB.close();
+		//traceDB.close();
 		for (ReducedEvent e: elist)
 			cache.put(e.ID, e);
 		//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
@@ -119,7 +126,7 @@ public class OcelotlEventCache {
 //		DeltaManager dm = new DeltaManager();
 //		dm.start();
 		cache.clear();
-		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
+		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
 		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
 		List<ReducedEvent> elist =query.getReducedEventList();
@@ -133,7 +140,7 @@ public class OcelotlEventCache {
 			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(elist.get(0).EP)));
 			query.setElementWhere(and);
 			elist=query.getReducedEventList();
-			traceDB.close();
+			//traceDB.close();
 			for (ReducedEvent e: elist)
 			cache.put(e.ID, e);
 			//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
@@ -150,7 +157,7 @@ public class OcelotlEventCache {
 //		DeltaManager dm = new DeltaManager();
 //		dm.start();
 		cache.clear();
-		TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
+		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
 		ReducedEventQuery query = new ReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
 		List<ReducedEvent> elist =query.getReducedEventList();
@@ -161,7 +168,7 @@ public class OcelotlEventCache {
 			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(elist.get(0).EP)));
 			query.setElementWhere(and);
 			elist=query.getReducedEventList();
-			traceDB.close();
+		//	traceDB.close();
 			for (ReducedEvent e: elist)
 			cache.put(e.ID, e);
 			//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
@@ -170,6 +177,14 @@ public class OcelotlEventCache {
 		return null;
 	}
 	
+	public void close(){
+		try {
+			traceDB.close();
+		} catch (SoCTraceException e) {
+		// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
  
 	
 	

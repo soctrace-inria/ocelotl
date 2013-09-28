@@ -54,7 +54,6 @@ public class ReducedEventQuery extends EventQuery {
 	
 	
 public List<ReducedEvent> getReducedEventList() throws SoCTraceException {
-		
 		try {
 			DeltaManager dm = new DeltaManager();
 			dm.start();

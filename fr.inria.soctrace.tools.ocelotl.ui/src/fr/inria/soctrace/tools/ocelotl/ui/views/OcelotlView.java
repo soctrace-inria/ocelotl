@@ -513,6 +513,8 @@ public class OcelotlView extends ViewPart {
 	private final java.util.List<EventProducer>	producers		= new LinkedList<EventProducer>();
 	private QualityView							qualityView;
 	private Spinner								spinnerDivideDbQuery;
+	private Spinner								spinnerThreadCached;
+	private Spinner								spinnerThreadNonCached;
 	private Spinner								spinnerPageSize;
 	private Spinner								spinnerEPPageSize;
 	private Spinner								spinnerTSNumber;
@@ -547,6 +549,8 @@ public class OcelotlView extends ViewPart {
 		spinnerDivideDbQuery.setSelection(0);
 		spinnerPageSize.setSelection(50);
 		spinnerEPPageSize.setSelection(100);
+		spinnerThreadCached.setSelection(30);
+		spinnerThreadNonCached.setSelection(5);
 		textRun.setText("0");
 		btnMergeAggregatedParts.setSelection(true);
 		producers.clear();
@@ -1007,6 +1011,39 @@ public class OcelotlView extends ViewPart {
 		spinnerDivideDbQuery.setMaximum(1000000);
 		spinnerDivideDbQuery.setSelection(0);
 
+		final Group grpMultiThread = new Group(sashFormAdvancedParameters, SWT.NONE);
+		grpMultiThread.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		grpMultiThread.setText("Multi Threading");
+		grpMultiThread.setLayout(new GridLayout(2, false));
+
+		final Label lblThreadNonCached = new Label(grpMultiThread, SWT.NONE);
+		lblThreadNonCached.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblThreadNonCached.setText("Working Threads (non cached queries)");
+
+		spinnerThreadNonCached = new Spinner(grpMultiThread, SWT.BORDER);
+		spinnerThreadNonCached.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		final GridData gd_spinnerThreadNonCached = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		gd_spinnerDivideDbQuery.widthHint = 99;
+		spinnerThreadNonCached.setLayoutData(gd_spinnerThreadNonCached);
+		spinnerThreadNonCached.addModifyListener(new ConfModificationListener());
+		spinnerThreadNonCached.setMinimum(1);
+		spinnerThreadNonCached.setMaximum(1000000);
+		spinnerThreadNonCached.setSelection(5);
+
+		final Label lblThreadCached = new Label(grpMultiThread, SWT.NONE);
+		lblThreadCached.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblThreadCached.setText("Working Threads (cached queries)");
+
+		spinnerThreadCached = new Spinner(grpMultiThread, SWT.BORDER);
+		spinnerThreadCached.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		final GridData gd_spinnerThreadCached = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		gd_spinnerDivideDbQuery.widthHint = 99;
+		spinnerThreadCached.setLayoutData(gd_spinnerThreadCached);
+		spinnerThreadCached.addModifyListener(new ConfModificationListener());
+		spinnerThreadCached.setMinimum(1);
+		spinnerThreadCached.setMaximum(1000000);
+		spinnerThreadCached.setSelection(30);
+
 		final Group grpVisualizationSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
 		grpVisualizationSettings.setText("Visualization settings");
 		grpVisualizationSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -1070,6 +1107,8 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters.setCache(btnCache.getSelection());
 		ocelotlParameters.setEpCache(spinnerEPPageSize.getSelection());
 		ocelotlParameters.setPageCache(spinnerPageSize.getSelection());
+		ocelotlParameters.setThreadCached(spinnerThreadCached.getSelection());
+		ocelotlParameters.setThreadNonCached(spinnerThreadNonCached.getSelection());
 		// TODO manage number format exception
 		try {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());
