@@ -149,6 +149,7 @@ public List<ReducedEvent> getReducedEventList() throws SoCTraceException {
 			String query;
 			query = "SELECT * FROM " + FramesocTable.EVENT_PARAM + 
 					" WHERE EVENT_ID IN " + vls.getValueString() + " AND EVENT_PARAM_TYPE_ID IN " + pvls.getValueString();
+			stm = dbObj.getConnection().createStatement();
 					
 			ResultSet prs = stm.executeQuery(query);//TODO verifier
 			while (prs.next())
