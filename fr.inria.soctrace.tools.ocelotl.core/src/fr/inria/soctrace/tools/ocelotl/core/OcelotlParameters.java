@@ -44,8 +44,8 @@ public class OcelotlParameters {
 	private boolean				cache				=true;
 	private int					epCache				=100;
 	private int					pageCache			=20;
-	private int					threadNonCached		=5;
-	private int					threadCached		=30;
+	private int					thread				=5;
+
 
 	public boolean isGrowingQualities() {
 		return growingQualities;
@@ -179,21 +179,15 @@ public class OcelotlParameters {
 		return builder.toString();
 	}
 
-	public int getThreadNonCached() {
-		return threadNonCached;
+	public int getThread() {
+		return thread;
 	}
 
-	public void setThreadNonCached(int threadNonCached) {
-		this.threadNonCached = threadNonCached;
+	public void setThread(int thread) {
+		this.thread = thread;
 	}
 
-	public int getThreadCached() {
-		return threadCached;
-	}
 
-	public void setThreadCached(int threadCached) {
-		this.threadCached = threadCached;
-	}
 
 
 
