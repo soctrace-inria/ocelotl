@@ -214,15 +214,22 @@ public class OcelotlView extends ViewPart {
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
 				hasChanged = HasChanged.PARAMETER;
 			else
-				listParameters.removeAll();
+				textRun.setText("1.0");
 			setConfiguration();
-			final String title = "Computing parts...";
+			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
 
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
 					try {
+						if (hasChanged != HasChanged.PARAMETER) {
+							ocelotlCore.computeDichotomy(hasChanged);
+							// textRun.setText(String.valueOf(ocelotlCore.getLpaggregManager().getParameters().get(ocelotlCore.getLpaggregManager().getParameters().size()
+							// - 1)));
+							// setConfiguration();
+						}
+						hasChanged = HasChanged.PARAMETER;
 						ocelotlCore.computeParts(hasChanged);
 						monitor.done();
 						Display.getDefault().syncExec(new Runnable() {
@@ -251,51 +258,82 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class GetParametersAdapter extends SelectionAdapter {
+	private class ParameterDownAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (confDataLoader.getCurrentTrace() == null)
-				return;
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER || hasChanged == HasChanged.EQ)
-				hasChanged = HasChanged.THRESHOLD;
-			setConfiguration();
-			final String title = "Getting parameters...";
-			final Job job = new Job(title) {
-
-				@Override
-				protected IStatus run(final IProgressMonitor monitor) {
-					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-					try {
-						ocelotlCore.computeDichotomy(hasChanged);
-
-						monitor.done();
-						Display.getDefault().syncExec(new Runnable() {
-
-							@Override
-							public void run() {
-								// MessageDialog.openInformation(getSite().getShell(),
-								// "Parameters", "Parameters retrieved");
-								hasChanged = HasChanged.NOTHING;
-								listParameters.removeAll();
-								for (int i = ocelotlCore.getLpaggregManager().getParameters().size() - 1; i >= 0; i--)
-									listParameters.add(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(i)));
-								listParameters.select(0);
-								listParameters.notifyListeners(SWT.Selection, new Event());
-								qualityView.createDiagram();
-							}
-						});
-					} catch (final Exception e) {
-						e.printStackTrace();
-						return Status.CANCEL_STATUS;
-					}
-					return Status.OK_STATUS;
+			float p = Float.parseFloat(textRun.getText());
+			for (float f : ocelotlCore.getLpaggregManager().getParameters())
+				if (f > p) {
+					textRun.setText(Float.toString(f));
+					break;
 				}
-			};
-			job.setUser(true);
-			job.schedule();
+			btnRun.notifyListeners(SWT.Selection, new Event());
+
 		}
+
 	}
+
+	private class ParameterUpAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			float p = Float.parseFloat(textRun.getText());
+			for (int f = ocelotlCore.getLpaggregManager().getParameters().size() - 1; f >= 0; f--)
+				if (ocelotlCore.getLpaggregManager().getParameters().get(f) < p) {
+					textRun.setText(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(f)));
+					break;
+				}
+			btnRun.notifyListeners(SWT.Selection, new Event());
+		}
+
+	}
+
+	//
+	// private class GetParametersAdapter extends SelectionAdapter {
+	//
+	// @Override
+	// public void widgetSelected(final SelectionEvent e) {
+	// if (confDataLoader.getCurrentTrace() == null)
+	// return;
+	// if (hasChanged == HasChanged.NOTHING || hasChanged ==
+	// HasChanged.PARAMETER || hasChanged == HasChanged.EQ)
+	// hasChanged = HasChanged.THRESHOLD;
+	// setConfiguration();
+	// final String title = "Getting parameters...";
+	// final Job job = new Job(title) {
+	//
+	// @Override
+	// protected IStatus run(final IProgressMonitor monitor) {
+	// monitor.beginTask(title, IProgressMonitor.UNKNOWN);
+	// try {
+	// ocelotlCore.computeDichotomy(hasChanged);
+	//
+	// monitor.done();
+	// Display.getDefault().syncExec(new Runnable() {
+	//
+	// @Override
+	// public void run() {
+	// // MessageDialog.openInformation(getSite().getShell(),
+	// // "Parameters", "Parameters retrieved");
+	// hasChanged = HasChanged.NOTHING;
+	// listParameters.add(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(i)));
+	// listParameters.select(0);
+	// listParameters.notifyListeners(SWT.Selection, new Event());
+	// qualityView.createDiagram();
+	// }
+	// });
+	// } catch (final Exception e) {
+	// e.printStackTrace();
+	// return Status.CANCEL_STATUS;
+	// }
+	// return Status.OK_STATUS;
+	// }
+	// };
+	// job.setUser(true);
+	// job.schedule();
+	// }
+	// }
 
 	private class IdlesSelectionAdapter extends SelectionAdapter {
 
@@ -410,6 +448,8 @@ public class OcelotlView extends ViewPart {
 			} catch (final NumberFormatException err) {
 				textThreshold.setText("0.001");
 			}
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
+				hasChanged = HasChanged.THRESHOLD;
 		}
 	}
 
@@ -450,7 +490,6 @@ public class OcelotlView extends ViewPart {
 	private Button								btnDecreasingQualities;
 	private Combo								comboAggregationOperator;
 	private Combo								comboTraces;
-	private ArrayList							listParameters;
 	private final ConfDataLoader				confDataLoader	= new ConfDataLoader();
 	private HasChanged							hasChanged		= HasChanged.ALL;
 	private final java.util.List<String>		idles			= new LinkedList<String>();
@@ -474,6 +513,8 @@ public class OcelotlView extends ViewPart {
 	private Text								textTimestampStart;
 	final Map<Integer, Trace>					traceMap		= new HashMap<Integer, Trace>();
 	private final java.util.List<EventType>		types			= new LinkedList<EventType>();
+	private Button								buttonDown;
+	private Button								buttonUp;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -500,7 +541,7 @@ public class OcelotlView extends ViewPart {
 		spinnerPageSize.setSelection(50);
 		spinnerEPPageSize.setSelection(100);
 		spinnerThread.setSelection(5);
-		textRun.setText("0");
+		textRun.setText("1.0");
 		btnMergeAggregatedParts.setSelection(true);
 		producers.clear();
 		types.clear();
@@ -745,7 +786,9 @@ public class OcelotlView extends ViewPart {
 		compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
 
 		comboAggregationOperator = new Combo(compositeAggregationOperator, SWT.READ_ONLY);
-		comboAggregationOperator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, false, true, 1, 1);
+		gd_comboAggregationOperator.widthHint = 170;
+		comboAggregationOperator.setLayoutData(gd_comboAggregationOperator);
 		comboAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		comboAggregationOperator.addSelectionListener(new SelectionAdapter() {
 
@@ -824,8 +867,8 @@ public class OcelotlView extends ViewPart {
 		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
 		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnGrowingQualities.setSelection(false);
+		sashFormTSandCurve.setWeights(new int[] { 211, 101 });
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
-		sashFormTSandCurve.setWeights(new int[] { 227, 151 });
 
 		SashForm sashForm = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
 
@@ -835,12 +878,13 @@ public class OcelotlView extends ViewPart {
 		final GridLayout gl_compositeQualityView = new GridLayout();
 		compositeQualityView.setLayout(gl_compositeQualityView);
 		final Canvas canvasQualityView = qualityView.initDiagram(compositeQualityView);
+
 		final Group groupLPAParameters = new Group(sashForm, SWT.NONE);
 		groupLPAParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupLPAParameters.setLayout(new GridLayout(1, false));
 
 		final Composite compositeGetParameters = new Composite(groupLPAParameters, SWT.NONE);
-		compositeGetParameters.setLayout(new GridLayout(6, false));
+		compositeGetParameters.setLayout(new GridLayout(8, false));
 		compositeGetParameters.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
 		final Label lblThreshold = new Label(compositeGetParameters, SWT.NONE);
@@ -848,32 +892,47 @@ public class OcelotlView extends ViewPart {
 		lblThreshold.setText("Threshold");
 
 		textThreshold = new Text(compositeGetParameters, SWT.BORDER);
-		final GridData gd_textThreshold = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_textThreshold.widthHint = 47;
+		final GridData gd_textThreshold = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		gd_textThreshold.widthHint = 39;
 		textThreshold.setLayoutData(gd_textThreshold);
 		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
-		btnGetParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnGetParameters.setText("Get");
+
+		Label lblParameter = new Label(compositeGetParameters, SWT.NONE);
+		lblParameter.setText("Parameter");
+		lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblParameter.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		// btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
+		// btnGetParameters.setFont(SWTResourceManager.getFont("Cantarell", 8,
+		// SWT.NORMAL));
+		// btnGetParameters.setText("Get");
 
 		textRun = new Text(compositeGetParameters, SWT.BORDER);
+		textRun.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
-		Spinner spinner = new Spinner(compositeGetParameters, SWT.BORDER);
-		spinner.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonDown = new Button(compositeGetParameters, SWT.NONE);
+		buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonDown.setText("<");
+		buttonDown.addSelectionListener(new ParameterDownAdapter());
+
+		buttonUp = new Button(compositeGetParameters, SWT.NONE);
+		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonUp.setText(">");
+		buttonUp.addSelectionListener(new ParameterUpAdapter());
 		btnRun = new Button(compositeGetParameters, SWT.NONE);
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRun.setText("Process");
-		sashForm.setWeights(new int[] { 252, 43 });
+		btnRun.setText("OK");
+		new Label(compositeGetParameters, SWT.NONE);
+		sashForm.setWeights(new int[] { 249, 46 });
+		sashFormTimeAggregationParameters.setWeights(new int[] { 209, 376 });
 		btnRun.addSelectionListener(new GetAggregationAdapter());
 		textRun.addModifyListener(new ParameterModifyListener());
 
-		btnGetParameters.addSelectionListener(new GetParametersAdapter());
+		// btnGetParameters.addSelectionListener(new GetParametersAdapter());
 		textThreshold.addModifyListener(new ThresholdModifyListener());
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
-		sashFormTimeAggregationParameters.setWeights(new int[] { 194, 226, 153 });
 
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
 		tbtmAdvancedParameters.setText("Advanced Parameters");
@@ -971,6 +1030,7 @@ public class OcelotlView extends ViewPart {
 		btnShowNumbers.setText("Show Part Numbers");
 		btnShowNumbers.setSelection(false);
 		btnShowNumbers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		sashFormGlobal.setWeights(new int[] { 317, 349 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });
 		canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -986,10 +1046,6 @@ public class OcelotlView extends ViewPart {
 
 	public OcelotlCore getCore() {
 		return ocelotlCore;
-	}
-
-	public List getList() {
-		return listParameters;
 	}
 
 	public Text getParam() {
