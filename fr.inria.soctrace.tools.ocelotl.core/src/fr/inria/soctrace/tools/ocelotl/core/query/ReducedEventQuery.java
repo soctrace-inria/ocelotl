@@ -12,6 +12,7 @@ package fr.inria.soctrace.tools.ocelotl.core.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -130,6 +131,7 @@ public List<ReducedEvent> getReducedEventList() throws SoCTraceException {
 		LinkedList<ReducedEvent> llist = new LinkedList<ReducedEvent>();
 		ValueListString vls = new ValueListString();
 		ValueListString pvls = new ValueListString();
+		List<Integer> li= new ArrayList<Integer>();
 		try {		
 		
 			while (rs.next()) {
@@ -145,15 +147,16 @@ public List<ReducedEvent> getReducedEventList() throws SoCTraceException {
 			ResultSet pprs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM_TYPE + 
 					" WHERE NAME='" + PajeExternalConstants.PajeStateValue+"'");
 			while (pprs.next())
-				pvls.addValue(String.valueOf(pprs.getInt("ID")));
+				li.add(pprs.getInt("ID"));
 			String query;
 			query = "SELECT * FROM " + FramesocTable.EVENT_PARAM + 
-					" WHERE EVENT_ID IN " + vls.getValueString() + " AND EVENT_PARAM_TYPE_ID IN " + pvls.getValueString();
-			stm = dbObj.getConnection().createStatement();
+					" WHERE EVENT_ID IN " + vls.getValueString();// + " AND EVENT_PARAM_TYPE_ID IN " + pvls.getValueString();
 					
 			ResultSet prs = stm.executeQuery(query);//TODO verifier
-			while (prs.next())
-				list.get(prs.getInt("EVENT_ID")).VALUE=prs.getString("VALUE");
+			while (prs.next()){
+				if (li.contains(prs.getInt("EVENT_PARAM_TYPE_ID")))
+					list.get(prs.getInt("EVENT_ID")).VALUE=prs.getString("VALUE");
+			}
 			return llist;
 		} catch (SQLException e) {
 			throw new SoCTraceException(e);
