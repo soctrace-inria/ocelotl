@@ -58,8 +58,8 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 		for (final ReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < query.getOcelotlParameters().getThreadNonCached(); t++) {
-			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThreadNonCached(), t, false));
+		for (int t = 0; t < query.getOcelotlParameters().getThread(); t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThread(), t, false));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
@@ -78,8 +78,8 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 		for (final EventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < query.getOcelotlParameters().getThreadCached(); t++) {
-			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThreadCached(), t, false));
+		for (int t = 0; t < query.getOcelotlParameters().getThread(); t++) {
+			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThread(), t, false));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
