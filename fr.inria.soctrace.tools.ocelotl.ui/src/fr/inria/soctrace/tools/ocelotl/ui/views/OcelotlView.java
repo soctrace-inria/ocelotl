@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -75,6 +76,8 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators.AggregationOperators;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
+
+import org.eclipse.swt.widgets.Slider;
 
 /**
  * Main view for LPAggreg Paje Tool
@@ -395,58 +398,6 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class SelectSelectionAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			try {
-				if (confDataLoader.getCurrentTrace() == null)
-					return;
-				if (listParameters.getSelectionCount() > 0)
-					textRun.setText(listParameters.getSelection()[0]);
-				if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
-					hasChanged = HasChanged.PARAMETER;
-				else
-					listParameters.removeAll();
-				setConfiguration();
-				final String title = "Computing parts...";
-				final Job job = new Job(title) {
-
-					@Override
-					protected IStatus run(final IProgressMonitor monitor) {
-						monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-						try {
-							ocelotlCore.computeParts(hasChanged);
-							monitor.done();
-							Display.getDefault().syncExec(new Runnable() {
-
-								@Override
-								public void run() {
-									// MessageDialog.openInformation(getSite().getShell(),
-									// "Parts", "Parts processing finished");
-									hasChanged = HasChanged.NOTHING;
-									matrixView.deleteDiagram();
-									timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
-									matrixView.createDiagram(ocelotlCore.getLpaggregManager().getParts(), ocelotlParameters.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
-									qualityView.createDiagram();
-								}
-							});
-						} catch (final Exception e) {
-							e.printStackTrace();
-							return Status.CANCEL_STATUS;
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.schedule();
-			} catch (final NumberFormatException e1) {
-
-			}
-
-		}
-	}
-
 	private class ThresholdModifyListener implements ModifyListener {
 
 		@Override
@@ -499,10 +450,10 @@ public class OcelotlView extends ViewPart {
 	private Button								btnDecreasingQualities;
 	private Combo								comboAggregationOperator;
 	private Combo								comboTraces;
+	private ArrayList							listParameters;
 	private final ConfDataLoader				confDataLoader	= new ConfDataLoader();
 	private HasChanged							hasChanged		= HasChanged.ALL;
 	private final java.util.List<String>		idles			= new LinkedList<String>();
-	private List								listParameters;
 	private ListViewer							listViewerIdleStates;
 	private ListViewer							listViewerEventProducers;
 	private ListViewer							listViewerEventTypes;
@@ -875,79 +826,54 @@ public class OcelotlView extends ViewPart {
 		btnGrowingQualities.setSelection(false);
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 		sashFormTSandCurve.setWeights(new int[] { 227, 151 });
-		final Group groupLPAParameters = new Group(sashFormTimeAggregationParameters, SWT.NONE);
+
+		SashForm sashForm = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
+
+		final Composite compositeQualityView = new Composite(sashForm, SWT.NONE);
+		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		final GridLayout gl_compositeQualityView = new GridLayout();
+		compositeQualityView.setLayout(gl_compositeQualityView);
+		final Canvas canvasQualityView = qualityView.initDiagram(compositeQualityView);
+		final Group groupLPAParameters = new Group(sashForm, SWT.NONE);
 		groupLPAParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupLPAParameters.setLayout(new GridLayout(1, false));
-		groupLPAParameters.setText("Get Best-Cut Partition Gain/Loss Parameter List");
 
 		final Composite compositeGetParameters = new Composite(groupLPAParameters, SWT.NONE);
-		compositeGetParameters.setLayout(new GridLayout(3, false));
+		compositeGetParameters.setLayout(new GridLayout(6, false));
 		compositeGetParameters.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
 		final Label lblThreshold = new Label(compositeGetParameters, SWT.NONE);
-		lblThreshold.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblThreshold.setText("Threshold");
 
 		textThreshold = new Text(compositeGetParameters, SWT.BORDER);
-		final GridData gd_textThreshold = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_textThreshold.widthHint = 342;
+		final GridData gd_textThreshold = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_textThreshold.widthHint = 47;
 		textThreshold.setLayoutData(gd_textThreshold);
 		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
 		btnGetParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnGetParameters.setText("Get");
 
-		final Group groupParameters = new Group(groupLPAParameters, SWT.NONE);
-		groupParameters.setLayout(new GridLayout(2, false));
-		final GridData gd_groupParameters = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_groupParameters.heightHint = 119;
-		gd_groupParameters.widthHint = 277;
-		groupParameters.setLayoutData(gd_groupParameters);
-
-		listParameters = new List(groupParameters, SWT.BORDER | SWT.V_SCROLL);
-		listParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		final GridData gd_list = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_list.heightHint = 132;
-		gd_list.widthHint = 330;
-		listParameters.setLayoutData(gd_list);
-		new Label(groupParameters, SWT.NONE);
-		final Group groupRun = new Group(groupParameters, SWT.NONE);
-		groupRun.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		groupRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupRun.setLayout(new GridLayout(3, false));
-		groupRun.setText("Perform Best-Cut Partition");
-
-		final Label lblRun = new Label(groupRun, SWT.NONE);
-		lblRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblRun.setText("Gain/loss parameter");
-
-		textRun = new Text(groupRun, SWT.BORDER);
+		textRun = new Text(compositeGetParameters, SWT.BORDER);
 		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		textRun.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		textRun.addModifyListener(new ParameterModifyListener());
-		btnRun = new Button(groupRun, SWT.NONE);
-		btnRun.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+
+		Spinner spinner = new Spinner(compositeGetParameters, SWT.BORDER);
+		spinner.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRun = new Button(compositeGetParameters, SWT.NONE);
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRun.setText("Process");
+		sashForm.setWeights(new int[] { 252, 43 });
 		btnRun.addSelectionListener(new GetAggregationAdapter());
-		new Label(groupParameters, SWT.NONE);
-
-		final Composite compositeQualityView = new Composite(sashFormTimeAggregationParameters, SWT.NONE);
-		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		final GridLayout gl_compositeQualityView = new GridLayout();
-		compositeQualityView.setLayout(gl_compositeQualityView);
-		final Canvas canvasQualityView = qualityView.initDiagram(compositeQualityView);
-		listParameters.addSelectionListener(new SelectSelectionAdapter());
+		textRun.addModifyListener(new ParameterModifyListener());
 
 		btnGetParameters.addSelectionListener(new GetParametersAdapter());
 		textThreshold.addModifyListener(new ThresholdModifyListener());
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
-		sashFormTimeAggregationParameters.setWeights(new int[] { 194, 153, 332 });
+		sashFormTimeAggregationParameters.setWeights(new int[] { 194, 226, 153 });
 
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
 		tbtmAdvancedParameters.setText("Advanced Parameters");
