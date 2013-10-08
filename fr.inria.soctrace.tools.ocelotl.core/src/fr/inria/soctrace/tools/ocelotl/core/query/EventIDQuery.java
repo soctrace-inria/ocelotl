@@ -23,7 +23,6 @@ import fr.inria.soctrace.lib.model.EventParamType;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.query.EventQuery;
 import fr.inria.soctrace.lib.query.SelfDefiningElementQuery;
 import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.query.conditions.ICondition;
