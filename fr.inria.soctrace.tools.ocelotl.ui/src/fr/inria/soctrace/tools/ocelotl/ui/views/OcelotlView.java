@@ -354,7 +354,7 @@ public class OcelotlView extends ViewPart {
 		public void widgetSelected(final SelectionEvent e) {
 			if (hasChanged != HasChanged.ALL)
 				hasChanged = HasChanged.NORMALIZE;
-			btnGetParameters.notifyListeners(SWT.Selection, new Event());
+			btnRun.notifyListeners(SWT.Selection, new Event());
 		}
 	}
 
