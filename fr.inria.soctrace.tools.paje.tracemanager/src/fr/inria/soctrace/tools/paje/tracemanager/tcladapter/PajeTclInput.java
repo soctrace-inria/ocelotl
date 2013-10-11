@@ -19,6 +19,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.query.EventProducerQuery;
 import fr.inria.soctrace.lib.search.ITraceSearch;
 import fr.inria.soctrace.lib.search.TraceSearch;
+import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 /**
  * Paje implementation of Tcl input.
@@ -86,9 +87,12 @@ public class PajeTclInput implements ITChartsInput {
 		
 		// XXX Hard coded result: used for the article
 		// Ignore the passed list, and use the result one.
+//		elist.clear();
+//		elist = getArticleList(trace);
+
 		elist.clear();
-		elist = getArticleList(trace);
-		
+		elist = getPresentationList(trace);
+
 		// load all producers
 		Map<Integer, EventProducer> eps = new HashMap<Integer, EventProducer>();
 		try {
@@ -128,7 +132,8 @@ public class PajeTclInput implements ITChartsInput {
 			ITChartsRow producerRow = cpuMap.get(e.getEventProducer().getId()); 
 			
 			// finally add the event if I'm on the end
-			final long OFFSET = 296000000000L;
+			//final long OFFSET = 298400000000L;
+			final long OFFSET = 0;
 			if (lastEvent!=null) {
 				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp()-OFFSET, e.getTimestamp()-OFFSET));	
 			}
@@ -142,7 +147,7 @@ public class PajeTclInput implements ITChartsInput {
 	private List<Event> getArticleList(Trace trace) {
 		
 		// Result label: the first result with this label is loaded. Take care.
-		final String FILTER_RESULT_LABEL = "xxx";
+		final String FILTER_RESULT_LABEL = "thelast";
 		// Filter tool name
 		final String FILTER_NAME = "Filter Tool";
 		
@@ -169,7 +174,21 @@ public class PajeTclInput implements ITChartsInput {
 		}
 		return null;
 	}
-	
+
+	private List<Event> getPresentationList(Trace trace) {
+		
+		try {
+			ITraceSearch search = new TraceSearch().initialize();
+			IntervalDesc desc = new IntervalDesc(100, 10000000000L);
+			List<Event> elist = search.getEventsByInterval(trace, desc);
+			search.uninitialize();
+			return elist;
+		} catch (SoCTraceException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private ITChartsRow getNewEventProducerRow(EventProducer ep, Map<Integer, EventProducer> eps, Map<Integer, ITChartsRow> cpuRows, ITChartsRow cpuRow) {
 		
 		debug("Creating event producer row " + ep.getId() + ", parent " + ep.getParentId());
