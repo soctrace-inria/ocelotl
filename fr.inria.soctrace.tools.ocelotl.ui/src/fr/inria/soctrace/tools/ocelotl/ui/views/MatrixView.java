@@ -48,8 +48,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
 import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
-import fr.inria.soctrace.tools.ocelotl.ui.views.TimeAxisView.State;
-import fr.inria.soctrace.tools.ocelotl.ui.views.TimeAxisView.TimeMouseListener;
 
 /**
  * Matrix View : part representation, according to LP algorithm result
@@ -144,6 +142,16 @@ public class MatrixView {
 		super();
 		this.ocelotlView = ocelotlView;
 	}
+
+	// public boolean isSelected() {
+	// return selectTime.compareTimeRegion(resetTime);
+	// }
+	//
+	// public void drawSelection() {
+	// selection.draw();
+	// if (!isSelected())
+	// root.remove(selection);
+	// }
 
 	public void createDiagram(final List<Integer> parts, final TimeRegion time, final boolean aggregated, final boolean numbers) {
 		root.removeAll();
@@ -272,16 +280,13 @@ public class MatrixView {
 
 		}
 
-		@SuppressWarnings("deprecation")
 		public void mousePressed(final MouseEvent arg0) {
 			// if (arg0.button==MouseEvent.BUTTON1){
 			selectTime = ocelotlView.getTimeRegion();
 			state = State.PRESSED_D;
 			long temp = ((long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart());
-			if (temp < selectTime.getTimeStampEnd())
-				selectTime.setTimeStampStart(temp);
-			else
-				selectTime.setTimeStampEnd(temp);
+			selectTime.setTimeStampStart(temp);
+			selectTime.setTimeStampEnd(temp);
 			// selectTime.setTimeStampStart(500);
 			// }else{
 			// state = State.PRESSED_G;
@@ -292,6 +297,7 @@ public class MatrixView {
 
 		public void mouseReleased(final MouseEvent arg0) {
 			state = State.RELEASED;
+			ocelotlView.getTimeAxisView().unselect();
 		}
 
 		@Override
@@ -307,6 +313,7 @@ public class MatrixView {
 					p1 = p3;
 				selectTime = new TimeRegion(p1, p2);
 				ocelotlView.setTimeRegion(selectTime);
+				ocelotlView.getTimeAxisView().select(selectTime);
 			}
 
 		}

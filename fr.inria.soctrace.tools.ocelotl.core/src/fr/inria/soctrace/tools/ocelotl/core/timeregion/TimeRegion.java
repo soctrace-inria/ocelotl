@@ -39,6 +39,10 @@ public class TimeRegion {
 		setTimeStampStart(time.getTimeStampStart());
 		setTimeStampEnd(time.getTimeStampEnd());
 	}
+	
+	public boolean compareTimeRegion(TimeRegion timeRegion){
+		return ((this.getTimeStampStart() == timeRegion.getTimeStampStart()) && (this.getTimeStampEnd() == timeRegion.getTimeStampEnd()));
+	}
 
 	public long getTimeDuration() {
 		return timeStampEnd - timeStampStart;

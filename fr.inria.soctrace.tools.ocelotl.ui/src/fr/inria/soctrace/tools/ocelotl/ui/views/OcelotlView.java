@@ -537,6 +537,10 @@ public class OcelotlView extends ViewPart {
 		return new TimeRegion(Long.parseLong(textTimestampStart.getText()), Long.parseLong(textTimestampEnd.getText()));
 	}
 
+	public TimeAxisView getTimeAxisView() {
+		return timeAxisView;
+	}
+
 	private void cleanAll() {
 		hasChanged = HasChanged.ALL;
 		textThreshold.setText("0.001");

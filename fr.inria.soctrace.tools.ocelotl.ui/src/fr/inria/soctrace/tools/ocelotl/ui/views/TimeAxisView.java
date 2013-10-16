@@ -53,12 +53,29 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.QualityView.State;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 public class TimeAxisView {
+	
+	private class SelectFigure extends RectangleFigure {
+
+		public SelectFigure() {
+			super();
+			final ToolbarLayout layout = new ToolbarLayout();
+			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
+			setLayoutManager(layout);
+			setForegroundColor(ColorConstants.blue);
+			setBackgroundColor(ColorConstants.lightGray);
+			setAlpha(50);
+		}
+
+		public void draw(TimeRegion timeRegion) {
+			root.add(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height-2), new Point((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart())
+					* (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), 2)));
+		}
+
+	}
 
 	Figure				root;
 	Canvas				canvas;
 	TimeRegion			time;
-	TimeRegion			selectTime;
-	TimeRegion			resetTime;
 	final static int	Height			= 100;
 	final static int	Border			= 10;
 	final static int	TimeAxisWidth	= 1;
@@ -74,24 +91,37 @@ public class TimeAxisView {
 	final static int	MiniGradHeight	= 4;
 	int					Space			= 6;
 	private OcelotlView	ocelotlView;
+	SelectFigure		selectFigure;
 	
 
 	public TimeAxisView(OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
+		this.selectFigure = new SelectFigure();
 	}
 
 	public void createDiagram(TimeRegion time) {
 		root.removeAll();
 		this.time = time;
 		if (time != null) {
-			this.resetTime = new TimeRegion(time);
-			this.selectTime = new TimeRegion(time);
 			drawMainLine();
 			drawGrads();
 		}
 		canvas.update();
 	}
+	
+	public void createDiagram(TimeRegion time, TimeRegion timeRegion) {
+		root.removeAll();
+		this.time=time;
+		if (time != null) {
+			drawMainLine();
+			drawGrads();
+			selectFigure.draw(timeRegion);
+		}
+		canvas.update();
+	}
+	
+	
 
 	public void drawGrads() {
 		grads();
@@ -175,9 +205,6 @@ public class TimeAxisView {
 		lws.setControl(canvas);
 		root.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		root.setSize(parent.getSize().x, parent.getSize().y);
-		TimeMouseListener mouse = new TimeMouseListener();
-		root.addMouseListener(mouse);
-		root.addMouseMotionListener(mouse);
 		canvas.addControlListener(new ControlListener() {
 
 			@Override
@@ -205,83 +232,16 @@ public class TimeAxisView {
 		root.repaint();
 	}
 	
-	static public enum State {
-		PRESSED_D, DRAG_D, PRESSED_G, RELEASED;
+	public void select(TimeRegion timeRegion) {
+		createDiagram(time, timeRegion);
+		root.repaint();
 	}
 	
-	class TimeMouseListener implements MouseListener, MouseMotionListener{
-		
-		State state = State.RELEASED;
-
+	public void unselect() {
+		resizeDiagram();
+	}
 	
-	public void mouseDoubleClicked(final MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@SuppressWarnings("deprecation")
-	public void mousePressed(final MouseEvent arg0) {
-		//if (arg0.button==MouseEvent.BUTTON1){
-			selectTime = ocelotlView.getTimeRegion();
-			state = State.PRESSED_D;
-			long temp=((long)((double)((arg0.x - Border)*resetTime.getTimeDuration())/(root.getSize().width()-2*Border))+resetTime.getTimeStampStart());
-			if (temp<selectTime.getTimeStampEnd())
-				selectTime.setTimeStampStart(temp);
-			else
-				selectTime.setTimeStampEnd(temp);
-			//selectTime.setTimeStampStart(500);
-		//}else{
-	//		state = State.PRESSED_G;
-	//		selectTime=new TimeRegion(resetTime);
-	//	}
-		ocelotlView.setTimeRegion(selectTime);	
-	}
-
-	public void mouseReleased(final MouseEvent arg0) {
-		state= State.RELEASED;	
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent arg0) {
-		if (state == State.PRESSED_D || state == State.DRAG_D){
-			state = State.DRAG_D;
-				long p3= (long)((double)((arg0.x - Border)*resetTime.getTimeDuration())/(root.getSize().width()-2*Border))+resetTime.getTimeStampStart();
-				long p1= selectTime.getTimeStampStart();
-				long p2= selectTime.getTimeStampEnd();
-				if (p3>p1)
-					p2=p3;
-				else
-					p1=p3;
-				selectTime=new TimeRegion(p1, p2);
-				ocelotlView.setTimeRegion(selectTime);
-		}
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseHover(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent arg0) {
-
-		}
-		
-	}
+	
 
 	
 
