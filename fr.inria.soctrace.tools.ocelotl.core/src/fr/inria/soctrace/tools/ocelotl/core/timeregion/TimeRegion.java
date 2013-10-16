@@ -34,6 +34,12 @@ public class TimeRegion {
 		setTimeStampEnd(timeStampEnd);
 	}
 
+	public TimeRegion(TimeRegion time) {
+		super();
+		setTimeStampStart(time.getTimeStampStart());
+		setTimeStampEnd(time.getTimeStampEnd());
+	}
+
 	public long getTimeDuration() {
 		return timeStampEnd - timeStampStart;
 	}

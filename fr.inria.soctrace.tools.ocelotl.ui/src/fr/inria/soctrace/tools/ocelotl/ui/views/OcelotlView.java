@@ -511,6 +511,7 @@ public class OcelotlView extends ViewPart {
 	private TimeAxisView						timeAxisView;
 	private Text								textTimestampEnd;
 	private Text								textTimestampStart;
+
 	final Map<Integer, Trace>					traceMap		= new HashMap<Integer, Trace>();
 	private final java.util.List<EventType>		types			= new LinkedList<EventType>();
 	private Button								buttonDown;
@@ -525,6 +526,15 @@ public class OcelotlView extends ViewPart {
 		}
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
+	}
+
+	public void setTimeRegion(TimeRegion time) {
+		textTimestampStart.setText(String.valueOf(time.getTimeStampStart()));
+		textTimestampEnd.setText(String.valueOf(time.getTimeStampEnd()));
+	}
+
+	public TimeRegion getTimeRegion() {
+		return new TimeRegion(Long.parseLong(textTimestampStart.getText()), Long.parseLong(textTimestampEnd.getText()));
 	}
 
 	private void cleanAll() {
@@ -555,8 +565,8 @@ public class OcelotlView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
-		matrixView = new MatrixView();
-		timeAxisView = new TimeAxisView();
+		matrixView = new MatrixView(this);
+		timeAxisView = new TimeAxisView(this);
 		qualityView = new QualityView(this);
 		final SashForm sashFormView = new SashForm(sashFormGlobal, SWT.BORDER | SWT.VERTICAL);
 		sashFormView.setSashWidth(1);

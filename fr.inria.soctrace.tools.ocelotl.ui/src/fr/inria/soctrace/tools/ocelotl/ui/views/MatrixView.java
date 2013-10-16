@@ -27,6 +27,9 @@ import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.RoundedRectangle;
@@ -45,6 +48,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
 import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
+import fr.inria.soctrace.tools.ocelotl.ui.views.TimeAxisView.State;
+import fr.inria.soctrace.tools.ocelotl.ui.views.TimeAxisView.TimeMouseListener;
 
 /**
  * Matrix View : part representation, according to LP algorithm result
@@ -125,12 +130,20 @@ public class MatrixView {
 	private final List<PartFigure>	figures		= new ArrayList<PartFigure>();
 	private List<Integer>			parts		= null;
 	private TimeRegion				time;
+	private TimeRegion				selectTime;
+	private TimeRegion				resetTime;
 	private boolean					aggregated	= false;
 	private boolean					numbers		= true;
 	// private final static int Height = 100;
 	private final static int		Border		= 10;
 	private int						Space		= 6;
 	private final ColorManager		colors		= new ColorManager();
+	private OcelotlView				ocelotlView;
+
+	public MatrixView(OcelotlView ocelotlView) {
+		super();
+		this.ocelotlView = ocelotlView;
+	}
 
 	public void createDiagram(final List<Integer> parts, final TimeRegion time, final boolean aggregated, final boolean numbers) {
 		root.removeAll();
@@ -139,6 +152,10 @@ public class MatrixView {
 		this.aggregated = aggregated;
 		this.parts = parts;
 		this.time = time;
+		if (time != null) {
+			this.resetTime = new TimeRegion(time);
+			this.selectTime = new TimeRegion(time);
+		}
 		this.numbers = numbers;
 		final int partHeight = (int) (root.getSize().height / 1.1 - Border);
 		Space = 6;
@@ -230,12 +247,93 @@ public class MatrixView {
 			}
 		});
 
+		TimeMouseListener mouse = new TimeMouseListener();
+		root.addMouseListener(mouse);
+		root.addMouseMotionListener(mouse);
+
 		return canvas;
 	}
 
 	public void resizeDiagram() {
 		createDiagram(parts, time, aggregated, numbers);
 		root.repaint();
+	}
+
+	static public enum State {
+		PRESSED_D, DRAG_D, PRESSED_G, RELEASED;
+	}
+
+	class TimeMouseListener implements MouseListener, MouseMotionListener {
+
+		State	state	= State.RELEASED;
+
+		public void mouseDoubleClicked(final MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@SuppressWarnings("deprecation")
+		public void mousePressed(final MouseEvent arg0) {
+			// if (arg0.button==MouseEvent.BUTTON1){
+			selectTime = ocelotlView.getTimeRegion();
+			state = State.PRESSED_D;
+			long temp = ((long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart());
+			if (temp < selectTime.getTimeStampEnd())
+				selectTime.setTimeStampStart(temp);
+			else
+				selectTime.setTimeStampEnd(temp);
+			// selectTime.setTimeStampStart(500);
+			// }else{
+			// state = State.PRESSED_G;
+			// selectTime=new TimeRegion(resetTime);
+			// }
+			ocelotlView.setTimeRegion(selectTime);
+		}
+
+		public void mouseReleased(final MouseEvent arg0) {
+			state = State.RELEASED;
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent arg0) {
+			if (state == State.PRESSED_D || state == State.DRAG_D) {
+				state = State.DRAG_D;
+				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
+				long p1 = selectTime.getTimeStampStart();
+				long p2 = selectTime.getTimeStampEnd();
+				if (p3 > p1)
+					p2 = p3;
+				else
+					p1 = p3;
+				selectTime = new TimeRegion(p1, p2);
+				ocelotlView.setTimeRegion(selectTime);
+			}
+
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseHover(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent arg0) {
+
+		}
+
 	}
 
 }
