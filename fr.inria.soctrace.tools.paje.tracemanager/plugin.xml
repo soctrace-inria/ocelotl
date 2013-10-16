@@ -22,6 +22,9 @@
             type="ANALYSIS">
       </tool>
    </extension>
+   
+   
+   <!--
    <extension
          point="fr.inria.soctrace.framesoc.ui.tclAdapter">
       <tclAdapter
@@ -31,5 +34,6 @@
             traceTypeName="inria.paje.0.0">
       </tclAdapter>
    </extension>
+ 	-->
 
 </plugin>
