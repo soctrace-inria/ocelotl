@@ -78,6 +78,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 
 import org.eclipse.swt.widgets.Slider;
+import org.eclipse.wb.swt.ResourceManager;
 
 /**
  * Main view for LPAggreg Paje Tool
@@ -187,6 +188,15 @@ public class OcelotlView extends ViewPart {
 			}
 		}
 
+	}
+
+	private class ResetListener extends SelectionAdapter {
+		public void widgetSelected(final SelectionEvent e) {
+			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
+			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
+			matrixView.resizeDiagram();
+			timeAxisView.resizeDiagram();
+		}
 	}
 
 	private class EventProducerLabelProvider extends LabelProvider {
@@ -572,12 +582,14 @@ public class OcelotlView extends ViewPart {
 		matrixView = new MatrixView(this);
 		timeAxisView = new TimeAxisView(this);
 		qualityView = new QualityView(this);
-		final SashForm sashFormView = new SashForm(sashFormGlobal, SWT.BORDER | SWT.VERTICAL);
-		sashFormView.setSashWidth(1);
+		final SashForm sashFormView = new SashForm(sashFormGlobal, SWT.VERTICAL);
+		sashFormView.setSashWidth(0);
 		final Composite compositeMatrixView = new Composite(sashFormView, SWT.NONE);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		final GridLayout gl_compositeMatrixView = new GridLayout();
+		gl_compositeMatrixView.horizontalSpacing = 0;
+		gl_compositeMatrixView.marginHeight = 0;
 		compositeMatrixView.setLayout(gl_compositeMatrixView);
 		compositeMatrixView.setSize(500, 500);
 		final Canvas canvasMatrixView = matrixView.initDiagram(compositeMatrixView);
@@ -585,6 +597,8 @@ public class OcelotlView extends ViewPart {
 		final Composite compositeTimeAxisView = new Composite(sashFormView, SWT.NONE);
 		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final GridLayout gl_compositeTimeAxisView = new GridLayout();
+		gl_compositeTimeAxisView.horizontalSpacing = 0;
+		gl_compositeTimeAxisView.marginHeight = 0;
 		compositeTimeAxisView.setLayout(gl_compositeTimeAxisView);
 		final Canvas canvasTimeAxisView = timeAxisView.initDiagram(compositeTimeAxisView);
 		sashFormView.setWeights(new int[] { 125, 36 });
@@ -823,7 +837,7 @@ public class OcelotlView extends ViewPart {
 		groupTimeInterval.setLayoutData(gd_groupTimeInterval);
 		groupTimeInterval.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTimeInterval.setText("Time Interval");
-		groupTimeInterval.setLayout(new GridLayout(2, false));
+		groupTimeInterval.setLayout(new GridLayout(3, false));
 
 		final Label lblStartTimestamp = new Label(groupTimeInterval, SWT.NONE);
 		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -833,6 +847,7 @@ public class OcelotlView extends ViewPart {
 		textTimestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		textTimestampStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		textTimestampStart.addModifyListener(new ConfModificationListener());
+		new Label(groupTimeInterval, SWT.NONE);
 
 		final Label lblEndTimestamp = new Label(groupTimeInterval, SWT.NONE);
 		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -841,6 +856,11 @@ public class OcelotlView extends ViewPart {
 		textTimestampEnd = new Text(groupTimeInterval, SWT.BORDER);
 		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		textTimestampEnd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		Button btnReset = new Button(groupTimeInterval, SWT.NONE);
+		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		btnReset.setText("Reset");
+		btnReset.addSelectionListener(new ResetListener());
 		textTimestampEnd.addModifyListener(new ConfModificationListener());
 		final Composite compositeTSNumber = new Composite(groupTSParameters, SWT.NONE);
 		compositeTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -907,7 +927,7 @@ public class OcelotlView extends ViewPart {
 
 		textThreshold = new Text(compositeGetParameters, SWT.BORDER);
 		final GridData gd_textThreshold = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-		gd_textThreshold.widthHint = 39;
+		gd_textThreshold.widthHint = 82;
 		textThreshold.setLayoutData(gd_textThreshold);
 		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
@@ -934,8 +954,9 @@ public class OcelotlView extends ViewPart {
 		buttonUp.setText(">");
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
 		btnRun = new Button(compositeGetParameters, SWT.NONE);
+		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRun.setText("OK");
+		btnRun.setText("RUN!");
 		new Label(compositeGetParameters, SWT.NONE);
 		sashForm.setWeights(new int[] { 249, 46 });
 		sashFormTimeAggregationParameters.setWeights(new int[] { 209, 376 });

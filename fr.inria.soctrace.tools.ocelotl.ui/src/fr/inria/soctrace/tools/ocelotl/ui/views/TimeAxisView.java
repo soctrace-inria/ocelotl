@@ -61,14 +61,19 @@ public class TimeAxisView {
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 			setLayoutManager(layout);
-			setForegroundColor(ColorConstants.blue);
-			setBackgroundColor(ColorConstants.lightGray);
 			setAlpha(50);
 		}
 
-		public void draw(TimeRegion timeRegion) {
+		public void draw(TimeRegion timeRegion, boolean active) {
+			if (active) {
+				setForegroundColor(MatrixView.activeColorFG);
+				setBackgroundColor(MatrixView.activeColorBG);
+			} else {
+				setForegroundColor(MatrixView.selectColorFG);
+				setBackgroundColor(MatrixView.selectColorBG);
+			}
 			root.add(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height-2), new Point((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart())
-					* (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), 2)));
+					* (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), -1)));
 		}
 
 	}
@@ -110,13 +115,13 @@ public class TimeAxisView {
 		canvas.update();
 	}
 	
-	public void createDiagram(TimeRegion time, TimeRegion timeRegion) {
+	public void createDiagram(TimeRegion time, TimeRegion timeRegion, boolean active) {
 		root.removeAll();
 		this.time=time;
 		if (time != null) {
 			drawMainLine();
 			drawGrads();
-			selectFigure.draw(timeRegion);
+			selectFigure.draw(timeRegion, active);
 		}
 		canvas.update();
 	}
@@ -232,8 +237,8 @@ public class TimeAxisView {
 		root.repaint();
 	}
 	
-	public void select(TimeRegion timeRegion) {
-		createDiagram(time, timeRegion);
+	public void select(TimeRegion timeRegion, boolean active) {
+		createDiagram(time, timeRegion, active);
 		root.repaint();
 	}
 	
