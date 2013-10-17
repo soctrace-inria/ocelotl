@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators;
+package fr.inria.soctrace.tools.ocelotl.core.aggregop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +35,7 @@ import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
+import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatrix {
 
@@ -47,7 +48,7 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<ReducedEvent> fullEvents = query.getEvents(eventProducers);
+		final List<ReducedEvent> fullEvents = query.getReducedEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -181,6 +182,16 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 
 			start();
 		}
+	}
+	
+	@Override
+	public String descriptor() {
+		return "State Sum (Normalized)";
+	}
+
+	@Override
+	public String traceType() {
+		return PajeConstants.PajeFormatName;
 	}
 
 	}

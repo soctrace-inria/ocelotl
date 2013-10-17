@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators;
+package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,7 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
@@ -37,8 +38,8 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 	protected TimeSliceManager				timeSliceManager;
 	int										count			= 0;
 	int										epit			= 0;
-	DeltaManager							dm;
-	final static int 						EPCOUNT			= 200;			
+	protected DeltaManager					dm;
+	public final static int 				EPCOUNT			= 200;			
 
 	public TimeSliceMatrix(final Query query) throws SoCTraceException {
 		super();
@@ -89,12 +90,6 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 	public synchronized int getEP() {
 		epit++;
 		return epit - 1;
-	}
-	
-	@Override
-	public void computeVectors() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -150,6 +145,11 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 	@Override
 	public void setQueries(final Query query) {
 		this.query = query;
+	}
+	
+	public VLPAggregManager createManager(){
+		return new VLPAggregManager(this);
+		
 	}
 
 }

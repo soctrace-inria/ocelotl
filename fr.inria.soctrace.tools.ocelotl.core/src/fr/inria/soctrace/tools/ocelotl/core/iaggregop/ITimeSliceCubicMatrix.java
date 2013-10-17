@@ -17,31 +17,19 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators;
+package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 
 import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
-public interface ITimeSliceCubicMatrix {
-	public void computeVectors();
+public interface ITimeSliceCubicMatrix extends IAggregationOperator{
 
 	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
 
-	public Query getQueries();
-
-	public TimeSliceManager getTimeSlicesManager();
-
-	public int getVectorSize();
-
-	public int getVectorsNumber();
-
-	public void initVectors() throws SoCTraceException;
-
-	public void print();
-
-	public void setQueries(Query query);
+	public MLPAggregManager createManager();
 }

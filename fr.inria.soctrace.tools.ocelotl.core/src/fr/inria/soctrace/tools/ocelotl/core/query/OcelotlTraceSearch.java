@@ -93,7 +93,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		traceDB.close();
 		return query.getList();
 	}
-	public List<ReducedEvent> getEventsByEventTypesAndIntervalsAndEventProducersReducedEvent(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public List<ReducedEvent> getReducedEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
@@ -148,7 +148,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 	}
 	
 	
-	public List<EventProxy> getEventsByEventTypesAndIntervalsAndEventProducersProxy(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public List<EventProxy> getEventProxysByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);

@@ -19,8 +19,8 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ITimeSliceCubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
-import fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators.ITimeSliceCubicMatrix;
 
 public class MLPAggregManager extends LPAggregManager {
 

@@ -22,8 +22,8 @@ package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ITimeSliceMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
-import fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators.ITimeSliceMatrix;
 
 public class VLPAggregManager extends LPAggregManager {
 

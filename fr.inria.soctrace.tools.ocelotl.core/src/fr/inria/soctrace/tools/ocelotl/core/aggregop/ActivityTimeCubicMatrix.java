@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators;
+package fr.inria.soctrace.tools.ocelotl.core.aggregop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +28,8 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ITimeSliceCubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.TimeSliceCubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
@@ -36,8 +38,9 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
+import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
-public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
+public class ActivityTimeCubicMatrix extends TimeSliceCubicMatrix {
 
 	protected Query											query;
 	protected List<HashMap<String, HashMap<String, Long>>>	matrix	= new ArrayList<HashMap<String, HashMap<String, Long>>>();
@@ -45,8 +48,7 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 	protected TimeSliceManager								timeSliceManager;
 
 	public ActivityTimeCubicMatrix(final Query query) throws SoCTraceException {
-		super();
-		this.query = query;
+		super(query);
 		query.checkTimeStamps();
 		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
@@ -72,7 +74,7 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		final List<ReducedEvent> fullEvents = query.getEvents(eventProducers);
+		final List<ReducedEvent> fullEvents = query.getReducedEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -150,67 +152,17 @@ public class ActivityTimeCubicMatrix implements ITimeSliceCubicMatrix {
 			computeSubMatrixNonCached(eventProducers);
 		}
 	}
-
+	
 	@Override
-	public void computeVectors() {
-		// TODO Auto-generated method stub
-
+	public String descriptor() {
+		return "State Type Sum";
 	}
 
 	@Override
-	public List<HashMap<String, HashMap<String, Long>>> getMatrix() {
-		return matrix;
+	public String traceType() {
+		return PajeConstants.PajeFormatName;
 	}
-
-	@Override
-	public Query getQueries() {
-		return query;
-	}
-
-	@Override
-	public TimeSliceManager getTimeSlicesManager() {
-		return timeSliceManager;
-	}
-
-	@Override
-	public int getVectorSize() {
-		return matrix.get(0).size();
-	}
-
-	@Override
-	public int getVectorsNumber() {
-		return matrix.size();
-	}
-
-	@Override
-	public void initVectors() throws SoCTraceException {
-		final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers();
-		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
-			matrix.add(new HashMap<String, HashMap<String, Long>>());
-
-			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep.getName(), new HashMap<String, Long>());
-		}
-	}
-
-	@Override
-	public void print() {
-		System.out.println();
-		System.out.println("Distribution Vectors");
-		int i = 0;
-		for (final HashMap<String, HashMap<String, Long>> it : matrix) {
-			System.out.println();
-			System.out.println("slice " + i++);
-			System.out.println();
-			for (final String ep : it.keySet())
-				System.out.println(ep + " = " + it.get(ep));
-		}
-	}
-
-	@Override
-	public void setQueries(final Query query) {
-		this.query = query;
-	}
+	
 
 }
 

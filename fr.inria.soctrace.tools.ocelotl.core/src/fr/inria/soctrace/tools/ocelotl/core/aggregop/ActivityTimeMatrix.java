@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators;
+package fr.inria.soctrace.tools.ocelotl.core.aggregop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,24 +27,28 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.TimeSliceMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
+import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class ActivityTimeMatrix extends TimeSliceMatrix {
 
+	final static String	Descriptor	= "State Sum";
+
 	public ActivityTimeMatrix(final Query query) throws SoCTraceException {
 		super(query);
-		System.out.println("Activity Time Matrix");
+		System.out.println(Descriptor);
 	}
 
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<ReducedEvent> fullEvents = query.getEvents(eventProducers);
+		final List<ReducedEvent> fullEvents = query.getReducedEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -177,5 +181,15 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 			start();
 		}
 
+	}
+
+	@Override
+	public String descriptor() {
+		return "State Sum";
+	}
+
+	@Override
+	public String traceType() {
+		return PajeConstants.PajeFormatName;
 	}
 }

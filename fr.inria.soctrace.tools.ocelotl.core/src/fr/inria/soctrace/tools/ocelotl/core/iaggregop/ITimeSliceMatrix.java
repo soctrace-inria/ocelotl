@@ -17,17 +17,20 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.tsaggregoperators;
+package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
-public class AggregationOperators {
+import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
-	static public String		ActivityTime						= "Activity Time";
-	static public String		ActivityTimeProbabilityDistribution	= "Activity Time Probability Distribution";
-	static public String		ActivityTimeByStateType				= "Activity Time by State Type";
-	static public List<String>	List								= new ArrayList<String>(Arrays.asList(ActivityTime, ActivityTimeProbabilityDistribution, ActivityTimeByStateType));
+public interface ITimeSliceMatrix extends IAggregationOperator{
 
+	public List<HashMap<String, Long>> getMatrix();
+
+	public VLPAggregManager createManager();
 }
