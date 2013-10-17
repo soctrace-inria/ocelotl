@@ -603,6 +603,8 @@ public class OcelotlView extends ViewPart {
 		final Canvas canvasTimeAxisView = timeAxisView.initDiagram(compositeTimeAxisView);
 		sashFormView.setWeights(new int[] { 125, 36 });
 
+		Group groupTime = new Group(sashFormGlobal, SWT.NONE);
+
 		final TabFolder tabFolder = new TabFolder(sashFormGlobal, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
@@ -1065,7 +1067,7 @@ public class OcelotlView extends ViewPart {
 		btnShowNumbers.setText("Show Part Numbers");
 		btnShowNumbers.setSelection(false);
 		btnShowNumbers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		sashFormGlobal.setWeights(new int[] { 317, 349 });
+		sashFormGlobal.setWeights(new int[] { 317, 333, 349 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });
 		canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
