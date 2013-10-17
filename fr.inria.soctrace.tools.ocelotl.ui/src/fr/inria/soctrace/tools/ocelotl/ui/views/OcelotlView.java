@@ -604,6 +604,46 @@ public class OcelotlView extends ViewPart {
 		sashFormView.setWeights(new int[] { 125, 36 });
 
 		Group groupTime = new Group(sashFormGlobal, SWT.NONE);
+		groupTime.setLayout(new GridLayout(7, false));
+
+		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
+		lblStartTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblStartTimestamp.setText("Start");
+
+		textTimestampStart = new Text(groupTime, SWT.BORDER);
+		textTimestampStart.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		textTimestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
+		lblEndTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblEndTimestamp.setText("End");
+
+		textTimestampEnd = new Text(groupTime, SWT.BORDER);
+		textTimestampEnd.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		Button btnReset = new Button(groupTime, SWT.NONE);
+		btnReset.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		btnReset.setText("Reset");
+
+		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
+		lblTSNumber.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		lblTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblTSNumber.setText("Timeslice Number");
+
+		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
+		spinnerTSNumber.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		spinnerTSNumber.setMaximum(10000);
+		spinnerTSNumber.setMinimum(1);
+		spinnerTSNumber.setSelection(200);
+		spinnerTSNumber.addModifyListener(new ConfModificationListener());
+		btnReset.addSelectionListener(new ResetListener());
+		textTimestampEnd.addModifyListener(new ConfModificationListener());
+		textTimestampStart.addModifyListener(new ConfModificationListener());
 
 		final TabFolder tabFolder = new TabFolder(sashFormGlobal, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
@@ -839,49 +879,11 @@ public class OcelotlView extends ViewPart {
 		groupTimeInterval.setLayoutData(gd_groupTimeInterval);
 		groupTimeInterval.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTimeInterval.setText("Time Interval");
-		groupTimeInterval.setLayout(new GridLayout(3, false));
-
-		final Label lblStartTimestamp = new Label(groupTimeInterval, SWT.NONE);
-		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblStartTimestamp.setText("Start Timestamp");
-
-		textTimestampStart = new Text(groupTimeInterval, SWT.BORDER);
-		textTimestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		textTimestampStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		textTimestampStart.addModifyListener(new ConfModificationListener());
-		new Label(groupTimeInterval, SWT.NONE);
-
-		final Label lblEndTimestamp = new Label(groupTimeInterval, SWT.NONE);
-		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblEndTimestamp.setText("End Timestamp");
-
-		textTimestampEnd = new Text(groupTimeInterval, SWT.BORDER);
-		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		textTimestampEnd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		Button btnReset = new Button(groupTimeInterval, SWT.NONE);
-		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		btnReset.setText("Reset");
-		btnReset.addSelectionListener(new ResetListener());
-		textTimestampEnd.addModifyListener(new ConfModificationListener());
+		groupTimeInterval.setLayout(new GridLayout(1, false));
 		final Composite compositeTSNumber = new Composite(groupTSParameters, SWT.NONE);
 		compositeTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		compositeTSNumber.setLayout(new GridLayout(2, false));
+		compositeTSNumber.setLayout(new GridLayout(1, false));
 		compositeTSNumber.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-
-		final Label lblTSNumber = new Label(compositeTSNumber, SWT.NONE);
-		lblTSNumber.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
-		lblTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblTSNumber.setText("Number of time slices");
-
-		spinnerTSNumber = new Spinner(compositeTSNumber, SWT.BORDER);
-		final GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
-		gd_spinnerTSNumber.widthHint = 36;
-		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
-		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerTSNumber.setMaximum(10000);
-		spinnerTSNumber.setMinimum(1);
-		spinnerTSNumber.setSelection(200);
 
 		Group groupQualityCurveSettings = new Group(sashFormTSandCurve, SWT.NONE);
 		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -903,7 +905,7 @@ public class OcelotlView extends ViewPart {
 		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
 		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnGrowingQualities.setSelection(false);
-		sashFormTSandCurve.setWeights(new int[] { 211, 101 });
+		sashFormTSandCurve.setWeights(new int[] { 164, 30 });
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 
 		SashForm sashForm = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
@@ -968,7 +970,6 @@ public class OcelotlView extends ViewPart {
 		// btnGetParameters.addSelectionListener(new GetParametersAdapter());
 		textThreshold.addModifyListener(new ThresholdModifyListener());
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
-		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
@@ -1067,7 +1068,7 @@ public class OcelotlView extends ViewPart {
 		btnShowNumbers.setText("Show Part Numbers");
 		btnShowNumbers.setSelection(false);
 		btnShowNumbers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		sashFormGlobal.setWeights(new int[] { 317, 333, 349 });
+		sashFormGlobal.setWeights(new int[] { 210, 38, 415 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });
 		canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
