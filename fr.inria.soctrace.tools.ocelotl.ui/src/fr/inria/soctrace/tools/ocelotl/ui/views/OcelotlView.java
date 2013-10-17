@@ -604,7 +604,34 @@ public class OcelotlView extends ViewPart {
 		sashFormView.setWeights(new int[] { 125, 36 });
 
 		Group groupTime = new Group(sashFormGlobal, SWT.NONE);
-		groupTime.setLayout(new GridLayout(7, false));
+		groupTime.setLayout(new GridLayout(8, false));
+		comboTraces = new Combo(groupTime, SWT.READ_ONLY);
+		GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_comboTraces.widthHint = 205;
+		comboTraces.setLayoutData(gd_comboTraces);
+		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		comboTraces.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				cleanAll();
+				try {
+					confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
+					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
+					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
+					for (int i = 0; i < confDataLoader.getTypes().size(); i++)
+						if (confDataLoader.getTypes().get(i).getName().contains("PajeSetState")) {
+							types.add(confDataLoader.getTypes().get(i));
+							break;
+						}
+					listViewerEventTypes.setInput(types);
+					idles.add("IDLE");
+					listViewerIdleStates.setInput(idles);
+				} catch (final SoCTraceException e1) {
+					MessageDialog.openError(getSite().getShell(), "Exception", e1.getMessage());
+				}
+			}
+		});
 
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
@@ -653,15 +680,6 @@ public class OcelotlView extends ViewPart {
 
 		final SashForm sashFormTraceParameter = new SashForm(tabFolder, SWT.VERTICAL);
 		tbtmTraceParameters.setControl(sashFormTraceParameter);
-
-		final Composite sashFormComboTrace = new Composite(sashFormTraceParameter, SWT.NONE);
-		sashFormComboTrace.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
-		sashFormComboTrace.setLayout(new GridLayout(1, false));
-		comboTraces = new Combo(sashFormComboTrace, SWT.READ_ONLY);
-		final GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
-		gd_comboTraces.widthHint = 327;
-		comboTraces.setLayoutData(gd_comboTraces);
-		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
 		int index = 0;
 		for (final Trace t : confDataLoader.getTraces()) {
@@ -804,29 +822,7 @@ public class OcelotlView extends ViewPart {
 		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
 		sashFormList.setWeights(new int[] { 1, 1, 1 });
-		sashFormTraceParameter.setWeights(new int[] { 38, 257 });
-		comboTraces.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				cleanAll();
-				try {
-					confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
-					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
-					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-					for (int i = 0; i < confDataLoader.getTypes().size(); i++)
-						if (confDataLoader.getTypes().get(i).getName().contains("PajeSetState")) {
-							types.add(confDataLoader.getTypes().get(i));
-							break;
-						}
-					listViewerEventTypes.setInput(types);
-					idles.add("IDLE");
-					listViewerIdleStates.setInput(idles);
-				} catch (final SoCTraceException e1) {
-					MessageDialog.openError(getSite().getShell(), "Exception", e1.getMessage());
-				}
-			}
-		});
+		sashFormTraceParameter.setWeights(new int[] { 257 });
 
 		final TabItem tbtmTimeAggregationParameters = new TabItem(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setText("Time Aggregation Parameters");
@@ -872,18 +868,6 @@ public class OcelotlView extends ViewPart {
 		for (final String op : AggregationOperators.List)
 			comboAggregationOperator.add(op);
 		comboAggregationOperator.setText(AggregationOperators.List.get(0));
-
-		final Group groupTimeInterval = new Group(groupTSParameters, SWT.NONE);
-		final GridData gd_groupTimeInterval = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-		gd_groupTimeInterval.widthHint = 200;
-		groupTimeInterval.setLayoutData(gd_groupTimeInterval);
-		groupTimeInterval.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupTimeInterval.setText("Time Interval");
-		groupTimeInterval.setLayout(new GridLayout(1, false));
-		final Composite compositeTSNumber = new Composite(groupTSParameters, SWT.NONE);
-		compositeTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		compositeTSNumber.setLayout(new GridLayout(1, false));
-		compositeTSNumber.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 
 		Group groupQualityCurveSettings = new Group(sashFormTSandCurve, SWT.NONE);
 		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
