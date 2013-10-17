@@ -50,31 +50,41 @@ public class OcelotlCore {
 	ILPAggregManager	lpaggregManager;
 	PartManager			partManager;
 	AggregationOperators operators;
+	IAggregationOperator operator;
 
 	public OcelotlCore() {
 		super();
 	}
+	
+	public void setOperator(){
+		try {
+			operator = operators.getOperator(ocelotlParameters.getAggOperator());
+		} catch (SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-	public OcelotlCore(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
+	public OcelotlCore(final OcelotlParameters ocelotlParameters) throws SoCTraceException{
 		super();
 		init(ocelotlParameters);
+		operators = new AggregationOperators(query);
 	}
 
 	public void compute(final HasChanged hasChanged) throws SoCTraceException {
-		if (hasChanged == HasChanged.ALL)
-			if (ocelotlParameters.getAggOperator().equals(AggregationOperators.ActivityTime))
-				lpaggregManager = new VLPAggregManager(new ActivityTimeMatrix(query));
-			else if (ocelotlParameters.getAggOperator().equals(AggregationOperators.ActivityTimeProbabilityDistribution))
-				lpaggregManager = new VLPAggregManager(new ActivityTimeProbabilityDistributionMatrix(query));
-			else if (ocelotlParameters.getAggOperator().equals(AggregationOperators.ActivityTimeByStateType))
-				lpaggregManager = new MLPAggregManager(new ActivityTimeCubicMatrix(query));
-			else
-				lpaggregManager = new VLPAggregManager(new ActivityTimeMatrix(query)); // default
+		if (hasChanged == HasChanged.ALL){
+			setOperator();
+			lpaggregManager = operator.createManager();
+		}
 		// vectors.print();
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE)
 			lpaggregManager.computeQualities();
 		// TODO clean dicho & parts
 
+	}
+
+	public AggregationOperators getOperators() {
+		return operators;
 	}
 
 	public void computeDichotomy(final HasChanged hasChanged) throws SoCTraceException {

@@ -38,11 +38,16 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class ActivityTimeMatrix extends TimeSliceMatrix {
 
-	final static String	Descriptor	= "State Sum";
+	public final static String	descriptor	= "State Sum";
+	public final static String	traceType	= PajeConstants.PajeFormatName;
 
 	public ActivityTimeMatrix(final Query query) throws SoCTraceException {
 		super(query);
-		System.out.println(Descriptor);
+		System.out.println(descriptor);
+	}
+
+	public ActivityTimeMatrix() throws SoCTraceException {
+		super();
 	}
 
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
@@ -85,20 +90,6 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 		for (Thread thread : threadlist)
 			thread.join();
 		dm.end("VECTOR COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
-	}
-
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
-		if (query.getOcelotlParameters().isCache()) {
-			computeSubMatrixCached(eventProducers);
-		} else {
-			computeSubMatrixNonCached(eventProducers);
-		}
-	}
-
-	void matrixWrite(long it, EventProducer ep, Map<Long, Long> distrib) {
-		synchronized (matrix) {
-			matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
-		}
 	}
 
 	class OcelotlThread extends Thread {
@@ -185,11 +176,11 @@ public class ActivityTimeMatrix extends TimeSliceMatrix {
 
 	@Override
 	public String descriptor() {
-		return "State Sum";
+		return descriptor;
 	}
 
 	@Override
 	public String traceType() {
-		return PajeConstants.PajeFormatName;
+		return traceType;
 	}
 }

@@ -42,17 +42,15 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class ActivityTimeCubicMatrix extends TimeSliceCubicMatrix {
 
-	protected Query											query;
-	protected List<HashMap<String, HashMap<String, Long>>>	matrix	= new ArrayList<HashMap<String, HashMap<String, Long>>>();
-	protected int											eventsNumber;
-	protected TimeSliceManager								timeSliceManager;
+	public final static String 									descriptor								="State Type Sum";
+	public final static String 									traceType								=PajeConstants.PajeFormatName;
 
 	public ActivityTimeCubicMatrix(final Query query) throws SoCTraceException {
 		super(query);
-		query.checkTimeStamps();
-		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
-		initVectors();
-		computeMatrix();
+	}
+	
+	public ActivityTimeCubicMatrix() throws SoCTraceException {
+		super();
 	}
 
 	public void computeMatrix() throws SoCTraceException {
@@ -152,15 +150,15 @@ public class ActivityTimeCubicMatrix extends TimeSliceCubicMatrix {
 			computeSubMatrixNonCached(eventProducers);
 		}
 	}
-	
+
 	@Override
 	public String descriptor() {
-		return "State Type Sum";
+		return descriptor;
 	}
 
 	@Override
 	public String traceType() {
-		return PajeConstants.PajeFormatName;
+		return traceType;
 	}
 	
 

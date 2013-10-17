@@ -46,11 +46,11 @@ public abstract class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
 
 	public TimeSliceCubicMatrix(final Query query) throws SoCTraceException {
 		super();
-		this.query = query;
-		query.checkTimeStamps();
-		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
-		initVectors();
-		computeMatrix();
+		setQueries(query);
+	}
+
+	public TimeSliceCubicMatrix() {
+		super();
 	}
 
 	public abstract void computeMatrix() throws SoCTraceException;
@@ -106,8 +106,12 @@ public abstract class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
 	}
 
 	@Override
-	public void setQueries(final Query query) {
+	public void setQueries(final Query query) throws SoCTraceException {
 		this.query = query;
+		query.checkTimeStamps();
+		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
+		initVectors();
+		computeMatrix();
 	}
 	
 	public MLPAggregManager createManager(){

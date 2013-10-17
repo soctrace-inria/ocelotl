@@ -28,6 +28,7 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.TimeSliceMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
@@ -37,11 +38,19 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
-public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatrix {
+public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix {
+	
+	public final static String 									descriptor								="State Sum (normalized)";
+	public final static String 									traceType								=PajeConstants.PajeFormatName;
 
 	public ActivityTimeProbabilityDistributionMatrix(final Query query) throws SoCTraceException {
 		super(query);
-		System.out.println("Activity Time Probability Distribution Matrix");
+		System.out.println(descriptor);
+	}
+
+
+	public ActivityTimeProbabilityDistributionMatrix() throws SoCTraceException {
+		super();
 	}
 
 
@@ -186,13 +195,16 @@ public class ActivityTimeProbabilityDistributionMatrix extends ActivityTimeMatri
 	
 	@Override
 	public String descriptor() {
-		return "State Sum (Normalized)";
+		return descriptor;
 	}
 
 	@Override
 	public String traceType() {
-		return PajeConstants.PajeFormatName;
+		return traceType;
 	}
+
+
+
 
 	}
 

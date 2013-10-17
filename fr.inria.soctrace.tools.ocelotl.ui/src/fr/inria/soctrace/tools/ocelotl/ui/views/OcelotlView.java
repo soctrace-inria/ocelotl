@@ -72,12 +72,10 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.AggregationOperators;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
-
-import org.eclipse.swt.widgets.Slider;
 import org.eclipse.wb.swt.ResourceManager;
 
 /**
@@ -686,6 +684,12 @@ public class OcelotlView extends ViewPart {
 					listViewerEventTypes.setInput(types);
 					idles.add("IDLE");
 					listViewerIdleStates.setInput(idles);
+					comboAggregationOperator.removeAll();
+					for (final IAggregationOperator op : ocelotlCore.getOperators().getList()) {
+						if (op.traceType().equals(confDataLoader.getCurrentTrace().getType().getName()))
+							comboAggregationOperator.add(op.descriptor());
+					}
+					comboAggregationOperator.setText("");
 				} catch (final SoCTraceException e1) {
 					MessageDialog.openError(getSite().getShell(), "Exception", e1.getMessage());
 				}
@@ -719,9 +723,7 @@ public class OcelotlView extends ViewPart {
 				hasChanged = HasChanged.ALL;
 			}
 		});
-		for (final String op : AggregationOperators.List)
-			comboAggregationOperator.add(op);
-		comboAggregationOperator.setText(AggregationOperators.List.get(0));
+		comboAggregationOperator.setText("");
 
 		// Group groupII = new Group(groupTSParameters, SWT.NONE);
 

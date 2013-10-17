@@ -22,6 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
@@ -43,11 +44,11 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 
 	public TimeSliceMatrix(final Query query) throws SoCTraceException {
 		super();
-		this.query = query;
-		query.checkTimeStamps();
-		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
-		initVectors();
-		computeMatrix();
+		setQueries(query);
+	}
+	
+	public TimeSliceMatrix() throws SoCTraceException {
+		super();
 	}
 
 	public void computeMatrix() throws SoCTraceException {
@@ -76,7 +77,7 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 		dmt.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
 	}
 
-	protected abstract void computeSubMatrix(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
+	//protected abstract void computeSubMatrix(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
 
 	public synchronized int getCount() {
 		count++;
@@ -143,13 +144,35 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 	}
 
 	@Override
-	public void setQueries(final Query query) {
+	public void setQueries(final Query query) throws SoCTraceException {
 		this.query = query;
+		query.checkTimeStamps();
+		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
+		initVectors();
+		computeMatrix();
 	}
 	
 	public VLPAggregManager createManager(){
 		return new VLPAggregManager(this);
 		
+	}
+	
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
+		if (query.getOcelotlParameters().isCache()) {
+			computeSubMatrixCached(eventProducers);
+		} else {
+			computeSubMatrixNonCached(eventProducers);
+		}
+	}
+
+	protected abstract void computeSubMatrixNonCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
+
+	protected abstract void computeSubMatrixCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
+
+	public void matrixWrite(long it, EventProducer ep, Map<Long, Long> distrib) {
+		synchronized (matrix) {
+			matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
+		}
 	}
 
 }
