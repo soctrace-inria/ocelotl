@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.TraceType;
@@ -28,13 +29,16 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeCubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeProbabilityDistributionMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.aggregop.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.ui.views.TraceTypeConfig;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 
 public class AggregationOperators {
 	
 ArrayList<IAggregationOperator> List;
+HashMap<String, TraceTypeConfig> Config;
 ArrayList<String> Names;
 Query query;
 
@@ -43,6 +47,7 @@ public AggregationOperators(Query query) {
 	this.query=query;
 	try {
 		init();
+		initConfig();
 	} catch (SoCTraceException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -58,11 +63,19 @@ private void init() throws SoCTraceException{
 	
 }
 
+private void initConfig() throws SoCTraceException{
+	Config = new HashMap<String, TraceTypeConfig>();
+	Config.put(PajeConstants.PajeFormatName, new PajeConfig());
+	
+	
+}
+
 public List<IAggregationOperator> getList(){
 	return List;
 }
 
-public IAggregationOperator getOperator(String name) throws SoCTraceException{
+public IAggregationOperator createOperator(String name) throws SoCTraceException{
+	init();
 	for (IAggregationOperator op: List){
 		if (op.descriptor().equals(name)){
 			op.setQueries(query);
@@ -70,6 +83,11 @@ public IAggregationOperator getOperator(String name) throws SoCTraceException{
 		}
 	}
 	return null;
+	
+}
+
+public TraceTypeConfig config(IAggregationOperator op){
+		return Config.get(op.traceType());
 	
 }
 

@@ -205,14 +205,6 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class EventTypeLabelProvider extends LabelProvider {
-
-		@Override
-		public String getText(final Object element) {
-			return ((EventType) element).getName();
-		}
-	}
-
 	private class GetAggregationAdapter extends SelectionAdapter {
 
 		@Override
@@ -297,65 +289,6 @@ public class OcelotlView extends ViewPart {
 
 	}
 
-	//
-	// private class GetParametersAdapter extends SelectionAdapter {
-	//
-	// @Override
-	// public void widgetSelected(final SelectionEvent e) {
-	// if (confDataLoader.getCurrentTrace() == null)
-	// return;
-	// if (hasChanged == HasChanged.NOTHING || hasChanged ==
-	// HasChanged.PARAMETER || hasChanged == HasChanged.EQ)
-	// hasChanged = HasChanged.THRESHOLD;
-	// setConfiguration();
-	// final String title = "Getting parameters...";
-	// final Job job = new Job(title) {
-	//
-	// @Override
-	// protected IStatus run(final IProgressMonitor monitor) {
-	// monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-	// try {
-	// ocelotlCore.computeDichotomy(hasChanged);
-	//
-	// monitor.done();
-	// Display.getDefault().syncExec(new Runnable() {
-	//
-	// @Override
-	// public void run() {
-	// // MessageDialog.openInformation(getSite().getShell(),
-	// // "Parameters", "Parameters retrieved");
-	// hasChanged = HasChanged.NOTHING;
-	// listParameters.add(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(i)));
-	// listParameters.select(0);
-	// listParameters.notifyListeners(SWT.Selection, new Event());
-	// qualityView.createDiagram();
-	// }
-	// });
-	// } catch (final Exception e) {
-	// e.printStackTrace();
-	// return Status.CANCEL_STATUS;
-	// }
-	// return Status.OK_STATUS;
-	// }
-	// };
-	// job.setUser(true);
-	// job.schedule();
-	// }
-	// }
-
-	private class IdlesSelectionAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			final InputDialog dialog = new InputDialog(getSite().getShell(), "Type Idle State", "Select Idle state", "", null);
-			if (dialog.open() == Window.CANCEL)
-				return;
-			idles.add(dialog.getValue());
-			listViewerIdleStates.setInput(idles);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
 	private class NormalizeSelectionAdapter extends SelectionAdapter {
 
 		@Override
@@ -408,25 +341,6 @@ public class OcelotlView extends ViewPart {
 
 	}
 
-	private class RemoveSelectionAdapter extends SelectionAdapter {
-
-		private final ListViewer	viewer;
-
-		public RemoveSelectionAdapter(final ListViewer viewer) {
-			this.viewer = viewer;
-		}
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-			final Object obj = selection.getFirstElement();
-			final Collection<?> c = (Collection<?>) viewer.getInput();
-			c.remove(obj);
-			viewer.refresh(false);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
 	private class ResetSelectionAdapter extends SelectionAdapter {
 
 		private final ListViewer	viewer;
@@ -461,31 +375,6 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class TypesSelectionAdapter extends SelectionAdapter {
-
-		// all - input
-		java.util.List<Object> diff(final java.util.List<EventType> all, final java.util.List<EventType> input) {
-			final java.util.List<Object> tmp = new LinkedList<>();
-			for (final Object oba : all)
-				tmp.add(oba);
-			tmp.removeAll(input);
-			return tmp;
-		}
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (confDataLoader.getCurrentTrace() == null)
-				return;
-			final ListSelectionDialog dialog = new ListSelectionDialog(getSite().getShell(), diff(confDataLoader.getTypes(), types), new ArrayContentProvider(), new EventTypeLabelProvider(), "Select Event Types");
-			if (dialog.open() == Window.CANCEL)
-				return;
-			for (final Object o : dialog.getResult())
-				types.add((EventType) o);
-			listViewerEventTypes.setInput(types);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
 	public static final String					ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
 	public static final String					PLUGIN_ID		= Activator.PLUGIN_ID;
 	private Button								btnMergeAggregatedParts;
@@ -500,10 +389,9 @@ public class OcelotlView extends ViewPart {
 	private Combo								comboTraces;
 	private final ConfDataLoader				confDataLoader	= new ConfDataLoader();
 	private HasChanged							hasChanged		= HasChanged.ALL;
-	private final java.util.List<String>		idles			= new LinkedList<String>();
-	private ListViewer							listViewerIdleStates;
+
 	private ListViewer							listViewerEventProducers;
-	private ListViewer							listViewerEventTypes;
+
 	private MatrixView							matrixView;
 	private final OcelotlCore					ocelotlCore;
 	private final OcelotlParameters				ocelotlParameters;
@@ -519,9 +407,10 @@ public class OcelotlView extends ViewPart {
 	private TimeAxisView						timeAxisView;
 	private Text								textTimestampEnd;
 	private Text								textTimestampStart;
+	private TraceTypeConfig						currentTraceTypeConfig;
 
 	final Map<Integer, Trace>					traceMap		= new HashMap<Integer, Trace>();
-	private final java.util.List<EventType>		types			= new LinkedList<EventType>();
+
 	private Button								buttonDown;
 	private Button								buttonUp;
 
@@ -566,11 +455,14 @@ public class OcelotlView extends ViewPart {
 		textRun.setText("1.0");
 		btnMergeAggregatedParts.setSelection(true);
 		producers.clear();
-		types.clear();
-		idles.clear();
+		// types.clear();
+		// idles.clear();
 		listViewerEventProducers.setInput(producers);
-		listViewerEventTypes.setInput(types);
-		listViewerIdleStates.setInput(idles);
+		// TODO config paje
+	}
+
+	public ConfDataLoader getConfDataLoader() {
+		return confDataLoader;
 	}
 
 	@Override
@@ -676,14 +568,6 @@ public class OcelotlView extends ViewPart {
 					confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
 					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-					for (int i = 0; i < confDataLoader.getTypes().size(); i++)
-						if (confDataLoader.getTypes().get(i).getName().contains("PajeSetState")) {
-							types.add(confDataLoader.getTypes().get(i));
-							break;
-						}
-					listViewerEventTypes.setInput(types);
-					idles.add("IDLE");
-					listViewerIdleStates.setInput(idles);
 					comboAggregationOperator.removeAll();
 					for (final IAggregationOperator op : ocelotlCore.getOperators().getList()) {
 						if (op.traceType().equals(confDataLoader.getCurrentTrace().getType().getName()))
@@ -704,7 +588,7 @@ public class OcelotlView extends ViewPart {
 
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
 		compositeAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		compositeAggregationOperator.setLayout(new GridLayout(1, false));
+		compositeAggregationOperator.setLayout(new GridLayout(2, false));
 		final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		gd_compositeAggregationOperator.widthHint = 85;
 		compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
@@ -725,7 +609,18 @@ public class OcelotlView extends ViewPart {
 		});
 		comboAggregationOperator.setText("");
 
-		// Group groupII = new Group(groupTSParameters, SWT.NONE);
+		Button btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
+		btnSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnSettings.setText("Settings");
+		btnSettings.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				hasChanged = HasChanged.ALL;
+				// TODO à faire demain!
+			}
+		});
+		;
 
 		final Group groupEventProducers = new Group(groupTSParameters, SWT.NONE);
 		groupEventProducers.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
@@ -883,88 +778,6 @@ public class OcelotlView extends ViewPart {
 		}
 		;
 
-		final SashForm sashFormList = new SashForm(sashFormTraceParameter, SWT.NONE);
-
-		final Group groupEventTypes = new Group(sashFormList, SWT.NONE);
-		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupEventTypes.setText("Event Types");
-		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
-		gl_groupEventTypes.horizontalSpacing = 0;
-		groupEventTypes.setLayout(gl_groupEventTypes);
-
-		listViewerEventTypes = new ListViewer(groupEventTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		listViewerEventTypes.setContentProvider(new ArrayContentProvider());
-		listViewerEventTypes.setLabelProvider(new EventTypeLabelProvider());
-		listViewerEventTypes.setComparator(new ViewerComparator());
-		final List listEventTypes = listViewerEventTypes.getList();
-		listEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		listEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-
-		final ScrolledComposite scrCompositeEventTypeButtons = new ScrolledComposite(groupEventTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrCompositeEventTypeButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		scrCompositeEventTypeButtons.setExpandHorizontal(true);
-		scrCompositeEventTypeButtons.setExpandVertical(true);
-
-		final Composite compositeEventTypeButtons = new Composite(scrCompositeEventTypeButtons, SWT.NONE);
-		compositeEventTypeButtons.setLayout(new GridLayout(1, false));
-
-		final Button btnAddEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
-		btnAddEventTypes.setText("Add");
-		btnAddEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnAddEventTypes.setImage(null);
-		btnAddEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		btnAddEventTypes.addSelectionListener(new TypesSelectionAdapter());
-
-		final Button btnRemoveEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
-		btnRemoveEventTypes.setText("Remove");
-		btnRemoveEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRemoveEventTypes.setImage(null);
-		btnRemoveEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		scrCompositeEventTypeButtons.setContent(compositeEventTypeButtons);
-		scrCompositeEventTypeButtons.setMinSize(compositeEventTypeButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		btnRemoveEventTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerEventTypes));
-		final Group groupIdleStates = new Group(sashFormList, SWT.NONE);
-		groupIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupIdleStates.setText("Idle States");
-		final GridLayout gl_groupIdleStates = new GridLayout(2, false);
-		gl_groupIdleStates.horizontalSpacing = 0;
-		gl_groupIdleStates.verticalSpacing = 0;
-		groupIdleStates.setLayout(gl_groupIdleStates);
-
-		listViewerIdleStates = new ListViewer(groupIdleStates, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		listViewerIdleStates.setContentProvider(new ArrayContentProvider());
-		listViewerIdleStates.setComparator(new ViewerComparator());
-		final List listIdleStates = listViewerIdleStates.getList();
-		final GridData gd_listIdleStates = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_listIdleStates.widthHint = 203;
-		listIdleStates.setLayoutData(gd_listIdleStates);
-		listIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		final ScrolledComposite scrCompositeIdleStateButton = new ScrolledComposite(groupIdleStates, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrCompositeIdleStateButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		scrCompositeIdleStateButton.setExpandHorizontal(true);
-		scrCompositeIdleStateButton.setExpandVertical(true);
-
-		final Composite compositeIdleStateButtons = new Composite(scrCompositeIdleStateButton, SWT.NONE);
-		compositeIdleStateButtons.setLayout(new GridLayout(1, false));
-
-		final Button btnAddIdleStates = new Button(compositeIdleStateButtons, SWT.NONE);
-		btnAddIdleStates.setText("Add");
-		btnAddIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnAddIdleStates.setImage(null);
-		btnAddIdleStates.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		btnAddIdleStates.addSelectionListener(new IdlesSelectionAdapter());
-
-		final Button btnRemoveIdle = new Button(compositeIdleStateButtons, SWT.NONE);
-		btnRemoveIdle.setText("Remove");
-		btnRemoveIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRemoveIdle.setImage(null);
-		btnRemoveIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		scrCompositeIdleStateButton.setContent(compositeIdleStateButtons);
-		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
-		sashFormTraceParameter.setWeights(new int[] { 257 });
-
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
 		tbtmAdvancedParameters.setText("Advanced Parameters");
 
@@ -1091,8 +904,8 @@ public class OcelotlView extends ViewPart {
 
 		ocelotlParameters.setTrace(confDataLoader.getCurrentTrace());
 		ocelotlParameters.setEventProducers(producers);
-		ocelotlParameters.setEventTypes(types);
-		ocelotlParameters.setSleepingStates(idles);
+		// ocelotlParameters.setEventTypes(types);
+		// ocelotlParameters.setSleepingStates(idles);
 		ocelotlParameters.setNormalize(btnNormalize.getSelection());
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());

@@ -30,6 +30,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ITimeSliceCubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.TimeSliceCubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.TraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
@@ -159,6 +160,12 @@ public class ActivityTimeCubicMatrix extends TimeSliceCubicMatrix {
 	@Override
 	public String traceType() {
 		return traceType;
+	}
+
+	@Override
+	public TraceTypeConfig getTraceTypeConfig() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 
