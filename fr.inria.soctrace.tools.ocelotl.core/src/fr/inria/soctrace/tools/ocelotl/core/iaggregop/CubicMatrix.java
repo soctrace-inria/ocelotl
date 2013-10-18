@@ -30,26 +30,26 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
-import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
-public abstract class TimeSliceCubicMatrix implements ITimeSliceCubicMatrix {
+public abstract class CubicMatrix implements ICubicMatrix {
 
 	protected Query											query;
 	protected List<HashMap<String, HashMap<String, Long>>>	matrix	= new ArrayList<HashMap<String, HashMap<String, Long>>>();
 	protected int											eventsNumber;
 	protected TimeSliceManager								timeSliceManager;
 
-	public TimeSliceCubicMatrix(final Query query) throws SoCTraceException {
+	public CubicMatrix(final Query query) throws SoCTraceException {
 		super();
 		setQueries(query);
 	}
 
-	public TimeSliceCubicMatrix() {
+	public CubicMatrix() {
 		super();
 	}
 

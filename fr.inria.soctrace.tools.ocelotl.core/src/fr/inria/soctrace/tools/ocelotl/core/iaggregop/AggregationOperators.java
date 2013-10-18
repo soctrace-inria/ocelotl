@@ -26,12 +26,12 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.TraceType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeCubicMatrix;
-import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeMatrix;
-import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeProbabilityDistributionMatrix;
-import fr.inria.soctrace.tools.ocelotl.core.aggregop.PajeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.TraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeNormalizedStateSum;
+import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum;
+import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateTypeSum;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
-import fr.inria.soctrace.tools.ocelotl.ui.views.TraceTypeConfig;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 
@@ -57,9 +57,9 @@ public AggregationOperators(Query query) {
 
 private void init() throws SoCTraceException{
 	List = new ArrayList<IAggregationOperator>();
-	List.add(new ActivityTimeMatrix());
-	List.add(new ActivityTimeProbabilityDistributionMatrix());
-	List.add(new ActivityTimeCubicMatrix());
+	List.add(new PajeStateSum());
+	List.add(new PajeNormalizedStateSum());
+	List.add(new PajeStateTypeSum());
 	
 }
 

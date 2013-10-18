@@ -26,7 +26,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.core.aggregop.PajeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
 
 public class PajeView extends ViewPart {
 	

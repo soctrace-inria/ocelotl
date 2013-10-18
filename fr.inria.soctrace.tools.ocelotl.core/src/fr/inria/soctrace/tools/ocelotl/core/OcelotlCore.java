@@ -21,15 +21,15 @@ package fr.inria.soctrace.tools.ocelotl.core;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
-import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeCubicMatrix;
-import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeMatrix;
-import fr.inria.soctrace.tools.ocelotl.core.aggregop.ActivityTimeProbabilityDistributionMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.AggregationOperators;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.ILPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.PartManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeNormalizedStateSum;
+import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum;
+import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateTypeSum;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 
 public class OcelotlCore {

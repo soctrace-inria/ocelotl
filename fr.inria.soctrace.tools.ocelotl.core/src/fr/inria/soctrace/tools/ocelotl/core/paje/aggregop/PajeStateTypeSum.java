@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.aggregop;
+package fr.inria.soctrace.tools.ocelotl.core.paje.aggregop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,29 +28,28 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ITimeSliceCubicMatrix;
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.TimeSliceCubicMatrix;
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.TraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ICubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.CubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
-import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
+import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
-import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
-public class ActivityTimeCubicMatrix extends TimeSliceCubicMatrix {
+public class PajeStateTypeSum extends CubicMatrix {
 
 	public final static String 									descriptor								="State Type Sum";
 	public final static String 									traceType								=PajeConstants.PajeFormatName;
 
-	public ActivityTimeCubicMatrix(final Query query) throws SoCTraceException {
+	public PajeStateTypeSum(final Query query) throws SoCTraceException {
 		super(query);
 	}
 	
-	public ActivityTimeCubicMatrix() throws SoCTraceException {
+	public PajeStateTypeSum() throws SoCTraceException {
 		super();
 	}
 
@@ -108,7 +107,7 @@ public class ActivityTimeCubicMatrix extends TimeSliceCubicMatrix {
 		int count = 0;
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		OcelotlEventCache cache = new OcelotlEventCache(query.getOcelotlParameters());
+		ReducedEventCache cache = new ReducedEventCache(query.getOcelotlParameters());
 		final List<EventProxy> fullEvents = query.getEventsProxy(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
@@ -162,11 +161,7 @@ public class ActivityTimeCubicMatrix extends TimeSliceCubicMatrix {
 		return traceType;
 	}
 
-	@Override
-	public TraceTypeConfig getTraceTypeConfig() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 	
 
 }

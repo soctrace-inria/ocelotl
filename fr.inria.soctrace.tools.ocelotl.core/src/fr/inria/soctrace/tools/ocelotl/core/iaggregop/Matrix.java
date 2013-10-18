@@ -31,7 +31,7 @@ import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
-public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
+public abstract class Matrix implements IMatrix {
 
 	protected Query							query;
 	protected List<HashMap<String, Long>>	matrix	= new ArrayList<HashMap<String, Long>>();
@@ -42,12 +42,12 @@ public abstract class TimeSliceMatrix implements ITimeSliceMatrix {
 	protected DeltaManager					dm;
 	public final static int 				EPCOUNT			= 200;			
 
-	public TimeSliceMatrix(final Query query) throws SoCTraceException {
+	public Matrix(final Query query) throws SoCTraceException {
 		super();
 		setQueries(query);
 	}
 	
-	public TimeSliceMatrix() throws SoCTraceException {
+	public Matrix() throws SoCTraceException {
 		super();
 	}
 

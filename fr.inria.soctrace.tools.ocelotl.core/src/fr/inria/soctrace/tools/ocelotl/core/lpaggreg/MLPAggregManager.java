@@ -19,14 +19,14 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ITimeSliceCubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ICubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
 
 public class MLPAggregManager extends LPAggregManager {
 
-	ITimeSliceCubicMatrix	timeSliceMatrix;
+	ICubicMatrix	timeSliceMatrix;
 
-	public MLPAggregManager(final ITimeSliceCubicMatrix timeSliceMatrix) {
+	public MLPAggregManager(final ICubicMatrix timeSliceMatrix) {
 		super(timeSliceMatrix.getQueries().getOcelotlParameters());
 		this.timeSliceMatrix = timeSliceMatrix;
 		lpaggregWrapper = new LPAggregWrapper(3);
@@ -46,7 +46,7 @@ public class MLPAggregManager extends LPAggregManager {
 
 	}
 
-	public ITimeSliceCubicMatrix getTimeSliceMatrix() {
+	public ICubicMatrix getTimeSliceMatrix() {
 		return timeSliceMatrix;
 	}
 

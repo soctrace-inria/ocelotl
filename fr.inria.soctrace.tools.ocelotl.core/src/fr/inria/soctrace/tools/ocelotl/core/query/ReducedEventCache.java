@@ -18,7 +18,7 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 
-public class OcelotlEventCache {
+public class ReducedEventCache {
 	private HashMap<Integer, ReducedEvent> cache= new HashMap<Integer, ReducedEvent>();
 	private String trace;
 	private TraceDBObject traceDB;
@@ -41,7 +41,7 @@ public class OcelotlEventCache {
 			traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
 	}
 	
-	public OcelotlEventCache(OcelotlParameters parameters) throws SoCTraceException {
+	public ReducedEventCache(OcelotlParameters parameters) throws SoCTraceException {
 		super();
 		this.EPPAGE = parameters.getEpCache();
 		this.PAGE = parameters.getPageCache();

@@ -22,16 +22,16 @@ package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ITimeSliceMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
 
 public class VLPAggregManager extends LPAggregManager {
 
-	ITimeSliceMatrix	timeSliceMatrix;
+	IMatrix	matrix;
 
-	public VLPAggregManager(final ITimeSliceMatrix timeSliceMatrix) {
-		super(timeSliceMatrix.getQueries().getOcelotlParameters());
-		this.timeSliceMatrix = timeSliceMatrix;
+	public VLPAggregManager(final IMatrix matrix) {
+		super(matrix.getQueries().getOcelotlParameters());
+		this.matrix = matrix;
 		lpaggregWrapper = new LPAggregWrapper(2);
 		fillVectors();
 	}
@@ -50,11 +50,11 @@ public class VLPAggregManager extends LPAggregManager {
 				for (int k = 0; k < parts.size(); k++)
 					if (parts.get(k) == i || parts.get(k) == j) {
 						lpaggregWrapperTemp.addVector();
-						for (final String key : timeSliceMatrix.getMatrix().get(k).keySet())
-							lpaggregWrapperTemp.push_back(timeSliceMatrix.getMatrix().get(k).get(key));
+						for (final String key : matrix.getMatrix().get(k).keySet())
+							lpaggregWrapperTemp.push_back(matrix.getMatrix().get(k).get(key));
 					}
-				lpaggregWrapperTemp.computeQualities(timeSliceMatrix.getQueries().getOcelotlParameters().isNormalize());
-				lpaggregWrapperTemp.computeParts(timeSliceMatrix.getQueries().getOcelotlParameters().getParameter());
+				lpaggregWrapperTemp.computeQualities(matrix.getQueries().getOcelotlParameters().isNormalize());
+				lpaggregWrapperTemp.computeParts(matrix.getQueries().getOcelotlParameters().getParameter());
 				boolean eq = true;
 				for (int l = 0; l < lpaggregWrapperTemp.getPartNumber(); l++)
 					if (l > 0 && lpaggregWrapperTemp.getPart(l) != lpaggregWrapperTemp.getPart(l - 1)) {
@@ -78,16 +78,16 @@ public class VLPAggregManager extends LPAggregManager {
 
 	@Override
 	public void fillVectors() {
-		for (int i = 0; i < timeSliceMatrix.getVectorsNumber(); i++) {
+		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
 			lpaggregWrapper.addVector();
-			for (final String key : timeSliceMatrix.getMatrix().get(i).keySet())
-				lpaggregWrapper.push_back(timeSliceMatrix.getMatrix().get(i).get(key));
+			for (final String key : matrix.getMatrix().get(i).keySet())
+				lpaggregWrapper.push_back(matrix.getMatrix().get(i).get(key));
 		}
 
 	}
 
-	public ITimeSliceMatrix getTimeSliceMatrix() {
-		return timeSliceMatrix;
+	public IMatrix getTimeSliceMatrix() {
+		return matrix;
 	}
 
 	@Override

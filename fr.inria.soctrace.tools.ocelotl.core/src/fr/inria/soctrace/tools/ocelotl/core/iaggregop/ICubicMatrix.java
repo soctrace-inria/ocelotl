@@ -24,13 +24,12 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
-public interface ITimeSliceMatrix extends IAggregationOperator{
+public interface ICubicMatrix extends IAggregationOperator{
 
-	public List<HashMap<String, Long>> getMatrix();
+	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
 
-	public VLPAggregManager createManager();
+	public MLPAggregManager createManager();
 }

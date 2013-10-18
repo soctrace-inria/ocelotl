@@ -17,42 +17,38 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.aggregop;
+package fr.inria.soctrace.tools.ocelotl.core.paje.aggregop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.TimeSliceMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.Matrix;
+import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
-import fr.inria.soctrace.tools.ocelotl.core.query.OcelotlEventCache;
+import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
-import fr.inria.soctrace.tools.ocelotl.core.ts.PajeState;
-import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
-public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix {
-	
-	public final static String 									descriptor								="State Sum (normalized)";
-	public final static String 									traceType								=PajeConstants.PajeFormatName;
+public class PajeStateSum extends Matrix {
 
-	public ActivityTimeProbabilityDistributionMatrix(final Query query) throws SoCTraceException {
+	public final static String	descriptor	= "State Sum";
+	public final static String	traceType	= PajeConstants.PajeFormatName;
+
+	public PajeStateSum(final Query query) throws SoCTraceException {
 		super(query);
 		System.out.println(descriptor);
 	}
 
-
-	public ActivityTimeProbabilityDistributionMatrix() throws SoCTraceException {
+	public PajeStateSum() throws SoCTraceException {
 		super();
 	}
-
 
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
@@ -89,7 +85,7 @@ public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix {
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < query.getOcelotlParameters().getThread(); t++) {
-			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThread(), t, false));
+			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThread(), t, true));
 		}
 		for (Thread thread : threadlist)
 			thread.join();
@@ -120,33 +116,23 @@ public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix {
 
 		private void cacheRun() throws SoCTraceException {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				OcelotlEventCache cache;
-				cache = new OcelotlEventCache(query.getOcelotlParameters());
+				ReducedEventCache cache;
+				cache = new ReducedEventCache(query.getOcelotlParameters());
 				EventProducer ep = eventProducers.get(t);
-					cache = new OcelotlEventCache(query.getOcelotlParameters());
-					IState state;
-					final List<EventProxy> events = eventProxyList.get(ep.getId());
-					for (int i = 0; i < events.size() - 1; i++) {
-						state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-						if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
-							final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-							for (final long it : distrib.keySet())
-								matrixWrite(it, ep, distrib);
-						}
+				IState state;
+				final List<EventProxy> events = eventProxyList.get(ep.getId());
+				for (int i = 0; i < events.size() - 1; i++) {
+					state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
+					if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
+						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+						for (final long it : distrib.keySet())
+							matrixWrite(it, ep, distrib);
 					}
-					long total = 0;
-					for (int i = 0; i < matrix.size(); i++)
-						total = matrix.get(i).get(ep.getName()) + total;
-					if (total != 0)
-						for (int i = 0; i < matrix.size(); i++)
-							matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
-					
-					cache.close();
-					int c = getCount();
-					if (c % EPCOUNT == 0)
-						total(c);
-					
-				 
+				}
+				cache.close();
+				int c = getCount();
+				if (c % EPCOUNT == 0)
+					total(c);
 			}
 
 		}
@@ -164,12 +150,6 @@ public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix {
 							matrixWrite(it, ep, distrib);
 					}
 				}
-				long total = 0;
-				for (int i = 0; i < matrix.size(); i++)
-					total = matrix.get(i).get(ep.getName()) + total;
-				if (total != 0)
-					for (int i = 0; i < matrix.size(); i++)
-						matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
 				int c = getCount();
 				if (c % EPCOUNT == 0)
 					total(c);
@@ -191,8 +171,9 @@ public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix {
 
 			start();
 		}
+
 	}
-	
+
 	@Override
 	public String descriptor() {
 		return descriptor;
@@ -202,9 +183,4 @@ public class ActivityTimeProbabilityDistributionMatrix extends TimeSliceMatrix {
 	public String traceType() {
 		return traceType;
 	}
-
-
-
-
-	}
-
+}
