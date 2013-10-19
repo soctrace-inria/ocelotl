@@ -1,5 +1,6 @@
 package fr.inria.soctrace.tools.ocelotl.ui.paje;
 
+import java.awt.Dialog;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -31,6 +32,10 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
 
 public class PajeView extends ApplicationWindow {
 
@@ -120,7 +125,7 @@ public class PajeView extends ApplicationWindow {
 
 		final Group groupEventTypes = new Group(sashFormGlobal, SWT.NONE);
 		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupEventTypes.setText("Event Types");
+		groupEventTypes.setText("States Event Types");
 		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
 		gl_groupEventTypes.horizontalSpacing = 0;
 		groupEventTypes.setLayout(gl_groupEventTypes);
@@ -197,16 +202,37 @@ public class PajeView extends ApplicationWindow {
 		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
 
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
+		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++) {
 			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains("PajeSetState")) {
-				if (!config.getTypes().contains("PajeSetState"))
+				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
 					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
 				break;
 			}
+		}
 		listViewerEventTypes.setInput(config.getTypes());
 		if (!config.getIdles().contains("IDLE"))
 			config.getIdles().add("IDLE");
 		listViewerIdleStates.setInput(config.getIdles());
+
+		final Composite OK = new Composite(sashFormGlobal, SWT.NONE);
+		OK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		OK.setLayout(new FormLayout());
+
+		final Button buttonOK = new Button(OK, SWT.NONE);
+		FormData fd_buttonOK = new FormData();
+		fd_buttonOK.bottom = new FormAttachment(100, -10);
+		fd_buttonOK.right = new FormAttachment(100, -10);
+		buttonOK.setLayoutData(fd_buttonOK);
+		buttonOK.setText("OK");
+		buttonOK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonOK.setImage(null);
+		sashFormGlobal.setWeights(new int[] { 140, 145, 89 });
+		buttonOK.addSelectionListener(new SelectionAdapter() {
+
+			public void widgetSelected(final SelectionEvent e) {
+				close();
+			}
+		});
 
 		return sashFormGlobal;
 

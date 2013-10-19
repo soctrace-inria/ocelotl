@@ -26,7 +26,7 @@ public class ConfigViewManager {
 			window = new PajeView(ocelotlView, (PajeConfig) ocelotlView.getCore().getOcelotlParameters().getTraceTypeConfig());
 		window.setBlockOnOpen(true);
 		window.open();
-		Display.getCurrent().dispose();
+		
 	}
 
 }

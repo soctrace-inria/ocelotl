@@ -213,6 +213,8 @@ public class OcelotlView extends ViewPart {
 		public void widgetSelected(final SelectionEvent e) {
 			if (confDataLoader.getCurrentTrace() == null)
 				return;
+			if (comboAggregationOperator.getText().equals(""))
+				return;
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
 				hasChanged = HasChanged.PARAMETER;
 			else
@@ -402,6 +404,7 @@ public class OcelotlView extends ViewPart {
 	private Button								btnShowNumbers;
 	private Button								btnGrowingQualities;
 	private Button								btnDecreasingQualities;
+	private Button								btnSettings;
 	private Combo								comboAggregationOperator;
 	private Combo								comboTraces;
 	private final ConfDataLoader				confDataLoader	= new ConfDataLoader();
@@ -622,11 +625,13 @@ public class OcelotlView extends ViewPart {
 					return;
 				hasChanged = HasChanged.ALL;
 				ocelotlParameters.setTraceTypeConfig(ocelotlCore.getOperators().config(comboAggregationOperator.getText()));
+				btnSettings.notifyListeners(SWT.Selection, new Event());
+
 			}
 		});
 		comboAggregationOperator.setText("");
 
-		Button btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
+		btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
 		btnSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnSettings.setText("Settings");
 		btnSettings.addSelectionListener(new SettingsSelectionAdapter(this));
