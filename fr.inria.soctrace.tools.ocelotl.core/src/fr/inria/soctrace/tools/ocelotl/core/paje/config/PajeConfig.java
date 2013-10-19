@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.core.paje;
+package fr.inria.soctrace.tools.ocelotl.core.paje.config;
 
 import java.util.LinkedList;
 import java.util.List;

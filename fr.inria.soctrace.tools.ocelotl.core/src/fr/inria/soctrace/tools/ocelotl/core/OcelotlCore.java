@@ -21,7 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.core;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.AggregationOperators;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.AggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.ILPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
@@ -49,7 +49,7 @@ public class OcelotlCore {
 	Query				query;
 	ILPAggregManager	lpaggregManager;
 	PartManager			partManager;
-	AggregationOperators operators;
+	AggregationOperatorManager operators;
 	IAggregationOperator operator;
 
 	public OcelotlCore() {
@@ -68,7 +68,7 @@ public class OcelotlCore {
 	public OcelotlCore(final OcelotlParameters ocelotlParameters) throws SoCTraceException{
 		super();
 		init(ocelotlParameters);
-		operators = new AggregationOperators(query);
+		
 	}
 
 	public void compute(final HasChanged hasChanged) throws SoCTraceException {
@@ -83,7 +83,7 @@ public class OcelotlCore {
 
 	}
 
-	public AggregationOperators getOperators() {
+	public AggregationOperatorManager getOperators() {
 		return operators;
 	}
 
@@ -125,7 +125,7 @@ public class OcelotlCore {
 
 	public void init(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
 		setOcelotlParameters(ocelotlParameters);
-		query = new Query(ocelotlParameters);
+		operators = new AggregationOperatorManager(ocelotlParameters);
 	}
 
 	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {

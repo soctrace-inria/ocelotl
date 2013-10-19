@@ -28,11 +28,12 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.state.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
@@ -40,13 +41,14 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 public abstract class CubicMatrix implements ICubicMatrix {
 
 	protected Query											query;
+	protected OcelotlParameters				parameters;
 	protected List<HashMap<String, HashMap<String, Long>>>	matrix;
 	protected int											eventsNumber;
 	protected TimeSliceManager								timeSliceManager;
 
-	public CubicMatrix(final Query query) throws SoCTraceException {
+	public CubicMatrix(final OcelotlParameters parameters) throws SoCTraceException {
 		super();
-		setQueries(query);
+		setOcelotlParameters(parameters);
 	}
 
 	public CubicMatrix() {
@@ -106,8 +108,9 @@ public abstract class CubicMatrix implements ICubicMatrix {
 	}
 
 	@Override
-	public void setQueries(final Query query) throws SoCTraceException {
-		this.query = query;
+	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException {
+		this.parameters=parameters;
+		this.query = new Query(parameters);
 		query.checkTimeStamps();
 		matrix = new ArrayList<HashMap<String, HashMap<String, Long>>>();
 		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
@@ -115,6 +118,16 @@ public abstract class CubicMatrix implements ICubicMatrix {
 		computeMatrix();
 	}
 	
+	public OcelotlParameters getOcelotlParameters(){
+		return parameters;
+	}
+	
+	
+	
+	public Query getQuery() {
+		return query;
+	}
+
 	public MLPAggregManager createManager(){
 		return new MLPAggregManager(this);
 		

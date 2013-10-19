@@ -27,13 +27,14 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.Matrix;
-import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
-import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
+import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeEventProxy;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEventCache;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.state.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
@@ -42,8 +43,8 @@ public class PajeStateSum extends Matrix {
 	public final static String	descriptor	= "State Sum";
 	public final static String	traceType	= PajeConstants.PajeFormatName;
 
-	public PajeStateSum(final Query query) throws SoCTraceException {
-		super(query);
+	public PajeStateSum(final OcelotlParameters parameters) throws SoCTraceException {
+		super(parameters);
 		System.out.println(descriptor);
 	}
 

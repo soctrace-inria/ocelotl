@@ -27,6 +27,7 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
@@ -34,6 +35,7 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 public abstract class Matrix implements IMatrix {
 
 	protected Query							query;
+	protected OcelotlParameters				parameters;
 	protected List<HashMap<String, Long>>	matrix;
 	protected int							eventsNumber;
 	protected TimeSliceManager				timeSliceManager;
@@ -42,13 +44,17 @@ public abstract class Matrix implements IMatrix {
 	protected DeltaManager					dm;
 	public final static int 				EPCOUNT			= 200;			
 
-	public Matrix(final Query query) throws SoCTraceException {
+	public Matrix(final OcelotlParameters parameters) throws SoCTraceException {
 		super();
-		setQueries(query);
+		setOcelotlParameters(parameters);
 	}
 	
 	public Matrix() throws SoCTraceException {
 		super();
+	}
+	
+	public Query getQuery() {
+		return query;
 	}
 
 	public void computeMatrix() throws SoCTraceException {
@@ -144,8 +150,9 @@ public abstract class Matrix implements IMatrix {
 	}
 
 	@Override
-	public void setQueries(final Query query) throws SoCTraceException {
-		this.query = query;
+	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException {
+		this.parameters=parameters;
+		this.query = new Query(parameters);
 		query.checkTimeStamps();
 		count			= 0;
 		epit			= 0;
@@ -153,6 +160,10 @@ public abstract class Matrix implements IMatrix {
 		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
+	}
+	
+	public OcelotlParameters getOcelotlParameters(){
+		return parameters;
 	}
 	
 	public VLPAggregManager createManager(){

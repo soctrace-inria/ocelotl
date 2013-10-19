@@ -21,6 +21,6 @@ Bundle-ActivationPolicy: lazy
 Import-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.iaggregop,
  fr.inria.soctrace.tools.ocelotl.core.lpaggreg,
- fr.inria.soctrace.tools.ocelotl.core.paje,
+ fr.inria.soctrace.tools.ocelotl.core.paje.*,
  fr.inria.soctrace.tools.paje.tracemanager.common.constants
 Export-Package: fr.inria.soctrace.tools.ocelotl.ui.views

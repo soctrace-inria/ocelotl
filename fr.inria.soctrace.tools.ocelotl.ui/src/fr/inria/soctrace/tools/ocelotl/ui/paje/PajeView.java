@@ -30,8 +30,9 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
+
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.FormData;

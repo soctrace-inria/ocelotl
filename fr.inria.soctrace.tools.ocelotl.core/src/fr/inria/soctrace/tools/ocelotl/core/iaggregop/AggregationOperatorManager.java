@@ -27,25 +27,26 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.TraceType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.TraceTypeConfig;
-import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeNormalizedStateSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateTypeSum;
+import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 
-public class AggregationOperators {
+public class AggregationOperatorManager {
 	
 HashMap<String,IAggregationOperator> List;
 HashMap<String, TraceTypeConfig> Config;
 ArrayList<String> Names;
-Query query;
+OcelotlParameters parameters;
 
-public AggregationOperators(Query query) {
+public AggregationOperatorManager(OcelotlParameters parameters) {
 	super();
-	this.query=query;
+	this.parameters=parameters;
 	try {
 		init();
 		initConfig();
@@ -75,7 +76,7 @@ public Collection<IAggregationOperator> getList(){
 
 public IAggregationOperator getOperator(String name) throws SoCTraceException{
 			IAggregationOperator op=List.get(name);
-			op.setQueries(query);
+			op.setOcelotlParameters(parameters);
 			return op;
 }
 
