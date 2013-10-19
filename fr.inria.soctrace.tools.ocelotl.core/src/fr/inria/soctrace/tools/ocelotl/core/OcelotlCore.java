@@ -24,12 +24,7 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.AggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.ILPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.PartManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeNormalizedStateSum;
-import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum;
-import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateTypeSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 
 public class OcelotlCore {
@@ -56,15 +51,6 @@ public class OcelotlCore {
 		super();
 	}
 
-	public void setOperator() {
-		try {
-			operator = operators.getOperator(ocelotlParameters.getAggOperator());
-		} catch (SoCTraceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	public OcelotlCore(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
 		super();
 		init(ocelotlParameters);
@@ -81,10 +67,6 @@ public class OcelotlCore {
 			lpaggregManager.computeQualities();
 		// TODO clean dicho & parts
 
-	}
-
-	public AggregationOperatorManager getOperators() {
-		return operators;
 	}
 
 	public void computeDichotomy(final HasChanged hasChanged) throws SoCTraceException {
@@ -115,6 +97,10 @@ public class OcelotlCore {
 		return ocelotlParameters;
 	}
 
+	public AggregationOperatorManager getOperators() {
+		return operators;
+	}
+
 	public PartManager getPartsManager() {
 		return partManager;
 	}
@@ -130,6 +116,15 @@ public class OcelotlCore {
 
 	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {
 		this.ocelotlParameters = ocelotlParameters;
+	}
+
+	public void setOperator() {
+		try {
+			operator = operators.getOperator(ocelotlParameters.getAggOperator());
+		} catch (final SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

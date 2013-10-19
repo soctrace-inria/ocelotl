@@ -16,20 +16,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import fr.inria.soctrace.lib.model.Event;
-import fr.inria.soctrace.lib.model.EventParam;
-import fr.inria.soctrace.lib.model.EventParamType;
-import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.query.SelfDefiningElementQuery;
 import fr.inria.soctrace.lib.query.ValueListString;
-import fr.inria.soctrace.lib.query.conditions.ICondition;
-import fr.inria.soctrace.lib.storage.DBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
-import fr.inria.soctrace.lib.storage.utils.ModelElementCache;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
@@ -48,22 +38,21 @@ public class PajeReducedEventQuery extends EventQuery {
 	 * @param traceDB
 	 *            Trace DB object where the query is performed.
 	 */
-	public PajeReducedEventQuery(TraceDBObject traceDB) {
+	public PajeReducedEventQuery(final TraceDBObject traceDB) {
 		super(traceDB);
 		clear();
 	}
 
 	public List<PajeReducedEvent> getReducedEventList() throws SoCTraceException {
 		try {
-			DeltaManager dm = new DeltaManager();
+			final DeltaManager dm = new DeltaManager();
 			dm.start();
 
 			boolean first = true;
-			StringBuffer eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
+			final StringBuffer eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
 
-			if (where) {
+			if (where)
 				eventQuery.append(" WHERE ");
-			}
 
 			if (elementWhere != null) {
 				first = false;
@@ -95,40 +84,39 @@ public class PajeReducedEventQuery extends EventQuery {
 				eventQuery.append(getParamConditionsString());
 			}
 
-			if (orderBy) {
+			if (orderBy)
 				eventQuery.append(" ORDER BY " + orderByColumn + " " + orderByCriterium);
-			}
 
-			String query = eventQuery.toString();
+			final String query = eventQuery.toString();
 			debug(query);
 
-			Statement stm = dbObj.getConnection().createStatement();
+			final Statement stm = dbObj.getConnection().createStatement();
 
-			ResultSet rs = stm.executeQuery(query);
-			List<PajeReducedEvent> elist = rebuildReducedEvent(rs);
+			final ResultSet rs = stm.executeQuery(query);
+			final List<PajeReducedEvent> elist = rebuildReducedEvent(rs);
 
 			debug(dm.endMessage("EventQuery.getList()"));
 
 			stm.close();
 			return elist;
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			throw new SoCTraceException(e);
 		}
 
 	}
 
-	private List<PajeReducedEvent> rebuildReducedEvent(ResultSet rs) throws SoCTraceException {
+	private List<PajeReducedEvent> rebuildReducedEvent(final ResultSet rs) throws SoCTraceException {
 
-		HashMap<Integer, PajeReducedEvent> list = new HashMap<Integer, PajeReducedEvent>();
-		LinkedList<PajeReducedEvent> llist = new LinkedList<PajeReducedEvent>();
-		ValueListString vls = new ValueListString();
-		ValueListString pvls = new ValueListString();
-		List<Integer> li = new ArrayList<Integer>();
+		final HashMap<Integer, PajeReducedEvent> list = new HashMap<Integer, PajeReducedEvent>();
+		final LinkedList<PajeReducedEvent> llist = new LinkedList<PajeReducedEvent>();
+		final ValueListString vls = new ValueListString();
+		new ValueListString();
+		final List<Integer> li = new ArrayList<Integer>();
 		try {
 
 			while (rs.next()) {
-				PajeReducedEvent re = new PajeReducedEvent(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), null);
+				final PajeReducedEvent re = new PajeReducedEvent(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), null);
 				list.put(re.ID, re);
 				llist.add(re);
 				vls.addValue(String.valueOf(re.ID));
@@ -136,8 +124,8 @@ public class PajeReducedEventQuery extends EventQuery {
 			if (llist.size() == 0)
 				return llist;
 
-			Statement stm = dbObj.getConnection().createStatement();
-			ResultSet pprs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM_TYPE + " WHERE NAME='" + PajeExternalConstants.PajeStateValue + "'");
+			final Statement stm = dbObj.getConnection().createStatement();
+			final ResultSet pprs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM_TYPE + " WHERE NAME='" + PajeExternalConstants.PajeStateValue + "'");
 			while (pprs.next())
 				li.add(pprs.getInt("ID"));
 			String query;
@@ -146,13 +134,12 @@ public class PajeReducedEventQuery extends EventQuery {
 																												// +
 																												// pvls.getValueString();
 
-			ResultSet prs = stm.executeQuery(query);// TODO verifier
-			while (prs.next()) {
+			final ResultSet prs = stm.executeQuery(query);// TODO verifier
+			while (prs.next())
 				if (li.contains(prs.getInt("EVENT_PARAM_TYPE_ID")))
 					list.get(prs.getInt("EVENT_ID")).VALUE = prs.getString("VALUE");
-			}
 			return llist;
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			throw new SoCTraceException(e);
 		}
 	}

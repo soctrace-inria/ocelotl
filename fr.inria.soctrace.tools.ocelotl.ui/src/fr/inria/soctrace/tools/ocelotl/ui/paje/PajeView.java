@@ -1,6 +1,5 @@
 package fr.inria.soctrace.tools.ocelotl.ui.paje;
 
-import java.awt.Dialog;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -17,6 +16,9 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -26,24 +28,21 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
-import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
-
 public class PajeView extends ApplicationWindow {
 
-	private OcelotlView	ocelotlView;
-	private ListViewer	listViewerIdleStates;
-	private ListViewer	listViewerEventTypes;
-	private PajeConfig	config;
+	private class EventTypeLabelProvider extends LabelProvider {
+
+		@Override
+		public String getText(final Object element) {
+			return ((EventType) element).getName();
+		}
+	}
 
 	private class IdlesSelectionAdapter extends SelectionAdapter {
 
@@ -55,12 +54,6 @@ public class PajeView extends ApplicationWindow {
 			config.getIdles().add(dialog.getValue());
 			listViewerIdleStates.setInput(config.getIdles());
 		}
-	}
-
-	public PajeView(OcelotlView ocelotlView, PajeConfig config) {
-		super(ocelotlView.getSite().getShell());
-		this.ocelotlView = ocelotlView;
-		this.config = config;
 	}
 
 	private class RemoveSelectionAdapter extends SelectionAdapter {
@@ -78,14 +71,6 @@ public class PajeView extends ApplicationWindow {
 			final Collection<?> c = (Collection<?>) viewer.getInput();
 			c.remove(obj);
 			viewer.refresh(false);
-		}
-	}
-
-	private class EventTypeLabelProvider extends LabelProvider {
-
-		@Override
-		public String getText(final Object element) {
-			return ((EventType) element).getName();
 		}
 	}
 
@@ -113,12 +98,28 @@ public class PajeView extends ApplicationWindow {
 		}
 	}
 
-	protected void configureShell(Shell newShell) {
+	private final OcelotlView	ocelotlView;
+
+	private ListViewer			listViewerIdleStates;
+
+	private ListViewer			listViewerEventTypes;
+
+	private final PajeConfig	config;
+
+	public PajeView(final OcelotlView ocelotlView, final PajeConfig config) {
+		super(ocelotlView.getSite().getShell());
+		this.ocelotlView = ocelotlView;
+		this.config = config;
+	}
+
+	@Override
+	protected void configureShell(final Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText("Pajé Aggregation Operator Settings");
 	}
 
-	public Control createContents(Composite parent) {
+	@Override
+	public Control createContents(final Composite parent) {
 		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
@@ -203,13 +204,12 @@ public class PajeView extends ApplicationWindow {
 		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
 
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++) {
+		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
 			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains("PajeSetState")) {
 				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
 					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
 				break;
 			}
-		}
 		listViewerEventTypes.setInput(config.getTypes());
 		if (!config.getIdles().contains("IDLE"))
 			config.getIdles().add("IDLE");
@@ -220,7 +220,7 @@ public class PajeView extends ApplicationWindow {
 		OK.setLayout(new FormLayout());
 
 		final Button buttonOK = new Button(OK, SWT.NONE);
-		FormData fd_buttonOK = new FormData();
+		final FormData fd_buttonOK = new FormData();
 		fd_buttonOK.bottom = new FormAttachment(100, -10);
 		fd_buttonOK.right = new FormAttachment(100, -10);
 		buttonOK.setLayoutData(fd_buttonOK);
@@ -230,6 +230,7 @@ public class PajeView extends ApplicationWindow {
 		sashFormGlobal.setWeights(new int[] { 140, 145, 89 });
 		buttonOK.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				close();
 			}

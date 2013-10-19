@@ -145,6 +145,7 @@ public class PajeTclInput implements ITChartsInput {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private List<Event> getArticleList(Trace trace) {
 
 		// Result label: the first result with this label is loaded. Take care.

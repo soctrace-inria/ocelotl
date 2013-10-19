@@ -37,7 +37,6 @@ import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.ComparisonOper
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.LogicalOperation;
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.OrderBy;
 import fr.inria.soctrace.lib.query.conditions.LogicalCondition;
-import fr.inria.soctrace.lib.query.conditions.ParamSimpleCondition;
 import fr.inria.soctrace.lib.query.conditions.SimpleCondition;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;

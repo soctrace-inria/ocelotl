@@ -26,9 +26,6 @@ import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
-import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.ToolbarLayout;
@@ -40,12 +37,9 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
-import fr.inria.soctrace.tools.ocelotl.ui.views.QualityView.State;
 
 /**
  * Matrix View : part representation, according to LP algorithm result
@@ -64,7 +58,7 @@ public class TimeAxisView {
 			setAlpha(50);
 		}
 
-		public void draw(TimeRegion timeRegion, boolean active) {
+		public void draw(final TimeRegion timeRegion, final boolean active) {
 			if (active) {
 				setForegroundColor(MatrixView.activeColorFG);
 				setBackgroundColor(MatrixView.activeColorBG);
@@ -79,33 +73,31 @@ public class TimeAxisView {
 
 	}
 
-	Figure				root;
-	Canvas				canvas;
-	TimeRegion			time;
-	final static int	Height			= 100;
-	final static int	Border			= 10;
-	final static int	TimeAxisWidth	= 1;
-	final static long	Divide			= 10;
-	double				GradNumber		= 10.0;
-	double				GradDuration	= 10.0;
-	final static long	GradWidthMin	= 50;
-	double				GradWidth		= 50;
-	final static int	GradHeight		= 8;
-	final static int	TextWidth		= 50;
-	final static int	TextHeight		= 20;
-	final static long	MiniDivide		= 5;
-	final static int	MiniGradHeight	= 4;
-	int					Space			= 6;
-	private OcelotlView	ocelotlView;
-	SelectFigure		selectFigure;
+	Figure						root;
+	Canvas						canvas;
+	TimeRegion					time;
+	final static int			Height			= 100;
+	final static int			Border			= 10;
+	final static int			TimeAxisWidth	= 1;
+	final static long			Divide			= 10;
+	double						GradNumber		= 10.0;
+	double						GradDuration	= 10.0;
+	final static long			GradWidthMin	= 50;
+	double						GradWidth		= 50;
+	final static int			GradHeight		= 8;
+	final static int			TextWidth		= 50;
+	final static int			TextHeight		= 20;
+	final static long			MiniDivide		= 5;
+	final static int			MiniGradHeight	= 4;
+	int							Space			= 6;
+	SelectFigure				selectFigure;
 
-	public TimeAxisView(OcelotlView ocelotlView) {
+	public TimeAxisView() {
 		super();
-		this.ocelotlView = ocelotlView;
-		this.selectFigure = new SelectFigure();
+		selectFigure = new SelectFigure();
 	}
 
-	public void createDiagram(TimeRegion time) {
+	public void createDiagram(final TimeRegion time) {
 		root.removeAll();
 		this.time = time;
 		if (time != null) {
@@ -115,7 +107,7 @@ public class TimeAxisView {
 		canvas.update();
 	}
 
-	public void createDiagram(TimeRegion time, TimeRegion timeRegion, boolean active) {
+	public void createDiagram(final TimeRegion time, final TimeRegion timeRegion, final boolean active) {
 		root.removeAll();
 		this.time = time;
 		if (time != null) {
@@ -235,7 +227,7 @@ public class TimeAxisView {
 		root.repaint();
 	}
 
-	public void select(TimeRegion timeRegion, boolean active) {
+	public void select(final TimeRegion timeRegion, final boolean active) {
 		createDiagram(time, timeRegion, active);
 		root.repaint();
 	}

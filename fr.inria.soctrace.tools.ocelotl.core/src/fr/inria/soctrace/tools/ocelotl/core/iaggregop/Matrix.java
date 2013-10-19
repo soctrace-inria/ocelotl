@@ -44,17 +44,13 @@ public abstract class Matrix implements IMatrix {
 	protected DeltaManager					dm;
 	public final static int					EPCOUNT	= 200;
 
-	public Matrix(final OcelotlParameters parameters) throws SoCTraceException {
-		super();
-		setOcelotlParameters(parameters);
-	}
-
 	public Matrix() throws SoCTraceException {
 		super();
 	}
 
-	public Query getQuery() {
-		return query;
+	public Matrix(final OcelotlParameters parameters) throws SoCTraceException {
+		super();
+		setOcelotlParameters(parameters);
 	}
 
 	public void computeMatrix() throws SoCTraceException {
@@ -65,7 +61,7 @@ public abstract class Matrix implements IMatrix {
 		if (query.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < query.getOcelotlParameters().getMaxEventProducers())
 			try {
 				computeSubMatrix(query.getOcelotlParameters().getEventProducers());
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -74,7 +70,7 @@ public abstract class Matrix implements IMatrix {
 			for (int i = 0; i < epsize; i = i + query.getOcelotlParameters().getMaxEventProducers())
 				try {
 					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getOcelotlParameters().getMaxEventProducers())));
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -83,16 +79,29 @@ public abstract class Matrix implements IMatrix {
 		dmt.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
 	}
 
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
+		if (query.getOcelotlParameters().isCache())
+			computeSubMatrixCached(eventProducers);
+		else
+			computeSubMatrixNonCached(eventProducers);
+	}
+
 	// protected abstract void computeSubMatrix(List<EventProducer>
 	// eventProducers) throws SoCTraceException, InterruptedException;
+
+	protected abstract void computeSubMatrixCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
+
+	protected abstract void computeSubMatrixNonCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
+
+	@Override
+	public VLPAggregManager createManager() {
+		return new VLPAggregManager(this);
+
+	}
 
 	public synchronized int getCount() {
 		count++;
 		return count;
-	}
-
-	public void total(int rows) {
-		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
 	}
 
 	public synchronized int getEP() {
@@ -106,7 +115,16 @@ public abstract class Matrix implements IMatrix {
 	}
 
 	@Override
+	public OcelotlParameters getOcelotlParameters() {
+		return parameters;
+	}
+
+	@Override
 	public Query getQueries() {
+		return query;
+	}
+
+	public Query getQuery() {
 		return query;
 	}
 
@@ -136,6 +154,12 @@ public abstract class Matrix implements IMatrix {
 		}
 	}
 
+	public void matrixWrite(final long it, final EventProducer ep, final Map<Long, Long> distrib) {
+		synchronized (matrix) {
+			matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
+		}
+	}
+
 	@Override
 	public void print() {
 		System.out.println();
@@ -153,7 +177,7 @@ public abstract class Matrix implements IMatrix {
 	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException {
 		this.parameters = parameters;
-		this.query = new Query(parameters);
+		query = new Query(parameters);
 		query.checkTimeStamps();
 		count = 0;
 		epit = 0;
@@ -163,31 +187,8 @@ public abstract class Matrix implements IMatrix {
 		computeMatrix();
 	}
 
-	public OcelotlParameters getOcelotlParameters() {
-		return parameters;
-	}
-
-	public VLPAggregManager createManager() {
-		return new VLPAggregManager(this);
-
-	}
-
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
-		if (query.getOcelotlParameters().isCache()) {
-			computeSubMatrixCached(eventProducers);
-		} else {
-			computeSubMatrixNonCached(eventProducers);
-		}
-	}
-
-	protected abstract void computeSubMatrixNonCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
-
-	protected abstract void computeSubMatrixCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
-
-	public void matrixWrite(long it, EventProducer ep, Map<Long, Long> distrib) {
-		synchronized (matrix) {
-			matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
-		}
+	public void total(final int rows) {
+		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
 	}
 
 }

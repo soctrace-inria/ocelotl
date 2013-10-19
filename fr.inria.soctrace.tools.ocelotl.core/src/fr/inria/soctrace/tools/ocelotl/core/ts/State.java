@@ -21,9 +21,6 @@ package fr.inria.soctrace.tools.ocelotl.core.ts;
 
 import java.util.Map;
 
-import fr.inria.soctrace.lib.model.Event;
-import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public abstract class State implements IState {
@@ -37,18 +34,22 @@ public abstract class State implements IState {
 		this.timeSliceManager = timeSliceManager;
 	}
 
+	@Override
 	public int getEventProducerID() {
 		return eventProducerID;
 	}
 
+	@Override
 	public String getStateType() {
 		return stateType;
 	}
 
+	@Override
 	public TimeRegion getTimeRegion() {
 		return timeRegion;
 	}
 
+	@Override
 	public Map<Long, Long> getTimeSlicesDistribution() {
 		return timeSliceManager.getTimeSlicesDistribution(timeRegion);
 	}

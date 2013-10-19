@@ -22,20 +22,12 @@ package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
-import fr.inria.soctrace.tools.ocelotl.core.paje.state.PajeState;
-import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
-import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
 public abstract class CubicMatrix implements ICubicMatrix {
@@ -46,16 +38,22 @@ public abstract class CubicMatrix implements ICubicMatrix {
 	protected int											eventsNumber;
 	protected TimeSliceManager								timeSliceManager;
 
+	public CubicMatrix() {
+		super();
+	}
+
 	public CubicMatrix(final OcelotlParameters parameters) throws SoCTraceException {
 		super();
 		setOcelotlParameters(parameters);
 	}
 
-	public CubicMatrix() {
-		super();
-	}
-
 	public abstract void computeMatrix() throws SoCTraceException;
+
+	@Override
+	public MLPAggregManager createManager() {
+		return new MLPAggregManager(this);
+
+	}
 
 	@Override
 	public List<HashMap<String, HashMap<String, Long>>> getMatrix() {
@@ -63,7 +61,16 @@ public abstract class CubicMatrix implements ICubicMatrix {
 	}
 
 	@Override
+	public OcelotlParameters getOcelotlParameters() {
+		return parameters;
+	}
+
+	@Override
 	public Query getQueries() {
+		return query;
+	}
+
+	public Query getQuery() {
 		return query;
 	}
 
@@ -110,25 +117,12 @@ public abstract class CubicMatrix implements ICubicMatrix {
 	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException {
 		this.parameters = parameters;
-		this.query = new Query(parameters);
+		query = new Query(parameters);
 		query.checkTimeStamps();
 		matrix = new ArrayList<HashMap<String, HashMap<String, Long>>>();
 		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
-	}
-
-	public OcelotlParameters getOcelotlParameters() {
-		return parameters;
-	}
-
-	public Query getQuery() {
-		return query;
-	}
-
-	public MLPAggregManager createManager() {
-		return new MLPAggregManager(this);
-
 	}
 
 }

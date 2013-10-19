@@ -57,40 +57,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
  */
 public class MatrixView {
 
-	final static Color	selectColorFG	= ColorConstants.blue;
-	final static Color	selectColorBG	= ColorConstants.lightGray;
-	final static Color	activeColorFG	= ColorConstants.black;
-	final static Color	activeColorBG	= ColorConstants.darkBlue;
-
-	private class SelectFigure extends RectangleFigure {
-
-		public SelectFigure() {
-			super();
-			final ToolbarLayout layout = new ToolbarLayout();
-			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			setLayoutManager(layout);
-			setForegroundColor(ColorConstants.blue);
-			setBackgroundColor(ColorConstants.lightGray);
-			setAlpha(50);
-		}
-
-		public void draw(TimeRegion timeRegion, boolean active) {
-			if (active) {
-				setForegroundColor(activeColorFG);
-				setBackgroundColor(activeColorBG);
-			} else {
-				setForegroundColor(selectColorFG);
-				setBackgroundColor(selectColorBG);
-			}
-			if (this.getParent() != root)
-				root.add(this);
-			root.setConstraint(this,
-					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height), new Point(
-							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), 2)));
-			root.repaint();
-		}
-	}
-
 	private class PartFigure extends RectangleFigure {
 
 		private TimeRegion			timeRegion;
@@ -158,27 +124,154 @@ public class MatrixView {
 
 	}
 
+	private class SelectFigure extends RectangleFigure {
+
+		public SelectFigure() {
+			super();
+			final ToolbarLayout layout = new ToolbarLayout();
+			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
+			setLayoutManager(layout);
+			setForegroundColor(ColorConstants.blue);
+			setBackgroundColor(ColorConstants.lightGray);
+			setAlpha(50);
+		}
+
+		public void draw(final TimeRegion timeRegion, final boolean active) {
+			if (active) {
+				setForegroundColor(activeColorFG);
+				setBackgroundColor(activeColorBG);
+			} else {
+				setForegroundColor(selectColorFG);
+				setBackgroundColor(selectColorBG);
+			}
+			if (getParent() != root)
+				root.add(this);
+			root.setConstraint(this,
+					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height), new Point(
+							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), 2)));
+			root.repaint();
+		}
+	}
+
+	static public enum State {
+		PRESSED_D, DRAG_D, PRESSED_G, RELEASED;
+	}
+
+	class TimeMouseListener implements MouseListener, MouseMotionListener {
+
+		State	state	= State.RELEASED;
+		Point	currentPoint;
+
+		@Override
+		public void mouseDoubleClicked(final MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseDragged(final MouseEvent arg0) {
+			if ((state == State.PRESSED_D || state == State.DRAG_D) && arg0.getLocation().getDistance(currentPoint) > 10) {
+				state = State.DRAG_D;
+				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
+				p3 = Math.max(p3, resetTime.getTimeStampStart());
+				p3 = Math.min(p3, resetTime.getTimeStampEnd());
+				long p1 = selectTime.getTimeStampStart();
+				long p2 = selectTime.getTimeStampEnd();
+				if (p3 > p1)
+					p2 = p3;
+				else if (p3 < p1)
+					p1 = p3;
+				selectTime = new TimeRegion(p1, p2);
+				ocelotlView.setTimeRegion(selectTime);
+				ocelotlView.getTimeAxisView().select(selectTime, false);
+				selectFigure.draw(selectTime, false);
+				if (ocelotlView.getTimeRegion().compareTimeRegion(time)) {
+					ocelotlView.getTimeAxisView().unselect();
+					if (selectFigure.getParent() != null)
+						root.remove(selectFigure);
+					root.repaint();
+				}
+			}
+
+		}
+
+		@Override
+		public void mouseEntered(final MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseExited(final MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseHover(final MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mouseMoved(final MouseEvent arg0) {
+
+		}
+
+		@Override
+		public void mousePressed(final MouseEvent arg0) {
+			// if (arg0.button==MouseEvent.BUTTON1){
+			// selectTime = ocelotlView.getTimeRegion();
+			state = State.PRESSED_D;
+			long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
+			p3 = Math.max(p3, resetTime.getTimeStampStart());
+			p3 = Math.min(p3, resetTime.getTimeStampEnd());
+			selectTime.setTimeStampStart(p3);
+			selectTime.setTimeStampEnd(p3);
+			currentPoint = arg0.getLocation();
+			ocelotlView.setTimeRegion(selectTime);
+			ocelotlView.getTimeAxisView().select(selectTime, false);
+			selectFigure.draw(selectTime, false);
+		}
+
+		@Override
+		public void mouseReleased(final MouseEvent arg0) {
+			state = State.RELEASED;
+			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
+				ocelotlView.getTimeAxisView().select(selectTime, true);
+				selectFigure.draw(selectTime, true);
+			} else {
+				ocelotlView.getTimeAxisView().resizeDiagram();
+				if (selectFigure.getParent() != null)
+					root.remove(selectFigure);
+				root.repaint();
+			}
+			selectTime = new TimeRegion(resetTime);
+		}
+
+	}
+
+	final static Color				selectColorFG	= ColorConstants.blue;
+
+	final static Color				selectColorBG	= ColorConstants.lightGray;
+
+	final static Color				activeColorFG	= ColorConstants.black;
+	final static Color				activeColorBG	= ColorConstants.darkBlue;
 	private Figure					root;
 	private Canvas					canvas;
-	private final List<PartFigure>	figures		= new ArrayList<PartFigure>();
-	private List<Integer>			parts		= null;
+	private final List<PartFigure>	figures			= new ArrayList<PartFigure>();
+	private List<Integer>			parts			= null;
 	private TimeRegion				time;
 	private TimeRegion				selectTime;
 	private TimeRegion				resetTime;
-	private boolean					aggregated	= false;
-	private boolean					numbers		= true;
+	private boolean					aggregated		= false;
+	private boolean					numbers			= true;
 	// private final static int Height = 100;
-	private final static int		Border		= 10;
-	private int						Space		= 6;
-	private final ColorManager		colors		= new ColorManager();
-	private OcelotlView				ocelotlView;
-	private SelectFigure			selectFigure;
+	private final static int		Border			= 10;
+	private int						Space			= 6;
+	private final ColorManager		colors			= new ColorManager();
 
-	public MatrixView(OcelotlView ocelotlView) {
-		super();
-		this.ocelotlView = ocelotlView;
-
-	}
+	private final OcelotlView		ocelotlView;
 
 	// public boolean isSelected() {
 	// return selectTime.compareTimeRegion(resetTime);
@@ -190,6 +283,14 @@ public class MatrixView {
 	// root.remove(selection);
 	// }
 
+	private SelectFigure			selectFigure;
+
+	public MatrixView(final OcelotlView ocelotlView) {
+		super();
+		this.ocelotlView = ocelotlView;
+
+	}
+
 	public void createDiagram(final List<Integer> parts, final TimeRegion time, final boolean aggregated, final boolean numbers) {
 		root.removeAll();
 		figures.clear();
@@ -198,8 +299,8 @@ public class MatrixView {
 		this.parts = parts;
 		this.time = time;
 		if (time != null) {
-			this.resetTime = new TimeRegion(time);
-			this.selectTime = new TimeRegion(time);
+			resetTime = new TimeRegion(time);
+			selectTime = new TimeRegion(time);
 		}
 		this.numbers = numbers;
 		final int partHeight = (int) (root.getSize().height / 1.1 - Border);
@@ -292,10 +393,10 @@ public class MatrixView {
 			}
 		});
 
-		TimeMouseListener mouse = new TimeMouseListener();
+		final TimeMouseListener mouse = new TimeMouseListener();
 		root.addMouseListener(mouse);
 		root.addMouseMotionListener(mouse);
-		this.selectFigure = new SelectFigure();
+		selectFigure = new SelectFigure();
 
 		return canvas;
 	}
@@ -303,101 +404,6 @@ public class MatrixView {
 	public void resizeDiagram() {
 		createDiagram(parts, time, aggregated, numbers);
 		root.repaint();
-	}
-
-	static public enum State {
-		PRESSED_D, DRAG_D, PRESSED_G, RELEASED;
-	}
-
-	class TimeMouseListener implements MouseListener, MouseMotionListener {
-
-		State	state	= State.RELEASED;
-		Point	currentPoint;
-
-		public void mouseDoubleClicked(final MouseEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		public void mousePressed(final MouseEvent arg0) {
-			// if (arg0.button==MouseEvent.BUTTON1){
-			// selectTime = ocelotlView.getTimeRegion();
-			state = State.PRESSED_D;
-			long p3 = ((long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart());
-			p3 = Math.max(p3, resetTime.getTimeStampStart());
-			p3 = Math.min(p3, resetTime.getTimeStampEnd());
-			selectTime.setTimeStampStart(p3);
-			selectTime.setTimeStampEnd(p3);
-			currentPoint = arg0.getLocation();
-			ocelotlView.setTimeRegion(selectTime);
-			ocelotlView.getTimeAxisView().select(selectTime, false);
-			selectFigure.draw(selectTime, false);
-		}
-
-		public void mouseReleased(final MouseEvent arg0) {
-			state = State.RELEASED;
-			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-				ocelotlView.getTimeAxisView().select(selectTime, true);
-				selectFigure.draw(selectTime, true);
-			} else {
-				ocelotlView.getTimeAxisView().resizeDiagram();
-				if (selectFigure.getParent() != null)
-					root.remove(selectFigure);
-				root.repaint();
-			}
-			selectTime = new TimeRegion(resetTime);
-		}
-
-		@Override
-		public void mouseDragged(MouseEvent arg0) {
-			if ((state == State.PRESSED_D || state == State.DRAG_D) && arg0.getLocation().getDistance(currentPoint) > 10) {
-				state = State.DRAG_D;
-				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
-				p3 = Math.max(p3, resetTime.getTimeStampStart());
-				p3 = Math.min(p3, resetTime.getTimeStampEnd());
-				long p1 = selectTime.getTimeStampStart();
-				long p2 = selectTime.getTimeStampEnd();
-				if (p3 > p1)
-					p2 = p3;
-				else if (p3 < p1)
-					p1 = p3;
-				selectTime = new TimeRegion(p1, p2);
-				ocelotlView.setTimeRegion(selectTime);
-				ocelotlView.getTimeAxisView().select(selectTime, false);
-				selectFigure.draw(selectTime, false);
-				if (ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-					ocelotlView.getTimeAxisView().unselect();
-					if (selectFigure.getParent() != null)
-						root.remove(selectFigure);
-					root.repaint();
-				}
-			}
-
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void mouseExited(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void mouseHover(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void mouseMoved(MouseEvent arg0) {
-
-		}
-
 	}
 
 }

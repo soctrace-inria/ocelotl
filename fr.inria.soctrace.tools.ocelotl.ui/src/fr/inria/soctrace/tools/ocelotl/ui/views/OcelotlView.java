@@ -19,7 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -29,10 +28,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -60,25 +57,21 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.TraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
-
-import org.eclipse.wb.swt.ResourceManager;
 
 /**
  * Main view for LPAggreg Paje Tool
@@ -190,12 +183,15 @@ public class OcelotlView extends ViewPart {
 
 	}
 
-	private class ResetListener extends SelectionAdapter {
+	private class DecreasingQualityRadioSelectionAdapter extends SelectionAdapter {
+
+		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
-			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
-			matrixView.resizeDiagram();
-			timeAxisView.resizeDiagram();
+			if (btnDecreasingQualities.getSelection()) {
+				btnGrowingQualities.setSelection(false);
+				ocelotlParameters.setGrowingQualities(false);
+				qualityView.createDiagram();
+			}
 		}
 	}
 
@@ -227,12 +223,11 @@ public class OcelotlView extends ViewPart {
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
 					try {
-						if (hasChanged != HasChanged.PARAMETER) {
+						if (hasChanged != HasChanged.PARAMETER)
 							ocelotlCore.computeDichotomy(hasChanged);
-							// textRun.setText(String.valueOf(ocelotlCore.getLpaggregManager().getParameters().get(ocelotlCore.getLpaggregManager().getParameters().size()
-							// - 1)));
-							// setConfiguration();
-						}
+						// textRun.setText(String.valueOf(ocelotlCore.getLpaggregManager().getParameters().get(ocelotlCore.getLpaggregManager().getParameters().size()
+						// - 1)));
+						// setConfiguration();
 						hasChanged = HasChanged.PARAMETER;
 						ocelotlCore.computeParts(hasChanged);
 						monitor.done();
@@ -262,47 +257,6 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class ParameterDownAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			float p = Float.parseFloat(textRun.getText());
-			for (float f : ocelotlCore.getLpaggregManager().getParameters())
-				if (f > p) {
-					textRun.setText(Float.toString(f));
-					break;
-				}
-			btnRun.notifyListeners(SWT.Selection, new Event());
-
-		}
-
-	}
-
-	private class ParameterUpAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			float p = Float.parseFloat(textRun.getText());
-			for (int f = ocelotlCore.getLpaggregManager().getParameters().size() - 1; f >= 0; f--)
-				if (ocelotlCore.getLpaggregManager().getParameters().get(f) < p) {
-					textRun.setText(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(f)));
-					break;
-				}
-			btnRun.notifyListeners(SWT.Selection, new Event());
-		}
-
-	}
-
-	private class NormalizeSelectionAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (hasChanged != HasChanged.ALL)
-				hasChanged = HasChanged.NORMALIZE;
-			btnRun.notifyListeners(SWT.Selection, new Event());
-		}
-	}
-
 	private class GrowingQualityRadioSelectionAdapter extends SelectionAdapter {
 
 		@Override
@@ -315,16 +269,30 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class DecreasingQualityRadioSelectionAdapter extends SelectionAdapter {
+	private class NormalizeSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (btnDecreasingQualities.getSelection()) {
-				btnGrowingQualities.setSelection(false);
-				ocelotlParameters.setGrowingQualities(false);
-				qualityView.createDiagram();
-			}
+			if (hasChanged != HasChanged.ALL)
+				hasChanged = HasChanged.NORMALIZE;
+			btnRun.notifyListeners(SWT.Selection, new Event());
 		}
+	}
+
+	private class ParameterDownAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			final float p = Float.parseFloat(textRun.getText());
+			for (final float f : ocelotlCore.getLpaggregManager().getParameters())
+				if (f > p) {
+					textRun.setText(Float.toString(f));
+					break;
+				}
+			btnRun.notifyListeners(SWT.Selection, new Event());
+
+		}
+
 	}
 
 	private class ParameterModifyListener implements ModifyListener {
@@ -343,6 +311,31 @@ public class OcelotlView extends ViewPart {
 				hasChanged = HasChanged.PARAMETER;
 		}
 
+	}
+
+	private class ParameterUpAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			final float p = Float.parseFloat(textRun.getText());
+			for (int f = ocelotlCore.getLpaggregManager().getParameters().size() - 1; f >= 0; f--)
+				if (ocelotlCore.getLpaggregManager().getParameters().get(f) < p) {
+					textRun.setText(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(f)));
+					break;
+				}
+			btnRun.notifyListeners(SWT.Selection, new Event());
+		}
+
+	}
+
+	private class ResetListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
+			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
+			matrixView.resizeDiagram();
+			timeAxisView.resizeDiagram();
+		}
 	}
 
 	private class ResetSelectionAdapter extends SelectionAdapter {
@@ -366,15 +359,16 @@ public class OcelotlView extends ViewPart {
 
 		private final OcelotlView	view;
 
-		public SettingsSelectionAdapter(OcelotlView view) {
+		public SettingsSelectionAdapter(final OcelotlView view) {
 			this.view = view;
 		}
 
+		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			hasChanged = HasChanged.ALL;
 			if (comboAggregationOperator.getText().equals(""))
 				return;
-			ConfigViewManager manager = new ConfigViewManager(view);
+			final ConfigViewManager manager = new ConfigViewManager(view);
 			manager.openConfigWindows();
 		}
 	}
@@ -400,7 +394,6 @@ public class OcelotlView extends ViewPart {
 	public static final String					PLUGIN_ID		= Activator.PLUGIN_ID;
 	private Button								btnMergeAggregatedParts;
 	private Button								btnCache;
-	private Button								btnGetParameters;
 	private Button								btnNormalize;
 	private Button								btnRun;
 	private Button								btnShowNumbers;
@@ -428,7 +421,6 @@ public class OcelotlView extends ViewPart {
 	private TimeAxisView						timeAxisView;
 	private Text								textTimestampEnd;
 	private Text								textTimestampStart;
-	private TraceTypeConfig						currentTraceTypeConfig;
 
 	final Map<Integer, Trace>					traceMap		= new HashMap<Integer, Trace>();
 
@@ -444,19 +436,6 @@ public class OcelotlView extends ViewPart {
 		}
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
-	}
-
-	public void setTimeRegion(TimeRegion time) {
-		textTimestampStart.setText(String.valueOf(time.getTimeStampStart()));
-		textTimestampEnd.setText(String.valueOf(time.getTimeStampEnd()));
-	}
-
-	public TimeRegion getTimeRegion() {
-		return new TimeRegion(Long.parseLong(textTimestampStart.getText()), Long.parseLong(textTimestampEnd.getText()));
-	}
-
-	public TimeAxisView getTimeAxisView() {
-		return timeAxisView;
 	}
 
 	private void cleanAll() {
@@ -482,10 +461,6 @@ public class OcelotlView extends ViewPart {
 		// TODO config paje
 	}
 
-	public ConfDataLoader getConfDataLoader() {
-		return confDataLoader;
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -493,7 +468,7 @@ public class OcelotlView extends ViewPart {
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		matrixView = new MatrixView(this);
-		timeAxisView = new TimeAxisView(this);
+		timeAxisView = new TimeAxisView();
 		qualityView = new QualityView(this);
 		final SashForm sashFormView = new SashForm(sashFormGlobal, SWT.VERTICAL);
 		sashFormView.setSashWidth(0);
@@ -516,7 +491,7 @@ public class OcelotlView extends ViewPart {
 		final Canvas canvasTimeAxisView = timeAxisView.initDiagram(compositeTimeAxisView);
 		sashFormView.setWeights(new int[] { 220, 57 });
 
-		Group groupTime = new Group(sashFormGlobal, SWT.NONE);
+		final Group groupTime = new Group(sashFormGlobal, SWT.NONE);
 		groupTime.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTime.setLayout(new GridLayout(7, false));
@@ -539,7 +514,7 @@ public class OcelotlView extends ViewPart {
 		textTimestampEnd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
-		Button btnReset = new Button(groupTime, SWT.NONE);
+		final Button btnReset = new Button(groupTime, SWT.NONE);
 		btnReset.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
 		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
 		btnReset.setText("Reset");
@@ -569,14 +544,14 @@ public class OcelotlView extends ViewPart {
 		final SashForm sashFormTimeAggregationParameters = new SashForm(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setControl(sashFormTimeAggregationParameters);
 
-		SashForm sashFormTSandCurve = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
+		final SashForm sashFormTSandCurve = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
 		sashFormTSandCurve.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
 		final Group groupTSParameters = new Group(sashFormTSandCurve, SWT.NONE);
 		groupTSParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTSParameters.setLayout(new GridLayout(1, false));
 		comboTraces = new Combo(groupTSParameters, SWT.READ_ONLY);
-		GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		final GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_comboTraces.widthHint = 180;
 		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -590,10 +565,9 @@ public class OcelotlView extends ViewPart {
 					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
 					comboAggregationOperator.removeAll();
-					for (final IAggregationOperator op : ocelotlCore.getOperators().getList()) {
+					for (final IAggregationOperator op : ocelotlCore.getOperators().getList())
 						if (op.traceType().equals(confDataLoader.getCurrentTrace().getType().getName()))
 							comboAggregationOperator.add(op.descriptor());
-					}
 					comboAggregationOperator.setText("");
 				} catch (final SoCTraceException e1) {
 					MessageDialog.openError(getSite().getShell(), "Exception", e1.getMessage());
@@ -615,7 +589,7 @@ public class OcelotlView extends ViewPart {
 		compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
 
 		comboAggregationOperator = new Combo(compositeAggregationOperator, SWT.READ_ONLY);
-		GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		gd_comboAggregationOperator.widthHint = 170;
 		comboAggregationOperator.setLayoutData(gd_comboAggregationOperator);
 		comboAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -693,7 +667,7 @@ public class OcelotlView extends ViewPart {
 		scrCompositeEventProducerButtons.setMinSize(compositeEventProducerButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnAddEventProducer.addSelectionListener(new AddEventProducersAdapter());
 
-		Group groupQualityCurveSettings = new Group(sashFormTSandCurve, SWT.NONE);
+		final Group groupQualityCurveSettings = new Group(sashFormTSandCurve, SWT.NONE);
 		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupQualityCurveSettings.setText("Quality Curve Settings");
 		groupQualityCurveSettings.setLayout(new GridLayout(3, false));
@@ -717,7 +691,7 @@ public class OcelotlView extends ViewPart {
 		sashFormTSandCurve.setWeights(new int[] { 265, 46 });
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 
-		SashForm sashForm = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
+		final SashForm sashForm = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
 
 		final Composite compositeQualityView = new Composite(sashForm, SWT.NONE);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -744,7 +718,7 @@ public class OcelotlView extends ViewPart {
 		textThreshold.setLayoutData(gd_textThreshold);
 		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
-		Label lblParameter = new Label(compositeGetParameters, SWT.NONE);
+		final Label lblParameter = new Label(compositeGetParameters, SWT.NONE);
 		lblParameter.setText("Parameter");
 		lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblParameter.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -905,6 +879,14 @@ public class OcelotlView extends ViewPart {
 		return btnRun;
 	}
 
+	public Combo getComboAggregationOperator() {
+		return comboAggregationOperator;
+	}
+
+	public ConfDataLoader getConfDataLoader() {
+		return confDataLoader;
+	}
+
 	public OcelotlCore getCore() {
 		return ocelotlCore;
 	}
@@ -915,6 +897,18 @@ public class OcelotlView extends ViewPart {
 
 	public OcelotlParameters getParams() {
 		return ocelotlParameters;
+	}
+
+	public TimeAxisView getTimeAxisView() {
+		return timeAxisView;
+	}
+
+	public TimeRegion getTimeRegion() {
+		return new TimeRegion(Long.parseLong(textTimestampStart.getText()), Long.parseLong(textTimestampEnd.getText()));
+	}
+
+	public void setComboAggregationOperator(final Combo comboAggregationOperator) {
+		this.comboAggregationOperator = comboAggregationOperator;
 	}
 
 	public void setConfiguration() {
@@ -941,16 +935,13 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	public Combo getComboAggregationOperator() {
-		return comboAggregationOperator;
-	}
-
-	public void setComboAggregationOperator(Combo comboAggregationOperator) {
-		this.comboAggregationOperator = comboAggregationOperator;
-	}
-
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
+	}
+
+	public void setTimeRegion(final TimeRegion time) {
+		textTimestampStart.setText(String.valueOf(time.getTimeStampStart()));
+		textTimestampEnd.setText(String.valueOf(time.getTimeStampEnd()));
 	}
 }

@@ -3,8 +3,6 @@ package fr.inria.soctrace.tools.ocelotl.core.paje.config;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.ui.part.ViewPart;
-
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.TraceTypeConfig;
 
@@ -23,15 +21,16 @@ public class PajeConfig implements TraceTypeConfig {
 		return idles;
 	}
 
+	@Override
 	public List<EventType> getTypes() {
 		return types;
 	}
 
-	public void setIdles(List<String> idles) {
+	public void setIdles(final List<String> idles) {
 		this.idles = idles;
 	}
 
-	public void setTypes(List<EventType> types) {
+	public void setTypes(final List<EventType> types) {
 		this.types = types;
 	}
 

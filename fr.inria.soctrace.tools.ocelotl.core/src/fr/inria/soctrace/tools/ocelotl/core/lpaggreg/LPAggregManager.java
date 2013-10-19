@@ -45,7 +45,7 @@ public abstract class LPAggregManager implements ILPAggregManager {
 	protected LPAggregWrapper		lpaggregWrapper;
 	protected OcelotlParameters		ocelotlParameters;
 
-	public LPAggregManager(OcelotlParameters ocelotlParameters) {
+	public LPAggregManager(final OcelotlParameters ocelotlParameters) {
 		super();
 		this.ocelotlParameters = ocelotlParameters;
 	}

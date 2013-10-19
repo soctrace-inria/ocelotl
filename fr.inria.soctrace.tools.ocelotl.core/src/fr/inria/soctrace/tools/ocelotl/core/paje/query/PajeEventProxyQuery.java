@@ -12,23 +12,11 @@ package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import fr.inria.soctrace.lib.model.Event;
-import fr.inria.soctrace.lib.model.EventParam;
-import fr.inria.soctrace.lib.model.EventParamType;
-import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.query.SelfDefiningElementQuery;
-import fr.inria.soctrace.lib.query.ValueListString;
-import fr.inria.soctrace.lib.query.conditions.ICondition;
-import fr.inria.soctrace.lib.storage.DBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
-import fr.inria.soctrace.lib.storage.utils.ModelElementCache;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 
@@ -48,7 +36,7 @@ public class PajeEventProxyQuery extends EventQuery {
 	 * @param traceDB
 	 *            Trace DB object where the query is performed.
 	 */
-	public PajeEventProxyQuery(TraceDBObject traceDB) {
+	public PajeEventProxyQuery(final TraceDBObject traceDB) {
 		super(traceDB);
 		clear();
 	}
@@ -56,7 +44,7 @@ public class PajeEventProxyQuery extends EventQuery {
 	public List<PajeEventProxy> getIDList() throws SoCTraceException {
 
 		try {
-			DeltaManager dm = new DeltaManager();
+			final DeltaManager dm = new DeltaManager();
 			dm.start();
 
 			boolean first = true;
@@ -64,13 +52,11 @@ public class PajeEventProxyQuery extends EventQuery {
 			if (USE_JOIN) {
 				debug("Experimental query with join");
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM + " on " + FramesocTable.EVENT + ".ID = " + FramesocTable.EVENT_PARAM + ".EVENT_ID ");
-			} else {
+			} else
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
-			}
 
-			if (where) {
+			if (where)
 				eventQuery.append(" WHERE ");
-			}
 
 			if (elementWhere != null) {
 				first = false;
@@ -102,16 +88,15 @@ public class PajeEventProxyQuery extends EventQuery {
 				eventQuery.append(getParamConditionsString());
 			}
 
-			if (orderBy) {
+			if (orderBy)
 				eventQuery.append(" ORDER BY " + orderByColumn + " " + orderByCriterium);
-			}
 
-			String query = eventQuery.toString();
+			final String query = eventQuery.toString();
 			debug(query);
 
-			Statement stm = dbObj.getConnection().createStatement();
+			final Statement stm = dbObj.getConnection().createStatement();
 
-			ResultSet rs = stm.executeQuery(query);
+			final ResultSet rs = stm.executeQuery(query);
 			List<PajeEventProxy> elist = null;
 			elist = rebuildEventID(rs);
 
@@ -120,22 +105,21 @@ public class PajeEventProxyQuery extends EventQuery {
 			stm.close();
 			return elist;
 
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			throw new SoCTraceException(e);
 		}
 
 	}
 
-	private List<PajeEventProxy> rebuildEventID(ResultSet rs) throws SoCTraceException {
+	private List<PajeEventProxy> rebuildEventID(final ResultSet rs) throws SoCTraceException {
 
-		List<PajeEventProxy> list = new LinkedList<PajeEventProxy>();
+		final List<PajeEventProxy> list = new LinkedList<PajeEventProxy>();
 		try {
 
-			while (rs.next()) {
+			while (rs.next())
 				list.add(new PajeEventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID")));
-			}
 			return list;
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			throw new SoCTraceException(e);
 		}
 	}

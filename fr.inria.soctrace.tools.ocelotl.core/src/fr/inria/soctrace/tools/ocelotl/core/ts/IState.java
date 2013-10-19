@@ -2,15 +2,14 @@ package fr.inria.soctrace.tools.ocelotl.core.ts;
 
 import java.util.Map;
 
-import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public interface IState {
-	public TimeRegion getTimeRegion();
+	public int getEventProducerID();
 
 	public String getStateType();
 
-	public int getEventProducerID();
+	public TimeRegion getTimeRegion();
 
 	public Map<Long, Long> getTimeSlicesDistribution();
 

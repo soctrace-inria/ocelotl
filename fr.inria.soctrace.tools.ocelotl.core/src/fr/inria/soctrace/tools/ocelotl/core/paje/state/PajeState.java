@@ -20,7 +20,6 @@
 package fr.inria.soctrace.tools.ocelotl.core.paje.state;
 
 import fr.inria.soctrace.lib.model.Event;
-import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;

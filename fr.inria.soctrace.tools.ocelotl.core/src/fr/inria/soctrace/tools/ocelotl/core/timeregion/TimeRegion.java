@@ -34,14 +34,20 @@ public class TimeRegion {
 		setTimeStampEnd(timeStampEnd);
 	}
 
-	public TimeRegion(TimeRegion time) {
+	public TimeRegion(final TimeRegion time) {
 		super();
 		setTimeStampStart(time.getTimeStampStart());
 		setTimeStampEnd(time.getTimeStampEnd());
 	}
 
-	public boolean compareTimeRegion(TimeRegion timeRegion) {
-		return ((this.getTimeStampStart() == timeRegion.getTimeStampStart()) && (this.getTimeStampEnd() == timeRegion.getTimeStampEnd()));
+	public boolean compareTimeRegion(final TimeRegion timeRegion) {
+		return getTimeStampStart() == timeRegion.getTimeStampStart() && getTimeStampEnd() == timeRegion.getTimeStampEnd();
+	}
+
+	public boolean containsTimeStamp(final long timeStamp) {
+		if (timeStamp < timeStampStart || timeStamp > timeStampEnd)
+			return false;
+		return true;
 	}
 
 	public long getTimeDuration() {
@@ -71,12 +77,6 @@ public class TimeRegion {
 	public void setTimeStampStart(final long timeStampStart) {
 		if (timeStampStart <= timeStampEnd)
 			this.timeStampStart = timeStampStart;
-	}
-
-	public boolean containsTimeStamp(final long timeStamp) {
-		if (timeStamp < timeStampStart || timeStamp > timeStampEnd)
-			return false;
-		return true;
 	}
 
 	@Override

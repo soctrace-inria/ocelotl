@@ -8,13 +8,15 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
 public interface IAggregationOperator {
 
-	public Query getQueries();
+	public ILPAggregManager createManager();
 
 	// public void setQueries(Query query) throws SoCTraceException;
 
-	public void setOcelotlParameters(OcelotlParameters parameters) throws SoCTraceException;
+	public String descriptor();
 
 	public OcelotlParameters getOcelotlParameters();
+
+	public Query getQueries();
 
 	public TimeSliceManager getTimeSlicesManager();
 
@@ -26,9 +28,7 @@ public interface IAggregationOperator {
 
 	public void print();
 
-	public ILPAggregManager createManager();
-
-	public String descriptor();
+	public void setOcelotlParameters(OcelotlParameters parameters) throws SoCTraceException;
 
 	public String traceType();
 

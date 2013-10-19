@@ -23,9 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlParameters {
@@ -48,56 +46,16 @@ public class OcelotlParameters {
 	private int					thread				= 5;
 	private TraceTypeConfig		traceTypeConfig;
 
-	public TraceTypeConfig getTraceTypeConfig() {
-		return traceTypeConfig;
-	}
-
-	public void setTraceTypeConfig(TraceTypeConfig traceTypeConfig) {
-		this.traceTypeConfig = traceTypeConfig;
-	}
-
-	public boolean isGrowingQualities() {
-		return growingQualities;
-	}
-
-	public void setGrowingQualities(boolean growingQualities) {
-		this.growingQualities = growingQualities;
-	}
-
 	public OcelotlParameters() {
 		super();
-	}
-
-	public boolean isCache() {
-		return cache;
-	}
-
-	public void setCache(boolean cache) {
-		this.cache = cache;
-	}
-
-	public int getEpCache() {
-		return epCache;
-	}
-
-	public void setEpCache(int epCache) {
-		this.epCache = epCache;
-	}
-
-	public int getPageCache() {
-		return pageCache;
-	}
-
-	public void setPageCache(int pageCache) {
-		this.pageCache = pageCache;
 	}
 
 	public String getAggOperator() {
 		return aggOperator;
 	}
 
-	public void setAggOperator(String aggOperator) {
-		this.aggOperator = aggOperator;
+	public int getEpCache() {
+		return epCache;
 	}
 
 	public List<EventProducer> getEventProducers() {
@@ -108,13 +66,17 @@ public class OcelotlParameters {
 		return maxEventProducers;
 	}
 
+	public int getPageCache() {
+		return pageCache;
+	}
+
 	public float getParameter() {
 		return parameter;
 	}
 
-	// public List<String> getSleepingStates() {
-	// return sleepingStates;
-	// }
+	public int getThread() {
+		return thread;
+	}
 
 	public float getThreshold() {
 		return threshold;
@@ -132,12 +94,44 @@ public class OcelotlParameters {
 		return trace;
 	}
 
+	public TraceTypeConfig getTraceTypeConfig() {
+		return traceTypeConfig;
+	}
+
+	public boolean isCache() {
+		return cache;
+	}
+
+	public boolean isGrowingQualities() {
+		return growingQualities;
+	}
+
 	public boolean isNormalize() {
 		return normalize;
 	}
 
+	// public List<String> getSleepingStates() {
+	// return sleepingStates;
+	// }
+
+	public void setAggOperator(final String aggOperator) {
+		this.aggOperator = aggOperator;
+	}
+
+	public void setCache(final boolean cache) {
+		this.cache = cache;
+	}
+
+	public void setEpCache(final int epCache) {
+		this.epCache = epCache;
+	}
+
 	public void setEventProducers(final List<EventProducer> eventProducers) {
 		this.eventProducers = eventProducers;
+	}
+
+	public void setGrowingQualities(final boolean growingQualities) {
+		this.growingQualities = growingQualities;
 	}
 
 	public void setMaxEventProducers(final int maxEventProducers) {
@@ -148,6 +142,10 @@ public class OcelotlParameters {
 		this.normalize = normalize;
 	}
 
+	public void setPageCache(final int pageCache) {
+		this.pageCache = pageCache;
+	}
+
 	public void setParameter(final float parameter) {
 		this.parameter = parameter;
 	}
@@ -155,6 +153,10 @@ public class OcelotlParameters {
 	// public void setSleepingStates(final List<String> sleepingStates) {
 	// this.sleepingStates = sleepingStates;
 	// }
+
+	public void setThread(final int thread) {
+		this.thread = thread;
+	}
 
 	public void setThreshold(final float threshold) {
 		this.threshold = threshold;
@@ -168,10 +170,6 @@ public class OcelotlParameters {
 		this.timeSlicesNumber = timeSlicesNumber;
 	}
 
-	public void setTrace(final Trace trace) {
-		this.trace = trace;
-	}
-
 	// @Override
 	// public String toString() { // TODO update this
 	// final StringBuilder builder = new StringBuilder();
@@ -180,12 +178,12 @@ public class OcelotlParameters {
 	// return builder.toString();
 	// }
 
-	public int getThread() {
-		return thread;
+	public void setTrace(final Trace trace) {
+		this.trace = trace;
 	}
 
-	public void setThread(int thread) {
-		this.thread = thread;
+	public void setTraceTypeConfig(final TraceTypeConfig traceTypeConfig) {
+		this.traceTypeConfig = traceTypeConfig;
 	}
 
 }

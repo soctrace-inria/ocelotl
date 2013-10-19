@@ -9,20 +9,45 @@
 package fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni;
 
 public class LPAggregWrapper {
+	protected static long getCPtr(final LPAggregWrapper obj) {
+		return obj == null ? 0 : obj.swigCPtr;
+	}
+
 	private long		swigCPtr;
+
 	protected boolean	swigCMemOwn;
 
-	protected LPAggregWrapper(long cPtr, boolean cMemoryOwn) {
+	public LPAggregWrapper(final int dimension) {
+		this(lpaggregJNI.new_LPAggregWrapper(dimension), true);
+	}
+
+	protected LPAggregWrapper(final long cPtr, final boolean cMemoryOwn) {
 		swigCMemOwn = cMemoryOwn;
 		swigCPtr = cPtr;
 	}
 
-	protected static long getCPtr(LPAggregWrapper obj) {
-		return (obj == null) ? 0 : obj.swigCPtr;
+	public void addMatrix() {
+		lpaggregJNI.LPAggregWrapper_addMatrix(swigCPtr, this);
 	}
 
-	protected void finalize() {
-		delete();
+	public void addVector() {
+		lpaggregJNI.LPAggregWrapper_addVector__SWIG_0(swigCPtr, this);
+	}
+
+	public void addVector(final int i) {
+		lpaggregJNI.LPAggregWrapper_addVector__SWIG_1(swigCPtr, this, i);
+	}
+
+	public void computeDichotomy(final float threshold) {
+		lpaggregJNI.LPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
+	}
+
+	public void computeParts(final float parameter) {
+		lpaggregJNI.LPAggregWrapper_computeParts(swigCPtr, this, parameter);
+	}
+
+	public void computeQualities(final boolean normalization) {
+		lpaggregJNI.LPAggregWrapper_computeQualities(swigCPtr, this, normalization);
 	}
 
 	public synchronized void delete() {
@@ -35,19 +60,28 @@ public class LPAggregWrapper {
 		}
 	}
 
-	public LPAggregWrapper(int dimension) {
-		this(lpaggregJNI.new_LPAggregWrapper(dimension), true);
+	@Override
+	protected void finalize() {
+		delete();
 	}
 
-	public int getPart(int index) {
-		return lpaggregJNI.LPAggregWrapper_getPart(swigCPtr, this, index);
+	public double getGainByIndex(final int index) {
+		return lpaggregJNI.LPAggregWrapper_getGainByIndex(swigCPtr, this, index);
 	}
 
-	public int getPartNumber() {
-		return lpaggregJNI.LPAggregWrapper_getPartNumber(swigCPtr, this);
+	public double getGainByParameter(final float parameter) {
+		return lpaggregJNI.LPAggregWrapper_getGainByParameter(swigCPtr, this, parameter);
 	}
 
-	public float getParameter(int index) {
+	public double getLossByIndex(final int index) {
+		return lpaggregJNI.LPAggregWrapper_getLossByIndex(swigCPtr, this, index);
+	}
+
+	public double getLossByParameter(final float parameter) {
+		return lpaggregJNI.LPAggregWrapper_getLossByParameter(swigCPtr, this, parameter);
+	}
+
+	public float getParameter(final int index) {
 		return lpaggregJNI.LPAggregWrapper_getParameter(swigCPtr, this, index);
 	}
 
@@ -55,68 +89,36 @@ public class LPAggregWrapper {
 		return lpaggregJNI.LPAggregWrapper_getParameterNumber(swigCPtr, this);
 	}
 
-	public double getGainByIndex(int index) {
-		return lpaggregJNI.LPAggregWrapper_getGainByIndex(swigCPtr, this, index);
+	public int getPart(final int index) {
+		return lpaggregJNI.LPAggregWrapper_getPart(swigCPtr, this, index);
 	}
 
-	public double getGainByParameter(float parameter) {
-		return lpaggregJNI.LPAggregWrapper_getGainByParameter(swigCPtr, this, parameter);
+	public int getPartNumber() {
+		return lpaggregJNI.LPAggregWrapper_getPartNumber(swigCPtr, this);
 	}
 
-	public double getLossByIndex(int index) {
-		return lpaggregJNI.LPAggregWrapper_getLossByIndex(swigCPtr, this, index);
-	}
-
-	public double getLossByParameter(float parameter) {
-		return lpaggregJNI.LPAggregWrapper_getLossByParameter(swigCPtr, this, parameter);
-	}
-
-	public void computeQualities(boolean normalization) {
-		lpaggregJNI.LPAggregWrapper_computeQualities(swigCPtr, this, normalization);
-	}
-
-	public void computeParts(float parameter) {
-		lpaggregJNI.LPAggregWrapper_computeParts(swigCPtr, this, parameter);
-	}
-
-	public void computeDichotomy(float threshold) {
-		lpaggregJNI.LPAggregWrapper_computeDichotomy(swigCPtr, this, threshold);
-	}
-
-	public void setValue(int i, double value) {
-		lpaggregJNI.LPAggregWrapper_setValue__SWIG_0(swigCPtr, this, i, value);
-	}
-
-	public void push_back(double value) {
+	public void push_back(final double value) {
 		lpaggregJNI.LPAggregWrapper_push_back__SWIG_0(swigCPtr, this, value);
 	}
 
-	public void addVector() {
-		lpaggregJNI.LPAggregWrapper_addVector__SWIG_0(swigCPtr, this);
-	}
-
-	public void setValue(int i, int j, double value) {
-		lpaggregJNI.LPAggregWrapper_setValue__SWIG_1(swigCPtr, this, i, j, value);
-	}
-
-	public void push_back(int i, double value) {
+	public void push_back(final int i, final double value) {
 		lpaggregJNI.LPAggregWrapper_push_back__SWIG_1(swigCPtr, this, i, value);
 	}
 
-	public void addMatrix() {
-		lpaggregJNI.LPAggregWrapper_addMatrix(swigCPtr, this);
-	}
-
-	public void setValue(int i, int j, int k, double value) {
-		lpaggregJNI.LPAggregWrapper_setValue__SWIG_2(swigCPtr, this, i, j, k, value);
-	}
-
-	public void addVector(int i) {
-		lpaggregJNI.LPAggregWrapper_addVector__SWIG_1(swigCPtr, this, i);
-	}
-
-	public void push_back(int i, int j, double value) {
+	public void push_back(final int i, final int j, final double value) {
 		lpaggregJNI.LPAggregWrapper_push_back__SWIG_2(swigCPtr, this, i, j, value);
+	}
+
+	public void setValue(final int i, final double value) {
+		lpaggregJNI.LPAggregWrapper_setValue__SWIG_0(swigCPtr, this, i, value);
+	}
+
+	public void setValue(final int i, final int j, final double value) {
+		lpaggregJNI.LPAggregWrapper_setValue__SWIG_1(swigCPtr, this, i, j, value);
+	}
+
+	public void setValue(final int i, final int j, final int k, final double value) {
+		lpaggregJNI.LPAggregWrapper_setValue__SWIG_2(swigCPtr, this, i, j, k, value);
 	}
 
 }

@@ -22,9 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
-import fr.inria.soctrace.lib.model.TraceType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.TraceTypeConfig;
@@ -32,7 +30,6 @@ import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeNormalizedStateSum
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateTypeSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class AggregationOperatorManager {
@@ -42,17 +39,39 @@ public class AggregationOperatorManager {
 	ArrayList<String>						Names;
 	OcelotlParameters						parameters;
 
-	public AggregationOperatorManager(OcelotlParameters parameters) {
+	public AggregationOperatorManager(final OcelotlParameters parameters) {
 		super();
 		this.parameters = parameters;
 		try {
 			init();
 			initConfig();
-		} catch (SoCTraceException e) {
+		} catch (final SoCTraceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+	}
+
+	public TraceTypeConfig config(final IAggregationOperator op) {
+		return Config.get(op.traceType());
+	}
+
+	public TraceTypeConfig config(final String op) {
+		return Config.get(List.get(op).traceType());
+	}
+
+	public Collection<IAggregationOperator> getList() {
+		return List.values();
+	}
+
+	public IAggregationOperator getOperator(final String name) throws SoCTraceException {
+		final IAggregationOperator op = List.get(name);
+		op.setOcelotlParameters(parameters);
+		return op;
+	}
+
+	public String getType(final String op) {
+		return List.get(op).traceType();
 	}
 
 	private void init() throws SoCTraceException {
@@ -66,28 +85,6 @@ public class AggregationOperatorManager {
 	private void initConfig() throws SoCTraceException {
 		Config = new HashMap<String, TraceTypeConfig>();
 		Config.put(PajeConstants.PajeFormatName, new PajeConfig());
-	}
-
-	public Collection<IAggregationOperator> getList() {
-		return List.values();
-	}
-
-	public IAggregationOperator getOperator(String name) throws SoCTraceException {
-		IAggregationOperator op = List.get(name);
-		op.setOcelotlParameters(parameters);
-		return op;
-	}
-
-	public TraceTypeConfig config(IAggregationOperator op) {
-		return Config.get(op.traceType());
-	}
-
-	public TraceTypeConfig config(String op) {
-		return Config.get(List.get(op).traceType());
-	}
-
-	public String getType(String op) {
-		return List.get(op).traceType();
 	}
 
 }

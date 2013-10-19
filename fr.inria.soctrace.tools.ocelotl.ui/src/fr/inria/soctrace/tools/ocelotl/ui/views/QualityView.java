@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.Quality;
 
 /**
@@ -53,6 +52,41 @@ import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.Quality;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 public class QualityView {
+
+	class ParamMouseListener implements MouseListener {
+
+		State	state	= State.RELEASED;
+
+		@Override
+		public void mouseDoubleClicked(final MouseEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void mousePressed(final MouseEvent arg0) {
+			state = State.PRESSED;
+			if (qualities != null)
+				if (arg0.x > XBorder && arg0.x < root.getSize().width() - Border) {
+					final float param = 1 - (float) (arg0.x - XBorder) / (root.getSize().width() - XBorder - Border);
+					ocelotlView.getParam().setText(String.valueOf(param));
+					ocelotlView.setConfiguration();
+					createDiagram();
+				}
+		}
+
+		@Override
+		public void mouseReleased(final MouseEvent arg0) {
+			state = State.RELEASED;
+			ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
+
+		}
+
+	}
+
+	static public enum State {
+		PRESSED, RELEASED;
+	}
 
 	private Figure				root;
 	private Canvas				canvas;
@@ -73,7 +107,9 @@ public class QualityView {
 	private List<Quality>		qualities;
 	private float				currentParameter;
 	private final OcelotlView	ocelotlView;
+
 	private final static float	ParamLineWidth		= 1.8F;
+
 	private final static float	QualityLineWidth	= 2.0F;
 
 	public QualityView(final OcelotlView lpaggregView) {
@@ -276,38 +312,6 @@ public class QualityView {
 		root.addMouseListener(new ParamMouseListener());
 
 		return canvas;
-	}
-
-	static public enum State {
-		PRESSED, RELEASED;
-	}
-
-	class ParamMouseListener implements MouseListener {
-
-		State	state	= State.RELEASED;
-
-		public void mouseDoubleClicked(final MouseEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		public void mousePressed(final MouseEvent arg0) {
-			state = State.PRESSED;
-			if (qualities != null)
-				if (arg0.x > XBorder && arg0.x < root.getSize().width() - Border) {
-					final float param = 1 - (float) (arg0.x - XBorder) / (root.getSize().width() - XBorder - Border);
-					ocelotlView.getParam().setText(String.valueOf(param));
-					ocelotlView.setConfiguration();
-					createDiagram();
-				}
-		}
-
-		public void mouseReleased(final MouseEvent arg0) {
-			state = State.RELEASED;
-			ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
-
-		}
-
 	}
 
 	public void resizeDiagram() {
