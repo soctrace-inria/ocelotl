@@ -44,13 +44,13 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class PajeStateTypeSum extends CubicMatrix {
 
-	public final static String 									descriptor								="State Type Sum";
-	public final static String 									traceType								=PajeConstants.PajeFormatName;
+	public final static String	descriptor	= "State Type Sum";
+	public final static String	traceType	= PajeConstants.PajeFormatName;
 
 	public PajeStateTypeSum(final OcelotlParameters parameters) throws SoCTraceException {
 		super(parameters);
 	}
-	
+
 	public PajeStateTypeSum() throws SoCTraceException {
 		super();
 	}
@@ -88,8 +88,8 @@ public class PajeStateTypeSum extends CubicMatrix {
 			IState state;
 			final List<PajeReducedEvent> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
-				state=new PajeState(events.get(i), events.get(i + 1), timeSliceManager);
-				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())){
+				state = new PajeState(events.get(i), events.get(i + 1), timeSliceManager);
+				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 						System.out.println("Adding " + state.getStateType() + " state");
@@ -104,7 +104,7 @@ public class PajeStateTypeSum extends CubicMatrix {
 		}
 		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
+
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException {
 		int count = 0;
 		DeltaManager dm = new DeltaManager();
@@ -126,8 +126,8 @@ public class PajeStateTypeSum extends CubicMatrix {
 			IState state;
 			final List<PajeEventProxy> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
-				state=(new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())){
+				state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
+				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 						System.out.println("Adding " + state.getStateType() + " state");
@@ -144,11 +144,11 @@ public class PajeStateTypeSum extends CubicMatrix {
 		}
 		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
+
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (query.getOcelotlParameters().isCache()){
+		if (query.getOcelotlParameters().isCache()) {
 			computeSubMatrixCached(eventProducers);
-		}else{
+		} else {
 			computeSubMatrixNonCached(eventProducers);
 		}
 	}
@@ -163,9 +163,4 @@ public class PajeStateTypeSum extends CubicMatrix {
 		return traceType;
 	}
 
-
-	
-
 }
-
-

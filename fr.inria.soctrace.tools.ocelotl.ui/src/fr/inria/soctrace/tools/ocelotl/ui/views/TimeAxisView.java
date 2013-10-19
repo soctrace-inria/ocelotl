@@ -53,7 +53,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.QualityView.State;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 public class TimeAxisView {
-	
+
 	private class SelectFigure extends RectangleFigure {
 
 		public SelectFigure() {
@@ -72,8 +72,9 @@ public class TimeAxisView {
 				setForegroundColor(MatrixView.selectColorFG);
 				setBackgroundColor(MatrixView.selectColorBG);
 			}
-			root.add(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height-2), new Point((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart())
-					* (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), -1)));
+			root.add(this,
+					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height - 2), new Point(
+							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), -1)));
 		}
 
 	}
@@ -97,7 +98,6 @@ public class TimeAxisView {
 	int					Space			= 6;
 	private OcelotlView	ocelotlView;
 	SelectFigure		selectFigure;
-	
 
 	public TimeAxisView(OcelotlView ocelotlView) {
 		super();
@@ -114,10 +114,10 @@ public class TimeAxisView {
 		}
 		canvas.update();
 	}
-	
+
 	public void createDiagram(TimeRegion time, TimeRegion timeRegion, boolean active) {
 		root.removeAll();
-		this.time=time;
+		this.time = time;
 		if (time != null) {
 			drawMainLine();
 			drawGrads();
@@ -125,8 +125,6 @@ public class TimeAxisView {
 		}
 		canvas.update();
 	}
-	
-	
 
 	public void drawGrads() {
 		grads();
@@ -236,18 +234,14 @@ public class TimeAxisView {
 		createDiagram(time);
 		root.repaint();
 	}
-	
+
 	public void select(TimeRegion timeRegion, boolean active) {
 		createDiagram(time, timeRegion, active);
 		root.repaint();
 	}
-	
+
 	public void unselect() {
 		resizeDiagram();
 	}
-	
-	
-
-	
 
 }

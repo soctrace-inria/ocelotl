@@ -48,7 +48,7 @@ public abstract class PajeConstants {
 	public final static String	PajeCreateContainerEventDefParamTypeName	= "Type";
 
 	public final static String	PajeCreateContainerEventDefParamNameName	= "Name";
-	
+
 	public final static String	PajeCreateContainerEventDefParamAliasName	= "Alias";
 
 	public final static long	NoTimestamp									= -1L;

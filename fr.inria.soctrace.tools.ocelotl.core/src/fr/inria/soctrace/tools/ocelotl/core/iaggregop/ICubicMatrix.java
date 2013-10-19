@@ -27,7 +27,7 @@ import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
-public interface ICubicMatrix extends IAggregationOperator{
+public interface ICubicMatrix extends IAggregationOperator {
 
 	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
 

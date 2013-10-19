@@ -41,7 +41,7 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 public abstract class CubicMatrix implements ICubicMatrix {
 
 	protected Query											query;
-	protected OcelotlParameters				parameters;
+	protected OcelotlParameters								parameters;
 	protected List<HashMap<String, HashMap<String, Long>>>	matrix;
 	protected int											eventsNumber;
 	protected TimeSliceManager								timeSliceManager;
@@ -109,7 +109,7 @@ public abstract class CubicMatrix implements ICubicMatrix {
 
 	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException {
-		this.parameters=parameters;
+		this.parameters = parameters;
 		this.query = new Query(parameters);
 		query.checkTimeStamps();
 		matrix = new ArrayList<HashMap<String, HashMap<String, Long>>>();
@@ -117,20 +117,18 @@ public abstract class CubicMatrix implements ICubicMatrix {
 		initVectors();
 		computeMatrix();
 	}
-	
-	public OcelotlParameters getOcelotlParameters(){
+
+	public OcelotlParameters getOcelotlParameters() {
 		return parameters;
 	}
-	
-	
-	
+
 	public Query getQuery() {
 		return query;
 	}
 
-	public MLPAggregManager createManager(){
+	public MLPAggregManager createManager() {
 		return new MLPAggregManager(this);
-		
+
 	}
 
 }

@@ -43,7 +43,7 @@ public class PajeEventManager {
 
 	private PajeEventTypeManager	eventTypesManager;
 
-	private PajeEventProducer			defaultEventProducer;
+	private PajeEventProducer		defaultEventProducer;
 	private static final String		defaultEventProducerLocalId	= "NoId";
 	private static final String		defaultEventProducerName	= "NoProducer";
 	private static final String		defaultEventProducerType	= "NoType";
@@ -52,7 +52,7 @@ public class PajeEventManager {
 	private IdManager				eventParamIdManager			= new IdManager();
 	private IdManager				eventProducerIdManager		= new IdManager();
 	private List<Event>				events;
-	private List<PajeEventProducer>		eventProducers;
+	private List<PajeEventProducer>	eventProducers;
 
 	/**
 	 * Constructor set a default Event Producer because of non management of
@@ -109,7 +109,7 @@ public class PajeEventManager {
 			// if the param is a container, set event producer
 			if (currentEventType.getEventParamTypes().get(i).getName().equals(PajeConstants.PajeEventDefParamContainerName))
 				for (PajeEventProducer it : eventProducers)
-					if (it.getName().equals(param.get(i))||it.getAlias().equals(param.get(i))) {
+					if (it.getName().equals(param.get(i)) || it.getAlias().equals(param.get(i))) {
 						currentEvent.setEventProducer(it);
 						break;
 					}

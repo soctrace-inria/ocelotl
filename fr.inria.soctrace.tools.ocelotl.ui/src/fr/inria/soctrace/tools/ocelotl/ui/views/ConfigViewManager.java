@@ -12,21 +12,21 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 
 public class ConfigViewManager {
-	
-	OcelotlView ocelotlView;
+
+	OcelotlView	ocelotlView;
 
 	public ConfigViewManager(OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
 	}
-	
-	public void openConfigWindows(){
+
+	public void openConfigWindows() {
 		ApplicationWindow window = null;
 		if (ocelotlView.getCore().getOperators().getType(ocelotlView.getComboAggregationOperator().getText()).equals(PajeConstants.PajeFormatName))
 			window = new PajeView(ocelotlView, (PajeConfig) ocelotlView.getCore().getOcelotlParameters().getTraceTypeConfig());
 		window.setBlockOnOpen(true);
 		window.open();
-		
+
 	}
 
 }

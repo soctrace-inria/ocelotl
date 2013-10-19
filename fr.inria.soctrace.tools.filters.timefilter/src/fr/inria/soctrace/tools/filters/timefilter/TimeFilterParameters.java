@@ -29,14 +29,13 @@ import fr.inria.soctrace.lib.model.EventType;
 
 public class TimeFilterParameters {
 
-	private String label;
-	private boolean include;
-	private boolean event;
-	private TimeRegion timeRegion;
-	private Trace trace = null;
-	private List<EventType> eventTypes= null;
-	private List<String> values=null;
-	
+	private String			label;
+	private boolean			include;
+	private boolean			event;
+	private TimeRegion		timeRegion;
+	private Trace			trace		= null;
+	private List<EventType>	eventTypes	= null;
+	private List<String>	values		= null;
 
 	public TimeFilterParameters() {
 		super();
@@ -97,5 +96,5 @@ public class TimeFilterParameters {
 	public void setTrace(Trace trace) {
 		this.trace = trace;
 	}
-	
+
 }

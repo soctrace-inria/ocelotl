@@ -36,35 +36,34 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
  * Query class for Event self-defining-pattern tables.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
- *
+ * 
  */
 public class PajeEventProxyQuery extends EventQuery {
 
-	private static final boolean USE_JOIN = false; 
-	
+	private static final boolean	USE_JOIN	= false;
 
 	/**
 	 * The constructor
-	 * @param traceDB Trace DB object where the query is performed.
+	 * 
+	 * @param traceDB
+	 *            Trace DB object where the query is performed.
 	 */
 	public PajeEventProxyQuery(TraceDBObject traceDB) {
 		super(traceDB);
 		clear();
 	}
 
-	
-public List<PajeEventProxy> getIDList() throws SoCTraceException {
-		
+	public List<PajeEventProxy> getIDList() throws SoCTraceException {
+
 		try {
 			DeltaManager dm = new DeltaManager();
 			dm.start();
-			
+
 			boolean first = true;
 			StringBuffer eventQuery = null;
 			if (USE_JOIN) {
 				debug("Experimental query with join");
-				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM
-						+ " on " +  FramesocTable.EVENT + ".ID = " +  FramesocTable.EVENT_PARAM + ".EVENT_ID ");
+				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM + " on " + FramesocTable.EVENT + ".ID = " + FramesocTable.EVENT_PARAM + ".EVENT_ID ");
 			} else {
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
 			}
@@ -83,20 +82,18 @@ public List<PajeEventProxy> getIDList() throws SoCTraceException {
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " 
-					+ FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
-			} 
+				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
+			}
 
 			if (eventProducerWhere != null) {
 				if (!first)
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " 
-					+ FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
-			} 
+				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
+			}
 
-			if (parametersConditions.size()>0) {
+			if (parametersConditions.size() > 0) {
 				if (!first)
 					eventQuery.append(" AND ");
 				else
@@ -113,16 +110,16 @@ public List<PajeEventProxy> getIDList() throws SoCTraceException {
 			debug(query);
 
 			Statement stm = dbObj.getConnection().createStatement();
-			
+
 			ResultSet rs = stm.executeQuery(query);
 			List<PajeEventProxy> elist = null;
 			elist = rebuildEventID(rs);
 
 			debug(dm.endMessage("EventQuery.getList()"));
-			
+
 			stm.close();
 			return elist;
-			
+
 		} catch (SQLException e) {
 			throw new SoCTraceException(e);
 		}
@@ -130,10 +127,10 @@ public List<PajeEventProxy> getIDList() throws SoCTraceException {
 	}
 
 	private List<PajeEventProxy> rebuildEventID(ResultSet rs) throws SoCTraceException {
-				
+
 		List<PajeEventProxy> list = new LinkedList<PajeEventProxy>();
-		try {		
-		
+		try {
+
 			while (rs.next()) {
 				list.add(new PajeEventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID")));
 			}
@@ -143,6 +140,3 @@ public List<PajeEventProxy> getIDList() throws SoCTraceException {
 		}
 	}
 }
-
-
-

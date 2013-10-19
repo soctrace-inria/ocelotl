@@ -39,20 +39,20 @@ public abstract class Matrix implements IMatrix {
 	protected List<HashMap<String, Long>>	matrix;
 	protected int							eventsNumber;
 	protected TimeSliceManager				timeSliceManager;
-	int										count			= 0;
-	int										epit			= 0;
+	int										count	= 0;
+	int										epit	= 0;
 	protected DeltaManager					dm;
-	public final static int 				EPCOUNT			= 200;			
+	public final static int					EPCOUNT	= 200;
 
 	public Matrix(final OcelotlParameters parameters) throws SoCTraceException {
 		super();
 		setOcelotlParameters(parameters);
 	}
-	
+
 	public Matrix() throws SoCTraceException {
 		super();
 	}
-	
+
 	public Query getQuery() {
 		return query;
 	}
@@ -83,7 +83,8 @@ public abstract class Matrix implements IMatrix {
 		dmt.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
 	}
 
-	//protected abstract void computeSubMatrix(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
+	// protected abstract void computeSubMatrix(List<EventProducer>
+	// eventProducers) throws SoCTraceException, InterruptedException;
 
 	public synchronized int getCount() {
 		count++;
@@ -151,26 +152,26 @@ public abstract class Matrix implements IMatrix {
 
 	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException {
-		this.parameters=parameters;
+		this.parameters = parameters;
 		this.query = new Query(parameters);
 		query.checkTimeStamps();
-		count			= 0;
-		epit			= 0;
+		count = 0;
+		epit = 0;
 		matrix = new ArrayList<HashMap<String, Long>>();
 		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
 	}
-	
-	public OcelotlParameters getOcelotlParameters(){
+
+	public OcelotlParameters getOcelotlParameters() {
 		return parameters;
 	}
-	
-	public VLPAggregManager createManager(){
+
+	public VLPAggregManager createManager() {
 		return new VLPAggregManager(this);
-		
+
 	}
-	
+
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		if (query.getOcelotlParameters().isCache()) {
 			computeSubMatrixCached(eventProducers);

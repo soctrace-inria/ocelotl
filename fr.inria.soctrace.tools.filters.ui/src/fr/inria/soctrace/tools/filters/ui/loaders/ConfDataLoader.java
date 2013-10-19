@@ -35,41 +35,40 @@ import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 
-
 /**
- * Convenience class to load Trace data related to
- * Filter tool configuration.
+ * Convenience class to load Trace data related to Filter tool configuration.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
 public class ConfDataLoader {
-	
-	private Trace currentTrace = null;
-	private List<Trace> traces;
-	private long minTimestamp;
-	private long maxTimestamp;
-	private TraceDBObject traceDB = null;
-	private List<EventType>			types;
-	
+
+	private Trace			currentTrace	= null;
+	private List<Trace>		traces;
+	private long			minTimestamp;
+	private long			maxTimestamp;
+	private TraceDBObject	traceDB			= null;
+	private List<EventType>	types;
+
 	/**
 	 * The constructor.
 	 */
 	public ConfDataLoader() {
 		clean();
 	}
-	
+
 	public List<Trace> loadTraces() throws SoCTraceException {
 		SystemDBObject sysDB = FramesocManager.getInstance().getSystemDB();
 		TraceQuery tQuery = new TraceQuery(sysDB);
 		traces = tQuery.getList();
 		sysDB.close();
-		return traces;		
+		return traces;
 	}
-	
+
 	/**
 	 * Load the information related to the new Trace.
 	 * 
-	 * @param trace trace to consider
+	 * @param trace
+	 *            trace to consider
 	 * @throws SoCTraceException
 	 */
 	public void load(final Trace trace) throws SoCTraceException {
@@ -82,11 +81,11 @@ public class ConfDataLoader {
 		types = tQuery.getList();
 		traceDB.close();
 	}
-	
+
 	public Trace getCurrentTrace() {
 		return currentTrace;
-	} 
-	
+	}
+
 	public List<Trace> getTraces() {
 		return traces;
 	}
@@ -98,12 +97,12 @@ public class ConfDataLoader {
 	public long getMaxTimestamp() {
 		return maxTimestamp;
 	}
-	
+
 	private void clean() {
 		currentTrace = null;
 		minTimestamp = maxTimestamp = 0;
 	}
-	
+
 	/**
 	 * Debug print method
 	 */
@@ -120,7 +119,5 @@ public class ConfDataLoader {
 	public void setTypes(List<EventType> types) {
 		this.types = types;
 	}
-	
-	
-	
+
 }

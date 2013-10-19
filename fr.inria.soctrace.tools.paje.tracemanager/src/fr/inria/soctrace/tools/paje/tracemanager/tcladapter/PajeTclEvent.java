@@ -1,3 +1,4 @@
+
 package fr.inria.soctrace.tools.paje.tracemanager.tcladapter;
 
 import java.util.ArrayList;
@@ -18,13 +19,13 @@ import fr.inria.soctrace.framesoc.ui.tcl.ITChartsEvent;
  */
 public class PajeTclEvent implements ITChartsEvent {
 
-	private final static int DEFAULT_EVENT_HEIGHT = 30;
-	
-	private final IFigure figure;
-	private final long startTime;
-	private final long endTime;
-	private List<ITChartsEvent> outlinkedEvents;
-	
+	private final static int	DEFAULT_EVENT_HEIGHT	= 30;
+
+	private final IFigure		figure;
+	private final long			startTime;
+	private final long			endTime;
+	private List<ITChartsEvent>	outlinkedEvents;
+
 	public PajeTclEvent(long startTime, long endTime) {
 		this.figure = createRect(ColorConstants.red, DEFAULT_EVENT_HEIGHT);
 		this.startTime = startTime;
@@ -61,19 +62,19 @@ public class PajeTclEvent implements ITChartsEvent {
 	public void setOutlinkedEvents(List<ITChartsEvent> outlinkedEvents) {
 		this.outlinkedEvents = outlinkedEvents;
 	}
-	
+
 	@Override
 	public void addOutlinkedEvent(ITChartsEvent event) {
 		outlinkedEvents.add(event);
 	}
-	
+
 	private RectangleFigure createRect(Color color, int height) {
-		RectangleFigure rectangle = new RectangleFigure();	
+		RectangleFigure rectangle = new RectangleFigure();
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setBackgroundColor(color);
 		rectangle.setOpaque(true);
 		rectangle.setSize(0, height);
 		return rectangle;
 	}
-	
+
 }

@@ -37,19 +37,21 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
  * Query class for Event self-defining-pattern tables.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
- *
+ * 
  */
 public class EventQuery extends SelfDefiningElementQuery {
 
-	protected static final boolean USE_JOIN = false; 
-	
-	protected ICondition typeWhere;
-	protected ICondition eventProducerWhere;	
-	private ModelElementCache eventProducerCache;
+	protected static final boolean	USE_JOIN	= false;
+
+	protected ICondition			typeWhere;
+	protected ICondition			eventProducerWhere;
+	private ModelElementCache		eventProducerCache;
 
 	/**
 	 * The constructor
-	 * @param traceDB Trace DB object where the query is performed.
+	 * 
+	 * @param traceDB
+	 *            Trace DB object where the query is performed.
 	 */
 	public EventQuery(TraceDBObject traceDB) {
 		super(traceDB);
@@ -57,8 +59,8 @@ public class EventQuery extends SelfDefiningElementQuery {
 	}
 
 	/**
-	 * Clear query: removes all the conditions.
-	 * EventProducer cache is not cleared, since we are not changing trace DB.
+	 * Clear query: removes all the conditions. EventProducer cache is not
+	 * cleared, since we are not changing trace DB.
 	 */
 	@Override
 	public void clear() {
@@ -69,7 +71,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 			eventProducerCache.clear();
 		this.eventProducerCache = null;
 	}
-	
+
 	@Override
 	public String getElementTableName() {
 		return FramesocTable.EVENT.toString();
@@ -89,10 +91,12 @@ public class EventQuery extends SelfDefiningElementQuery {
 	public DBObject getDBObject() {
 		return dbObj;
 	}
-	
+
 	/**
 	 * Set the condition to be put in the WHERE clause of EVENT_TYPE table.
-	 * @param typeCondition condition to be applied to the event type table
+	 * 
+	 * @param typeCondition
+	 *            condition to be applied to the event type table
 	 */
 	public void setTypeWhere(ICondition typeCondition) {
 		where = true;
@@ -100,36 +104,37 @@ public class EventQuery extends SelfDefiningElementQuery {
 	}
 
 	/**
-	 * Set the condition to be put in the WHERE clause of EVENT_PRODUCER table. 
-	 * @param eventProducerCondition condition to be applied to the event producer table
+	 * Set the condition to be put in the WHERE clause of EVENT_PRODUCER table.
+	 * 
+	 * @param eventProducerCondition
+	 *            condition to be applied to the event producer table
 	 */
 	public void setEventProducerWhere(ICondition eventProducerCondition) {
 		where = true;
 		this.eventProducerWhere = eventProducerCondition;
 	}
-	
+
 	/**
-	 * Builds a list of Event respecting the condition specified by
-	 * elementWhere AND typeWhere AND eventProducerWhere AND parametersConditions.
-	 * The different parameter conditions are evaluated in OR,
-	 * since they refer to different event types so it makes no sense
-	 * having an AND.
+	 * Builds a list of Event respecting the condition specified by elementWhere
+	 * AND typeWhere AND eventProducerWhere AND parametersConditions. The
+	 * different parameter conditions are evaluated in OR, since they refer to
+	 * different event types so it makes no sense having an AND.
+	 * 
 	 * @return the event list.
 	 * @throws SoCTraceException
 	 */
 	@Override
 	public List<Event> getList() throws SoCTraceException {
-		
+
 		try {
 			DeltaManager dm = new DeltaManager();
 			dm.start();
-			
+
 			boolean first = true;
 			StringBuffer eventQuery = null;
 			if (USE_JOIN) {
 				debug("Experimental query with join");
-				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM
-						+ " on " +  FramesocTable.EVENT + ".ID = " +  FramesocTable.EVENT_PARAM + ".EVENT_ID ");
+				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM + " on " + FramesocTable.EVENT + ".ID = " + FramesocTable.EVENT_PARAM + ".EVENT_ID ");
 			} else {
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
 			}
@@ -148,20 +153,18 @@ public class EventQuery extends SelfDefiningElementQuery {
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " 
-					+ FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
-			} 
+				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
+			}
 
 			if (eventProducerWhere != null) {
 				if (!first)
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " 
-					+ FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
-			} 
+				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
+			}
 
-			if (parametersConditions.size()>0) {
+			if (parametersConditions.size() > 0) {
 				if (!first)
 					eventQuery.append(" AND ");
 				else
@@ -178,7 +181,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 			debug(query);
 
 			Statement stm = dbObj.getConnection().createStatement();
-			
+
 			ResultSet rs = stm.executeQuery(query);
 			List<Event> elist = null;
 			if (USE_JOIN) {
@@ -188,34 +191,34 @@ public class EventQuery extends SelfDefiningElementQuery {
 			}
 
 			debug(dm.endMessage("EventQuery.getList()"));
-			
+
 			stm.close();
 			return elist;
-			
+
 		} catch (SQLException e) {
 			throw new SoCTraceException(e);
 		}
 
 	}
-	
+
 	/*
-	 *      U t i l i t i e s
+	 * U t i l i t i e s
 	 */
-	
-	
+
 	/**
 	 * Get the event type id, given the event type name.
 	 * 
 	 * TODO: this can be optimized with the type cache
-	 * @param name event type name
-	 * @return the corresponding event type ID 
+	 * 
+	 * @param name
+	 *            event type name
+	 * @return the corresponding event type ID
 	 * @throws SoCTraceException
 	 */
 	private int getEventTypeId(String name) throws SoCTraceException {
 		try {
 			Statement stm = dbObj.getConnection().createStatement();
-			ResultSet rs = stm.executeQuery("SELECT * FROM " 
-					+ FramesocTable.EVENT_TYPE + " WHERE NAME='" + name + "'");
+			ResultSet rs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_TYPE + " WHERE NAME='" + name + "'");
 			if (rs.next()) {
 				return rs.getInt("ID");
 			}
@@ -224,22 +227,24 @@ public class EventQuery extends SelfDefiningElementQuery {
 			throw new SoCTraceException(e);
 		}
 	}
-	
+
 	/**
-	 * Get the event param type with the given name, for the event type 
-	 * whose ID is passed.
+	 * Get the event param type with the given name, for the event type whose ID
+	 * is passed.
 	 * 
 	 * TODO: this can be optimized with the type cache
-	 * @param name the event param type name
-	 * @param eventTypeId the event type ID 
+	 * 
+	 * @param name
+	 *            the event param type name
+	 * @param eventTypeId
+	 *            the event type ID
 	 * @return the corresponding event param type
 	 * @throws SoCTraceException
 	 */
 	private ParamType getEventParamType(String name, int eventTypeId) throws SoCTraceException {
 		try {
 			Statement stm = dbObj.getConnection().createStatement();
-			ResultSet rs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM_TYPE + 
-					" WHERE NAME='" + name + "' AND EVENT_TYPE_ID="+eventTypeId);
+			ResultSet rs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM_TYPE + " WHERE NAME='" + name + "' AND EVENT_TYPE_ID=" + eventTypeId);
 			if (rs.next()) {
 				return new ParamType(rs.getInt("ID"), name, rs.getString("TYPE"));
 			}
@@ -248,26 +253,28 @@ public class EventQuery extends SelfDefiningElementQuery {
 			throw new SoCTraceException(e);
 		}
 	}
-	
+
 	/**
 	 * Build the EventProducer object corresponding to the passed ID
-	 * @param id event producer ID
-	 * @return a EventProducer 
+	 * 
+	 * @param id
+	 *            event producer ID
+	 * @return a EventProducer
 	 * @throws SoCTraceException
 	 */
 	private EventProducer getEventProducer(int id) throws SoCTraceException {
-		if (eventProducerCache==null) {
-			 eventProducerCache = new ModelElementCache();
-			 eventProducerCache.addElementMap(EventProducer.class);
+		if (eventProducerCache == null) {
+			eventProducerCache = new ModelElementCache();
+			eventProducerCache.addElementMap(EventProducer.class);
 		}
-		
+
 		EventProducer eventProducer;
-		if (( eventProducer = eventProducerCache.get(EventProducer.class, id)) != null)
+		if ((eventProducer = eventProducerCache.get(EventProducer.class, id)) != null)
 			return eventProducer;
-		
+
 		try {
 			Statement stm = dbObj.getConnection().createStatement();
-			ResultSet rs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PRODUCER + " WHERE ID="+id);
+			ResultSet rs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PRODUCER + " WHERE ID=" + id);
 			if (rs.next()) {
 				eventProducer = new EventProducer(id);
 				eventProducer.setType(rs.getString("TYPE"));
@@ -280,41 +287,42 @@ public class EventQuery extends SelfDefiningElementQuery {
 			return null;
 		} catch (SQLException e) {
 			throw new SoCTraceException(e);
-		}	
+		}
 	}
-	
+
 	/**
 	 * Rebuilds the events corresponding to the result set.
-	 * @param rs Result set corresponding to a SELECT * FROM EVENT ...
+	 * 
+	 * @param rs
+	 *            Result set corresponding to a SELECT * FROM EVENT ...
 	 * @return a list of Event
 	 * @throws SoCTraceException
 	 */
 	private List<Event> rebuildEvents(ResultSet rs) throws SoCTraceException {
-				
+
 		ValueListString vls = new ValueListString();
 		List<Event> list = new LinkedList<Event>();
 		Map<Integer, Event> tmp = new HashMap<Integer, Event>();
-		try {		
-		
+		try {
+
 			while (rs.next()) {
 				Event e = rebuildEvent(rs);
 				list.add(e);
-				
+
 				// to rebuild all params
 				tmp.put(e.getId(), e);
 				vls.addValue(String.valueOf(e.getId()));
 			}
 
-			if (vls.size()==0)
+			if (vls.size() == 0)
 				return list;
-			
+
 			Statement stm = dbObj.getConnection().createStatement();
-			ResultSet prs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM + 
-					" WHERE EVENT_ID IN " + vls.getValueString());
+			ResultSet prs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM + " WHERE EVENT_ID IN " + vls.getValueString());
 			while (prs.next()) {
 				rebuildEventParam(prs, tmp);
 			}
-			
+
 			return list;
 		} catch (SQLException e) {
 			throw new SoCTraceException(e);
@@ -323,16 +331,19 @@ public class EventQuery extends SelfDefiningElementQuery {
 
 	/**
 	 * Rebuilds the events corresponding to the result set.
-	 * @param rs Result set corresponding to a SELECT * FROM EVENT join EVENT_PARAM ...
+	 * 
+	 * @param rs
+	 *            Result set corresponding to a SELECT * FROM EVENT join
+	 *            EVENT_PARAM ...
 	 * @return a list of Event
 	 * @throws SoCTraceException
 	 */
 	private List<Event> rebuildEventsJoin(ResultSet rs) throws SoCTraceException {
 		List<Event> list = new LinkedList<Event>();
 		Map<Integer, Event> tmp = new HashMap<Integer, Event>();
-		try {		
+		try {
 			while (rs.next()) {
-				int id = rs.getInt(1); 
+				int id = rs.getInt(1);
 				if (!tmp.containsKey(id)) {
 					Event e = rebuildEvent(rs);
 					rebuildEventParam(rs, e);
@@ -346,59 +357,66 @@ public class EventQuery extends SelfDefiningElementQuery {
 			return list;
 		} catch (SQLException e) {
 			throw new SoCTraceException(e);
-		}	
+		}
 	}
-	
+
 	/**
 	 * Rebuild an Event, given the corresponding EVENT table row.
 	 * 
-	 * @param rs EVENT table row
-	 * @param epVls 
+	 * @param rs
+	 *            EVENT table row
+	 * @param epVls
 	 * @return the Event
 	 * @throws SQLException
 	 * @throws SoCTraceException
 	 */
 	private Event rebuildEvent(ResultSet rs) throws SQLException, SoCTraceException {
 		Event e = new Event(rs.getInt(1));
-		TraceDBObject traceDB = (TraceDBObject)dbObj;
+		TraceDBObject traceDB = (TraceDBObject) dbObj;
 		EventType et = traceDB.getEventTypeCache().get(EventType.class, rs.getInt(2));
 		EventProducer s = getEventProducer(rs.getInt(3));
-		e.setEventProducer(s); 
+		e.setEventProducer(s);
 		e.setType(et);
 		e.setTimestamp(rs.getLong(4));
 		e.setCpu(rs.getInt(5));
 		e.setPage(rs.getInt(6));
 		return e;
 	}
-	
+
 	/**
 	 * Rebuild an EventParam, given the corresponding EVENT_PARAM table row.
-	 * @param prs EVENT_PARAM table row
-	 * @param tmp map containing the Events returned by the query
+	 * 
+	 * @param prs
+	 *            EVENT_PARAM table row
+	 * @param tmp
+	 *            map containing the Events returned by the query
 	 * @return the EventParam
 	 * @throws SQLException
-	 * @throws SoCTraceException 
+	 * @throws SoCTraceException
 	 */
-	private EventParam rebuildEventParam(ResultSet prs, Map<Integer, Event> tmp) 
-			throws SQLException, SoCTraceException {
+	private EventParam rebuildEventParam(ResultSet prs, Map<Integer, Event> tmp) throws SQLException, SoCTraceException {
 		EventParam ep = new EventParam(prs.getInt(1));
 		ep.setEvent(tmp.get(prs.getInt(2)));
-		TraceDBObject traceDB = (TraceDBObject)dbObj;
+		TraceDBObject traceDB = (TraceDBObject) dbObj;
 		ep.setEventParamType(traceDB.getEventTypeCache().get(EventParamType.class, prs.getInt(3)));
 		ep.setValue(prs.getString(4));
 		return ep;
 	}
-	
+
 	/**
 	 * Rebuild an EventParam, given the corresponding join result set row.
-	 * @param rs Result set row corresponding to a SELECT * FROM EVENT join EVENT_PARAM ...
-	 * @param e Event related to this parameter
+	 * 
+	 * @param rs
+	 *            Result set row corresponding to a SELECT * FROM EVENT join
+	 *            EVENT_PARAM ...
+	 * @param e
+	 *            Event related to this parameter
 	 * @return the EventParameter
 	 * @throws SQLException
 	 * @throws SoCTraceException
 	 */
 	private EventParam rebuildEventParam(ResultSet rs, Event e) throws SQLException, SoCTraceException {
-		TraceDBObject traceDB = (TraceDBObject)dbObj;
+		TraceDBObject traceDB = (TraceDBObject) dbObj;
 		EventParam ep = new EventParam(rs.getInt(7));
 		ep.setEvent(e);
 		ep.setEventParamType(traceDB.getEventTypeCache().get(EventParamType.class, rs.getInt(9)));

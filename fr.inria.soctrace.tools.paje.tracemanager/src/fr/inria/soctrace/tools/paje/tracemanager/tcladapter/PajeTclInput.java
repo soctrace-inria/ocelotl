@@ -1,3 +1,4 @@
+
 package fr.inria.soctrace.tools.paje.tracemanager.tcladapter;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import fr.inria.soctrace.lib.search.ITraceSearch;
 import fr.inria.soctrace.lib.search.TraceSearch;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
+
 /**
  * Paje implementation of Tcl input.
  * The input contains the Tcl rows.
@@ -29,17 +31,17 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
  */
 public class PajeTclInput implements ITChartsInput {
 
-	private ArrayList<ITChartsRow> mainItems = new ArrayList<ITChartsRow>();
-	private boolean startTimeSet = false;
-	private long startTime;
-	private boolean endTimeSet = false;
-	private long endTime;
-	
+	private ArrayList<ITChartsRow>	mainItems		= new ArrayList<ITChartsRow>();
+	private boolean					startTimeSet	= false;
+	private long					startTime;
+	private boolean					endTimeSet		= false;
+	private long					endTime;
+
 	/**
 	 * Debug flag
 	 */
-	public final static boolean DEBUG = false;
-	
+	public final static boolean		DEBUG			= false;
+
 	@Override
 	public void addTChartsRow(ITChartsRow main) {
 		mainItems.add(main);
@@ -54,12 +56,12 @@ public class PajeTclInput implements ITChartsInput {
 	public long getStartTime() {
 		if (startTimeSet)
 			return startTime;
-		
+
 		startTime = mainItems.get(0).getStartTime();
 		long time;
-		for(ITChartsRow item : mainItems) {
+		for (ITChartsRow item : mainItems) {
 			time = item.getStartTime();
-			if(time < startTime)
+			if (time < startTime)
 				startTime = time;
 		}
 		startTimeSet = true;
@@ -70,12 +72,12 @@ public class PajeTclInput implements ITChartsInput {
 	public long getEndTime() {
 		if (endTimeSet)
 			return endTime;
-		
+
 		endTime = mainItems.get(0).getEndTime();
 		long time;
-		for(ITChartsRow item : mainItems) {
+		for (ITChartsRow item : mainItems) {
 			time = item.getEndTime();
-			if(time > endTime)
+			if (time > endTime)
 				endTime = time;
 		}
 		endTimeSet = true;
@@ -84,11 +86,11 @@ public class PajeTclInput implements ITChartsInput {
 
 	@Override
 	public void loadPage(Trace trace, List<Event> elist) {
-		
+
 		// XXX Hard coded result: used for the article
 		// Ignore the passed list, and use the result one.
-//		elist.clear();
-//		elist = getArticleList(trace);
+		//		elist.clear();
+		//		elist = getArticleList(trace);
 
 		elist.clear();
 		elist = getPresentationList(trace);
@@ -99,25 +101,24 @@ public class PajeTclInput implements ITChartsInput {
 			TraceDBObject traceDB = TraceDBObject.openNewIstance(trace.getDbName());
 			EventProducerQuery query = new EventProducerQuery(traceDB);
 			List<EventProducer> producers = query.getList();
-			for (EventProducer ep: producers) {
+			for (EventProducer ep : producers) {
 				eps.put(ep.getId(), ep);
 			}
 			traceDB.close();
 		} catch (SoCTraceException e) {
 			e.printStackTrace();
 		}
-		
+
 		//  CPU          EP id
 		Map<Integer, Map<Integer, ITChartsRow>> rows = new HashMap<Integer, Map<Integer, ITChartsRow>>();
 		//  CPU      row
 		Map<Integer, ITChartsRow> main = new HashMap<Integer, ITChartsRow>();
-		
+
 		// iterate over all page events 
 		Event lastEvent = null;
 		ITChartsRow lastProducerRow = null;
 
-		
-		for (Event e: elist) {
+		for (Event e : elist) {
 			// get the map containing all the rows for this CPU
 			if (!rows.containsKey(e.getCpu())) {
 				rows.put(e.getCpu(), new HashMap<Integer, ITChartsRow>());
@@ -125,44 +126,44 @@ public class PajeTclInput implements ITChartsInput {
 				this.addTChartsRow(main.get(e.getCpu()));
 			}
 			Map<Integer, ITChartsRow> cpuMap = rows.get(e.getCpu());
-			
+
 			// get the row for the given producer
 			if (!cpuMap.containsKey(e.getEventProducer().getId()))
-				cpuMap.put(e.getEventProducer().getId(), getNewEventProducerRow(e.getEventProducer(), eps, cpuMap, main.get(e.getCpu())));		
-			ITChartsRow producerRow = cpuMap.get(e.getEventProducer().getId()); 
-			
+				cpuMap.put(e.getEventProducer().getId(), getNewEventProducerRow(e.getEventProducer(), eps, cpuMap, main.get(e.getCpu())));
+			ITChartsRow producerRow = cpuMap.get(e.getEventProducer().getId());
+
 			// finally add the event if I'm on the end
 			//final long OFFSET = 298400000000L;
 			final long OFFSET = 0;
-			if (lastEvent!=null) {
-				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp()-OFFSET, e.getTimestamp()-OFFSET));	
+			if (lastEvent != null) {
+				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp() - OFFSET, e.getTimestamp() - OFFSET));
 			}
-			
+
 			lastEvent = e;
 			lastProducerRow = producerRow;
-			
+
 		}
 	}
-	
+
 	private List<Event> getArticleList(Trace trace) {
-		
+
 		// Result label: the first result with this label is loaded. Take care.
 		final String FILTER_RESULT_LABEL = "thelast";
 		// Filter tool name
 		final String FILTER_NAME = "Filter Tool";
-		
+
 		try {
 			ITraceSearch search = new TraceSearch().initialize();
 			Tool filter = search.getToolByName(FILTER_NAME);
 			List<AnalysisResult> alist = search.getAnalysisResultsByToolAndType(trace, filter, AnalysisResultType.TYPE_SEARCH);
 			AnalysisResult ar = null;
-			for (AnalysisResult a: alist) {
+			for (AnalysisResult a : alist) {
 				if (a.getDescription().equals(FILTER_RESULT_LABEL)) {
 					ar = a;
 					break;
 				}
 			}
-			if (ar==null)
+			if (ar == null)
 				return null;
 			AnalysisResultSearchData data = (AnalysisResultSearchData) search.getAnalysisResultData(trace, ar);
 			@SuppressWarnings("unchecked")
@@ -176,7 +177,7 @@ public class PajeTclInput implements ITChartsInput {
 	}
 
 	private List<Event> getPresentationList(Trace trace) {
-		
+
 		try {
 			ITraceSearch search = new TraceSearch().initialize();
 			IntervalDesc desc = new IntervalDesc(100, 10000000000L);
@@ -190,12 +191,12 @@ public class PajeTclInput implements ITChartsInput {
 	}
 
 	private ITChartsRow getNewEventProducerRow(EventProducer ep, Map<Integer, EventProducer> eps, Map<Integer, ITChartsRow> cpuRows, ITChartsRow cpuRow) {
-		
+
 		debug("Creating event producer row " + ep.getId() + ", parent " + ep.getParentId());
-		
+
 		ITChartsRow parentRow = cpuRow;
 		// if there's a parent
-		if (ep.getParentId()!=EventProducer.NO_PARENT_ID) {
+		if (ep.getParentId() != EventProducer.NO_PARENT_ID) {
 			// if there is already its row
 			if (cpuRows.containsKey(ep.getParentId()))
 				parentRow = cpuRows.get(ep.getParentId());
@@ -213,14 +214,14 @@ public class PajeTclInput implements ITChartsInput {
 		startTimeSet = false;
 		endTimeSet = false;
 	}
-	
+
 	/**
 	 * Print a debug message
 	 * @param s message
 	 */
 	private void debug(String s) {
 		if (DEBUG)
-			System.out.println("[Default Input] "+ s);
+			System.out.println("[Default Input] " + s);
 	}
 
 }

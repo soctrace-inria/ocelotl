@@ -96,12 +96,12 @@ public class PajeStateSum extends Matrix {
 
 	class OcelotlThread extends Thread {
 
-		List<EventProducer>					eventProducers;
+		List<EventProducer>						eventProducers;
 		Map<Integer, List<PajeEventProxy>>		eventProxyList;
 		Map<Integer, List<PajeReducedEvent>>	eventList;
-		int									threadNumber;
-		int									thread;
-		boolean								cached;
+		int										threadNumber;
+		int										thread;
+		boolean									cached;
 
 		@Override
 		public void run() {

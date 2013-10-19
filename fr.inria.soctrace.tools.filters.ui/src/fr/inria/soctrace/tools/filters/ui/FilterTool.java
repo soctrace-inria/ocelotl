@@ -34,10 +34,10 @@ public class FilterTool extends FramesocTool {
 	@Override
 	public void launch(String[] args) {
 		System.out.println("Arguments");
-		for (String s: args) {
+		for (String s : args) {
 			System.out.println(s);
 		}
-		
+
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		try {
 			window.getActivePage().showView(FilterView.ID);

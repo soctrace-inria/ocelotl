@@ -21,6 +21,6 @@ package fr.inria.soctrace.tools.paje.tracemanager.common.constants;
 
 public abstract class PajeExternalConstants {
 
-	public final static String PajeStateValue = "Value";
+	public final static String	PajeStateValue	= "Value";
 
 }

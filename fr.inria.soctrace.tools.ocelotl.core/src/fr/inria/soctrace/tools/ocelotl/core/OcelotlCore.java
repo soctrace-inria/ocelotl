@@ -45,18 +45,18 @@ public class OcelotlCore {
 		return TEST;
 	}
 
-	OcelotlParameters	ocelotlParameters;
-	Query				query;
-	ILPAggregManager	lpaggregManager;
-	PartManager			partManager;
-	AggregationOperatorManager operators;
-	IAggregationOperator operator;
+	OcelotlParameters			ocelotlParameters;
+	Query						query;
+	ILPAggregManager			lpaggregManager;
+	PartManager					partManager;
+	AggregationOperatorManager	operators;
+	IAggregationOperator		operator;
 
 	public OcelotlCore() {
 		super();
 	}
-	
-	public void setOperator(){
+
+	public void setOperator() {
 		try {
 			operator = operators.getOperator(ocelotlParameters.getAggOperator());
 		} catch (SoCTraceException e) {
@@ -65,14 +65,14 @@ public class OcelotlCore {
 		}
 	}
 
-	public OcelotlCore(final OcelotlParameters ocelotlParameters) throws SoCTraceException{
+	public OcelotlCore(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
 		super();
 		init(ocelotlParameters);
-		
+
 	}
 
 	public void compute(final HasChanged hasChanged) throws SoCTraceException {
-		if (hasChanged == HasChanged.ALL){
+		if (hasChanged == HasChanged.ALL) {
 			setOperator();
 			lpaggregManager = operator.createManager();
 		}

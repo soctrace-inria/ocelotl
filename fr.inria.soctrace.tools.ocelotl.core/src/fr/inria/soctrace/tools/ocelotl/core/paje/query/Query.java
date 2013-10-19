@@ -61,7 +61,7 @@ public class Query {
 		traceSearch.uninitialize();
 		return elist;
 	}
-	
+
 	public List<PajeReducedEvent> getReducedEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
 			return getAllReducedEvents();
@@ -74,8 +74,7 @@ public class Query {
 			return elist;
 		}
 	}
-	
-	
+
 	public List<Event> getAllEvents() throws SoCTraceException {
 		final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
 		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
@@ -84,7 +83,7 @@ public class Query {
 		traceSearch.uninitialize();
 		return elist;
 	}
-	
+
 	public List<Event> getEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
 			return getAllEvents();
@@ -106,7 +105,7 @@ public class Query {
 		traceSearch.uninitialize();
 		return elist;
 	}
-	
+
 	public List<PajeEventProxy> getEventsProxy(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
 			return getAllEventsProxy();

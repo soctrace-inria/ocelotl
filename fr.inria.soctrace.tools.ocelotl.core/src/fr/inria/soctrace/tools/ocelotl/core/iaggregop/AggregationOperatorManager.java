@@ -19,7 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,64 +35,59 @@ import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
-
 public class AggregationOperatorManager {
-	
-HashMap<String,IAggregationOperator> List;
-HashMap<String, TraceTypeConfig> Config;
-ArrayList<String> Names;
-OcelotlParameters parameters;
 
-public AggregationOperatorManager(OcelotlParameters parameters) {
-	super();
-	this.parameters=parameters;
-	try {
-		init();
-		initConfig();
-	} catch (SoCTraceException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+	HashMap<String, IAggregationOperator>	List;
+	HashMap<String, TraceTypeConfig>		Config;
+	ArrayList<String>						Names;
+	OcelotlParameters						parameters;
+
+	public AggregationOperatorManager(OcelotlParameters parameters) {
+		super();
+		this.parameters = parameters;
+		try {
+			init();
+			initConfig();
+		} catch (SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private void init() throws SoCTraceException {
+		List = new HashMap<String, IAggregationOperator>();
+		List.put(PajeStateSum.descriptor, new PajeStateSum());
+		List.put(PajeNormalizedStateSum.descriptor, new PajeNormalizedStateSum());
+		List.put(PajeStateTypeSum.descriptor, new PajeStateTypeSum());
+
+	}
+
+	private void initConfig() throws SoCTraceException {
+		Config = new HashMap<String, TraceTypeConfig>();
+		Config.put(PajeConstants.PajeFormatName, new PajeConfig());
+	}
+
+	public Collection<IAggregationOperator> getList() {
+		return List.values();
+	}
+
+	public IAggregationOperator getOperator(String name) throws SoCTraceException {
+		IAggregationOperator op = List.get(name);
+		op.setOcelotlParameters(parameters);
+		return op;
+	}
+
+	public TraceTypeConfig config(IAggregationOperator op) {
+		return Config.get(op.traceType());
+	}
+
+	public TraceTypeConfig config(String op) {
+		return Config.get(List.get(op).traceType());
+	}
+
+	public String getType(String op) {
+		return List.get(op).traceType();
 	}
 
 }
-
-private void init() throws SoCTraceException{
-	List = new HashMap<String, IAggregationOperator>();
-	List.put(PajeStateSum.descriptor, new PajeStateSum());
-	List.put(PajeNormalizedStateSum.descriptor, new PajeNormalizedStateSum());
-	List.put(PajeStateTypeSum.descriptor, new PajeStateTypeSum());
-	
-}
-
-private void initConfig() throws SoCTraceException{
-	Config = new HashMap<String, TraceTypeConfig>();
-	Config.put(PajeConstants.PajeFormatName, new PajeConfig());
-}
-
-public Collection<IAggregationOperator> getList(){
-	return List.values();
-}
-
-public IAggregationOperator getOperator(String name) throws SoCTraceException{
-			IAggregationOperator op=List.get(name);
-			op.setOcelotlParameters(parameters);
-			return op;
-}
-
-public TraceTypeConfig config(IAggregationOperator op){
-		return Config.get(op.traceType());
-}
-
-public TraceTypeConfig config(String op){
-	return Config.get(List.get(op).traceType());
-}
-
-public String getType(String op) {
-	return List.get(op).traceType();
-}
-
-
- 
-}
-
-

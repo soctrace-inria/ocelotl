@@ -26,11 +26,11 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public abstract class State implements IState{
+public abstract class State implements IState {
 
-	protected String					stateType	= null;
-	protected TimeRegion				timeRegion = null;
-	protected int		eventProducerID = -1;
+	protected String					stateType		= null;
+	protected TimeRegion				timeRegion		= null;
+	protected int						eventProducerID	= -1;
 	protected final TimeSliceManager	timeSliceManager;
 
 	public State(final TimeSliceManager timeSliceManager) {// TODO

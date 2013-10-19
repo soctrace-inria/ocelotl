@@ -27,9 +27,7 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
-public class PajeState extends State{
-
-
+public class PajeState extends State {
 
 	public PajeState(final Event eventStart, final Event eventEnd, final TimeSliceManager timeSliceManager) {
 		super(timeSliceManager);
@@ -41,15 +39,12 @@ public class PajeState extends State{
 				break;
 			}
 	}
-	
+
 	public PajeState(final PajeReducedEvent eventStart, final PajeReducedEvent eventEnd, final TimeSliceManager timeSliceManager) {
 		super(timeSliceManager);
 		timeRegion = new TimeRegion(eventStart.TS, eventEnd.TS);
 		eventProducerID = eventStart.EP;
-		stateType = eventStart.VALUE;	
+		stateType = eventStart.VALUE;
 	}
-
-
-
 
 }

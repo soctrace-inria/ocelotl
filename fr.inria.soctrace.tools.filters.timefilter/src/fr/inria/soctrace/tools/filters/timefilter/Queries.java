@@ -99,11 +99,11 @@ public class Queries {
 		List<Event> elist = eventQuery.getList();
 		if (timeFilterParameters.getValues() != null) {
 			if (timeFilterParameters.getValues().size() != 0) {
-				for (int i=elist.size()-1; i>=0; i--){
+				for (int i = elist.size() - 1; i >= 0; i--) {
 					if (timeFilterParameters.getValues().contains(elist.get(i).getParamMap().get("Value").getValue()))
 						elist.remove(i);
 				}
-					
+
 			}
 		}
 		traceDB.close();
@@ -131,11 +131,11 @@ public class Queries {
 		List<Event> elist = eventQuery.getList();
 		if (timeFilterParameters.getValues() != null) {
 			if (timeFilterParameters.getValues().size() != 0) {
-				for (int i=elist.size()-1; i>=0; i--){
+				for (int i = elist.size() - 1; i >= 0; i--) {
 					if (timeFilterParameters.getValues().contains(elist.get(i).getParamMap().get("Value").getValue()))
 						elist.remove(i);
 				}
-					
+
 			}
 		}
 		for (Event e : elist) {
@@ -174,11 +174,11 @@ public class Queries {
 			List<Event> elist = eventQuery.getList();
 			if (timeFilterParameters.getValues() != null) {
 				if (timeFilterParameters.getValues().size() != 0) {
-					for (int j=elist.size()-1; j>=0; j--){
+					for (int j = elist.size() - 1; j >= 0; j--) {
 						if (timeFilterParameters.getValues().contains(elist.get(j).getParamMap().get("Value").getValue()))
 							elist.remove(j);
 					}
-						
+
 				}
 			}
 			for (Event e : elist) {
@@ -213,11 +213,11 @@ public class Queries {
 		List<Event> elist = eventQuery.getList();
 		if (timeFilterParameters.getValues() != null) {
 			if (timeFilterParameters.getValues().size() != 0) {
-				for (int i=elist.size()-1; i>=0; i--){
+				for (int i = elist.size() - 1; i >= 0; i--) {
 					if (timeFilterParameters.getValues().contains(elist.get(i).getParamMap().get("Value").getValue()))
 						elist.remove(i);
 				}
-					
+
 			}
 		}
 		traceDB.close();
@@ -244,11 +244,11 @@ public class Queries {
 		List<Event> elist = eventQuery.getList();
 		if (timeFilterParameters.getValues() != null) {
 			if (timeFilterParameters.getValues().size() != 0) {
-				for (int i=elist.size()-1; i>=0; i--){
+				for (int i = elist.size() - 1; i >= 0; i--) {
 					if (timeFilterParameters.getValues().contains(elist.get(i).getParamMap().get("Value").getValue()))
 						elist.remove(i);
 				}
-					
+
 			}
 		}
 		for (Event e : elist) {
@@ -281,11 +281,11 @@ public class Queries {
 			List<Event> elist = eventQuery.getList();
 			if (timeFilterParameters.getValues() != null) {
 				if (timeFilterParameters.getValues().size() != 0) {
-					for (int j=elist.size()-1; j>=0; j--){
+					for (int j = elist.size() - 1; j >= 0; j--) {
 						if (timeFilterParameters.getValues().contains(elist.get(j).getParamMap().get("Value").getValue()))
 							elist.remove(j);
 					}
-						
+
 				}
 			}
 			for (Event e : elist) {

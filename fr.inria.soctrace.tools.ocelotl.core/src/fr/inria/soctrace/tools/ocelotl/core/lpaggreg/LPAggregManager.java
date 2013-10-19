@@ -47,11 +47,11 @@ public abstract class LPAggregManager implements ILPAggregManager {
 
 	public LPAggregManager(OcelotlParameters ocelotlParameters) {
 		super();
-		this.ocelotlParameters=ocelotlParameters;
+		this.ocelotlParameters = ocelotlParameters;
 	}
 
 	@Override
-	public void computeDichotomy(){
+	public void computeDichotomy() {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
 		parameters.clear();
@@ -63,11 +63,10 @@ public abstract class LPAggregManager implements ILPAggregManager {
 		}
 		dm.end("LPAGGREG - PARAMETERS LIST");
 
-	
 	}
 
 	@Override
-	public void computeParts(){
+	public void computeParts() {
 		parts.clear();
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
@@ -77,9 +76,8 @@ public abstract class LPAggregManager implements ILPAggregManager {
 		dm.end("LPAGGREG - COMPUTE PARTS");
 	}
 
-	
 	@Override
-	public void computeQualities(){
+	public void computeQualities() {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
 		lpaggregWrapper.computeQualities(ocelotlParameters.isNormalize());

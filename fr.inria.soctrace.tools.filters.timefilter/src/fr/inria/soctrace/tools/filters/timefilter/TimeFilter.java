@@ -27,8 +27,8 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 
 public class TimeFilter {
 
-	private static final boolean DEBUG = true;
-	private static final boolean TEST = true;
+	private static final boolean	DEBUG	= true;
+	private static final boolean	TEST	= true;
 
 	public static boolean isDebug() {
 		return DEBUG;
@@ -38,12 +38,11 @@ public class TimeFilter {
 		return TEST;
 	}
 
-	TimeFilterParameters params;
-	Queries queries;
-	ResultManager results;
+	TimeFilterParameters	params;
+	Queries					queries;
+	ResultManager			results;
 
-	public TimeFilter(TimeFilterParameters timefilterParameters)
-			throws SoCTraceException {
+	public TimeFilter(TimeFilterParameters timefilterParameters) throws SoCTraceException {
 		super();
 		params = timefilterParameters;
 		queries = new Queries(params);

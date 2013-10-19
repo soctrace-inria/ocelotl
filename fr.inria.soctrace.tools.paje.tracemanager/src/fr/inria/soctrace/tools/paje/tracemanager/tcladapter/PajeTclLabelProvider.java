@@ -1,3 +1,4 @@
+
 package fr.inria.soctrace.tools.paje.tracemanager.tcladapter;
 
 import org.eclipse.draw2d.Connection;
@@ -15,8 +16,8 @@ import fr.inria.soctrace.framesoc.ui.tcl.ITChartsEvent;
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsRow;
 
 public class PajeTclLabelProvider extends LabelProvider implements ITChartsLabelProvider {
-	
-	private final int MARGIN = 20;
+
+	private final int	MARGIN	= 20;
 
 	@Override
 	public Image getImage(Object element) {
@@ -26,12 +27,12 @@ public class PajeTclLabelProvider extends LabelProvider implements ITChartsLabel
 	@Override
 	public String getText(Object element) {
 		String name = "";
-		
-		if(element instanceof ITChartsRow)
+
+		if (element instanceof ITChartsRow)
 			name = ((ITChartsRow) element).getName();
-		else if(element instanceof ITChartsEvent)
+		else if (element instanceof ITChartsEvent)
 			name = ((ITChartsEvent) element).getName();
-			
+
 		return name;
 	}
 
@@ -52,20 +53,20 @@ public class PajeTclLabelProvider extends LabelProvider implements ITChartsLabel
 			if (((ITChartsEvent) sourceEvent).getOutlinkedEvents().contains(destEvent)) {
 				// We create the figure (Connection) corresponding to the link
 				PolylineConnection c = new PolylineConnection();
-				if(((ITChartsEvent) destEvent).getStartTime() - ((ITChartsEvent) sourceEvent).getEndTime() > 1000) {
+				if (((ITChartsEvent) destEvent).getStartTime() - ((ITChartsEvent) sourceEvent).getEndTime() > 1000) {
 					PolygonDecoration decoration = new PolygonDecoration();
 					PointList decorationPointList = new PointList();
-					decorationPointList.addPoint(0,0);
-					decorationPointList.addPoint(-2,2);
-					decorationPointList.addPoint(-4,0);
-					decorationPointList.addPoint(-2,-2);
+					decorationPointList.addPoint(0, 0);
+					decorationPointList.addPoint(-2, 2);
+					decorationPointList.addPoint(-4, 0);
+					decorationPointList.addPoint(-2, -2);
 					decoration.setTemplate(decorationPointList);
 					c.setSourceDecoration(decoration);
-					
+
 					c.setSourceAnchor(new BorderAnchor(((ITChartsEvent) sourceEvent).getFigure()));
 					c.setTargetAnchor(new BorderAnchor(((ITChartsEvent) destEvent).getFigure()));
 				}
-				
+
 				// And we return it
 				return c;
 			}
@@ -75,9 +76,9 @@ public class PajeTclLabelProvider extends LabelProvider implements ITChartsLabel
 
 	@Override
 	public int getRowHeight(Object element) {
-		if(element instanceof ITChartsRow)
+		if (element instanceof ITChartsRow)
 			return ((ITChartsRow) element).getMaxEventHeight() + MARGIN;
-		else if(element instanceof ITChartsEvent)
+		else if (element instanceof ITChartsEvent)
 			return ((ITChartsEvent) element).getFigure().getSize().height + MARGIN;
 		else
 			return MARGIN;

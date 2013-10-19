@@ -39,8 +39,8 @@ public class TimeRegion {
 		setTimeStampStart(time.getTimeStampStart());
 		setTimeStampEnd(time.getTimeStampEnd());
 	}
-	
-	public boolean compareTimeRegion(TimeRegion timeRegion){
+
+	public boolean compareTimeRegion(TimeRegion timeRegion) {
 		return ((this.getTimeStampStart() == timeRegion.getTimeStampStart()) && (this.getTimeStampEnd() == timeRegion.getTimeStampEnd()));
 	}
 
@@ -72,9 +72,9 @@ public class TimeRegion {
 		if (timeStampStart <= timeStampEnd)
 			this.timeStampStart = timeStampStart;
 	}
-	
+
 	public boolean containsTimeStamp(final long timeStamp) {
-		if (timeStamp<timeStampStart||timeStamp>timeStampEnd)
+		if (timeStamp < timeStampStart || timeStamp > timeStampEnd)
 			return false;
 		return true;
 	}

@@ -41,20 +41,18 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class PajeNormalizedStateSum extends Matrix {
-	
-	public final static String 									descriptor								="State Sum (normalized)";
-	public final static String 									traceType								=PajeConstants.PajeFormatName;
+
+	public final static String	descriptor	= "State Sum (normalized)";
+	public final static String	traceType	= PajeConstants.PajeFormatName;
 
 	public PajeNormalizedStateSum(final OcelotlParameters parameters) throws SoCTraceException {
 		super(parameters);
 		System.out.println(descriptor);
 	}
 
-
 	public PajeNormalizedStateSum() throws SoCTraceException {
 		super();
 	}
-
 
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
@@ -100,12 +98,12 @@ public class PajeNormalizedStateSum extends Matrix {
 
 	class OcelotlThread extends Thread {
 
-		List<EventProducer>					eventProducers;
+		List<EventProducer>						eventProducers;
 		Map<Integer, List<PajeEventProxy>>		eventProxyList;
 		Map<Integer, List<PajeReducedEvent>>	eventList;
-		int									threadNumber;
-		int									thread;
-		boolean								cached;
+		int										threadNumber;
+		int										thread;
+		boolean									cached;
 
 		@Override
 		public void run() {
@@ -125,30 +123,29 @@ public class PajeNormalizedStateSum extends Matrix {
 				PajeReducedEventCache cache;
 				cache = new PajeReducedEventCache(query.getOcelotlParameters());
 				EventProducer ep = eventProducers.get(t);
-					cache = new PajeReducedEventCache(query.getOcelotlParameters());
-					IState state;
-					final List<PajeEventProxy> events = eventProxyList.get(ep.getId());
-					for (int i = 0; i < events.size() - 1; i++) {
-						state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-						if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-							final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-							for (final long it : distrib.keySet())
-								matrixWrite(it, ep, distrib);
-						}
+				cache = new PajeReducedEventCache(query.getOcelotlParameters());
+				IState state;
+				final List<PajeEventProxy> events = eventProxyList.get(ep.getId());
+				for (int i = 0; i < events.size() - 1; i++) {
+					state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
+					if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+						for (final long it : distrib.keySet())
+							matrixWrite(it, ep, distrib);
 					}
-					long total = 0;
+				}
+				long total = 0;
+				for (int i = 0; i < matrix.size(); i++)
+					total = matrix.get(i).get(ep.getName()) + total;
+				if (total != 0)
 					for (int i = 0; i < matrix.size(); i++)
-						total = matrix.get(i).get(ep.getName()) + total;
-					if (total != 0)
-						for (int i = 0; i < matrix.size(); i++)
-							matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
-					
-					cache.close();
-					int c = getCount();
-					if (c % EPCOUNT == 0)
-						total(c);
-					
-				 
+						matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
+
+				cache.close();
+				int c = getCount();
+				if (c % EPCOUNT == 0)
+					total(c);
+
 			}
 
 		}
@@ -194,7 +191,7 @@ public class PajeNormalizedStateSum extends Matrix {
 			start();
 		}
 	}
-	
+
 	@Override
 	public String descriptor() {
 		return descriptor;
@@ -205,8 +202,4 @@ public class PajeNormalizedStateSum extends Matrix {
 		return traceType;
 	}
 
-
-
-
-	}
-
+}

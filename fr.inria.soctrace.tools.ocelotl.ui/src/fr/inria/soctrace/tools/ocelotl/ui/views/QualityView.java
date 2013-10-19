@@ -112,24 +112,24 @@ public class QualityView {
 	public void drawQualities() {
 		int i;
 		final double maxValue = Math.max(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss());
-		final int width = root.getSize().width -  XBorder - Border;
+		final int width = root.getSize().width - XBorder - Border;
 		final int yOff = root.getSize().height() - YBorder;
 		final int height = root.getSize().height() - YBorder - Border;
 		qualities.add(new Quality(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss(), 1));
 		for (i = 1; i < qualities.size(); i++) {
 			final float cParam = 1 - qualities.get(i).getParameter();
 			final float nParam = 1 - qualities.get(i - 1).getParameter();
-			double cgain = qualities.get(qualities.size() - 1).getGain()-qualities.get(i).getGain();
-			double ngain = qualities.get(qualities.size() - 1).getGain()-qualities.get(i - 1).getGain();
-			double closs = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i).getLoss();
-			double nloss = qualities.get(qualities.size() - 1).getLoss()-qualities.get(i - 1).getLoss();
-			if (!ocelotlView.getParams().isGrowingQualities()){
+			double cgain = qualities.get(qualities.size() - 1).getGain() - qualities.get(i).getGain();
+			double ngain = qualities.get(qualities.size() - 1).getGain() - qualities.get(i - 1).getGain();
+			double closs = qualities.get(qualities.size() - 1).getLoss() - qualities.get(i).getLoss();
+			double nloss = qualities.get(qualities.size() - 1).getLoss() - qualities.get(i - 1).getLoss();
+			if (!ocelotlView.getParams().isGrowingQualities()) {
 				cgain = qualities.get(i).getGain();
 				ngain = qualities.get(i - 1).getGain();
 				closs = qualities.get(i).getLoss();
 				nloss = qualities.get(i - 1).getLoss();
 			}
-			
+
 			final PolylineConnection lineGain1 = new PolylineConnection();
 			lineGain1.setEndpoints(new Point((int) (XBorder + width * cParam), (int) (yOff - height * cgain / maxValue)), new Point((int) (XBorder + width * cParam), (int) (yOff - height * ngain / maxValue)));
 			final PolylineConnection lineLoss1 = new PolylineConnection();
@@ -194,7 +194,7 @@ public class QualityView {
 	public void drawXYLines() {
 		final RectangleFigure rectangleX = new RectangleFigure();
 		final RectangleFigure rectangleY = new RectangleFigure();
-		root.add(rectangleX, new Rectangle(new Point(XBorder, root.getSize().height() - YBorder + AxisWidth), new Point(root.getSize().width()- Border, root.getSize().height() - YBorder)));
+		root.add(rectangleX, new Rectangle(new Point(XBorder, root.getSize().height() - YBorder + AxisWidth), new Point(root.getSize().width() - Border, root.getSize().height() - YBorder)));
 		rectangleX.setBackgroundColor(ColorConstants.darkGray);
 		rectangleX.setForegroundColor(ColorConstants.darkGray);
 		root.add(rectangleY, new Rectangle(new Point(XBorder - AxisWidth, Border), new Point(XBorder, root.getSize().height() - YBorder)));
@@ -209,7 +209,7 @@ public class QualityView {
 		NumberFormat formatter = null;
 		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
 		formatter = new DecimalFormat("0.0E0");
-		final double width = root.getSize().width -  XBorder - Border;
+		final double width = root.getSize().width - XBorder - Border;
 		final double height = root.getSize().height - YBorder;
 		for (int i = 0; i < (int) yGradNumber + 1; i++) {
 			final PolylineConnection line = new PolylineConnection();
@@ -223,10 +223,10 @@ public class QualityView {
 			rectangleText.setBackgroundColor(ColorConstants.white);
 			rectangleText.setForegroundColor(ColorConstants.white);
 			final double max = Math.max(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss());
-			final double value = i == yGradNumber ? max : (double) ((long) (i * qualityWidth * 10) / 10.0);			
+			final double value = i == yGradNumber ? max : (double) ((long) (i * qualityWidth * 10) / 10.0);
 			String text = formatter.format(value);
-			if (value<1000)
-				text=String.valueOf(value);
+			if (value < 1000)
+				text = String.valueOf(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(ColorConstants.darkGray);
@@ -277,38 +277,38 @@ public class QualityView {
 
 		return canvas;
 	}
-	
+
 	static public enum State {
 		PRESSED, RELEASED;
 	}
-	
-	class ParamMouseListener implements MouseListener{
-		
-		State state = State.RELEASED;
-	
-	public void mouseDoubleClicked(final MouseEvent arg0) {
-		// TODO Auto-generated method stub
 
-	}
+	class ParamMouseListener implements MouseListener {
 
-	public void mousePressed(final MouseEvent arg0) {
-		state = State.PRESSED;
-		if (qualities != null)
-			if (arg0.x > XBorder && arg0.x < root.getSize().width() - Border) {
-				final float param = 1 - (float) (arg0.x - XBorder) / (root.getSize().width() - XBorder - Border);
-				ocelotlView.getParam().setText(String.valueOf(param));
-				ocelotlView.setConfiguration();
-				createDiagram();
-			}
-	}
+		State	state	= State.RELEASED;
 
-	public void mouseReleased(final MouseEvent arg0) {
-		state= State.RELEASED;
-		ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
-		
-	}
+		public void mouseDoubleClicked(final MouseEvent arg0) {
+			// TODO Auto-generated method stub
 
 		}
+
+		public void mousePressed(final MouseEvent arg0) {
+			state = State.PRESSED;
+			if (qualities != null)
+				if (arg0.x > XBorder && arg0.x < root.getSize().width() - Border) {
+					final float param = 1 - (float) (arg0.x - XBorder) / (root.getSize().width() - XBorder - Border);
+					ocelotlView.getParam().setText(String.valueOf(param));
+					ocelotlView.setConfiguration();
+					createDiagram();
+				}
+		}
+
+		public void mouseReleased(final MouseEvent arg0) {
+			state = State.RELEASED;
+			ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
+
+		}
+
+	}
 
 	public void resizeDiagram() {
 		createDiagram();

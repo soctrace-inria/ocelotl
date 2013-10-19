@@ -7,9 +7,11 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public interface IState {
 	public TimeRegion getTimeRegion();
+
 	public String getStateType();
+
 	public int getEventProducerID();
+
 	public Map<Long, Long> getTimeSlicesDistribution();
-	
 
 }

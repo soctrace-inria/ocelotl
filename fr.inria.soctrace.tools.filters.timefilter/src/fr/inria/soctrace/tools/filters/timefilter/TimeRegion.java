@@ -2,8 +2,8 @@ package fr.inria.soctrace.tools.filters.timefilter;
 
 public class TimeRegion {
 
-	private long timeStampStart = 0;
-	private long timeStampEnd = Long.MAX_VALUE;
+	private long	timeStampStart	= 0;
+	private long	timeStampEnd	= Long.MAX_VALUE;
 
 	public TimeRegion() {
 		super();
@@ -46,8 +46,7 @@ public class TimeRegion {
 
 	@Override
 	public String toString() {
-		return "TimeRegion [timeStampStart=" + timeStampStart
-				+ ", timeStampEnd=" + timeStampEnd + "]";
+		return "TimeRegion [timeStampStart=" + timeStampStart + ", timeStampEnd=" + timeStampEnd + "]";
 	}
 
 }
