@@ -30,10 +30,10 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.Matrix;
 import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
-import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
-import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEventCache;
-import fr.inria.soctrace.tools.ocelotl.core.query.Query;
-import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeEventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
@@ -54,15 +54,15 @@ public class PajeStateSum extends Matrix {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<ReducedEvent> fullEvents = query.getReducedEvents(eventProducers);
+		final List<PajeReducedEvent> fullEvents = query.getReducedEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
-		final Map<Integer, List<ReducedEvent>> eventList = new HashMap<Integer, List<ReducedEvent>>();
+		final Map<Integer, List<PajeReducedEvent>> eventList = new HashMap<Integer, List<PajeReducedEvent>>();
 		for (final EventProducer ep : eventProducers)
-			eventList.put(ep.getId(), new ArrayList<ReducedEvent>());
-		for (final ReducedEvent e : fullEvents)
+			eventList.put(ep.getId(), new ArrayList<PajeReducedEvent>());
+		for (final PajeReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < query.getOcelotlParameters().getThread(); t++) {
@@ -76,13 +76,13 @@ public class PajeStateSum extends Matrix {
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<EventProxy> fullEvents = query.getEventsProxy(eventProducers);
+		final List<PajeEventProxy> fullEvents = query.getEventsProxy(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
-		final Map<Integer, List<EventProxy>> eventList = new HashMap<Integer, List<EventProxy>>();
+		final Map<Integer, List<PajeEventProxy>> eventList = new HashMap<Integer, List<PajeEventProxy>>();
 		for (final EventProducer ep : eventProducers)
-			eventList.put(ep.getId(), new ArrayList<EventProxy>());
-		for (final EventProxy e : fullEvents)
+			eventList.put(ep.getId(), new ArrayList<PajeEventProxy>());
+		for (final PajeEventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
 		List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < query.getOcelotlParameters().getThread(); t++) {
@@ -96,8 +96,8 @@ public class PajeStateSum extends Matrix {
 	class OcelotlThread extends Thread {
 
 		List<EventProducer>					eventProducers;
-		Map<Integer, List<EventProxy>>		eventProxyList;
-		Map<Integer, List<ReducedEvent>>	eventList;
+		Map<Integer, List<PajeEventProxy>>		eventProxyList;
+		Map<Integer, List<PajeReducedEvent>>	eventList;
 		int									threadNumber;
 		int									thread;
 		boolean								cached;
@@ -117,11 +117,11 @@ public class PajeStateSum extends Matrix {
 
 		private void cacheRun() throws SoCTraceException {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				ReducedEventCache cache;
-				cache = new ReducedEventCache(query.getOcelotlParameters());
+				PajeReducedEventCache cache;
+				cache = new PajeReducedEventCache(query.getOcelotlParameters());
 				EventProducer ep = eventProducers.get(t);
 				IState state;
-				final List<EventProxy> events = eventProxyList.get(ep.getId());
+				final List<PajeEventProxy> events = eventProxyList.get(ep.getId());
 				for (int i = 0; i < events.size() - 1; i++) {
 					state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
 					if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
@@ -141,7 +141,7 @@ public class PajeStateSum extends Matrix {
 		private void noCacheRun() {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
 				EventProducer ep = eventProducers.get(t);
-				final List<ReducedEvent> events = eventList.get(ep.getId());
+				final List<PajeReducedEvent> events = eventList.get(ep.getId());
 				IState state;
 				for (int i = 0; i < events.size() - 1; i++) {
 					state = (new PajeState(events.get(i), events.get(i + 1), timeSliceManager));
@@ -164,9 +164,9 @@ public class PajeStateSum extends Matrix {
 			this.eventProducers = eventProducers;
 			this.cached = cached;
 			if (cached)
-				this.eventProxyList = (Map<Integer, List<EventProxy>>) eventList;
+				this.eventProxyList = (Map<Integer, List<PajeEventProxy>>) eventList;
 			else
-				this.eventList = (Map<Integer, List<ReducedEvent>>) eventList;
+				this.eventList = (Map<Integer, List<PajeReducedEvent>>) eventList;
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 

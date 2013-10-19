@@ -32,10 +32,10 @@ import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ICubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.CubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
-import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
-import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEventCache;
-import fr.inria.soctrace.tools.ocelotl.core.query.Query;
-import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeEventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEventCache;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.State;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
@@ -73,19 +73,19 @@ public class PajeStateTypeSum extends CubicMatrix {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		final List<ReducedEvent> fullEvents = query.getReducedEvents(eventProducers);
+		final List<PajeReducedEvent> fullEvents = query.getReducedEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
-		final Map<Integer, List<ReducedEvent>> eventList = new HashMap<Integer, List<ReducedEvent>>();
+		final Map<Integer, List<PajeReducedEvent>> eventList = new HashMap<Integer, List<PajeReducedEvent>>();
 		for (final EventProducer ep : eventProducers)
-			eventList.put(ep.getId(), new ArrayList<ReducedEvent>());
-		for (final ReducedEvent e : fullEvents)
+			eventList.put(ep.getId(), new ArrayList<PajeReducedEvent>());
+		for (final PajeReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
 		for (final EventProducer ep : eventProducers) {
 			IState state;
-			final List<ReducedEvent> events = eventList.get(ep.getId());
+			final List<PajeReducedEvent> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
 				state=new PajeState(events.get(i), events.get(i + 1), timeSliceManager);
 				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())){
@@ -108,22 +108,22 @@ public class PajeStateTypeSum extends CubicMatrix {
 		int count = 0;
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		ReducedEventCache cache = new ReducedEventCache(query.getOcelotlParameters());
-		final List<EventProxy> fullEvents = query.getEventsProxy(eventProducers);
+		PajeReducedEventCache cache = new PajeReducedEventCache(query.getOcelotlParameters());
+		final List<PajeEventProxy> fullEvents = query.getEventsProxy(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		DeltaManager dm2 = new DeltaManager();
 		dm.start();
-		final Map<Integer, List<EventProxy>> eventList = new HashMap<Integer, List<EventProxy>>();
+		final Map<Integer, List<PajeEventProxy>> eventList = new HashMap<Integer, List<PajeEventProxy>>();
 		for (final EventProducer ep : eventProducers)
-			eventList.put(ep.getId(), new ArrayList<EventProxy>());
-		for (final EventProxy e : fullEvents)
+			eventList.put(ep.getId(), new ArrayList<PajeEventProxy>());
+		for (final PajeEventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
 		for (final EventProducer ep : eventProducers) {
 			dm2.start();
 			IState state;
-			final List<EventProxy> events = eventList.get(ep.getId());
+			final List<PajeEventProxy> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
 				state=(new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
 				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())){

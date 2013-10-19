@@ -2,7 +2,7 @@ package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.ILPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
 public interface IAggregationOperator {

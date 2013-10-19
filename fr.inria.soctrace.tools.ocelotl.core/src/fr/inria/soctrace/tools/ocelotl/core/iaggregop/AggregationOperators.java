@@ -32,7 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeNormalizedStateSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateTypeSum;
-import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 

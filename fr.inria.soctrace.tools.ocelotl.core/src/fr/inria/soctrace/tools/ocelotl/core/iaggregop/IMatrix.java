@@ -25,7 +25,7 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
 public interface IMatrix extends IAggregationOperator{

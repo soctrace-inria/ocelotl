@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.core.query;
+package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 
 /*******************************************************************************
  * Copyright (c) 2013 Damien Dosimont
@@ -12,7 +12,6 @@ package fr.inria.soctrace.tools.ocelotl.core.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +31,6 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.ModelElementCache;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
 /**
  * Query class for Event self-defining-pattern tables.
@@ -40,26 +38,36 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalCo
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  *
  */
-public class ReducedEventQuery extends EventQuery {
+public class PajeEventProxyQuery extends EventQuery {
+
+	private static final boolean USE_JOIN = false; 
+	
 
 	/**
 	 * The constructor
 	 * @param traceDB Trace DB object where the query is performed.
 	 */
-	public ReducedEventQuery(TraceDBObject traceDB) {
+	public PajeEventProxyQuery(TraceDBObject traceDB) {
 		super(traceDB);
 		clear();
 	}
 
 	
-	
-public List<ReducedEvent> getReducedEventList() throws SoCTraceException {
+public List<PajeEventProxy> getIDList() throws SoCTraceException {
+		
 		try {
 			DeltaManager dm = new DeltaManager();
 			dm.start();
 			
 			boolean first = true;
-			StringBuffer eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
+			StringBuffer eventQuery = null;
+			if (USE_JOIN) {
+				debug("Experimental query with join");
+				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM
+						+ " on " +  FramesocTable.EVENT + ".ID = " +  FramesocTable.EVENT_PARAM + ".EVENT_ID ");
+			} else {
+				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
+			}
 
 			if (where) {
 				eventQuery.append(" WHERE ");
@@ -107,7 +115,8 @@ public List<ReducedEvent> getReducedEventList() throws SoCTraceException {
 			Statement stm = dbObj.getConnection().createStatement();
 			
 			ResultSet rs = stm.executeQuery(query);
-			List<ReducedEvent> elist = rebuildReducedEvent(rs);
+			List<PajeEventProxy> elist = null;
+			elist = rebuildEventID(rs);
 
 			debug(dm.endMessage("EventQuery.getList()"));
 			
@@ -120,50 +129,20 @@ public List<ReducedEvent> getReducedEventList() throws SoCTraceException {
 
 	}
 
-
-
-	
-
-	private List<ReducedEvent> rebuildReducedEvent(ResultSet rs) throws SoCTraceException {
+	private List<PajeEventProxy> rebuildEventID(ResultSet rs) throws SoCTraceException {
 				
-		HashMap<Integer, ReducedEvent> list = new HashMap<Integer, ReducedEvent>();
-		LinkedList<ReducedEvent> llist = new LinkedList<ReducedEvent>();
-		ValueListString vls = new ValueListString();
-		ValueListString pvls = new ValueListString();
-		List<Integer> li= new ArrayList<Integer>();
+		List<PajeEventProxy> list = new LinkedList<PajeEventProxy>();
 		try {		
 		
 			while (rs.next()) {
-				ReducedEvent re = new ReducedEvent(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), null);
-				list.put(re.ID, re);
-				llist.add(re);
-				vls.addValue(String.valueOf(re.ID));
+				list.add(new PajeEventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID")));
 			}
-			if (llist.size()==0)
-				return llist;
-			
-			Statement stm = dbObj.getConnection().createStatement();
-			ResultSet pprs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM_TYPE + 
-					" WHERE NAME='" + PajeExternalConstants.PajeStateValue+"'");
-			while (pprs.next())
-				li.add(pprs.getInt("ID"));
-			String query;
-			query = "SELECT * FROM " + FramesocTable.EVENT_PARAM + 
-					" WHERE EVENT_ID IN " + vls.getValueString();// + " AND EVENT_PARAM_TYPE_ID IN " + pvls.getValueString();
-					
-			ResultSet prs = stm.executeQuery(query);//TODO verifier
-			while (prs.next()){
-				if (li.contains(prs.getInt("EVENT_PARAM_TYPE_ID")))
-					list.get(prs.getInt("EVENT_ID")).VALUE=prs.getString("VALUE");
-			}
-			return llist;
+			return list;
 		} catch (SQLException e) {
 			throw new SoCTraceException(e);
 		}
 	}
-	
 }
-
 
 
 

@@ -125,7 +125,7 @@ public class PajeView extends ApplicationWindow {
 
 		final Group groupEventTypes = new Group(sashFormGlobal, SWT.NONE);
 		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupEventTypes.setText("States Event Types");
+		groupEventTypes.setText("Set State Event Types");
 		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
 		gl_groupEventTypes.horizontalSpacing = 0;
 		groupEventTypes.setLayout(gl_groupEventTypes);

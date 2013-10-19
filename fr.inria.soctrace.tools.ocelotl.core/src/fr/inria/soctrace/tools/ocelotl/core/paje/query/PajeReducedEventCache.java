@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.core.query;
+package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,8 +18,8 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 
-public class ReducedEventCache {
-	private HashMap<Integer, ReducedEvent> cache= new HashMap<Integer, ReducedEvent>();
+public class PajeReducedEventCache {
+	private HashMap<Integer, PajeReducedEvent> cache= new HashMap<Integer, PajeReducedEvent>();
 	private String trace;
 	private TraceDBObject traceDB;
 	private int EPPAGE = 100;
@@ -41,7 +41,7 @@ public class ReducedEventCache {
 			traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
 	}
 	
-	public ReducedEventCache(OcelotlParameters parameters) throws SoCTraceException {
+	public PajeReducedEventCache(OcelotlParameters parameters) throws SoCTraceException {
 		super();
 		this.EPPAGE = parameters.getEpCache();
 		this.PAGE = parameters.getPageCache();
@@ -49,23 +49,23 @@ public class ReducedEventCache {
 
 	}
 	
-	public ReducedEvent getEvent(EventProxy event) throws SoCTraceException{
+	public PajeReducedEvent getEvent(PajeEventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
 		//	HIT++;
 			return cache.get(event.ID);
 		}
 		cache.clear();
 		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		ReducedEventQuery query = new ReducedEventQuery(traceDB);
+		PajeReducedEventQuery query = new PajeReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<ReducedEvent> elist =query.getReducedEventList();
+		List<PajeReducedEvent> elist =query.getReducedEventList();
 	//	traceDB.close();
-		for (ReducedEvent e: elist)
+		for (PajeReducedEvent e: elist)
 			cache.put(e.ID, e);
 		return cache.get(event.ID);
 	}
 	
-	public ReducedEvent getEventPageCache(EventProxy event) throws SoCTraceException{
+	public PajeReducedEvent getEventPageCache(PajeEventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
 		//	HIT++;
 			return cache.get(event.ID);
@@ -74,15 +74,15 @@ public class ReducedEventCache {
 //		dm.start();
 		cache.clear();
 		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		ReducedEventQuery query = new ReducedEventQuery(traceDB);
+		PajeReducedEventQuery query = new PajeReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<ReducedEvent> elist =query.getReducedEventList();
+		List<PajeReducedEvent> elist =query.getReducedEventList();
 		if (!elist.isEmpty()){
-			query = new ReducedEventQuery(traceDB);
+			query = new PajeReducedEventQuery(traceDB);
 			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, String.valueOf(elist.get(0).PAGE)));
 			elist=query.getReducedEventList();
 	//	traceDB.close();
-		for (ReducedEvent e: elist)
+		for (PajeReducedEvent e: elist)
 			cache.put(e.ID, e);
 		//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
 		return cache.get(event.ID);
@@ -90,7 +90,7 @@ public class ReducedEventCache {
 		return null;
 	}
 	
-	public ReducedEvent getEventMultiPageCache(EventProxy event) throws SoCTraceException{
+	public PajeReducedEvent getEventMultiPageCache(PajeEventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
 		//	HIT++;
 			return cache.get(event.ID);
@@ -99,18 +99,18 @@ public class ReducedEventCache {
 //		dm.start();
 		cache.clear();
 		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		ReducedEventQuery query = new ReducedEventQuery(traceDB);
+		PajeReducedEventQuery query = new PajeReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<ReducedEvent> elist =query.getReducedEventList();
+		List<PajeReducedEvent> elist =query.getReducedEventList();
 		if (!elist.isEmpty()){
-			query = new ReducedEventQuery(traceDB);
+			query = new PajeReducedEventQuery(traceDB);
 			final ValueListString vls = new ValueListString();
 			for (int i=0; i<PAGE; i++)	
 				vls.addValue(String.valueOf(elist.get(0).PAGE+i));
 			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, vls.getValueString()));
 			elist=query.getReducedEventList();
 		//traceDB.close();
-		for (ReducedEvent e: elist)
+		for (PajeReducedEvent e: elist)
 			cache.put(e.ID, e);
 		//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
 		return cache.get(event.ID);
@@ -118,7 +118,7 @@ public class ReducedEventCache {
 		return null;
 	}
 	
-	public ReducedEvent getEventMultiPageEPCache(EventProxy event) throws SoCTraceException{
+	public PajeReducedEvent getEventMultiPageEPCache(PajeEventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
 			//HIT++;
 			return cache.get(event.ID);
@@ -127,11 +127,11 @@ public class ReducedEventCache {
 //		dm.start();
 		cache.clear();
 		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		ReducedEventQuery query = new ReducedEventQuery(traceDB);
+		PajeReducedEventQuery query = new PajeReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<ReducedEvent> elist =query.getReducedEventList();
+		List<PajeReducedEvent> elist =query.getReducedEventList();
 		if (!elist.isEmpty()){
-			query = new ReducedEventQuery(traceDB);
+			query = new PajeReducedEventQuery(traceDB);
 			final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 			final ValueListString vls = new ValueListString();
 			for (int i=0; i<EPPAGE; i++)	
@@ -141,7 +141,7 @@ public class ReducedEventCache {
 			query.setElementWhere(and);
 			elist=query.getReducedEventList();
 			//traceDB.close();
-			for (ReducedEvent e: elist)
+			for (PajeReducedEvent e: elist)
 			cache.put(e.ID, e);
 			//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
 			return cache.get(event.ID);
@@ -149,7 +149,7 @@ public class ReducedEventCache {
 		return null;
 	}
 	
-	public ReducedEvent getEventPageEPCache(EventProxy event) throws SoCTraceException{
+	public PajeReducedEvent getEventPageEPCache(PajeEventProxy event) throws SoCTraceException{
 		if (cache.containsKey(event.ID)) {
 		//	HIT++;
 			return cache.get(event.ID);
@@ -158,18 +158,18 @@ public class ReducedEventCache {
 //		dm.start();
 		cache.clear();
 		//TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
-		ReducedEventQuery query = new ReducedEventQuery(traceDB);
+		PajeReducedEventQuery query = new PajeReducedEventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
-		List<ReducedEvent> elist =query.getReducedEventList();
+		List<PajeReducedEvent> elist =query.getReducedEventList();
 		if (!elist.isEmpty()){
-			query = new ReducedEventQuery(traceDB);
+			query = new PajeReducedEventQuery(traceDB);
 			final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 			and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, String.valueOf(elist.get(0).PAGE)));
 			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(elist.get(0).EP)));
 			query.setElementWhere(and);
 			elist=query.getReducedEventList();
 		//	traceDB.close();
-			for (ReducedEvent e: elist)
+			for (PajeReducedEvent e: elist)
 			cache.put(e.ID, e);
 			//dm.end("CACHING :" + MISS++ + " MISS " + HIT + " HIT");
 			return cache.get(event.ID);

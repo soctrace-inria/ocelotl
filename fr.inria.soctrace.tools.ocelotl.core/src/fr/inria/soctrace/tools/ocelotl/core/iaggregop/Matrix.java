@@ -28,7 +28,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
 public abstract class Matrix implements IMatrix {

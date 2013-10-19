@@ -8,7 +8,7 @@
  * Contributors:
  *     Generoso Pagano - initial API and implementation
  ******************************************************************************/
-package fr.inria.soctrace.tools.ocelotl.core.query;
+package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

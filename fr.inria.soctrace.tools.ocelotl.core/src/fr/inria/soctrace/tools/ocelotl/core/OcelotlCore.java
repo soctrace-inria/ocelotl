@@ -30,7 +30,7 @@ import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeNormalizedStateSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateTypeSum;
-import fr.inria.soctrace.tools.ocelotl.core.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 
 public class OcelotlCore {
 

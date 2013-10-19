@@ -780,11 +780,12 @@ public class OcelotlView extends ViewPart {
 		textThreshold.addModifyListener(new ThresholdModifyListener());
 		canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		final TabItem tbtmTraceParameters = new TabItem(tabFolder, SWT.NONE);
-		tbtmTraceParameters.setText("Trace Parameters");
+		// final TabItem tbtmTraceParameters = new TabItem(tabFolder, SWT.NONE);
+		// tbtmTraceParameters.setText("Trace Parameters");
 
-		final SashForm sashFormTraceParameter = new SashForm(tabFolder, SWT.VERTICAL);
-		tbtmTraceParameters.setControl(sashFormTraceParameter);
+		// final SashForm sashFormTraceParameter = new SashForm(tabFolder,
+		// SWT.VERTICAL);
+		// tbtmTraceParameters.setControl(sashFormTraceParameter);
 
 		int index = 0;
 		for (final Trace t : confDataLoader.getTraces()) {

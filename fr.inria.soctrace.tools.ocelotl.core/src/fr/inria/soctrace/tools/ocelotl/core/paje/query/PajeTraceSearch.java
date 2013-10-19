@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.query;
+package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -41,7 +41,7 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class OcelotlTraceSearch extends TraceSearch {
+public class PajeTraceSearch extends TraceSearch {
 
 	@SuppressWarnings("unused")
 	private LogicalCondition buildIntervalCondition(final IntervalDesc interval) {
@@ -54,7 +54,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 	@Override
 	public List<Event> getEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		openTraceDBObject(t);
-		final EventIDQuery query = new EventIDQuery(traceDB);
+		final PajeEventProxyQuery query = new PajeEventProxyQuery(traceDB);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 
@@ -93,11 +93,11 @@ public class OcelotlTraceSearch extends TraceSearch {
 		traceDB.close();
 		return query.getList();
 	}
-	public List<ReducedEvent> getReducedEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public List<PajeReducedEvent> getReducedEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
-		List<ReducedEvent> proxy=new ArrayList<ReducedEvent>();
+		List<PajeReducedEvent> proxy=new ArrayList<PajeReducedEvent>();
 
 		// types
 		if (eventTypes != null) {
@@ -109,7 +109,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 				return proxy;
 		}
 		dm.start();
-		ReducedEventQuery query = new ReducedEventQuery(traceDB);
+		PajeReducedEventQuery query = new PajeReducedEventQuery(traceDB);
 		LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 		//and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, Long.toString(i)));
 			
@@ -148,11 +148,11 @@ public class OcelotlTraceSearch extends TraceSearch {
 	}
 	
 	
-	public List<EventProxy> getEventProxysByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public List<PajeEventProxy> getEventProxysByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
-		List<EventProxy> proxy=new ArrayList<EventProxy>();
+		List<PajeEventProxy> proxy=new ArrayList<PajeEventProxy>();
 
 		// types
 		if (eventTypes != null) {
@@ -164,7 +164,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 				return proxy;
 		}
 		dm.start();
-		EventIDQuery query = new EventIDQuery(traceDB);
+		PajeEventProxyQuery query = new PajeEventProxyQuery(traceDB);
 		LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 		//and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, Long.toString(i)));
 			
