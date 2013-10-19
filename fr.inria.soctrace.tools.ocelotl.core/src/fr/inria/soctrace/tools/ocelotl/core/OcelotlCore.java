@@ -58,7 +58,7 @@ public class OcelotlCore {
 	
 	public void setOperator(){
 		try {
-			operator = operators.createOperator(ocelotlParameters.getAggOperator());
+			operator = operators.getOperator(ocelotlParameters.getAggOperator());
 		} catch (SoCTraceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

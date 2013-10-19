@@ -34,7 +34,7 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 public abstract class Matrix implements IMatrix {
 
 	protected Query							query;
-	protected List<HashMap<String, Long>>	matrix	= new ArrayList<HashMap<String, Long>>();
+	protected List<HashMap<String, Long>>	matrix;
 	protected int							eventsNumber;
 	protected TimeSliceManager				timeSliceManager;
 	int										count			= 0;
@@ -147,6 +147,9 @@ public abstract class Matrix implements IMatrix {
 	public void setQueries(final Query query) throws SoCTraceException {
 		this.query = query;
 		query.checkTimeStamps();
+		count			= 0;
+		epit			= 0;
+		matrix = new ArrayList<HashMap<String, Long>>();
 		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();

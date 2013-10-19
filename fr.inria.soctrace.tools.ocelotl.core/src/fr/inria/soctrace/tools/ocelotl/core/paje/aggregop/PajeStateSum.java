@@ -28,6 +28,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.Matrix;
+import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEventCache;
@@ -123,7 +124,7 @@ public class PajeStateSum extends Matrix {
 				final List<EventProxy> events = eventProxyList.get(ep.getId());
 				for (int i = 0; i < events.size() - 1; i++) {
 					state = (new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-					if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
+					if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 						for (final long it : distrib.keySet())
 							matrixWrite(it, ep, distrib);
@@ -144,7 +145,7 @@ public class PajeStateSum extends Matrix {
 				IState state;
 				for (int i = 0; i < events.size() - 1; i++) {
 					state = (new PajeState(events.get(i), events.get(i + 1), timeSliceManager));
-					if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())) {
+					if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 						for (final long it : distrib.keySet())
 							matrixWrite(it, ep, distrib);

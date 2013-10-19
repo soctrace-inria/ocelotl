@@ -30,6 +30,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ICubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.CubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.query.ReducedEventCache;
@@ -87,7 +88,7 @@ public class PajeStateTypeSum extends CubicMatrix {
 			final List<ReducedEvent> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
 				state=new PajeState(events.get(i), events.get(i + 1), timeSliceManager);
-				if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())){
+				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())){
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 						System.out.println("Adding " + state.getStateType() + " state");
@@ -125,7 +126,7 @@ public class PajeStateTypeSum extends CubicMatrix {
 			final List<EventProxy> events = eventList.get(ep.getId());
 			for (int i = 0; i < events.size() - 1; i++) {
 				state=(new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager));
-				if (!query.getOcelotlParameters().getSleepingStates().contains(state.getStateType())){
+				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())){
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 						System.out.println("Adding " + state.getStateType() + " state");

@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.ui.views;
+package fr.inria.soctrace.tools.ocelotl.ui.paje;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -19,41 +20,41 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.paje.PajeConfig;
+import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-public class PajeView extends ViewPart {
-	
-	private OcelotlView ocelotlView;
-	private ListViewer							listViewerIdleStates;
-	private ListViewer							listViewerEventTypes;
-	private PajeConfig							config;
+public class PajeView extends ApplicationWindow {
 
-	
+	private OcelotlView	ocelotlView;
+	private ListViewer	listViewerIdleStates;
+	private ListViewer	listViewerEventTypes;
+	private PajeConfig	config;
+
 	private class IdlesSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			final InputDialog dialog = new InputDialog(getSite().getShell(), "Type Idle State", "Select Idle state", "", null);
+			final InputDialog dialog = new InputDialog(getShell(), "Type Idle State", "Select Idle state", "", null);
 			if (dialog.open() == Window.CANCEL)
 				return;
 			config.getIdles().add(dialog.getValue());
 			listViewerIdleStates.setInput(config.getIdles());
 		}
 	}
-	
-	
-	
+
 	public PajeView(OcelotlView ocelotlView, PajeConfig config) {
-		super();
+		super(ocelotlView.getSite().getShell());
 		this.ocelotlView = ocelotlView;
-		this.config=config;
+		this.config = config;
 	}
 
 	private class RemoveSelectionAdapter extends SelectionAdapter {
@@ -73,7 +74,7 @@ public class PajeView extends ViewPart {
 			viewer.refresh(false);
 		}
 	}
-	
+
 	private class EventTypeLabelProvider extends LabelProvider {
 
 		@Override
@@ -81,7 +82,7 @@ public class PajeView extends ViewPart {
 			return ((EventType) element).getName();
 		}
 	}
-	
+
 	private class TypesSelectionAdapter extends SelectionAdapter {
 
 		// all - input
@@ -97,7 +98,7 @@ public class PajeView extends ViewPart {
 		public void widgetSelected(final SelectionEvent e) {
 			if (ocelotlView.getConfDataLoader().getCurrentTrace() == null)
 				return;
-			final ListSelectionDialog dialog = new ListSelectionDialog(getSite().getShell(), diff(ocelotlView.getConfDataLoader().getTypes(), config.getTypes()), new ArrayContentProvider(), new EventTypeLabelProvider(), "Select Event Types");
+			final ListSelectionDialog dialog = new ListSelectionDialog(getShell(), diff(ocelotlView.getConfDataLoader().getTypes(), config.getTypes()), new ArrayContentProvider(), new EventTypeLabelProvider(), "Select Event Types");
 			if (dialog.open() == Window.CANCEL)
 				return;
 			for (final Object o : dialog.getResult())
@@ -105,9 +106,14 @@ public class PajeView extends ViewPart {
 			listViewerEventTypes.setInput(config.getTypes());
 		}
 	}
-	@Override
-	public void createPartControl(Composite parent) {
-		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+	protected void configureShell(Shell newShell) {
+		super.configureShell(newShell);
+		newShell.setText("Pajé Aggregation Operator Settings");
+	}
+
+	public Control createContents(Composite parent) {
+		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -191,21 +197,18 @@ public class PajeView extends ViewPart {
 		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
 
-
 		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
 			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains("PajeSetState")) {
-				config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
+				if (!config.getTypes().contains("PajeSetState"))
+					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
 				break;
 			}
 		listViewerEventTypes.setInput(config.getTypes());
-		config.getIdles().add("IDLE");
+		if (!config.getIdles().contains("IDLE"))
+			config.getIdles().add("IDLE");
 		listViewerIdleStates.setInput(config.getIdles());
 
-	}
-
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
+		return sashFormGlobal;
 
 	}
 

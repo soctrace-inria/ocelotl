@@ -360,6 +360,21 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
+	private class SettingsSelectionAdapter extends SelectionAdapter {
+
+		private final OcelotlView	view;
+
+		public SettingsSelectionAdapter(OcelotlView view) {
+			this.view = view;
+		}
+
+		public void widgetSelected(final SelectionEvent e) {
+			hasChanged = HasChanged.ALL;
+			ConfigViewManager manager = new ConfigViewManager(view);
+			manager.openConfigWindows();
+		}
+	}
+
 	private class ThresholdModifyListener implements ModifyListener {
 
 		@Override
@@ -393,7 +408,6 @@ public class OcelotlView extends ViewPart {
 	private HasChanged							hasChanged		= HasChanged.ALL;
 
 	private ListViewer							listViewerEventProducers;
-
 	private MatrixView							matrixView;
 	private final OcelotlCore					ocelotlCore;
 	private final OcelotlParameters				ocelotlParameters;
@@ -607,6 +621,7 @@ public class OcelotlView extends ViewPart {
 				if (confDataLoader.getCurrentTrace() == null)
 					return;
 				hasChanged = HasChanged.ALL;
+				ocelotlParameters.setTraceTypeConfig(ocelotlCore.getOperators().config(comboAggregationOperator.getText()));
 			}
 		});
 		comboAggregationOperator.setText("");
@@ -614,15 +629,7 @@ public class OcelotlView extends ViewPart {
 		Button btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
 		btnSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnSettings.setText("Settings");
-		btnSettings.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				hasChanged = HasChanged.ALL;
-				// TODO à faire demain!
-			}
-		});
-		;
+		btnSettings.addSelectionListener(new SettingsSelectionAdapter(this));
 
 		final Group groupEventProducers = new Group(groupTSParameters, SWT.NONE);
 		groupEventProducers.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
@@ -924,6 +931,14 @@ public class OcelotlView extends ViewPart {
 		} catch (final NumberFormatException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
+	}
+
+	public Combo getComboAggregationOperator() {
+		return comboAggregationOperator;
+	}
+
+	public void setComboAggregationOperator(Combo comboAggregationOperator) {
+		this.comboAggregationOperator = comboAggregationOperator;
 	}
 
 	@Override

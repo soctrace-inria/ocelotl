@@ -25,13 +25,14 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
+import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlParameters {
 
 	private List<EventProducer>	eventProducers		= new ArrayList<EventProducer>();
-	private List<EventType>		eventTypes			= new ArrayList<EventType>();		;
-	private List<String>		sleepingStates		= new ArrayList<String>();			;
+	//private List<EventType>		eventTypes			= new ArrayList<EventType>();		;
+	//private List<String>		sleepingStates		= new ArrayList<String>();			;
 	private int					timeSlicesNumber	= 1;
 	private TimeRegion			timeRegion;
 	private float				parameter			= 0;
@@ -45,7 +46,16 @@ public class OcelotlParameters {
 	private int					epCache				=100;
 	private int					pageCache			=20;
 	private int					thread				=5;
+	private TraceTypeConfig		traceTypeConfig;	
 
+
+	public TraceTypeConfig getTraceTypeConfig() {
+		return traceTypeConfig;
+	}
+
+	public void setTraceTypeConfig(TraceTypeConfig traceTypeConfig) {
+		this.traceTypeConfig = traceTypeConfig;
+	}
 
 	public boolean isGrowingQualities() {
 		return growingQualities;
@@ -83,16 +93,17 @@ public class OcelotlParameters {
 		this.pageCache = pageCache;
 	}
 
+
 	public String getAggOperator() {
 		return aggOperator;
 	}
 
-	public List<EventProducer> getEventProducers() {
-		return eventProducers;
+	public void setAggOperator(String aggOperator) {
+		this.aggOperator = aggOperator;
 	}
 
-	public List<EventType> getEventTypes() {
-		return eventTypes;
+	public List<EventProducer> getEventProducers() {
+		return eventProducers;
 	}
 
 	public int getMaxEventProducers() {
@@ -103,9 +114,9 @@ public class OcelotlParameters {
 		return parameter;
 	}
 
-	public List<String> getSleepingStates() {
-		return sleepingStates;
-	}
+//	public List<String> getSleepingStates() {
+//		return sleepingStates;
+//	}
 
 	public float getThreshold() {
 		return threshold;
@@ -127,16 +138,8 @@ public class OcelotlParameters {
 		return normalize;
 	}
 
-	public void setAggOperator(final String aggOperator) {
-		this.aggOperator = aggOperator;
-	}
-
 	public void setEventProducers(final List<EventProducer> eventProducers) {
 		this.eventProducers = eventProducers;
-	}
-
-	public void setEventTypes(final List<EventType> eventTypes) {
-		this.eventTypes = eventTypes;
 	}
 
 	public void setMaxEventProducers(final int maxEventProducers) {
@@ -151,9 +154,9 @@ public class OcelotlParameters {
 		this.parameter = parameter;
 	}
 
-	public void setSleepingStates(final List<String> sleepingStates) {
-		this.sleepingStates = sleepingStates;
-	}
+//	public void setSleepingStates(final List<String> sleepingStates) {
+//		this.sleepingStates = sleepingStates;
+//	}
 
 	public void setThreshold(final float threshold) {
 		this.threshold = threshold;
@@ -171,13 +174,13 @@ public class OcelotlParameters {
 		this.trace = trace;
 	}
 
-	@Override
-	public String toString() { // TODO update this
-		final StringBuilder builder = new StringBuilder();
-		builder.append("OcelotlParameters \n[\neventProducers=").append(eventProducers).append("\neventTypes=").append(eventTypes).append("\nsleepingStates=").append(sleepingStates).append("\ntimeSlicesNumber=").append(timeSlicesNumber)
-				.append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold).append("\ntrace=").append(trace).append("\n]");
-		return builder.toString();
-	}
+//	@Override
+//	public String toString() { // TODO update this
+//		final StringBuilder builder = new StringBuilder();
+//		builder.append("OcelotlParameters \n[\neventProducers=").append(eventProducers).append("\neventTypes=").append(eventTypes).append("\nsleepingStates=").append(sleepingStates).append("\ntimeSlicesNumber=").append(timeSlicesNumber)
+//				.append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold).append("\ntrace=").append(trace).append("\n]");
+//		return builder.toString();
+//	}
 
 	public int getThread() {
 		return thread;
