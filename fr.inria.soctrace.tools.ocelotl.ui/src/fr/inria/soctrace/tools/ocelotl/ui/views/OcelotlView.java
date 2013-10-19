@@ -372,6 +372,8 @@ public class OcelotlView extends ViewPart {
 
 		public void widgetSelected(final SelectionEvent e) {
 			hasChanged = HasChanged.ALL;
+			if (comboAggregationOperator.getText().equals(""))
+				return;
 			ConfigViewManager manager = new ConfigViewManager(view);
 			manager.openConfigWindows();
 		}
