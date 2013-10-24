@@ -145,11 +145,11 @@ public class PajeTraceSearch extends TraceSearch {
 		return query.getList();
 	}
 
-	public List<PajeReducedEvent> getReducedEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public List<PajeReducedEvent1> getReducedEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		final DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
-		List<PajeReducedEvent> proxy = new ArrayList<PajeReducedEvent>();
+		List<PajeReducedEvent1> proxy = new ArrayList<PajeReducedEvent1>();
 
 		// types
 		if (eventTypes != null)
@@ -159,7 +159,7 @@ public class PajeTraceSearch extends TraceSearch {
 			if (eventProducers.size() == 0)
 				return proxy;
 		dm.start();
-		final PajeReducedEventQuery query = new PajeReducedEventQuery(traceDB);
+		final PajeReducedEvent1Query query = new PajeReducedEvent1Query(traceDB);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 		// and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ,
 		// Long.toString(i)));

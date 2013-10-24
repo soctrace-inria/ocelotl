@@ -132,15 +132,11 @@ public abstract class CubicMatrix extends AggregationOperator implements ICubicM
 
 	
 	public void matrixWrite(final long it, final EventProducer ep, IState state, final Map<Long, Long> distrib) {
-		synchronized (matrix) {
 			matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
-		}
 	}
 	
 	public void matrixPushType(int incr, String epstring, IState state, final Map<Long, Long> distrib) {
-		synchronized (matrix) {
 			matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
-		}
 	}
 
 

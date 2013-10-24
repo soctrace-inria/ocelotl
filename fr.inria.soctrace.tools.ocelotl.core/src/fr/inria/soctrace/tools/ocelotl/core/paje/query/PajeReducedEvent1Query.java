@@ -30,7 +30,7 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalCo
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
  */
-public class PajeReducedEventQuery extends EventQuery {
+public class PajeReducedEvent1Query extends EventQuery {
 
 	/**
 	 * The constructor
@@ -38,12 +38,12 @@ public class PajeReducedEventQuery extends EventQuery {
 	 * @param traceDB
 	 *            Trace DB object where the query is performed.
 	 */
-	public PajeReducedEventQuery(final TraceDBObject traceDB) {
+	public PajeReducedEvent1Query(final TraceDBObject traceDB) {
 		super(traceDB);
 		clear();
 	}
 
-	public List<PajeReducedEvent> getReducedEventList() throws SoCTraceException {
+	public List<PajeReducedEvent1> getReducedEventList() throws SoCTraceException {
 		try {
 			final DeltaManager dm = new DeltaManager();
 			dm.start();
@@ -93,7 +93,7 @@ public class PajeReducedEventQuery extends EventQuery {
 			final Statement stm = dbObj.getConnection().createStatement();
 
 			final ResultSet rs = stm.executeQuery(query);
-			final List<PajeReducedEvent> elist = rebuildReducedEvent(rs);
+			final List<PajeReducedEvent1> elist = rebuildReducedEvent(rs);
 
 			debug(dm.endMessage("EventQuery.getList()"));
 
@@ -106,17 +106,17 @@ public class PajeReducedEventQuery extends EventQuery {
 
 	}
 
-	private List<PajeReducedEvent> rebuildReducedEvent(final ResultSet rs) throws SoCTraceException {
+	private List<PajeReducedEvent1> rebuildReducedEvent(final ResultSet rs) throws SoCTraceException {
 
-		final HashMap<Integer, PajeReducedEvent> list = new HashMap<Integer, PajeReducedEvent>();
-		final LinkedList<PajeReducedEvent> llist = new LinkedList<PajeReducedEvent>();
+		final HashMap<Integer, PajeReducedEvent1> list = new HashMap<Integer, PajeReducedEvent1>();
+		final LinkedList<PajeReducedEvent1> llist = new LinkedList<PajeReducedEvent1>();
 		final ValueListString vls = new ValueListString();
 		new ValueListString();
 		final List<Integer> li = new ArrayList<Integer>();
 		try {
 
 			while (rs.next()) {
-				final PajeReducedEvent re = new PajeReducedEvent(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), null);
+				final PajeReducedEvent1 re = new PajeReducedEvent1(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), null);
 				list.put(re.ID, re);
 				llist.add(re);
 				vls.addValue(String.valueOf(re.ID));

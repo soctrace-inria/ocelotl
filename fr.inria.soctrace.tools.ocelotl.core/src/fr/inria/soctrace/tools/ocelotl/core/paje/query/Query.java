@@ -70,11 +70,11 @@ public class Query {
 		return elist;
 	}
 
-	public List<PajeReducedEvent> getAllReducedEvents() throws SoCTraceException {
+	public List<PajeReducedEvent1> getAllReducedEvents() throws SoCTraceException {
 		final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
 		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
 		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-		final List<PajeReducedEvent> elist = traceSearch.getReducedEventsByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
+		final List<PajeReducedEvent1> elist = traceSearch.getReducedEventsByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
 		traceSearch.uninitialize();
 		return elist;
 	}
@@ -109,14 +109,14 @@ public class Query {
 		return ocelotlParameters;
 	}
 
-	public List<PajeReducedEvent> getReducedEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
+	public List<PajeReducedEvent1> getReducedEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
 			return getAllReducedEvents();
 		else {
 			final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
 			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
 			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-			final List<PajeReducedEvent> elist = traceSearch.getReducedEventsByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
+			final List<PajeReducedEvent1> elist = traceSearch.getReducedEventsByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
 			traceSearch.uninitialize();
 			return elist;
 		}

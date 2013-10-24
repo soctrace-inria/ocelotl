@@ -1,13 +1,13 @@
 package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 
 
-public class PajeReducedEvent extends PajeEventProxy {
+public class PajeReducedEvent1 extends PajeEventProxy {
 
 	public String	VALUE;
 	public int		PAGE;
 	public long		TS;
 
-	public PajeReducedEvent(final int id, final int ep, final int page, final long ts, final String value) {
+	public PajeReducedEvent1(final int id, final int ep, final int page, final long ts, final String value) {
 		super(id, ep);
 		VALUE = value;
 		PAGE = page;
