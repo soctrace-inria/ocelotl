@@ -66,7 +66,12 @@ public class AggregationOperatorManager {
 
 	public IAggregationOperator getOperator(final String name) throws SoCTraceException {
 		final IAggregationOperator op = List.get(name);
-		op.setOcelotlParameters(parameters);
+		try {
+			op.setOcelotlParameters(parameters);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return op;
 	}
 

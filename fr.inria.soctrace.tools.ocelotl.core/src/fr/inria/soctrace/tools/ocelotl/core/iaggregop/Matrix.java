@@ -32,17 +32,11 @@ import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
-public abstract class Matrix implements IMatrix {
+public abstract class Matrix extends AggregationOperator implements IMatrix  {
 
-	protected Query							query;
-	protected OcelotlParameters				parameters;
+
 	protected List<HashMap<String, Long>>	matrix;
-	protected int							eventsNumber;
-	protected TimeSliceManager				timeSliceManager;
-	int										count	= 0;
-	int										epit	= 0;
-	protected DeltaManager					dm;
-	public final static int					EPCOUNT	= 200;
+
 
 	public Matrix() throws SoCTraceException {
 		super();
@@ -50,7 +44,12 @@ public abstract class Matrix implements IMatrix {
 
 	public Matrix(final OcelotlParameters parameters) throws SoCTraceException {
 		super();
-		setOcelotlParameters(parameters);
+		try {
+			setOcelotlParameters(parameters);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void computeMatrix() throws SoCTraceException {
@@ -79,34 +78,10 @@ public abstract class Matrix implements IMatrix {
 		dmt.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
 	}
 
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
-		if (query.getOcelotlParameters().isCache())
-			computeSubMatrixCached(eventProducers);
-		else
-			computeSubMatrixNonCached(eventProducers);
-	}
-
-	// protected abstract void computeSubMatrix(List<EventProducer>
-	// eventProducers) throws SoCTraceException, InterruptedException;
-
-	protected abstract void computeSubMatrixCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
-
-	protected abstract void computeSubMatrixNonCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
-
 	@Override
 	public VLPAggregManager createManager() {
 		return new VLPAggregManager(this);
 
-	}
-
-	public synchronized int getCount() {
-		count++;
-		return count;
-	}
-
-	public synchronized int getEP() {
-		epit++;
-		return epit - 1;
 	}
 
 	@Override
@@ -114,24 +89,6 @@ public abstract class Matrix implements IMatrix {
 		return matrix;
 	}
 
-	@Override
-	public OcelotlParameters getOcelotlParameters() {
-		return parameters;
-	}
-
-	@Override
-	public Query getQueries() {
-		return query;
-	}
-
-	public Query getQuery() {
-		return query;
-	}
-
-	@Override
-	public TimeSliceManager getTimeSlicesManager() {
-		return timeSliceManager;
-	}
 
 	@Override
 	public int getVectorSize() {
@@ -145,6 +102,7 @@ public abstract class Matrix implements IMatrix {
 
 	@Override
 	public void initVectors() throws SoCTraceException {
+		matrix = new ArrayList<HashMap<String, Long>>();
 		final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
 			matrix.add(new HashMap<String, Long>());
@@ -174,21 +132,6 @@ public abstract class Matrix implements IMatrix {
 		}
 	}
 
-	@Override
-	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException {
-		this.parameters = parameters;
-		query = new Query(parameters);
-		query.checkTimeStamps();
-		count = 0;
-		epit = 0;
-		matrix = new ArrayList<HashMap<String, Long>>();
-		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
-		initVectors();
-		computeMatrix();
-	}
 
-	public void total(final int rows) {
-		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
-	}
 
 }

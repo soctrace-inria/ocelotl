@@ -29,6 +29,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.CubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum.OcelotlThread;
 import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeEventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent;
@@ -38,6 +39,97 @@ import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class PajeStateTypeSum extends CubicMatrix {
+	
+	class OcelotlThread extends Thread {
+
+		List<EventProducer>						eventProducers;
+		Map<Integer, List<PajeEventProxy>>		eventProxyList;
+		Map<Integer, List<PajeReducedEvent>>	eventList;
+		int										threadNumber;
+		int										thread;
+		boolean									cached;
+
+		@SuppressWarnings("unchecked")
+		public OcelotlThread(final List<EventProducer> eventProducers, final Object eventList, final int threadNumber, final int thread, final boolean cached) {
+			super();
+			this.eventProducers = eventProducers;
+			this.cached = cached;
+			if (cached)
+				eventProxyList = (Map<Integer, List<PajeEventProxy>>) eventList;
+			else
+				this.eventList = (Map<Integer, List<PajeReducedEvent>>) eventList;
+			this.threadNumber = threadNumber;
+			this.thread = thread;
+
+			start();
+		}
+
+		private void cacheRun() throws SoCTraceException {
+			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
+				PajeReducedEventCache cache;
+				cache = new PajeReducedEventCache(query.getOcelotlParameters());
+				final EventProducer ep = eventProducers.get(t);
+				IState state;
+				final List<PajeEventProxy> events = eventProxyList.get(ep.getId());
+				for (int i = 0; i < events.size() - 1; i++) {
+					state = new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager);
+					if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+						if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
+							System.out.println("Adding " + state.getStateType() + " state");
+							for (int incr = 0; incr < matrix.size(); incr++)
+								for (final String epstring : matrix.get(incr).keySet())
+									matrixPushType(incr, epstring, state, distrib);
+						}
+						for (final long it : distrib.keySet())
+							matrixWrite(it, ep, state, distrib);					}
+				}
+				final int c = getCount();
+				if (c % EPCOUNT == 0)
+					total(c);
+			}
+
+		}
+
+		private void noCacheRun() {
+			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
+				final EventProducer ep = eventProducers.get(t);
+				final List<PajeReducedEvent> events = eventList.get(ep.getId());
+				IState state;
+				for (int i = 0; i < events.size() - 1; i++) {
+					state = new PajeState(events.get(i), events.get(i + 1), timeSliceManager);
+					if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+						if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
+							System.out.println("Adding " + state.getStateType() + " state");
+							for (int incr = 0; incr < matrix.size(); incr++)
+								for (final String epstring : matrix.get(incr).keySet())
+									matrixPushType(incr, epstring, state, distrib);
+						}
+						for (final long it : distrib.keySet())
+							matrixWrite(it, ep, state, distrib);					}
+				}
+				final int c = getCount();
+				if (c % EPCOUNT == 0)
+					total(c);
+			}
+
+		}
+		
+		@Override
+		public void run() {
+			if (cached)
+				try {
+					cacheRun();
+				} catch (final SoCTraceException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			else
+				noCacheRun();
+		}
+	}
+
 
 	public final static String	descriptor	= "State Type Sum";
 	public final static String	traceType	= PajeConstants.PajeFormatName;
@@ -50,71 +142,28 @@ public class PajeStateTypeSum extends CubicMatrix {
 		super(parameters);
 	}
 
-	@Override
-	public void computeMatrix() throws SoCTraceException {
-		eventsNumber = 0;
-		final DeltaManager dm = new DeltaManager();
-		dm.start();
-		final int epsize = query.getOcelotlParameters().getEventProducers().size();
-		if (query.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < query.getOcelotlParameters().getMaxEventProducers())
-			computeSubMatrix(query.getOcelotlParameters().getEventProducers());
-		else {
-			final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers().size() == 0 ? query.getAllEventProducers() : query.getOcelotlParameters().getEventProducers();
-			for (int i = 0; i < epsize; i = i + query.getOcelotlParameters().getMaxEventProducers())
-				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getOcelotlParameters().getMaxEventProducers())));
-		}
-
-		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
-	}
-
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (query.getOcelotlParameters().isCache())
-			computeSubMatrixCached(eventProducers);
-		else
-			computeSubMatrixNonCached(eventProducers);
-	}
-
-	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException {
-		int count = 0;
+	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		final PajeReducedEventCache cache = new PajeReducedEventCache(query.getOcelotlParameters());
 		final List<PajeEventProxy> fullEvents = query.getEventsProxy(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
-		final DeltaManager dm2 = new DeltaManager();
 		dm.start();
 		final Map<Integer, List<PajeEventProxy>> eventList = new HashMap<Integer, List<PajeEventProxy>>();
 		for (final EventProducer ep : eventProducers)
 			eventList.put(ep.getId(), new ArrayList<PajeEventProxy>());
 		for (final PajeEventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
-		for (final EventProducer ep : eventProducers) {
-			dm2.start();
-			IState state;
-			final List<PajeEventProxy> events = eventList.get(ep.getId());
-			for (int i = 0; i < events.size() - 1; i++) {
-				state = new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager);
-				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
-						System.out.println("Adding " + state.getStateType() + " state");
-						for (int incr = 0; incr < matrix.size(); incr++)
-							for (final String epstring : matrix.get(incr).keySet())
-								matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
-					}
-					for (final long it : distrib.keySet())
-						matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
-				}
-			}
-			dm2.end("EP VECTORS (" + count++ + "): " + ep.getName());
-
-		}
+		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		for (int t = 0; t < query.getOcelotlParameters().getThread(); t++)
+			threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThread(), t, true));
+		for (final Thread thread : threadlist)
+			thread.join();
 		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
-	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException {
+	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
 		final List<PajeReducedEvent> fullEvents = query.getReducedEvents(eventProducers);
@@ -127,26 +176,15 @@ public class PajeStateTypeSum extends CubicMatrix {
 			eventList.put(ep.getId(), new ArrayList<PajeReducedEvent>());
 		for (final PajeReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
-		for (final EventProducer ep : eventProducers) {
-			IState state;
-			final List<PajeReducedEvent> events = eventList.get(ep.getId());
-			for (int i = 0; i < events.size() - 1; i++) {
-				state = new PajeState(events.get(i), events.get(i + 1), timeSliceManager);
-				if (!((PajeConfig) query.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
-						System.out.println("Adding " + state.getStateType() + " state");
-						for (int incr = 0; incr < matrix.size(); incr++)
-							for (final String epstring : matrix.get(incr).keySet())
-								matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
-					}
-					for (final long it : distrib.keySet())
-						matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
-				}
-			}
-		}
+			final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+			for (int t = 0; t < query.getOcelotlParameters().getThread(); t++)
+				threadlist.add(new OcelotlThread(eventProducers, eventList, query.getOcelotlParameters().getThread(), t, false));
+			for (final Thread thread : threadlist)
+				thread.join();
 		dm.end("VECTORS COMPUTATION : " + query.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
+	
+	
 
 	@Override
 	public String descriptor() {

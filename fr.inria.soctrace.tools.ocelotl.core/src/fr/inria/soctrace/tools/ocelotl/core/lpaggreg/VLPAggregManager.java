@@ -30,7 +30,7 @@ public class VLPAggregManager extends LPAggregManager {
 	IMatrix	matrix;
 
 	public VLPAggregManager(final IMatrix matrix) {
-		super(matrix.getQueries().getOcelotlParameters());
+		super(matrix.getQuery().getOcelotlParameters());
 		this.matrix = matrix;
 		lpaggregWrapper = new LPAggregWrapper(2);
 		fillVectors();
@@ -53,8 +53,8 @@ public class VLPAggregManager extends LPAggregManager {
 						for (final String key : matrix.getMatrix().get(k).keySet())
 							lpaggregWrapperTemp.push_back(matrix.getMatrix().get(k).get(key));
 					}
-				lpaggregWrapperTemp.computeQualities(matrix.getQueries().getOcelotlParameters().isNormalize());
-				lpaggregWrapperTemp.computeParts(matrix.getQueries().getOcelotlParameters().getParameter());
+				lpaggregWrapperTemp.computeQualities(matrix.getQuery().getOcelotlParameters().isNormalize());
+				lpaggregWrapperTemp.computeParts(matrix.getQuery().getOcelotlParameters().getParameter());
 				boolean eq = true;
 				for (int l = 0; l < lpaggregWrapperTemp.getPartNumber(); l++)
 					if (l > 0 && lpaggregWrapperTemp.getPart(l) != lpaggregWrapperTemp.getPart(l - 1)) {

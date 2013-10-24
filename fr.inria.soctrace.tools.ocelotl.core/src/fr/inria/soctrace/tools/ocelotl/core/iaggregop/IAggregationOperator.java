@@ -16,7 +16,7 @@ public interface IAggregationOperator {
 
 	public OcelotlParameters getOcelotlParameters();
 
-	public Query getQueries();
+	public Query getQuery();
 
 	public TimeSliceManager getTimeSlicesManager();
 
@@ -28,7 +28,7 @@ public interface IAggregationOperator {
 
 	public void print();
 
-	public void setOcelotlParameters(OcelotlParameters parameters) throws SoCTraceException;
+	public void setOcelotlParameters(OcelotlParameters parameters) throws SoCTraceException, InterruptedException;
 
 	public String traceType();
 

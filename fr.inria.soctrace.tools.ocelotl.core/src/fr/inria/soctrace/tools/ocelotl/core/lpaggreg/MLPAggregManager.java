@@ -27,7 +27,7 @@ public class MLPAggregManager extends LPAggregManager {
 	ICubicMatrix	timeSliceMatrix;
 
 	public MLPAggregManager(final ICubicMatrix timeSliceMatrix) {
-		super(timeSliceMatrix.getQueries().getOcelotlParameters());
+		super(timeSliceMatrix.getQuery().getOcelotlParameters());
 		this.timeSliceMatrix = timeSliceMatrix;
 		lpaggregWrapper = new LPAggregWrapper(3);
 		fillVectors();
