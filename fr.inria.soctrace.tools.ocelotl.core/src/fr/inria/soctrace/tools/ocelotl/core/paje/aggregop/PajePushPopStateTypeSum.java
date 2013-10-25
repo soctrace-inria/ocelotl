@@ -66,8 +66,10 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 			start();
 		}
 		
-		private void matrixUpdate(IState state, EventProducer ep, Map<Long, Long> distrib){
+		private void matrixUpdate(IState state, EventProducer ep){
 			synchronized(matrix){
+				if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 		if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 			System.out.println("Adding " + state.getStateType() + " state");
 			for (int incr = 0; incr < matrix.size(); incr++)
@@ -77,11 +79,13 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 			for (final long it : distrib.keySet())
 				matrixWrite(it, ep, state, distrib);
 		}
+			}
 	}
 
 		private void cacheRun() throws SoCTraceException {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
 				ArrayList<PajeReducedEvent2> stack = new ArrayList<PajeReducedEvent2>();
+				
 				PajeReducedEvent2Cache cache;
 				cache = new PajeReducedEvent2Cache(genericQuery.getOcelotlParameters());
 				final EventProducer ep = eventProducers.get(t);
@@ -90,7 +94,8 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 				for (int i = 1; i < events.size(); i++) {
 					PajeReducedEvent2 tmp1 = cache.getEventMultiPageEPCache(events.get(i-1));
 					PajeReducedEvent2 tmp2 = cache.getEventMultiPageEPCache(events.get(i));
-					compute(tmp1, tmp2, stack, state, ep);
+					PajeReducedEvent2 current = null;
+					compute(tmp1, tmp2, current, stack, state, ep);
 				}
 					computeEnd(stack, state, ep);
 					
@@ -110,7 +115,8 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 					for (int i = 1; i < events.size(); i++) {
 						PajeReducedEvent2 tmp1 = events.get(i-1);
 						PajeReducedEvent2 tmp2 = events.get(i);
-						compute(tmp1, tmp2, stack, state, ep);
+						PajeReducedEvent2 current = null;
+						compute(tmp1, tmp2, current, stack, state, ep);
 					}
 						computeEnd(stack, state, ep);
 				final int c = getCount();
@@ -119,41 +125,38 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 			}
 
 		}
-			void compute(PajeReducedEvent2 tmp1, PajeReducedEvent2 tmp2, ArrayList<PajeReducedEvent2> stack, IState state, EventProducer ep){
+			void compute(PajeReducedEvent2 tmp1, PajeReducedEvent2 tmp2, PajeReducedEvent2 current, ArrayList<PajeReducedEvent2> stack, IState state, EventProducer ep){
 				if (tmp2.TYPE.contains(PajeExternalConstants.PajePushState)){
 					if (!tmp1.TYPE.contains(PajeExternalConstants.PajePopState))
-						stack.add(tmp1);
+						stack.add(tmp1);	
+					else
+						if (current!=null)
+							stack.add(current);
 				}
 				else if (tmp2.TYPE.contains(PajeExternalConstants.PajePopState)){
+					current=null;
+					if (!stack.isEmpty()){
+						current=stack.get(stack.size()-1);
+						stack.remove(stack.size()-1);
+					}
 					if (tmp1.TYPE.contains(PajeExternalConstants.PajePushState)){
 						state = new PajeState(tmp1, tmp2, timeSliceManager);
-					if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-						matrixUpdate(state, ep, distrib);
-					}
+						matrixUpdate(state, ep);
 					}
 					else{
-						state = new PajeState(stack.get(stack.size()-1), tmp2, timeSliceManager);
-						stack.remove(stack.size()-1);
-						if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-							final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-							matrixUpdate(state, ep, distrib);
+						if (current!=null){
+							state = new PajeState(current, tmp2, timeSliceManager);
+							matrixUpdate(state, ep);
 						}
 					}
 				}
 				else if (tmp2.TYPE.contains(PajeExternalConstants.PajeSetState)){
 					state = new PajeState(tmp1, tmp2, timeSliceManager);
-					if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-						matrixUpdate(state, ep, distrib);
-					}
+						matrixUpdate(state, ep);
 					for (PajeReducedEvent2 stacked:stack){
 						state = new PajeState(stacked, tmp2, timeSliceManager);
-						if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-							final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-							matrixUpdate(state, ep, distrib);
+						matrixUpdate(state, ep);
 						}
-					}
 					stack.clear();
 				}
 			}
@@ -162,12 +165,10 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 			if (!stack.isEmpty()){
 				for (PajeReducedEvent2 stacked:stack){
 					state = new PajeState(stacked, genericQuery.getOcelotlParameters().getTimeRegion().getTimeStampEnd(), timeSliceManager);
-					if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-						matrixUpdate(state, ep, distrib);
+					matrixUpdate(state, ep);
 					}
-				}
 			}
+			stack.clear();
 			}
 				
 		
