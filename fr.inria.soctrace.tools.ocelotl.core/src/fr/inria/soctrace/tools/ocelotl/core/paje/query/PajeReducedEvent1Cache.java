@@ -12,6 +12,7 @@ import fr.inria.soctrace.lib.query.conditions.SimpleCondition;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.EventProxy;
 
 public class PajeReducedEvent1Cache {
 	private final HashMap<Integer, PajeReducedEvent1>	cache	= new HashMap<Integer, PajeReducedEvent1>();
@@ -42,7 +43,7 @@ public class PajeReducedEvent1Cache {
 		}
 	}
 
-	public PajeReducedEvent1 getEvent(final PajeEventProxy event) throws SoCTraceException {
+	public PajeReducedEvent1 getEvent(final EventProxy event) throws SoCTraceException {
 		if (cache.containsKey(event.ID))
 			// HIT++;
 			return cache.get(event.ID);
@@ -57,7 +58,7 @@ public class PajeReducedEvent1Cache {
 		return cache.get(event.ID);
 	}
 
-	public PajeReducedEvent1 getEventMultiPageCache(final PajeEventProxy event) throws SoCTraceException {
+	public PajeReducedEvent1 getEventMultiPageCache(final EventProxy event) throws SoCTraceException {
 		if (cache.containsKey(event.ID))
 			// HIT++;
 			return cache.get(event.ID);
@@ -84,7 +85,7 @@ public class PajeReducedEvent1Cache {
 		return null;
 	}
 
-	public PajeReducedEvent1 getEventMultiPageEPCache(final PajeEventProxy event) throws SoCTraceException {
+	public PajeReducedEvent1 getEventMultiPageEPCache(final EventProxy event) throws SoCTraceException {
 		if (cache.containsKey(event.ID))
 			// HIT++;
 			return cache.get(event.ID);
@@ -114,7 +115,7 @@ public class PajeReducedEvent1Cache {
 		return null;
 	}
 
-	public PajeReducedEvent1 getEventPageCache(final PajeEventProxy event) throws SoCTraceException {
+	public PajeReducedEvent1 getEventPageCache(final EventProxy event) throws SoCTraceException {
 		if (cache.containsKey(event.ID))
 			// HIT++;
 			return cache.get(event.ID);
@@ -138,7 +139,7 @@ public class PajeReducedEvent1Cache {
 		return null;
 	}
 
-	public PajeReducedEvent1 getEventPageEPCache(final PajeEventProxy event) throws SoCTraceException {
+	public PajeReducedEvent1 getEventPageEPCache(final EventProxy event) throws SoCTraceException {
 		if (cache.containsKey(event.ID))
 			// HIT++;
 			return cache.get(event.ID);

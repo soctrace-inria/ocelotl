@@ -6,18 +6,18 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
+import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.GenericQuery;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
 public abstract class AggregationOperator {
 	
 	protected TimeSliceManager				timeSliceManager;
-	int										count	= 0;
-	int										epit	= 0;
+	protected int										count	= 0;
+	protected int										epit	= 0;
 	protected DeltaManager					dm;
 	public final static int					EPCOUNT	= 200;
 	protected int							eventsNumber;
-	protected Query							query;
+	protected GenericQuery					genericQuery;
 	protected OcelotlParameters				parameters;
 	
 	public synchronized int getCount() {
@@ -34,8 +34,8 @@ public abstract class AggregationOperator {
 		return parameters;
 	}
 
-	public Query getQuery() {
-		return query;
+	public GenericQuery getQuery() {
+		return genericQuery;
 	}
 
 	public TimeSliceManager getTimeSlicesManager() {
@@ -43,7 +43,7 @@ public abstract class AggregationOperator {
 	}
 	
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
-		if (query.getOcelotlParameters().isCache())
+		if (genericQuery.getOcelotlParameters().isCache())
 			computeSubMatrixCached(eventProducers);
 		else
 			computeSubMatrixNonCached(eventProducers);
@@ -55,11 +55,11 @@ public abstract class AggregationOperator {
 
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
 		this.parameters = parameters;
-		query = new Query(parameters);
-		query.checkTimeStamps();
+		genericQuery = new GenericQuery(parameters);
+		genericQuery.checkTimeStamps();
 		count = 0;
 		epit = 0;
-		timeSliceManager = new TimeSliceManager(query.getOcelotlParameters().getTimeRegion(), query.getOcelotlParameters().getTimeSlicesNumber());
+		timeSliceManager = new TimeSliceManager(genericQuery.getOcelotlParameters().getTimeRegion(), genericQuery.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
 	}

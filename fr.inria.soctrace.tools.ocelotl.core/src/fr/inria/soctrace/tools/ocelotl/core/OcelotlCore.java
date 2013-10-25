@@ -21,11 +21,12 @@ package fr.inria.soctrace.tools.ocelotl.core;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
+import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.GenericQuery;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.AggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.ILPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.PartManager;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
+
 
 public class OcelotlCore {
 
@@ -41,7 +42,6 @@ public class OcelotlCore {
 	}
 
 	OcelotlParameters			ocelotlParameters;
-	Query						query;
 	ILPAggregManager			lpaggregManager;
 	PartManager					partManager;
 	AggregationOperatorManager	operators;
@@ -103,10 +103,6 @@ public class OcelotlCore {
 
 	public PartManager getPartsManager() {
 		return partManager;
-	}
-
-	public Query getQueries() {
-		return query;
 	}
 
 	public void init(final OcelotlParameters ocelotlParameters) throws SoCTraceException {

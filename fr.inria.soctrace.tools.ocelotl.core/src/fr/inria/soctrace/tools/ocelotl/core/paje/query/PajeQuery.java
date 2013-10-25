@@ -30,45 +30,19 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.EventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.GenericQuery;
 
-public class Query {
+public class PajeQuery extends GenericQuery{
 
 	private final OcelotlParameters	ocelotlParameters;
 
-	public Query(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
-		super();
+	public PajeQuery(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
+		super(ocelotlParameters);
 		this.ocelotlParameters = ocelotlParameters;
 	}
 
-	public void checkTimeStamps() {
-		// TODO calculer le max
-	}
 
-	public List<EventProducer> getAllEventProducers() throws SoCTraceException {
-		final TraceDBObject traceDB = new TraceDBObject(ocelotlParameters.getTrace().getDbName(), DBMode.DB_OPEN);
-		final EventProducerQuery eventProducerQuery = new EventProducerQuery(traceDB);
-		final List<EventProducer> eplist = eventProducerQuery.getList();
-		traceDB.close();
-		return eplist;
-	}
-
-	public List<Event> getAllEvents() throws SoCTraceException {
-		final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
-		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-		final List<Event> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
-		traceSearch.uninitialize();
-		return elist;
-	}
-
-	public List<PajeEventProxy> getAllEventsProxy() throws SoCTraceException {
-		final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
-		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-		final List<PajeEventProxy> elist = traceSearch.getEventProxysByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
-		traceSearch.uninitialize();
-		return elist;
-	}
 
 	public List<PajeReducedEvent1> getAllReducedEvents1() throws SoCTraceException {
 		final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
@@ -88,37 +62,6 @@ public class Query {
 		return elist;
 	}
 	
-	
-
-	public List<Event> getEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getAllEvents();
-		else {
-			final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-			final List<Event> elist = traceSearch.getEventsByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
-			traceSearch.uninitialize();
-			return elist;
-		}
-	}
-
-	public List<PajeEventProxy> getEventsProxy(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getAllEventsProxy();
-		else {
-			final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-			final List<PajeEventProxy> elist = traceSearch.getEventProxysByEventTypesAndIntervalsAndEventProducers(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
-			traceSearch.uninitialize();
-			return elist;
-		}
-	}
-
-	public OcelotlParameters getOcelotlParameters() {
-		return ocelotlParameters;
-	}
 
 	public List<PajeReducedEvent1> getReducedEvents1(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())

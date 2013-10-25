@@ -23,10 +23,11 @@ import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.EventQuery;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
 /**
- * Query class for Event self-defining-pattern tables.
+ * GenericQuery class for Event self-defining-pattern tables.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
@@ -37,7 +38,7 @@ public class PajeReducedEvent2Query extends EventQuery {
 	 * The constructor
 	 * 
 	 * @param traceDB
-	 *            Trace DB object where the query is performed.
+	 *            Trace DB object where the genericQuery is performed.
 	 */
 	public PajeReducedEvent2Query(final TraceDBObject traceDB) {
 		super(traceDB);

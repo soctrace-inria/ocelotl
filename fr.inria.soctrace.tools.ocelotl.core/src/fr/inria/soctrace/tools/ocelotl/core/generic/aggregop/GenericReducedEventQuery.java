@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.core.paje.query;
+package fr.inria.soctrace.tools.ocelotl.core.generic.aggregop;
 
 /*******************************************************************************
  * Copyright (c) 2013 Damien Dosimont
@@ -12,48 +12,46 @@ package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.EventQuery;
+import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
 /**
- * Query class for Event self-defining-pattern tables.
+ * GenericQuery class for Event self-defining-pattern tables.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
  */
-public class PajeEventProxyQuery extends EventQuery {
-
-	private static final boolean	USE_JOIN	= false;
+public class GenericReducedEventQuery extends EventQuery {
 
 	/**
 	 * The constructor
 	 * 
 	 * @param traceDB
-	 *            Trace DB object where the query is performed.
+	 *            Trace DB object where the genericQuery is performed.
 	 */
-	public PajeEventProxyQuery(final TraceDBObject traceDB) {
+	public GenericReducedEventQuery(final TraceDBObject traceDB) {
 		super(traceDB);
 		clear();
 	}
 
-	public List<PajeEventProxy> getIDList() throws SoCTraceException {
-
+	public List<GenericReducedEvent> getReducedEventList() throws SoCTraceException {
 		try {
 			final DeltaManager dm = new DeltaManager();
 			dm.start();
 
 			boolean first = true;
-			StringBuffer eventQuery = null;
-			if (USE_JOIN) {
-				debug("Experimental query with join");
-				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM + " on " + FramesocTable.EVENT + ".ID = " + FramesocTable.EVENT_PARAM + ".EVENT_ID ");
-			} else
-				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
+			final StringBuffer eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
 
 			if (where)
 				eventQuery.append(" WHERE ");
@@ -97,8 +95,7 @@ public class PajeEventProxyQuery extends EventQuery {
 			final Statement stm = dbObj.getConnection().createStatement();
 
 			final ResultSet rs = stm.executeQuery(query);
-			List<PajeEventProxy> elist = null;
-			elist = rebuildEventID(rs);
+			final List<GenericReducedEvent> elist = rebuildReducedEvent(rs);
 
 			debug(dm.endMessage("EventQuery.getList()"));
 
@@ -111,16 +108,27 @@ public class PajeEventProxyQuery extends EventQuery {
 
 	}
 
-	private List<PajeEventProxy> rebuildEventID(final ResultSet rs) throws SoCTraceException {
+	private List<GenericReducedEvent> rebuildReducedEvent(final ResultSet rs) throws SoCTraceException {
 
-		final List<PajeEventProxy> list = new LinkedList<PajeEventProxy>();
+		final HashMap<Integer, GenericReducedEvent> list = new HashMap<Integer, GenericReducedEvent>();
+		final LinkedList<GenericReducedEvent> llist = new LinkedList<GenericReducedEvent>();
+		final ValueListString vls = new ValueListString();
+		new ValueListString();
+		final List<Integer> li = new ArrayList<Integer>();
+		final TraceDBObject traceDB = (TraceDBObject) dbObj;
 		try {
 
-			while (rs.next())
-				list.add(new PajeEventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID")));
-			return list;
+			while (rs.next()) {
+				final GenericReducedEvent re = new GenericReducedEvent(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), traceDB.getEventTypeCache().get(EventType.class, rs.getInt(2)).getName());
+				list.put(re.ID, re);
+				llist.add(re);
+				vls.addValue(String.valueOf(re.ID));
+			}
+
+			return llist;
 		} catch (final SQLException e) {
 			throw new SoCTraceException(e);
 		}
 	}
+
 }

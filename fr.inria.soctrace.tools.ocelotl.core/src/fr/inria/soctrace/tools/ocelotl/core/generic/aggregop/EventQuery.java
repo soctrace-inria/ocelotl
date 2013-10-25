@@ -8,7 +8,7 @@
  * Contributors:
  *     Generoso Pagano - initial API and implementation
  ******************************************************************************/
-package fr.inria.soctrace.tools.ocelotl.core.paje.query;
+package fr.inria.soctrace.tools.ocelotl.core.generic.aggregop;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,7 +34,7 @@ import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 
 /**
- * Query class for Event self-defining-pattern tables.
+ * GenericQuery class for Event self-defining-pattern tables.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
@@ -51,7 +51,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 	 * The constructor
 	 * 
 	 * @param traceDB
-	 *            Trace DB object where the query is performed.
+	 *            Trace DB object where the genericQuery is performed.
 	 */
 	public EventQuery(final TraceDBObject traceDB) {
 		super(traceDB);
@@ -59,7 +59,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 	}
 
 	/**
-	 * Clear query: removes all the conditions. EventProducer cache is not
+	 * Clear genericQuery: removes all the conditions. EventProducer cache is not
 	 * cleared, since we are not changing trace DB.
 	 */
 	@Override
@@ -184,7 +184,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 			boolean first = true;
 			StringBuffer eventQuery = null;
 			if (USE_JOIN) {
-				debug("Experimental query with join");
+				debug("Experimental genericQuery with join");
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM + " on " + FramesocTable.EVENT + ".ID = " + FramesocTable.EVENT_PARAM + ".EVENT_ID ");
 			} else
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
@@ -312,7 +312,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 	 * @param prs
 	 *            EVENT_PARAM table row
 	 * @param tmp
-	 *            map containing the Events returned by the query
+	 *            map containing the Events returned by the genericQuery
 	 * @return the EventParam
 	 * @throws SQLException
 	 * @throws SoCTraceException

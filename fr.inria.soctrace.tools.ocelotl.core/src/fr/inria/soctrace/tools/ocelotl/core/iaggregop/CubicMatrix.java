@@ -29,7 +29,6 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.Query;
 import fr.inria.soctrace.tools.ocelotl.core.ts.IState;
 import fr.inria.soctrace.tools.ocelotl.core.ts.TimeSliceManager;
 
@@ -58,19 +57,19 @@ public abstract class CubicMatrix extends AggregationOperator implements ICubicM
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		final int epsize = query.getOcelotlParameters().getEventProducers().size();
-		if (query.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < query.getOcelotlParameters().getMaxEventProducers())
+		final int epsize = genericQuery.getOcelotlParameters().getEventProducers().size();
+		if (genericQuery.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < genericQuery.getOcelotlParameters().getMaxEventProducers())
 			try {
-				computeSubMatrix(query.getOcelotlParameters().getEventProducers());
+				computeSubMatrix(genericQuery.getOcelotlParameters().getEventProducers());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		else {
-			final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers().size() == 0 ? query.getAllEventProducers() : query.getOcelotlParameters().getEventProducers();
-			for (int i = 0; i < epsize; i = i + query.getOcelotlParameters().getMaxEventProducers())
+			final List<EventProducer> producers = genericQuery.getOcelotlParameters().getEventProducers().size() == 0 ? genericQuery.getAllEventProducers() : genericQuery.getOcelotlParameters().getEventProducers();
+			for (int i = 0; i < epsize; i = i + genericQuery.getOcelotlParameters().getMaxEventProducers())
 				try {
-					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + query.getOcelotlParameters().getMaxEventProducers())));
+					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + genericQuery.getOcelotlParameters().getMaxEventProducers())));
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -106,7 +105,7 @@ public abstract class CubicMatrix extends AggregationOperator implements ICubicM
 	@Override
 	public void initVectors() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<String, HashMap<String, Long>>>();
-		final List<EventProducer> producers = query.getOcelotlParameters().getEventProducers();
+		final List<EventProducer> producers = genericQuery.getOcelotlParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
 			matrix.add(new HashMap<String, HashMap<String, Long>>());
 
