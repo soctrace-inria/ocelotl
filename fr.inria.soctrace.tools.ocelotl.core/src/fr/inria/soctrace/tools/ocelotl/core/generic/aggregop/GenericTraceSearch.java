@@ -146,7 +146,7 @@ public class GenericTraceSearch extends TraceSearch {
 	}
 
 	
-	public List<GenericReducedEvent> getReducedEvents2ByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public List<GenericReducedEvent> getReducedEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		final DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);

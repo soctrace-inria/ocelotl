@@ -41,9 +41,10 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.EventProxyQuery;
+import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.GenericTraceSearch;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class PajeTraceSearch extends TraceSearch {
+public class PajeTraceSearch extends GenericTraceSearch {
 
 	@SuppressWarnings("unused")
 	private LogicalCondition buildIntervalCondition(final IntervalDesc interval) {
@@ -53,99 +54,10 @@ public class PajeTraceSearch extends TraceSearch {
 		return and;
 	}
 
-	public List<EventProxy> getEventProxysByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
-		final DeltaManager dm = new DeltaManager();
-		openTraceDBObject(t);
-		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
-		List<EventProxy> proxy = new ArrayList<EventProxy>();
-
-		// types
-		if (eventTypes != null)
-			if (eventTypes.size() == 0)
-				return proxy;
-		if (eventProducers != null)
-			if (eventProducers.size() == 0)
-				return proxy;
-		dm.start();
-		final EventProxyQuery query = new EventProxyQuery(traceDB);
-		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
-		// and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ,
-		// Long.toString(i)));
+	
 
 		// intervals
-		if (region != null) {
-			if (traceDB.getMaxTimestamp() != region.getTimeStampEnd())
-				and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
-			if (traceDB.getMinTimestamp() != region.getTimeStampStart())
-				and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
-		}
 
-		if (eventTypes != null) {
-			final ValueListString vls = new ValueListString();
-			for (final EventType et : eventTypes)
-				vls.addValue(String.valueOf(et.getId()));
-			and.addCondition(new SimpleCondition("EVENT_TYPE_ID", ComparisonOperation.IN, vls.getValueString()));
-		}
-
-		// eventProducers
-		if (eventProducers != null) {
-			final ValueListString vls = new ValueListString();
-			for (final EventProducer ep : eventProducers)
-				vls.addValue(String.valueOf(ep.getId()));
-			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.IN, vls.getValueString()));
-		}
-
-		if (and.getNumberOfConditions() == 1)
-			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-		query.setElementWhere(and);
-		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
-		proxy = query.getIDList();
-		traceDB.close();
-		return proxy;
-	}
-
-	@Override
-	public List<Event> getEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
-		openTraceDBObject(t);
-		final EventProxyQuery query = new EventProxyQuery(traceDB);
-		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
-		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
-
-		// types
-		if (eventTypes != null) {
-			if (eventTypes.size() == 0)
-				return new LinkedList<Event>();
-			final ValueListString vls = new ValueListString();
-			for (final EventType et : eventTypes)
-				vls.addValue(String.valueOf(et.getId()));
-			and.addCondition(new SimpleCondition("EVENT_TYPE_ID", ComparisonOperation.IN, vls.getValueString()));
-		}
-
-		// intervals
-		if (region != null) {
-			if (traceDB.getMaxTimestamp() != region.getTimeStampEnd())
-				and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
-			if (traceDB.getMinTimestamp() != region.getTimeStampStart())
-				and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
-		}
-
-		// eventProducers
-		if (eventProducers != null) {
-			if (eventProducers.size() == 0)
-				return new LinkedList<Event>();
-			final ValueListString vls = new ValueListString();
-			for (final EventProducer ep : eventProducers)
-				vls.addValue(String.valueOf(ep.getId()));
-			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.IN, vls.getValueString()));
-		}
-		// TODO improve
-		if (and.getNumberOfConditions() == 1)
-			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-		query.setElementWhere(and);
-		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
-		traceDB.close();
-		return query.getList();
-	}
 
 	public List<PajeReducedEvent1> getReducedEvents1ByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		final DeltaManager dm = new DeltaManager();
