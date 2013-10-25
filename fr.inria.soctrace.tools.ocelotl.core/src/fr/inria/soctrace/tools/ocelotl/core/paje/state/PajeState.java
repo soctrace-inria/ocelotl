@@ -45,5 +45,12 @@ public class PajeState extends State {
 		eventProducerID = eventStart.EP;
 		stateType = eventStart.VALUE;
 	}
+	
+	public PajeState(final PajeReducedEvent1 eventStart, final long end, final TimeSliceManager timeSliceManager) {
+		super(timeSliceManager);
+		timeRegion = new TimeRegion(eventStart.TS, end);
+		eventProducerID = eventStart.EP;
+		stateType = eventStart.VALUE;
+	}
 
 }

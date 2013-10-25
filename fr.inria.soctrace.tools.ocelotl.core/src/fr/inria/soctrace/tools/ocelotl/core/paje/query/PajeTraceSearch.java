@@ -145,7 +145,7 @@ public class PajeTraceSearch extends TraceSearch {
 		return query.getList();
 	}
 
-	public List<PajeReducedEvent1> getReducedEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public List<PajeReducedEvent1> getReducedEvents1ByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		final DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
@@ -160,6 +160,57 @@ public class PajeTraceSearch extends TraceSearch {
 				return proxy;
 		dm.start();
 		final PajeReducedEvent1Query query = new PajeReducedEvent1Query(traceDB);
+		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+		// and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ,
+		// Long.toString(i)));
+
+		// intervals
+		if (region != null) {
+			if (traceDB.getMaxTimestamp() != region.getTimeStampEnd())
+				and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
+			if (traceDB.getMinTimestamp() != region.getTimeStampStart())
+				and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
+		}
+
+		if (eventTypes != null) {
+			final ValueListString vls = new ValueListString();
+			for (final EventType et : eventTypes)
+				vls.addValue(String.valueOf(et.getId()));
+			and.addCondition(new SimpleCondition("EVENT_TYPE_ID", ComparisonOperation.IN, vls.getValueString()));
+		}
+
+		// eventProducers
+		if (eventProducers != null) {
+			final ValueListString vls = new ValueListString();
+			for (final EventProducer ep : eventProducers)
+				vls.addValue(String.valueOf(ep.getId()));
+			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.IN, vls.getValueString()));
+		}
+
+		if (and.getNumberOfConditions() == 1)
+			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
+		query.setElementWhere(and);
+		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+		proxy = query.getReducedEventList();
+		traceDB.close();
+		return proxy;
+	}
+	
+	public List<PajeReducedEvent2> getReducedEvents2ByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+		final DeltaManager dm = new DeltaManager();
+		openTraceDBObject(t);
+		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
+		List<PajeReducedEvent2> proxy = new ArrayList<PajeReducedEvent2>();
+
+		// types
+		if (eventTypes != null)
+			if (eventTypes.size() == 0)
+				return proxy;
+		if (eventProducers != null)
+			if (eventProducers.size() == 0)
+				return proxy;
+		dm.start();
+		final PajeReducedEvent2Query query = new PajeReducedEvent2Query(traceDB);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 		// and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ,
 		// Long.toString(i)));

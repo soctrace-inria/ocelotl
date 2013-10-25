@@ -172,7 +172,7 @@ public class PajeNormalizedStateSum extends Matrix {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<PajeReducedEvent1> fullEvents = query.getReducedEvents(eventProducers);
+		final List<PajeReducedEvent1> fullEvents = query.getReducedEvents1(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();

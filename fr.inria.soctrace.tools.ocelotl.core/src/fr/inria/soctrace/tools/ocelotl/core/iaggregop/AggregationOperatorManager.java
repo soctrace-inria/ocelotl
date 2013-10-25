@@ -27,6 +27,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.TraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeNormalizedStateSum;
+import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajePushPopStateTypeSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.aggregop.PajeStateTypeSum;
 import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
@@ -84,6 +85,7 @@ public class AggregationOperatorManager {
 		List.put(PajeStateSum.descriptor, new PajeStateSum());
 		List.put(PajeNormalizedStateSum.descriptor, new PajeNormalizedStateSum());
 		List.put(PajeStateTypeSum.descriptor, new PajeStateTypeSum());
+		List.put(PajePushPopStateTypeSum.descriptor, new PajePushPopStateTypeSum());
 
 	}
 

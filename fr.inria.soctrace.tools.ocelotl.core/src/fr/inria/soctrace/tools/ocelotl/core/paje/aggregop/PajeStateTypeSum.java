@@ -167,7 +167,7 @@ public class PajeStateTypeSum extends CubicMatrix {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		final List<PajeReducedEvent1> fullEvents = query.getReducedEvents(eventProducers);
+		final List<PajeReducedEvent1> fullEvents = query.getReducedEvents1(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();

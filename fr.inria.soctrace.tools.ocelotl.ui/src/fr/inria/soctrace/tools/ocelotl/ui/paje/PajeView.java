@@ -33,6 +33,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
+import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
 public class PajeView extends ApplicationWindow {
 
@@ -205,7 +206,19 @@ public class PajeView extends ApplicationWindow {
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
 
 		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains("PajeSetState")) {
+			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains(PajeExternalConstants.PajeSetState)) {
+				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
+					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
+				break;
+			}
+		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
+			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains(PajeExternalConstants.PajePushState)) {
+				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
+					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
+				break;
+			}
+		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
+			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains(PajeExternalConstants.PajePopState)) {
 				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
 					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
 				break;
