@@ -39,6 +39,7 @@ public class OcelotlParameters {
 	private Trace				trace				= null;
 	private int					maxEventProducers	= 0;
 	private String				aggOperator;
+	private String				aggOperator2;
 	private boolean				growingQualities	= true;
 	private boolean				cache				= true;
 	private int					epCache				= 100;
@@ -116,6 +117,16 @@ public class OcelotlParameters {
 
 	public void setAggOperator(final String aggOperator) {
 		this.aggOperator = aggOperator;
+	}
+	
+	
+
+	public String getAggOperator2() {
+		return aggOperator2;
+	}
+
+	public void setAggOperator2(String aggOperator2) {
+		this.aggOperator2 = aggOperator2;
 	}
 
 	public void setCache(final boolean cache) {
