@@ -61,6 +61,11 @@ public class Part {
 		this.data = data;
 	}
 	
+	public int getPartSize(){
+		return endPart-startPart;
+		
+	}
+	
 	
 	
 }

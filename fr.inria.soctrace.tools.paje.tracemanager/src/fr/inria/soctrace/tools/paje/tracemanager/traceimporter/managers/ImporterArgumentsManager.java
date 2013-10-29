@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.paje.tracemanager.traceimporter.managers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.soctrace.framesoc.core.FramesocManager;
@@ -80,12 +81,15 @@ public class ImporterArgumentsManager extends ArgumentManager {
 	@Override
 	public void processArgs() throws SoCTraceException {
 		sysDbName = Configuration.getInstance().get(SoCTraceProperty.soctrace_db_name);
-		traceDbName = options.containsKey("db") ? options.get("db") : FramesocManager.getInstance().getTraceDBName(PajeConstants.ImportToolName);
+		//traceDbName = options.containsKey("db") ? options.get("db") : FramesocManager.getInstance().getTraceDBName(PajeConstants.ImportToolName);
 		logFile = options.containsKey("log") ? options.get("log") : null;
 		traceDescription = options.containsKey("desc") ? options.get("desc") : null;
 		if (defaults.isEmpty())
 			throw new SoCTraceException("Missing trace files");
 		traceFiles = defaults;
+		ArrayList<String> tokens = new ArrayList<String>();
+		tokens.toArray(traceFiles.get(0).split("/"));
+		traceDbName = options.containsKey("db") ? options.get("db") : tokens.get(tokens.size()-1);
 	}
 
 }
