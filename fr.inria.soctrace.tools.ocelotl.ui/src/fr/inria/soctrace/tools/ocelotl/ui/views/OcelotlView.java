@@ -461,6 +461,23 @@ public class OcelotlView extends ViewPart {
 		// TODO config paje
 	}
 
+	private void refreshTraces() {
+		try {
+			confDataLoader.loadTraces();
+		} catch (SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int index = 0;
+		comboTraces.removeAll();
+		for (final Trace t : confDataLoader.getTraces()) {
+			comboTraces.add(t.getAlias(), index);
+			traceMap.put(index, t);
+			index++;
+		}
+		;
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -550,11 +567,24 @@ public class OcelotlView extends ViewPart {
 		final Group groupTSParameters = new Group(sashFormTSandCurve, SWT.NONE);
 		groupTSParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTSParameters.setLayout(new GridLayout(1, false));
-		comboTraces = new Combo(groupTSParameters, SWT.READ_ONLY);
-		final GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+
+		Group groupTraces = new Group(groupTSParameters, SWT.NONE);
+		groupTraces.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		groupTraces.setLayout(new GridLayout(2, false));
+		comboTraces = new Combo(groupTraces, SWT.READ_ONLY);
+		GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_comboTraces.widthHint = 180;
 		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		Button buttonRefresh = new Button(groupTraces, SWT.NONE);
+		buttonRefresh.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/load.png"));
+		buttonRefresh.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				refreshTraces();
+			}
+		});
 		comboTraces.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -574,6 +604,14 @@ public class OcelotlView extends ViewPart {
 				}
 			}
 		});
+
+		int index = 0;
+		for (final Trace t : confDataLoader.getTraces()) {
+			comboTraces.add(t.getAlias(), index);
+			traceMap.put(index, t);
+			index++;
+		}
+		;
 
 		final Group groupAggregationOperator = new Group(groupTSParameters, SWT.NONE);
 		groupAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -688,7 +726,7 @@ public class OcelotlView extends ViewPart {
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
 		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		sashFormTSandCurve.setWeights(new int[] { 265, 46 });
+		sashFormTSandCurve.setWeights(new int[] { 281, 49 });
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 
 		final SashForm sashForm = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
@@ -760,14 +798,6 @@ public class OcelotlView extends ViewPart {
 		// final SashForm sashFormTraceParameter = new SashForm(tabFolder,
 		// SWT.VERTICAL);
 		// tbtmTraceParameters.setControl(sashFormTraceParameter);
-
-		int index = 0;
-		for (final Trace t : confDataLoader.getTraces()) {
-			comboTraces.add(t.getAlias(), index);
-			traceMap.put(index, t);
-			index++;
-		}
-		;
 
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
 		tbtmAdvancedParameters.setText("Advanced Parameters");

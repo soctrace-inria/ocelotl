@@ -138,6 +138,7 @@ public class ConfDataLoader {
 	}
 
 	public List<Trace> loadTraces() throws SoCTraceException {
+		clean();
 		final SystemDBObject sysDB = FramesocManager.getInstance().getSystemDB();
 		final TraceQuery tQuery = new TraceQuery(sysDB);
 		traces = tQuery.getList();
