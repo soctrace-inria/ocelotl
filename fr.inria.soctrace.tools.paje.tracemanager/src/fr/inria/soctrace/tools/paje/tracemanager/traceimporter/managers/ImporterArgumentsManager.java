@@ -81,15 +81,15 @@ public class ImporterArgumentsManager extends ArgumentManager {
 	@Override
 	public void processArgs() throws SoCTraceException {
 		sysDbName = Configuration.getInstance().get(SoCTraceProperty.soctrace_db_name);
-		//traceDbName = options.containsKey("db") ? options.get("db") : FramesocManager.getInstance().getTraceDBName(PajeConstants.ImportToolName);
+		traceDbName = options.containsKey("db") ? options.get("db") : FramesocManager.getInstance().getTraceDBName(PajeConstants.ImportToolName);
 		logFile = options.containsKey("log") ? options.get("log") : null;
 		traceDescription = options.containsKey("desc") ? options.get("desc") : null;
 		if (defaults.isEmpty())
 			throw new SoCTraceException("Missing trace files");
 		traceFiles = defaults;
-		ArrayList<String> tokens = new ArrayList<String>();
-		tokens.toArray(traceFiles.get(0).split("/"));
-		traceDbName = options.containsKey("db") ? options.get("db") : tokens.get(tokens.size()-1);
+		String[] tokens = traceFiles.get(0).split("/");
+		String string = tokens[tokens.length-1].replace(".paje", "");
+		traceDbName = options.containsKey("db") ? options.get("db") : string;
 	}
 
 }
