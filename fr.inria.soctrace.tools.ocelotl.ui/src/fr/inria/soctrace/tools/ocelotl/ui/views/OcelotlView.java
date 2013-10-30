@@ -670,7 +670,7 @@ public class OcelotlView extends ViewPart {
 		listEventProducers.setLayoutData(gd_listEventProducers);
 
 		final ScrolledComposite scrCompositeEventProducerButtons = new ScrolledComposite(groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrCompositeEventProducerButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		scrCompositeEventProducerButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
 		scrCompositeEventProducerButtons.setExpandHorizontal(true);
 		scrCompositeEventProducerButtons.setExpandVertical(true);
 

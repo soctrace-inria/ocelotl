@@ -20,7 +20,10 @@
 package fr.inria.soctrace.tools.ocelotl.core.iaggregop;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
@@ -62,7 +65,17 @@ public class AggregationOperatorManager {
 	}
 
 	public Collection<IAggregationOperator> getList() {
-		return List.values();
+		List<IAggregationOperator> val = new ArrayList<IAggregationOperator>();
+		val.addAll(List.values());
+		Collections.sort(val, new Comparator<IAggregationOperator>() {
+
+			@Override
+			public int compare(IAggregationOperator o1, IAggregationOperator o2) {
+				return o1.descriptor().compareTo(o2.descriptor());
+			}
+			
+		});
+		return val;
 	}
 
 	public IAggregationOperator getOperator(final String name) throws SoCTraceException {
