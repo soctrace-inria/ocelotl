@@ -42,5 +42,7 @@ public interface ILPAggregManager {
 	public void printParts();
 
 	public void reset();
+	
+	public List<String> getEventProducers();
 
 }

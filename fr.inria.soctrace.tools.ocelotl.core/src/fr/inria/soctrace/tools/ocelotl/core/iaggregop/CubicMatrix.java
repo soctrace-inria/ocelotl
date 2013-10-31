@@ -36,8 +36,8 @@ public abstract class CubicMatrix extends AggregationOperator implements ICubicM
 
 
 	protected List<HashMap<String, HashMap<String, Long>>>	matrix;
-
-
+	List<String> keys;
+	
 
 	public CubicMatrix() {
 		super();
@@ -54,6 +54,7 @@ public abstract class CubicMatrix extends AggregationOperator implements ICubicM
 	}
 
 	public void computeMatrix() throws SoCTraceException{
+		keys = new ArrayList<String>();
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
@@ -136,7 +137,14 @@ public abstract class CubicMatrix extends AggregationOperator implements ICubicM
 	
 	public void matrixPushType(int incr, String epstring, IState state, final Map<Long, Long> distrib) {
 			matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
+			addKey(state.getStateType());
+	}
+	
+	public void addKey(String key){
+		keys.add(key);
 	}
 
-
+	public List<String> getKeys(){
+		return keys;
+	}
 }

@@ -19,6 +19,9 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ICubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
 
@@ -54,6 +57,10 @@ public class MLPAggregManager extends LPAggregManager {
 	public void reset() {
 		lpaggregWrapper = new LPAggregWrapper(3);
 		fillVectors();
+	}
+	
+	public List<String> getEventProducers(){
+		return new ArrayList<String>(timeSliceMatrix.getMatrix().get(0).keySet());	
 	}
 
 }

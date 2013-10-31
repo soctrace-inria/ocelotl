@@ -30,4 +30,8 @@ public interface ICubicMatrix extends IAggregationOperator {
 	public MLPAggregManager createManager();
 
 	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
+	
+	public void addKey(String key);
+	
+	public List<String> getKeys();
 }

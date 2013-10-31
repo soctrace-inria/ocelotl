@@ -95,5 +95,9 @@ public class VLPAggregManager extends LPAggregManager {
 		lpaggregWrapper = new LPAggregWrapper(2);
 		fillVectors();
 	}
+	
+	public List<String> getEventProducers(){
+		return new ArrayList<String>(matrix.getMatrix().get(0).keySet());	
+	}
 
 }
