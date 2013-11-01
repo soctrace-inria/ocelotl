@@ -81,7 +81,7 @@ public class VLPAggregManager extends LPAggregManager {
 		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
 			lpaggregWrapper.addVector();
 			for (final String key : matrix.getMatrix().get(i).keySet())
-				lpaggregWrapper.push_back(matrix.getMatrix().get(i).get(key));
+				lpaggregWrapper.push_back(matrix.getMatrix().get(i).get(key).doubleValue());
 		}
 
 	}

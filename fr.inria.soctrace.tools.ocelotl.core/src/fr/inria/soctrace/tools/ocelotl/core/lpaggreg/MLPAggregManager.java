@@ -43,7 +43,7 @@ public class MLPAggregManager extends LPAggregManager {
 			for (final String key : timeSliceMatrix.getMatrix().get(i).keySet()) {
 				lpaggregWrapper.addVector();
 				for (final String key2 : timeSliceMatrix.getMatrix().get(i).get(key).keySet())
-					lpaggregWrapper.push_back(timeSliceMatrix.getMatrix().get(i).get(key).get(key2));
+					lpaggregWrapper.push_back(timeSliceMatrix.getMatrix().get(i).get(key).get(key2).doubleValue());
 			}
 		}
 
