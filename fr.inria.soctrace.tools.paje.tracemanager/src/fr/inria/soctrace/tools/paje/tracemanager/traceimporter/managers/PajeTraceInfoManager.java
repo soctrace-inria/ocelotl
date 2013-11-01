@@ -30,6 +30,7 @@ import fr.inria.soctrace.lib.model.TraceParamType;
 import fr.inria.soctrace.lib.model.TraceType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
+import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
@@ -37,6 +38,7 @@ public class PajeTraceInfoManager {
 
 	private ImporterArgumentsManager	arguments;
 	private SystemDBObject				sysDB;
+	private TraceDBObject				traceDB;
 
 	private Trace						trace;
 	private TraceType					traceType;
@@ -46,9 +48,10 @@ public class PajeTraceInfoManager {
 	 * @throws SoCTraceException
 	 * 
 	 */
-	public PajeTraceInfoManager(ImporterArgumentsManager arguments, SystemDBObject sysDB) throws SoCTraceException {
+	public PajeTraceInfoManager(ImporterArgumentsManager arguments, SystemDBObject sysDB, TraceDBObject traceDB) throws SoCTraceException {
 		this.arguments = arguments;
 		this.sysDB = sysDB;
+		this.traceDB = traceDB;
 		isTraceTypeExisting = sysDB.isTraceTypePresent(PajeConstants.PajeFormatName);
 	}
 
@@ -60,7 +63,7 @@ public class PajeTraceInfoManager {
 	private void buildTrace() throws SoCTraceException {
 
 		trace = new Trace(sysDB.getNewId(FramesocTable.TRACE.toString(), "ID"));
-		trace.setDbName(arguments.getTraceDbName());
+		trace.setDbName(traceDB.getDBName());
 		trace.setType(traceType);
 		trace.setDescription(arguments.getTraceDescription() != null ? arguments.getTraceDescription() : "Paje trace imported on " + getCurrentDate());
 
@@ -71,16 +74,6 @@ public class PajeTraceInfoManager {
 		trace.setOperatingSystem("unknown");
 		trace.setNumberOfCpus(1);
 		trace.setOutputDevice("unknown");
-
-		// If there are trace parameters, set them here. Sample code follows.
-		// IdManager tpIdManager = new IdManager();
-		// tpIdManager.setNextId(sysDB.getMaxId(STITables.TRACE_PARAM.toString(),
-		// "ID") + 1);
-		// TraceParam tp;
-		// tp = new TraceParam(tpIdManager.getNextId());
-		// tp.setTrace(trace);
-		// tp.setTraceParamType( /* TODO */ );
-		// tp.setValue( /* TODO : set a value here*/ );
 
 	}
 

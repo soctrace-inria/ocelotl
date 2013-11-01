@@ -48,7 +48,6 @@ public class ArgumentManager implements IArgumentManager {
 				break;
 			default:
 				defaults.add(args[i]);
-				break;
 			}
 	}
 

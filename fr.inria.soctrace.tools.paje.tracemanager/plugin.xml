@@ -5,7 +5,7 @@
          point="fr.inria.soctrace.framesoc.core.tool">
       <tool
             class="fr.inria.soctrace.tools.paje.tracemanager.traceimporter.PajeTraceImporterTool"
-            doc="[-desc trace description] [-db trace-db-name] [-log log file]"
+            doc="[-desc trace description] [-log log file]"
             name="Paje Importer"
             type="IMPORT">
       </tool>

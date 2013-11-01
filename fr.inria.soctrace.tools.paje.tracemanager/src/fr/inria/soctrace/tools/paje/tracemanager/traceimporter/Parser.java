@@ -86,15 +86,12 @@ public class Parser {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	private BufferedReader[] getFileReaders() throws FileNotFoundException {
+	private BufferedReader getFileReaders(int i) throws FileNotFoundException {
 
-		BufferedReader[] br = new BufferedReader[arguments.getTraceFiles().size()];
-
-		for (int i = 0; i < arguments.getTraceFiles().size(); ++i) {
+		BufferedReader br ;
 			FileInputStream fstream = new FileInputStream(arguments.getTraceFiles().get(i));
 			DataInputStream in = new DataInputStream(fstream);
-			br[i] = new BufferedReader(new InputStreamReader(in));
-		}
+			br = new BufferedReader(new InputStreamReader(in));
 		return br;
 	}
 
@@ -103,20 +100,18 @@ public class Parser {
 	 * 
 	 * @throws SoCTraceException
 	 */
-	public void importTrace() throws SoCTraceException {
+	public void importTrace(int i) throws SoCTraceException {
 
 		try {
 
 			// create trace general info
-			PajeTraceInfoManager pajeTraceInfoManager = new PajeTraceInfoManager(arguments, sysDB);
+			PajeTraceInfoManager pajeTraceInfoManager = new PajeTraceInfoManager(arguments, sysDB, traceDB);
 			pajeTraceInfoManager.createTraceInfo();
 			pajeTraceInfoManager.saveTraceInfo();
 
-			parseEventDef(getFileReaders()[0]);
+			parseEventDef(getFileReaders(i));
 			pajeEventTypeManager.save(traceDB);
-
-			for (BufferedReader brIt : getFileReaders())
-				parseEvent(brIt);
+			parseEvent(getFileReaders(i));
 			pajeEventManager.saveEventProducer(traceDB);
 
 		} catch (Exception e) {

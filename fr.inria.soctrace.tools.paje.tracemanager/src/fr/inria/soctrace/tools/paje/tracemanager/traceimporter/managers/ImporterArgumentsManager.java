@@ -32,7 +32,7 @@ import fr.inria.soctrace.tools.paje.utils.argumentmanager.ArgumentManager;
 public class ImporterArgumentsManager extends ArgumentManager {
 
 	private String			sysDbName			= null;
-	private String			traceDbName			= null;
+	private List<String>	traceDbName			= new ArrayList<String>();
 	private List<String>	traceFiles			= null;
 	private String			logFile				= null;
 	private String			traceDescription	= null;
@@ -49,7 +49,7 @@ public class ImporterArgumentsManager extends ArgumentManager {
 		return sysDbName;
 	}
 
-	public String getTraceDbName() {
+	public List<String> getTraceDbName() {
 		return traceDbName;
 	}
 
@@ -81,15 +81,17 @@ public class ImporterArgumentsManager extends ArgumentManager {
 	@Override
 	public void processArgs() throws SoCTraceException {
 		sysDbName = Configuration.getInstance().get(SoCTraceProperty.soctrace_db_name);
-		traceDbName = options.containsKey("db") ? options.get("db") : FramesocManager.getInstance().getTraceDBName(PajeConstants.ImportToolName);
+		//traceDbName = options.containsKey("db") ? options.get("db") : FramesocManager.getInstance().getTraceDBName(PajeConstants.ImportToolName);
 		logFile = options.containsKey("log") ? options.get("log") : null;
 		traceDescription = options.containsKey("desc") ? options.get("desc") : null;
 		if (defaults.isEmpty())
 			throw new SoCTraceException("Missing trace files");
 		traceFiles = defaults;
-		String[] tokens = traceFiles.get(0).split("/");
-		String string = tokens[tokens.length-1].replace(".paje", "");
-		traceDbName = options.containsKey("db") ? options.get("db") : string;
+		for (String td : traceFiles){
+			String[] tokens = td.split("/");
+			String string = tokens[tokens.length-1].replace(".paje", "");
+			traceDbName.add(string);
+		}
 	}
 
 }

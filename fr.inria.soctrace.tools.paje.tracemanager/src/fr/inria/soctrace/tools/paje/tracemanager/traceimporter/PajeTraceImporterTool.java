@@ -58,19 +58,27 @@ public class PajeTraceImporterTool extends FramesocTool {
 			if (DEBUG)
 				arguments.debugArgs();
 
-			SystemDBObject sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
-			TraceDBObject traceDB = new TraceDBObject(arguments.getTraceDbName(), DBMode.DB_CREATE);
+			SystemDBObject sysDB =  null;
+			TraceDBObject traceDB = null;
+			for (int i=0; i<arguments.getTraceDbName().size(); i++ ){
+				sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
+				dm.end("Paje Trace " + i + " Importing");
+				traceDB = new TraceDBObject(arguments.getTraceDbName().get(i), DBMode.DB_CREATE);
 
 			/** Import trace */
 
 			Parser importer = new Parser(arguments, sysDB, traceDB);
-			importer.importTrace();
+			importer.importTrace(i);
 
 			/** DB close (commit) */
 
 			traceDB.close();
 			sysDB.close();
+			
 
+			dm.end("Paje Trace " + i + " Imported");
+			}
+			
 			dm.end("Paje Trace Importer end");
 
 		}
