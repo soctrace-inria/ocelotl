@@ -46,7 +46,7 @@ public class OcelotlParameters {
 	private int					epCache				= 100;
 	private int					pageCache			= 20;
 	private int					thread				= 5;
-	private ITraceTypeConfig		iTraceTypeConfig;
+	private ITraceTypeConfig	iTraceTypeConfig;
 
 	public OcelotlParameters() {
 		super();
@@ -54,6 +54,10 @@ public class OcelotlParameters {
 
 	public String getAggOperator() {
 		return aggOperator;
+	}
+
+	public String getAggOperator2() {
+		return aggOperator2;
 	}
 
 	public int getEpCache() {
@@ -108,25 +112,19 @@ public class OcelotlParameters {
 		return growingQualities;
 	}
 
-	public boolean isNormalize() {
-		return normalize;
-	}
-
 	// public List<String> getSleepingStates() {
 	// return sleepingStates;
 	// }
 
+	public boolean isNormalize() {
+		return normalize;
+	}
+
 	public void setAggOperator(final String aggOperator) {
 		this.aggOperator = aggOperator;
 	}
-	
-	
 
-	public String getAggOperator2() {
-		return aggOperator2;
-	}
-
-	public void setAggOperator2(String aggOperator2) {
+	public void setAggOperator2(final String aggOperator2) {
 		this.aggOperator2 = aggOperator2;
 	}
 

@@ -26,26 +26,25 @@ public class PajeTclEvent implements ITChartsEvent {
 	private final long			endTime;
 	private List<ITChartsEvent>	outlinkedEvents;
 
-	public PajeTclEvent(long startTime, long endTime) {
-		this.figure = createRect(ColorConstants.red, DEFAULT_EVENT_HEIGHT);
+	public PajeTclEvent(final long startTime, final long endTime) {
+		figure = createRect(ColorConstants.red, DEFAULT_EVENT_HEIGHT);
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.outlinkedEvents = new ArrayList<ITChartsEvent>();
+		outlinkedEvents = new ArrayList<ITChartsEvent>();
 	}
 
 	@Override
-	public String getName() {
-		return "";
+	public void addOutlinkedEvent(final ITChartsEvent event) {
+		outlinkedEvents.add(event);
 	}
 
-	@Override
-	public IFigure getFigure() {
-		return figure;
-	}
-
-	@Override
-	public long getStartTime() {
-		return startTime;
+	private RectangleFigure createRect(final Color color, final int height) {
+		final RectangleFigure rectangle = new RectangleFigure();
+		rectangle.setLayoutManager(new BorderLayout());
+		rectangle.setBackgroundColor(color);
+		rectangle.setOpaque(true);
+		rectangle.setSize(0, height);
+		return rectangle;
 	}
 
 	@Override
@@ -54,27 +53,28 @@ public class PajeTclEvent implements ITChartsEvent {
 	}
 
 	@Override
+	public IFigure getFigure() {
+		return figure;
+	}
+
+	@Override
+	public String getName() {
+		return "";
+	}
+
+	@Override
 	public List<ITChartsEvent> getOutlinkedEvents() {
 		return outlinkedEvents;
 	}
 
 	@Override
-	public void setOutlinkedEvents(List<ITChartsEvent> outlinkedEvents) {
-		this.outlinkedEvents = outlinkedEvents;
+	public long getStartTime() {
+		return startTime;
 	}
 
 	@Override
-	public void addOutlinkedEvent(ITChartsEvent event) {
-		outlinkedEvents.add(event);
-	}
-
-	private RectangleFigure createRect(Color color, int height) {
-		RectangleFigure rectangle = new RectangleFigure();
-		rectangle.setLayoutManager(new BorderLayout());
-		rectangle.setBackgroundColor(color);
-		rectangle.setOpaque(true);
-		rectangle.setSize(0, height);
-		return rectangle;
+	public void setOutlinkedEvents(final List<ITChartsEvent> outlinkedEvents) {
+		this.outlinkedEvents = outlinkedEvents;
 	}
 
 }

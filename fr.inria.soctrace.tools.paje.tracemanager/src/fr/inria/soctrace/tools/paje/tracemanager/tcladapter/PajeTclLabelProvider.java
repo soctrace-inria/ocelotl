@@ -20,42 +20,20 @@ public class PajeTclLabelProvider extends LabelProvider implements ITChartsLabel
 	private final int	MARGIN	= 20;
 
 	@Override
-	public Image getImage(Object element) {
-		return ((ITChartsRow) element).getImg();
-	}
-
-	@Override
-	public String getText(Object element) {
-		String name = "";
-
-		if (element instanceof ITChartsRow)
-			name = ((ITChartsRow) element).getName();
-		else if (element instanceof ITChartsEvent)
-			name = ((ITChartsEvent) element).getName();
-
-		return name;
-	}
-
-	@Override
 	public void dispose() {
 		// Nothing to do
 	}
 
 	@Override
-	public IFigure getFigure(Object event) {
-		return ((ITChartsEvent) event).getFigure();
-	}
-
-	@Override
-	public Connection getConnection(Object sourceEvent, Object destEvent) {
-		if ((sourceEvent instanceof ITChartsEvent) && (destEvent instanceof ITChartsEvent)) {
+	public Connection getConnection(final Object sourceEvent, final Object destEvent) {
+		if (sourceEvent instanceof ITChartsEvent && destEvent instanceof ITChartsEvent)
 			// If this link actually exists
 			if (((ITChartsEvent) sourceEvent).getOutlinkedEvents().contains(destEvent)) {
 				// We create the figure (Connection) corresponding to the link
-				PolylineConnection c = new PolylineConnection();
+				final PolylineConnection c = new PolylineConnection();
 				if (((ITChartsEvent) destEvent).getStartTime() - ((ITChartsEvent) sourceEvent).getEndTime() > 1000) {
-					PolygonDecoration decoration = new PolygonDecoration();
-					PointList decorationPointList = new PointList();
+					final PolygonDecoration decoration = new PolygonDecoration();
+					final PointList decorationPointList = new PointList();
 					decorationPointList.addPoint(0, 0);
 					decorationPointList.addPoint(-2, 2);
 					decorationPointList.addPoint(-4, 0);
@@ -70,18 +48,39 @@ public class PajeTclLabelProvider extends LabelProvider implements ITChartsLabel
 				// And we return it
 				return c;
 			}
-		}
 		return null;
 	}
 
 	@Override
-	public int getRowHeight(Object element) {
+	public IFigure getFigure(final Object event) {
+		return ((ITChartsEvent) event).getFigure();
+	}
+
+	@Override
+	public Image getImage(final Object element) {
+		return ((ITChartsRow) element).getImg();
+	}
+
+	@Override
+	public int getRowHeight(final Object element) {
 		if (element instanceof ITChartsRow)
 			return ((ITChartsRow) element).getMaxEventHeight() + MARGIN;
 		else if (element instanceof ITChartsEvent)
 			return ((ITChartsEvent) element).getFigure().getSize().height + MARGIN;
 		else
 			return MARGIN;
+	}
+
+	@Override
+	public String getText(final Object element) {
+		String name = "";
+
+		if (element instanceof ITChartsRow)
+			name = ((ITChartsRow) element).getName();
+		else if (element instanceof ITChartsEvent)
+			name = ((ITChartsEvent) element).getName();
+
+		return name;
 	}
 
 }

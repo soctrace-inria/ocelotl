@@ -3,52 +3,51 @@ package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class PartMap implements IPartData {
-	
-	Map<String, Double> elements;
+
+	Map<String, Double>	elements;
 
 	public PartMap() {
 		super();
-		elements=new HashMap<String, Double>();
+		elements = new HashMap<String, Double>();
 	}
 
-	public PartMap(Map<String, Double> elements) {
+	public PartMap(final Map<String, Double> elements) {
 		super();
 		this.elements = elements;
+	}
+
+	public void addElement(final String string, final double value) {
+		elements.put(string, elements.get(string) + value);
+	}
+
+	public void divideElement(final String string, final double value) {
+		if (value != 0)
+			elements.put(string, elements.get(string) / value);
 	}
 
 	public Map<String, Double> getElements() {
 		return elements;
 	}
 
-	public void setElements(Map<String, Double> elements) {
-		this.elements = elements;
+	public double getTotal() {
+		double total = 0;
+		for (final String key : elements.keySet())
+			total += elements.get(key);
+		return total;
 	}
-	
-	public void putElement(String string, double value){
+
+	public void normalizeElements(final long timeSliceDuration, final int partNumber) {
+		for (final String key : elements.keySet())
+			divideElement(key, (double) timeSliceDuration * (double) partNumber);
+	}
+
+	public void putElement(final String string, final double value) {
 		elements.put(string, value);
 	}
-	
-	public void addElement(String string, double value){
-		elements.put(string, elements.get(string)+ value);
-	}
-	
-	public void divideElement(String string, double value){
-		if (value!=0)
-		elements.put(string, elements.get(string)/ value);
-	}
-	
-	public void normalizeElements(long timeSliceDuration, int partNumber){
-		for (String key : elements.keySet())
-			divideElement(key, (double) timeSliceDuration * (double) partNumber);	
-	}
-	
-	public double getTotal(){
-		double total=0;
-		for (String key : elements.keySet())
-			total+=elements.get(key);
-		return total;
+
+	public void setElements(final Map<String, Double> elements) {
+		this.elements = elements;
 	}
 
 }

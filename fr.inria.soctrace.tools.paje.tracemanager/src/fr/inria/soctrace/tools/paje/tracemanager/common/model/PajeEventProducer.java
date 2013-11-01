@@ -7,7 +7,7 @@ public class PajeEventProducer extends EventProducer {
 
 	private String	alias	= "";
 
-	public PajeEventProducer(int id) {
+	public PajeEventProducer(final int id) {
 		super(id);
 		// TODO Auto-generated constructor stub
 	}
@@ -16,7 +16,7 @@ public class PajeEventProducer extends EventProducer {
 		return alias;
 	}
 
-	public void setAlias(String alias) {
+	public void setAlias(final String alias) {
 		this.alias = alias;
 	}
 }

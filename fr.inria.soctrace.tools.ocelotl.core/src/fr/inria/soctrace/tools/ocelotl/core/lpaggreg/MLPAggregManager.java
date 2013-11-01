@@ -49,6 +49,11 @@ public class MLPAggregManager extends LPAggregManager {
 
 	}
 
+	@Override
+	public List<String> getEventProducers() {
+		return new ArrayList<String>(timeSliceMatrix.getMatrix().get(0).keySet());
+	}
+
 	public ICubicMatrix getTimeSliceMatrix() {
 		return timeSliceMatrix;
 	}
@@ -57,10 +62,6 @@ public class MLPAggregManager extends LPAggregManager {
 	public void reset() {
 		lpaggregWrapper = new LPAggregWrapper(3);
 		fillVectors();
-	}
-	
-	public List<String> getEventProducers(){
-		return new ArrayList<String>(timeSliceMatrix.getMatrix().get(0).keySet());	
 	}
 
 }

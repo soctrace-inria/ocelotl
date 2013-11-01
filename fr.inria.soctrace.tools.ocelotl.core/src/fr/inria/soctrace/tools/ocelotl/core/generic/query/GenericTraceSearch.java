@@ -145,7 +145,6 @@ public class GenericTraceSearch extends TraceSearch {
 		return query.getList();
 	}
 
-	
 	public List<GenericReducedEvent> getReducedEventsByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		final DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);

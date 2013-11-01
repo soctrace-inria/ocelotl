@@ -29,13 +29,10 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
-public abstract class Matrix extends TimeAggregationOperator implements IMatrix  {
-
+public abstract class Matrix extends TimeAggregationOperator implements IMatrix {
 
 	protected List<HashMap<String, Long>>	matrix;
-
 
 	public Matrix() throws SoCTraceException {
 		super();
@@ -45,12 +42,13 @@ public abstract class Matrix extends TimeAggregationOperator implements IMatrix 
 		super();
 		try {
 			setOcelotlParameters(parameters);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	@Override
 	public void computeMatrix() throws SoCTraceException {
 		eventsNumber = 0;
 		final DeltaManager dmt = new DeltaManager();
@@ -87,7 +85,6 @@ public abstract class Matrix extends TimeAggregationOperator implements IMatrix 
 	public List<HashMap<String, Long>> getMatrix() {
 		return matrix;
 	}
-
 
 	@Override
 	public int getVectorSize() {
@@ -130,7 +127,5 @@ public abstract class Matrix extends TimeAggregationOperator implements IMatrix 
 				System.out.println(ep + " = " + it.get(ep));
 		}
 	}
-
-
 
 }

@@ -37,30 +37,30 @@ public class PajeTraceCleanerTool extends FramesocTool {
 	 */
 	private class PajeCleanerPluginJobBody implements IPluginToolJobBody {
 
-		private String	args[];
+		private final String	args[];
 
-		public PajeCleanerPluginJobBody(String[] args) {
+		public PajeCleanerPluginJobBody(final String[] args) {
 			this.args = args;
 		}
 
 		@Override
 		public void run() throws SoCTraceException {
-			DeltaManager dm = new DeltaManager();
+			final DeltaManager dm = new DeltaManager();
 			dm.start();
 
 			try {
-				CleanerArgumentsManager arguments = new CleanerArgumentsManager(args);
+				final CleanerArgumentsManager arguments = new CleanerArgumentsManager(args);
 				arguments.parseArgs();
 				arguments.processArgs();
 				if (DEBUG)
 					arguments.debugArgs();
 
-				SystemDBObject sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
-				TraceDBObject traceDB = new TraceDBObject(arguments.getTraceDbName(), DBMode.DB_OPEN);
+				final SystemDBObject sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
+				final TraceDBObject traceDB = new TraceDBObject(arguments.getTraceDbName(), DBMode.DB_OPEN);
 
 				/** Clean trace*/
 
-				Cleaner cleaner = new Cleaner(traceDB);
+				final Cleaner cleaner = new Cleaner(traceDB);
 				cleaner.cleanup();
 
 				/** DB close (commit) */
@@ -77,8 +77,8 @@ public class PajeTraceCleanerTool extends FramesocTool {
 	private static final boolean	DEBUG	= true;
 
 	@Override
-	public void launch(String[] args) {
-		PluginToolJob job = new PluginToolJob("Paje Cleaner", new PajeCleanerPluginJobBody(args));
+	public void launch(final String[] args) {
+		final PluginToolJob job = new PluginToolJob("Paje Cleaner", new PajeCleanerPluginJobBody(args));
 		job.setUser(true);
 		job.schedule();
 	}

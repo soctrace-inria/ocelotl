@@ -86,6 +86,11 @@ public class VLPAggregManager extends LPAggregManager {
 
 	}
 
+	@Override
+	public List<String> getEventProducers() {
+		return new ArrayList<String>(matrix.getMatrix().get(0).keySet());
+	}
+
 	public IMatrix getTimeSliceMatrix() {
 		return matrix;
 	}
@@ -94,10 +99,6 @@ public class VLPAggregManager extends LPAggregManager {
 	public void reset() {
 		lpaggregWrapper = new LPAggregWrapper(2);
 		fillVectors();
-	}
-	
-	public List<String> getEventProducers(){
-		return new ArrayList<String>(matrix.getMatrix().get(0).keySet());	
 	}
 
 }

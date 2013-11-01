@@ -5,10 +5,13 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 public interface ISpaceAggregationOperator {
 
 	public String descriptor();
-	public int getPartNumber();
-	public Part getPart(int i);
-	public int getSliceNumber();
+
 	public OcelotlCore getOcelotlCore();
-	
-	
+
+	public Part getPart(int i);
+
+	public int getPartNumber();
+
+	public int getSliceNumber();
+
 }

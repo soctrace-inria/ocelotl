@@ -32,24 +32,24 @@ public class PajeTraceExporter {
 
 	private static final boolean	DEBUG	= true;
 
-	public static void main(String[] args) throws IOException {
+	public static void main(final String[] args) throws IOException {
 
-		DeltaManager dm = new DeltaManager();
+		final DeltaManager dm = new DeltaManager();
 		dm.start();
 
 		try {
-			ExporterArgumentsManager arguments = new ExporterArgumentsManager(args);
+			final ExporterArgumentsManager arguments = new ExporterArgumentsManager(args);
 			arguments.parseArgs();
 			arguments.processArgs();
 			if (DEBUG)
 				arguments.debugArgs();
 
-			SystemDBObject sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
-			TraceDBObject traceDB = new TraceDBObject(arguments.getTraceDbName(), DBMode.DB_OPEN);
+			final SystemDBObject sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
+			final TraceDBObject traceDB = new TraceDBObject(arguments.getTraceDbName(), DBMode.DB_OPEN);
 
 			/** Export trace from database*/
 
-			Writer exporter = new Writer(arguments, traceDB);
+			final Writer exporter = new Writer(arguments, traceDB);
 			exporter.exportTrace();
 
 			/** DB close (commit) */
@@ -57,7 +57,7 @@ public class PajeTraceExporter {
 			traceDB.close();
 			sysDB.close();
 
-		} catch (SoCTraceException e) {
+		} catch (final SoCTraceException e) {
 			e.printStackTrace();
 		} finally {
 			dm.end("Paje Trace Exporter end");

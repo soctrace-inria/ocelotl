@@ -23,8 +23,6 @@ import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventQuery;
-import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
 /**
  * GenericQuery class for Event self-defining-pattern tables.
@@ -114,7 +112,7 @@ public class GenericReducedEventQuery extends EventQuery {
 		final LinkedList<GenericReducedEvent> llist = new LinkedList<GenericReducedEvent>();
 		final ValueListString vls = new ValueListString();
 		new ValueListString();
-		final List<Integer> li = new ArrayList<Integer>();
+		new ArrayList<Integer>();
 		final TraceDBObject traceDB = (TraceDBObject) dbObj;
 		try {
 

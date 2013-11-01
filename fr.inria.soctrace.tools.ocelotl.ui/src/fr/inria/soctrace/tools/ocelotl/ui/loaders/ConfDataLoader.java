@@ -112,8 +112,6 @@ public class ConfDataLoader {
 	public List<Trace> getTraces() {
 		return traces;
 	}
-	
-	
 
 	public List<EventType> getTypes() {
 		return types;
@@ -147,15 +145,12 @@ public class ConfDataLoader {
 		final TraceQuery tQuery = new TraceQuery(sysDB);
 		traces = tQuery.getList();
 		sysDB.close();
-		Collections.sort(traces, 
-				  new Comparator<Trace>() 
-				  {
-					@Override
-					public int compare(Trace arg0, Trace arg1) {
-						return arg0.getAlias().compareTo(arg1.getAlias());
-					}
-				  }
-				);
+		Collections.sort(traces, new Comparator<Trace>() {
+			@Override
+			public int compare(final Trace arg0, final Trace arg1) {
+				return arg0.getAlias().compareTo(arg1.getAlias());
+			}
+		});
 		return traces;
 	}
 

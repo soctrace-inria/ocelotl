@@ -36,19 +36,19 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class PajeTraceInfoManager {
 
-	private ImporterArgumentsManager	arguments;
-	private SystemDBObject				sysDB;
-	private TraceDBObject				traceDB;
+	private final ImporterArgumentsManager	arguments;
+	private final SystemDBObject			sysDB;
+	private final TraceDBObject				traceDB;
 
-	private Trace						trace;
-	private TraceType					traceType;
-	private boolean						isTraceTypeExisting;
+	private Trace							trace;
+	private TraceType						traceType;
+	private final boolean					isTraceTypeExisting;
 
 	/**
 	 * @throws SoCTraceException
 	 * 
 	 */
-	public PajeTraceInfoManager(ImporterArgumentsManager arguments, SystemDBObject sysDB, TraceDBObject traceDB) throws SoCTraceException {
+	public PajeTraceInfoManager(final ImporterArgumentsManager arguments, final SystemDBObject sysDB, final TraceDBObject traceDB) throws SoCTraceException {
 		this.arguments = arguments;
 		this.sysDB = sysDB;
 		this.traceDB = traceDB;
@@ -124,7 +124,7 @@ public class PajeTraceInfoManager {
 	 * @return a string with the current date
 	 */
 	private String getCurrentDate() {
-		SimpleDateFormat sdf = new SimpleDateFormat();
+		final SimpleDateFormat sdf = new SimpleDateFormat();
 		sdf.setTimeZone(new SimpleTimeZone(0, "GMT"));
 		sdf.applyPattern("dd MMM yyyy HH:mm:ss z");
 		return sdf.format(new Date()).toString();
@@ -155,12 +155,12 @@ public class PajeTraceInfoManager {
 
 		if (!isTraceTypeExisting) {
 			sysDB.save(traceType);
-			for (TraceParamType tpt : traceType.getTraceParamTypes())
+			for (final TraceParamType tpt : traceType.getTraceParamTypes())
 				sysDB.save(tpt);
 		}
 
 		sysDB.save(trace);
-		for (TraceParam tp : trace.getParams())
+		for (final TraceParam tp : trace.getParams())
 			sysDB.save(tp);
 	}
 

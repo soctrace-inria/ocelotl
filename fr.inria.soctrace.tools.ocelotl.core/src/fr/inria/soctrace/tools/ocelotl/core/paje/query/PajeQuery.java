@@ -22,18 +22,13 @@ package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.query.EventProducerQuery;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
-import fr.inria.soctrace.lib.storage.DBObject.DBMode;
-import fr.inria.soctrace.lib.storage.TraceDBObject;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.generic.query.GenericQuery;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
-public class PajeQuery extends GenericQuery{
+public class PajeQuery extends GenericQuery {
 
 	private final OcelotlParameters	ocelotlParameters;
 
@@ -41,8 +36,6 @@ public class PajeQuery extends GenericQuery{
 		super(ocelotlParameters);
 		this.ocelotlParameters = ocelotlParameters;
 	}
-
-
 
 	public List<PajeReducedEvent1> getAllReducedEvents1() throws SoCTraceException {
 		final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
@@ -52,7 +45,7 @@ public class PajeQuery extends GenericQuery{
 		traceSearch.uninitialize();
 		return elist;
 	}
-	
+
 	public List<PajeReducedEvent2> getAllReducedEvents2() throws SoCTraceException {
 		final PajeTraceSearch traceSearch = (PajeTraceSearch) new PajeTraceSearch().initialize();
 		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
@@ -61,7 +54,6 @@ public class PajeQuery extends GenericQuery{
 		traceSearch.uninitialize();
 		return elist;
 	}
-	
 
 	public List<PajeReducedEvent1> getReducedEvents1(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
@@ -75,7 +67,7 @@ public class PajeQuery extends GenericQuery{
 			return elist;
 		}
 	}
-	
+
 	public List<PajeReducedEvent2> getReducedEvents2(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
 			return getAllReducedEvents2();

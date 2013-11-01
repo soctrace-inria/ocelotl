@@ -122,7 +122,5 @@ public abstract class LPAggregManager implements ILPAggregManager {
 
 	@Override
 	public abstract void reset();
-	
-
 
 }

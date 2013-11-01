@@ -20,11 +20,11 @@
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
@@ -39,9 +39,9 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 public class TimeAggregationOperatorManager {
 
 	HashMap<String, ITimeAggregationOperator>	List;
-	HashMap<String, ITraceTypeConfig>		Config;
-	ArrayList<String>						Names;
-	OcelotlParameters						parameters;
+	HashMap<String, ITraceTypeConfig>			Config;
+	ArrayList<String>							Names;
+	OcelotlParameters							parameters;
 
 	public TimeAggregationOperatorManager(final OcelotlParameters parameters) {
 		super();
@@ -65,15 +65,15 @@ public class TimeAggregationOperatorManager {
 	}
 
 	public Collection<ITimeAggregationOperator> getList() {
-		List<ITimeAggregationOperator> val = new ArrayList<ITimeAggregationOperator>();
+		final List<ITimeAggregationOperator> val = new ArrayList<ITimeAggregationOperator>();
 		val.addAll(List.values());
 		Collections.sort(val, new Comparator<ITimeAggregationOperator>() {
 
 			@Override
-			public int compare(ITimeAggregationOperator o1, ITimeAggregationOperator o2) {
+			public int compare(final ITimeAggregationOperator o1, final ITimeAggregationOperator o2) {
 				return o1.descriptor().compareTo(o2.descriptor());
 			}
-			
+
 		});
 		return val;
 	}
@@ -82,7 +82,7 @@ public class TimeAggregationOperatorManager {
 		final ITimeAggregationOperator op = List.get(name);
 		try {
 			op.setOcelotlParameters(parameters);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

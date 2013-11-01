@@ -40,16 +40,16 @@ public class PajeState extends State {
 			}
 	}
 
-	public PajeState(final PajeReducedEvent1 eventStart, final PajeReducedEvent1 eventEnd, final TimeSliceManager timeSliceManager) {
-		super(timeSliceManager);
-		timeRegion = new TimeRegion(eventStart.TS, eventEnd.TS);
-		eventProducerID = eventStart.EP;
-		stateType = eventStart.VALUE;
-	}
-	
 	public PajeState(final PajeReducedEvent1 eventStart, final long end, final TimeSliceManager timeSliceManager) {
 		super(timeSliceManager);
 		timeRegion = new TimeRegion(eventStart.TS, end);
+		eventProducerID = eventStart.EP;
+		stateType = eventStart.VALUE;
+	}
+
+	public PajeState(final PajeReducedEvent1 eventStart, final PajeReducedEvent1 eventEnd, final TimeSliceManager timeSliceManager) {
+		super(timeSliceManager);
+		timeRegion = new TimeRegion(eventStart.TS, eventEnd.TS);
 		eventProducerID = eventStart.EP;
 		stateType = eventStart.VALUE;
 	}
@@ -60,8 +60,8 @@ public class PajeState extends State {
 		eventProducerID = eventStart.EP;
 		stateType = eventStart.VALUE;
 	}
-	
-	public void setEndState(final PajeReducedEvent2 eventEnd){
+
+	public void setEndState(final PajeReducedEvent2 eventEnd) {
 		timeRegion = new TimeRegion(timeRegion.getTimeStampStart(), eventEnd.TS);
 	}
 

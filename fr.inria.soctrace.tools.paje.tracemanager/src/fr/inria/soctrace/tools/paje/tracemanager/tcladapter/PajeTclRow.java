@@ -18,23 +18,23 @@ public class PajeTclRow implements ITChartsRow {
 
 	private final String			name;
 	private final Image				img;
-	private ITChartsRow				parent;
+	private final ITChartsRow		parent;
 	private ArrayList<ITChartsRow>	items;
 	private List<ITChartsEvent>		events;
 	private boolean					startTimeSet		= false;
 	private long					startTime;
 	private boolean					endTimeSet			= false;
 	private long					endTime;
-	private int						order;
+	private final int				order;
 
 	private final static int		DEFAULT_ROW_HEIGHT	= 15;
 
-	public PajeTclRow(String name, Image img, ITChartsRow parent, int order) {
+	public PajeTclRow(final String name, final Image img, final ITChartsRow parent, final int order) {
 		this.name = name; // XXX just to test we are using the correct model 
 		this.img = img;
 		this.parent = parent;
-		this.items = new ArrayList<ITChartsRow>();
-		this.events = new ArrayList<ITChartsEvent>();
+		items = new ArrayList<ITChartsRow>();
+		events = new ArrayList<ITChartsEvent>();
 
 		if (parent != null)
 			getParent().addChildRow(this);
@@ -43,27 +43,18 @@ public class PajeTclRow implements ITChartsRow {
 	}
 
 	@Override
-	public String getName() {
-		return name;
+	public void addChildRow(final ITChartsRow row) {
+		items.add(row);
 	}
 
 	@Override
-	public Image getImg() {
-		return img;
+	public void addEvent(final ITChartsEvent event) {
+		events.add(event);
 	}
 
 	@Override
-	public ITChartsRow getParent() {
-		return parent;
-	}
-
-	@Override
-	public long getStartTime() {
-		if (!startTimeSet) {
-			setStartTime();
-			startTimeSet = true;
-		}
-		return startTime;
+	public ArrayList<ITChartsRow> getChildrenRows() {
+		return items;
 	}
 
 	@Override
@@ -76,35 +67,28 @@ public class PajeTclRow implements ITChartsRow {
 	}
 
 	@Override
-	public ArrayList<ITChartsRow> getChildrenRows() {
-		return items;
-	}
-
-	@Override
-	public void setChildrenRows(ArrayList<ITChartsRow> rows) {
-		this.items = rows;
-		setStartTime();
-		setEndTime();
-	}
-
-	@Override
-	public void addChildRow(ITChartsRow row) {
-		items.add(row);
-	}
-
-	@Override
 	public List<ITChartsEvent> getEvents() {
 		return events;
 	}
 
 	@Override
-	public void setEvents(List<ITChartsEvent> events) {
-		this.events = events;
+	public Image getImg() {
+		return img;
 	}
 
 	@Override
-	public void addEvent(ITChartsEvent event) {
-		events.add(event);
+	public int getMaxEventHeight() {
+		return DEFAULT_ROW_HEIGHT;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public ITChartsRow getParent() {
+		return parent;
 	}
 
 	@Override
@@ -113,37 +97,19 @@ public class PajeTclRow implements ITChartsRow {
 	}
 
 	@Override
-	public int getMaxEventHeight() {
-		return DEFAULT_ROW_HEIGHT;
+	public long getStartTime() {
+		if (!startTimeSet) {
+			setStartTime();
+			startTimeSet = true;
+		}
+		return startTime;
 	}
 
-	/*
-	 *  utilities
-	 */
-
-	private void setStartTime() {
-		if (!events.isEmpty()) {
-			long eventStartTime;
-			startTime = events.get(0).getStartTime();
-
-			for (ITChartsEvent event : events) {
-				eventStartTime = event.getStartTime();
-				if (eventStartTime < startTime)
-					startTime = eventStartTime;
-			}
-		}
-
-		if (!items.isEmpty()) {
-			long itemStartTime;
-			if (events.isEmpty())
-				startTime = items.get(0).getStartTime();
-
-			for (ITChartsRow item : items) {
-				itemStartTime = item.getStartTime();
-				if (itemStartTime < startTime)
-					startTime = itemStartTime;
-			}
-		}
+	@Override
+	public void setChildrenRows(final ArrayList<ITChartsRow> rows) {
+		items = rows;
+		setStartTime();
+		setEndTime();
 	}
 
 	private void setEndTime() {
@@ -151,7 +117,7 @@ public class PajeTclRow implements ITChartsRow {
 			long eventEndTime;
 			endTime = events.get(0).getEndTime();
 
-			for (ITChartsEvent event : events) {
+			for (final ITChartsEvent event : events) {
 				eventEndTime = event.getEndTime();
 				if (eventEndTime > endTime)
 					endTime = eventEndTime;
@@ -163,10 +129,44 @@ public class PajeTclRow implements ITChartsRow {
 			if (events.isEmpty())
 				endTime = items.get(0).getEndTime();
 
-			for (ITChartsRow item : items) {
+			for (final ITChartsRow item : items) {
 				itemEndTime = item.getEndTime();
 				if (itemEndTime > endTime)
 					endTime = itemEndTime;
+			}
+		}
+	}
+
+	/*
+	 *  utilities
+	 */
+
+	@Override
+	public void setEvents(final List<ITChartsEvent> events) {
+		this.events = events;
+	}
+
+	private void setStartTime() {
+		if (!events.isEmpty()) {
+			long eventStartTime;
+			startTime = events.get(0).getStartTime();
+
+			for (final ITChartsEvent event : events) {
+				eventStartTime = event.getStartTime();
+				if (eventStartTime < startTime)
+					startTime = eventStartTime;
+			}
+		}
+
+		if (!items.isEmpty()) {
+			long itemStartTime;
+			if (events.isEmpty())
+				startTime = items.get(0).getStartTime();
+
+			for (final ITChartsRow item : items) {
+				itemStartTime = item.getStartTime();
+				if (itemStartTime < startTime)
+					startTime = itemStartTime;
 			}
 		}
 	}

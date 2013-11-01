@@ -1,4 +1,5 @@
 package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
+
 ///* ===========================================================
 // * Ocelotl Visualization Tool
 // * =====================================================================
@@ -254,4 +255,4 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //		return traceType;
 //	}
 //
-//}
+// }

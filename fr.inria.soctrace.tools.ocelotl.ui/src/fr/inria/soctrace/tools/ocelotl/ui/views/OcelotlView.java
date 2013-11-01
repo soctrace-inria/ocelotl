@@ -461,23 +461,6 @@ public class OcelotlView extends ViewPart {
 		// TODO config paje
 	}
 
-	private void refreshTraces() {
-		try {
-			confDataLoader.loadTraces();
-		} catch (SoCTraceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		int index = 0;
-		comboTraces.removeAll();
-		for (final Trace t : confDataLoader.getTraces()) {
-			comboTraces.add(t.getAlias(), index);
-			traceMap.put(index, t);
-			index++;
-		}
-		;
-	}
-
 	@Override
 	public void createPartControl(final Composite parent) {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -568,20 +551,20 @@ public class OcelotlView extends ViewPart {
 		groupTSParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTSParameters.setLayout(new GridLayout(1, false));
 
-		Group groupTraces = new Group(groupTSParameters, SWT.NONE);
+		final Group groupTraces = new Group(groupTSParameters, SWT.NONE);
 		groupTraces.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		groupTraces.setLayout(new GridLayout(2, false));
 		comboTraces = new Combo(groupTraces, SWT.READ_ONLY);
-		GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		final GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_comboTraces.widthHint = 180;
 		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
-		Button buttonRefresh = new Button(groupTraces, SWT.NONE);
+		final Button buttonRefresh = new Button(groupTraces, SWT.NONE);
 		buttonRefresh.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/load.png"));
 		buttonRefresh.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(final SelectionEvent e) {
 				refreshTraces();
 			}
 		});
@@ -935,6 +918,23 @@ public class OcelotlView extends ViewPart {
 
 	public TimeRegion getTimeRegion() {
 		return new TimeRegion(Long.parseLong(textTimestampStart.getText()), Long.parseLong(textTimestampEnd.getText()));
+	}
+
+	private void refreshTraces() {
+		try {
+			confDataLoader.loadTraces();
+		} catch (final SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int index = 0;
+		comboTraces.removeAll();
+		for (final Trace t : confDataLoader.getTraces()) {
+			comboTraces.add(t.getAlias(), index);
+			traceMap.put(index, t);
+			index++;
+		}
+		;
 	}
 
 	public void setComboAggregationOperator(final Combo comboAggregationOperator) {

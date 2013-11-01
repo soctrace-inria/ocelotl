@@ -30,14 +30,11 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
-public abstract class CubicMatrix extends TimeAggregationOperator implements ICubicMatrix  {
-
+public abstract class CubicMatrix extends TimeAggregationOperator implements ICubicMatrix {
 
 	protected List<HashMap<String, HashMap<String, Long>>>	matrix;
-	List<String> keys;
-	
+	List<String>											keys;
 
 	public CubicMatrix() {
 		super();
@@ -47,13 +44,19 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 		super();
 		try {
 			setOcelotlParameters(parameters);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public void computeMatrix() throws SoCTraceException{
+	@Override
+	public void addKey(final String key) {
+		keys.add(key);
+	}
+
+	@Override
+	public void computeMatrix() throws SoCTraceException {
 		keys = new ArrayList<String>();
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
@@ -62,7 +65,7 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 		if (genericQuery.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < genericQuery.getOcelotlParameters().getMaxEventProducers())
 			try {
 				computeSubMatrix(genericQuery.getOcelotlParameters().getEventProducers());
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -71,7 +74,7 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 			for (int i = 0; i < epsize; i = i + genericQuery.getOcelotlParameters().getMaxEventProducers())
 				try {
 					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + genericQuery.getOcelotlParameters().getMaxEventProducers())));
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -80,7 +83,6 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
 	}
 
-	
 	@Override
 	public MLPAggregManager createManager() {
 		return new MLPAggregManager(this);
@@ -88,10 +90,14 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 	}
 
 	@Override
+	public List<String> getKeys() {
+		return keys;
+	}
+
+	@Override
 	public List<HashMap<String, HashMap<String, Long>>> getMatrix() {
 		return matrix;
 	}
-
 
 	@Override
 	public int getVectorSize() {
@@ -115,6 +121,15 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 		}
 	}
 
+	public void matrixPushType(final int incr, final String epstring, final IState state, final Map<Long, Long> distrib) {
+		matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
+		addKey(state.getStateType());
+	}
+
+	public void matrixWrite(final long it, final EventProducer ep, final IState state, final Map<Long, Long> distrib) {
+		matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
+	}
+
 	@Override
 	public void print() {
 		System.out.println();
@@ -127,24 +142,5 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 			for (final String ep : it.keySet())
 				System.out.println(ep + " = " + it.get(ep));
 		}
-	}
-
-
-	
-	public void matrixWrite(final long it, final EventProducer ep, IState state, final Map<Long, Long> distrib) {
-			matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
-	}
-	
-	public void matrixPushType(int incr, String epstring, IState state, final Map<Long, Long> distrib) {
-			matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
-			addKey(state.getStateType());
-	}
-	
-	public void addKey(String key){
-		keys.add(key);
-	}
-
-	public List<String> getKeys(){
-		return keys;
 	}
 }

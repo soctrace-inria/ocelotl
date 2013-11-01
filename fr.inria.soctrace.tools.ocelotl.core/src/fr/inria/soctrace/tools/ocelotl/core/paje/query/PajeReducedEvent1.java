@@ -2,7 +2,6 @@ package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 
 import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxy;
 
-
 public class PajeReducedEvent1 extends EventProxy {
 
 	public String	VALUE;

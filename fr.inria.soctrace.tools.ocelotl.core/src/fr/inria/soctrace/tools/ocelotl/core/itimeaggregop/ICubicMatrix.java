@@ -26,12 +26,12 @@ import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 
 public interface ICubicMatrix extends ITimeAggregationOperator {
 
+	public void addKey(String key);
+
 	@Override
 	public MLPAggregManager createManager();
 
-	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
-	
-	public void addKey(String key);
-	
 	public List<String> getKeys();
+
+	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
 }

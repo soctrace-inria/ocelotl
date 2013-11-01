@@ -36,18 +36,18 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.model.PajeEventType;
 public class PajeEventTypeManager {
 
 	private List<PajeEventType>	eventTypes				= new ArrayList<PajeEventType>();
-	private IdManager			eventTypeIDManager		= new IdManager();
-	private IdManager			eventParamTypeIDManager	= new IdManager();
+	private final IdManager		eventTypeIDManager		= new IdManager();
+	private final IdManager		eventParamTypeIDManager	= new IdManager();
 
-	public void addPajeEventParamType(String pajeId, String paramName, String paramType) {
-		for (PajeEventType it : eventTypes)
+	public void addPajeEventParamType(final String pajeId, final String paramName, final String paramType) {
+		for (final PajeEventType it : eventTypes)
 			if (it.getPajeId() == pajeId) {
 				it.addEventParamType(eventParamTypeIDManager.getNextId(), paramName, paramType);
 				break;
 			}
 	}
 
-	public void addPajeEventType(String name, String pajeId) {
+	public void addPajeEventType(final String name, final String pajeId) {
 		eventTypes.add(new PajeEventType(eventTypeIDManager.getNextId(), name, pajeId));
 	}
 
@@ -64,11 +64,11 @@ public class PajeEventTypeManager {
 	 * @param traceDB
 	 * @throws SoCTraceException
 	 */
-	public void save(TraceDBObject traceDB) throws SoCTraceException {
-		for (PajeEventType e : eventTypes) {
+	public void save(final TraceDBObject traceDB) throws SoCTraceException {
+		for (final PajeEventType e : eventTypes) {
 			traceDB.save(e);
-			List<EventParamType> ept = e.getEventParamTypes();
-			for (EventParamType p : ept)
+			final List<EventParamType> ept = e.getEventParamTypes();
+			for (final EventParamType p : ept)
 				traceDB.save(p);
 		}
 		traceDB.flushVisitorBatches();
@@ -78,7 +78,7 @@ public class PajeEventTypeManager {
 	 * @param eventTypes
 	 *            the eventTypes to set
 	 */
-	public void setEventTypes(List<PajeEventType> eventTypes) {
+	public void setEventTypes(final List<PajeEventType> eventTypes) {
 		this.eventTypes = eventTypes;
 	}
 }

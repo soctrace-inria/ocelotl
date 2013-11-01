@@ -15,23 +15,25 @@ public class ArgumentManager implements IArgumentManager {
 	protected String[]				args;
 	protected List<String>			defaults	= new ArrayList<String>();			;
 
-	public ArgumentManager(String[] args) throws SoCTraceException {
+	public ArgumentManager(final String[] args) throws SoCTraceException {
 		super();
 		this.args = args;
 	}
 
+	@Override
 	public void debugArgs() {
-		Iterator<Entry<String, String>> it = options.entrySet().iterator();
+		final Iterator<Entry<String, String>> it = options.entrySet().iterator();
 		while (it.hasNext()) {
-			Map.Entry<String, String> pairs = it.next();
+			final Map.Entry<String, String> pairs = it.next();
 			System.out.println(pairs.getKey() + " = " + pairs.getValue());
 		}
 		System.out.println("defaults =");
-		for (String it2 : defaults)
+		for (final String it2 : defaults)
 			System.out.println(it2);
 		printArgs();
 	}
 
+	@Override
 	public void parseArgs() throws SoCTraceException {
 
 		for (int i = 0; i < args.length; i++)
@@ -41,7 +43,7 @@ public class ArgumentManager implements IArgumentManager {
 					throw new IllegalArgumentException("Not a valid argument: " + args[i]);
 				if (args[i].charAt(1) == '-')
 					throw new IllegalArgumentException("Not a valid argument: " + args[i]);
-				if ((args.length - 1) == i)
+				if (args.length - 1 == i)
 					throw new IllegalArgumentException("Expected arg after: " + args[i]);
 				options.put(args[i].substring(1), args[i + 1]);
 				i++;
@@ -51,9 +53,11 @@ public class ArgumentManager implements IArgumentManager {
 			}
 	}
 
+	@Override
 	public void printArgs() {
 	}
 
+	@Override
 	public void processArgs() throws SoCTraceException {
 	}
 

@@ -45,35 +45,35 @@ public class Parser {
 	/**
 	 * Importer arguments
 	 */
-	private ImporterArgumentsManager	arguments;
+	private final ImporterArgumentsManager	arguments;
 
 	/**
 	 * System DB Object (the importer has no ownership on it)
 	 */
-	private SystemDBObject				sysDB;
+	private final SystemDBObject			sysDB;
 
 	/**
 	 * Trace DB Object (the importer has no ownership on it)
 	 */
-	private TraceDBObject				traceDB;
+	private final TraceDBObject				traceDB;
 
 	/**
 	 * Event number to reach before saving into the traceDB
 	 */
-	private static final int			eventNumberToSave		= 20000;
+	private static final int				eventNumberToSave		= 20000;
 	/**
 	 * pajeEventTypesManager
 	 */
-	private PajeEventTypeManager		pajeEventTypeManager	= new PajeEventTypeManager();
+	private final PajeEventTypeManager		pajeEventTypeManager	= new PajeEventTypeManager();
 	/**
 	 * pajeEventsManager
 	 */
-	private PajeEventManager			pajeEventManager		= new PajeEventManager(pajeEventTypeManager);
+	private final PajeEventManager			pajeEventManager		= new PajeEventManager(pajeEventTypeManager);
 
 	/**
 	 * The constructor.
 	 */
-	public Parser(ImporterArgumentsManager arguments, SystemDBObject sysDB, TraceDBObject traceDB) {
+	public Parser(final ImporterArgumentsManager arguments, final SystemDBObject sysDB, final TraceDBObject traceDB) {
 		this.arguments = arguments;
 		this.sysDB = sysDB;
 		this.traceDB = traceDB;
@@ -86,12 +86,12 @@ public class Parser {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	private BufferedReader getFileReaders(int i) throws FileNotFoundException {
+	private BufferedReader getFileReaders(final int i) throws FileNotFoundException {
 
-		BufferedReader br ;
-			FileInputStream fstream = new FileInputStream(arguments.getTraceFiles().get(i));
-			DataInputStream in = new DataInputStream(fstream);
-			br = new BufferedReader(new InputStreamReader(in));
+		BufferedReader br;
+		final FileInputStream fstream = new FileInputStream(arguments.getTraceFiles().get(i));
+		final DataInputStream in = new DataInputStream(fstream);
+		br = new BufferedReader(new InputStreamReader(in));
 		return br;
 	}
 
@@ -100,12 +100,12 @@ public class Parser {
 	 * 
 	 * @throws SoCTraceException
 	 */
-	public void importTrace(int i) throws SoCTraceException {
+	public void importTrace(final int i) throws SoCTraceException {
 
 		try {
 
 			// create trace general info
-			PajeTraceInfoManager pajeTraceInfoManager = new PajeTraceInfoManager(arguments, sysDB, traceDB);
+			final PajeTraceInfoManager pajeTraceInfoManager = new PajeTraceInfoManager(arguments, sysDB, traceDB);
 			pajeTraceInfoManager.createTraceInfo();
 			pajeTraceInfoManager.saveTraceInfo();
 
@@ -114,7 +114,7 @@ public class Parser {
 			parseEvent(getFileReaders(i));
 			pajeEventManager.saveEventProducer(traceDB);
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new SoCTraceException(e);
 		}
 
@@ -127,7 +127,7 @@ public class Parser {
 	 * @throws IOException
 	 * @throws SoCTraceException
 	 */
-	private void parseEvent(BufferedReader br) throws IOException, SoCTraceException {
+	private void parseEvent(final BufferedReader br) throws IOException, SoCTraceException {
 		String strLine = "";
 		String currentPajeId = "";
 		while ((strLine = br.readLine()) != null) {
@@ -144,10 +144,10 @@ public class Parser {
 			// Event
 			else {// TODO manage error case : non valid line (if first arg is
 					// not a number for instance)
-				String[] tokens = strLine.split(" (?=[^\"]*(\"[^\"]*\"[^\"]*)*$)");
+				final String[] tokens = strLine.split(" (?=[^\"]*(\"[^\"]*\"[^\"]*)*$)");
 				// TODO put this horror somewhere (and check if it works good)
 				currentPajeId = tokens[0];
-				List<String> parameters = new ArrayList<String>();
+				final List<String> parameters = new ArrayList<String>();
 				for (int i = 1; i < tokens.length; i++) {
 					tokens[i] = tokens[i].replace("\"", "");
 					parameters.add(tokens[i]);
@@ -174,7 +174,7 @@ public class Parser {
 	 * @param br
 	 * @throws IOException
 	 */
-	private void parseEventDef(BufferedReader br) throws IOException {
+	private void parseEventDef(final BufferedReader br) throws IOException {
 		String strLine = "";
 		String currentPajeId = "";
 		while ((strLine = br.readLine()) != null) {
@@ -188,7 +188,7 @@ public class Parser {
 			// Event definition
 			if (strLine.startsWith(PajeConstants.PajeFormatStartEventDef)) {
 				// TODO constant
-				String[] tokens = strLine.split(" ");
+				final String[] tokens = strLine.split(" ");
 				currentPajeId = tokens[2];
 				pajeEventTypeManager.addPajeEventType(tokens[1], currentPajeId);
 			}
@@ -202,7 +202,7 @@ public class Parser {
 																										// error
 																										// case
 				// TODO does it work good for tabs space and cie mixing?
-				String[] tokens = strLine.split("\\s+");
+				final String[] tokens = strLine.split("\\s+");
 				pajeEventTypeManager.addPajeEventParamType(currentPajeId, tokens[1], tokens[2]);
 			} else
 				return;

@@ -22,22 +22,20 @@ package fr.inria.soctrace.tools.paje.tracemanager.traceimporter.managers;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.soctrace.framesoc.core.FramesocManager;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.Configuration;
 import fr.inria.soctrace.lib.utils.Configuration.SoCTraceProperty;
-import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 import fr.inria.soctrace.tools.paje.utils.argumentmanager.ArgumentManager;
 
 public class ImporterArgumentsManager extends ArgumentManager {
 
-	private String			sysDbName			= null;
-	private List<String>	traceDbName			= new ArrayList<String>();
-	private List<String>	traceFiles			= null;
-	private String			logFile				= null;
-	private String			traceDescription	= null;
+	private String				sysDbName			= null;
+	private final List<String>	traceDbName			= new ArrayList<String>();
+	private List<String>		traceFiles			= null;
+	private String				logFile				= null;
+	private String				traceDescription	= null;
 
-	public ImporterArgumentsManager(String[] args) throws SoCTraceException {
+	public ImporterArgumentsManager(final String[] args) throws SoCTraceException {
 		super(args);
 	}
 
@@ -71,7 +69,7 @@ public class ImporterArgumentsManager extends ArgumentManager {
 		System.out.println("Trace Description: " + (traceDescription != null ? traceDescription : "-"));
 		System.out.println("Trace Files:");
 		if (!traceFiles.isEmpty())
-			for (String it : traceFiles)
+			for (final String it : traceFiles)
 				System.out.println(it);
 		else
 			System.out.println("Trace files: -");
@@ -87,9 +85,9 @@ public class ImporterArgumentsManager extends ArgumentManager {
 		if (defaults.isEmpty())
 			throw new SoCTraceException("Missing trace files");
 		traceFiles = defaults;
-		for (String td : traceFiles){
-			String[] tokens = td.split("/");
-			String string = tokens[tokens.length-1].replace(".paje", "");
+		for (final String td : traceFiles) {
+			final String[] tokens = td.split("/");
+			final String string = tokens[tokens.length - 1].replace(".paje", "");
 			traceDbName.add(string);
 		}
 	}

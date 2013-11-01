@@ -44,7 +44,7 @@ public class PajeNormalizedStateSum extends Matrix {
 	class OcelotlThread extends Thread {
 
 		List<EventProducer>						eventProducers;
-		Map<Integer, List<EventProxy>>		eventProxyList;
+		Map<Integer, List<EventProxy>>			eventProxyList;
 		Map<Integer, List<PajeReducedEvent1>>	eventList;
 		int										threadNumber;
 		int										thread;
@@ -192,7 +192,12 @@ public class PajeNormalizedStateSum extends Matrix {
 		dm.end("VECTOR COMPUTATION : " + genericQuery.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
-	
+	@Override
+	public String descriptor() {
+		return descriptor;
+	}
+
+	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
 		this.parameters = parameters;
 		genericQuery = new PajeQuery(parameters);
@@ -202,11 +207,6 @@ public class PajeNormalizedStateSum extends Matrix {
 		timeSliceManager = new TimeSliceManager(genericQuery.getOcelotlParameters().getTimeRegion(), genericQuery.getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
-	}
-	
-	@Override
-	public String descriptor() {
-		return descriptor;
 	}
 
 	@Override

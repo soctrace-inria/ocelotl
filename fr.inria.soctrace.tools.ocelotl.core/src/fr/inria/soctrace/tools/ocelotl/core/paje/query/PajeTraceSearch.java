@@ -20,10 +20,8 @@
 package fr.inria.soctrace.tools.ocelotl.core.paje.query;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
@@ -34,13 +32,10 @@ import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.LogicalOperati
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.OrderBy;
 import fr.inria.soctrace.lib.query.conditions.LogicalCondition;
 import fr.inria.soctrace.lib.query.conditions.SimpleCondition;
-import fr.inria.soctrace.lib.search.TraceSearch;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxy;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxyQuery;
 import fr.inria.soctrace.tools.ocelotl.core.generic.query.GenericTraceSearch;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
@@ -54,10 +49,7 @@ public class PajeTraceSearch extends GenericTraceSearch {
 		return and;
 	}
 
-	
-
-		// intervals
-
+	// intervals
 
 	public List<PajeReducedEvent1> getReducedEvents1ByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		final DeltaManager dm = new DeltaManager();
@@ -109,7 +101,7 @@ public class PajeTraceSearch extends GenericTraceSearch {
 		traceDB.close();
 		return proxy;
 	}
-	
+
 	public List<PajeReducedEvent2> getReducedEvents2ByEventTypesAndIntervalsAndEventProducers(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		final DeltaManager dm = new DeltaManager();
 		openTraceDBObject(t);
@@ -161,6 +153,7 @@ public class PajeTraceSearch extends GenericTraceSearch {
 		return proxy;
 	}
 
+	@Override
 	protected void openTraceDBObject(final Trace t) throws SoCTraceException {
 		if (traceDB != null)
 			if (traceDB.getDBName() == t.getDbName())

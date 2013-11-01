@@ -40,44 +40,41 @@ import fr.inria.soctrace.lib.utils.IdManager;
 
 class Cleaner {
 
-	private TraceDBObject	traceDB;
-	private IdManager		eventParamIdManager	= new IdManager();
+	private final TraceDBObject	traceDB;
+	private final IdManager		eventParamIdManager	= new IdManager();
 
-	public Cleaner(TraceDBObject traceDB) throws SoCTraceException {
+	public Cleaner(final TraceDBObject traceDB) throws SoCTraceException {
 		this.traceDB = traceDB;
 		eventParamIdManager.setNextId(traceDB.getMaxId("EVENT_PARAM", "ID") + 1);
 	}
 
-	public void cleanPopStateEventTypes(List<Event> events) throws SoCTraceException {
-		for (int i = 2; i < events.size(); i++) {
+	public void cleanPopStateEventTypes(final List<Event> events) throws SoCTraceException {
+		for (int i = 2; i < events.size(); i++)
 			if (events.get(i).getType().equals(getPopStateEventTypes().get(0))) {
-				List<EventParam> oldEventParam = events.get(i).getEventParams();
-				List<EventParam> newEventParam = new ArrayList<EventParam>();
+				final List<EventParam> oldEventParam = events.get(i).getEventParams();
+				final List<EventParam> newEventParam = new ArrayList<EventParam>();
 				for (int j = 0; j < getSetStateEventTypes().get(0).getEventParamTypes().size(); j++) {
-					EventParam currentEventParam = new EventParam(eventParamIdManager.getNextId());
+					final EventParam currentEventParam = new EventParam(eventParamIdManager.getNextId());
 					currentEventParam.setEventParamType(getSetStateEventTypes().get(0).getEventParamTypes().get(j));
-					for (int k = 0; k < getSetStateEventTypes().get(0).getEventParamTypes().size(); k++) {
+					for (int k = 0; k < getSetStateEventTypes().get(0).getEventParamTypes().size(); k++)
 						if (events.get(i - 2).getType().getEventParamTypes().get(k).getName().equals(currentEventParam.getEventParamType().getName()) && events.get(i - 2).getType().getEventParamTypes().get(k).getType().equals(currentEventParam.getEventParamType().getType())) {
 							currentEventParam.setValue(events.get(i - 2).getEventParams().get(k).getValue());
 							break;
 						}
-					}
-					for (int k = 0; k < oldEventParam.size(); k++) {
+					for (int k = 0; k < oldEventParam.size(); k++)
 						if (events.get(i).getType().getEventParamTypes().get(k).getName().equals(currentEventParam.getEventParamType().getName()) && events.get(i).getType().getEventParamTypes().get(k).getType().equals(currentEventParam.getEventParamType().getType())) {
 							currentEventParam.setValue(oldEventParam.get(k).getValue());
 							break;
 						}
-					}
 					newEventParam.add(currentEventParam);
 				}
-				for (EventParam currentEventParam : oldEventParam) {
+				for (final EventParam currentEventParam : oldEventParam)
 					traceDB.delete(currentEventParam);
-					//System.out.println("commit " + currentEventParam.toString());
-					//traceDB.commit();
-				}
+				//System.out.println("commit " + currentEventParam.toString());
+				//traceDB.commit();
 				oldEventParam.clear();
 				events.get(i).setType(getSetStateEventTypes().get(0));
-				for (EventParam currentEventParam : newEventParam) {
+				for (final EventParam currentEventParam : newEventParam) {
 					currentEventParam.setEvent(events.get(i));
 					traceDB.save(currentEventParam);
 					//System.out.println("commit " + currentEventParam.toString());
@@ -87,35 +84,32 @@ class Cleaner {
 				//System.out.println("commit " + events.get(i));
 				//traceDB.commit();
 			}
-		}
 
 	}
 
-	public void cleanPushStateEventTypes(List<Event> events) throws SoCTraceException {
+	public void cleanPushStateEventTypes(final List<Event> events) throws SoCTraceException {
 		for (int i = 0; i < events.size(); i++)
 			if (events.get(i).getType().equals(getPushStateEventTypes().get(0))) {
-				List<EventParam> oldEventParam = events.get(i).getEventParams();
-				List<EventParam> newEventParam = new ArrayList<EventParam>();
+				final List<EventParam> oldEventParam = events.get(i).getEventParams();
+				final List<EventParam> newEventParam = new ArrayList<EventParam>();
 				for (int j = 0; j < getSetStateEventTypes().get(0).getEventParamTypes().size(); j++) {
-					EventParam currentEventParam = new EventParam(eventParamIdManager.getNextId());
+					final EventParam currentEventParam = new EventParam(eventParamIdManager.getNextId());
 					currentEventParam.setEventParamType(getSetStateEventTypes().get(0).getEventParamTypes().get(j));
-					for (int k = 0; k < oldEventParam.size(); k++) {
+					for (int k = 0; k < oldEventParam.size(); k++)
 						if (events.get(i).getType().getEventParamTypes().get(k).getName().equals(currentEventParam.getEventParamType().getName()) && events.get(i).getType().getEventParamTypes().get(k).getType().equals(currentEventParam.getEventParamType().getType())) {
 							currentEventParam.setValue(oldEventParam.get(k).getValue());
 							break;
 						} else
 							currentEventParam.setValue("Unknown");//TODO improve management		
-					}
 					newEventParam.add(currentEventParam);
 				}
-				for (EventParam currentEventParam : oldEventParam) {
+				for (final EventParam currentEventParam : oldEventParam)
 					traceDB.delete(currentEventParam);
-					//System.out.println("delete " + currentEventParam.toString());
-					//traceDB.commit();
-				}
+				//System.out.println("delete " + currentEventParam.toString());
+				//traceDB.commit();
 				oldEventParam.clear();
 				events.get(i).setType(getSetStateEventTypes().get(0));
-				for (EventParam currentEventParam : newEventParam) {
+				for (final EventParam currentEventParam : newEventParam) {
 					currentEventParam.setEvent(events.get(i));
 					traceDB.save(currentEventParam);
 					//System.out.println("commit " + currentEventParam.toString());
@@ -128,10 +122,10 @@ class Cleaner {
 	}
 
 	public void cleanup() throws SoCTraceException {
-		List<Event> events = getEvents();
-		for (EventProducer ep : getEventProducers()) {
+		final List<Event> events = getEvents();
+		for (final EventProducer ep : getEventProducers()) {
 			System.out.println(ep.toString());
-			List<Event> subEvents = getSubsetEvents(events, ep);
+			final List<Event> subEvents = getSubsetEvents(events, ep);
 			if (!subEvents.isEmpty()) {
 				cleanPushStateEventTypes(subEvents);
 				System.out.println("Push");
@@ -154,13 +148,13 @@ class Cleaner {
 	//	}
 
 	public List<EventProducer> getEventProducers() throws SoCTraceException {
-		EventProducerQuery pQuery = new EventProducerQuery(traceDB);
+		final EventProducerQuery pQuery = new EventProducerQuery(traceDB);
 		return pQuery.getList();
 	}
 
 	public List<Event> getEvents() throws SoCTraceException {
-		EventQuery eQuery = new EventQuery(traceDB);
-		LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
+		final EventQuery eQuery = new EventQuery(traceDB);
+		final LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
 		//TODO management of Paje Extra type (PushState)
 		if (!getPushStateEventTypes().isEmpty() && !getPopStateEventTypes().isEmpty()) {
 			if (!getSetStateEventTypes().isEmpty())
@@ -174,9 +168,9 @@ class Cleaner {
 		return null;
 	}
 
-	public List<Event> getEvents(EventProducer producer) throws SoCTraceException {
-		EventQuery eQuery = new EventQuery(traceDB);
-		LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
+	public List<Event> getEvents(final EventProducer producer) throws SoCTraceException {
+		final EventQuery eQuery = new EventQuery(traceDB);
+		final LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
 		//TODO management of Paje Extra type (PushState)
 		if (!getPushStateEventTypes().isEmpty() && !getPopStateEventTypes().isEmpty()) {
 			if (!getSetStateEventTypes().isEmpty())
@@ -192,29 +186,28 @@ class Cleaner {
 	}
 
 	public List<EventType> getPopStateEventTypes() throws SoCTraceException {
-		EventTypeQuery tQuery = new EventTypeQuery(traceDB);
+		final EventTypeQuery tQuery = new EventTypeQuery(traceDB);
 		tQuery.setElementWhere(new SimpleCondition("NAME", ComparisonOperation.LIKE, "%PajePopState"));//TODO check
 		return tQuery.getList();
 	}
 
 	public List<EventType> getPushStateEventTypes() throws SoCTraceException {
-		EventTypeQuery tQuery = new EventTypeQuery(traceDB);
+		final EventTypeQuery tQuery = new EventTypeQuery(traceDB);
 		tQuery.setElementWhere(new SimpleCondition("NAME", ComparisonOperation.LIKE, "%PajePushState"));//TODO check
 		return tQuery.getList();
 	}
 
 	public List<EventType> getSetStateEventTypes() throws SoCTraceException {
-		EventTypeQuery tQuery = new EventTypeQuery(traceDB);
+		final EventTypeQuery tQuery = new EventTypeQuery(traceDB);
 		tQuery.setElementWhere(new SimpleCondition("NAME", ComparisonOperation.LIKE, "%PajeSetState"));//TODO check
 		return tQuery.getList();
 	}
 
-	public List<Event> getSubsetEvents(List<Event> events, EventProducer producer) {
-		List<Event> subEvents = new ArrayList<Event>();
-		for (Event e : events) {
+	public List<Event> getSubsetEvents(final List<Event> events, final EventProducer producer) {
+		final List<Event> subEvents = new ArrayList<Event>();
+		for (final Event e : events)
 			if (e.getEventProducer().getId() == producer.getId())
 				subEvents.add(e);
-		}
 		return subEvents;
 
 	}

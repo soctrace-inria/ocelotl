@@ -31,182 +31,20 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
  */
 public class PajeTclInput implements ITChartsInput {
 
-	private ArrayList<ITChartsRow>	mainItems		= new ArrayList<ITChartsRow>();
-	private boolean					startTimeSet	= false;
-	private long					startTime;
-	private boolean					endTimeSet		= false;
-	private long					endTime;
+	private final ArrayList<ITChartsRow>	mainItems		= new ArrayList<ITChartsRow>();
+	private boolean							startTimeSet	= false;
+	private long							startTime;
+	private boolean							endTimeSet		= false;
+	private long							endTime;
 
 	/**
 	 * Debug flag
 	 */
-	public final static boolean		DEBUG			= false;
+	public final static boolean				DEBUG			= false;
 
 	@Override
-	public void addTChartsRow(ITChartsRow main) {
+	public void addTChartsRow(final ITChartsRow main) {
 		mainItems.add(main);
-	}
-
-	@Override
-	public ArrayList<ITChartsRow> getTChartsRows() {
-		return mainItems;
-	}
-
-	@Override
-	public long getStartTime() {
-		if (startTimeSet)
-			return startTime;
-
-		startTime = mainItems.get(0).getStartTime();
-		long time;
-		for (ITChartsRow item : mainItems) {
-			time = item.getStartTime();
-			if (time < startTime)
-				startTime = time;
-		}
-		startTimeSet = true;
-		return startTime;
-	}
-
-	@Override
-	public long getEndTime() {
-		if (endTimeSet)
-			return endTime;
-
-		endTime = mainItems.get(0).getEndTime();
-		long time;
-		for (ITChartsRow item : mainItems) {
-			time = item.getEndTime();
-			if (time > endTime)
-				endTime = time;
-		}
-		endTimeSet = true;
-		return endTime;
-	}
-
-	@Override
-	public void loadPage(Trace trace, List<Event> elist) {
-
-		// XXX Hard coded result: used for the article
-		// Ignore the passed list, and use the result one.
-		//		elist.clear();
-		//		elist = getArticleList(trace);
-
-		elist.clear();
-		elist = getPresentationList(trace);
-
-		// load all producers
-		Map<Integer, EventProducer> eps = new HashMap<Integer, EventProducer>();
-		try {
-			TraceDBObject traceDB = TraceDBObject.openNewIstance(trace.getDbName());
-			EventProducerQuery query = new EventProducerQuery(traceDB);
-			List<EventProducer> producers = query.getList();
-			for (EventProducer ep : producers) {
-				eps.put(ep.getId(), ep);
-			}
-			traceDB.close();
-		} catch (SoCTraceException e) {
-			e.printStackTrace();
-		}
-
-		//  CPU          EP id
-		Map<Integer, Map<Integer, ITChartsRow>> rows = new HashMap<Integer, Map<Integer, ITChartsRow>>();
-		//  CPU      row
-		Map<Integer, ITChartsRow> main = new HashMap<Integer, ITChartsRow>();
-
-		// iterate over all page events 
-		Event lastEvent = null;
-		ITChartsRow lastProducerRow = null;
-
-		for (Event e : elist) {
-			// get the map containing all the rows for this CPU
-			if (!rows.containsKey(e.getCpu())) {
-				rows.put(e.getCpu(), new HashMap<Integer, ITChartsRow>());
-				main.put(e.getCpu(), new PajeTclRow("CPU " + e.getCpu(), null, null, e.getCpu()));
-				this.addTChartsRow(main.get(e.getCpu()));
-			}
-			Map<Integer, ITChartsRow> cpuMap = rows.get(e.getCpu());
-
-			// get the row for the given producer
-			if (!cpuMap.containsKey(e.getEventProducer().getId()))
-				cpuMap.put(e.getEventProducer().getId(), getNewEventProducerRow(e.getEventProducer(), eps, cpuMap, main.get(e.getCpu())));
-			ITChartsRow producerRow = cpuMap.get(e.getEventProducer().getId());
-
-			// finally add the event if I'm on the end
-			//final long OFFSET = 298400000000L;
-			final long OFFSET = 0;
-			if (lastEvent != null) {
-				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp() - OFFSET, e.getTimestamp() - OFFSET));
-			}
-
-			lastEvent = e;
-			lastProducerRow = producerRow;
-
-		}
-	}
-
-	@SuppressWarnings("unused")
-	private List<Event> getArticleList(Trace trace) {
-
-		// Result label: the first result with this label is loaded. Take care.
-		final String FILTER_RESULT_LABEL = "thelast";
-		// Filter tool name
-		final String FILTER_NAME = "Filter Tool";
-
-		try {
-			ITraceSearch search = new TraceSearch().initialize();
-			Tool filter = search.getToolByName(FILTER_NAME);
-			List<AnalysisResult> alist = search.getAnalysisResultsByToolAndType(trace, filter, AnalysisResultType.TYPE_SEARCH);
-			AnalysisResult ar = null;
-			for (AnalysisResult a : alist) {
-				if (a.getDescription().equals(FILTER_RESULT_LABEL)) {
-					ar = a;
-					break;
-				}
-			}
-			if (ar == null)
-				return null;
-			AnalysisResultSearchData data = (AnalysisResultSearchData) search.getAnalysisResultData(trace, ar);
-			@SuppressWarnings("unchecked")
-			List<Event> elist = (List<Event>) (List<? extends ISearchable>) data.getElements();
-			search.uninitialize();
-			return elist;
-		} catch (SoCTraceException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private List<Event> getPresentationList(Trace trace) {
-
-		try {
-			ITraceSearch search = new TraceSearch().initialize();
-			IntervalDesc desc = new IntervalDesc(100, 10000000000L);
-			List<Event> elist = search.getEventsByInterval(trace, desc);
-			search.uninitialize();
-			return elist;
-		} catch (SoCTraceException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private ITChartsRow getNewEventProducerRow(EventProducer ep, Map<Integer, EventProducer> eps, Map<Integer, ITChartsRow> cpuRows, ITChartsRow cpuRow) {
-
-		debug("Creating event producer row " + ep.getId() + ", parent " + ep.getParentId());
-
-		ITChartsRow parentRow = cpuRow;
-		// if there's a parent
-		if (ep.getParentId() != EventProducer.NO_PARENT_ID) {
-			// if there is already its row
-			if (cpuRows.containsKey(ep.getParentId()))
-				parentRow = cpuRows.get(ep.getParentId());
-			else {
-				parentRow = getNewEventProducerRow(eps.get(ep.getParentId()), eps, cpuRows, cpuRow);
-				cpuRows.put(ep.getParentId(), parentRow);
-			}
-		}
-		return new PajeTclRow(ep.getName(), null, parentRow, ep.getId());
 	}
 
 	@Override
@@ -220,9 +58,167 @@ public class PajeTclInput implements ITChartsInput {
 	 * Print a debug message
 	 * @param s message
 	 */
-	private void debug(String s) {
+	private void debug(final String s) {
 		if (DEBUG)
 			System.out.println("[Default Input] " + s);
+	}
+
+	@SuppressWarnings("unused")
+	private List<Event> getArticleList(final Trace trace) {
+
+		// Result label: the first result with this label is loaded. Take care.
+		final String FILTER_RESULT_LABEL = "thelast";
+		// Filter tool name
+		final String FILTER_NAME = "Filter Tool";
+
+		try {
+			final ITraceSearch search = new TraceSearch().initialize();
+			final Tool filter = search.getToolByName(FILTER_NAME);
+			final List<AnalysisResult> alist = search.getAnalysisResultsByToolAndType(trace, filter, AnalysisResultType.TYPE_SEARCH);
+			AnalysisResult ar = null;
+			for (final AnalysisResult a : alist)
+				if (a.getDescription().equals(FILTER_RESULT_LABEL)) {
+					ar = a;
+					break;
+				}
+			if (ar == null)
+				return null;
+			final AnalysisResultSearchData data = (AnalysisResultSearchData) search.getAnalysisResultData(trace, ar);
+			@SuppressWarnings("unchecked")
+			final List<Event> elist = (List<Event>) (List<? extends ISearchable>) data.getElements();
+			search.uninitialize();
+			return elist;
+		} catch (final SoCTraceException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public long getEndTime() {
+		if (endTimeSet)
+			return endTime;
+
+		endTime = mainItems.get(0).getEndTime();
+		long time;
+		for (final ITChartsRow item : mainItems) {
+			time = item.getEndTime();
+			if (time > endTime)
+				endTime = time;
+		}
+		endTimeSet = true;
+		return endTime;
+	}
+
+	private ITChartsRow getNewEventProducerRow(final EventProducer ep, final Map<Integer, EventProducer> eps, final Map<Integer, ITChartsRow> cpuRows, final ITChartsRow cpuRow) {
+
+		debug("Creating event producer row " + ep.getId() + ", parent " + ep.getParentId());
+
+		ITChartsRow parentRow = cpuRow;
+		// if there's a parent
+		if (ep.getParentId() != EventProducer.NO_PARENT_ID)
+			// if there is already its row
+			if (cpuRows.containsKey(ep.getParentId()))
+				parentRow = cpuRows.get(ep.getParentId());
+			else {
+				parentRow = getNewEventProducerRow(eps.get(ep.getParentId()), eps, cpuRows, cpuRow);
+				cpuRows.put(ep.getParentId(), parentRow);
+			}
+		return new PajeTclRow(ep.getName(), null, parentRow, ep.getId());
+	}
+
+	private List<Event> getPresentationList(final Trace trace) {
+
+		try {
+			final ITraceSearch search = new TraceSearch().initialize();
+			final IntervalDesc desc = new IntervalDesc(100, 10000000000L);
+			final List<Event> elist = search.getEventsByInterval(trace, desc);
+			search.uninitialize();
+			return elist;
+		} catch (final SoCTraceException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public long getStartTime() {
+		if (startTimeSet)
+			return startTime;
+
+		startTime = mainItems.get(0).getStartTime();
+		long time;
+		for (final ITChartsRow item : mainItems) {
+			time = item.getStartTime();
+			if (time < startTime)
+				startTime = time;
+		}
+		startTimeSet = true;
+		return startTime;
+	}
+
+	@Override
+	public ArrayList<ITChartsRow> getTChartsRows() {
+		return mainItems;
+	}
+
+	@Override
+	public void loadPage(final Trace trace, List<Event> elist) {
+
+		// XXX Hard coded result: used for the article
+		// Ignore the passed list, and use the result one.
+		//		elist.clear();
+		//		elist = getArticleList(trace);
+
+		elist.clear();
+		elist = getPresentationList(trace);
+
+		// load all producers
+		final Map<Integer, EventProducer> eps = new HashMap<Integer, EventProducer>();
+		try {
+			final TraceDBObject traceDB = TraceDBObject.openNewIstance(trace.getDbName());
+			final EventProducerQuery query = new EventProducerQuery(traceDB);
+			final List<EventProducer> producers = query.getList();
+			for (final EventProducer ep : producers)
+				eps.put(ep.getId(), ep);
+			traceDB.close();
+		} catch (final SoCTraceException e) {
+			e.printStackTrace();
+		}
+
+		//  CPU          EP id
+		final Map<Integer, Map<Integer, ITChartsRow>> rows = new HashMap<Integer, Map<Integer, ITChartsRow>>();
+		//  CPU      row
+		final Map<Integer, ITChartsRow> main = new HashMap<Integer, ITChartsRow>();
+
+		// iterate over all page events 
+		Event lastEvent = null;
+		ITChartsRow lastProducerRow = null;
+
+		for (final Event e : elist) {
+			// get the map containing all the rows for this CPU
+			if (!rows.containsKey(e.getCpu())) {
+				rows.put(e.getCpu(), new HashMap<Integer, ITChartsRow>());
+				main.put(e.getCpu(), new PajeTclRow("CPU " + e.getCpu(), null, null, e.getCpu()));
+				addTChartsRow(main.get(e.getCpu()));
+			}
+			final Map<Integer, ITChartsRow> cpuMap = rows.get(e.getCpu());
+
+			// get the row for the given producer
+			if (!cpuMap.containsKey(e.getEventProducer().getId()))
+				cpuMap.put(e.getEventProducer().getId(), getNewEventProducerRow(e.getEventProducer(), eps, cpuMap, main.get(e.getCpu())));
+			final ITChartsRow producerRow = cpuMap.get(e.getEventProducer().getId());
+
+			// finally add the event if I'm on the end
+			//final long OFFSET = 298400000000L;
+			final long OFFSET = 0;
+			if (lastEvent != null)
+				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp() - OFFSET, e.getTimestamp() - OFFSET));
+
+			lastEvent = e;
+			lastProducerRow = producerRow;
+
+		}
 	}
 
 }

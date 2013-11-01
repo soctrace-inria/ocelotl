@@ -41,44 +41,43 @@ public class PajeTraceImporterTool extends FramesocTool {
 	 */
 	private class PajeImporterPluginJobBody implements IPluginToolJobBody {
 
-		private String	args[];
+		private final String	args[];
 
-		public PajeImporterPluginJobBody(String[] args) {
+		public PajeImporterPluginJobBody(final String[] args) {
 			this.args = args;
 		}
 
 		@Override
 		public void run() throws SoCTraceException {
-			DeltaManager dm = new DeltaManager();
+			final DeltaManager dm = new DeltaManager();
 			dm.start();
 
-			ImporterArgumentsManager arguments = new ImporterArgumentsManager(args);
+			final ImporterArgumentsManager arguments = new ImporterArgumentsManager(args);
 			arguments.parseArgs();
 			arguments.processArgs();
 			if (DEBUG)
 				arguments.debugArgs();
 
-			SystemDBObject sysDB =  null;
+			SystemDBObject sysDB = null;
 			TraceDBObject traceDB = null;
-			for (int i=0; i<arguments.getTraceDbName().size(); i++ ){
+			for (int i = 0; i < arguments.getTraceDbName().size(); i++) {
 				sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
 				dm.end("Paje Trace " + i + " Importing");
 				traceDB = new TraceDBObject(arguments.getTraceDbName().get(i), DBMode.DB_CREATE);
 
-			/** Import trace */
+				/** Import trace */
 
-			Parser importer = new Parser(arguments, sysDB, traceDB);
-			importer.importTrace(i);
+				final Parser importer = new Parser(arguments, sysDB, traceDB);
+				importer.importTrace(i);
 
-			/** DB close (commit) */
+				/** DB close (commit) */
 
-			traceDB.close();
-			sysDB.close();
-			
+				traceDB.close();
+				sysDB.close();
 
-			dm.end("Paje Trace " + i + " Imported");
+				dm.end("Paje Trace " + i + " Imported");
 			}
-			
+
 			dm.end("Paje Trace Importer end");
 
 		}
@@ -88,8 +87,8 @@ public class PajeTraceImporterTool extends FramesocTool {
 	private static final boolean	DEBUG	= true;
 
 	@Override
-	public void launch(String[] args) {
-		PluginImporterJob job = new PluginImporterJob("Paje Importer", new PajeImporterPluginJobBody(args));
+	public void launch(final String[] args) {
+		final PluginImporterJob job = new PluginImporterJob("Paje Importer", new PajeImporterPluginJobBody(args));
 		job.setUser(true);
 		job.schedule();
 	}

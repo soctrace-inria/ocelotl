@@ -41,18 +41,18 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.model.PajeEventType;
  */
 public class PajeEventManager {
 
-	private PajeEventTypeManager	eventTypesManager;
+	private PajeEventTypeManager			eventTypesManager;
 
-	private PajeEventProducer		defaultEventProducer;
-	private static final String		defaultEventProducerLocalId	= "NoId";
-	private static final String		defaultEventProducerName	= "NoProducer";
-	private static final String		defaultEventProducerType	= "NoType";
-	private int						currentPage					= 0;
-	private IdManager				eventIdManager				= new IdManager();
-	private IdManager				eventParamIdManager			= new IdManager();
-	private IdManager				eventProducerIdManager		= new IdManager();
-	private List<Event>				events;
-	private List<PajeEventProducer>	eventProducers;
+	private final PajeEventProducer			defaultEventProducer;
+	private static final String				defaultEventProducerLocalId	= "NoId";
+	private static final String				defaultEventProducerName	= "NoProducer";
+	private static final String				defaultEventProducerType	= "NoType";
+	private int								currentPage					= 0;
+	private final IdManager					eventIdManager				= new IdManager();
+	private final IdManager					eventParamIdManager			= new IdManager();
+	private final IdManager					eventProducerIdManager		= new IdManager();
+	private List<Event>						events;
+	private final List<PajeEventProducer>	eventProducers;
 
 	/**
 	 * Constructor set a default Event Producer because of non management of
@@ -60,7 +60,7 @@ public class PajeEventManager {
 	 * 
 	 * @param eventTypeManager
 	 */
-	public PajeEventManager(PajeEventTypeManager eventTypeManager) {
+	public PajeEventManager(final PajeEventTypeManager eventTypeManager) {
 		super();
 		eventTypesManager = eventTypeManager;
 		defaultEventProducer = new PajeEventProducer(eventProducerIdManager.getNextId());
@@ -78,15 +78,15 @@ public class PajeEventManager {
 	 * @param pajeId
 	 * @param param
 	 */
-	public void createEvent(String pajeId, List<String> param) {
-		Event currentEvent = new Event(eventIdManager.getNextId());
+	public void createEvent(final String pajeId, final List<String> param) {
+		final Event currentEvent = new Event(eventIdManager.getNextId());
 		PajeEventType currentEventType = new PajeEventType(IdManager.RESERVED_NO_ID);
 		// initialize in case of paje id is wrong
 		currentEvent.setEventProducer(defaultEventProducer);
 		currentEvent.setCpu(0);
 		currentEvent.setPage(currentPage);
 		currentEvent.setTimestamp(PajeConstants.NoTimestamp);
-		for (PajeEventType it : eventTypesManager.getEventTypes())
+		for (final PajeEventType it : eventTypesManager.getEventTypes())
 			if (it.getPajeId().equals(pajeId)) {
 				currentEventType = it;
 				break;
@@ -95,7 +95,7 @@ public class PajeEventManager {
 		// valid)
 		currentEvent.setType(currentEventType);
 		for (int i = 0; i < param.size(); i++) {
-			EventParam currentEventParam = new EventParam(eventParamIdManager.getNextId());
+			final EventParam currentEventParam = new EventParam(eventParamIdManager.getNextId());
 			currentEventParam.setEventParamType(currentEventType.getEventParamTypes().get(i));
 			currentEventParam.setValue(param.get(i));
 			// if the param is a timestamp, copy the value to event field
@@ -108,7 +108,7 @@ public class PajeEventManager {
 			}
 			// if the param is a container, set event producer
 			if (currentEventType.getEventParamTypes().get(i).getName().equals(PajeConstants.PajeEventDefParamContainerName))
-				for (PajeEventProducer it : eventProducers)
+				for (final PajeEventProducer it : eventProducers)
 					if (it.getName().equals(param.get(i)) || it.getAlias().equals(param.get(i))) {
 						currentEvent.setEventProducer(it);
 						break;
@@ -119,7 +119,7 @@ public class PajeEventManager {
 		// event producer creation
 		if (currentEventType.getPajeName().equals(PajeConstants.PajeCreateContainerEventDefName)) {
 			// if event is a container creation
-			PajeEventProducer currentEventProducer = new PajeEventProducer(eventProducerIdManager.getNextId());
+			final PajeEventProducer currentEventProducer = new PajeEventProducer(eventProducerIdManager.getNextId());
 			// set fields by defaults
 			currentEventProducer.setLocalId(Integer.toString(currentEventProducer.getId()));
 			currentEventProducer.setName(defaultEventProducerName);
@@ -138,7 +138,7 @@ public class PajeEventManager {
 					currentEventProducer.setAlias(currentEvent.getEventParams().get(i).getValue());
 				// else if it's the name of its parent container
 				else if (currentEventType.getEventParamTypes().get(i).getName().equals(PajeConstants.PajeEventDefParamContainerName))
-					for (EventProducer it : eventProducers)
+					for (final EventProducer it : eventProducers)
 						if (currentEvent.getEventParams().get(i).getValue().equals(it.getName()))
 							currentEventProducer.setParentId(it.getId());
 			eventProducers.add(currentEventProducer);
@@ -178,18 +178,18 @@ public class PajeEventManager {
 	 * @param traceDB
 	 * @throws SoCTraceException
 	 */
-	public void save(TraceDBObject traceDB) throws SoCTraceException {
-		for (Event e : events) {
+	public void save(final TraceDBObject traceDB) throws SoCTraceException {
+		for (final Event e : events) {
 			traceDB.save(e);
-			for (EventParam p : e.getEventParams())
+			for (final EventParam p : e.getEventParams())
 				traceDB.save(p);
 		}
 		traceDB.flushVisitorBatches();
 		currentPage++;
 	}
 
-	public void saveEventProducer(TraceDBObject traceDB) throws SoCTraceException {
-		for (EventProducer ep : eventProducers)
+	public void saveEventProducer(final TraceDBObject traceDB) throws SoCTraceException {
+		for (final EventProducer ep : eventProducers)
 			traceDB.save(ep);
 		traceDB.flushVisitorBatches();
 	}
@@ -198,7 +198,7 @@ public class PajeEventManager {
 	 * @param eventTypesManager
 	 *            the eventTypeManager to set
 	 */
-	public void setEventTypeManager(PajeEventTypeManager eventTypesManager) {
+	public void setEventTypeManager(final PajeEventTypeManager eventTypesManager) {
 		this.eventTypesManager = eventTypesManager;
 	}
 

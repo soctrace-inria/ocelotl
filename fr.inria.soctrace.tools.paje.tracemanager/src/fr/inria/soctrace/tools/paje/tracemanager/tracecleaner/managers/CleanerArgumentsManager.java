@@ -29,7 +29,7 @@ public class CleanerArgumentsManager extends ArgumentManager {
 	private String	sysDbName	= null;
 	private String	traceDbName	= null;
 
-	public CleanerArgumentsManager(String[] args) throws SoCTraceException {
+	public CleanerArgumentsManager(final String[] args) throws SoCTraceException {
 		super(args);
 	}
 

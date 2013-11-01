@@ -10,7 +10,8 @@ public interface ITimeAggregationOperator {
 
 	public ILPAggregManager createManager();
 
-	// public void setQueries(GenericQuery genericQuery) throws SoCTraceException;
+	// public void setQueries(GenericQuery genericQuery) throws
+	// SoCTraceException;
 
 	public String descriptor();
 

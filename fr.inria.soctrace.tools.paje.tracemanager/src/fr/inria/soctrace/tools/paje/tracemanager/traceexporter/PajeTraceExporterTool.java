@@ -39,30 +39,30 @@ public class PajeTraceExporterTool extends FramesocTool {
 	 */
 	private class PajeExporterPluginJobBody implements IPluginToolJobBody {
 
-		private String	args[];
+		private final String	args[];
 
-		public PajeExporterPluginJobBody(String[] args) {
+		public PajeExporterPluginJobBody(final String[] args) {
 			this.args = args;
 		}
 
 		@Override
 		public void run() throws SoCTraceException {
-			DeltaManager dm = new DeltaManager();
+			final DeltaManager dm = new DeltaManager();
 			dm.start();
 
 			try {
-				ExporterArgumentsManager arguments = new ExporterArgumentsManager(args);
+				final ExporterArgumentsManager arguments = new ExporterArgumentsManager(args);
 				arguments.parseArgs();
 				arguments.processArgs();
 				if (DEBUG)
 					arguments.debugArgs();
 
-				SystemDBObject sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
-				TraceDBObject traceDB = new TraceDBObject(arguments.getTraceDbName(), DBMode.DB_OPEN);
+				final SystemDBObject sysDB = new SystemDBObject(arguments.getSysDbName(), DBMode.DB_OPEN);
+				final TraceDBObject traceDB = new TraceDBObject(arguments.getTraceDbName(), DBMode.DB_OPEN);
 
 				/** Export trace from database*/
 
-				Writer exporter = new Writer(arguments, traceDB);
+				final Writer exporter = new Writer(arguments, traceDB);
 				exporter.exportTrace();
 
 				/** DB close (commit) */
@@ -70,7 +70,7 @@ public class PajeTraceExporterTool extends FramesocTool {
 				traceDB.close();
 				sysDB.close();
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new SoCTraceException(e);
 			} finally {
 				dm.end("Paje Trace Exporter end");
@@ -82,8 +82,8 @@ public class PajeTraceExporterTool extends FramesocTool {
 	private static final boolean	DEBUG	= true;
 
 	@Override
-	public void launch(String[] args) {
-		PluginToolJob job = new PluginToolJob("Paje Exporter", new PajeExporterPluginJobBody(args));
+	public void launch(final String[] args) {
+		final PluginToolJob job = new PluginToolJob("Paje Exporter", new PajeExporterPluginJobBody(args));
 		job.setUser(true);
 		job.schedule();
 	}

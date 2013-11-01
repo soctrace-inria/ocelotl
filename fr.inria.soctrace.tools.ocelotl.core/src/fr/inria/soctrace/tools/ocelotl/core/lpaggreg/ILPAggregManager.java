@@ -31,6 +31,8 @@ public interface ILPAggregManager {
 
 	public void fillVectors();
 
+	public List<String> getEventProducers();
+
 	public List<Float> getParameters();
 
 	public List<Integer> getParts();
@@ -42,7 +44,5 @@ public interface ILPAggregManager {
 	public void printParts();
 
 	public void reset();
-	
-	public List<String> getEventProducers();
 
 }

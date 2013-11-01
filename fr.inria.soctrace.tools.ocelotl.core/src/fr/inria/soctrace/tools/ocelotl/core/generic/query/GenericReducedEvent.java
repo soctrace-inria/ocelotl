@@ -1,7 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.generic.query;
 
-public class GenericReducedEvent extends EventProxy{
-	public String TYPE;
+public class GenericReducedEvent extends EventProxy {
+	public String	TYPE;
 	public int		PAGE;
 	public long		TS;
 

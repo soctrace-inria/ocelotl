@@ -8,9 +8,9 @@ import org.eclipse.jface.viewers.Viewer;
 
 import com.st.tchartslite.viewer.ITChartsContentProvider;
 
+import fr.inria.soctrace.framesoc.ui.tcl.ITChartsEvent;
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsInput;
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsRow;
-import fr.inria.soctrace.framesoc.ui.tcl.ITChartsEvent;
 
 /**
  * Paje content provider for Tcl Gantt
@@ -20,60 +20,30 @@ import fr.inria.soctrace.framesoc.ui.tcl.ITChartsEvent;
 public class PajeTclContentProvider implements ITChartsContentProvider {
 
 	@Override
-	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof ITChartsInput) {
-			Object[] items = ((ITChartsInput) inputElement).getTChartsRows().toArray();
-			return items;
-		} else
-			return null;
-	}
-
-	@Override
-	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof ITChartsRow) {
-			Object[] items = ((ITChartsRow) parentElement).getChildrenRows().toArray();
-			return items;
-		} else
-			return null;
-	}
-
-	@Override
-	public Object getParent(Object element) {
-		if (element instanceof ITChartsRow)
-			return ((ITChartsRow) element).getParent();
-		else
-			return null;
-	}
-
-	@Override
-	public boolean hasChildren(Object element) {
-		if (element instanceof ITChartsRow)
-			return !((ITChartsRow) element).getChildrenRows().isEmpty();
-		else
-			return false;
-	}
-
-	@Override
 	public void dispose() {
 		// Nothing to do
 	}
 
 	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		// TODO Auto-generated method stub
-
+	public Object[] getChildren(final Object parentElement) {
+		if (parentElement instanceof ITChartsRow) {
+			final Object[] items = ((ITChartsRow) parentElement).getChildrenRows().toArray();
+			return items;
+		} else
+			return null;
 	}
 
 	@Override
-	public long getStartTime(Object inputElement) {
-		if (inputElement instanceof ITChartsInput)
-			return ((ITChartsInput) inputElement).getStartTime();
-		else
-			return -1;
+	public Object[] getElements(final Object inputElement) {
+		if (inputElement instanceof ITChartsInput) {
+			final Object[] items = ((ITChartsInput) inputElement).getTChartsRows().toArray();
+			return items;
+		} else
+			return null;
 	}
 
 	@Override
-	public long getEndTime(Object inputElement) {
+	public long getEndTime(final Object inputElement) {
 		if (inputElement instanceof ITChartsInput)
 			return ((ITChartsInput) inputElement).getEndTime();
 		else
@@ -81,10 +51,18 @@ public class PajeTclContentProvider implements ITChartsContentProvider {
 	}
 
 	@Override
-	public List<Object> getEvents(Object element) {
+	public long getEventEndTime(final Object event) {
+		if (event instanceof ITChartsEvent)
+			return ((ITChartsEvent) event).getEndTime();
+		else
+			return -1;
+	}
+
+	@Override
+	public List<Object> getEvents(final Object element) {
 		if (element instanceof ITChartsRow) {
 			List<Object> events = new ArrayList<Object>();
-			List<ITChartsEvent> l = ((ITChartsRow) element).getEvents();
+			final List<ITChartsEvent> l = ((ITChartsRow) element).getEvents();
 			if (l != null)
 				events.addAll(l);
 			else
@@ -96,7 +74,7 @@ public class PajeTclContentProvider implements ITChartsContentProvider {
 	}
 
 	@Override
-	public long getEventStartTime(Object event) {
+	public long getEventStartTime(final Object event) {
 		if (event instanceof ITChartsEvent)
 			return ((ITChartsEvent) event).getStartTime();
 		else
@@ -104,18 +82,10 @@ public class PajeTclContentProvider implements ITChartsContentProvider {
 	}
 
 	@Override
-	public long getEventEndTime(Object event) {
-		if (event instanceof ITChartsEvent)
-			return ((ITChartsEvent) event).getEndTime();
-		else
-			return -1;
-	}
-
-	@Override
-	public List<Object> getOutlinkedEvents(Object event) {
+	public List<Object> getOutlinkedEvents(final Object event) {
 		if (event instanceof ITChartsEvent) {
 			List<Object> outlinkedEvents = new ArrayList<Object>();
-			List<ITChartsEvent> l = ((ITChartsEvent) event).getOutlinkedEvents();
+			final List<ITChartsEvent> l = ((ITChartsEvent) event).getOutlinkedEvents();
 			if (l != null)
 				outlinkedEvents.addAll(l);
 			else
@@ -124,6 +94,36 @@ public class PajeTclContentProvider implements ITChartsContentProvider {
 			return outlinkedEvents;
 		} else
 			return null;
+	}
+
+	@Override
+	public Object getParent(final Object element) {
+		if (element instanceof ITChartsRow)
+			return ((ITChartsRow) element).getParent();
+		else
+			return null;
+	}
+
+	@Override
+	public long getStartTime(final Object inputElement) {
+		if (inputElement instanceof ITChartsInput)
+			return ((ITChartsInput) inputElement).getStartTime();
+		else
+			return -1;
+	}
+
+	@Override
+	public boolean hasChildren(final Object element) {
+		if (element instanceof ITChartsRow)
+			return !((ITChartsRow) element).getChildrenRows().isEmpty();
+		else
+			return false;
+	}
+
+	@Override
+	public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

@@ -31,7 +31,7 @@ public class ExporterArgumentsManager extends ArgumentManager {
 	private String	traceDbName	= null;
 	private String	traceFile	= null;
 
-	public ExporterArgumentsManager(String[] args) throws SoCTraceException {
+	public ExporterArgumentsManager(final String[] args) throws SoCTraceException {
 		super(args);
 	}
 

@@ -70,7 +70,6 @@ public class GenericQuery {
 		return elist;
 	}
 
-	
 	public List<GenericReducedEvent> getAllReducedEvents() throws SoCTraceException {
 		final GenericTraceSearch traceSearch = (GenericTraceSearch) new GenericTraceSearch().initialize();
 		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
@@ -79,8 +78,6 @@ public class GenericQuery {
 		traceSearch.uninitialize();
 		return elist;
 	}
-	
-	
 
 	public List<Event> getEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
@@ -111,7 +108,7 @@ public class GenericQuery {
 	public OcelotlParameters getOcelotlParameters() {
 		return ocelotlParameters;
 	}
-	
+
 	public List<GenericReducedEvent> getReducedEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
 			return getAllReducedEvents();

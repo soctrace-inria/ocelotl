@@ -20,51 +20,48 @@
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
 public class Part {
-	int startPart;
-	int endPart;
-	IPartData data;
-	
-
-	
-	public Part(int startPart, int endPart, IPartData data) {
-		super();
-		this.startPart = startPart;
-		this.endPart = endPart;
-		this.data = data;
-	}
+	int			startPart;
+	int			endPart;
+	IPartData	data;
 
 	public Part() {
 		super();
 	}
 
-	public int getStartPart() {
-		return startPart;
-	}
-
-	public void setStartPart(int startPart) {
+	public Part(final int startPart, final int endPart, final IPartData data) {
+		super();
 		this.startPart = startPart;
-	}
-
-	public int getEndPart() {
-		return endPart;
-	}
-
-	public void setEndPart(int endPart) {
 		this.endPart = endPart;
+		this.data = data;
 	}
 
 	public IPartData getData() {
 		return data;
 	}
 
-	public void setData(IPartData data) {
+	public int getEndPart() {
+		return endPart;
+	}
+
+	public int getPartSize() {
+		return endPart - startPart;
+
+	}
+
+	public int getStartPart() {
+		return startPart;
+	}
+
+	public void setData(final IPartData data) {
 		this.data = data;
 	}
-	
-	public int getPartSize(){
-		return endPart-startPart;
-		
+
+	public void setEndPart(final int endPart) {
+		this.endPart = endPart;
 	}
-	
-	
+
+	public void setStartPart(final int startPart) {
+		this.startPart = startPart;
+	}
+
 }

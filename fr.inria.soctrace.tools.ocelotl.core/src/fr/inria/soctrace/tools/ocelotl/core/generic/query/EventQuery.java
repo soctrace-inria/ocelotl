@@ -59,8 +59,8 @@ public class EventQuery extends SelfDefiningElementQuery {
 	}
 
 	/**
-	 * Clear genericQuery: removes all the conditions. EventProducer cache is not
-	 * cleared, since we are not changing trace DB.
+	 * Clear genericQuery: removes all the conditions. EventProducer cache is
+	 * not cleared, since we are not changing trace DB.
 	 */
 	@Override
 	public void clear() {

@@ -73,24 +73,24 @@ public class TimeAxisView {
 
 	}
 
-	Figure						root;
-	Canvas						canvas;
-	TimeRegion					time;
-	final static int			Height			= 100;
-	final static int			Border			= 10;
-	final static int			TimeAxisWidth	= 1;
-	final static long			Divide			= 10;
-	double						GradNumber		= 10.0;
-	double						GradDuration	= 10.0;
-	final static long			GradWidthMin	= 50;
-	double						GradWidth		= 50;
-	final static int			GradHeight		= 8;
-	final static int			TextWidth		= 50;
-	final static int			TextHeight		= 20;
-	final static long			MiniDivide		= 5;
-	final static int			MiniGradHeight	= 4;
-	int							Space			= 6;
-	SelectFigure				selectFigure;
+	Figure				root;
+	Canvas				canvas;
+	TimeRegion			time;
+	final static int	Height			= 100;
+	final static int	Border			= 10;
+	final static int	TimeAxisWidth	= 1;
+	final static long	Divide			= 10;
+	double				GradNumber		= 10.0;
+	double				GradDuration	= 10.0;
+	final static long	GradWidthMin	= 50;
+	double				GradWidth		= 50;
+	final static int	GradHeight		= 8;
+	final static int	TextWidth		= 50;
+	final static int	TextHeight		= 20;
+	final static long	MiniDivide		= 5;
+	final static int	MiniGradHeight	= 4;
+	int					Space			= 6;
+	SelectFigure		selectFigure;
 
 	public TimeAxisView() {
 		super();

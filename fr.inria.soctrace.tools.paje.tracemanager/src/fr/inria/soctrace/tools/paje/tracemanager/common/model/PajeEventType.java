@@ -40,7 +40,7 @@ public class PajeEventType extends EventType {
 	 * @param id
 	 *            : database id field
 	 */
-	public PajeEventType(int id) {
+	public PajeEventType(final int id) {
 		super(id);
 	}
 
@@ -54,7 +54,7 @@ public class PajeEventType extends EventType {
 	 * @param pajeId
 	 *            : number associate to EventType in Paje trace
 	 */
-	public PajeEventType(int id, String name, String pajeId) {
+	public PajeEventType(final int id, final String name, final String pajeId) {
 		super(id);
 		pajeName = name;
 		this.pajeId = pajeId;
@@ -68,8 +68,8 @@ public class PajeEventType extends EventType {
 	* @param name
 	* @param type
 	*/
-	public void addEventParamType(int id, String name, String type) {
-		EventParamType currentEventParamType = new EventParamType(id);
+	public void addEventParamType(final int id, final String name, final String type) {
+		final EventParamType currentEventParamType = new EventParamType(id);
 		currentEventParamType.setName(name);
 		currentEventParamType.setType(type);
 		currentEventParamType.setEventType(this);
@@ -102,7 +102,7 @@ public class PajeEventType extends EventType {
 	 * @param pajeId
 	 * @param pajeName
 	 */
-	public void setName(String pajeId, String pajeName) {
+	public void setName(final String pajeId, final String pajeName) {
 		setName(pajeId + PajeConstants.PajeIdNameSeparator + pajeName);
 	}
 
@@ -110,7 +110,7 @@ public class PajeEventType extends EventType {
 	 * @param pajeId
 	 *            the pajeId to set
 	 */
-	public void setPajeId(String pajeId) {
+	public void setPajeId(final String pajeId) {
 		this.pajeId = pajeId;
 	}
 
@@ -118,7 +118,7 @@ public class PajeEventType extends EventType {
 	 * @param pajeName
 	 *            the pajeName to set
 	 */
-	public void setPajeName(String pajeName) {
+	public void setPajeName(final String pajeName) {
 		this.pajeName = pajeName;
 	}
 

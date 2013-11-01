@@ -21,13 +21,11 @@ package fr.inria.soctrace.tools.ocelotl.core;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.GenericQuery;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.ILPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.PartManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-
 
 public class OcelotlCore {
 
@@ -42,9 +40,9 @@ public class OcelotlCore {
 		return TEST;
 	}
 
-	OcelotlParameters			ocelotlParameters;
-	ILPAggregManager			lpaggregManager;
-	PartManager					partManager;
+	OcelotlParameters				ocelotlParameters;
+	ILPAggregManager				lpaggregManager;
+	PartManager						partManager;
 	TimeAggregationOperatorManager	operators;
 	ITimeAggregationOperator		operator;
 

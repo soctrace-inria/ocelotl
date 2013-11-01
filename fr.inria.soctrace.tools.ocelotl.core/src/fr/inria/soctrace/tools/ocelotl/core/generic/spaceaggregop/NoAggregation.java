@@ -4,22 +4,21 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
 
 public class NoAggregation extends SpaceAggregationOperator {
-	
 
-	public NoAggregation(OcelotlCore ocelotlCore) {
+	final static String	Descriptor	= "No Aggregation";
+
+	public NoAggregation(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
 	}
 
-	final static String Descriptor = "No Aggregation";
+	@Override
+	protected void computeParts() {
+		initParts();
+	}
 
+	@Override
 	public String descriptor() {
 		return Descriptor;
 	}
-	
-	protected void computeParts(){
-	}
-	
-	
-	
 
 }

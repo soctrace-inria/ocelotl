@@ -41,11 +41,11 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
 public class PajePushPopStateTypeSum extends CubicMatrix {
-	
+
 	class OcelotlThread extends Thread {
 
 		List<EventProducer>						eventProducers;
-		Map<Integer, List<EventProxy>>		eventProxyList;
+		Map<Integer, List<EventProxy>>			eventProxyList;
 		Map<Integer, List<PajeReducedEvent2>>	eventList;
 		int										threadNumber;
 		int										thread;
@@ -65,113 +65,106 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 
 			start();
 		}
-		
-		private void matrixUpdate(IState state, EventProducer ep){
-			synchronized(matrix){
-				if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-		if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
-			System.out.println("Adding " + state.getStateType() + " state");
-			for (int incr = 0; incr < matrix.size(); incr++)
-				for (final String epstring : matrix.get(incr).keySet())
-					matrixPushType(incr, epstring, state, distrib);
-		}
-			for (final long it : distrib.keySet())
-				matrixWrite(it, ep, state, distrib);
-		}
-			}
-	}
 
 		private void cacheRun() throws SoCTraceException {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				ArrayList<PajeReducedEvent2> stack = new ArrayList<PajeReducedEvent2>();
-				
+				final ArrayList<PajeReducedEvent2> stack = new ArrayList<PajeReducedEvent2>();
+
 				PajeReducedEvent2Cache cache;
 				cache = new PajeReducedEvent2Cache(genericQuery.getOcelotlParameters());
 				final EventProducer ep = eventProducers.get(t);
-				IState state=null;
+				final IState state = null;
 				final List<EventProxy> events = eventProxyList.get(ep.getId());
 				for (int i = 1; i < events.size(); i++) {
-					PajeReducedEvent2 tmp1 = cache.getEventMultiPageEPCache(events.get(i-1));
-					PajeReducedEvent2 tmp2 = cache.getEventMultiPageEPCache(events.get(i));
-					PajeReducedEvent2 current = null;
+					final PajeReducedEvent2 tmp1 = cache.getEventMultiPageEPCache(events.get(i - 1));
+					final PajeReducedEvent2 tmp2 = cache.getEventMultiPageEPCache(events.get(i));
+					final PajeReducedEvent2 current = null;
 					compute(tmp1, tmp2, current, stack, state, ep);
 				}
-					computeEnd(stack, state, ep);
-					
+				computeEnd(stack, state, ep);
+
 				final int c = getCount();
 				if (c % EPCOUNT == 0)
 					total(c);
 			}
 
+		}
+
+		void compute(final PajeReducedEvent2 tmp1, final PajeReducedEvent2 tmp2, PajeReducedEvent2 current, final ArrayList<PajeReducedEvent2> stack, IState state, final EventProducer ep) {
+			if (tmp2.TYPE.contains(PajeExternalConstants.PajePushState)) {
+				if (!tmp1.TYPE.contains(PajeExternalConstants.PajePopState))
+					stack.add(tmp1);
+				else if (current != null)
+					stack.add(current);
+			} else if (tmp2.TYPE.contains(PajeExternalConstants.PajePopState)) {
+				current = null;
+				if (!stack.isEmpty()) {
+					current = stack.get(stack.size() - 1);
+					stack.remove(stack.size() - 1);
+				}
+				if (tmp1.TYPE.contains(PajeExternalConstants.PajePushState)) {
+					state = new PajeState(tmp1, tmp2, timeSliceManager);
+					matrixUpdate(state, ep);
+				} else if (current != null) {
+					state = new PajeState(current, tmp2, timeSliceManager);
+					matrixUpdate(state, ep);
+				}
+			} else if (tmp2.TYPE.contains(PajeExternalConstants.PajeSetState)) {
+				state = new PajeState(tmp1, tmp2, timeSliceManager);
+				matrixUpdate(state, ep);
+				for (final PajeReducedEvent2 stacked : stack) {
+					state = new PajeState(stacked, tmp2, timeSliceManager);
+					matrixUpdate(state, ep);
+				}
+				stack.clear();
+			}
+		}
+
+		void computeEnd(final ArrayList<PajeReducedEvent2> stack, IState state, final EventProducer ep) {
+			if (!stack.isEmpty())
+				for (final PajeReducedEvent2 stacked : stack) {
+					state = new PajeState(stacked, genericQuery.getOcelotlParameters().getTimeRegion().getTimeStampEnd(), timeSliceManager);
+					matrixUpdate(state, ep);
+				}
+			stack.clear();
+		}
+
+		private void matrixUpdate(final IState state, final EventProducer ep) {
+			synchronized (matrix) {
+				if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+					if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
+						System.out.println("Adding " + state.getStateType() + " state");
+						for (int incr = 0; incr < matrix.size(); incr++)
+							for (final String epstring : matrix.get(incr).keySet())
+								matrixPushType(incr, epstring, state, distrib);
+					}
+					for (final long it : distrib.keySet())
+						matrixWrite(it, ep, state, distrib);
+				}
+			}
 		}
 
 		private void noCacheRun() {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
 				final EventProducer ep = eventProducers.get(t);
-				ArrayList<PajeReducedEvent2> stack = new ArrayList<PajeReducedEvent2>();
+				final ArrayList<PajeReducedEvent2> stack = new ArrayList<PajeReducedEvent2>();
 				final List<PajeReducedEvent2> events = eventList.get(ep.getId());
-				IState state=null;
-					for (int i = 1; i < events.size(); i++) {
-						PajeReducedEvent2 tmp1 = events.get(i-1);
-						PajeReducedEvent2 tmp2 = events.get(i);
-						PajeReducedEvent2 current = null;
-						compute(tmp1, tmp2, current, stack, state, ep);
-					}
-						computeEnd(stack, state, ep);
+				final IState state = null;
+				for (int i = 1; i < events.size(); i++) {
+					final PajeReducedEvent2 tmp1 = events.get(i - 1);
+					final PajeReducedEvent2 tmp2 = events.get(i);
+					final PajeReducedEvent2 current = null;
+					compute(tmp1, tmp2, current, stack, state, ep);
+				}
+				computeEnd(stack, state, ep);
 				final int c = getCount();
 				if (c % EPCOUNT == 0)
 					total(c);
 			}
 
 		}
-			void compute(PajeReducedEvent2 tmp1, PajeReducedEvent2 tmp2, PajeReducedEvent2 current, ArrayList<PajeReducedEvent2> stack, IState state, EventProducer ep){
-				if (tmp2.TYPE.contains(PajeExternalConstants.PajePushState)){
-					if (!tmp1.TYPE.contains(PajeExternalConstants.PajePopState))
-						stack.add(tmp1);	
-					else
-						if (current!=null)
-							stack.add(current);
-				}
-				else if (tmp2.TYPE.contains(PajeExternalConstants.PajePopState)){
-					current=null;
-					if (!stack.isEmpty()){
-						current=stack.get(stack.size()-1);
-						stack.remove(stack.size()-1);
-					}
-					if (tmp1.TYPE.contains(PajeExternalConstants.PajePushState)){
-						state = new PajeState(tmp1, tmp2, timeSliceManager);
-						matrixUpdate(state, ep);
-					}
-					else{
-						if (current!=null){
-							state = new PajeState(current, tmp2, timeSliceManager);
-							matrixUpdate(state, ep);
-						}
-					}
-				}
-				else if (tmp2.TYPE.contains(PajeExternalConstants.PajeSetState)){
-					state = new PajeState(tmp1, tmp2, timeSliceManager);
-						matrixUpdate(state, ep);
-					for (PajeReducedEvent2 stacked:stack){
-						state = new PajeState(stacked, tmp2, timeSliceManager);
-						matrixUpdate(state, ep);
-						}
-					stack.clear();
-				}
-			}
-			
-			void computeEnd(ArrayList<PajeReducedEvent2> stack, IState state, EventProducer ep){
-			if (!stack.isEmpty()){
-				for (PajeReducedEvent2 stacked:stack){
-					state = new PajeState(stacked, genericQuery.getOcelotlParameters().getTimeRegion().getTimeStampEnd(), timeSliceManager);
-					matrixUpdate(state, ep);
-					}
-			}
-			stack.clear();
-			}
-				
-		
+
 		@Override
 		public void run() {
 			if (cached)
@@ -186,7 +179,6 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 		}
 	}
 
-
 	public final static String	descriptor	= "State Type Sum (PushPop)";
 	public final static String	traceType	= PajeConstants.PajeFormatName;
 
@@ -198,6 +190,7 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 		super(parameters);
 	}
 
+	@Override
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
@@ -219,6 +212,7 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 		dm.end("VECTORS COMPUTATION : " + genericQuery.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
+	@Override
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
@@ -232,14 +226,20 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 			eventList.put(ep.getId(), new ArrayList<PajeReducedEvent2>());
 		for (final PajeReducedEvent2 e : fullEvents)
 			eventList.get(e.EP).add(e);
-			final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-			for (int t = 0; t < Math.min(genericQuery.getOcelotlParameters().getThread(), eventProducers.size()); t++)
-				threadlist.add(new OcelotlThread(eventProducers, eventList, genericQuery.getOcelotlParameters().getThread(), t, false));
-			for (final Thread thread : threadlist)
-				thread.join();
+		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		for (int t = 0; t < Math.min(genericQuery.getOcelotlParameters().getThread(), eventProducers.size()); t++)
+			threadlist.add(new OcelotlThread(eventProducers, eventList, genericQuery.getOcelotlParameters().getThread(), t, false));
+		for (final Thread thread : threadlist)
+			thread.join();
 		dm.end("VECTORS COMPUTATION : " + genericQuery.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
+
+	@Override
+	public String descriptor() {
+		return descriptor;
+	}
+
+	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
 		this.parameters = parameters;
 		genericQuery = new PajeQuery(parameters);
@@ -252,14 +252,8 @@ public class PajePushPopStateTypeSum extends CubicMatrix {
 	}
 
 	@Override
-	public String descriptor() {
-		return descriptor;
-	}
-
-	@Override
 	public String traceType() {
 		return traceType;
 	}
-
 
 }
