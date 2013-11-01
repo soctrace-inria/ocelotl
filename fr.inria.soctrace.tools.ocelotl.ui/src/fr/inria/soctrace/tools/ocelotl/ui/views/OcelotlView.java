@@ -950,7 +950,7 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters.setNormalize(btnNormalize.getSelection());
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
-		ocelotlParameters.setAggOperator(comboAggregationOperator.getText());
+		ocelotlParameters.setTimeAggOperator(comboAggregationOperator.getText());
 		ocelotlParameters.setCache(btnCache.getSelection());
 		ocelotlParameters.setEpCache(spinnerEPPageSize.getSelection());
 		ocelotlParameters.setPageCache(spinnerPageSize.getSelection());

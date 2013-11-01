@@ -16,6 +16,14 @@ abstract public class SpaceAggregationOperator implements ISpaceAggregationOpera
 
 	public SpaceAggregationOperator(final OcelotlCore ocelotlCore) {
 		super();
+		setOcelotlCore(ocelotlCore);
+	}
+
+	public SpaceAggregationOperator() {
+		super();
+	}
+
+	public void setOcelotlCore(OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
 		lpaggregManager = ocelotlCore.getLpaggregManager();
 		timeSliceNumber = ocelotlCore.getOcelotlParameters().getTimeSlicesNumber();

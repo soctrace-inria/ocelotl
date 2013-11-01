@@ -30,8 +30,6 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 public class OcelotlParameters {
 
 	private List<EventProducer>	eventProducers		= new ArrayList<EventProducer>();
-	// private List<EventType> eventTypes = new ArrayList<EventType>(); ;
-	// private List<String> sleepingStates = new ArrayList<String>(); ;
 	private int					timeSlicesNumber	= 1;
 	private TimeRegion			timeRegion;
 	private float				parameter			= 0;
@@ -39,8 +37,8 @@ public class OcelotlParameters {
 	private float				threshold			= (float) 0.001;
 	private Trace				trace				= null;
 	private int					maxEventProducers	= 0;
-	private String				aggOperator;
-	private String				aggOperator2;
+	private String				timeAggOperator;
+	private String				spaceAggOperator;
 	private boolean				growingQualities	= true;
 	private boolean				cache				= true;
 	private int					epCache				= 100;
@@ -50,14 +48,6 @@ public class OcelotlParameters {
 
 	public OcelotlParameters() {
 		super();
-	}
-
-	public String getAggOperator() {
-		return aggOperator;
-	}
-
-	public String getAggOperator2() {
-		return aggOperator2;
 	}
 
 	public int getEpCache() {
@@ -112,20 +102,8 @@ public class OcelotlParameters {
 		return growingQualities;
 	}
 
-	// public List<String> getSleepingStates() {
-	// return sleepingStates;
-	// }
-
 	public boolean isNormalize() {
 		return normalize;
-	}
-
-	public void setAggOperator(final String aggOperator) {
-		this.aggOperator = aggOperator;
-	}
-
-	public void setAggOperator2(final String aggOperator2) {
-		this.aggOperator2 = aggOperator2;
 	}
 
 	public void setCache(final boolean cache) {
@@ -180,20 +158,28 @@ public class OcelotlParameters {
 		this.timeSlicesNumber = timeSlicesNumber;
 	}
 
-	// @Override
-	// public String toString() { // TODO update this
-	// final StringBuilder builder = new StringBuilder();
-	// builder.append("OcelotlParameters \n[\neventProducers=").append(eventProducers).append("\neventTypes=").append(eventTypes).append("\nsleepingStates=").append(sleepingStates).append("\ntimeSlicesNumber=").append(timeSlicesNumber)
-	// .append("\ntimeRegion=").append(timeRegion).append("\nparameter=").append(parameter).append("\nnormalize=").append(normalize).append("\nthreshold=").append(threshold).append("\ntrace=").append(trace).append("\n]");
-	// return builder.toString();
-	// }
-
 	public void setTrace(final Trace trace) {
 		this.trace = trace;
 	}
 
 	public void setTraceTypeConfig(final ITraceTypeConfig iTraceTypeConfig) {
 		this.iTraceTypeConfig = iTraceTypeConfig;
+	}
+
+	public String getTimeAggOperator() {
+		return timeAggOperator;
+	}
+
+	public void setTimeAggOperator(String timeAggOperator) {
+		this.timeAggOperator = timeAggOperator;
+	}
+
+	public String getSpaceAggOperator() {
+		return spaceAggOperator;
+	}
+
+	public void setSpaceAggOperator(String spaceAggOperator) {
+		this.spaceAggOperator = spaceAggOperator;
 	}
 
 }

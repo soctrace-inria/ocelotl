@@ -10,11 +10,16 @@ import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 
 public class StateDistribution extends SpaceAggregationOperator {
 
-	final static String		Descriptor	= "State Distribution";
+	public final static String		descriptor	= "State Distribution";
 	private List<String>	states;
 
 	public StateDistribution(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
+		// TODO Auto-generated constructor stub
+	}
+	
+	public StateDistribution() {
+		super();
 		// TODO Auto-generated constructor stub
 	}
 
@@ -37,7 +42,7 @@ public class StateDistribution extends SpaceAggregationOperator {
 
 	@Override
 	public String descriptor() {
-		return Descriptor;
+		return descriptor;
 	}
 
 	@Override

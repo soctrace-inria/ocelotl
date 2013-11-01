@@ -21,6 +21,8 @@ package fr.inria.soctrace.tools.ocelotl.core;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.ILPAggregManager;
@@ -43,8 +45,30 @@ public class OcelotlCore {
 	OcelotlParameters				ocelotlParameters;
 	ILPAggregManager				lpaggregManager;
 	PartManager						partManager;
-	TimeAggregationOperatorManager	operators;
-	ITimeAggregationOperator		operator;
+	TimeAggregationOperatorManager	timeOperators;
+	ITimeAggregationOperator		timeOperator;
+	SpaceAggregationOperatorManager spaceOperators;
+	ISpaceAggregationOperator		spaceOperator;
+
+	public PartManager getPartManager() {
+		return partManager;
+	}
+
+	public TimeAggregationOperatorManager getTimeOperators() {
+		return timeOperators;
+	}
+
+	public ITimeAggregationOperator getTimeOperator() {
+		return timeOperator;
+	}
+
+	public SpaceAggregationOperatorManager getSpaceOperators() {
+		return spaceOperators;
+	}
+
+	public ISpaceAggregationOperator getSpaceOperator() {
+		return spaceOperator;
+	}
 
 	public OcelotlCore() {
 		super();
@@ -58,8 +82,8 @@ public class OcelotlCore {
 
 	public void compute(final HasChanged hasChanged) throws SoCTraceException {
 		if (hasChanged == HasChanged.ALL) {
-			setOperator();
-			lpaggregManager = operator.createManager();
+			setTimeOperator();
+			lpaggregManager = timeOperator.createManager();
 		}
 		// vectors.print();
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE)
@@ -82,6 +106,7 @@ public class OcelotlCore {
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.PARAMETER) {
 			lpaggregManager.computeParts();
 			lpaggregManager.printParts();
+			setSpaceOperator();
 			partManager = new PartManager(this);
 			partManager.print();
 		}
@@ -97,7 +122,7 @@ public class OcelotlCore {
 	}
 
 	public TimeAggregationOperatorManager getOperators() {
-		return operators;
+		return timeOperators;
 	}
 
 	public PartManager getPartsManager() {
@@ -106,17 +131,27 @@ public class OcelotlCore {
 
 	public void init(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
 		setOcelotlParameters(ocelotlParameters);
-		operators = new TimeAggregationOperatorManager(ocelotlParameters);
+		timeOperators = new TimeAggregationOperatorManager(ocelotlParameters);
+		spaceOperators = new SpaceAggregationOperatorManager(this);
 	}
 
 	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {
 		this.ocelotlParameters = ocelotlParameters;
 	}
 
-	public void setOperator() {
+	public void setTimeOperator() {
 		try {
-			operator = operators.getOperator(ocelotlParameters.getAggOperator());
+			timeOperator = timeOperators.getOperator(ocelotlParameters.getTimeAggOperator());
 		} catch (final SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void setSpaceOperator() {
+		try {
+			spaceOperator = spaceOperators.getOperator(ocelotlParameters.getSpaceAggOperator());
+		} catch (SoCTraceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
