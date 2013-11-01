@@ -65,10 +65,10 @@ import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.IAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
@@ -595,7 +595,7 @@ public class OcelotlView extends ViewPart {
 					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
 					comboAggregationOperator.removeAll();
-					for (final IAggregationOperator op : ocelotlCore.getOperators().getList())
+					for (final ITimeAggregationOperator op : ocelotlCore.getOperators().getList())
 						if (op.traceType().equals(confDataLoader.getCurrentTrace().getType().getName()))
 							comboAggregationOperator.add(op.descriptor());
 					comboAggregationOperator.setText("");

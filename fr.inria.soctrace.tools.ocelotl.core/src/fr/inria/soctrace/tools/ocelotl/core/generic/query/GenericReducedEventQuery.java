@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.core.paje.query;
+package fr.inria.soctrace.tools.ocelotl.core.generic.query;
 
 /*******************************************************************************
  * Copyright (c) 2013 Damien Dosimont
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
@@ -31,7 +32,7 @@ import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalCo
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
  */
-public class PajeReducedEvent1Query extends EventQuery {
+public class GenericReducedEventQuery extends EventQuery {
 
 	/**
 	 * The constructor
@@ -39,12 +40,12 @@ public class PajeReducedEvent1Query extends EventQuery {
 	 * @param traceDB
 	 *            Trace DB object where the genericQuery is performed.
 	 */
-	public PajeReducedEvent1Query(final TraceDBObject traceDB) {
+	public GenericReducedEventQuery(final TraceDBObject traceDB) {
 		super(traceDB);
 		clear();
 	}
 
-	public List<PajeReducedEvent1> getReducedEventList() throws SoCTraceException {
+	public List<GenericReducedEvent> getReducedEventList() throws SoCTraceException {
 		try {
 			final DeltaManager dm = new DeltaManager();
 			dm.start();
@@ -94,7 +95,7 @@ public class PajeReducedEvent1Query extends EventQuery {
 			final Statement stm = dbObj.getConnection().createStatement();
 
 			final ResultSet rs = stm.executeQuery(query);
-			final List<PajeReducedEvent1> elist = rebuildReducedEvent(rs);
+			final List<GenericReducedEvent> elist = rebuildReducedEvent(rs);
 
 			debug(dm.endMessage("EventQuery.getList()"));
 
@@ -107,38 +108,23 @@ public class PajeReducedEvent1Query extends EventQuery {
 
 	}
 
-	private List<PajeReducedEvent1> rebuildReducedEvent(final ResultSet rs) throws SoCTraceException {
+	private List<GenericReducedEvent> rebuildReducedEvent(final ResultSet rs) throws SoCTraceException {
 
-		final HashMap<Integer, PajeReducedEvent1> list = new HashMap<Integer, PajeReducedEvent1>();
-		final LinkedList<PajeReducedEvent1> llist = new LinkedList<PajeReducedEvent1>();
+		final HashMap<Integer, GenericReducedEvent> list = new HashMap<Integer, GenericReducedEvent>();
+		final LinkedList<GenericReducedEvent> llist = new LinkedList<GenericReducedEvent>();
 		final ValueListString vls = new ValueListString();
 		new ValueListString();
 		final List<Integer> li = new ArrayList<Integer>();
+		final TraceDBObject traceDB = (TraceDBObject) dbObj;
 		try {
 
 			while (rs.next()) {
-				final PajeReducedEvent1 re = new PajeReducedEvent1(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), null);
+				final GenericReducedEvent re = new GenericReducedEvent(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), traceDB.getEventTypeCache().get(EventType.class, rs.getInt(2)).getName());
 				list.put(re.ID, re);
 				llist.add(re);
 				vls.addValue(String.valueOf(re.ID));
 			}
-			if (llist.size() == 0)
-				return llist;
 
-			final Statement stm = dbObj.getConnection().createStatement();
-			final ResultSet pprs = stm.executeQuery("SELECT * FROM " + FramesocTable.EVENT_PARAM_TYPE + " WHERE NAME='" + PajeExternalConstants.PajeStateValue + "'");
-			while (pprs.next())
-				li.add(pprs.getInt("ID"));
-			String query;
-			query = "SELECT * FROM " + FramesocTable.EVENT_PARAM + " WHERE EVENT_ID IN " + vls.getValueString();// +
-																												// " AND EVENT_PARAM_TYPE_ID IN "
-																												// +
-																												// pvls.getValueString();
-
-			final ResultSet prs = stm.executeQuery(query);// TODO verifier
-			while (prs.next())
-				if (li.contains(prs.getInt("EVENT_PARAM_TYPE_ID")))
-					list.get(prs.getInt("EVENT_ID")).VALUE = prs.getString("VALUE");
 			return llist;
 		} catch (final SQLException e) {
 			throw new SoCTraceException(e);

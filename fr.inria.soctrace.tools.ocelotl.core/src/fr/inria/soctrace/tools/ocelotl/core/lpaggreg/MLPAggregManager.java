@@ -22,7 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.iaggregop.ICubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ICubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
 
 public class MLPAggregManager extends LPAggregManager {

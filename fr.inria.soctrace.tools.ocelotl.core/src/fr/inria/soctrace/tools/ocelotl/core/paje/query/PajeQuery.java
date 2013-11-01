@@ -29,9 +29,9 @@ import fr.inria.soctrace.lib.query.EventProducerQuery;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.EventProxy;
-import fr.inria.soctrace.tools.ocelotl.core.generic.aggregop.GenericQuery;
+import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.generic.query.GenericQuery;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class PajeQuery extends GenericQuery{
 

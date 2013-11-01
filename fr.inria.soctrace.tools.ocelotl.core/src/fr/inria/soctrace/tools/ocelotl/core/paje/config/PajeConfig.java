@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.core.TraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
 
-public class PajeConfig implements TraceTypeConfig {
+public class PajeConfig implements ITraceTypeConfig {
 
 	public final static String	DefaultState	= "PajeSetState";
 	public final static String	DefaultIdle		= "IDLE";

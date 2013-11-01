@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public abstract class LPAggregManager implements ILPAggregManager {
 
