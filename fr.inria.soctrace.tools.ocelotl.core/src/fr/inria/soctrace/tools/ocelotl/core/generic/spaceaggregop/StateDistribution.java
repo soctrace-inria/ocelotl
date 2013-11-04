@@ -12,6 +12,7 @@ public class StateDistribution extends SpaceAggregationOperator {
 
 	public final static String		descriptor	= "State Distribution";
 	private List<String>	states;
+	private double max;
 
 	public StateDistribution(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
@@ -31,6 +32,12 @@ public class StateDistribution extends SpaceAggregationOperator {
 						((PartMap) part.getData()).addElement(state, ((MLPAggregManager) lpaggregManager).getTimeSliceMatrix().getMatrix().get(i).get(ep).get(state).doubleValue());
 
 	}
+	
+	
+
+	public List<String> getStates() {
+		return states;
+	}
 
 	@Override
 	protected void computeParts() {
@@ -38,6 +45,18 @@ public class StateDistribution extends SpaceAggregationOperator {
 		initStates();
 		aggregateStates();
 		normalize();
+		computeMax();
+	}
+
+	private void computeMax() {
+		max=0;
+		for (final Part part : parts)
+			if (((PartMap) part.getData()).getTotal()>max)
+				max=((PartMap) part.getData()).getTotal();
+	}
+
+	public double getMax() {
+		return max;
 	}
 
 	@Override
@@ -45,13 +64,13 @@ public class StateDistribution extends SpaceAggregationOperator {
 		return descriptor;
 	}
 
-	@Override
+
 	protected void initParts() {
 		int oldPart = 0;
 		parts.add(new Part(0, 1, new PartMap()));
-		for (int i = 1; i < lpaggregManager.getParts().size() - 1; i++)
+		for (int i = 0; i < lpaggregManager.getParts().size(); i++)
 			if (lpaggregManager.getParts().get(i) == oldPart)
-				parts.get(parts.size() - 1).setEndPart(i);
+				parts.get(parts.size() - 1).setEndPart(i+1);
 			else {
 				oldPart = lpaggregManager.getParts().get(i);
 				parts.add(new Part(i, i + 1, new PartMap()));

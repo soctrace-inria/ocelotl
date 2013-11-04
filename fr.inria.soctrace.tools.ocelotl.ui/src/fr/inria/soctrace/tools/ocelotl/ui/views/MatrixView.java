@@ -46,9 +46,13 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
 import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
+import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.MultiState;
+import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.PartFigure;
 
 /**
  * Matrix View : part representation, according to LP algorithm result
@@ -56,73 +60,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 public class MatrixView {
-
-	private class PartFigure extends RectangleFigure {
-
-		private TimeRegion			timeRegion;
-		private int					index;
-		private final int			value;
-		private final OcelotlColor	color;
-		private final static int	textSize	= 15;
-
-		public PartFigure(final TimeRegion timeRegion, final int index, final int value, final OcelotlColor color) {
-			super();
-			setTimeRegion(timeRegion);
-			setIndex(index);
-			this.value = value;
-			this.color = color;
-
-		}
-
-		@SuppressWarnings("unused")
-		public int getIndex() {
-			return index;
-		}
-
-		@SuppressWarnings("unused")
-		public TimeRegion getTimeRegion() {
-			return timeRegion;
-		}
-
-		public void init() {
-			removeAll();
-			final RoundedRectangle roundedRectangle = new RoundedRectangle();
-			roundedRectangle.setBackgroundColor(color.getBg());
-			roundedRectangle.setForegroundColor(color.getBg());
-			roundedRectangle.setLineWidth(15);
-			final ToolbarLayout roundedLayout = new ToolbarLayout();
-			roundedRectangle.setLayoutManager(roundedLayout);
-			roundedRectangle.setPreferredSize(1000, 1000);
-			this.add(roundedRectangle);
-			final int dim = 0;
-			// if (Math.min(getSize().height / 2 - 2, getSize().width / 2 - 2) <
-			// 8)
-			// dim = Math.min(getSize().height / 2, getSize().width / 2);
-			roundedRectangle.setCornerDimensions(new Dimension(dim, dim));
-			final Label label = new Label("" + value);
-			label.setLabelAlignment(SWT.CENTER);
-			label.setForegroundColor(color.getFg());
-			roundedRectangle.setFont(SWTResourceManager.getFont("Cantarell", textSize, SWT.BOLD));
-			if (numbers)
-				if (getSize().width / 2 - 3 > textSize && getSize().height / 2 - 3 > textSize)
-					roundedRectangle.add(label);
-			final ToolbarLayout layout = new ToolbarLayout();
-			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			setConstraint(roundedRectangle, getBounds());
-			setLayoutManager(layout);
-			setForegroundColor(ColorConstants.white);
-			setBackgroundColor(ColorConstants.white);
-		}
-
-		public void setIndex(final int index) {
-			this.index = index;
-		}
-
-		public void setTimeRegion(final TimeRegion timeRegion) {
-			this.timeRegion = timeRegion;
-		}
-
-	}
 
 	private class SelectFigure extends RectangleFigure {
 
@@ -220,8 +157,6 @@ public class MatrixView {
 
 		@Override
 		public void mousePressed(final MouseEvent arg0) {
-			// if (arg0.button==MouseEvent.BUTTON1){
-			// selectTime = ocelotlView.getTimeRegion();
 			state = State.PRESSED_D;
 			long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
 			p3 = Math.max(p3, resetTime.getTimeStampStart());
@@ -251,39 +186,28 @@ public class MatrixView {
 
 	}
 
-	final static Color				selectColorFG	= ColorConstants.blue;
+	final static Color					selectColorFG	= ColorConstants.blue;
 
-	final static Color				selectColorBG	= ColorConstants.lightGray;
+	final static Color					selectColorBG	= ColorConstants.lightGray;
 
-	final static Color				activeColorFG	= ColorConstants.black;
-	final static Color				activeColorBG	= ColorConstants.darkBlue;
-	private Figure					root;
-	private Canvas					canvas;
-	private final List<PartFigure>	figures			= new ArrayList<PartFigure>();
-	private List<Integer>			parts			= null;
-	private TimeRegion				time;
-	private TimeRegion				selectTime;
-	private TimeRegion				resetTime;
-	private boolean					aggregated		= false;
-	private boolean					numbers			= true;
-	// private final static int Height = 100;
-	private final static int		Border			= 10;
-	private int						Space			= 6;
-	private final ColorManager		colors			= new ColorManager();
+	final static Color					activeColorFG	= ColorConstants.black;
+	final static Color					activeColorBG	= ColorConstants.darkBlue;
+	private Figure						root;
+	private Canvas						canvas;
+	private final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
+	private List<Integer>				parts			= null;
+	private TimeRegion					time;
+	private TimeRegion					selectTime;
+	private TimeRegion					resetTime;
+	private boolean						aggregated		= false;
+	private boolean						numbers			= true;
+	private final static int			Border			= 10;
+	private int							Space			= 6;
+	private final ColorManager			colors			= new ColorManager();
 
-	private final OcelotlView		ocelotlView;
+	private final OcelotlView			ocelotlView;
 
-	// public boolean isSelected() {
-	// return selectTime.compareTimeRegion(resetTime);
-	// }
-	//
-	// public void drawSelection() {
-	// selection.draw();
-	// if (!isSelected())
-	// root.remove(selection);
-	// }
-
-	private SelectFigure			selectFigure;
+	private SelectFigure				selectFigure;
 
 	public MatrixView(final OcelotlView ocelotlView) {
 		super();
@@ -306,17 +230,11 @@ public class MatrixView {
 		final int partHeight = (int) (root.getSize().height / 1.1 - Border);
 		Space = 6;
 		if (parts != null) {
-			// if ((root.getSize().width - 2 * Border) / parts.size() <
-			// root.getSize().height / 2 - 2 * Border)
-			// partHeight = (((root.getSize().width - 2 * Border) /
-			// parts.size())>20) ? (root.getSize().width - 2 * Border) /
-			// parts.size() : 20;
 			while ((root.getSize().width - 2 * Border) / parts.size() - 2 < Space && Space != 0)
 				Space = Space - 1;
 			if (!aggregated)
 				for (int i = 0; i < parts.size(); i++) {
-					// TODO manage parts
-					final PartFigure part = new PartFigure(new TimeRegion(), i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()));
+					final PartFigure part = new PartFigure(i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()), numbers);
 					figures.add(part);
 					root.add(part, new Rectangle(new Point(i * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height / 2 - partHeight / 2), new Point((i + 1) * (root.getSize().width - 2 * Border) / parts.size() + Border - Space,
 							root.getSize().height / 2 + partHeight / 2)));
@@ -324,23 +242,31 @@ public class MatrixView {
 					part.init();
 				}
 			else {
-				final List<Integer> aggParts = new ArrayList<Integer>();
-				for (int i = 0; i <= parts.get(parts.size() - 1); i++)
-					aggParts.add(0);
-				for (int i = 0; i < parts.size(); i++)
-					aggParts.set(parts.get(i), aggParts.get(parts.get(i)) + 1);
-				int j = 0;
-				for (int i = 0; i < aggParts.size(); i++) {
-					// TODO manage parts
-					final PartFigure part = new PartFigure(new TimeRegion(), i, i, colors.getColors().get(j % colors.getColors().size()));
-					figures.add(part);
-					root.add(
-							part,
-							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - Space + Border, 0 + root
-									.getSize().height / 10)));
-					j = j + aggParts.get(i);
-					part.getUpdateManager().performUpdate();
-					part.init();
+				if (ocelotlView.getParams().getSpaceAggOperator().equals("No Aggregation")) {
+					final List<Integer> aggParts = new ArrayList<Integer>();
+					for (int i = 0; i <= parts.get(parts.size() - 1); i++)
+						aggParts.add(0);
+					for (int i = 0; i < parts.size(); i++)
+						aggParts.set(parts.get(i), aggParts.get(parts.get(i)) + 1);
+					int j = 0;
+					for (int i = 0; i < aggParts.size(); i++) {
+						// TODO manage parts
+						final PartFigure part = new PartFigure(i, i, colors.getColors().get(j % colors.getColors().size()), numbers);
+						figures.add(part);
+						root.add(part, new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - Space + Border,
+								0 + root.getSize().height / 10)));
+						j = j + aggParts.get(i);
+						part.getUpdateManager().performUpdate();
+						part.init();
+					}
+				} else {
+					for (int i = 0; i < ocelotlView.getCore().getSpaceOperator().getPartNumber(); i++) {
+						// TODO manage parts
+						final MultiState part = new MultiState(i, ((StateDistribution) ocelotlView.getCore().getSpaceOperator()), root, Space);
+						// figures.add(part);
+						part.init();
+						// part.getUpdateManager().performUpdate();
+					}
 				}
 			}
 		}

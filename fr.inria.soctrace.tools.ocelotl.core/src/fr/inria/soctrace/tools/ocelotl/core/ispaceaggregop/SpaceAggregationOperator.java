@@ -60,10 +60,10 @@ abstract public class SpaceAggregationOperator implements ISpaceAggregationOpera
 
 	protected void initParts() {
 		int oldPart = 0;
-		parts.add(new Part(0, 1, new PartMap()));
-		for (int i = 1; i < lpaggregManager.getParts().size() - 1; i++)
+		parts.add(new Part(0, 1, null));
+		for (int i = 0; i < lpaggregManager.getParts().size(); i++)
 			if (lpaggregManager.getParts().get(i) == oldPart)
-				parts.get(parts.size() - 1).setEndPart(i);
+				parts.get(parts.size() - 1).setEndPart(i+1);
 			else {
 				oldPart = lpaggregManager.getParts().get(i);
 				parts.add(new Part(i, i + 1, null));

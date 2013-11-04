@@ -123,7 +123,6 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 
 	public void matrixPushType(final int incr, final String epstring, final IState state, final Map<Long, Long> distrib) {
 		matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
-		addKey(state.getStateType());
 	}
 
 	public void matrixWrite(final long it, final EventProducer ep, final IState state, final Map<Long, Long> distrib) {

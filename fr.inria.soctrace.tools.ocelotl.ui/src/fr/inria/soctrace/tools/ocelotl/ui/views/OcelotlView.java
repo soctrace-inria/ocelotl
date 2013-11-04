@@ -428,6 +428,7 @@ public class OcelotlView extends ViewPart {
 	private Button								buttonDown;
 	private Button								buttonUp;
 	private Combo								combo;
+	private Button								btnRemoveEventProducer;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -599,6 +600,8 @@ public class OcelotlView extends ViewPart {
 										for (final ISpaceAggregationOperator op : ocelotlCore.getSpaceOperators().getList())
 											combo.add(op.descriptor());
 										combo.setText("");
+										btnRemoveEventProducer.notifyListeners(SWT.Selection, new Event());
+
 									} catch (final SoCTraceException e1) {
 										MessageDialog.openError(getSite().getShell(), "Exception", e1.getMessage());
 									}
@@ -742,7 +745,7 @@ public class OcelotlView extends ViewPart {
 		btnAddResult.setImage(null);
 		btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnAddResult.addSelectionListener(new AddResultsEventProducersAdapter());
-		final Button btnRemoveEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
+		btnRemoveEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
 		btnRemoveEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnRemoveEventProducer.setText("Reset");
 		btnRemoveEventProducer.addSelectionListener(new ResetSelectionAdapter(listViewerEventProducers));

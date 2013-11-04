@@ -90,6 +90,7 @@ public class PajeStateTypeSum extends CubicMatrix {
 			synchronized (matrix) {
 				if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 					System.out.println("Adding " + state.getStateType() + " state");
+					addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final String epstring : matrix.get(incr).keySet())
 							matrixPushType(incr, epstring, state, distrib);
