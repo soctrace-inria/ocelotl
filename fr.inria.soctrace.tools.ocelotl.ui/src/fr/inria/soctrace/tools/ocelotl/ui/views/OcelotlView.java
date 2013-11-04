@@ -595,6 +595,7 @@ public class OcelotlView extends ViewPart {
 											if (op.traceType().equals(confDataLoader.getCurrentTrace().getType().getName()))
 												comboAggregationOperator.add(op.descriptor());
 										comboAggregationOperator.setText("");
+										combo.removeAll();
 										for (final ISpaceAggregationOperator op : ocelotlCore.getSpaceOperators().getList())
 											combo.add(op.descriptor());
 										combo.setText("");
