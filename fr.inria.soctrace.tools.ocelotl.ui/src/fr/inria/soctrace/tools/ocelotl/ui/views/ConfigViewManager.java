@@ -17,7 +17,7 @@ public class ConfigViewManager {
 
 	public void openConfigWindows() {
 		ApplicationWindow window = null;
-		if (ocelotlView.getCore().getOperators().getType(ocelotlView.getComboAggregationOperator().getText()).equals(PajeConstants.PajeFormatName))
+		if (ocelotlView.getCore().getTimeOperators().getType(ocelotlView.getComboAggregationOperator().getText()).equals(PajeConstants.PajeFormatName))
 			window = new PajeView(ocelotlView, (PajeConfig) ocelotlView.getCore().getOcelotlParameters().getTraceTypeConfig());
 		window.setBlockOnOpen(true);
 		window.open();

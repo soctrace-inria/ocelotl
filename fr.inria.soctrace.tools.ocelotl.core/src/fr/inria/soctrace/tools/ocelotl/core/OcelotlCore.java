@@ -54,9 +54,6 @@ public class OcelotlCore {
 		return partManager;
 	}
 
-	public TimeAggregationOperatorManager getTimeOperators() {
-		return timeOperators;
-	}
 
 	public ITimeAggregationOperator getTimeOperator() {
 		return timeOperator;
@@ -121,7 +118,7 @@ public class OcelotlCore {
 		return ocelotlParameters;
 	}
 
-	public TimeAggregationOperatorManager getOperators() {
+	public TimeAggregationOperatorManager getTimeOperators() {
 		return timeOperators;
 	}
 
