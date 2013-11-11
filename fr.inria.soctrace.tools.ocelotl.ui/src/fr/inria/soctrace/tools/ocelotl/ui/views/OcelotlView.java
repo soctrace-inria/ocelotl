@@ -204,6 +204,55 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
+	private class TraceAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			final String title = "Loading Trace";
+			final Job job = new Job(title) {
+
+				@Override
+				protected IStatus run(final IProgressMonitor monitor) {
+					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
+					try {
+						monitor.done();
+						Display.getDefault().syncExec(new Runnable() {
+
+							@Override
+							public void run() {
+								try {
+									confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
+								} catch (SoCTraceException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
+								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
+								comboAggregationOperator.removeAll();
+								for (final ITimeAggregationOperator op : ocelotlCore.getTimeOperators().getList())
+									if (op.traceType().equals(confDataLoader.getCurrentTrace().getType().getName()))
+										comboAggregationOperator.add(op.descriptor());
+								comboAggregationOperator.setText("");
+								combo.removeAll();
+								for (final ISpaceAggregationOperator op : ocelotlCore.getSpaceOperators().getList())
+									combo.add(op.descriptor());
+								combo.setText("");
+								btnRemoveEventProducer.notifyListeners(SWT.Selection, new Event());
+							}
+						});
+					} catch (final Exception e) {
+						e.printStackTrace();
+						return Status.CANCEL_STATUS;
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setUser(true);
+			job.schedule();
+
+		}
+	}
+
 	private class GetAggregationAdapter extends SelectionAdapter {
 
 		@Override
@@ -450,7 +499,7 @@ public class OcelotlView extends ViewPart {
 		btnGrowingQualities.setSelection(true);
 		btnDecreasingQualities.setSelection(false);
 		btnCache.setSelection(false);
-		spinnerTSNumber.setSelection(200);
+		spinnerTSNumber.setSelection(100);
 		spinnerDivideDbQuery.setSelection(0);
 		spinnerPageSize.setSelection(50);
 		spinnerEPPageSize.setSelection(100);
@@ -571,54 +620,7 @@ public class OcelotlView extends ViewPart {
 				refreshTraces();
 			}
 		});
-		comboTraces.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				final String title = "Loading Trace";
-				final Job job = new Job(title) {
-
-					@Override
-					protected IStatus run(final IProgressMonitor monitor) {
-						monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-						try {
-							monitor.done();
-							Display.getDefault().syncExec(new Runnable() {
-
-								@Override
-								public void run() {
-									try {
-										confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
-										textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
-										textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-										comboAggregationOperator.removeAll();
-										for (final ITimeAggregationOperator op : ocelotlCore.getTimeOperators().getList())
-											if (op.traceType().equals(confDataLoader.getCurrentTrace().getType().getName()))
-												comboAggregationOperator.add(op.descriptor());
-										comboAggregationOperator.setText("");
-										combo.removeAll();
-										for (final ISpaceAggregationOperator op : ocelotlCore.getSpaceOperators().getList())
-											combo.add(op.descriptor());
-										combo.setText("");
-										btnRemoveEventProducer.notifyListeners(SWT.Selection, new Event());
-
-									} catch (final SoCTraceException e1) {
-										MessageDialog.openError(getSite().getShell(), "Exception", e1.getMessage());
-									}
-								}
-							});
-						} catch (final Exception e) {
-							e.printStackTrace();
-							return Status.CANCEL_STATUS;
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.schedule();
-
-			}
-		});
+		comboTraces.addSelectionListener(new TraceAdapter());
 
 		int index = 0;
 		for (final Trace t : confDataLoader.getTraces()) {

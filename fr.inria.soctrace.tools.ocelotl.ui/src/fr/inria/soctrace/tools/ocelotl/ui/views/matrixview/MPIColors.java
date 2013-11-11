@@ -32,6 +32,16 @@ public class MPIColors {
 		Colors.put("MPI_Send", new Color(device, (int)(255*0), (int)(255*0), (int)(255*1)));
 		Colors.put("MPI_Wait", new Color(device, (int)(255*1), (int)(255*0.612729), (int)(255*0.62382)));
 		Colors.put("MPI_Waitall", new Color(device, (int)(255*0.886904), (int)(255*0.384766), (int)(255*1)));
+		Colors.put("MPI_Allgatherv", new Color(device, (int)(255*1), (int)(255*0.5), (int)(255*0.0)));
+		Colors.put("ERROR", new Color(device, (int) (255 * 1), (int) (255 * 0.0), (int) (255 * 0.0)));
+		Colors.put("WARN", new Color(device, (int) (255 * 1), (int) (255 * 0.4), (int) (255 * 0.0)));
+		Colors.put("FIXME", new Color(device, (int) (255 * 0.0), (int) (255 * 0.0), (int) (255 * 1)));
+		Colors.put("INFO", new Color(device, (int) (255 * 0.0), (int) (255 * 1), (int) (255 * 0.0)));
+		Colors.put("DEBUG", new Color(device, (int) (255 * 1), (int) (255 * 0.8), (int) (255 * 0.0)));
+		Colors.put("LOG", new Color(device, (int) (255 * 0.4), (int) (255 * 0.4), (int) (255 * 0.4)));
+		Colors.put("TRACE", new Color(device, (int) (255 * 0.3), (int) (255 * 0.3), (int) (255 * 0.0)));
+		Colors.put("IDLE", new Color(device, (int) (255 * 0.7), (int) (255 * 0.7), (int) (255 * 0.7)));
+		
 	}
 
 
