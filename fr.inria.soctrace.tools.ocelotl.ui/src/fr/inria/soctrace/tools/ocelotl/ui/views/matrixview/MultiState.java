@@ -61,7 +61,7 @@ public class MultiState {
 		for (String state : states){
 			double value=((PartMap) distribution.getPart(index).getData()).getElements().get(state);
 			if (value>0){
-				System.out.println("Part " + index + " " + state + " " + value);
+				//System.out.println("Part " + index + " " + state + " " + value);
 				RectangleFigure rect = new RectangleFigure();
 				rect.setBackgroundColor(ColorConstants.white);
 				if (MPIColors.Colors.containsKey(state))
@@ -69,7 +69,7 @@ public class MultiState {
 				else
 					rect.setBackgroundColor(ColorConstants.black);
 				rect.setForegroundColor(ColorConstants.white);
-				Label label = new Label(state);
+				Label label = new Label(" "+ state+" ");
 				rect.setToolTip(label);
 				if ((y1 * (double) (value)/m)>MinHeight){
 				root.add(rect, new Rectangle(
@@ -86,14 +86,14 @@ public class MultiState {
 			}			
 		}
 		if (agg!=0){
-			System.out.println("Part " + index + " " + "Aggregate" + " " + agg);
+			//System.out.println("Part " + index + " " + "Aggregate" + " " + agg);
 			RectangleFigure rect = new RectangleFigure();
 			rect.setBackgroundColor(ColorConstants.black);
 			rect.setForegroundColor(ColorConstants.white);
-			String aggString="";
+			String aggString=" ";
 			for (int i=0; i<aggList.size()-1; i++)
-				aggString=aggString + aggList.get(i) + "; ";
-			aggString=aggString + aggList.get(aggList.size()-1);
+				aggString=aggString + aggList.get(i) + " + ";
+			aggString=aggString + aggList.get(aggList.size()-1)+ " ";
 			Label label = new Label(aggString);
 			rect.setToolTip(label);
 			agg=Math.max((y1 * (double) agg), MinHeight*m)/y1;
