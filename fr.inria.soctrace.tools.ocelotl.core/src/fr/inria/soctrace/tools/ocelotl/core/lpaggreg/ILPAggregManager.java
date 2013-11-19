@@ -1,9 +1,9 @@
-/* ===========================================================
+/* =====================================================================
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
  * Ocelotl is a FrameSoC plug in which enables to visualize a trace 
- * under an aggregated representation form.
+ * overview by using a time aggregation technique
  *
  * (C) Copyright 2013 INRIA
  *
