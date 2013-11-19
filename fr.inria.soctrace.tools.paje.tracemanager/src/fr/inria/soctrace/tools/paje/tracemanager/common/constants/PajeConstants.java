@@ -25,9 +25,9 @@ public abstract class PajeConstants {
 
 	public final static String	ExportToolName								= "PajeTraceCleaner";
 
-	public final static String	PajeFormatName								= "inria.paje.0.0";
+	public final static String	PajeFormatName								= "Paje 1.2.5";
 
-	public final static String	PajeExportTraceFile							= "pajeetracefile.pj";
+	public final static String	PajeExportTraceFile							= "trace.paje";
 
 	public final static String	PajeIdNameSeparator							= "_";
 
