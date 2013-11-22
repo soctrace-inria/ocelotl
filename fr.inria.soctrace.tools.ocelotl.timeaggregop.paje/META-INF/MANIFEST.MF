@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TimeAggOp
+Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.timeaggregop.paje
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Export-Package: fr.inria.soctrace.tools.ocelotl.timeaggregop.paje,
+ fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config,
+ fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query,
+ fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.state

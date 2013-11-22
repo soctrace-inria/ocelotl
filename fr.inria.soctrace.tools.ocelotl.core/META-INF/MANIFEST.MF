@@ -22,10 +22,6 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,
  fr.inria.soctrace.tools.ocelotl.core.itimeaggregop,
  fr.inria.soctrace.tools.ocelotl.core.lpaggreg,
- fr.inria.soctrace.tools.ocelotl.core.paje.config,
- fr.inria.soctrace.tools.ocelotl.core.paje.query,
- fr.inria.soctrace.tools.ocelotl.core.paje.state,
- fr.inria.soctrace.tools.ocelotl.core.paje.timeaggregop,
  fr.inria.soctrace.tools.ocelotl.core.parameters,
  fr.inria.soctrace.tools.ocelotl.core.timeregion
 Import-Package: fr.inria.soctrace.tools.paje.tracemanager.common.constants

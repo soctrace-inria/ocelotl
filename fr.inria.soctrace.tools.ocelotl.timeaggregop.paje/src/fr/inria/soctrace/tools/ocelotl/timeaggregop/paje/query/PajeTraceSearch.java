@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.paje.query;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query;
 
 import java.util.ArrayList;
 import java.util.List;

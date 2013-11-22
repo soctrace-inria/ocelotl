@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.paje.timeaggregop;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,14 +29,14 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.Matrix;
-import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeQuery;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent1;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent1Cache;
-import fr.inria.soctrace.tools.ocelotl.core.paje.state.PajeState;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeQuery;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent1;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent1Cache;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.state.PajeState;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 public class PajeNormalizedStateSum extends Matrix {

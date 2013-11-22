@@ -17,14 +17,14 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.paje.state;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.state;
 
 import fr.inria.soctrace.lib.model.Event;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent1;
-import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent2;
 import fr.inria.soctrace.tools.ocelotl.core.state.State;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent1;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent2;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
 public class PajeState extends State {

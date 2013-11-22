@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.paje.config;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config;
 
 import java.util.LinkedList;
 import java.util.List;
