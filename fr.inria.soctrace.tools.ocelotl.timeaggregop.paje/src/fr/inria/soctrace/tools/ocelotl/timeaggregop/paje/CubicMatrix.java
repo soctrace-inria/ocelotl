@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,18 +27,21 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ICubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 
-public abstract class Matrix extends TimeAggregationOperator implements IMatrix {
+public abstract class CubicMatrix extends TimeAggregationOperator implements ICubicMatrix {
 
-	protected List<HashMap<String, Long>>	matrix;
+	protected List<HashMap<String, HashMap<String, Long>>>	matrix;
+	List<String>											keys;
 
-	public Matrix() throws SoCTraceException {
+	public CubicMatrix() {
 		super();
 	}
 
-	public Matrix(final OcelotlParameters parameters) throws SoCTraceException {
+	public CubicMatrix(final OcelotlParameters parameters) throws SoCTraceException {
 		super();
 		try {
 			setOcelotlParameters(parameters);
@@ -49,10 +52,16 @@ public abstract class Matrix extends TimeAggregationOperator implements IMatrix 
 	}
 
 	@Override
+	public void addKey(final String key) {
+		keys.add(key);
+	}
+
+	@Override
 	public void computeMatrix() throws SoCTraceException {
+		keys = new ArrayList<String>();
 		eventsNumber = 0;
-		final DeltaManager dmt = new DeltaManager();
-		dmt.start();
+		final DeltaManager dm = new DeltaManager();
+		dm.start();
 		final int epsize = genericQuery.getOcelotlParameters().getEventProducers().size();
 		if (genericQuery.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < genericQuery.getOcelotlParameters().getMaxEventProducers())
 			try {
@@ -72,17 +81,22 @@ public abstract class Matrix extends TimeAggregationOperator implements IMatrix 
 				}
 		}
 
-		dmt.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
+		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
 	}
 
 	@Override
-	public VLPAggregManager createManager() {
-		return new VLPAggregManager(this);
+	public MLPAggregManager createManager() {
+		return new MLPAggregManager(this);
 
 	}
 
 	@Override
-	public List<HashMap<String, Long>> getMatrix() {
+	public List<String> getKeys() {
+		return keys;
+	}
+
+	@Override
+	public List<HashMap<String, HashMap<String, Long>>> getMatrix() {
 		return matrix;
 	}
 
@@ -98,20 +112,22 @@ public abstract class Matrix extends TimeAggregationOperator implements IMatrix 
 
 	@Override
 	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<String, Long>>();
+		matrix = new ArrayList<HashMap<String, HashMap<String, Long>>>();
 		final List<EventProducer> producers = genericQuery.getOcelotlParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
-			matrix.add(new HashMap<String, Long>());
+			matrix.add(new HashMap<String, HashMap<String, Long>>());
 
 			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep.getName(), 0L);
+				matrix.get((int) i).put(ep.getName(), new HashMap<String, Long>());
 		}
 	}
 
-	public void matrixWrite(final long it, final EventProducer ep, final Map<Long, Long> distrib) {
-		synchronized (matrix) {
-			matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
-		}
+	public void matrixPushType(final int incr, final String epstring, final IState state, final Map<Long, Long> distrib) {
+		matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
+	}
+
+	public void matrixWrite(final long it, final EventProducer ep, final IState state, final Map<Long, Long> distrib) {
+		matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
 	}
 
 	@Override
@@ -119,7 +135,7 @@ public abstract class Matrix extends TimeAggregationOperator implements IMatrix 
 		System.out.println();
 		System.out.println("Distribution Vectors");
 		int i = 0;
-		for (final HashMap<String, Long> it : matrix) {
+		for (final HashMap<String, HashMap<String, Long>> it : matrix) {
 			System.out.println();
 			System.out.println("slice " + i++);
 			System.out.println();
@@ -127,5 +143,4 @@ public abstract class Matrix extends TimeAggregationOperator implements IMatrix 
 				System.out.println(ep + " = " + it.get(ep));
 		}
 	}
-
 }

@@ -21,7 +21,6 @@ Bundle-ActivationPolicy: lazy
 Import-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.itimeaggregop,
  fr.inria.soctrace.tools.ocelotl.core.lpaggreg,
- fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config,
  fr.inria.soctrace.tools.paje.tracemanager.common.constants
 Export-Package: fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt,
  fr.inria.soctrace.tools.ocelotl.ui.loaders,

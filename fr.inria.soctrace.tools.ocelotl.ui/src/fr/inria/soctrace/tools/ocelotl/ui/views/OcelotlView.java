@@ -66,7 +66,6 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
@@ -229,9 +228,8 @@ public class OcelotlView extends ViewPart {
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
 								comboAggregationOperator.removeAll();
-								for (final ITimeAggregationOperator op : ocelotlCore.getTimeOperators().getList())
-									if (op.traceType().equals(confDataLoader.getCurrentTrace().getType().getName()))
-										comboAggregationOperator.add(op.descriptor());
+								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName()))
+									comboAggregationOperator.add(op);
 								comboAggregationOperator.setText("");
 								combo.removeAll();
 								for (final ISpaceAggregationOperator op : ocelotlCore.getSpaceOperators().getList())
@@ -657,7 +655,7 @@ public class OcelotlView extends ViewPart {
 				if (confDataLoader.getCurrentTrace() == null)
 					return;
 				hasChanged = HasChanged.ALL;
-				ocelotlParameters.setTraceTypeConfig(ocelotlCore.getTimeOperators().config(comboAggregationOperator.getText()));
+				ocelotlCore.getTimeOperators().setSelectedOperator(comboAggregationOperator.getText());
 				btnSettings.notifyListeners(SWT.Selection, new Event());
 
 			}

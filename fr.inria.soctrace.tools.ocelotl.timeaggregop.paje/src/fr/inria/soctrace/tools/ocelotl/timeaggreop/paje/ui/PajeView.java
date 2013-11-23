@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 import fr.inria.soctrace.lib.model.EventType;
+import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -119,18 +120,23 @@ public class PajeView extends ApplicationWindow {
 		}
 	}
 
-	private final OcelotlView	ocelotlView;
+	private OcelotlView	ocelotlView;
 
 	private ListViewer			listViewerIdleStates;
 
 	private ListViewer			listViewerEventTypes;
 
-	private final PajeConfig	config;
+	private PajeConfig	config;
 
-	public PajeView(final OcelotlView ocelotlView, final PajeConfig config) {
-		super(ocelotlView.getSite().getShell());
+	public PajeView(Shell shell){
+		super(shell);
+		this.ocelotlView=null;
+		this.config=null;
+	}
+	
+	public void init (final OcelotlView ocelotlView, final ITraceTypeConfig config) {
 		this.ocelotlView = ocelotlView;
-		this.config = config;
+		this.config = (PajeConfig) config;
 	}
 
 	@Override

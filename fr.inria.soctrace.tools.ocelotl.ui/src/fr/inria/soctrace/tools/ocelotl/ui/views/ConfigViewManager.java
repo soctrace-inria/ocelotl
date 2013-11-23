@@ -19,11 +19,10 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
-import org.eclipse.jface.window.ApplicationWindow;
+import java.lang.reflect.InvocationTargetException;
 
-import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
-import fr.inria.soctrace.tools.ocelotl.ui.paje.PajeView;
-import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
+import org.eclipse.swt.widgets.Shell;
+
 
 public class ConfigViewManager {
 
@@ -35,9 +34,15 @@ public class ConfigViewManager {
 	}
 
 	public void openConfigWindows() {
-		ApplicationWindow window = null;
-		if (ocelotlView.getCore().getTimeOperators().getType(ocelotlView.getComboAggregationOperator().getText()).equals(PajeConstants.PajeFormatName))
-			window = new PajeView(ocelotlView, (PajeConfig) ocelotlView.getCore().getOcelotlParameters().getTraceTypeConfig());
+		ISettingApplicationWindow window = null;
+		
+		try {
+			window = (ISettingApplicationWindow) Class.forName(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		window.init(ocelotlView, ocelotlView.getCore().getOcelotlParameters().getTraceTypeConfig());
 		window.setBlockOnOpen(true);
 		window.open();
 

@@ -33,7 +33,7 @@ import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.NoAggregation;
 import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
 
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
+
 
 public class SpaceAggregationOperatorManager {
 
