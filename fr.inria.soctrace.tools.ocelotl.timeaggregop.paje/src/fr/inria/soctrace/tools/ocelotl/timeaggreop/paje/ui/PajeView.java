@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.paje;
+package fr.inria.soctrace.tools.ocelotl.timeaggreop.paje.ui;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -47,12 +47,13 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
+import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
+
 
 public class PajeView extends ApplicationWindow {
 

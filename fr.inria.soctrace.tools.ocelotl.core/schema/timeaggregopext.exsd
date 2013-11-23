@@ -17,6 +17,9 @@
          </appinfo>
       </annotation>
       <complexType>
+         <choice minOccurs="1" maxOccurs="unbounded">
+            <element ref="aggregation_operator"/>
+         </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -44,21 +47,6 @@
       </complexType>
    </element>
 
-   <element name="trace_format_compatibility">
-      <complexType>
-         <attribute name="list" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn=":java.util.List"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
    <element name="aggregation_operator">
       <complexType>
          <attribute name="class" type="string" use="required">
@@ -71,22 +59,45 @@
                </appinfo>
             </annotation>
          </attribute>
-      </complexType>
-   </element>
-
-   <element name="param_win" type="string">
-   </element>
-
-   <element name="spatial_compatibility">
-      <complexType>
-         <attribute name="list" type="string" use="required">
+         <attribute name="trace_formats" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="param_win" type="string">
             <annotation>
                <documentation>
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":java.util.List"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.jface.window.ApplicationWindow:"/>
                </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="spatial_compatibility" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="param_config" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="generic" type="boolean" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
             </annotation>
          </attribute>
       </complexType>

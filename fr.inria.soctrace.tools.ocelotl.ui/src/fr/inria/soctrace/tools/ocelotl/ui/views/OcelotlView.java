@@ -58,8 +58,6 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.wb.swt.ResourceManager;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.EventProducer;
@@ -72,6 +70,8 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperat
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
+import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.ResourceManager;
+import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 
 /**

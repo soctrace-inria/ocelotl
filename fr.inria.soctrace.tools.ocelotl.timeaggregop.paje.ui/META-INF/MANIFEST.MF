@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ui
+Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.timeaggreop.paje.ui
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: fr.inria.soctrace.tools.ocelotl.timeaggreop.paje.ui.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ fr.inria.soctrace.lib.model,
+ fr.inria.soctrace.tools.ocelotl.timeaggregop.paje
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt,
+ fr.inria.soctrace.tools.ocelotl.ui.loaders,
+ fr.inria.soctrace.tools.ocelotl.ui.views,
+ fr.inria.soctrace.tools.paje.tracemanager.common.constants

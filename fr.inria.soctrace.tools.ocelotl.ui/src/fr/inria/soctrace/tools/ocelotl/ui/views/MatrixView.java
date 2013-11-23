@@ -44,13 +44,13 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
 import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
+import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.MultiState;
 import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.PartFigure;
 

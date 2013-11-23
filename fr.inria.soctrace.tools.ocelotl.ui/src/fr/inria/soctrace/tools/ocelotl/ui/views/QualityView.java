@@ -42,9 +42,9 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.Quality;
+import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 
 /**
  * Matrix View : part representation, according to LP algorithm result

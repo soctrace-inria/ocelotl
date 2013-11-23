@@ -31,11 +31,7 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.NoAggregation;
 import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
-import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
-import fr.inria.soctrace.tools.ocelotl.core.paje.timeaggregop.PajeNormalizedStateSum;
-import fr.inria.soctrace.tools.ocelotl.core.paje.timeaggregop.PajePushPopStateTypeSum;
-import fr.inria.soctrace.tools.ocelotl.core.paje.timeaggregop.PajeStateSum;
-import fr.inria.soctrace.tools.ocelotl.core.paje.timeaggregop.PajeStateTypeSum;
+
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 

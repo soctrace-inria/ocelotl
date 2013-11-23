@@ -24,8 +24,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.ui.IAggregateWorkingSet;
+
+import fr.inria.soctrace.lib.model.Tool;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
@@ -42,6 +49,12 @@ public class TimeAggregationOperatorManager {
 	HashMap<String, ITraceTypeConfig>			Config;
 	ArrayList<String>							Names;
 	OcelotlParameters							parameters;
+	
+	private static final String POINT_ID = "timeaggregopext"; //$NON-NLS-1$
+	private static final String OP_NAME = "name"; //$NON-NLS-1$
+	private static final String OP_TYPE = "class"; //$NON-NLS-1$
+	private static final String EP_TOOL_DOC = "doc"; //$NON-NLS-1$
+	private static final String EP_TOOL_CLASS = "class"; //$NON-NLS-1$
 
 	public TimeAggregationOperatorManager(final OcelotlParameters parameters) {
 		super();
@@ -95,10 +108,23 @@ public class TimeAggregationOperatorManager {
 
 	private void init() throws SoCTraceException {
 		List = new HashMap<String, ITimeAggregationOperator>();
-		List.put(PajeStateSum.descriptor, new PajeStateSum());
-		List.put(PajeNormalizedStateSum.descriptor, new PajeNormalizedStateSum());
-		List.put(PajeStateTypeSum.descriptor, new PajeStateTypeSum());
-		List.put(PajePushPopStateTypeSum.descriptor, new PajePushPopStateTypeSum());
+		
+		IExtensionRegistry reg = Platform.getExtensionRegistry();
+		IConfigurationElement[] config = reg.getConfigurationElementsFor(POINT_ID);
+
+		for (IConfigurationElement e : config) {
+			ITimeAggregationOperator operator=(ITimeAggregationOperator) Class.forName(e.getAttribute("class")).newInstance();
+			Tool tmp = new Tool(reverseIdManager.getNextId());
+			tmp.setPlugin(true);
+			tmp.setCommand("plugin:"+e.getNamespaceIdentifier());
+			tmp.setName(e.getAttribute(EP_TOOL_NAME));
+			tmp.setType(e.getAttribute(EP_TOOL_TYPE));
+			if (e.getAttribute(EP_TOOL_DOC)!=null)
+				tmp.setDoc(e.getAttribute(EP_TOOL_DOC));
+			tools.add(tmp);
+		}
+		
+		return tools;
 
 	}
 

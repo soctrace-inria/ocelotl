@@ -8,7 +8,7 @@
  * Contributors:
  *    Google, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.wb.swt;
+package fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt;
 
 import java.io.File;
 import java.io.InputStream;
