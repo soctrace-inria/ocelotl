@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TimeAggregationOperatorResource {
-	String			id;
 
 	String			operatorClass;
 
@@ -15,10 +14,10 @@ public class TimeAggregationOperatorResource {
 	List<String>	spaceCompatibility	= new ArrayList<String>();
 	String			paramWinClass;
 	String			paramConfig;
+	String 			bundle;
 
-	public TimeAggregationOperatorResource(final String id, final String operatorClass, final String name, final boolean generic, final List<String> traceFormats, final List<String> spaceCompatibility, final String paramWinClass, final String paramConfig) {
+	public TimeAggregationOperatorResource(final String operatorClass, final String name, final boolean generic, final List<String> traceFormats, final List<String> spaceCompatibility, final String paramWinClass, final String paramConfig, final String bundle) {
 		super();
-		this.id = id;
 		this.operatorClass = operatorClass;
 		this.name = name;
 		this.generic = generic;
@@ -26,11 +25,11 @@ public class TimeAggregationOperatorResource {
 		this.spaceCompatibility = spaceCompatibility;
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
+		this.bundle = bundle;
 	}
 
-	public TimeAggregationOperatorResource(final String id, final String operatorClass, final String name, final boolean generic, final String traceFormats, final String spaceCompatibility, final String paramWinClass, final String paramConfig) {
+	public TimeAggregationOperatorResource(final String operatorClass, final String name, final boolean generic, final String traceFormats, final String spaceCompatibility, final String paramWinClass, final String paramConfig, final String bundle) {
 		super();
-		this.id = id;
 		this.operatorClass = operatorClass;
 		this.name = name;
 		this.generic = generic;
@@ -38,15 +37,13 @@ public class TimeAggregationOperatorResource {
 		setSpaceCompatibility(spaceCompatibility);
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
+		this.bundle = bundle;
 	}
 
 	public TimeAggregationOperatorResource() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public String getId() {
-		return id;
-	}
 
 	public String getName() {
 		return name;
@@ -80,8 +77,13 @@ public class TimeAggregationOperatorResource {
 		this.generic = generic;
 	}
 
-	public void setId(final String id) {
-		this.id = id;
+
+	public String getBundle() {
+		return bundle;
+	}
+
+	public void setBundle(String bundle) {
+		this.bundle = bundle;
 	}
 
 	public void setName(final String name) {

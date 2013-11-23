@@ -21,7 +21,10 @@ package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.framework.Bundle;
 
 
 public class ConfigViewManager {
@@ -37,14 +40,15 @@ public class ConfigViewManager {
 		ISettingApplicationWindow window = null;
 		
 		try {
-			window = (ISettingApplicationWindow) Class.forName(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
+			Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getBundle());
+			window = (ISettingApplicationWindow) mybundle.loadClass(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		window.init(ocelotlView, ocelotlView.getCore().getOcelotlParameters().getTraceTypeConfig());
 		window.setBlockOnOpen(true);
-		window.open();
+		((ApplicationWindow) window).open();
 
 	}
 

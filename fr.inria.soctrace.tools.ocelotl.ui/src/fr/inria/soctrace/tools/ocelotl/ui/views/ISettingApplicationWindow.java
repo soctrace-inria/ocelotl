@@ -8,6 +8,5 @@ public interface ISettingApplicationWindow{
 
 	public void setBlockOnOpen(boolean b);
 
-	public void open();
 
 }

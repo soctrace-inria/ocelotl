@@ -52,11 +52,12 @@ import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
+import fr.inria.soctrace.tools.ocelotl.ui.views.ISettingApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
 
-public class PajeView extends ApplicationWindow {
+public class PajeView extends ApplicationWindow implements ISettingApplicationWindow{
 
 	private class EventTypeLabelProvider extends LabelProvider {
 

@@ -27,9 +27,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
@@ -65,15 +67,19 @@ public class TimeAggregationOperatorManager {
 	}
 	
 	public void setSelectedOperator(String name){
+		Bundle mybundle = Platform.getBundle(List.get(name).getBundle()
+				); 
 		try {
-			selectedOperator=(ITimeAggregationOperator) Class.forName(List.get(name).getOperatorClass()).newInstance();
+
+			selectedOperator=(ITimeAggregationOperator) mybundle.loadClass( 
+					List.get(name).getOperatorClass()).newInstance();
 			selectedOperatorName=name;
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
-			selectedConfig=(ITraceTypeConfig) Class.forName(List.get(name).getParamConfig()).newInstance();
+			selectedConfig= (ITraceTypeConfig) mybundle.loadClass(List.get(name).getParamConfig()).newInstance();
 			parameters.setTraceTypeConfig(selectedConfig);
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -98,7 +104,6 @@ public class TimeAggregationOperatorManager {
 		System.out.println(config.length);
 
 		for (IConfigurationElement e : config) {
-			
 			TimeAggregationOperatorResource  resource = new TimeAggregationOperatorResource();
 			resource.setOperatorClass(e.getAttribute(OP_CLASS));
 			resource.setName(e.getAttribute(OP_NAME));
@@ -107,6 +112,7 @@ public class TimeAggregationOperatorManager {
 			resource.setSpaceCompatibility(e.getAttribute(OP_SPATIAL_COMPATIBILITY));
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
+			resource.setBundle(e.getContributor().getName());
 			List.put(resource.getName(), resource);
 			System.out.println(resource.getName()+" time operator detected");
 		}

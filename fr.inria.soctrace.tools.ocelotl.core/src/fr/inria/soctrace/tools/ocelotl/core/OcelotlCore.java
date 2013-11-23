@@ -137,8 +137,8 @@ public class OcelotlCore {
 	}
 
 	public void setTimeOperator() {
-		timeOperators.setSelectedOperator(ocelotlParameters.getTimeAggOperator());
 		timeOperators.activateSelectedOperator();
+		timeOperator=timeOperators.getSelectedOperator();
 	}
 	
 	public void setSpaceOperator() {
