@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.query;
+package fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +31,7 @@ import fr.inria.soctrace.lib.query.conditions.SimpleCondition;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 
 public class GenericReducedEventCache {
 	private final HashMap<Integer, GenericReducedEvent>	cache	= new HashMap<Integer, GenericReducedEvent>();

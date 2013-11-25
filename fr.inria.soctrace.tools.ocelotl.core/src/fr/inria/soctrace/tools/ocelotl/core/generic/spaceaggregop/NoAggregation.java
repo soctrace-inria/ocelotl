@@ -26,13 +26,12 @@ public class NoAggregation extends SpaceAggregationOperator {
 
 	final public static String	descriptor	= "No Aggregation";
 
-	public NoAggregation(final OcelotlCore ocelotlCore) {
-		super(ocelotlCore);
-	}
-	
-	
 	public NoAggregation() {
 		super();
+	}
+
+	public NoAggregation(final OcelotlCore ocelotlCore) {
+		super(ocelotlCore);
 	}
 
 	@Override

@@ -27,19 +27,19 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DCacheMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
+import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.CubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeQuery;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent1;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent1Cache;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.state.PajeState;
-import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
-public class PajeStateTypeSum extends CubicMatrix {
+public class PajeStateTypeSum extends _3DCacheMicroDescription {
 
 	class OcelotlThread extends Thread {
 
@@ -68,13 +68,13 @@ public class PajeStateTypeSum extends CubicMatrix {
 		private void cacheRun() throws SoCTraceException {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
 				PajeReducedEvent1Cache cache;
-				cache = new PajeReducedEvent1Cache(genericQuery.getOcelotlParameters());
+				cache = new PajeReducedEvent1Cache(getOcelotlParameters());
 				final EventProducer ep = eventProducers.get(t);
 				IState state;
 				final List<EventProxy> events = eventProxyList.get(ep.getId());
 				for (int i = 0; i < events.size() - 1; i++) {
 					state = new PajeState(cache.getEventMultiPageEPCache(events.get(i)), cache.getEventMultiPageEPCache(events.get(i + 1)), timeSliceManager);
-					if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+					if (!((PajeConfig) getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 						matrixUpdate(state, ep, distrib);
 					}
@@ -90,13 +90,13 @@ public class PajeStateTypeSum extends CubicMatrix {
 			synchronized (matrix) {
 				if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
 					System.out.println("Adding " + state.getStateType() + " state");
-					addKey(state.getStateType());
+					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final String epstring : matrix.get(incr).keySet())
-							matrixPushType(incr, epstring, state, distrib);
+							matrixPushType(incr, epstring, state.getStateType(), distrib);
 				}
 				for (final long it : distrib.keySet())
-					matrixWrite(it, ep, state, distrib);
+					matrixWrite(it, ep, state.getStateType(), distrib);
 			}
 		}
 
@@ -107,7 +107,7 @@ public class PajeStateTypeSum extends CubicMatrix {
 				IState state;
 				for (int i = 0; i < events.size() - 1; i++) {
 					state = new PajeState(events.get(i), events.get(i + 1), timeSliceManager);
-					if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+					if (!((PajeConfig) getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 						matrixUpdate(state, ep, distrib);
 					}
@@ -133,9 +133,6 @@ public class PajeStateTypeSum extends CubicMatrix {
 		}
 	}
 
-	public final static String	descriptor	= "State Type Sum";
-	public final static String	traceType	= PajeConstants.PajeFormatName;
-
 	public PajeStateTypeSum() throws SoCTraceException {
 		super();
 	}
@@ -148,7 +145,7 @@ public class PajeStateTypeSum extends CubicMatrix {
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<EventProxy> fullEvents = genericQuery.getEventsProxy(eventProducers);
+		final List<EventProxy> fullEvents = ((OcelotlQueries) ocelotlQueries).getEventProxies(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -159,18 +156,18 @@ public class PajeStateTypeSum extends CubicMatrix {
 		for (final EventProxy e : fullEvents)
 			eventList.get(e.EP).add(e);
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < Math.min(genericQuery.getOcelotlParameters().getThread(), eventProducers.size()); t++)
-			threadlist.add(new OcelotlThread(eventProducers, eventList, genericQuery.getOcelotlParameters().getThread(), t, true));
+		for (int t = 0; t < Math.min(getOcelotlParameters().getThread(), eventProducers.size()); t++)
+			threadlist.add(new OcelotlThread(eventProducers, eventList, getOcelotlParameters().getThread(), t, true));
 		for (final Thread thread : threadlist)
 			thread.join();
-		dm.end("VECTORS COMPUTATION : " + genericQuery.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	@Override
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<PajeReducedEvent1> fullEvents = ((PajeQuery) genericQuery).getReducedEvents1(eventProducers);
+		final List<PajeReducedEvent1> fullEvents = ((PajeQuery) ocelotlQueries).getReducedEvents1(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -181,33 +178,34 @@ public class PajeStateTypeSum extends CubicMatrix {
 		for (final PajeReducedEvent1 e : fullEvents)
 			eventList.get(e.EP).add(e);
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < Math.min(genericQuery.getOcelotlParameters().getThread(), eventProducers.size()); t++)
-			threadlist.add(new OcelotlThread(eventProducers, eventList, genericQuery.getOcelotlParameters().getThread(), t, false));
+		for (int t = 0; t < Math.min(getOcelotlParameters().getThread(), eventProducers.size()); t++)
+			threadlist.add(new OcelotlThread(eventProducers, eventList, getOcelotlParameters().getThread(), t, false));
 		for (final Thread thread : threadlist)
 			thread.join();
-		dm.end("VECTORS COMPUTATION : " + genericQuery.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	@Override
-	public String descriptor() {
-		return descriptor;
+	public void initQueries() {
+		try {
+			ocelotlQueries = new PajeQuery(parameters);
+		} catch (final SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ocelotlQueries.checkTimeStamps();
 	}
 
 	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
 		this.parameters = parameters;
-		genericQuery = new PajeQuery(parameters);
-		genericQuery.checkTimeStamps();
+		ocelotlQueries = new PajeQuery(parameters);
+		ocelotlQueries.checkTimeStamps();
 		count = 0;
 		epit = 0;
-		timeSliceManager = new TimeSliceManager(genericQuery.getOcelotlParameters().getTimeRegion(), genericQuery.getOcelotlParameters().getTimeSlicesNumber());
+		timeSliceManager = new TimeSliceManager(getOcelotlParameters().getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
-	}
-
-	@Override
-	public String traceType() {
-		return traceType;
 	}
 
 }

@@ -14,7 +14,11 @@ public class TimeAggregationOperatorResource {
 	List<String>	spaceCompatibility	= new ArrayList<String>();
 	String			paramWinClass;
 	String			paramConfig;
-	String 			bundle;
+	String			bundle;
+
+	public TimeAggregationOperatorResource() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public TimeAggregationOperatorResource(final String operatorClass, final String name, final boolean generic, final List<String> traceFormats, final List<String> spaceCompatibility, final String paramWinClass, final String paramConfig, final String bundle) {
 		super();
@@ -40,10 +44,9 @@ public class TimeAggregationOperatorResource {
 		this.bundle = bundle;
 	}
 
-	public TimeAggregationOperatorResource() {
-		// TODO Auto-generated constructor stub
+	public String getBundle() {
+		return bundle;
 	}
-
 
 	public String getName() {
 		return name;
@@ -73,17 +76,12 @@ public class TimeAggregationOperatorResource {
 		return generic;
 	}
 
+	public void setBundle(final String bundle) {
+		this.bundle = bundle;
+	}
+
 	public void setGeneric(final boolean generic) {
 		this.generic = generic;
-	}
-
-
-	public String getBundle() {
-		return bundle;
-	}
-
-	public void setBundle(String bundle) {
-		this.bundle = bundle;
 	}
 
 	public void setName(final String name) {

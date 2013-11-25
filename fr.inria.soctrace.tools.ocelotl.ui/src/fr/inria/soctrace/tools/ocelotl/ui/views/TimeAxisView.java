@@ -42,7 +42,8 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 
 /**
- * Matrix View : part representation, according to LP algorithm result
+ * _2DCacheMicroDescription View : part representation, according to LP
+ * algorithm result
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */

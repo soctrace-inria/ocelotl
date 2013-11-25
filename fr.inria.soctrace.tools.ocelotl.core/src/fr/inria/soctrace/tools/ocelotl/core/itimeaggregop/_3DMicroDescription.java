@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje;
+package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,21 +27,19 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ICubicMatrix;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 
-public abstract class CubicMatrix extends TimeAggregationOperator implements ICubicMatrix {
+public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOperator implements I3DMicroDescription {
 
 	protected List<HashMap<String, HashMap<String, Long>>>	matrix;
 	List<String>											keys;
 
-	public CubicMatrix() {
+	public _3DMicroDescription() {
 		super();
 	}
 
-	public CubicMatrix(final OcelotlParameters parameters) throws SoCTraceException {
+	public _3DMicroDescription(final OcelotlParameters parameters) throws SoCTraceException {
 		super();
 		try {
 			setOcelotlParameters(parameters);
@@ -52,29 +50,24 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 	}
 
 	@Override
-	public void addKey(final String key) {
-		keys.add(key);
-	}
-
-	@Override
 	public void computeMatrix() throws SoCTraceException {
 		keys = new ArrayList<String>();
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		final int epsize = genericQuery.getOcelotlParameters().getEventProducers().size();
-		if (genericQuery.getOcelotlParameters().getMaxEventProducers() == 0 || epsize < genericQuery.getOcelotlParameters().getMaxEventProducers())
+		final int epsize = getOcelotlParameters().getEventProducers().size();
+		if (getOcelotlParameters().getMaxEventProducers() == 0 || epsize < getOcelotlParameters().getMaxEventProducers())
 			try {
-				computeSubMatrix(genericQuery.getOcelotlParameters().getEventProducers());
+				computeSubMatrix(getOcelotlParameters().getEventProducers());
 			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		else {
-			final List<EventProducer> producers = genericQuery.getOcelotlParameters().getEventProducers().size() == 0 ? genericQuery.getAllEventProducers() : genericQuery.getOcelotlParameters().getEventProducers();
-			for (int i = 0; i < epsize; i = i + genericQuery.getOcelotlParameters().getMaxEventProducers())
+			final List<EventProducer> producers = getOcelotlParameters().getEventProducers().size() == 0 ? ocelotlQueries.getAllEventProducers() : getOcelotlParameters().getEventProducers();
+			for (int i = 0; i < epsize; i = i + getOcelotlParameters().getMaxEventProducers())
 				try {
-					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + genericQuery.getOcelotlParameters().getMaxEventProducers())));
+					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + getOcelotlParameters().getMaxEventProducers())));
 				} catch (final InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -88,11 +81,6 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 	public MLPAggregManager createManager() {
 		return new MLPAggregManager(this);
 
-	}
-
-	@Override
-	public List<String> getKeys() {
-		return keys;
 	}
 
 	@Override
@@ -113,7 +101,7 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 	@Override
 	public void initVectors() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<String, HashMap<String, Long>>>();
-		final List<EventProducer> producers = genericQuery.getOcelotlParameters().getEventProducers();
+		final List<EventProducer> producers = getOcelotlParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
 			matrix.add(new HashMap<String, HashMap<String, Long>>());
 
@@ -122,12 +110,12 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 		}
 	}
 
-	public void matrixPushType(final int incr, final String epstring, final IState state, final Map<Long, Long> distrib) {
-		matrix.get(incr).get(epstring).put(state.getStateType(), 0L);
+	public void matrixPushType(final int incr, final String epstring, final String key, final Map<Long, Long> distrib) {
+		matrix.get(incr).get(epstring).put(key, 0L);
 	}
 
-	public void matrixWrite(final long it, final EventProducer ep, final IState state, final Map<Long, Long> distrib) {
-		matrix.get((int) it).get(ep.getName()).put(state.getStateType(), matrix.get((int) it).get(ep.getName()).get(state.getStateType()) + distrib.get(it));
+	public void matrixWrite(final long it, final EventProducer ep, final String key, final Map<Long, Long> distrib) {
+		matrix.get((int) it).get(ep.getName()).put(key, matrix.get((int) it).get(ep.getName()).get(key) + distrib.get(it));
 	}
 
 	@Override
@@ -143,4 +131,5 @@ public abstract class CubicMatrix extends TimeAggregationOperator implements ICu
 				System.out.println(ep + " = " + it.get(ep));
 		}
 	}
+
 }

@@ -89,7 +89,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig"/>
+                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig"/>
                </appinfo>
             </annotation>
          </attribute>

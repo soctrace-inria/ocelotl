@@ -17,21 +17,20 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
+package fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent;
 
-import java.util.HashMap;
-import java.util.List;
+import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
+public class GenericReducedEvent extends EventProxy {
+	public String	TYPE;
+	public int		PAGE;
+	public long		TS;
 
-public interface ICubicMatrix extends ITimeAggregationOperator {
+	public GenericReducedEvent(final int id, final int ep, final int page, final long ts, final String type) {
+		super(id, ep);
+		PAGE = page;
+		TS = ts;
+		TYPE = type;
+	}
 
-	public void addKey(String key);
-
-	@Override
-	public MLPAggregManager createManager();
-
-	public List<String> getKeys();
-
-	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
 }

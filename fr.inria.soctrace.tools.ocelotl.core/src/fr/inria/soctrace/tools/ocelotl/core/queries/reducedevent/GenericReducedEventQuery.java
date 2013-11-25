@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.query;
+package fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent;
 
 /*******************************************************************************
  * Copyright (c) 2013 Damien Dosimont
@@ -42,9 +42,10 @@ import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.queries.event.EventQuery;
 
 /**
- * GenericQuery class for Event self-defining-pattern tables.
+ * OcelotlQueries class for Event self-defining-pattern tables.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
@@ -55,7 +56,7 @@ public class GenericReducedEventQuery extends EventQuery {
 	 * The constructor
 	 * 
 	 * @param traceDB
-	 *            Trace DB object where the genericQuery is performed.
+	 *            Trace DB object where the ocelotlQueries is performed.
 	 */
 	public GenericReducedEventQuery(final TraceDBObject traceDB) {
 		super(traceDB);

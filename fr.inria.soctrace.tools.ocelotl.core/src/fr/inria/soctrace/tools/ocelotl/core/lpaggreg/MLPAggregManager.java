@@ -22,15 +22,15 @@ package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ICubicMatrix;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.jni.LPAggregWrapper;
 
 public class MLPAggregManager extends LPAggregManager {
 
-	ICubicMatrix	timeSliceMatrix;
+	I3DMicroDescription	timeSliceMatrix;
 
-	public MLPAggregManager(final ICubicMatrix timeSliceMatrix) {
-		super(timeSliceMatrix.getQuery().getOcelotlParameters());
+	public MLPAggregManager(final I3DMicroDescription timeSliceMatrix) {
+		super(timeSliceMatrix.getOcelotlParameters());
 		this.timeSliceMatrix = timeSliceMatrix;
 		lpaggregWrapper = new LPAggregWrapper(3);
 		fillVectors();
@@ -54,7 +54,11 @@ public class MLPAggregManager extends LPAggregManager {
 		return new ArrayList<String>(timeSliceMatrix.getMatrix().get(0).keySet());
 	}
 
-	public ICubicMatrix getTimeSliceMatrix() {
+	public List<String> getKeys() {
+		return new ArrayList<String>(timeSliceMatrix.getMatrix().get(0).get(getEventProducers().get(0)).keySet());
+	}
+
+	public I3DMicroDescription getTimeSliceMatrix() {
 		return timeSliceMatrix;
 	}
 

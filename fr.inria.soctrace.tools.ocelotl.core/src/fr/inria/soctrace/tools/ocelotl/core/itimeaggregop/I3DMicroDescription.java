@@ -17,18 +17,17 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.query;
+package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
-public class GenericReducedEvent extends EventProxy {
-	public String	TYPE;
-	public int		PAGE;
-	public long		TS;
+import java.util.HashMap;
+import java.util.List;
 
-	public GenericReducedEvent(final int id, final int ep, final int page, final long ts, final String type) {
-		super(id, ep);
-		PAGE = page;
-		TS = ts;
-		TYPE = type;
-	}
+import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 
+public interface I3DMicroDescription extends ITimeAggregationOperator {
+
+	@Override
+	public MLPAggregManager createManager();
+
+	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
 }

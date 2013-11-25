@@ -17,17 +17,14 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
+package fr.inria.soctrace.tools.ocelotl.core.config;
 
-import java.util.HashMap;
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
+import fr.inria.soctrace.lib.model.EventType;
 
-public interface IMatrix extends ITimeAggregationOperator {
+public interface ITraceTypeConfig {
 
-	@Override
-	public VLPAggregManager createManager();
+	public List<EventType> getTypes();
 
-	public List<HashMap<String, Long>> getMatrix();
 }

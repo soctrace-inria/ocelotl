@@ -17,14 +17,28 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.config;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventType;
+import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
-public interface ITraceTypeConfig {
+public class GenericConfig implements ITraceTypeConfig {
 
-	public List<EventType> getTypes();
+	public final static String		DefaultState	= "PajeSetState";
+	public final static String		DefaultIdle		= "IDLE";
+	private final List<String>		idles			= new LinkedList<String>();
+	private final List<EventType>	types			= new LinkedList<EventType>();
+
+	public GenericConfig() {
+		super();
+	}
+
+	@Override
+	public List<EventType> getTypes() {
+		return types;
+	}
 
 }

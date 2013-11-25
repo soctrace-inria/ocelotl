@@ -30,7 +30,7 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 //import fr.inria.soctrace.lib.utils.DeltaManager;
 //import fr.inria.soctrace.tools.ocelotl.core.OcelotlParameters;
-//import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.CubicMatrix;
+//import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DCacheMicroDescription;
 //import fr.inria.soctrace.tools.ocelotl.core.paje.config.PajeConfig;
 //import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent2;
 //import fr.inria.soctrace.tools.ocelotl.core.paje.query.PajeReducedEvent2Cache;
@@ -39,7 +39,7 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 //import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 //
-//public class GenericEventDistribution extends CubicMatrix {
+//public class GenericEventDistribution extends _3DCacheMicroDescription {
 //	
 //	class OcelotlThread extends Thread {
 //
@@ -90,7 +90,7 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
 //				ArrayList<GenericReducedEvent> stack = new ArrayList<GenericReducedEvent>();
 //				GenericReducedEventCache cache;
-//				cache = new GenericReducedEventCache(genericQuery.getOcelotlParameters());
+//				cache = new GenericReducedEventCache(ocelotlQueries.getOcelotlParameters());
 //				final EventProducer ep = eventProducers.get(t);
 //				IState state=null;
 //				final List<EventProxy> events = eventProxyList.get(ep.getId());
@@ -131,7 +131,7 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //				else if (tmp2.TYPE.contains(PajeExternalConstants.PajePopState)){
 //					if (tmp1.TYPE.contains(PajeExternalConstants.PajePushState)){
 //						state = new PajeState(tmp1, tmp2, timeSliceManager);
-//					if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+//					if (!((PajeConfig) ocelotlQueries.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 //						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 //						matrixUpdate(state, ep, distrib);
 //					}
@@ -139,7 +139,7 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //					else{
 //						state = new PajeState(stack.get(stack.size()-1), tmp2, timeSliceManager);
 //						stack.remove(stack.size()-1);
-//						if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+//						if (!((PajeConfig) ocelotlQueries.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 //							final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 //							matrixUpdate(state, ep, distrib);
 //						}
@@ -147,13 +147,13 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //				}
 //				else if (tmp2.TYPE.contains(PajeExternalConstants.PajeSetState)){
 //					state = new PajeState(tmp1, tmp2, timeSliceManager);
-//					if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+//					if (!((PajeConfig) ocelotlQueries.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 //						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 //						matrixUpdate(state, ep, distrib);
 //					}
 //					for (PajeReducedEvent2 stacked:stack){
 //						state = new PajeState(stacked, tmp2, timeSliceManager);
-//						if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+//						if (!((PajeConfig) ocelotlQueries.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 //							final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 //							matrixUpdate(state, ep, distrib);
 //						}
@@ -165,8 +165,8 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //			void computeEnd(ArrayList<PajeReducedEvent2> stack, IState state, EventProducer ep){
 //			if (!stack.isEmpty()){
 //				for (PajeReducedEvent2 stacked:stack){
-//					state = new PajeState(stacked, genericQuery.getOcelotlParameters().getTimeRegion().getTimeStampEnd(), timeSliceManager);
-//					if (!((PajeConfig) genericQuery.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
+//					state = new PajeState(stacked, ocelotlQueries.getOcelotlParameters().getTimeRegion().getTimeStampEnd(), timeSliceManager);
+//					if (!((PajeConfig) ocelotlQueries.getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
 //						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 //						matrixUpdate(state, ep, distrib);
 //					}
@@ -204,7 +204,7 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 //		DeltaManager dm = new DeltaManager();
 //		dm.start();
-//		final List<EventProxy> fullEvents = genericQuery.getEventsProxy(eventProducers);
+//		final List<EventProxy> fullEvents = ocelotlQueries.getEventsProxy(eventProducers);
 //		eventsNumber = fullEvents.size();
 //		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 //		dm = new DeltaManager();
@@ -215,17 +215,17 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //		for (final EventProxy e : fullEvents)
 //			eventList.get(e.EP).add(e);
 //		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-//		for (int t = 0; t < genericQuery.getOcelotlParameters().getThread(); t++)
-//			threadlist.add(new OcelotlThread(eventProducers, eventList, genericQuery.getOcelotlParameters().getThread(), t, true));
+//		for (int t = 0; t < ocelotlQueries.getOcelotlParameters().getThread(); t++)
+//			threadlist.add(new OcelotlThread(eventProducers, eventList, ocelotlQueries.getOcelotlParameters().getThread(), t, true));
 //		for (final Thread thread : threadlist)
 //			thread.join();
-//		dm.end("VECTORS COMPUTATION : " + genericQuery.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+//		dm.end("VECTORS COMPUTATION : " + ocelotlQueries.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 //	}
 //
 //	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 //		DeltaManager dm = new DeltaManager();
 //		dm.start();
-//		final List<GenericReducedEvent> fullEvents = genericQuery.getReducedEvents(eventProducers);
+//		final List<GenericReducedEvent> fullEvents = ocelotlQueries.getReducedEvents(eventProducers);
 //		eventsNumber = fullEvents.size();
 //		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 //		dm = new DeltaManager();
@@ -236,11 +236,11 @@ package fr.inria.soctrace.tools.ocelotl.core.generic.timeaggregop;
 //		for (final GenericReducedEvent e : fullEvents)
 //			eventList.get(e.EP).add(e);
 //			final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-//			for (int t = 0; t < genericQuery.getOcelotlParameters().getThread(); t++)
-//				threadlist.add(new OcelotlThread(eventProducers, eventList, genericQuery.getOcelotlParameters().getThread(), t, false));
+//			for (int t = 0; t < ocelotlQueries.getOcelotlParameters().getThread(); t++)
+//				threadlist.add(new OcelotlThread(eventProducers, eventList, ocelotlQueries.getOcelotlParameters().getThread(), t, false));
 //			for (final Thread thread : threadlist)
 //				thread.join();
-//		dm.end("VECTORS COMPUTATION : " + genericQuery.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+//		dm.end("VECTORS COMPUTATION : " + ocelotlQueries.getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 //	}
 //	
 //	

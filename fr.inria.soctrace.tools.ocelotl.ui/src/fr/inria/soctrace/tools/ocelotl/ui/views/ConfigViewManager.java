@@ -26,7 +26,6 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
-
 public class ConfigViewManager {
 
 	OcelotlView	ocelotlView;
@@ -38,9 +37,9 @@ public class ConfigViewManager {
 
 	public void openConfigWindows() {
 		ISettingApplicationWindow window = null;
-		
+
 		try {
-			Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getBundle());
+			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getBundle());
 			window = (ISettingApplicationWindow) mybundle.loadClass(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block

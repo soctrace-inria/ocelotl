@@ -24,7 +24,7 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Trace;
-import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlParameters {
@@ -70,12 +70,20 @@ public class OcelotlParameters {
 		return parameter;
 	}
 
+	public String getSpaceAggOperator() {
+		return spaceAggOperator;
+	}
+
 	public int getThread() {
 		return thread;
 	}
 
 	public float getThreshold() {
 		return threshold;
+	}
+
+	public String getTimeAggOperator() {
+		return timeAggOperator;
 	}
 
 	public TimeRegion getTimeRegion() {
@@ -130,6 +138,10 @@ public class OcelotlParameters {
 		this.normalize = normalize;
 	}
 
+	// public void setSleepingStates(final List<String> sleepingStates) {
+	// this.sleepingStates = sleepingStates;
+	// }
+
 	public void setPageCache(final int pageCache) {
 		this.pageCache = pageCache;
 	}
@@ -138,9 +150,9 @@ public class OcelotlParameters {
 		this.parameter = parameter;
 	}
 
-	// public void setSleepingStates(final List<String> sleepingStates) {
-	// this.sleepingStates = sleepingStates;
-	// }
+	public void setSpaceAggOperator(final String spaceAggOperator) {
+		this.spaceAggOperator = spaceAggOperator;
+	}
 
 	public void setThread(final int thread) {
 		this.thread = thread;
@@ -148,6 +160,10 @@ public class OcelotlParameters {
 
 	public void setThreshold(final float threshold) {
 		this.threshold = threshold;
+	}
+
+	public void setTimeAggOperator(final String timeAggOperator) {
+		this.timeAggOperator = timeAggOperator;
 	}
 
 	public void setTimeRegion(final TimeRegion timeRegion) {
@@ -164,22 +180,6 @@ public class OcelotlParameters {
 
 	public void setTraceTypeConfig(final ITraceTypeConfig iTraceTypeConfig) {
 		this.iTraceTypeConfig = iTraceTypeConfig;
-	}
-
-	public String getTimeAggOperator() {
-		return timeAggOperator;
-	}
-
-	public void setTimeAggOperator(String timeAggOperator) {
-		this.timeAggOperator = timeAggOperator;
-	}
-
-	public String getSpaceAggOperator() {
-		return spaceAggOperator;
-	}
-
-	public void setSpaceAggOperator(String spaceAggOperator) {
-		this.spaceAggOperator = spaceAggOperator;
 	}
 
 }

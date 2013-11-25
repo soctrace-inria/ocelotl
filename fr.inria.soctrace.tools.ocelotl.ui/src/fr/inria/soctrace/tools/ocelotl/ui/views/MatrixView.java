@@ -25,17 +25,14 @@ import java.util.List;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.RoundedRectangle;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.XYLayout;
-import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
@@ -45,17 +42,16 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
-import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.MultiState;
 import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.PartFigure;
 
 /**
- * Matrix View : part representation, according to LP algorithm result
+ * _2DCacheMicroDescription View : part representation, according to LP
+ * algorithm result
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
@@ -241,34 +237,33 @@ public class MatrixView {
 					part.getUpdateManager().performUpdate();
 					part.init();
 				}
-			else {
-				if (ocelotlView.getParams().getSpaceAggOperator().equals("No Aggregation")) {
-					final List<Integer> aggParts = new ArrayList<Integer>();
-					for (int i = 0; i <= parts.get(parts.size() - 1); i++)
-						aggParts.add(0);
-					for (int i = 0; i < parts.size(); i++)
-						aggParts.set(parts.get(i), aggParts.get(parts.get(i)) + 1);
-					int j = 0;
-					for (int i = 0; i < aggParts.size(); i++) {
-						// TODO manage parts
-						final PartFigure part = new PartFigure(i, i, colors.getColors().get(j % colors.getColors().size()), numbers);
-						figures.add(part);
-						root.add(part, new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - Space + Border,
-								0 + root.getSize().height / 10)));
-						j = j + aggParts.get(i);
-						part.getUpdateManager().performUpdate();
-						part.init();
-					}
-				} else {
-					for (int i = 0; i < ocelotlView.getCore().getSpaceOperator().getPartNumber(); i++) {
-						// TODO manage parts
-						final MultiState part = new MultiState(i, ((StateDistribution) ocelotlView.getCore().getSpaceOperator()), root, Space);
-						// figures.add(part);
-						part.init();
-						// part.getUpdateManager().performUpdate();
-					}
+			else if (ocelotlView.getParams().getSpaceAggOperator().equals("No Aggregation")) {
+				final List<Integer> aggParts = new ArrayList<Integer>();
+				for (int i = 0; i <= parts.get(parts.size() - 1); i++)
+					aggParts.add(0);
+				for (int i = 0; i < parts.size(); i++)
+					aggParts.set(parts.get(i), aggParts.get(parts.get(i)) + 1);
+				int j = 0;
+				for (int i = 0; i < aggParts.size(); i++) {
+					// TODO manage parts
+					final PartFigure part = new PartFigure(i, i, colors.getColors().get(j % colors.getColors().size()), numbers);
+					figures.add(part);
+					root.add(
+							part,
+							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - Space + Border, 0 + root
+									.getSize().height / 10)));
+					j = j + aggParts.get(i);
+					part.getUpdateManager().performUpdate();
+					part.init();
 				}
-			}
+			} else
+				for (int i = 0; i < ocelotlView.getCore().getSpaceOperator().getPartNumber(); i++) {
+					// TODO manage parts
+					final MultiState part = new MultiState(i, (StateDistribution) ocelotlView.getCore().getSpaceOperator(), root, Space);
+					// figures.add(part);
+					part.init();
+					// part.getUpdateManager().performUpdate();
+				}
 		}
 	}
 

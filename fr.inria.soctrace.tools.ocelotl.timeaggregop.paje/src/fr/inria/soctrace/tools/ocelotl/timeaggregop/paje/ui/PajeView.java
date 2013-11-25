@@ -49,15 +49,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.ISettingApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
-
-public class PajeView extends ApplicationWindow implements ISettingApplicationWindow{
+public class PajeView extends ApplicationWindow implements ISettingApplicationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 
@@ -123,21 +122,16 @@ public class PajeView extends ApplicationWindow implements ISettingApplicationWi
 
 	private OcelotlView	ocelotlView;
 
-	private ListViewer			listViewerIdleStates;
+	private ListViewer	listViewerIdleStates;
 
-	private ListViewer			listViewerEventTypes;
+	private ListViewer	listViewerEventTypes;
 
 	private PajeConfig	config;
 
-	public PajeView(Shell shell){
+	public PajeView(final Shell shell) {
 		super(shell);
-		this.ocelotlView=null;
-		this.config=null;
-	}
-	
-	public void init (final OcelotlView ocelotlView, final ITraceTypeConfig config) {
-		this.ocelotlView = ocelotlView;
-		this.config = (PajeConfig) config;
+		ocelotlView = null;
+		config = null;
 	}
 
 	@Override
@@ -278,6 +272,12 @@ public class PajeView extends ApplicationWindow implements ISettingApplicationWi
 
 		return sashFormGlobal;
 
+	}
+
+	@Override
+	public void init(final OcelotlView ocelotlView, final ITraceTypeConfig config) {
+		this.ocelotlView = ocelotlView;
+		this.config = (PajeConfig) config;
 	}
 
 }

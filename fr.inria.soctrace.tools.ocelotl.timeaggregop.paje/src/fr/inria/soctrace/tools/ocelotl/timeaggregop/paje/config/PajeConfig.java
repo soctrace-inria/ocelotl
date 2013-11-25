@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
 public class PajeConfig implements ITraceTypeConfig {
 

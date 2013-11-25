@@ -25,10 +25,10 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.GenericQuery;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 
-public class PajeQuery extends GenericQuery {
+public class PajeQuery extends OcelotlQueries {
 
 	private final OcelotlParameters	ocelotlParameters;
 

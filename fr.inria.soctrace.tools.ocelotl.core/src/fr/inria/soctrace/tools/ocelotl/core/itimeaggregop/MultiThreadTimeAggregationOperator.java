@@ -17,18 +17,18 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje;
+package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.GenericQuery;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.queries.IOcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
-public abstract class TimeAggregationOperator {
+public abstract class MultiThreadTimeAggregationOperator {
 
 	protected TimeSliceManager	timeSliceManager;
 	protected int				count	= 0;
@@ -36,21 +36,12 @@ public abstract class TimeAggregationOperator {
 	protected DeltaManager		dm;
 	public final static int		EPCOUNT	= 200;
 	protected int				eventsNumber;
-	protected GenericQuery		genericQuery;
 	protected OcelotlParameters	parameters;
+	protected IOcelotlQueries	ocelotlQueries;
 
 	abstract protected void computeMatrix() throws SoCTraceException, InterruptedException;
 
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
-		if (genericQuery.getOcelotlParameters().isCache())
-			computeSubMatrixCached(eventProducers);
-		else
-			computeSubMatrixNonCached(eventProducers);
-	}
-
-	protected abstract void computeSubMatrixCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
-
-	protected abstract void computeSubMatrixNonCached(List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
+	abstract protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
 
 	public synchronized int getCount() {
 		count++;
@@ -66,23 +57,22 @@ public abstract class TimeAggregationOperator {
 		return parameters;
 	}
 
-	public GenericQuery getQuery() {
-		return genericQuery;
-	}
-
 	public TimeSliceManager getTimeSlicesManager() {
 		return timeSliceManager;
 	}
+
+	abstract public void initQueries();
 
 	abstract protected void initVectors() throws SoCTraceException;
 
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
 		this.parameters = parameters;
-		genericQuery = new GenericQuery(parameters);
-		genericQuery.checkTimeStamps();
+		// ocelotlQueries = new OcelotlQueries(parameters);
+		// ocelotlQueries.checkTimeStamps();
 		count = 0;
 		epit = 0;
-		timeSliceManager = new TimeSliceManager(genericQuery.getOcelotlParameters().getTimeRegion(), genericQuery.getOcelotlParameters().getTimeSlicesNumber());
+		timeSliceManager = new TimeSliceManager(getOcelotlParameters().getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		initQueries();
 		initVectors();
 		computeMatrix();
 	}

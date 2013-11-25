@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.query;
+package fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy;
 
 /*******************************************************************************
  * Copyright (c) 2013 Damien Dosimont
@@ -38,9 +38,10 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.queries.event.EventQuery;
 
 /**
- * GenericQuery class for Event self-defining-pattern tables.
+ * OcelotlQueries class for Event self-defining-pattern tables.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
@@ -53,7 +54,7 @@ public class EventProxyQuery extends EventQuery {
 	 * The constructor
 	 * 
 	 * @param traceDB
-	 *            Trace DB object where the genericQuery is performed.
+	 *            Trace DB object where the ocelotlQueries is performed.
 	 */
 	public EventProxyQuery(final TraceDBObject traceDB) {
 		super(traceDB);
@@ -69,7 +70,7 @@ public class EventProxyQuery extends EventQuery {
 			boolean first = true;
 			StringBuffer eventQuery = null;
 			if (USE_JOIN) {
-				debug("Experimental genericQuery with join");
+				debug("Experimental ocelotlQueries with join");
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM + " on " + FramesocTable.EVENT + ".ID = " + FramesocTable.EVENT_PARAM + ".EVENT_ID ");
 			} else
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");

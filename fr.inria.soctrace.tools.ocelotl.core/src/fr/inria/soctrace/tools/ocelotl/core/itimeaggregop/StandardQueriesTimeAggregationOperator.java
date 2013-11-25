@@ -17,15 +17,28 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.query;
+package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
-public class EventProxy {
-	public int	ID;
-	public int	EP;
+import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 
-	public EventProxy(final int id, final int ep) {
-		ID = id;
-		EP = ep;
+public abstract class StandardQueriesTimeAggregationOperator extends CacheTimeAggregationOperator {
+
+	protected OcelotlQueries	ocelotlQueries;
+
+	public OcelotlQueries getQuery() {
+		return ocelotlQueries;
+	}
+
+	@Override
+	public void initQueries() {
+		try {
+			ocelotlQueries = new OcelotlQueries(parameters);
+		} catch (final SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ocelotlQueries.checkTimeStamps();
 	}
 
 }

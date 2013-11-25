@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.query;
+package fr.inria.soctrace.tools.ocelotl.core.queries;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -39,9 +39,13 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxyQuery;
+import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEventQuery;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class GenericTraceSearch extends TraceSearch {
+public class OcelotlTraceSearch extends TraceSearch {
 
 	@SuppressWarnings("unused")
 	private LogicalCondition buildIntervalCondition(final IntervalDesc interval) {

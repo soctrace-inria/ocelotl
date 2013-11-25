@@ -203,54 +203,6 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class TraceAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			final String title = "Loading Trace";
-			final Job job = new Job(title) {
-
-				@Override
-				protected IStatus run(final IProgressMonitor monitor) {
-					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-					try {
-						monitor.done();
-						Display.getDefault().syncExec(new Runnable() {
-
-							@Override
-							public void run() {
-								try {
-									confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
-								} catch (SoCTraceException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
-								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-								comboAggregationOperator.removeAll();
-								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName()))
-									comboAggregationOperator.add(op);
-								comboAggregationOperator.setText("");
-								combo.removeAll();
-								for (final ISpaceAggregationOperator op : ocelotlCore.getSpaceOperators().getList())
-									combo.add(op.descriptor());
-								combo.setText("");
-								btnRemoveEventProducer.notifyListeners(SWT.Selection, new Event());
-							}
-						});
-					} catch (final Exception e) {
-						e.printStackTrace();
-						return Status.CANCEL_STATUS;
-					}
-					return Status.OK_STATUS;
-				}
-			};
-			job.setUser(true);
-			job.schedule();
-
-		}
-	}
-
 	private class GetAggregationAdapter extends SelectionAdapter {
 
 		@Override
@@ -435,6 +387,54 @@ public class OcelotlView extends ViewPart {
 			}
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
 				hasChanged = HasChanged.THRESHOLD;
+		}
+	}
+
+	private class TraceAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			final String title = "Loading Trace";
+			final Job job = new Job(title) {
+
+				@Override
+				protected IStatus run(final IProgressMonitor monitor) {
+					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
+					try {
+						monitor.done();
+						Display.getDefault().syncExec(new Runnable() {
+
+							@Override
+							public void run() {
+								try {
+									confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
+								} catch (final SoCTraceException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
+								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
+								comboAggregationOperator.removeAll();
+								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName()))
+									comboAggregationOperator.add(op);
+								comboAggregationOperator.setText("");
+								combo.removeAll();
+								for (final ISpaceAggregationOperator op : ocelotlCore.getSpaceOperators().getList())
+									combo.add(op.descriptor());
+								combo.setText("");
+								btnRemoveEventProducer.notifyListeners(SWT.Selection, new Event());
+							}
+						});
+					} catch (final Exception e) {
+						e.printStackTrace();
+						return Status.CANCEL_STATUS;
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setUser(true);
+			job.schedule();
+
 		}
 	}
 
@@ -628,7 +628,7 @@ public class OcelotlView extends ViewPart {
 		}
 		;
 
-		SashForm sashAggreg = new SashForm(groupTSParameters, SWT.NONE);
+		final SashForm sashAggreg = new SashForm(groupTSParameters, SWT.NONE);
 		sashAggreg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
 		final Group groupAggregationOperator = new Group(sashAggreg, SWT.NONE);
@@ -668,13 +668,13 @@ public class OcelotlView extends ViewPart {
 		btnSettings.addSelectionListener(new SettingsSelectionAdapter(this));
 		comboAggregationOperator.setText("");
 
-		Group grpSpaceAggregationOperator = new Group(sashAggreg, SWT.NONE);
+		final Group grpSpaceAggregationOperator = new Group(sashAggreg, SWT.NONE);
 		grpSpaceAggregationOperator.setText("Space Aggregation Operator");
 		grpSpaceAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		grpSpaceAggregationOperator.setLayout(new GridLayout(1, false));
 
-		Composite composite = new Composite(grpSpaceAggregationOperator, SWT.NONE);
-		GridData gd_composite = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		final Composite composite = new Composite(grpSpaceAggregationOperator, SWT.NONE);
+		final GridData gd_composite = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		gd_composite.widthHint = 85;
 		composite.setLayoutData(gd_composite);
 		composite.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -682,7 +682,7 @@ public class OcelotlView extends ViewPart {
 
 		combo = new Combo(composite, SWT.READ_ONLY);
 		combo.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		GridData gd_combo = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		final GridData gd_combo = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		gd_combo.widthHint = 170;
 		combo.setLayoutData(gd_combo);
 		combo.setText("");
@@ -892,12 +892,12 @@ public class OcelotlView extends ViewPart {
 
 		final Group grpDivideDbQuery = new Group(sashFormAdvancedParameters, SWT.NONE);
 		grpDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpDivideDbQuery.setText("Query Management");
+		grpDivideDbQuery.setText("OcelotlQueries Management");
 		grpDivideDbQuery.setLayout(new GridLayout(2, false));
 
 		final Label lblDivideDbQueries = new Label(grpDivideDbQuery, SWT.NONE);
 		lblDivideDbQueries.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblDivideDbQueries.setText("Event Producers per query (0=All)");
+		lblDivideDbQueries.setText("Event Producers per ocelotlQueries (0=All)");
 
 		spinnerDivideDbQuery = new Spinner(grpDivideDbQuery, SWT.BORDER);
 		spinnerDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));

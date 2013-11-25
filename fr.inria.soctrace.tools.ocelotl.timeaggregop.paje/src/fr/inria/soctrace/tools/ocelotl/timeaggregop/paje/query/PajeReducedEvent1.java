@@ -19,7 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query;
 
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 
 public class PajeReducedEvent1 extends EventProxy {
 

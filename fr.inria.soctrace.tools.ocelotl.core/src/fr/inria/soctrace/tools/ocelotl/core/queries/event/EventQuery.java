@@ -16,7 +16,7 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
-package fr.inria.soctrace.tools.ocelotl.core.generic.query;
+package fr.inria.soctrace.tools.ocelotl.core.queries.event;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,7 +42,7 @@ import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 
 /**
- * GenericQuery class for Event self-defining-pattern tables.
+ * OcelotlQueries class for Event self-defining-pattern tables.
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
@@ -59,7 +59,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 	 * The constructor
 	 * 
 	 * @param traceDB
-	 *            Trace DB object where the genericQuery is performed.
+	 *            Trace DB object where the ocelotlQueries is performed.
 	 */
 	public EventQuery(final TraceDBObject traceDB) {
 		super(traceDB);
@@ -67,7 +67,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 	}
 
 	/**
-	 * Clear genericQuery: removes all the conditions. EventProducer cache is
+	 * Clear ocelotlQueries: removes all the conditions. EventProducer cache is
 	 * not cleared, since we are not changing trace DB.
 	 */
 	@Override
@@ -192,7 +192,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 			boolean first = true;
 			StringBuffer eventQuery = null;
 			if (USE_JOIN) {
-				debug("Experimental genericQuery with join");
+				debug("Experimental ocelotlQueries with join");
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM + " on " + FramesocTable.EVENT + ".ID = " + FramesocTable.EVENT_PARAM + ".EVENT_ID ");
 			} else
 				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
@@ -320,7 +320,7 @@ public class EventQuery extends SelfDefiningElementQuery {
 	 * @param prs
 	 *            EVENT_PARAM table row
 	 * @param tmp
-	 *            map containing the Events returned by the genericQuery
+	 *            map containing the Events returned by the ocelotlQueries
 	 * @return the EventParam
 	 * @throws SQLException
 	 * @throws SoCTraceException

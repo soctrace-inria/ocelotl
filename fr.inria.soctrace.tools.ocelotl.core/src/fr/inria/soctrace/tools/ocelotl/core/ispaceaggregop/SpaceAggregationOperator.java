@@ -33,23 +33,13 @@ abstract public class SpaceAggregationOperator implements ISpaceAggregationOpera
 	protected long				timeSliceDuration;
 	protected ILPAggregManager	lpaggregManager;
 
-	public SpaceAggregationOperator(final OcelotlCore ocelotlCore) {
-		super();
-		setOcelotlCore(ocelotlCore);
-	}
-
 	public SpaceAggregationOperator() {
 		super();
 	}
 
-	public void setOcelotlCore(OcelotlCore ocelotlCore) {
-		this.ocelotlCore = ocelotlCore;
-		lpaggregManager = ocelotlCore.getLpaggregManager();
-		timeSliceNumber = ocelotlCore.getOcelotlParameters().getTimeSlicesNumber();
-		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion().getTimeDuration() / timeSliceNumber;
-		parts = new ArrayList<Part>();
-		initParts();
-		computeParts();
+	public SpaceAggregationOperator(final OcelotlCore ocelotlCore) {
+		super();
+		setOcelotlCore(ocelotlCore);
 	}
 
 	abstract protected void computeParts();
@@ -82,11 +72,22 @@ abstract public class SpaceAggregationOperator implements ISpaceAggregationOpera
 		parts.add(new Part(0, 1, null));
 		for (int i = 0; i < lpaggregManager.getParts().size(); i++)
 			if (lpaggregManager.getParts().get(i) == oldPart)
-				parts.get(parts.size() - 1).setEndPart(i+1);
+				parts.get(parts.size() - 1).setEndPart(i + 1);
 			else {
 				oldPart = lpaggregManager.getParts().get(i);
 				parts.add(new Part(i, i + 1, null));
 			}
+	}
+
+	@Override
+	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
+		this.ocelotlCore = ocelotlCore;
+		lpaggregManager = ocelotlCore.getLpaggregManager();
+		timeSliceNumber = ocelotlCore.getOcelotlParameters().getTimeSlicesNumber();
+		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion().getTimeDuration() / timeSliceNumber;
+		parts = new ArrayList<Part>();
+		initParts();
+		computeParts();
 	}
 
 }

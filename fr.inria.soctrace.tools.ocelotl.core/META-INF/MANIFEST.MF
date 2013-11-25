@@ -17,14 +17,16 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.ocelotl.core,
+ fr.inria.soctrace.tools.ocelotl.core.config,
  fr.inria.soctrace.tools.ocelotl.core.constants,
- fr.inria.soctrace.tools.ocelotl.core.generic.config,
- fr.inria.soctrace.tools.ocelotl.core.generic.query,
  fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop,
  fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,
  fr.inria.soctrace.tools.ocelotl.core.itimeaggregop,
  fr.inria.soctrace.tools.ocelotl.core.lpaggreg,
  fr.inria.soctrace.tools.ocelotl.core.parameters,
+ fr.inria.soctrace.tools.ocelotl.core.queries,
+ fr.inria.soctrace.tools.ocelotl.core.queries.event,
+ fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy,
  fr.inria.soctrace.tools.ocelotl.core.state,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
  fr.inria.soctrace.tools.ocelotl.core.timeslice

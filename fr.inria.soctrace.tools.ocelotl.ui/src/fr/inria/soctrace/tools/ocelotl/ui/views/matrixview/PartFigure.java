@@ -28,7 +28,6 @@ import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.SWT;
 
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 
@@ -38,9 +37,9 @@ public class PartFigure extends RectangleFigure {
 	private final int			value;
 	private final OcelotlColor	color;
 	private final static int	textSize	= 15;
-	private boolean 			numbers;
+	private final boolean		numbers;
 
-	public PartFigure(final int index, final int value, final OcelotlColor color, boolean numbers) {
+	public PartFigure(final int index, final int value, final OcelotlColor color, final boolean numbers) {
 		super();
 		setIndex(index);
 		this.value = value;
@@ -52,7 +51,6 @@ public class PartFigure extends RectangleFigure {
 	public int getIndex() {
 		return index;
 	}
-
 
 	public void init() {
 		removeAll();

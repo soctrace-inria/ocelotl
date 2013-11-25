@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="idGeneric"
+         name="GenericTimeAggregationOperators"
+         point="fr.inria.soctrace.tools.ocelotl.core.timeaggregopext">
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.GenericEventDistribution"
+            generic="true"
+            operator="Generic Event Distribution"
+            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.GenericConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.GenericView"
+            spatial_compatibility="2D"
+            trace_formats="ALL">
+      </aggregation_operator>
+   </extension>
+
+</plugin>

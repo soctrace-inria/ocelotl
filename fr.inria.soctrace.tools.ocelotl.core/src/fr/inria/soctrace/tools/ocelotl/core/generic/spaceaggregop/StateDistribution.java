@@ -29,17 +29,17 @@ import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 
 public class StateDistribution extends SpaceAggregationOperator {
 
-	public final static String		descriptor	= "State Distribution";
-	private List<String>	states;
-	private double max;
+	public final static String	descriptor	= "State Distribution";
+	private List<String>		states;
+	private double				max;
+
+	public StateDistribution() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	public StateDistribution(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
-		// TODO Auto-generated constructor stub
-	}
-	
-	public StateDistribution() {
-		super();
 		// TODO Auto-generated constructor stub
 	}
 
@@ -51,11 +51,12 @@ public class StateDistribution extends SpaceAggregationOperator {
 						((PartMap) part.getData()).addElement(state, ((MLPAggregManager) lpaggregManager).getTimeSliceMatrix().getMatrix().get(i).get(ep).get(state).doubleValue());
 
 	}
-	
-	
 
-	public List<String> getStates() {
-		return states;
+	private void computeMax() {
+		max = 0;
+		for (final Part part : parts)
+			if (((PartMap) part.getData()).getTotal() > max)
+				max = ((PartMap) part.getData()).getTotal();
 	}
 
 	@Override
@@ -67,29 +68,26 @@ public class StateDistribution extends SpaceAggregationOperator {
 		computeMax();
 	}
 
-	private void computeMax() {
-		max=0;
-		for (final Part part : parts)
-			if (((PartMap) part.getData()).getTotal()>max)
-				max=((PartMap) part.getData()).getTotal();
+	@Override
+	public String descriptor() {
+		return descriptor;
 	}
 
 	public double getMax() {
 		return max;
 	}
 
-	@Override
-	public String descriptor() {
-		return descriptor;
+	public List<String> getStates() {
+		return states;
 	}
 
-
+	@Override
 	protected void initParts() {
 		int oldPart = 0;
 		parts.add(new Part(0, 1, new PartMap()));
 		for (int i = 0; i < lpaggregManager.getParts().size(); i++)
 			if (lpaggregManager.getParts().get(i) == oldPart)
-				parts.get(parts.size() - 1).setEndPart(i+1);
+				parts.get(parts.size() - 1).setEndPart(i + 1);
 			else {
 				oldPart = lpaggregManager.getParts().get(i);
 				parts.add(new Part(i, i + 1, new PartMap()));
@@ -97,7 +95,7 @@ public class StateDistribution extends SpaceAggregationOperator {
 	}
 
 	private void initStates() {
-		states = ((MLPAggregManager) lpaggregManager).getTimeSliceMatrix().getKeys();
+		states = ((MLPAggregManager) lpaggregManager).getKeys();
 		for (final Part part : parts)
 			for (final String state : states)
 				((PartMap) part.getData()).putElement(state, 0.0);

@@ -36,10 +36,10 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.GenericTraceSearch;
+import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlTraceSearch;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class PajeTraceSearch extends GenericTraceSearch {
+public class PajeTraceSearch extends OcelotlTraceSearch {
 
 	@SuppressWarnings("unused")
 	private LogicalCondition buildIntervalCondition(final IntervalDesc interval) {

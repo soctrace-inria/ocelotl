@@ -30,8 +30,8 @@ import fr.inria.soctrace.lib.query.conditions.LogicalCondition;
 import fr.inria.soctrace.lib.query.conditions.SimpleCondition;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
-import fr.inria.soctrace.tools.ocelotl.core.generic.query.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 
 public class PajeReducedEvent2Cache {
 	private final HashMap<Integer, PajeReducedEvent2>	cache	= new HashMap<Integer, PajeReducedEvent2>();

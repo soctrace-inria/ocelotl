@@ -47,25 +47,8 @@ public class OcelotlCore {
 	PartManager						partManager;
 	TimeAggregationOperatorManager	timeOperators;
 	ITimeAggregationOperator		timeOperator;
-	SpaceAggregationOperatorManager spaceOperators;
+	SpaceAggregationOperatorManager	spaceOperators;
 	ISpaceAggregationOperator		spaceOperator;
-
-	public PartManager getPartManager() {
-		return partManager;
-	}
-
-
-	public ITimeAggregationOperator getTimeOperator() {
-		return timeOperator;
-	}
-
-	public SpaceAggregationOperatorManager getSpaceOperators() {
-		return spaceOperators;
-	}
-
-	public ISpaceAggregationOperator getSpaceOperator() {
-		return spaceOperator;
-	}
 
 	public OcelotlCore() {
 		super();
@@ -118,12 +101,28 @@ public class OcelotlCore {
 		return ocelotlParameters;
 	}
 
-	public TimeAggregationOperatorManager getTimeOperators() {
-		return timeOperators;
+	public PartManager getPartManager() {
+		return partManager;
 	}
 
 	public PartManager getPartsManager() {
 		return partManager;
+	}
+
+	public ISpaceAggregationOperator getSpaceOperator() {
+		return spaceOperator;
+	}
+
+	public SpaceAggregationOperatorManager getSpaceOperators() {
+		return spaceOperators;
+	}
+
+	public ITimeAggregationOperator getTimeOperator() {
+		return timeOperator;
+	}
+
+	public TimeAggregationOperatorManager getTimeOperators() {
+		return timeOperators;
 	}
 
 	public void init(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
@@ -136,18 +135,18 @@ public class OcelotlCore {
 		this.ocelotlParameters = ocelotlParameters;
 	}
 
-	public void setTimeOperator() {
-		timeOperators.activateSelectedOperator();
-		timeOperator=timeOperators.getSelectedOperator();
-	}
-	
 	public void setSpaceOperator() {
 		try {
 			spaceOperator = spaceOperators.getOperator(ocelotlParameters.getSpaceAggOperator());
-		} catch (SoCTraceException e) {
+		} catch (final SoCTraceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public void setTimeOperator() {
+		timeOperators.activateSelectedOperator();
+		timeOperator = timeOperators.getSelectedOperator();
 	}
 
 }

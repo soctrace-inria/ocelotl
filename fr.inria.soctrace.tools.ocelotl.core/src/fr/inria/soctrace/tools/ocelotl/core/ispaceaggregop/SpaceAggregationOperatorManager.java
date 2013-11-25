@@ -28,12 +28,9 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.generic.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.NoAggregation;
 import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
-
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-
 
 public class SpaceAggregationOperatorManager {
 
@@ -44,8 +41,8 @@ public class SpaceAggregationOperatorManager {
 
 	public SpaceAggregationOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
-		this.ocelotlCore=ocelotlCore;
-		this.parameters = this.ocelotlCore.getOcelotlParameters();
+		this.ocelotlCore = ocelotlCore;
+		parameters = this.ocelotlCore.getOcelotlParameters();
 		try {
 			init();
 		} catch (final SoCTraceException e) {

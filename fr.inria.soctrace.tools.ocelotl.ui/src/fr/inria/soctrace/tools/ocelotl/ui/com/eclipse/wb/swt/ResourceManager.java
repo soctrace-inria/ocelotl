@@ -178,7 +178,7 @@ public class ResourceManager extends SWTResourceManager {
 			m_descriptorImageMap.clear();
 		}
 		// dispose decorated images
-		for (final Map<Image, Map<Image, Image>> cornerDecoratedImageMap : m_decoratedImageMap) {
+		for (final Map<Image, Map<Image, Image>> cornerDecoratedImageMap : m_decoratedImageMap)
 			if (cornerDecoratedImageMap != null) {
 				for (final Map<Image, Image> decoratedMap : cornerDecoratedImageMap.values()) {
 					for (final Image image : decoratedMap.values())
@@ -187,7 +187,6 @@ public class ResourceManager extends SWTResourceManager {
 				}
 				cornerDecoratedImageMap.clear();
 			}
-		}
 		// dispose plugin images
 		{
 			for (final Image image : m_URLImageMap.values())
