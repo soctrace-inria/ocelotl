@@ -56,7 +56,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.ISettingApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
-public class PajeView extends ApplicationWindow implements ISettingApplicationWindow {
+public abstract class PajeView extends ApplicationWindow implements ISettingApplicationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 
@@ -120,13 +120,15 @@ public class PajeView extends ApplicationWindow implements ISettingApplicationWi
 		}
 	}
 
-	private OcelotlView	ocelotlView;
+	protected OcelotlView	ocelotlView;
 
-	private ListViewer	listViewerIdleStates;
+	protected ListViewer	listViewerIdleStates;
 
-	private ListViewer	listViewerEventTypes;
+	protected ListViewer	listViewerEventTypes;
 
-	private PajeConfig	config;
+	protected PajeConfig	config;
+	
+	protected boolean 	init=false;
 
 	public PajeView(final Shell shell) {
 		super(shell);
@@ -226,28 +228,7 @@ public class PajeView extends ApplicationWindow implements ISettingApplicationWi
 		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
 
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains(PajeExternalConstants.PajeSetState)) {
-				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
-					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
-				break;
-			}
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains(PajeExternalConstants.PajePushState)) {
-				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
-					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
-				break;
-			}
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains(PajeExternalConstants.PajePopState)) {
-				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
-					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
-				break;
-			}
-		listViewerEventTypes.setInput(config.getTypes());
-		if (!config.getIdles().contains("IDLE"))
-			config.getIdles().add("IDLE");
-		listViewerIdleStates.setInput(config.getIdles());
+
 
 		final Composite OK = new Composite(sashFormGlobal, SWT.NONE);
 		OK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -269,10 +250,13 @@ public class PajeView extends ApplicationWindow implements ISettingApplicationWi
 				close();
 			}
 		});
-
+		
+		setParameters();
 		return sashFormGlobal;
 
 	}
+	
+	abstract public void setParameters();
 
 	@Override
 	public void init(final OcelotlView ocelotlView, final ITraceTypeConfig config) {

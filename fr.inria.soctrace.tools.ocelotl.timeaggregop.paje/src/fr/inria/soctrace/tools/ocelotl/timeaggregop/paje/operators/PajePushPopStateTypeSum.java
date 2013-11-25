@@ -33,9 +33,9 @@ import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeQuery;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent2;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent2Cache;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.PajeQueries;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent2.PajeReducedEvent2;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent2.PajeReducedEvent2Cache;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.state.PajeState;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
 
@@ -213,7 +213,7 @@ public class PajePushPopStateTypeSum extends _3DCacheMicroDescription {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<PajeReducedEvent2> fullEvents = ((PajeQuery) ocelotlQueries).getReducedEvents2(eventProducers);
+		final List<PajeReducedEvent2> fullEvents = ((PajeQueries) ocelotlQueries).getReducedEvents2(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -234,7 +234,7 @@ public class PajePushPopStateTypeSum extends _3DCacheMicroDescription {
 	@Override
 	public void initQueries() {
 		try {
-			ocelotlQueries = new PajeQuery(parameters);
+			ocelotlQueries = new PajeQueries(parameters);
 		} catch (final SoCTraceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

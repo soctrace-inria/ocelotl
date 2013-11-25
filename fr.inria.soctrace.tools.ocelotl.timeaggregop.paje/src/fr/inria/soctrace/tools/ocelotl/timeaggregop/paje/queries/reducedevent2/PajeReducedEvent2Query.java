@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent2;
 
 /*******************************************************************************
  * Copyright (c) 2013 Damien Dosimont

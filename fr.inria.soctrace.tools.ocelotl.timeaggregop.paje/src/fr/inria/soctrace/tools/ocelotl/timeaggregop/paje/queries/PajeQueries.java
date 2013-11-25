@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,14 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent1.PajeReducedEvent1;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent2.PajeReducedEvent2;
 
-public class PajeQuery extends OcelotlQueries {
+public class PajeQueries extends OcelotlQueries {
 
 	private final OcelotlParameters	ocelotlParameters;
 
-	public PajeQuery(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
+	public PajeQueries(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
 		super(ocelotlParameters);
 		this.ocelotlParameters = ocelotlParameters;
 	}

@@ -17,21 +17,16 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent2;
 
-import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent1.PajeReducedEvent1;
 
-public class PajeReducedEvent1 extends EventProxy {
+public class PajeReducedEvent2 extends PajeReducedEvent1 {
+	public String	TYPE;
 
-	public String	VALUE;
-	public int		PAGE;
-	public long		TS;
-
-	public PajeReducedEvent1(final int id, final int ep, final int page, final long ts, final String value) {
-		super(id, ep);
-		VALUE = value;
-		PAGE = page;
-		TS = ts;
+	public PajeReducedEvent2(final int id, final int ep, final int page, final long ts, final String type, final String value) {
+		super(id, ep, page, ts, value);
+		TYPE = type;
 		// TODO Auto-generated constructor stub
 	}
 

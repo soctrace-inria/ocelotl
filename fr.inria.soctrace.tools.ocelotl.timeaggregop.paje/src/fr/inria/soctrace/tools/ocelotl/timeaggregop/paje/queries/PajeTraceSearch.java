@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +38,10 @@ import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlTraceSearch;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent1.PajeReducedEvent1;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent1.PajeReducedEvent1Query;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent2.PajeReducedEvent2;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent2.PajeReducedEvent2Query;
 
 public class PajeTraceSearch extends OcelotlTraceSearch {
 

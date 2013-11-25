@@ -34,9 +34,9 @@ import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeQuery;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent1;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query.PajeReducedEvent1Cache;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.PajeQueries;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent1.PajeReducedEvent1;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent1.PajeReducedEvent1Cache;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.state.PajeState;
 
 public class PajeNormalizedStateSum extends _2DCacheMicroDescription {
@@ -169,7 +169,7 @@ public class PajeNormalizedStateSum extends _2DCacheMicroDescription {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<PajeReducedEvent1> fullEvents = ((PajeQuery) ocelotlQueries).getReducedEvents1(eventProducers);
+		final List<PajeReducedEvent1> fullEvents = ((PajeQueries) ocelotlQueries).getReducedEvents1(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -190,7 +190,7 @@ public class PajeNormalizedStateSum extends _2DCacheMicroDescription {
 	@Override
 	public void initQueries() {
 		try {
-			ocelotlQueries = new PajeQuery(parameters);
+			ocelotlQueries = new PajeQueries(parameters);
 		} catch (final SoCTraceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -201,7 +201,7 @@ public class PajeNormalizedStateSum extends _2DCacheMicroDescription {
 	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
 		this.parameters = parameters;
-		ocelotlQueries = new PajeQuery(parameters);
+		ocelotlQueries = new PajeQueries(parameters);
 		ocelotlQueries.checkTimeStamps();
 		count = 0;
 		epit = 0;
