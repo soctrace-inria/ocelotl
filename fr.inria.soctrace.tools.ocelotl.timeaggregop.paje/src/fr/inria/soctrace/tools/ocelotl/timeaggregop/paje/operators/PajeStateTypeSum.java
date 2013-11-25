@@ -79,6 +79,7 @@ public class PajeStateTypeSum extends _3DCacheMicroDescription {
 						matrixUpdate(state, ep, distrib);
 					}
 				}
+				cache.close();
 				final int c = getCount();
 				if (c % EPCOUNT == 0)
 					total(c);

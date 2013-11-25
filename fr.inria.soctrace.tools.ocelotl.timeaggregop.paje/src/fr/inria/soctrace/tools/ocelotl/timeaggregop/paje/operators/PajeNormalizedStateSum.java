@@ -80,18 +80,8 @@ public class PajeNormalizedStateSum extends _2DCacheMicroDescription {
 							matrixWrite(it, ep, distrib);
 					}
 				}
-				long total = 0;
-				for (int i = 0; i < matrix.size(); i++)
-					total = matrix.get(i).get(ep.getName()) + total;
-				if (total != 0)
-					for (int i = 0; i < matrix.size(); i++)
-						matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
-
+				normalize(ep);
 				cache.close();
-				final int c = getCount();
-				if (c % EPCOUNT == 0)
-					total(c);
-
 			}
 
 		}
@@ -109,17 +99,23 @@ public class PajeNormalizedStateSum extends _2DCacheMicroDescription {
 							matrixWrite(it, ep, distrib);
 					}
 				}
-				long total = 0;
-				for (int i = 0; i < matrix.size(); i++)
-					total = matrix.get(i).get(ep.getName()) + total;
-				if (total != 0)
-					for (int i = 0; i < matrix.size(); i++)
-						matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
-				final int c = getCount();
-				if (c % EPCOUNT == 0)
-					total(c);
+				normalize(ep);
 			}
 
+		}
+		
+		private void normalize(EventProducer ep){
+			long total = 0;
+			for (int i = 0; i < matrix.size(); i++)
+				total = matrix.get(i).get(ep.getName()) + total;
+			if (total != 0)
+				for (int i = 0; i < matrix.size(); i++)
+					synchronized(matrix){
+					matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
+					}
+			final int c = getCount();
+			if (c % EPCOUNT == 0)
+				total(c);
 		}
 
 		@Override

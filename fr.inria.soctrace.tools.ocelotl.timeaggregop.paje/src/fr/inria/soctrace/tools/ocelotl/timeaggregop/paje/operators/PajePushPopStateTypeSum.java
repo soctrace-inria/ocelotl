@@ -81,7 +81,7 @@ public class PajePushPopStateTypeSum extends _3DCacheMicroDescription {
 					compute(tmp1, tmp2, current, stack, state, ep);
 				}
 				computeEnd(stack, state, ep);
-
+				cache.close();
 				final int c = getCount();
 				if (c % EPCOUNT == 0)
 					total(c);
