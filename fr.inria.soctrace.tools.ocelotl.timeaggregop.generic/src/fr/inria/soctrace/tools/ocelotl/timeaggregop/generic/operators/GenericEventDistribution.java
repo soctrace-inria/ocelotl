@@ -31,13 +31,15 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
+import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEvent;
+
 
 public class GenericEventDistribution extends _2DMicroDescription {
 
 	class OcelotlThread extends Thread {
 
 		List<EventProducer>				eventProducers;
-		Map<Integer, List<EventProxy>>	eventProxyList;
+		Map<Integer, List<GenericReducedEvent>>	eventProxyList;
 		int								threadNumber;
 		int								thread;
 
@@ -45,7 +47,7 @@ public class GenericEventDistribution extends _2DMicroDescription {
 		public OcelotlThread(final List<EventProducer> eventProducers, final Object eventList, final int threadNumber, final int thread, final boolean cached) {
 			super();
 			this.eventProducers = eventProducers;
-			eventProxyList = (Map<Integer, List<EventProxy>>) eventList;
+			eventProxyList = (Map<Integer, List<GenericReducedEvent>>) eventList;
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			start();
@@ -59,6 +61,26 @@ public class GenericEventDistribution extends _2DMicroDescription {
 
 		@Override
 		public void run() {
+//			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
+//				final EventProducer ep = eventProducers.get(t);;
+//				final List<GenericReducedEvent> events = eventProxyList.get(ep.getId());
+//				for (int i = 0; i < events.size() - 1; i++) {
+//					new HashMapLong timeSliceManager.getTimeSlice(events.get(i).TS);
+//					}
+//				}
+//				long total = 0;
+//				for (int i = 0; i < matrix.size(); i++)
+//					total = matrix.get(i).get(ep.getName()) + total;
+//				if (total != 0)
+//					for (int i = 0; i < matrix.size(); i++)
+//						matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
+//
+//				cache.close();
+//				final int c = getCount();
+//				if (c % EPCOUNT == 0)
+//					total(c);
+
+//			}
 		}
 	}
 
@@ -74,15 +96,15 @@ public class GenericEventDistribution extends _2DMicroDescription {
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		DeltaManager dm = new DeltaManager();
 		dm.start();
-		final List<EventProxy> fullEvents = ((OcelotlQueries) ocelotlQueries).getEventProxies(eventProducers);
+		final List<GenericReducedEvent> fullEvents = ((OcelotlQueries) ocelotlQueries).getReducedEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
-		final Map<Integer, List<EventProxy>> eventList = new HashMap<Integer, List<EventProxy>>();
+		final Map<Integer, List<GenericReducedEvent>> eventList = new HashMap<Integer, List<GenericReducedEvent>>();
 		for (final EventProducer ep : eventProducers)
-			eventList.put(ep.getId(), new ArrayList<EventProxy>());
-		for (final EventProxy e : fullEvents)
+			eventList.put(ep.getId(), new ArrayList<GenericReducedEvent>());
+		for (final GenericReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < getOcelotlParameters().getThread(); t++)

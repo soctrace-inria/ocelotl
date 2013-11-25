@@ -70,7 +70,6 @@ public class PajeNormalizedStateSum extends _2DCacheMicroDescription {
 				PajeReducedEvent1Cache cache;
 				cache = new PajeReducedEvent1Cache(getOcelotlParameters());
 				final EventProducer ep = eventProducers.get(t);
-				cache = new PajeReducedEvent1Cache(getOcelotlParameters());
 				IState state;
 				final List<EventProxy> events = eventProxyList.get(ep.getId());
 				for (int i = 0; i < events.size() - 1; i++) {
