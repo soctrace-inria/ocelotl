@@ -29,7 +29,6 @@ public class GenericConfig implements ITraceTypeConfig {
 
 	public final static String		DefaultState	= "PajeSetState";
 	public final static String		DefaultIdle		= "IDLE";
-	private final List<String>		idles			= new LinkedList<String>();
 	private final List<EventType>	types			= new LinkedList<EventType>();
 
 	public GenericConfig() {
