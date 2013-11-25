@@ -9,7 +9,7 @@
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators.PajeStateSum"
             generic="false"
             param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajeView"
+            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajeSetStateView"
             spatial_compatibility="2D"
             trace_formats="Paje 1.2.5"
             operator="Paje State Sum">
@@ -18,7 +18,7 @@
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators.PajeNormalizedStateSum"
             generic="false"
             param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajeView"
+            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajeSetStateView"
             spatial_compatibility="2D"
             trace_formats="Paje 1.2.5"
             operator="Paje State Sum (Normalized)">
@@ -27,7 +27,7 @@
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators.PajeStateTypeSum"
             generic="false"
             param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajeView"
+            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajePushPopStateView"
             spatial_compatibility="2D, 3D"
             trace_formats="Paje 1.2.5"
             operator="Paje State Type Sum">
@@ -36,7 +36,7 @@
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators.PajePushPopStateTypeSum"
             generic="false"
             param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajeView"
+            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajePushPopStateView"
             spatial_compatibility="2D, 3D"
             trace_formats="Paje 1.2.5"
             operator="Paje State Type Sum (PushPop)">

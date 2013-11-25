@@ -54,7 +54,7 @@ import fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.config.PajeConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.ISettingApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
-import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeExternalConstants;
+
 
 public abstract class PajeView extends ApplicationWindow implements ISettingApplicationWindow {
 

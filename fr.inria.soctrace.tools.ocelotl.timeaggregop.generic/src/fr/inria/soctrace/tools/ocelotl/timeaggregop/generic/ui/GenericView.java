@@ -200,7 +200,7 @@ public class GenericView extends ApplicationWindow implements ISettingApplicatio
 		buttonOK.setText("OK");
 		buttonOK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		buttonOK.setImage(null);
-		sashFormGlobal.setWeights(new int[] { 140, 145, 89 });
+		sashFormGlobal.setWeights(new int[] { 215, 59 });
 		buttonOK.addSelectionListener(new SelectionAdapter() {
 
 			@Override
