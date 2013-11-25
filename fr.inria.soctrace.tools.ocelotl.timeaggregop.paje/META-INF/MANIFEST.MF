@@ -21,4 +21,4 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.timeaggregop.paje,
  fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators,
  fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.query,
  fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.state,
- fr.inria.soctrace.tools.ocelotl.timeaggreop.paje.ui
+ fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui
