@@ -50,8 +50,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.MultiState;
 import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.PartFigure;
 
 /**
- * _2DCacheMicroDescription View : part representation, according to LP
- * algorithm result
+ * Matrix View : part representation, according to LP algorithm result
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */

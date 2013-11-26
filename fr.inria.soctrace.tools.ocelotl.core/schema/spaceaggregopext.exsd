@@ -3,7 +3,7 @@
 <schema targetNamespace="fr.inria.soctrace.tools.ocelotl.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="fr.inria.soctrace.tools.ocelotl.core" id="timeaggregopext" name="TimeAggregationOperatorExt"/>
+         <meta.schema plugin="fr.inria.soctrace.tools.ocelotl.core" id="spaceaggregopext" name="SpaceAggregationOperatorExt"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -17,9 +17,6 @@
          </appinfo>
       </annotation>
       <complexType>
-         <choice minOccurs="1" maxOccurs="unbounded">
-            <element ref="aggregation_operator"/>
-         </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -27,14 +24,14 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="id" type="string" use="required">
+         <attribute name="id" type="string">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="name" type="string" use="required">
+         <attribute name="name" type="string">
             <annotation>
                <documentation>
                   
@@ -47,7 +44,7 @@
       </complexType>
    </element>
 
-   <element name="aggregation_operator">
+   <element name="new_element">
       <complexType>
          <attribute name="operator" type="string" use="required">
             <annotation>
@@ -62,45 +59,41 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator"/>
+                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="param_win" type="string" use="required">
+         <attribute name="visualization" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.jface.window.ApplicationWindow:"/>
+                  <meta.attribute kind="java"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="param_config" type="string" use="required">
+         <attribute name="param_win" type="string">
             <annotation>
                <documentation>
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig"/>
+                  <meta.attribute kind="java"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="trace_formats" type="string" use="required">
+         <attribute name="param_config" type="string">
             <annotation>
                <documentation>
                   
                </documentation>
+               <appinfo>
+                  <meta.attribute kind="java"/>
+               </appinfo>
             </annotation>
          </attribute>
-         <attribute name="generic" type="boolean" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="spatial_compatibility" type="string" use="required">
+         <attribute name="format" type="string" use="required">
             <annotation>
                <documentation>
                   
