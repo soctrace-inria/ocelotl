@@ -53,34 +53,29 @@ public class GenericEventDistribution extends _2DMicroDescription {
 			start();
 		}
 
-		private void matrixUpdate(final String type, final EventProducer ep, final Map<Long, Long> distrib) {
+		private void matrixWrite(long slice, final EventProducer ep) {
 			synchronized (matrix) {
+				matrix.get((int) slice).put(ep.getName(), matrix.get((int) slice).get(ep.getName())+1);
 			}
 
 		}
 
 		@Override
 		public void run() {
-//			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-//				final EventProducer ep = eventProducers.get(t);;
-//				final List<GenericReducedEvent> events = eventProxyList.get(ep.getId());
-//				for (int i = 0; i < events.size() - 1; i++) {
-//					new HashMapLong timeSliceManager.getTimeSlice(events.get(i).TS);
-//					}
-//				}
-//				long total = 0;
-//				for (int i = 0; i < matrix.size(); i++)
-//					total = matrix.get(i).get(ep.getName()) + total;
-//				if (total != 0)
-//					for (int i = 0; i < matrix.size(); i++)
-//						matrix.get(i).put(ep.getName(), matrix.get(i).get(ep.getName()) * 1000000000 / total);
-//
-//				cache.close();
-//				final int c = getCount();
-//				if (c % EPCOUNT == 0)
-//					total(c);
+			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
+				final EventProducer ep = eventProducers.get(t);;
+				final List<GenericReducedEvent> events = eventProxyList.get(ep.getId());
+				for (int i = 0; i < events.size() - 1; i++) {
+					long slice = timeSliceManager.getTimeSlice(events.get(i).TS);
+					matrixWrite(slice, ep);
+				}
+				final int c = getCount();
+				if (c % EPCOUNT == 0)
+					total(c);
+			}
 
-//			}
+
+			
 		}
 	}
 
