@@ -12,7 +12,7 @@
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajeSetStateView"
             spatial_compatibility="2D"
             trace_formats="Paje 1.2.5"
-            operator="Paje State Sum">
+            operator="State Sum (Set)">
       </aggregation_operator>
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators.PajeNormalizedStateSum"
@@ -21,7 +21,7 @@
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajeSetStateView"
             spatial_compatibility="2D"
             trace_formats="Paje 1.2.5"
-            operator="Paje State Sum (Normalized)">
+            operator="State Sum (Set, Normalized)">
       </aggregation_operator>
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators.PajeStateTypeSum"
@@ -30,7 +30,7 @@
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajePushPopStateView"
             spatial_compatibility="2D, 3D"
             trace_formats="Paje 1.2.5"
-            operator="Paje State Type Sum">
+            operator="State Type Sum (Set)">
       </aggregation_operator>
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.operators.PajePushPopStateTypeSum"
@@ -39,7 +39,7 @@
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.ui.PajePushPopStateView"
             spatial_compatibility="2D, 3D"
             trace_formats="Paje 1.2.5"
-            operator="Paje State Type Sum (PushPop)">
+            operator="State Type Sum (SetPushPop)">
       </aggregation_operator>
    </extension>
 

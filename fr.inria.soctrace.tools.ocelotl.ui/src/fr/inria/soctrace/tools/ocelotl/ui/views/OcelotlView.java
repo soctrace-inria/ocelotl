@@ -892,12 +892,12 @@ public class OcelotlView extends ViewPart {
 
 		final Group grpDivideDbQuery = new Group(sashFormAdvancedParameters, SWT.NONE);
 		grpDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpDivideDbQuery.setText("OcelotlQueries Management");
+		grpDivideDbQuery.setText("Query Management");
 		grpDivideDbQuery.setLayout(new GridLayout(2, false));
 
 		final Label lblDivideDbQueries = new Label(grpDivideDbQuery, SWT.NONE);
 		lblDivideDbQueries.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblDivideDbQueries.setText("Event Producers per ocelotlQueries (0=All)");
+		lblDivideDbQueries.setText("Event Producers per Query (0=All)");
 
 		spinnerDivideDbQuery = new Spinner(grpDivideDbQuery, SWT.BORDER);
 		spinnerDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
