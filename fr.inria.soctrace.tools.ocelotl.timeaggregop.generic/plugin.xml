@@ -11,7 +11,8 @@
             operator="Generic Event Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.GenericConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.GenericView"
-            spatial_compatibility="2D">
+            spatial_compatibility="2D"
+            trace_formats="ALL">
       </aggregation_operator>
    </extension>
 

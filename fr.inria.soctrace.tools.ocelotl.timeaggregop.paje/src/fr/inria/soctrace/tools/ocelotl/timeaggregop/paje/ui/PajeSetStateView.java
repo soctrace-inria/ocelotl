@@ -32,20 +32,20 @@ public class PajeSetStateView extends PajeView {
 
 	@Override
 	public void setParameters() {
-		if (!init){
+		if (config.getTypes().isEmpty()){
 		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
 			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains(PajeExternalConstants.PajeSetState)) {
 				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
 					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
 				break;
 			}
-		listViewerEventTypes.setInput(config.getTypes());
 		if (!config.getIdles().contains("IDLE"))
 			config.getIdles().add("IDLE");
-		listViewerIdleStates.setInput(config.getIdles());
-		
-		init=true;
 		}
+		listViewerEventTypes.setInput(config.getTypes());
+		listViewerIdleStates.setInput(config.getIdles());
+		}
+		
 	}
 
-}
+

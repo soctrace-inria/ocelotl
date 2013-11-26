@@ -126,6 +126,8 @@ public class GenericView extends ApplicationWindow implements ISettingApplicatio
 
 	private GenericConfig	config;
 
+	boolean					init	= false;
+
 	public GenericView(final Shell shell) {
 		super(shell);
 		ocelotlView = null;
@@ -184,8 +186,9 @@ public class GenericView extends ApplicationWindow implements ISettingApplicatio
 		scrCompositeEventTypeButtons.setMinSize(compositeEventTypeButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveEventTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerEventTypes));
 
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-			config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
+		if (config.getTypes().isEmpty())
+			for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
+				config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
 		listViewerEventTypes.setInput(config.getTypes());
 
 		final Composite OK = new Composite(sashFormGlobal, SWT.NONE);

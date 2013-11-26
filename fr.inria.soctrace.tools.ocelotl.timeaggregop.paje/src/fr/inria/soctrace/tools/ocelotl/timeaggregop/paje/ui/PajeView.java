@@ -127,8 +127,6 @@ public abstract class PajeView extends ApplicationWindow implements ISettingAppl
 	protected ListViewer	listViewerEventTypes;
 
 	protected PajeConfig	config;
-	
-	protected boolean 	init=false;
 
 	public PajeView(final Shell shell) {
 		super(shell);
@@ -250,7 +248,6 @@ public abstract class PajeView extends ApplicationWindow implements ISettingAppl
 				close();
 			}
 		});
-		
 		setParameters();
 		return sashFormGlobal;
 

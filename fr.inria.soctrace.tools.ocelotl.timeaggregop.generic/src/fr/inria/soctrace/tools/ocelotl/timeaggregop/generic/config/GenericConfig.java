@@ -27,8 +27,6 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
 public class GenericConfig implements ITraceTypeConfig {
 
-	public final static String		DefaultState	= "PajeSetState";
-	public final static String		DefaultIdle		= "IDLE";
 	private final List<EventType>	types			= new LinkedList<EventType>();
 
 	public GenericConfig() {

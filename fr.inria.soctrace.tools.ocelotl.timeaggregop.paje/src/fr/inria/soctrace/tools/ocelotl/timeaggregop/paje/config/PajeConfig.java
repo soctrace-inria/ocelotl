@@ -27,8 +27,6 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
 public class PajeConfig implements ITraceTypeConfig {
 
-	public final static String	DefaultState	= "PajeSetState";
-	public final static String	DefaultIdle		= "IDLE";
 	private List<String>		idles			= new LinkedList<String>();
 	private List<EventType>		types			= new LinkedList<EventType>();
 
