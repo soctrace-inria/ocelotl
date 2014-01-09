@@ -20,12 +20,15 @@
 package fr.inria.soctrace.tools.paje.tracemanager.tcladapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import fr.inria.soctrace.framesoc.ui.gantt.LoadDescriptor;
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsInput;
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsRow;
+import fr.inria.soctrace.framesoc.ui.tcl.TclGanttView.TclViewHandle;
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.AnalysisResultData.AnalysisResultType;
 import fr.inria.soctrace.lib.model.AnalysisResultSearchData;
@@ -35,11 +38,8 @@ import fr.inria.soctrace.lib.model.ISearchable;
 import fr.inria.soctrace.lib.model.Tool;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.query.EventProducerQuery;
 import fr.inria.soctrace.lib.search.ITraceSearch;
 import fr.inria.soctrace.lib.search.TraceSearch;
-import fr.inria.soctrace.lib.search.utils.IntervalDesc;
-import fr.inria.soctrace.lib.storage.TraceDBObject;
 
 /**
  * Paje implementation of Tcl input.
@@ -145,20 +145,6 @@ public class PajeTclInput implements ITChartsInput {
 		return new PajeTclRow(ep.getName(), null, parentRow, ep.getId());
 	}
 
-	private List<Event> getPresentationList(final Trace trace) {
-
-		try {
-			final ITraceSearch search = new TraceSearch().initialize();
-			final IntervalDesc desc = new IntervalDesc(100, 10000000000L);
-			final List<Event> elist = search.getEventsByInterval(trace, desc);
-			search.uninitialize();
-			return elist;
-		} catch (final SoCTraceException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	@Override
 	public long getStartTime() {
 		if (startTimeSet)
@@ -181,62 +167,8 @@ public class PajeTclInput implements ITChartsInput {
 	}
 
 	@Override
-	public void loadPage(final Trace trace, List<Event> elist) {
-
-		// XXX Hard coded result: used for the article
-		// Ignore the passed list, and use the result one.
-		//		elist.clear();
-		//		elist = getArticleList(trace);
-
-		elist.clear();
-		elist = getPresentationList(trace);
-
-		// load all producers
-		final Map<Integer, EventProducer> eps = new HashMap<Integer, EventProducer>();
-		try {
-			final TraceDBObject traceDB = TraceDBObject.openNewIstance(trace.getDbName());
-			final EventProducerQuery query = new EventProducerQuery(traceDB);
-			final List<EventProducer> producers = query.getList();
-			for (final EventProducer ep : producers)
-				eps.put(ep.getId(), ep);
-			traceDB.close();
-		} catch (final SoCTraceException e) {
-			e.printStackTrace();
-		}
-
-		//  CPU          EP id
-		final Map<Integer, Map<Integer, ITChartsRow>> rows = new HashMap<Integer, Map<Integer, ITChartsRow>>();
-		//  CPU      row
-		final Map<Integer, ITChartsRow> main = new HashMap<Integer, ITChartsRow>();
-
-		// iterate over all page events 
-		Event lastEvent = null;
-		ITChartsRow lastProducerRow = null;
-
-		for (final Event e : elist) {
-			// get the map containing all the rows for this CPU
-			if (!rows.containsKey(e.getCpu())) {
-				rows.put(e.getCpu(), new HashMap<Integer, ITChartsRow>());
-				main.put(e.getCpu(), new PajeTclRow("CPU " + e.getCpu(), null, null, e.getCpu()));
-				addTChartsRow(main.get(e.getCpu()));
-			}
-			final Map<Integer, ITChartsRow> cpuMap = rows.get(e.getCpu());
-
-			// get the row for the given producer
-			if (!cpuMap.containsKey(e.getEventProducer().getId()))
-				cpuMap.put(e.getEventProducer().getId(), getNewEventProducerRow(e.getEventProducer(), eps, cpuMap, main.get(e.getCpu())));
-			final ITChartsRow producerRow = cpuMap.get(e.getEventProducer().getId());
-
-			// finally add the event if I'm on the end
-			//final long OFFSET = 298400000000L;
-			final long OFFSET = 0;
-			if (lastEvent != null)
-				lastProducerRow.addEvent(new PajeTclEvent(lastEvent.getTimestamp() - OFFSET, e.getTimestamp() - OFFSET));
-
-			lastEvent = e;
-			lastProducerRow = producerRow;
-
-		}
+	public LoadDescriptor loadTimeWindow(Trace trace, long startTimestamp, long endTimestamp, IProgressMonitor monitor, TclViewHandle handle) throws SoCTraceException {
+		throw new SoCTraceException("not implemented");	
 	}
 
 }
