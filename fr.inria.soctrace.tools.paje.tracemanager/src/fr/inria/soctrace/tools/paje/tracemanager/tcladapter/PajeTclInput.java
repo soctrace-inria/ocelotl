@@ -24,8 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import fr.inria.soctrace.framesoc.ui.gantt.LoadDescriptor;
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsInput;
 import fr.inria.soctrace.framesoc.ui.tcl.ITChartsRow;
+import fr.inria.soctrace.framesoc.ui.tcl.TclGanttView.TclViewHandle;
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.AnalysisResultData.AnalysisResultType;
 import fr.inria.soctrace.lib.model.AnalysisResultSearchData;
@@ -180,7 +184,6 @@ public class PajeTclInput implements ITChartsInput {
 		return mainItems;
 	}
 
-	@Override
 	public void loadPage(final Trace trace, List<Event> elist) {
 
 		// XXX Hard coded result: used for the article
@@ -237,6 +240,12 @@ public class PajeTclInput implements ITChartsInput {
 			lastProducerRow = producerRow;
 
 		}
+	}
+
+	@Override
+	public LoadDescriptor loadTimeWindow(Trace trace, long startTimestamp, long endTimestamp, IProgressMonitor monitor, TclViewHandle handle) throws SoCTraceException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
