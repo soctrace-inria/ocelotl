@@ -138,18 +138,11 @@ public class SpaceAggregationOperatorManager {
 		final Bundle mybundle = Platform.getBundle(List.get(name).getBundle());
 		try {
 
-			selectedOperator = (ITimeAggregationOperator) mybundle.loadClass(List.get(name).getOperatorClass()).newInstance();
+			selectedOperator = (ISpaceAggregationOperator) mybundle.loadClass(List.get(name).getOperatorClass()).newInstance();
 			selectedOperatorName = name;
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-		try {
-			selectedConfig = (ITraceTypeConfig) mybundle.loadClass(List.get(name).getParamConfig()).newInstance();
-			parameters.setTraceTypeConfig(selectedConfig);
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	

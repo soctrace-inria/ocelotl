@@ -54,7 +54,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.PartFigure;
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
-public class MatrixView {
+public class TimeLineView {
 
 	private class SelectFigure extends RectangleFigure {
 
@@ -204,7 +204,7 @@ public class MatrixView {
 
 	private SelectFigure				selectFigure;
 
-	public MatrixView(final OcelotlView ocelotlView) {
+	public TimeLineView(final OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
 

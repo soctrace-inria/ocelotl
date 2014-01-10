@@ -61,11 +61,11 @@ public class TimeAxisView {
 
 		public void draw(final TimeRegion timeRegion, final boolean active) {
 			if (active) {
-				setForegroundColor(MatrixView.activeColorFG);
-				setBackgroundColor(MatrixView.activeColorBG);
+				setForegroundColor(TimeLineView.activeColorFG);
+				setBackgroundColor(TimeLineView.activeColorBG);
 			} else {
-				setForegroundColor(MatrixView.selectColorFG);
-				setBackgroundColor(MatrixView.selectColorBG);
+				setForegroundColor(TimeLineView.selectColorFG);
+				setBackgroundColor(TimeLineView.selectColorBG);
 			}
 			root.add(this,
 					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height - 2), new Point(

@@ -136,12 +136,9 @@ public class OcelotlCore {
 	}
 
 	public void setSpaceOperator() {
-		try {
-			spaceOperator = spaceOperators.getOperator(ocelotlParameters.getSpaceAggOperator());
-		} catch (final SoCTraceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		spaceOperators.activateSelectedOperator();
+		spaceOperator = spaceOperators.getSelectedOperator();
+
 	}
 
 	public void setTimeOperator() {
