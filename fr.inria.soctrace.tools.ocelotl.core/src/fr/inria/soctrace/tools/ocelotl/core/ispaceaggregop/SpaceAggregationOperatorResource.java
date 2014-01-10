@@ -6,10 +6,8 @@ import java.util.List;
 public class SpaceAggregationOperatorResource {
 
 	String			operatorClass;
-
 	String			name;
-
-	String			format;
+	List<String>	timeCompatibility;
 	String			paramWinClass;
 	String			paramConfig;
 	String			visualization;
@@ -19,11 +17,11 @@ public class SpaceAggregationOperatorResource {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SpaceAggregationOperatorResource(final String operatorClass, final String name, final String format, String visualization, final String paramWinClass, final String paramConfig, final String bundle) {
+	public SpaceAggregationOperatorResource(final String operatorClass, final String name, final List<String> timeCompatibility, String visualization, final String paramWinClass, final String paramConfig, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
-		this.format = format;
+		this.timeCompatibility = timeCompatibility;
 		this.visualization = visualization;
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
@@ -41,15 +39,17 @@ public class SpaceAggregationOperatorResource {
 	public String getOperatorClass() {
 		return operatorClass;
 	}
-	
-	
 
-	public String getFormat() {
-		return format;
+	public void setTimeCompatibility(String string) {
+		final String[] tmp = string.split(", ");
+		for (final String s : tmp)
+			this.timeCompatibility.add(string);
 	}
+	
+	
 
-	public void setFormat(String format) {
-		this.format = format;
+	public List<String> getTimeCompatibility() {
+		return timeCompatibility;
 	}
 
 	public String getVisualization() {

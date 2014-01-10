@@ -44,7 +44,7 @@
       </complexType>
    </element>
 
-   <element name="new_element">
+   <element name="aggregation_operator">
       <complexType>
          <attribute name="operator" type="string" use="required">
             <annotation>
@@ -93,7 +93,7 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="format" type="string" use="required">
+         <attribute name="time_compatibility" type="string" use="required">
             <annotation>
                <documentation>
                   
