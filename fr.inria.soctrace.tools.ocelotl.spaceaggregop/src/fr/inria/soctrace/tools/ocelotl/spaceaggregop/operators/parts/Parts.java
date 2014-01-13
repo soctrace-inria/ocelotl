@@ -17,20 +17,20 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
 
-public class NoAggregation extends SpaceAggregationOperator {
+public class Parts extends SpaceAggregationOperator {
 
 	final public static String	descriptor	= "No Aggregation";
 
-	public NoAggregation() {
+	public Parts() {
 		super();
 	}
 
-	public NoAggregation(final OcelotlCore ocelotlCore) {
+	public Parts(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
 	}
 

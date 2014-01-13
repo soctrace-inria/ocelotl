@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         id="idGeneric"
+         id="idGenericTime"
          name="GenericTimeAggregationOperators"
          point="fr.inria.soctrace.tools.ocelotl.core.timeaggregopext">
       <aggregation_operator
@@ -11,7 +11,7 @@
             operator="Event Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.GenericConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.GenericView"
-            spatial_compatibility="2D"
+            spatial_compatibility="Parts"
             trace_formats="ALL">
       </aggregation_operator>
    </extension>

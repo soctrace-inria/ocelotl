@@ -22,8 +22,7 @@ Import-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.itimeaggregop,
  fr.inria.soctrace.tools.ocelotl.core.lpaggreg,
  fr.inria.soctrace.tools.paje.tracemanager.common.constants
-Export-Package: fr.inria.soctrace.tools.ocelotl.ui.color,
- fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt,
+Export-Package: fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt,
  fr.inria.soctrace.tools.ocelotl.ui.loaders,
  fr.inria.soctrace.tools.ocelotl.ui.views,
  fr.inria.soctrace.tools.ocelotl.ui.views.timelineview

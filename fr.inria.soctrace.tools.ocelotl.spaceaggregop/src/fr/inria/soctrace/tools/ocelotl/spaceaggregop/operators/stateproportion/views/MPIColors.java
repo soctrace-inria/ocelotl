@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views;
 
 import java.util.HashMap;
 

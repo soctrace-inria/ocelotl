@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.views;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +9,12 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
-public class PartsTimeLineView extends TimeLineView{
+public class PartTimeLineView extends TimeLineView{
 
-	public PartsTimeLineView(OcelotlView ocelotlView) {
+	
+	private ColorManager colors = new ColorManager();
+	
+	public PartTimeLineView(OcelotlView ocelotlView) {
 		super(ocelotlView);
 		// TODO Auto-generated constructor stub
 	}

@@ -72,7 +72,9 @@ import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.ResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.ITimeLineView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 
 /**
  * Main view for LPAggreg Paje Tool
@@ -453,7 +455,7 @@ public class OcelotlView extends ViewPart {
 	private HasChanged							hasChanged		= HasChanged.ALL;
 
 	private ListViewer							listViewerEventProducers;
-	private TimeLineView							timeLineView;
+	private ITimeLineView							timeLineView;
 	private final OcelotlCore					ocelotlCore;
 	private final OcelotlParameters				ocelotlParameters;
 	private Text								textRun;
@@ -475,6 +477,8 @@ public class OcelotlView extends ViewPart {
 	private Button								buttonUp;
 	private Combo								comboSpace;
 	private Button								btnRemoveEventProducer;
+	private Canvas	canvasMatrixView;
+	private TimeLineViewManager	timeLineViewManager;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -485,6 +489,7 @@ public class OcelotlView extends ViewPart {
 		}
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
+		timeLineViewManager = new TimeLineViewManager(this);
 	}
 
 	private void cleanAll() {
@@ -516,7 +521,6 @@ public class OcelotlView extends ViewPart {
 
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		timeLineView = new TimeLineView(this);
 		timeAxisView = new TimeAxisView();
 		qualityView = new QualityView(this);
 		final SashForm sashFormView = new SashForm(sashFormGlobal, SWT.VERTICAL);
@@ -529,7 +533,7 @@ public class OcelotlView extends ViewPart {
 		gl_compositeMatrixView.marginHeight = 0;
 		compositeMatrixView.setLayout(gl_compositeMatrixView);
 		compositeMatrixView.setSize(500, 500);
-		final Canvas canvasMatrixView = timeLineView.initDiagram(compositeMatrixView);
+		canvasMatrixView = new Canvas(compositeMatrixView, SWT.DOUBLE_BUFFERED);
 		canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
 		final Composite compositeTimeAxisView = new Composite(sashFormView, SWT.NONE);
 		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -692,12 +696,17 @@ public class OcelotlView extends ViewPart {
 
 		comboSpace.addSelectionListener(new SelectionAdapter() {
 
+			
+
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				if (confDataLoader.getCurrentTrace() == null)
 					return;
 				hasChanged = HasChanged.PARAMETER;
 				ocelotlParameters.setSpaceAggOperator(comboSpace.getText());
+				timeLineView = timeLineViewManager.create();
+//				canvasMatrixView = timeLineView.initDiagram(compositeMatrixView);
+//				canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 			}
 		});

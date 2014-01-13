@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Spaceaggregop
-Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.spaceaggregop
+Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.spaceaggregop;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.spaceaggregop.Activator
 Require-Bundle: org.eclipse.ui,
@@ -11,3 +11,8 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.tools.ocelotl.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
+Export-Package: fr.inria.soctrace.tools.ocelotl.spaceaggregop,
+ fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts,
+ fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.views,
+ fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion,
+ fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views

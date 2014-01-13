@@ -117,14 +117,19 @@ public class SpaceAggregationOperatorManager {
 		System.out.println(config.length+ " Space aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
+			System.out.println("A");
 			final SpaceAggregationOperatorResource resource = new SpaceAggregationOperatorResource();
+			System.out.println("B");
 			resource.setOperatorClass(e.getAttribute(OP_CLASS));
+			System.out.println("H");
 			resource.setName(e.getAttribute(OP_NAME));
 			resource.setTimeCompatibility(e.getAttribute(OP_TIME_COMPATIBILITY));
 //			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 //			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
+			System.out.println("H");
 			resource.setBundle(e.getContributor().getName());
+			System.out.println("C");
 			List.put(resource.getName(), resource);
 			System.out.println("    "+ resource.getName() + " "+resource.getTimeCompatibility());
 		}

@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.views;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
@@ -28,18 +28,17 @@ import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.SWT;
 
-import fr.inria.soctrace.tools.ocelotl.ui.color.OcelotlColor;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 
 public class PartFigure extends RectangleFigure {
 
 	private int					index;
 	private final int			value;
-	private final OcelotlColor	color;
+	private final PartColor	color;
 	private final static int	textSize	= 15;
 	private final boolean		numbers;
 
-	public PartFigure(final int index, final int value, final OcelotlColor color, final boolean numbers) {
+	public PartFigure(final int index, final int value, final PartColor color, final boolean numbers) {
 		super();
 		setIndex(index);
 		this.value = value;

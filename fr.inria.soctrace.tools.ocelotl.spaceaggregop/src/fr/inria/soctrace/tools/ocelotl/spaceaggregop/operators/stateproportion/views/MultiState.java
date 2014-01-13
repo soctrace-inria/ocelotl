@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +32,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
+import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.StateProportion;
 
 public class MultiState {
 
@@ -39,10 +40,10 @@ public class MultiState {
 	private static final int	Border		= 10;
 	private static final double	MinHeight	= 5.0;
 	private int					space		= 6;
-	StateDistribution			distribution;
+	StateProportion			distribution;
 	IFigure						root;
 
-	public MultiState(final int index, final StateDistribution distribution, final IFigure root, final int space) {
+	public MultiState(final int index, final StateProportion distribution, final IFigure root, final int space) {
 		super();
 		setIndex(index);
 		this.distribution = distribution;

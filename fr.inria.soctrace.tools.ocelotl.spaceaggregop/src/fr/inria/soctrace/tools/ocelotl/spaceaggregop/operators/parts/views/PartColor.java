@@ -17,14 +17,14 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.color;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.views;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 
-public class OcelotlColor {
+public class PartColor {
 
 	private static int	light		= 180;
 	private static int	tooLight	= 180;
@@ -38,24 +38,24 @@ public class OcelotlColor {
 	}
 
 	public static void setLight(final int light) {
-		OcelotlColor.light = light;
+		PartColor.light = light;
 	}
 
 	public static void setTooLight(final int tooLight) {
-		OcelotlColor.tooLight = tooLight;
+		PartColor.tooLight = tooLight;
 	}
 
 	private Color	bg;
 
 	private Color	fg;
 
-	public OcelotlColor(final Color bg) {
+	public PartColor(final Color bg) {
 		super();
 		this.bg = bg;
 		setFg();
 	}
 
-	public OcelotlColor(final int r, final int g, final int b) {
+	public PartColor(final int r, final int g, final int b) {
 		super();
 		final Device device = Display.getCurrent();
 		bg = new Color(device, r % 255, g % 255, b % 255);

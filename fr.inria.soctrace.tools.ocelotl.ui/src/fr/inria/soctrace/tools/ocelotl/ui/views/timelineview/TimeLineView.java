@@ -43,8 +43,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.spaceaggregop.StateDistribution;
-import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -197,7 +195,6 @@ abstract public class TimeLineView implements ITimeLineView{
 	protected boolean						numbers			= true;
 	protected final static int			Border			= 10;
 	protected int							Space			= 6;
-	protected final ColorManager			colors			= new ColorManager();
 
 	protected final OcelotlView			ocelotlView;
 
