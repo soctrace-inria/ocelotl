@@ -40,9 +40,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
 /**
- * _2DCacheMicroDescription View : part representation, according to LP
+ * Time Axis View : part representation, according to LP
  * algorithm result
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"

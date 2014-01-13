@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.views.matrixview;
+package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import java.util.HashMap;
 

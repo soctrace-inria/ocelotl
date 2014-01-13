@@ -26,6 +26,9 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.ITimeLineView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
+
 public class TimeLineViewManager {
 
 	OcelotlView	ocelotlView;
@@ -35,11 +38,11 @@ public class TimeLineViewManager {
 		this.ocelotlView = ocelotlView;
 	}
 
-	public TimeLineView create() {
-		TimeLineView timeLineView = null;
+	public ITimeLineView create() {
+		ITimeLineView timeLineView = null;
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getBundle());
-			timeLineView = (TimeLineView) mybundle.loadClass(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getVisualization()).getDeclaredConstructor(TimeLineView.class).newInstance(ocelotlView);
+			timeLineView = (ITimeLineView) mybundle.loadClass(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getVisualization()).getDeclaredConstructor(TimeLineView.class).newInstance(ocelotlView);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

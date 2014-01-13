@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.views;
+package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,15 +46,14 @@ import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribut
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
-import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.MultiState;
-import fr.inria.soctrace.tools.ocelotl.ui.views.matrixview.PartFigure;
+import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 /**
  * Matrix View : part representation, according to LP algorithm result
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
-public class TimeLineView {
+abstract public class TimeLineView implements ITimeLineView{
 
 	private class SelectFigure extends RectangleFigure {
 
@@ -187,20 +186,20 @@ public class TimeLineView {
 
 	final static Color					activeColorFG	= ColorConstants.black;
 	final static Color					activeColorBG	= ColorConstants.darkBlue;
-	private Figure						root;
-	private Canvas						canvas;
-	private final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
-	private List<Integer>				parts			= null;
-	private TimeRegion					time;
-	private TimeRegion					selectTime;
-	private TimeRegion					resetTime;
-	private boolean						aggregated		= false;
-	private boolean						numbers			= true;
-	private final static int			Border			= 10;
-	private int							Space			= 6;
-	private final ColorManager			colors			= new ColorManager();
+	protected Figure						root;
+	protected Canvas						canvas;
+	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
+	protected List<Integer>				parts			= null;
+	protected TimeRegion					time;
+	protected TimeRegion					selectTime;
+	protected TimeRegion					resetTime;
+	protected boolean						aggregated		= false;
+	protected boolean						numbers			= true;
+	protected final static int			Border			= 10;
+	protected int							Space			= 6;
+	protected final ColorManager			colors			= new ColorManager();
 
-	private final OcelotlView			ocelotlView;
+	protected final OcelotlView			ocelotlView;
 
 	private SelectFigure				selectFigure;
 
@@ -222,49 +221,52 @@ public class TimeLineView {
 			selectTime = new TimeRegion(time);
 		}
 		this.numbers = numbers;
-		final int partHeight = (int) (root.getSize().height / 1.1 - Border);
 		Space = 6;
-		if (parts != null) {
-			while ((root.getSize().width - 2 * Border) / parts.size() - 2 < Space && Space != 0)
-				Space = Space - 1;
-			if (!aggregated)
-				for (int i = 0; i < parts.size(); i++) {
-					final PartFigure part = new PartFigure(i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()), numbers);
-					figures.add(part);
-					root.add(part, new Rectangle(new Point(i * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height / 2 - partHeight / 2), new Point((i + 1) * (root.getSize().width - 2 * Border) / parts.size() + Border - Space,
-							root.getSize().height / 2 + partHeight / 2)));
-					part.getUpdateManager().performUpdate();
-					part.init();
-				}
-			else if (ocelotlView.getParams().getSpaceAggOperator().equals("No Aggregation")) {
-				final List<Integer> aggParts = new ArrayList<Integer>();
-				for (int i = 0; i <= parts.get(parts.size() - 1); i++)
-					aggParts.add(0);
-				for (int i = 0; i < parts.size(); i++)
-					aggParts.set(parts.get(i), aggParts.get(parts.get(i)) + 1);
-				int j = 0;
-				for (int i = 0; i < aggParts.size(); i++) {
-					// TODO manage parts
-					final PartFigure part = new PartFigure(i, i, colors.getColors().get(j % colors.getColors().size()), numbers);
-					figures.add(part);
-					root.add(
-							part,
-							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - Space + Border, 0 + root
-									.getSize().height / 10)));
-					j = j + aggParts.get(i);
-					part.getUpdateManager().performUpdate();
-					part.init();
-				}
-			} else
-				for (int i = 0; i < ocelotlView.getCore().getSpaceOperator().getPartNumber(); i++) {
-					// TODO manage parts
-					final MultiState part = new MultiState(i, (StateDistribution) ocelotlView.getCore().getSpaceOperator(), root, Space);
-					// figures.add(part);
-					part.init();
-					// part.getUpdateManager().performUpdate();
-				}
-		}
+		computeDiagram();		
+//		final int partHeight = (int) (root.getSize().height / 1.1 - Border);
+//		if (parts != null) {
+//			while ((root.getSize().width - 2 * Border) / parts.size() - 2 < Space && Space != 0)
+//				Space = Space - 1;
+//			if (!aggregated)
+//				for (int i = 0; i < parts.size(); i++) {
+//					final PartFigure part = new PartFigure(i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()), numbers);
+//					figures.add(part);
+//					root.add(part, new Rectangle(new Point(i * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height / 2 - partHeight / 2), new Point((i + 1) * (root.getSize().width - 2 * Border) / parts.size() + Border - Space,
+//							root.getSize().height / 2 + partHeight / 2)));
+//					part.getUpdateManager().performUpdate();
+//					part.init();
+//				}
+//			else if (ocelotlView.getParams().getSpaceAggOperator().equals("No Aggregation")) {
+//				final List<Integer> aggParts = new ArrayList<Integer>();
+//				for (int i = 0; i <= parts.get(parts.size() - 1); i++)
+//					aggParts.add(0);
+//				for (int i = 0; i < parts.size(); i++)
+//					aggParts.set(parts.get(i), aggParts.get(parts.get(i)) + 1);
+//				int j = 0;
+//				for (int i = 0; i < aggParts.size(); i++) {
+//					// TODO manage parts
+//					final PartFigure part = new PartFigure(i, i, colors.getColors().get(j % colors.getColors().size()), numbers);
+//					figures.add(part);
+//					root.add(
+//							part,
+//							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - Space + Border, 0 + root
+//									.getSize().height / 10)));
+//					j = j + aggParts.get(i);
+//					part.getUpdateManager().performUpdate();
+//					part.init();
+//				}
+//			} else
+//				for (int i = 0; i < ocelotlView.getCore().getSpaceOperator().getPartNumber(); i++) {
+//					// TODO manage parts
+//					final MultiState part = new MultiState(i, (StateDistribution) ocelotlView.getCore().getSpaceOperator(), root, Space);
+//					// figures.add(part);
+//					part.init();
+//					// part.getUpdateManager().performUpdate();
+//				}
+//		}
 	}
+
+	abstract protected void computeDiagram();
 
 	@SuppressWarnings("unused")
 	private IFigure createPart() {
