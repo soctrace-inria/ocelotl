@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.ui.views;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,7 @@ import java.util.List;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.PartFigure;
+import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
 public class PartsTimeLineView extends TimeLineView{

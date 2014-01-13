@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.views;
+package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -26,8 +26,7 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.ITimeLineView;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class TimeLineViewManager {
 

@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
 
 import java.util.List;
 

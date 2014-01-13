@@ -42,8 +42,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.spaceaggregop.StateDistribution;
 import fr.inria.soctrace.tools.ocelotl.ui.color.ColorManager;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -180,12 +180,12 @@ abstract public class TimeLineView implements ITimeLineView{
 
 	}
 
-	final static Color					selectColorFG	= ColorConstants.blue;
+	public final static Color					selectColorFG	= ColorConstants.blue;
 
-	final static Color					selectColorBG	= ColorConstants.lightGray;
+	public final static Color					selectColorBG	= ColorConstants.lightGray;
 
-	final static Color					activeColorFG	= ColorConstants.black;
-	final static Color					activeColorBG	= ColorConstants.darkBlue;
+	public final static Color					activeColorFG	= ColorConstants.black;
+	public final static Color					activeColorBG	= ColorConstants.darkBlue;
 	protected Figure						root;
 	protected Canvas						canvas;
 	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();

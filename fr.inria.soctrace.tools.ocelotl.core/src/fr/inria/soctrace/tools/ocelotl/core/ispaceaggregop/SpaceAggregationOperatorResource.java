@@ -1,6 +1,5 @@
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SpaceAggregationOperatorResource {
@@ -8,8 +7,8 @@ public class SpaceAggregationOperatorResource {
 	String			operatorClass;
 	String			name;
 	List<String>	timeCompatibility;
-	String			paramWinClass;
-	String			paramConfig;
+//	String			paramWinClass;
+//	String			paramConfig;
 	String			visualization;
 	String			bundle;
 
@@ -17,14 +16,25 @@ public class SpaceAggregationOperatorResource {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SpaceAggregationOperatorResource(final String operatorClass, final String name, final List<String> timeCompatibility, String visualization, final String paramWinClass, final String paramConfig, final String bundle) {
+//	public SpaceAggregationOperatorResource(final String operatorClass, final String name, final List<String> timeCompatibility, String visualization, final String paramWinClass, final String paramConfig, final String bundle) {
+//		super();
+//		this.operatorClass = operatorClass;
+//		this.name = name;
+//		this.timeCompatibility = timeCompatibility;
+//		this.visualization = visualization;
+//		this.paramWinClass = paramWinClass;
+//		this.paramConfig = paramConfig;
+//		this.bundle = bundle;
+//	}
+	
+	public SpaceAggregationOperatorResource(final String operatorClass, final String name, final List<String> timeCompatibility, String visualization, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
 		this.timeCompatibility = timeCompatibility;
 		this.visualization = visualization;
-		this.paramWinClass = paramWinClass;
-		this.paramConfig = paramConfig;
+//		this.paramWinClass = paramWinClass;
+//		this.paramConfig = paramConfig;
 		this.bundle = bundle;
 	}
 
@@ -60,13 +70,13 @@ public class SpaceAggregationOperatorResource {
 		this.visualization = visualization;
 	}
 
-	public String getParamConfig() {
-		return paramConfig;
-	}
-
-	public String getParamWinClass() {
-		return paramWinClass;
-	}
+//	public String getParamConfig() {
+//		return paramConfig;
+//	}
+//
+//	public String getParamWinClass() {
+//		return paramWinClass;
+//	}
 
 
 	public void setBundle(final String bundle) {
@@ -82,12 +92,12 @@ public class SpaceAggregationOperatorResource {
 		this.operatorClass = operatorClass;
 	}
 
-	public void setParamConfig(final String paramConfig) {
-		this.paramConfig = paramConfig;
-	}
-
-	public void setParamWinClass(final String paramWinClass) {
-		this.paramWinClass = paramWinClass;
-	}
+//	public void setParamConfig(final String paramConfig) {
+//		this.paramConfig = paramConfig;
+//	}
+//
+//	public void setParamWinClass(final String paramWinClass) {
+//		this.paramWinClass = paramWinClass;
+//	}
 
 }

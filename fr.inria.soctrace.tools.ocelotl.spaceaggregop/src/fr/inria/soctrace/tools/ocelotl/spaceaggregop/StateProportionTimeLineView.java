@@ -1,7 +1,6 @@
-package fr.inria.soctrace.tools.ocelotl.ui.views;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
 
-import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.MultiState;
+import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
 public class StateProportionTimeLineView extends TimeLineView{

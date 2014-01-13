@@ -34,10 +34,6 @@ import org.osgi.framework.Bundle;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
-import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.NoAggregation;
-import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorResource;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class SpaceAggregationOperatorManager {
@@ -54,8 +50,8 @@ public class SpaceAggregationOperatorManager {
 	private static final String							OP_NAME						= "operator";												//$NON-NLS-1$
 	private static final String							OP_CLASS					= "class";													//$NON-NLS-1$
 	private static final String							OP_VISUALIZATION			= "visualization";											//$NON-NLS-1$
-	private static final String							OP_PARAM_WIN				= "param_win";												//$NON-NLS-1$
-	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
+//	private static final String							OP_PARAM_WIN				= "param_win";												//$NON-NLS-1$
+//	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
 	private static final String							OP_TIME_COMPATIBILITY		= "time_compatibility";										//$NON-NLS-1$
 
 
@@ -125,8 +121,8 @@ public class SpaceAggregationOperatorManager {
 			resource.setOperatorClass(e.getAttribute(OP_CLASS));
 			resource.setName(e.getAttribute(OP_NAME));
 			resource.setTimeCompatibility(e.getAttribute(OP_TIME_COMPATIBILITY));
-			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
-			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
+//			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
+//			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
 			resource.setBundle(e.getContributor().getName());
 			List.put(resource.getName(), resource);

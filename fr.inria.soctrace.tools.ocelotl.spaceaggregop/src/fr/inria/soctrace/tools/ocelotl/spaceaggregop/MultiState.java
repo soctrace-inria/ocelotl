@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +31,6 @@ import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop.StateDistribution;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 
 public class MultiState {

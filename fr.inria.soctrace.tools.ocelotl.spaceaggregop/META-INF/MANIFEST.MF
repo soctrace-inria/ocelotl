@@ -5,6 +5,9 @@ Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.spaceaggregop
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.spaceaggregop.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ fr.inria.soctrace.tools.ocelotl.ui,
+ org.eclipse.draw2d,
+ fr.inria.soctrace.tools.ocelotl.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
