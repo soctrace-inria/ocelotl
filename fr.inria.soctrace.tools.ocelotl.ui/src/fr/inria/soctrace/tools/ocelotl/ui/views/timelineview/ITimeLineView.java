@@ -11,7 +11,7 @@ public interface ITimeLineView {
 
 	public void deleteDiagram();
 
-	public Canvas initDiagram(final Composite parent);
+	public void init(TimeLineViewWrapper wrapper);
 
 	public void resizeDiagram();
 

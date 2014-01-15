@@ -73,6 +73,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.ITimeLineView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
 
 /**
  * Main view for LPAggreg Paje Tool
@@ -478,6 +479,7 @@ public class OcelotlView extends ViewPart {
 	private final TimeLineViewManager			timeLineViewManager;
 	private Composite							compositeMatrixView;
 	private SashForm							sashFormView;
+	private TimeLineViewWrapper					timeLineViewWrapper;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -532,9 +534,9 @@ public class OcelotlView extends ViewPart {
 		gl_compositeMatrixView.marginHeight = 0;
 		compositeMatrixView.setLayout(gl_compositeMatrixView);
 		compositeMatrixView.setSize(500, 500);
-		// canvasMatrixView = new Canvas(compositeMatrixView,
-		// SWT.DOUBLE_BUFFERED);
-		// canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
+		timeLineViewWrapper = new TimeLineViewWrapper(this);
+		canvasMatrixView = timeLineViewWrapper.init(compositeMatrixView);
+		canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
 		final Composite compositeTimeAxisView = new Composite(sashFormView, SWT.NONE);
 		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final GridLayout gl_compositeTimeAxisView = new GridLayout();
@@ -705,8 +707,8 @@ public class OcelotlView extends ViewPart {
 					hasChanged = HasChanged.PARAMETER;
 				ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
 				timeLineView = timeLineViewManager.create();
-				canvasMatrixView = timeLineView.initDiagram(compositeMatrixView);
-				canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
+				timeLineViewWrapper.setView(timeLineView);
+
 			}
 		});
 		sashAggreg.setWeights(new int[] { 1, 1 });

@@ -19,11 +19,17 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
@@ -41,7 +47,20 @@ public class TimeLineViewWrapper{
 	private Canvas						canvas;
 	private final OcelotlView			ocelotlView;
 	private ITimeLineView view;
+	private List<ControlListener> controlListeners = new ArrayList<ControlListener>();
+	private List<MouseListener> mouseListeners = new ArrayList<MouseListener>();
+	private List<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
 	
+	
+	
+	public Figure getRoot() {
+		return root;
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
 	public TimeLineViewWrapper(final OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
@@ -73,6 +92,48 @@ public class TimeLineViewWrapper{
 
 	public void setView(ITimeLineView view) {
 		this.view = view;
+		view.init(this);
+	}
+
+	public void cleanControlListeners() {
+		for (ControlListener c: controlListeners){
+			canvas.removeControlListener(c);
+		}
+		controlListeners.clear();	
+	}
+
+	public void addControlListener(ControlListener controlListener) {
+		controlListeners.add(controlListener);
+		canvas.addControlListener(controlListener);
+		
+	}
+
+	public void cleanMouseListeners() {
+		for (MouseListener m: mouseListeners){
+			root.removeMouseListener(m);
+		}
+		mouseListeners.clear();	
+		
+	}
+
+	public void cleanMouseMotionListeners() {
+		for (MouseMotionListener m: mouseMotionListeners){
+			root.removeMouseMotionListener(m);
+		}
+		mouseMotionListeners.clear();	
+		
+	}
+
+	public void addMouseListener(MouseListener mouse) {
+		mouseListeners.add(mouse);
+		root.addMouseListener(mouse);
+		
+	}
+
+	public void addMouseMotionListener(MouseMotionListener mouse) {
+		mouseMotionListeners.add(mouse);
+		root.addMouseMotionListener(mouse);
+		
 	}
 
 }

@@ -310,26 +310,16 @@ abstract public class TimeLineView implements ITimeLineView {
 	}
 
 	@Override
-	public Canvas initDiagram(final Composite parent) {
-		root = new Figure();
-		root.setFont(parent.getFont());
-		final XYLayout layout = new XYLayout();
-		root.setLayoutManager(layout);
-		canvas = new Canvas(parent, SWT.DOUBLE_BUFFERED);
-		canvas.setBackground(ColorConstants.white);
-		canvas.setSize(parent.getSize());
-		final LightweightSystem lws = new LightweightSystem(canvas);
-		lws.setContents(root);
-		lws.setControl(canvas);
-		root.setFont(SWTResourceManager.getFont("Cantarell", 24, SWT.NORMAL));
-		root.setSize(parent.getSize().x, parent.getSize().y);
-		canvas.addControlListener(new ControlListener() {
+	public void init(TimeLineViewWrapper wrapper) {
+		root = wrapper.getRoot();
+		canvas = wrapper.getCanvas();
+		wrapper.cleanControlListeners();
+		wrapper.addControlListener(
+		new ControlListener() {
 
 			@Override
 			public void controlMoved(final ControlEvent arg0) {
-				// TODO Auto-generated method stub
 				canvas.redraw();
-				// root.repaint();
 				resizeDiagram();
 
 			}
@@ -337,17 +327,16 @@ abstract public class TimeLineView implements ITimeLineView {
 			@Override
 			public void controlResized(final ControlEvent arg0) {
 				canvas.redraw();
-				// root.repaint();
 				resizeDiagram();
 			}
 		});
 
 		final TimeMouseListener mouse = new TimeMouseListener();
-		root.addMouseListener(mouse);
-		root.addMouseMotionListener(mouse);
+		wrapper.cleanMouseListeners();
+		wrapper.cleanMouseMotionListeners();
+		wrapper.addMouseListener(mouse);
+		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
-
-		return canvas;
 	}
 
 	@Override
@@ -355,5 +344,4 @@ abstract public class TimeLineView implements ITimeLineView {
 		createDiagram(parts, time, aggregated, numbers);
 		root.repaint();
 	}
-
 }
