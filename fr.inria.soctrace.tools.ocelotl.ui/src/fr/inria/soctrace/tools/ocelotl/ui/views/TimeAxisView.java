@@ -43,8 +43,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
 /**
- * Time Axis View : part representation, according to LP
- * algorithm result
+ * Time Axis View : part representation, according to LP algorithm result
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */

@@ -65,7 +65,6 @@ import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
@@ -73,7 +72,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.ResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.ITimeLineView;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 
 /**
@@ -477,7 +475,7 @@ public class OcelotlView extends ViewPart {
 	private Combo								comboSpace;
 	private Button								btnRemoveEventProducer;
 	private Canvas								canvasMatrixView;
-	private TimeLineViewManager					timeLineViewManager;
+	private final TimeLineViewManager			timeLineViewManager;
 	private Composite							compositeMatrixView;
 	private SashForm							sashFormView;
 
@@ -1017,7 +1015,7 @@ public class OcelotlView extends ViewPart {
 	}
 
 	public void setComboAggregationOperator(final Combo comboAggregationOperator) {
-		this.comboTime = comboAggregationOperator;
+		comboTime = comboAggregationOperator;
 	}
 
 	public void setConfiguration() {

@@ -51,7 +51,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
-abstract public class TimeLineView implements ITimeLineView{
+abstract public class TimeLineView implements ITimeLineView {
 
 	private class SelectFigure extends RectangleFigure {
 
@@ -178,27 +178,95 @@ abstract public class TimeLineView implements ITimeLineView{
 
 	}
 
-	public final static Color					selectColorFG	= ColorConstants.blue;
+	public final static Color				selectColorFG	= ColorConstants.blue;
 
-	public final static Color					selectColorBG	= ColorConstants.lightGray;
+	public final static Color				selectColorBG	= ColorConstants.lightGray;
 
-	public final static Color					activeColorFG	= ColorConstants.black;
-	public final static Color					activeColorBG	= ColorConstants.darkBlue;
+	public final static Color				activeColorFG	= ColorConstants.black;
+	public final static Color				activeColorBG	= ColorConstants.darkBlue;
 	protected Figure						root;
 	protected Canvas						canvas;
 	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
-	protected List<Integer>				parts			= null;
+	protected List<Integer>					parts			= null;
 	protected TimeRegion					time;
 	protected TimeRegion					selectTime;
 	protected TimeRegion					resetTime;
 	protected boolean						aggregated		= false;
 	protected boolean						numbers			= true;
-	protected final static int			Border			= 10;
+	protected final static int				Border			= 10;
 	protected int							Space			= 6;
+	
+	public static Color getSelectcolorfg() {
+		return selectColorFG;
+	}
 
-	protected final OcelotlView			ocelotlView;
+	public static Color getSelectcolorbg() {
+		return selectColorBG;
+	}
 
-	private SelectFigure				selectFigure;
+	public static Color getActivecolorfg() {
+		return activeColorFG;
+	}
+
+	public static Color getActivecolorbg() {
+		return activeColorBG;
+	}
+
+	public Figure getRoot() {
+		return root;
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public List<RectangleFigure> getFigures() {
+		return figures;
+	}
+
+	public List<Integer> getParts() {
+		return parts;
+	}
+
+	public TimeRegion getTime() {
+		return time;
+	}
+
+	public TimeRegion getSelectTime() {
+		return selectTime;
+	}
+
+	public TimeRegion getResetTime() {
+		return resetTime;
+	}
+
+	public boolean isAggregated() {
+		return aggregated;
+	}
+
+	public boolean isNumbers() {
+		return numbers;
+	}
+
+	public static int getBorder() {
+		return Border;
+	}
+
+	public int getSpace() {
+		return Space;
+	}
+
+	public OcelotlView getOcelotlView() {
+		return ocelotlView;
+	}
+
+	public SelectFigure getSelectFigure() {
+		return selectFigure;
+	}
+
+	protected final OcelotlView				ocelotlView;
+
+	private SelectFigure					selectFigure;
 
 	public TimeLineView(final OcelotlView ocelotlView) {
 		super();
@@ -206,6 +274,9 @@ abstract public class TimeLineView implements ITimeLineView{
 
 	}
 
+	abstract protected void computeDiagram();
+
+	@Override
 	public void createDiagram(final List<Integer> parts, final TimeRegion time, final boolean aggregated, final boolean numbers) {
 		root.removeAll();
 		figures.clear();
@@ -219,51 +290,8 @@ abstract public class TimeLineView implements ITimeLineView{
 		}
 		this.numbers = numbers;
 		Space = 6;
-		computeDiagram();		
-//		final int partHeight = (int) (root.getSize().height / 1.1 - Border);
-//		if (parts != null) {
-//			while ((root.getSize().width - 2 * Border) / parts.size() - 2 < Space && Space != 0)
-//				Space = Space - 1;
-//			if (!aggregated)
-//				for (int i = 0; i < parts.size(); i++) {
-//					final PartFigure part = new PartFigure(i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()), numbers);
-//					figures.add(part);
-//					root.add(part, new Rectangle(new Point(i * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height / 2 - partHeight / 2), new Point((i + 1) * (root.getSize().width - 2 * Border) / parts.size() + Border - Space,
-//							root.getSize().height / 2 + partHeight / 2)));
-//					part.getUpdateManager().performUpdate();
-//					part.init();
-//				}
-//			else if (ocelotlView.getParams().getSpaceAggOperator().equals("No Aggregation")) {
-//				final List<Integer> aggParts = new ArrayList<Integer>();
-//				for (int i = 0; i <= parts.get(parts.size() - 1); i++)
-//					aggParts.add(0);
-//				for (int i = 0; i < parts.size(); i++)
-//					aggParts.set(parts.get(i), aggParts.get(parts.get(i)) + 1);
-//				int j = 0;
-//				for (int i = 0; i < aggParts.size(); i++) {
-//					// TODO manage parts
-//					final PartFigure part = new PartFigure(i, i, colors.getColors().get(j % colors.getColors().size()), numbers);
-//					figures.add(part);
-//					root.add(
-//							part,
-//							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - Space + Border, 0 + root
-//									.getSize().height / 10)));
-//					j = j + aggParts.get(i);
-//					part.getUpdateManager().performUpdate();
-//					part.init();
-//				}
-//			} else
-//				for (int i = 0; i < ocelotlView.getCore().getSpaceOperator().getPartNumber(); i++) {
-//					// TODO manage parts
-//					final MultiState part = new MultiState(i, (StateDistribution) ocelotlView.getCore().getSpaceOperator(), root, Space);
-//					// figures.add(part);
-//					part.init();
-//					// part.getUpdateManager().performUpdate();
-//				}
-//		}
+		computeDiagram();
 	}
-
-	abstract protected void computeDiagram();
 
 	@SuppressWarnings("unused")
 	private IFigure createPart() {
@@ -274,12 +302,14 @@ abstract public class TimeLineView implements ITimeLineView{
 		return rectangleFigure;
 	}
 
+	@Override
 	public void deleteDiagram() {
 		root.removeAll();
 		figures.clear();
 		root.repaint();
 	}
 
+	@Override
 	public Canvas initDiagram(final Composite parent) {
 		root = new Figure();
 		root.setFont(parent.getFont());
@@ -320,6 +350,7 @@ abstract public class TimeLineView implements ITimeLineView{
 		return canvas;
 	}
 
+	@Override
 	public void resizeDiagram() {
 		createDiagram(parts, time, aggregated, numbers);
 		root.repaint();

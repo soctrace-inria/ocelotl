@@ -236,7 +236,7 @@ public class SWTResourceManager {
 			m_imageMap.clear();
 		}
 		// dispose decorated images
-		for (final Map<Image, Map<Image, Image>> cornerDecoratedImageMap : m_decoratedImageMap) {
+		for (final Map<Image, Map<Image, Image>> cornerDecoratedImageMap : m_decoratedImageMap)
 			if (cornerDecoratedImageMap != null) {
 				for (final Map<Image, Image> decoratedMap : cornerDecoratedImageMap.values()) {
 					for (final Image image : decoratedMap.values())
@@ -245,7 +245,6 @@ public class SWTResourceManager {
 				}
 				cornerDecoratedImageMap.clear();
 			}
-		}
 	}
 
 	/**
