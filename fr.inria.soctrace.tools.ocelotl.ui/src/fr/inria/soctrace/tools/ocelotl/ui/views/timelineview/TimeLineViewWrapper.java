@@ -37,11 +37,11 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  */
 public class TimeLineViewWrapper{
 
-	protected Figure						root;
-	protected Canvas						canvas;
-	protected final OcelotlView				ocelotlView;
-
-
+	private Figure						root;
+	private Canvas						canvas;
+	private final OcelotlView			ocelotlView;
+	private ITimeLineView view;
+	
 	public TimeLineViewWrapper(final OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
@@ -61,6 +61,18 @@ public class TimeLineViewWrapper{
 		root.setFont(SWTResourceManager.getFont("Cantarell", 24, SWT.NORMAL));
 		root.setSize(parent.getSize().x, parent.getSize().y);
 		return canvas;
+	}
+
+	public OcelotlView getOcelotlView() {
+		return ocelotlView;
+	}
+
+	public ITimeLineView getView() {
+		return view;
+	}
+
+	public void setView(ITimeLineView view) {
+		this.view = view;
 	}
 
 }
