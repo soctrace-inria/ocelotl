@@ -72,7 +72,7 @@ public class TimeAggregationOperatorManager {
 	}
 
 	public List<String> getOperators(final String traceType) {
-		System.out.println("Comparing Operator trace format with " + traceType);
+		System.out.println("Comparing Time Operator trace format with " + traceType);
 		final List<String> op = new ArrayList<String>();
 		for (final TimeAggregationOperatorResource r : List.values()) {
 			System.out.println(r.getTraceFormats());

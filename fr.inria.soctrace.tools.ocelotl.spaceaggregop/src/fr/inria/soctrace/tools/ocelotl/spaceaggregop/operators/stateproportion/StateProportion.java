@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.generic.spaceaggregop;
+package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion;
 
 import java.util.List;
 
@@ -27,18 +27,18 @@ import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 
-public class StateDistribution extends SpaceAggregationOperator {
+public class StateProportion extends SpaceAggregationOperator {
 
 	public final static String	descriptor	= "State Distribution";
 	private List<String>		states;
 	private double				max;
 
-	public StateDistribution() {
+	public StateProportion() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public StateDistribution(final OcelotlCore ocelotlCore) {
+	public StateProportion(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
 		// TODO Auto-generated constructor stub
 	}

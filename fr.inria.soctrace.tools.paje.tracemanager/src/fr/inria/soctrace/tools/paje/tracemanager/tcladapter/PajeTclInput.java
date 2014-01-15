@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.paje.tracemanager.tcladapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -169,6 +170,7 @@ public class PajeTclInput implements ITChartsInput {
 	@Override
 	public LoadDescriptor loadTimeWindow(Trace trace, long startTimestamp, long endTimestamp, IProgressMonitor monitor, TclViewHandle handle) throws SoCTraceException {
 		throw new SoCTraceException("not implemented");	
+		
 	}
 
 }

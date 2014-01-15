@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="idGenericSpace"
+         name="GenericSpaceAggregationOperators"
+         point="fr.inria.soctrace.tools.ocelotl.core.spaceaggregopext">
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.Parts"
+            operator="Parts"
+            time_compatibility="Parts"
+            visualization="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.views.PartTimeLineView">
+      </aggregation_operator>
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.StateProportion"
+            operator="State Proportion"
+            time_compatibility="StateProportion"
+            visualization="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views.StateProportionTimeLineView">
+      </aggregation_operator>
+   </extension>
+
+</plugin>

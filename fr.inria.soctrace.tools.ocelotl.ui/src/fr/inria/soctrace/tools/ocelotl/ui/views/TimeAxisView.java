@@ -40,10 +40,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
 /**
- * _2DCacheMicroDescription View : part representation, according to LP
- * algorithm result
+ * Time Axis View : part representation, according to LP algorithm result
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
@@ -61,11 +61,11 @@ public class TimeAxisView {
 
 		public void draw(final TimeRegion timeRegion, final boolean active) {
 			if (active) {
-				setForegroundColor(MatrixView.activeColorFG);
-				setBackgroundColor(MatrixView.activeColorBG);
+				setForegroundColor(TimeLineView.activeColorFG);
+				setBackgroundColor(TimeLineView.activeColorBG);
 			} else {
-				setForegroundColor(MatrixView.selectColorFG);
-				setBackgroundColor(MatrixView.selectColorBG);
+				setForegroundColor(TimeLineView.selectColorFG);
+				setBackgroundColor(TimeLineView.selectColorBG);
 			}
 			root.add(this,
 					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height - 2), new Point(
