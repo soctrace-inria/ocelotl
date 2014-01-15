@@ -69,6 +69,15 @@ public class SpaceAggregationOperatorManager {
 	}
 	
 	public void activateSelectedOperator() {
+		final Bundle mybundle = Platform.getBundle(List.get(selectedOperatorName).getBundle());
+		try {
+
+			selectedOperator = (ISpaceAggregationOperator) mybundle.loadClass(List.get(selectedOperatorName).getOperatorClass()).newInstance();
+			
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		selectedOperator.setOcelotlCore(ocelotlCore);
 	}
 	
@@ -78,9 +87,11 @@ public class SpaceAggregationOperatorManager {
 		for (final SpaceAggregationOperatorResource r : List.values()) {
 			System.out.println(r.getTimeCompatibility());
 			for (String comp : compatibility)
-				if (r.getTimeCompatibility().contains(comp)){
-					op.add(r.getName());
-					break;
+				for (String s : r.getTimeCompatibility()){
+					if (s.equals(comp))
+						if (!op.contains(r.getName())){
+							op.add(r.getName());
+						}
 				}
 		}
 		Collections.sort(op, new Comparator<String>() {
@@ -117,34 +128,22 @@ public class SpaceAggregationOperatorManager {
 		System.out.println(config.length+ " Space aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
-			System.out.println("A");
 			final SpaceAggregationOperatorResource resource = new SpaceAggregationOperatorResource();
-			System.out.println("B");
 			resource.setOperatorClass(e.getAttribute(OP_CLASS));
-			System.out.println("H");
 			resource.setName(e.getAttribute(OP_NAME));
 			resource.setTimeCompatibility(e.getAttribute(OP_TIME_COMPATIBILITY));
 //			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 //			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
-			System.out.println("H");
 			resource.setBundle(e.getContributor().getName());
-			System.out.println("C");
+			//System.out.println(resource.getBundle());
 			List.put(resource.getName(), resource);
 			System.out.println("    "+ resource.getName() + " "+resource.getTimeCompatibility());
 		}
 	}
 	
 	public void setSelectedOperator(final String name) {
-		final Bundle mybundle = Platform.getBundle(List.get(name).getBundle());
-		try {
-
-			selectedOperator = (ISpaceAggregationOperator) mybundle.loadClass(List.get(name).getOperatorClass()).newInstance();
-			selectedOperatorName = name;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		selectedOperatorName = name;
 	}
 	
 }

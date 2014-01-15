@@ -1,12 +1,13 @@
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpaceAggregationOperatorResource {
 
 	String			operatorClass;
 	String			name;
-	List<String>	timeCompatibility;
+	List<String>	timeCompatibility = new ArrayList<String>();
 //	String			paramWinClass;
 //	String			paramConfig;
 	String			visualization;
@@ -53,7 +54,7 @@ public class SpaceAggregationOperatorResource {
 	public void setTimeCompatibility(String string) {
 		final String[] tmp = string.split(", ");
 		for (final String s : tmp)
-			this.timeCompatibility.add(string);
+			this.timeCompatibility.add(s);
 	}
 	
 	

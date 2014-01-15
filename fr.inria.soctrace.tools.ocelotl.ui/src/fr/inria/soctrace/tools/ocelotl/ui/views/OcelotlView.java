@@ -206,7 +206,6 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-
 	private class GetAggregationAdapter extends SelectionAdapter {
 
 		@Override
@@ -455,7 +454,7 @@ public class OcelotlView extends ViewPart {
 	private HasChanged							hasChanged		= HasChanged.ALL;
 
 	private ListViewer							listViewerEventProducers;
-	private ITimeLineView							timeLineView;
+	private ITimeLineView						timeLineView;
 	private final OcelotlCore					ocelotlCore;
 	private final OcelotlParameters				ocelotlParameters;
 	private Text								textRun;
@@ -477,8 +476,10 @@ public class OcelotlView extends ViewPart {
 	private Button								buttonUp;
 	private Combo								comboSpace;
 	private Button								btnRemoveEventProducer;
-	private Canvas	canvasMatrixView;
-	private TimeLineViewManager	timeLineViewManager;
+	private Canvas								canvasMatrixView;
+	private TimeLineViewManager					timeLineViewManager;
+	private Composite							compositeMatrixView;
+	private SashForm							sashFormView;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -523,9 +524,9 @@ public class OcelotlView extends ViewPart {
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		timeAxisView = new TimeAxisView();
 		qualityView = new QualityView(this);
-		final SashForm sashFormView = new SashForm(sashFormGlobal, SWT.VERTICAL);
+		sashFormView = new SashForm(sashFormGlobal, SWT.VERTICAL);
 		sashFormView.setSashWidth(0);
-		final Composite compositeMatrixView = new Composite(sashFormView, SWT.NONE);
+		compositeMatrixView = new Composite(sashFormView, SWT.NONE);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		final GridLayout gl_compositeMatrixView = new GridLayout();
@@ -533,8 +534,9 @@ public class OcelotlView extends ViewPart {
 		gl_compositeMatrixView.marginHeight = 0;
 		compositeMatrixView.setLayout(gl_compositeMatrixView);
 		compositeMatrixView.setSize(500, 500);
-		canvasMatrixView = new Canvas(compositeMatrixView, SWT.DOUBLE_BUFFERED);
-		canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
+		// canvasMatrixView = new Canvas(compositeMatrixView,
+		// SWT.DOUBLE_BUFFERED);
+		// canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
 		final Composite compositeTimeAxisView = new Composite(sashFormView, SWT.NONE);
 		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final GridLayout gl_compositeTimeAxisView = new GridLayout();
@@ -542,6 +544,7 @@ public class OcelotlView extends ViewPart {
 		gl_compositeTimeAxisView.marginHeight = 0;
 		compositeTimeAxisView.setLayout(gl_compositeTimeAxisView);
 		final Canvas canvasTimeAxisView = timeAxisView.initDiagram(compositeTimeAxisView);
+		canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
 		sashFormView.setWeights(new int[] { 220, 57 });
 
 		final Group groupTime = new Group(sashFormGlobal, SWT.NONE);
@@ -660,7 +663,7 @@ public class OcelotlView extends ViewPart {
 				hasChanged = HasChanged.ALL;
 				ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
 				comboSpace.removeAll();
-				for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility())))
+				for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility()))
 					comboSpace.add(op);
 				comboSpace.setText("");
 				btnSettings.notifyListeners(SWT.Selection, new Event());
@@ -696,18 +699,16 @@ public class OcelotlView extends ViewPart {
 
 		comboSpace.addSelectionListener(new SelectionAdapter() {
 
-			
-
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				if (confDataLoader.getCurrentTrace() == null)
 					return;
-				hasChanged = HasChanged.PARAMETER;
-				ocelotlParameters.setSpaceAggOperator(comboSpace.getText());
+				if (hasChanged == HasChanged.NOTHING)
+					hasChanged = HasChanged.PARAMETER;
+				ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
 				timeLineView = timeLineViewManager.create();
-//				canvasMatrixView = timeLineView.initDiagram(compositeMatrixView);
-//				canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
-
+				canvasMatrixView = timeLineView.initDiagram(compositeMatrixView);
+				canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
 			}
 		});
 		sashAggreg.setWeights(new int[] { 1, 1 });
@@ -960,7 +961,6 @@ public class OcelotlView extends ViewPart {
 		sashFormGlobal.setWeights(new int[] { 254, 41, 368 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });
-		canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// clean all
 		cleanAll();
