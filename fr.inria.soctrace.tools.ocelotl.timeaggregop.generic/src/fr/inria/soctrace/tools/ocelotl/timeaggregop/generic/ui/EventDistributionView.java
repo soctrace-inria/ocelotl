@@ -50,12 +50,12 @@ import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.GenericConfig;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.EventDistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.ISettingApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-public class GenericView extends ApplicationWindow implements ISettingApplicationWindow {
+public class EventDistributionView extends ApplicationWindow implements ISettingApplicationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 
@@ -69,7 +69,7 @@ public class GenericView extends ApplicationWindow implements ISettingApplicatio
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			final InputDialog dialog = new InputDialog(getShell(), "Type Idle State", "Select Idle state", "", null);
+			final InputDialog dialog = new InputDialog(getShell(), "Type Idle GenericState", "Select Idle state", "", null);
 			if (dialog.open() == Window.CANCEL)
 				return;
 
@@ -124,11 +124,11 @@ public class GenericView extends ApplicationWindow implements ISettingApplicatio
 
 	private ListViewer		listViewerEventTypes;
 
-	private GenericConfig	config;
+	private EventDistributionConfig	config;
 
 	boolean					init	= false;
 
-	public GenericView(final Shell shell) {
+	public EventDistributionView(final Shell shell) {
 		super(shell);
 		ocelotlView = null;
 		config = null;
@@ -149,7 +149,7 @@ public class GenericView extends ApplicationWindow implements ISettingApplicatio
 
 		final Group groupEventTypes = new Group(sashFormGlobal, SWT.NONE);
 		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupEventTypes.setText("Set State Event Types");
+		groupEventTypes.setText("Set GenericState Event Types");
 		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
 		gl_groupEventTypes.horizontalSpacing = 0;
 		groupEventTypes.setLayout(gl_groupEventTypes);
@@ -219,7 +219,7 @@ public class GenericView extends ApplicationWindow implements ISettingApplicatio
 	@Override
 	public void init(final OcelotlView ocelotlView, final ITraceTypeConfig config) {
 		this.ocelotlView = ocelotlView;
-		this.config = (GenericConfig) config;
+		this.config = (EventDistributionConfig) config;
 	}
 
 }

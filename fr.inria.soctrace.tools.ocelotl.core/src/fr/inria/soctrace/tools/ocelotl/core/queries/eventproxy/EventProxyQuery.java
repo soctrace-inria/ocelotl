@@ -137,7 +137,7 @@ public class EventProxyQuery extends EventQuery {
 		try {
 
 			while (rs.next())
-				list.add(new EventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID")));
+				list.add(new EventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE")));
 			return list;
 		} catch (final SQLException e) {
 			throw new SoCTraceException(e);

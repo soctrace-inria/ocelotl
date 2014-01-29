@@ -6,11 +6,11 @@
          name="GenericTimeAggregationOperators"
          point="fr.inria.soctrace.tools.ocelotl.core.timeaggregopext">
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.GenericEventDistribution"
+            class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.EventDistribution"
             generic="true"
             operator="Event Distribution"
-            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.GenericConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.GenericView"
+            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.EventDistributionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.EventDistributionView"
             spatial_compatibility="Parts"
             trace_formats="ALL">
       </aggregation_operator>

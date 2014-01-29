@@ -34,7 +34,7 @@ import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEvent;
 
 
-public class GenericEventDistribution extends _2DMicroDescription {
+public class EventDistribution extends _2DMicroDescription {
 
 	class OcelotlThread extends Thread {
 
@@ -79,11 +79,11 @@ public class GenericEventDistribution extends _2DMicroDescription {
 		}
 	}
 
-	public GenericEventDistribution() throws SoCTraceException {
+	public EventDistribution() throws SoCTraceException {
 		super();
 	}
 
-	public GenericEventDistribution(final OcelotlParameters parameters) throws SoCTraceException {
+	public EventDistribution(final OcelotlParameters parameters) throws SoCTraceException {
 		super(parameters);
 	}
 

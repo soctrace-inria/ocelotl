@@ -17,20 +17,25 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent1;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config;
 
-import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
+import java.util.LinkedList;
+import java.util.List;
 
-public class PajeReducedEvent1 extends EventProxy {
+import fr.inria.soctrace.lib.model.EventType;
+import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
-	public String	VALUE;
-	public long		TS;
+public class EventDistributionConfig implements ITraceTypeConfig {
 
-	public PajeReducedEvent1(final int id, final int ep, final int page, final long ts, final String value) {
-		super(id, ep, page);
-		VALUE = value;
-		TS = ts;
-		// TODO Auto-generated constructor stub
+	private final List<EventType>	types			= new LinkedList<EventType>();
+
+	public EventDistributionConfig() {
+		super();
+	}
+
+	@Override
+	public List<EventType> getTypes() {
+		return types;
 	}
 
 }

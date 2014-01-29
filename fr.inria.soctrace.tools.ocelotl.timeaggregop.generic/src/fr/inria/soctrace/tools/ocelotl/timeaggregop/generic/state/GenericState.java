@@ -17,20 +17,22 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.timeaggregop.paje.queries.reducedevent1;
+package fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.state;
 
-import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
+import fr.inria.soctrace.lib.model.Event;
+import fr.inria.soctrace.tools.ocelotl.core.state.State;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
-public class PajeReducedEvent1 extends EventProxy {
 
-	public String	VALUE;
-	public long		TS;
+public class GenericState extends State {
 
-	public PajeReducedEvent1(final int id, final int ep, final int page, final long ts, final String value) {
-		super(id, ep, page);
-		VALUE = value;
-		TS = ts;
-		// TODO Auto-generated constructor stub
+	public GenericState(final Event event, final TimeSliceManager timeSliceManager) {
+		super(timeSliceManager);
+		timeRegion = new TimeRegion(event.getTimestamp(), event.getLongPar());
+		eventProducerID = event.getEventProducer().getId();
+		stateType=event.getType().getName();
 	}
+
 
 }
