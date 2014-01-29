@@ -29,6 +29,7 @@ import fr.inria.soctrace.lib.model.TraceParam;
 import fr.inria.soctrace.lib.model.TraceParamType;
 import fr.inria.soctrace.lib.model.TraceType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.model.utils.ModelConstants.TimeUnit;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
@@ -74,6 +75,7 @@ public class PajeTraceInfoManager {
 		trace.setOperatingSystem("unknown");
 		trace.setNumberOfCpus(1);
 		trace.setOutputDevice("unknown");
+		trace.setTimeUnit(TimeUnit.NANOSECONDS.getInt());
 
 	}
 
