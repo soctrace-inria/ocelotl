@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.paje.tracemanager.common.model;
 
 import fr.inria.soctrace.lib.model.EventParamType;
 import fr.inria.soctrace.lib.model.EventType;
+import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
 import fr.inria.soctrace.tools.paje.tracemanager.common.constants.PajeConstants;
 
 /**
@@ -41,7 +42,7 @@ public class PajeEventType extends EventType {
 	 *            : database id field
 	 */
 	public PajeEventType(final int id) {
-		super(id);
+		super(id, EventCategory.PUNCTUAL_EVENT);
 	}
 
 	/**
@@ -55,7 +56,7 @@ public class PajeEventType extends EventType {
 	 *            : number associate to EventType in Paje trace
 	 */
 	public PajeEventType(final int id, final String name, final String pajeId) {
-		super(id);
+		super(id, EventCategory.PUNCTUAL_EVENT);
 		pajeName = name;
 		this.pajeId = pajeId;
 		this.setName();

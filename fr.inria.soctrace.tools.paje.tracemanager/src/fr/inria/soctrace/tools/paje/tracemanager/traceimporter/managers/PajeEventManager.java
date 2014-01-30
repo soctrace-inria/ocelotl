@@ -77,8 +77,9 @@ public class PajeEventManager {
 	 * 
 	 * @param pajeId
 	 * @param param
+	 * @throws SoCTraceException 
 	 */
-	public void createEvent(final String pajeId, final List<String> param) {
+	public void createEvent(final String pajeId, final List<String> param) throws SoCTraceException {
 		final Event currentEvent = new Event(eventIdManager.getNextId());
 		PajeEventType currentEventType = new PajeEventType(IdManager.RESERVED_NO_ID);
 		// initialize in case of paje id is wrong
