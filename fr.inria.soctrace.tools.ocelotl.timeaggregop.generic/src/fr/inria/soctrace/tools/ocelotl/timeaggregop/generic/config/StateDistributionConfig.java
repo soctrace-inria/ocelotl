@@ -27,24 +27,15 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
 public class StateDistributionConfig implements ITraceTypeConfig {
 
-	private List<String>		idles			= new LinkedList<String>();
 	private List<EventType>		types			= new LinkedList<EventType>();
 
 	public StateDistributionConfig() {
 		super();
 	}
 
-	public List<String> getIdles() {
-		return idles;
-	}
-
 	@Override
 	public List<EventType> getTypes() {
 		return types;
-	}
-
-	public void setIdles(final List<String> idles) {
-		this.idles = idles;
 	}
 
 	public void setTypes(final List<EventType> types) {

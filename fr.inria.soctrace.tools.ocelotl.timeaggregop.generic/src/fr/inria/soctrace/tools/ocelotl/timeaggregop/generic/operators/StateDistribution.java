@@ -45,7 +45,7 @@ public class StateDistribution extends _3DCacheMicroDescription {
 
 		List<EventProducer>						eventProducers;
 		Map<Integer, List<EventProxy>>			eventProxyList;
-		Map<Integer, List<Event>>	eventList;
+		Map<Integer, List<Event>>				eventList;
 		int										threadNumber;
 		int										thread;
 		boolean									cached;
@@ -74,10 +74,8 @@ public class StateDistribution extends _3DCacheMicroDescription {
 				final List<EventProxy> events = eventProxyList.get(ep.getId());
 				for (int i = 0; i < events.size() - 1; i++) {
 					state = new GenericState(cache.getEventMultiPageEPCache(events.get(i)), timeSliceManager);
-					if (!((StateDistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-						matrixUpdate(state, ep, distrib);
-					}
+					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+					matrixUpdate(state, ep, distrib);
 				}
 				cache.close();
 				final int c = getCount();
@@ -108,10 +106,8 @@ public class StateDistribution extends _3DCacheMicroDescription {
 				IState state;
 				for (int i = 0; i < events.size() - 1; i++) {
 					state = new GenericState(events.get(i), timeSliceManager);
-					if (!((StateDistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getIdles().contains(state.getStateType())) {
-						final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-						matrixUpdate(state, ep, distrib);
-					}
+					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+					matrixUpdate(state, ep, distrib);
 				}
 				final int c = getCount();
 				if (c % EPCOUNT == 0)
@@ -146,7 +142,7 @@ public class StateDistribution extends _3DCacheMicroDescription {
 	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<EventProxy> fullEvents = ((OcelotlQueries) ocelotlQueries).getEventProxies(eventProducers);
+		final List<EventProxy> fullEvents = ((OcelotlQueries) ocelotlQueries).getStateProxies(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -168,7 +164,7 @@ public class StateDistribution extends _3DCacheMicroDescription {
 	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<Event> fullEvents = ((OcelotlQueries) ocelotlQueries).getEvents(eventProducers);
+		final List<Event> fullEvents = ((OcelotlQueries) ocelotlQueries).getStates(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();

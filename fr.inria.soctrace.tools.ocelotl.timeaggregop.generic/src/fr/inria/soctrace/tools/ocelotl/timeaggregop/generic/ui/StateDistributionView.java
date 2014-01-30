@@ -21,6 +21,8 @@ package fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui;
 
 import org.eclipse.swt.widgets.Shell;
 
+import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
+
 
 public class StateDistributionView extends StateDistributionBaseView {
 
@@ -32,19 +34,14 @@ public class StateDistributionView extends StateDistributionBaseView {
 	@Override
 	public void setParameters() {
 		if (config.getTypes().isEmpty()){
-//		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-//			if (ocelotlView.getConfDataLoader().getTypes().get(i).getName().contains(PajeExternalConstants.PajeSetState)) {
-//				if (!config.getTypes().contains(ocelotlView.getConfDataLoader().getTypes().get(i)))
-//					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
-//				break;
-//			}
-		if (!config.getIdles().contains("IDLE"))
-			config.getIdles().add("IDLE");
+		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++){
+			if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory()==EventCategory.STATE) {
+					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
+			}
+		}
 		}
 		listViewerEventTypes.setInput(config.getTypes());
-		listViewerIdleStates.setInput(config.getIdles());
-		}
-		
 	}
+}
 
 

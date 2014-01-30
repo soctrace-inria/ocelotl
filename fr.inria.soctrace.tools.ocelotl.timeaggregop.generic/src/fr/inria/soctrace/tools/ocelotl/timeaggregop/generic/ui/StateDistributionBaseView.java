@@ -66,17 +66,6 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 		}
 	}
 
-	private class IdlesSelectionAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			final InputDialog dialog = new InputDialog(getShell(), "Type Idle GenericState", "Select Idle state", "", null);
-			if (dialog.open() == Window.CANCEL)
-				return;
-			config.getIdles().add(dialog.getValue());
-			listViewerIdleStates.setInput(config.getIdles());
-		}
-	}
 
 	private class RemoveSelectionAdapter extends SelectionAdapter {
 
@@ -185,48 +174,6 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 		scrCompositeEventTypeButtons.setContent(compositeEventTypeButtons);
 		scrCompositeEventTypeButtons.setMinSize(compositeEventTypeButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveEventTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerEventTypes));
-		final Group groupIdleStates = new Group(sashFormGlobal, SWT.NONE);
-		groupIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupIdleStates.setText("Idle States");
-		final GridLayout gl_groupIdleStates = new GridLayout(2, false);
-		gl_groupIdleStates.horizontalSpacing = 0;
-		gl_groupIdleStates.verticalSpacing = 0;
-		groupIdleStates.setLayout(gl_groupIdleStates);
-
-		listViewerIdleStates = new ListViewer(groupIdleStates, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		listViewerIdleStates.setContentProvider(new ArrayContentProvider());
-		listViewerIdleStates.setComparator(new ViewerComparator());
-		final List listIdleStates = listViewerIdleStates.getList();
-		final GridData gd_listIdleStates = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_listIdleStates.widthHint = 203;
-		listIdleStates.setLayoutData(gd_listIdleStates);
-		listIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		final ScrolledComposite scrCompositeIdleStateButton = new ScrolledComposite(groupIdleStates, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrCompositeIdleStateButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		scrCompositeIdleStateButton.setExpandHorizontal(true);
-		scrCompositeIdleStateButton.setExpandVertical(true);
-
-		final Composite compositeIdleStateButtons = new Composite(scrCompositeIdleStateButton, SWT.NONE);
-		compositeIdleStateButtons.setLayout(new GridLayout(1, false));
-
-		final Button btnAddIdleStates = new Button(compositeIdleStateButtons, SWT.NONE);
-		btnAddIdleStates.setText("Add");
-		btnAddIdleStates.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnAddIdleStates.setImage(null);
-		btnAddIdleStates.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		btnAddIdleStates.addSelectionListener(new IdlesSelectionAdapter());
-
-		final Button btnRemoveIdle = new Button(compositeIdleStateButtons, SWT.NONE);
-		btnRemoveIdle.setText("Remove");
-		btnRemoveIdle.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRemoveIdle.setImage(null);
-		btnRemoveIdle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		scrCompositeIdleStateButton.setContent(compositeIdleStateButtons);
-		scrCompositeIdleStateButton.setMinSize(compositeIdleStateButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		btnRemoveIdle.addSelectionListener(new RemoveSelectionAdapter(listViewerIdleStates));
-
-
 
 		final Composite OK = new Composite(sashFormGlobal, SWT.NONE);
 		OK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -240,7 +187,6 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 		buttonOK.setText("OK");
 		buttonOK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		buttonOK.setImage(null);
-		sashFormGlobal.setWeights(new int[] { 140, 145, 89 });
 		buttonOK.addSelectionListener(new SelectionAdapter() {
 
 			@Override

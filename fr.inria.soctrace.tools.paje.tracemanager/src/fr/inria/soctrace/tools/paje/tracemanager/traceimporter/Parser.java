@@ -188,7 +188,7 @@ public class Parser {
 			// Event definition
 			if (strLine.startsWith(PajeConstants.PajeFormatStartEventDef)) {
 				// TODO constant
-				final String[] tokens = strLine.split(" ");
+				final String[] tokens = strLine.split("\\s+");
 				currentPajeId = tokens[2];
 				pajeEventTypeManager.addPajeEventType(tokens[1], currentPajeId);
 			}

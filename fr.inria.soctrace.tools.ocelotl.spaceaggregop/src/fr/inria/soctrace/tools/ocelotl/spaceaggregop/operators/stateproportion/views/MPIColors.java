@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views;
 
+import java.io.ObjectInputStream.GetField;
 import java.util.HashMap;
 
 import org.eclipse.swt.graphics.Color;
@@ -28,14 +29,22 @@ import org.eclipse.swt.widgets.Display;
 public class MPIColors {
 
 	public static HashMap<String, Color>	Colors	= new HashMap<String, Color>();
+	private static Device device;
 
 	static {
 		init();
 	}
+	
+
+	public static Color ocelotlColor(float r, float g, float b) {
+			// TODO Auto-generated constructor stub
+			return new Color(device, (int)r*255, (int)g*255, (int)b*255);
+		}
+		
 
 	private static void init() {
 		Colors.clear();
-		final Device device = Display.getCurrent();
+		device = Display.getCurrent();
 		Colors.put("Execution", new Color(device, (int) (255 * 0.179082), (int) (255 * 0.934619), 255 * 1));
 		Colors.put("MPI_Allreduce", new Color(device, 255 * 1, (int) (255 * 0.323597), (int) (255 * 0.7323)));
 		Colors.put("MPI_Alltoall", new Color(device, (int) (255 * 0.305274), (int) (255 * 0.454396), 255 * 1));
@@ -60,7 +69,35 @@ public class MPIColors {
 		Colors.put("LOG", new Color(device, (int) (255 * 0.4), (int) (255 * 0.4), (int) (255 * 0.4)));
 		Colors.put("TRACE", new Color(device, (int) (255 * 0.3), (int) (255 * 0.3), (int) (255 * 0.0)));
 		Colors.put("IDLE", new Color(device, (int) (255 * 0.7), (int) (255 * 0.7), (int) (255 * 0.7)));
+//		5 12 11 underloaded "0 1 1"
+//		5 13 11 normal "1 1 1"
+//		5 14 11 violation "1 0 0"
+//		5 15 11 violation-det "0 1 0"
+//		5 16 11 violation-out "1 0 0"
+//		2 17 2 SERVICE
+//		5 18 17 free "1 1 1"
+//		5 19 17 booked "0 0 1"
+//		5 20 17 compute "1 0 1"
+//		5 21 17 reconfigure "1 1 0"
+		addColor("12", 0, 1, 1);
+		addColor("13", 1, 1, 1);
+		addColor("14", 1, 0, 0);
+		addColor("15", 0, 1, 0);
+		addColor("16", 1, 0, 0);
+		addColor("17", 1, 1, 1);
+		addColor("18", 1, 0.5, 0.5);
+		addColor("19", 0, 0, 1);
+		addColor("20", 1, 0, 1);
+		addColor("21", 1, 1, 0);
 
+	}
+	
+	static void addColor(String name, float r, float g, float b){
+		Colors.put(name, ocelotlColor(r, g, b));
+	}
+	
+	static void addColor(String name, double r, double g, double b){
+		Colors.put(name, ocelotlColor((float)r, (float)g, (float)b));
 	}
 
 }

@@ -38,11 +38,11 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.query.EventQuery;
 import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.queries.event.EventQuery;
 
 /**
  * OcelotlQueries class for Event self-defining-pattern tables.
@@ -79,20 +79,20 @@ public class GenericReducedEventQuery extends EventQuery {
 				eventQuery.append(elementWhere.getSQLString());
 			}
 
-			if (typeWhere != null) {
+			if (getTypeWhere() != null) {
 				if (!first)
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
+				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + getTypeWhere().getSQLString() + " ) )");
 			}
 
-			if (eventProducerWhere != null) {
+			if (getEventProducerWhere() != null) {
 				if (!first)
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
+				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + getEventProducerWhere().getSQLString() + " ) )");
 			}
 
 			if (parametersConditions.size() > 0) {
