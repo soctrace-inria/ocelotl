@@ -17,7 +17,7 @@
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.StateDistribution"
             generic="true"
-            operator="StateDistribution"
+            operator="State Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.StateDistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.StateDistributionView"
             spatial_compatibility="Parts, StateProportion"

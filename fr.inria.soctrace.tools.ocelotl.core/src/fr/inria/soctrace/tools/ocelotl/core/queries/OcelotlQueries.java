@@ -73,6 +73,15 @@ public class OcelotlQueries implements IOcelotlQueries {
 		traceSearch.uninitialize();
 		return elist;
 	}
+	
+	public List<Event> getAllStates() throws SoCTraceException {
+		final OcelotlTraceSearch traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
+		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+		final List<Event> elist = traceSearch.getStates(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
+		traceSearch.uninitialize();
+		return elist;
+	}
 
 	public List<GenericReducedEvent> getAllReducedEvents() throws SoCTraceException {
 		final OcelotlTraceSearch traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
@@ -137,7 +146,7 @@ public class OcelotlQueries implements IOcelotlQueries {
 	
 	public List<Event> getStates(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
-			return getAllEvents();
+			return getAllStates();
 		else {
 			final OcelotlTraceSearch traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
 			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();

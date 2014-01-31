@@ -422,6 +422,7 @@ public class OcelotlView extends ViewPart {
 								comboTime.setText("");
 								comboSpace.removeAll();
 								btnRemoveEventProducer.notifyListeners(SWT.Selection, new Event());
+								btnAddAllEventProducer.notifyListeners(SWT.Selection, new Event());
 							}
 						});
 					} catch (final Exception e) {
@@ -480,6 +481,7 @@ public class OcelotlView extends ViewPart {
 	private Composite							compositeMatrixView;
 	private SashForm							sashFormView;
 	private TimeLineViewWrapper					timeLineViewWrapper;
+	private Button								btnAddAllEventProducer;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -595,7 +597,7 @@ public class OcelotlView extends ViewPart {
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
 		final TabItem tbtmTimeAggregationParameters = new TabItem(tabFolder, SWT.NONE);
-		tbtmTimeAggregationParameters.setText("Time Aggregation");
+		tbtmTimeAggregationParameters.setText("Trace Overview");
 
 		final SashForm sashFormTimeAggregationParameters = new SashForm(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setControl(sashFormTimeAggregationParameters);
@@ -639,7 +641,7 @@ public class OcelotlView extends ViewPart {
 
 		final Group groupAggregationOperator = new Group(sashAggreg, SWT.NONE);
 		groupAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupAggregationOperator.setText("Time Aggregation Operator");
+		groupAggregationOperator.setText("Time Microscopic Description");
 		groupAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
@@ -679,7 +681,7 @@ public class OcelotlView extends ViewPart {
 		comboTime.setText("");
 
 		final Group grpSpaceAggregationOperator = new Group(sashAggreg, SWT.NONE);
-		grpSpaceAggregationOperator.setText("Space Aggregation Operator");
+		grpSpaceAggregationOperator.setText("Visualization");
 		grpSpaceAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		grpSpaceAggregationOperator.setLayout(new GridLayout(1, false));
 
@@ -745,7 +747,7 @@ public class OcelotlView extends ViewPart {
 		btnAddEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnAddEventProducer.setImage(null);
 
-		final Button btnAddAllEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
+		btnAddAllEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
 		btnAddAllEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnAddAllEventProducer.setText("Add All");
 		btnAddAllEventProducer.setImage(null);

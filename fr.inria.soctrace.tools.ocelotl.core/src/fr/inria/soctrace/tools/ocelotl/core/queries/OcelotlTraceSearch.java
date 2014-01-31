@@ -334,7 +334,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		and.addCondition(new SimpleCondition("CATEGORY", ComparisonOperation.EQ, String.valueOf(EventCategory.STATE)));
 		query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
-		query.setLoadParameters(false);
+		//query.setLoadParameters(false);
 		traceDB.close();
 		return query.getList();
 	}

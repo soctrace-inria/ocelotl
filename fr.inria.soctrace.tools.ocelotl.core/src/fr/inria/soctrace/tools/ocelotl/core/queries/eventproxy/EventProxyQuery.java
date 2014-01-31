@@ -83,20 +83,20 @@ public class EventProxyQuery extends EventQuery {
 				eventQuery.append(elementWhere.getSQLString());
 			}
 
-			if (getTypeWhere() != null) {
+			if (typeWhere != null) {
 				if (!first)
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + getTypeWhere().getSQLString() + " ) )");
+				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
 			}
 
-			if (getEventProducerWhere() != null) {
+			if (eventProducerWhere != null) {
 				if (!first)
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + getEventProducerWhere().getSQLString() + " ) )");
+				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
 			}
 
 			if (parametersConditions.size() > 0) {

@@ -173,7 +173,7 @@ public class StateDistribution extends _3DCacheMicroDescription {
 		for (final EventProducer ep : eventProducers)
 			eventList.put(ep.getId(), new ArrayList<Event>());
 		for (final Event e : fullEvents)
-			eventList.get(e.getEventProducer().getName()).add(e);
+			eventList.get(e.getEventProducer().getId()).add(e);
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < Math.min(getOcelotlParameters().getThread(), eventProducers.size()); t++)
 			threadlist.add(new OcelotlThread(eventProducers, eventList, getOcelotlParameters().getThread(), t, false));
