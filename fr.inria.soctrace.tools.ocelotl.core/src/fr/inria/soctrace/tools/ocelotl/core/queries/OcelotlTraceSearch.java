@@ -103,7 +103,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 
 		if (and.getNumberOfConditions() == 1)
 			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-		query.setElementWhere(and);
+		if (and.getNumberOfConditions() >2 )
+			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		proxy = query.getIDList();
 		traceDB.close();
@@ -115,7 +116,9 @@ public class OcelotlTraceSearch extends TraceSearch {
 		openTraceDBObject(t);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
 		List<EventProxy> proxy = new ArrayList<EventProxy>();
-
+		final EventProxyQuery query = new EventProxyQuery(traceDB);
+		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+		
 		// types
 		if (eventTypes != null)
 			if (eventTypes.size() == 0)
@@ -124,8 +127,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 			if (eventProducers.size() == 0)
 				return proxy;
 		dm.start();
-		final EventProxyQuery query = new EventProxyQuery(traceDB);
-		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+
 		// and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ,
 		// Long.toString(i)));
 		
@@ -146,43 +148,51 @@ public class OcelotlTraceSearch extends TraceSearch {
 				vls.addValue(String.valueOf(ep.getId()));
 			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.IN, vls.getValueString()));
 		}
-		
+
 		// intervals
-				final LogicalCondition ort = new LogicalCondition(LogicalOperation.OR);
-				final LogicalCondition andt = new LogicalCondition(LogicalOperation.AND);
-				final LogicalCondition andd = new LogicalCondition(LogicalOperation.AND);
-				final LogicalCondition anddt = new LogicalCondition(LogicalOperation.AND);
-				if (region != null) {
-					if (traceDB.getMaxTimestamp() != region.getTimeStampEnd()){
-						andt.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
-						andd.addCondition(new SimpleCondition("LPAR", ComparisonOperation.GE, Long.toString(region.getTimeStampEnd())));
-						anddt.addCondition(new SimpleCondition("LPAR", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
-
-					}
-					if (traceDB.getMinTimestamp() != region.getTimeStampStart()){
-						andt.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
-						andd.addCondition(new SimpleCondition("LPAR", ComparisonOperation.LE, Long.toString(region.getTimeStampStart())));
-						anddt.addCondition(new SimpleCondition("LPAR", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
-
-					}
-						while (andt.getNumberOfConditions()<2)
-						andt.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-						while (andd.getNumberOfConditions()<2)
-						andd.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-						while (anddt.getNumberOfConditions()<2)
-						anddt.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-						ort.addCondition(anddt);
-						ort.addCondition(andt);
-						ort.addCondition(andd);
+		final LogicalCondition ort = new LogicalCondition(LogicalOperation.OR);
+		final LogicalCondition andt = new LogicalCondition(LogicalOperation.AND);
+		final LogicalCondition andd = new LogicalCondition(LogicalOperation.AND);
+		SimpleCondition t1=null;
+		SimpleCondition t2=null;
+		SimpleCondition d1=null;
+		SimpleCondition d2=null;
+		
+		if (region != null) {
+			if (traceDB.getMaxTimestamp() > region.getTimeStampEnd()){
+				t2=new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd()));
+			}
+			if (traceDB.getMinTimestamp() < region.getTimeStampStart()){
+				t1=new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart()));
+				d1=new SimpleCondition("TIMESTAMP", ComparisonOperation.LT, Long.toString(region.getTimeStampStart()));
+				d2=new SimpleCondition("LPAR", ComparisonOperation.GE, Long.toString(region.getTimeStampStart()));
+			}
+				if (t1==null&&t2!=null){
+				and.addCondition(t2);
 				}
-
-		and.addCondition(ort);
-
-
-
+				else if (t2==null&&t1!=null){
+				ort.addCondition(t1);
+				andd.addCondition(d1);
+				andd.addCondition(d2);
+				ort.addCondition(andd);
+				and.addCondition(ort);
+				}
+				else if (t2!=null&&t1!=null){
+				andt.addCondition(t1);
+				andt.addCondition(t2);
+				ort.addCondition(andt);
+				andd.addCondition(d1);
+				andd.addCondition(d2);
+				ort.addCondition(andd);
+				and.addCondition(ort);
+				}
+		}
+		if (and.getNumberOfConditions() ==1 )
 		and.addCondition(new SimpleCondition("CATEGORY", ComparisonOperation.EQ, String.valueOf(EventCategory.STATE)));
-		query.setElementWhere(and);
+		if (and.getNumberOfConditions() >=2 )
+			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+		query.setLoadParameters(false);
 		proxy = query.getIDList();
 		traceDB.close();
 		return proxy;
@@ -224,7 +234,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// TODO improve
 		if (and.getNumberOfConditions() == 1)
 			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-		query.setElementWhere(and);
+		if (and.getNumberOfConditions() >=2 )
+			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		traceDB.close();
 		return query.getList();
@@ -267,7 +278,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// TODO improve
 		if (and.getNumberOfConditions() == 1)
 			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-		query.setElementWhere(and);
+		if (and.getNumberOfConditions() >=2 )
+			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
 		traceDB.close();
@@ -304,37 +316,46 @@ public class OcelotlTraceSearch extends TraceSearch {
 		final LogicalCondition ort = new LogicalCondition(LogicalOperation.OR);
 		final LogicalCondition andt = new LogicalCondition(LogicalOperation.AND);
 		final LogicalCondition andd = new LogicalCondition(LogicalOperation.AND);
-		final LogicalCondition anddt = new LogicalCondition(LogicalOperation.AND);
+		SimpleCondition t1=null;
+		SimpleCondition t2=null;
+		SimpleCondition d1=null;
+		SimpleCondition d2=null;
+		
 		if (region != null) {
-			if (traceDB.getMaxTimestamp() != region.getTimeStampEnd()){
-				andt.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
-				andd.addCondition(new SimpleCondition("LPAR", ComparisonOperation.GE, Long.toString(region.getTimeStampEnd())));
-				anddt.addCondition(new SimpleCondition("LPAR", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
-
+			if (traceDB.getMaxTimestamp() > region.getTimeStampEnd()){
+				t2=new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd()));
 			}
-			if (traceDB.getMinTimestamp() != region.getTimeStampStart()){
-				andt.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
-				andd.addCondition(new SimpleCondition("LPAR", ComparisonOperation.LE, Long.toString(region.getTimeStampStart())));
-				anddt.addCondition(new SimpleCondition("LPAR", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
-
+			if (traceDB.getMinTimestamp() < region.getTimeStampStart()){
+				t1=new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart()));
+				d1=new SimpleCondition("TIMESTAMP", ComparisonOperation.LT, Long.toString(region.getTimeStampStart()));
+				d2=new SimpleCondition("LPAR", ComparisonOperation.GE, Long.toString(region.getTimeStampStart()));
 			}
-				while (andt.getNumberOfConditions()<2)
-				andt.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-				while (andd.getNumberOfConditions()<2)
-				andd.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-				while (anddt.getNumberOfConditions()<2)
-				anddt.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-				ort.addCondition(anddt);
-				ort.addCondition(andt);
+				if (t1==null&&t2!=null){
+				and.addCondition(t2);
+				}
+				else if (t2==null&&t1!=null){
+				ort.addCondition(t1);
+				andd.addCondition(d1);
+				andd.addCondition(d2);
 				ort.addCondition(andd);
+				and.addCondition(ort);
+				}
+				else if (t2!=null&&t1!=null){
+				andt.addCondition(t1);
+				andt.addCondition(t2);
+				ort.addCondition(andt);
+				andd.addCondition(d1);
+				andd.addCondition(d2);
+				ort.addCondition(andd);
+				and.addCondition(ort);
+				}
 		}
-
-		and.addCondition(ort);
-
-		and.addCondition(new SimpleCondition("CATEGORY", ComparisonOperation.EQ, String.valueOf(EventCategory.STATE)));
-		query.setElementWhere(and);
+		if (and.getNumberOfConditions() ==1 )
+			and.addCondition(new SimpleCondition("CATEGORY", ComparisonOperation.EQ, String.valueOf(EventCategory.STATE)));
+		if (and.getNumberOfConditions() >=2 )
+			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
-		//query.setLoadParameters(false);
+		query.setLoadParameters(false);
 		traceDB.close();
 		return query.getList();
 	}
@@ -383,7 +404,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 
 		if (and.getNumberOfConditions() == 1)
 			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, "1"));
-		query.setElementWhere(and);
+		if (and.getNumberOfConditions() >=2 )
+			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		proxy = query.getReducedEventList();
 		traceDB.close();
