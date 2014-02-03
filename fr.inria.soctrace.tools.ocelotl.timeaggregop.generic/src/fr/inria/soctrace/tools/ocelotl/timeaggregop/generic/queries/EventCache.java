@@ -73,6 +73,7 @@ public class EventCache {
 		final EventQuery query = new EventQuery(traceDB);
 		query.setElementWhere(new SimpleCondition("ID", ComparisonOperation.EQ, String.valueOf(event.ID)));
 		final List<Event> elist = query.getList();
+		query.setLoadParameters(false);
 		// traceDB.close();
 		for (final Event e : elist)
 			cache.put(e.getId(), e);
@@ -92,6 +93,7 @@ public class EventCache {
 			for (int i = 0; i < PAGE; i++)
 				vls.addValue(String.valueOf(event.PAGE + i));
 			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, vls.getValueString()));
+			query.setLoadParameters(false);
 			List<Event> elist = query.getList();
 			// traceDB.close();
 			for (final Event e : elist)
@@ -117,6 +119,7 @@ public class EventCache {
 			and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.IN, String.valueOf(vls.getValueString())));
 			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(event.EP)));
 			query.setElementWhere(and);
+			query.setLoadParameters(false);
 			List<Event> elist = query.getList();
 			// traceDB.close();
 			for (final Event e : elist)
@@ -135,6 +138,7 @@ public class EventCache {
 		// TraceDBObject traceDB = new TraceDBObject(trace, DBMode.DB_OPEN);
 		EventQuery query = new EventQuery(traceDB);
 			query.setElementWhere(new SimpleCondition("PAGE", ComparisonOperation.IN, String.valueOf(event.PAGE)));
+			query.setLoadParameters(false);
 			List<Event> elist = query.getList();
 			// traceDB.close();
 			for (final Event e : elist)
@@ -156,6 +160,7 @@ public class EventCache {
 			and.addCondition(new SimpleCondition("PAGE", ComparisonOperation.EQ, String.valueOf(event.PAGE)));
 			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.EQ, String.valueOf(event.EP)));
 			query.setElementWhere(and);
+			query.setLoadParameters(false);
 			List<Event> elist = query.getList();
 			// traceDB.close();
 			for (final Event e : elist)

@@ -45,22 +45,6 @@ public class MPIColors {
 	private static void init() {
 		Colors.clear();
 		device = Display.getCurrent();
-		Colors.put("STATE_Execution", new Color(device, (int) (255 * 0.179082), (int) (255 * 0.934619), 255 * 1));
-		Colors.put("STATE_MPI_Allreduce", new Color(device, 255 * 1, (int) (255 * 0.323597), (int) (255 * 0.7323)));
-		Colors.put("STATE_MPI_Alltoall", new Color(device, (int) (255 * 0.305274), (int) (255 * 0.454396), 255 * 1));
-		Colors.put("STATE_MPI_Alltoallv", new Color(device, (int) (255 * 0.321158), (int) (255 * 0.912927), 255 * 1));
-		Colors.put("STATE_MPI_Barrier", new Color(device, 255 * 0, (int) (255 * 0.991057), 255 * 1));
-		Colors.put("STATE_MPI_Bcast", new Color(device, 255 * 1, (int) (255 * 0.996891), 255 * 0));
-		Colors.put("STATE_MPI_Comm_rank", new Color(device, 255 * 1, (int) (255 * 0.559672), (int) (255 * 0.289578)));
-		Colors.put("STATE_MPI_Comm_size", new Color(device, 255 * 1, (int) (255 * 0.464106), (int) (255 * 0.579677)));
-		Colors.put("STATE_MPI_Finalize", new Color(device, (int) (255 * 0.915529), 255 * 0, 255 * 1));
-		Colors.put("STATE_MPI_Init", new Color(device, 255 * 1, (int) (255 * 0.927823), (int) (255 * 0.21797)));
-		Colors.put("STATE_MPI_Recv", new Color(device, 255 * 1, 255 * 0, 255 * 0));
-		Colors.put("STATE_MPI_Reduce", new Color(device, (int) (255 * 0.446826), 255 * 1, (int) (255 * 0.280726)));
-		Colors.put("STATE_MPI_Send", new Color(device, 255 * 0, 255 * 0, 255 * 1));
-		Colors.put("STATE_MPI_Wait", new Color(device, 255 * 1, (int) (255 * 0.612729), (int) (255 * 0.62382)));
-		Colors.put("STATE_MPI_Waitall", new Color(device, (int) (255 * 0.886904), (int) (255 * 0.384766), 255 * 1));
-		Colors.put("STATE_MPI_Allgatherv", new Color(device, 255 * 1, (int) (255 * 0.5), (int) (255 * 0.0)));
 		Colors.put("Execution", new Color(device, (int) (255 * 0.179082), (int) (255 * 0.934619), 255 * 1));
 		Colors.put("MPI_Allreduce", new Color(device, 255 * 1, (int) (255 * 0.323597), (int) (255 * 0.7323)));
 		Colors.put("MPI_Alltoall", new Color(device, (int) (255 * 0.305274), (int) (255 * 0.454396), 255 * 1));
@@ -77,6 +61,7 @@ public class MPIColors {
 		Colors.put("MPI_Wait", new Color(device, 255 * 1, (int) (255 * 0.612729), (int) (255 * 0.62382)));
 		Colors.put("MPI_Waitall", new Color(device, (int) (255 * 0.886904), (int) (255 * 0.384766), 255 * 1));
 		Colors.put("MPI_Allgatherv", new Color(device, 255 * 1, (int) (255 * 0.5), (int) (255 * 0.0)));
+		Colors.put("IDLE", new Color(device, (int) (255 * 0.7), (int) (255 * 0.7), (int) (255 * 0.7)));
 		Colors.put("ERROR", new Color(device, 255 * 1, (int) (255 * 0.0), (int) (255 * 0.0)));
 		Colors.put("WARN", new Color(device, 255 * 1, (int) (255 * 0.4), (int) (255 * 0.0)));
 		Colors.put("FIXME", new Color(device, (int) (255 * 0.0), (int) (255 * 0.0), 255 * 1));
@@ -84,7 +69,15 @@ public class MPIColors {
 		Colors.put("DEBUG", new Color(device, 255 * 1, (int) (255 * 0.8), (int) (255 * 0.0)));
 		Colors.put("LOG", new Color(device, (int) (255 * 0.4), (int) (255 * 0.4), (int) (255 * 0.4)));
 		Colors.put("TRACE", new Color(device, (int) (255 * 0.3), (int) (255 * 0.3), (int) (255 * 0.0)));
-		Colors.put("IDLE", new Color(device, (int) (255 * 0.7), (int) (255 * 0.7), (int) (255 * 0.7)));
+		Colors.put("Idle", new Color(device, (int) (255 * 0.7), (int) (255 * 0.7), (int) (255 * 0.7)));
+		Colors.put("Error", new Color(device, 255 * 1, (int) (255 * 0.0), (int) (255 * 0.0)));
+		Colors.put("Warning", new Color(device, 255 * 1, (int) (255 * 0.4), (int) (255 * 0.0)));
+		Colors.put("Fixme", new Color(device, (int) (255 * 0.0), (int) (255 * 0.0), 255 * 1));
+		Colors.put("Info", new Color(device, (int) (255 * 0.0), 255 * 1, (int) (255 * 0.0)));
+		Colors.put("Debug", new Color(device, 255 * 1, (int) (255 * 0.8), (int) (255 * 0.0)));
+		Colors.put("Log", new Color(device, (int) (255 * 0.4), (int) (255 * 0.4), (int) (255 * 0.4)));
+		Colors.put("Trace", new Color(device, (int) (255 * 0.3), (int) (255 * 0.3), (int) (255 * 0.0)));
+
 //		5 12 11 underloaded "0 1 1"
 //		5 13 11 normal "1 1 1"
 //		5 14 11 violation "1 0 0"

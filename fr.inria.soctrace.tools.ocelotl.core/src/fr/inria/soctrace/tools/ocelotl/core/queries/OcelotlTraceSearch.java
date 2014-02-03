@@ -40,6 +40,7 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQuery.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxyQuery;
 import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEvent;
@@ -358,6 +359,89 @@ public class OcelotlTraceSearch extends TraceSearch {
 		query.setLoadParameters(false);
 		traceDB.close();
 		return query.getList();
+	}
+	
+	public EventIterator getStateIterator(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+		openTraceDBObject(t);
+		final IteratorQuery query = new IteratorQuery(traceDB);
+		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
+		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+
+		// types
+		if (eventTypes != null) {
+			if (eventTypes.size() == 0)
+				return null;
+			final ValueListString vls = new ValueListString();
+			for (final EventType et : eventTypes)
+				vls.addValue(String.valueOf(et.getId()));
+			query.setTypeWhere(new SimpleCondition("EVENT_TYPE_ID", ComparisonOperation.IN, vls.getValueString()));
+		}
+		
+		// eventProducers
+		if (eventProducers != null) {
+			if (eventProducers.size() == 0)
+				return null;
+			final ValueListString vls = new ValueListString();
+			for (final EventProducer ep : eventProducers)
+				vls.addValue(String.valueOf(ep.getId()));
+			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.IN, vls.getValueString()));
+		}
+
+		// intervals
+		final LogicalCondition ort = new LogicalCondition(LogicalOperation.OR);
+		final LogicalCondition andt = new LogicalCondition(LogicalOperation.AND);
+		final LogicalCondition andd = new LogicalCondition(LogicalOperation.AND);
+		SimpleCondition t1=null;
+		SimpleCondition t2=null;
+		SimpleCondition d1=null;
+		SimpleCondition d2=null;
+		
+		if (region != null) {
+			if (traceDB.getMaxTimestamp() > region.getTimeStampEnd()){
+				t2=new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd()));
+			}
+			if (traceDB.getMinTimestamp() < region.getTimeStampStart()){
+				t1=new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart()));
+				d1=new SimpleCondition("TIMESTAMP", ComparisonOperation.LT, Long.toString(region.getTimeStampStart()));
+				d2=new SimpleCondition("LPAR", ComparisonOperation.GE, Long.toString(region.getTimeStampStart()));
+			}
+				if (t1==null&&t2!=null){
+				and.addCondition(t2);
+				}
+				else if (t2==null&&t1!=null){
+				ort.addCondition(t1);
+				andd.addCondition(d1);
+				andd.addCondition(d2);
+				ort.addCondition(andd);
+				and.addCondition(ort);
+				}
+				else if (t2!=null&&t1!=null){
+				andt.addCondition(t1);
+				andt.addCondition(t2);
+				ort.addCondition(andt);
+				andd.addCondition(d1);
+				andd.addCondition(d2);
+				ort.addCondition(andd);
+				and.addCondition(ort);
+				}
+		}
+		if (and.getNumberOfConditions() ==1 )
+			and.addCondition(new SimpleCondition("CATEGORY", ComparisonOperation.EQ, String.valueOf(EventCategory.STATE)));
+		if (and.getNumberOfConditions() >=2 )
+			query.setElementWhere(and);
+		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+		query.setLoadParameters(false);
+		//traceDB.close();
+		return query.getIterator();
+	}
+	
+	public void closeTraceDB(){
+		try {
+			traceDB.close();
+		} catch (SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public List<GenericReducedEvent> getReducedEvents(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
