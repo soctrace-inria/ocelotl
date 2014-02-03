@@ -441,7 +441,6 @@ public class OcelotlView extends ViewPart {
 	public static final String					ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
 	public static final String					PLUGIN_ID		= Activator.PLUGIN_ID;
 	private Button								btnMergeAggregatedParts;
-	private Button								btnCache;
 	private Button								btnNormalize;
 	private Button								btnRun;
 	private Button								btnShowNumbers;
@@ -462,8 +461,7 @@ public class OcelotlView extends ViewPart {
 	private QualityView							qualityView;
 	private Spinner								spinnerDivideDbQuery;
 	private Spinner								spinnerThread;
-	private Spinner								spinnerPageSize;
-	private Spinner								spinnerEPPageSize;
+	private Spinner								spinnerEventSize;
 	private Spinner								spinnerTSNumber;
 	private Text								textThreshold;
 	private TimeAxisView						timeAxisView;
@@ -503,12 +501,10 @@ public class OcelotlView extends ViewPart {
 		btnNormalize.setSelection(false);
 		btnGrowingQualities.setSelection(true);
 		btnDecreasingQualities.setSelection(false);
-		btnCache.setSelection(false);
 		spinnerTSNumber.setSelection(100);
 		spinnerDivideDbQuery.setSelection(0);
-		spinnerPageSize.setSelection(50);
-		spinnerEPPageSize.setSelection(100);
-		spinnerThread.setSelection(5);
+		spinnerEventSize.setSelection(10000);
+		spinnerThread.setSelection(8);
 		textRun.setText("1.0");
 		btnMergeAggregatedParts.setSelection(true);
 		producers.clear();
@@ -873,37 +869,19 @@ public class OcelotlView extends ViewPart {
 
 		final Group grpCacheManagement = new Group(sashFormAdvancedParameters, SWT.NONE);
 		grpCacheManagement.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpCacheManagement.setText("Cache Management");
-		grpCacheManagement.setLayout(new GridLayout(5, false));
-
-		btnCache = new Button(grpCacheManagement, SWT.CHECK);
-		btnCache.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		// btnCache.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true,
-		// false, 1, 1));
-		btnCache.setText("Activate Cache");
-		btnCache.setSelection(false);
+		grpCacheManagement.setText("Iterator Management");
+		grpCacheManagement.setLayout(new GridLayout(2, false));
 
 		final Label lblPageSize = new Label(grpCacheManagement, SWT.NONE);
 		lblPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblPageSize.setText("Cache Page Size");
+		lblPageSize.setText("Event Number Retrieved by Threads");
 
-		spinnerPageSize = new Spinner(grpCacheManagement, SWT.BORDER);
-		spinnerPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerPageSize.addModifyListener(new ConfModificationListener());
-		spinnerPageSize.setMinimum(1);
-		spinnerPageSize.setMaximum(1000000);
-		spinnerPageSize.setSelection(50);
-
-		final Label lblEPPageSize = new Label(grpCacheManagement, SWT.NONE);
-		lblEPPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblEPPageSize.setText("EP Cache Page Size");
-
-		spinnerEPPageSize = new Spinner(grpCacheManagement, SWT.BORDER);
-		spinnerEPPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerEPPageSize.addModifyListener(new ConfModificationListener());
-		spinnerEPPageSize.setMinimum(1);
-		spinnerEPPageSize.setMaximum(1000000);
-		spinnerEPPageSize.setSelection(100);
+		spinnerEventSize = new Spinner(grpCacheManagement, SWT.BORDER);
+		spinnerEventSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		spinnerEventSize.addModifyListener(new ConfModificationListener());
+		spinnerEventSize.setMinimum(100);
+		spinnerEventSize.setMaximum(10000000);
+		spinnerEventSize.setSelection(100000);
 
 		final Group grpDivideDbQuery = new Group(sashFormAdvancedParameters, SWT.NONE);
 		grpDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -1032,7 +1010,7 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
-		ocelotlParameters.setEventsPerThread(spinnerPageSize.getSelection());
+		ocelotlParameters.setEventsPerThread(spinnerEventSize.getSelection());
 		ocelotlParameters.setThread(spinnerThread.getSelection());
 		// TODO manage number format exception
 		try {

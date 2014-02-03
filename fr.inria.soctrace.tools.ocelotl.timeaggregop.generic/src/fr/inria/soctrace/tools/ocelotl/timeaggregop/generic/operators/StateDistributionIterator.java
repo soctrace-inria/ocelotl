@@ -50,7 +50,6 @@ public class StateDistributionIterator extends _3DMicroDescription {
 		int										thread;
 		int 									size;
 
-		@SuppressWarnings("unchecked")
 		public OcelotlThread(final int threadNumber, final int thread, final int size) {
 			super();
 			this.threadNumber = threadNumber;
@@ -106,6 +105,7 @@ public class StateDistributionIterator extends _3DMicroDescription {
 			if (it.getNext()==null)
 				return events;
 			events.add(it.getEvent());
+			eventsNumber++;
 		}
 		}
 		return events;
@@ -122,7 +122,7 @@ public class StateDistributionIterator extends _3DMicroDescription {
 		dm.start();
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < getOcelotlParameters().getThread(); t++)
-			threadlist.add(new OcelotlThread(getOcelotlParameters().getThread(), t, 10000));
+			threadlist.add(new OcelotlThread(getOcelotlParameters().getThread(), t, getOcelotlParameters().getEventsPerThread()));
 		for (final Thread thread : threadlist)
 			thread.join();
 		((OcelotlQueries) ocelotlQueries).closeIterator();
