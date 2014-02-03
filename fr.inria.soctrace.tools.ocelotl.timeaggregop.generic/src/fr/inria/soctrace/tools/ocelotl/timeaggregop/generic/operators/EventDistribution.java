@@ -117,7 +117,6 @@ public class EventDistribution extends _2DMicroDescription {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ocelotlQueries.checkTimeStamps();
 	}
 
 }

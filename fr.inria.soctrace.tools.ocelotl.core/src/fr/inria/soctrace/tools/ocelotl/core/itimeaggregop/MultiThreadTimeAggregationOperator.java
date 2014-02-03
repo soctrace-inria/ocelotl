@@ -25,7 +25,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.queries.IOcelotlQueries;
+import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
 public abstract class MultiThreadTimeAggregationOperator {
@@ -37,7 +37,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	public final static int		EPCOUNT	= 200;
 	protected int				eventsNumber;
 	protected OcelotlParameters	parameters;
-	protected IOcelotlQueries	ocelotlQueries;
+	protected OcelotlQueries	ocelotlQueries;
 
 	abstract protected void computeMatrix() throws SoCTraceException, InterruptedException;
 

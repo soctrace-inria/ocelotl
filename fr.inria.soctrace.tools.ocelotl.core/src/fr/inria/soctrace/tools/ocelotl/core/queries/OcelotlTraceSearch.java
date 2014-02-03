@@ -40,7 +40,7 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQuery.EventIterator;
+import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxyQuery;
 import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEvent;
@@ -363,7 +363,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 	
 	public EventIterator getStateIterator(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
 		openTraceDBObject(t);
-		final IteratorQuery query = new IteratorQuery(traceDB);
+		final IteratorQueries query = new IteratorQueries(traceDB);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 

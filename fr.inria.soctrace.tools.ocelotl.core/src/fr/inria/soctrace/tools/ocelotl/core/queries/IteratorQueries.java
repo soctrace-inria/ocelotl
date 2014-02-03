@@ -51,7 +51,7 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  * 
  */
-public class IteratorQuery extends EventQuery {
+public class IteratorQueries extends EventQuery {
 
 	EventIterator iterator = new EventIterator();
 	ResultSet rs = null;
@@ -91,7 +91,7 @@ public class IteratorQuery extends EventQuery {
 	 * @param traceDB
 	 *            Trace DB object where the ocelotlQueries is performed.
 	 */
-	public IteratorQuery(final TraceDBObject traceDB) {
+	public IteratorQueries(final TraceDBObject traceDB) {
 		super(traceDB);
 		clear();
 	}

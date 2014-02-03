@@ -20,7 +20,6 @@
 package fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,20 +27,69 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DCacheMicroDescription;
+
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQuery.EventIterator;
+import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
-import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
+
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.queries.EventCache;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.state.GenericState;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.StateDistributionConfig;
 
 
-public class StateDistributionIterator extends _3DCacheMicroDescription {
 
+public class StateDistributionIterator extends _3DMicroDescription {
+
+	EventIterator it;
+	
+	class OcelotlThread extends Thread {
+
+		List<EventProducer>						eventProducers;
+		int										threadNumber;
+		int										thread;
+		int 									size;
+
+		@SuppressWarnings("unchecked")
+		public OcelotlThread(final int threadNumber, final int thread, final int size) {
+			super();
+			this.threadNumber = threadNumber;
+			this.thread = thread;
+			this.size=size;
+
+			start();
+		}
+
+		private void matrixUpdate(final IState state, final EventProducer ep, final Map<Long, Long> distrib) {
+			synchronized (matrix) {
+				if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
+					System.out.println("Adding " + state.getStateType() + " state");
+					// addKey(state.getStateType());
+					for (int incr = 0; incr < matrix.size(); incr++)
+						for (final String epstring : matrix.get(incr).keySet())
+							matrixPushType(incr, epstring, state.getStateType(), distrib);
+				}
+				for (final long it : distrib.keySet())
+					matrixWrite(it, ep, state.getStateType(), distrib);
+			}
+		}
+
+
+		@Override
+		public void run() {
+			while(true){
+				final List<Event> events = getEvents(size);
+				if (events.size()==0)
+					break;
+				IState state;
+				for (Event event: events) {
+					state = new GenericState(event, timeSliceManager);
+					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+					matrixUpdate(state, event.getEventProducer(), distrib);
+				}
+			}
+		}
+	}
 	
 	public StateDistributionIterator() throws SoCTraceException {
 		super();
@@ -51,43 +99,34 @@ public class StateDistributionIterator extends _3DCacheMicroDescription {
 		super(parameters);
 	}
 
-	@Override
-	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
+	private List<Event> getEvents(int size){
+		List<Event> events= new ArrayList<Event>();
+		synchronized (it){
+		for (int i=0; i<size; i++){
+			if (it.getNext()==null)
+				return events;
+			events.add(it.getEvent());
+		}
+		}
+		return events;
 	}
 
 	@Override
-	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		EventIterator it = ((OcelotlQueries) ocelotlQueries).getStateIterator(eventProducers);
+		it = ((OcelotlQueries) ocelotlQueries).getStateIterator(eventProducers);
 		//eventsNumber = fullEvents.size();
 		//dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
-		IState state;
-		Event event;
-		while (it.getNext() != null){
-			
-			event=it.getEvent();
-			state = new GenericState(event, timeSliceManager);
-			matrixUpdate(state, event.getEventProducer(), state.getTimeSlicesDistribution());
-		}
+		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		for (int t = 0; t < getOcelotlParameters().getThread(); t++)
+			threadlist.add(new OcelotlThread(getOcelotlParameters().getThread(), t, 10000));
+		for (final Thread thread : threadlist)
+			thread.join();
 		((OcelotlQueries) ocelotlQueries).closeIterator();
 		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
-	}
-	
-	private void matrixUpdate(final IState state, final EventProducer ep, final Map<Long, Long> distrib) {
-		synchronized (matrix) {
-			if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
-				System.out.println("Adding " + state.getStateType() + " state");
-				// addKey(state.getStateType());
-				for (int incr = 0; incr < matrix.size(); incr++)
-					for (final String epstring : matrix.get(incr).keySet())
-						matrixPushType(incr, epstring, state.getStateType(), distrib);
-			}
-			for (final long it : distrib.keySet())
-				matrixWrite(it, ep, state.getStateType(), distrib);
-		}
 	}
 
 	@Override
@@ -98,19 +137,19 @@ public class StateDistributionIterator extends _3DCacheMicroDescription {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ocelotlQueries.checkTimeStamps();
 	}
 
 	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
 		this.parameters = parameters;
 		ocelotlQueries = new OcelotlQueries(parameters);
-		ocelotlQueries.checkTimeStamps();
 		count = 0;
 		epit = 0;
 		timeSliceManager = new TimeSliceManager(getOcelotlParameters().getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
 	}
+
+
 
 }

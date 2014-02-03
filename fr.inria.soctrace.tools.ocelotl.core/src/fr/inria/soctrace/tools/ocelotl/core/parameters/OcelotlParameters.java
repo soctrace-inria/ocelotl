@@ -40,18 +40,12 @@ public class OcelotlParameters {
 	private String				timeAggOperator;
 	private String				spaceAggOperator;
 	private boolean				growingQualities	= true;
-	private boolean				cache				= true;
-	private int					epCache				= 100;
-	private int					pageCache			= 20;
+	private int					eventsPerThread		= 20;
 	private int					thread				= 5;
 	private ITraceTypeConfig	iTraceTypeConfig;
 
 	public OcelotlParameters() {
 		super();
-	}
-
-	public int getEpCache() {
-		return epCache;
 	}
 
 	public List<EventProducer> getEventProducers() {
@@ -60,10 +54,6 @@ public class OcelotlParameters {
 
 	public int getMaxEventProducers() {
 		return maxEventProducers;
-	}
-
-	public int getPageCache() {
-		return pageCache;
 	}
 
 	public float getParameter() {
@@ -102,24 +92,12 @@ public class OcelotlParameters {
 		return iTraceTypeConfig;
 	}
 
-	public boolean isCache() {
-		return cache;
-	}
-
 	public boolean isGrowingQualities() {
 		return growingQualities;
 	}
 
 	public boolean isNormalize() {
 		return normalize;
-	}
-
-	public void setCache(final boolean cache) {
-		this.cache = cache;
-	}
-
-	public void setEpCache(final int epCache) {
-		this.epCache = epCache;
 	}
 
 	public void setEventProducers(final List<EventProducer> eventProducers) {
@@ -136,14 +114,6 @@ public class OcelotlParameters {
 
 	public void setNormalize(final boolean normalize) {
 		this.normalize = normalize;
-	}
-
-	// public void setSleepingStates(final List<String> sleepingStates) {
-	// this.sleepingStates = sleepingStates;
-	// }
-
-	public void setPageCache(final int pageCache) {
-		this.pageCache = pageCache;
 	}
 
 	public void setParameter(final float parameter) {
@@ -180,6 +150,14 @@ public class OcelotlParameters {
 
 	public void setTraceTypeConfig(final ITraceTypeConfig iTraceTypeConfig) {
 		this.iTraceTypeConfig = iTraceTypeConfig;
+	}
+
+	public int getEventsPerThread() {
+		return eventsPerThread;
+	}
+
+	public void setEventsPerThread(int eventsPerThread) {
+		this.eventsPerThread = eventsPerThread;
 	}
 
 }

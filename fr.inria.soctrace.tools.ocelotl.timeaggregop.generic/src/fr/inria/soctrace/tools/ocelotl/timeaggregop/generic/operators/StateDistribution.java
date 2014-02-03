@@ -28,18 +28,16 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DCacheMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.queries.EventCache;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.state.GenericState;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.StateDistributionConfig;
 
 
-public class StateDistribution extends _3DCacheMicroDescription {
+public class StateDistribution extends _3DMicroDescription {
 
 	class OcelotlThread extends Thread {
 
@@ -48,42 +46,18 @@ public class StateDistribution extends _3DCacheMicroDescription {
 		Map<Integer, List<Event>>				eventList;
 		int										threadNumber;
 		int										thread;
-		boolean									cached;
 
 		@SuppressWarnings("unchecked")
-		public OcelotlThread(final List<EventProducer> eventProducers, final Object eventList, final int threadNumber, final int thread, final boolean cached) {
+		public OcelotlThread(final List<EventProducer> eventProducers, final Object eventList, final int threadNumber, final int thread) {
 			super();
 			this.eventProducers = eventProducers;
-			this.cached = cached;
-			if (cached)
-				eventProxyList = (Map<Integer, List<EventProxy>>) eventList;
-			else
-				this.eventList = (Map<Integer, List<Event>>) eventList;
+			this.eventList = (Map<Integer, List<Event>>) eventList;
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 
 			start();
 		}
 
-		private void cacheRun() throws SoCTraceException {
-			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				EventCache cache;
-				cache = new EventCache(getOcelotlParameters());
-				final EventProducer ep = eventProducers.get(t);
-				IState state;
-				final List<EventProxy> events = eventProxyList.get(ep.getId());
-				for (int i = 0; i < events.size() - 1; i++) {
-					state = new GenericState(cache.getEventMultiPageEPCache(events.get(i)), timeSliceManager);
-					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-					matrixUpdate(state, ep, distrib);
-				}
-				cache.close();
-				final int c = getCount();
-				if (c % EPCOUNT == 0)
-					total(c);
-			}
-
-		}
 
 		private void matrixUpdate(final IState state, final EventProducer ep, final Map<Long, Long> distrib) {
 			synchronized (matrix) {
@@ -99,7 +73,9 @@ public class StateDistribution extends _3DCacheMicroDescription {
 			}
 		}
 
-		private void noCacheRun() {
+
+		@Override
+		public void run() {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
 				final EventProducer ep = eventProducers.get(t);
 				final List<Event> events = eventList.get(ep.getId());
@@ -113,20 +89,6 @@ public class StateDistribution extends _3DCacheMicroDescription {
 				if (c % EPCOUNT == 0)
 					total(c);
 			}
-
-		}
-
-		@Override
-		public void run() {
-			if (cached)
-				try {
-					cacheRun();
-				} catch (final SoCTraceException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			else
-				noCacheRun();
 		}
 	}
 
@@ -138,30 +100,9 @@ public class StateDistribution extends _3DCacheMicroDescription {
 		super(parameters);
 	}
 
-	@Override
-	protected void computeSubMatrixCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
-		dm = new DeltaManager();
-		dm.start();
-		final List<EventProxy> fullEvents = ((OcelotlQueries) ocelotlQueries).getStateProxies(eventProducers);
-		eventsNumber = fullEvents.size();
-		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
-		dm = new DeltaManager();
-		dm.start();
-		final Map<Integer, List<EventProxy>> eventList = new HashMap<Integer, List<EventProxy>>();
-		for (final EventProducer ep : eventProducers)
-			eventList.put(ep.getId(), new ArrayList<EventProxy>());
-		for (final EventProxy e : fullEvents)
-			eventList.get(e.EP).add(e);
-		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < Math.min(getOcelotlParameters().getThread(), eventProducers.size()); t++)
-			threadlist.add(new OcelotlThread(eventProducers, eventList, getOcelotlParameters().getThread(), t, true));
-		for (final Thread thread : threadlist)
-			thread.join();
-		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
-	}
 
 	@Override
-	protected void computeSubMatrixNonCached(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
 		final List<Event> fullEvents = ((OcelotlQueries) ocelotlQueries).getStates(eventProducers);
@@ -176,7 +117,7 @@ public class StateDistribution extends _3DCacheMicroDescription {
 			eventList.get(e.getEventProducer().getId()).add(e);
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < Math.min(getOcelotlParameters().getThread(), eventProducers.size()); t++)
-			threadlist.add(new OcelotlThread(eventProducers, eventList, getOcelotlParameters().getThread(), t, false));
+			threadlist.add(new OcelotlThread(eventProducers, eventList, getOcelotlParameters().getThread(), t));
 		for (final Thread thread : threadlist)
 			thread.join();
 		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
@@ -190,19 +131,18 @@ public class StateDistribution extends _3DCacheMicroDescription {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ocelotlQueries.checkTimeStamps();
 	}
 
 	@Override
 	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
 		this.parameters = parameters;
 		ocelotlQueries = new OcelotlQueries(parameters);
-		ocelotlQueries.checkTimeStamps();
 		count = 0;
 		epit = 0;
 		timeSliceManager = new TimeSliceManager(getOcelotlParameters().getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
 	}
+
 
 }

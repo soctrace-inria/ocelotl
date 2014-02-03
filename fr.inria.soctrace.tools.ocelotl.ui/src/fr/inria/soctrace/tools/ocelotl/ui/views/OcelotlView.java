@@ -1032,9 +1032,7 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
-		ocelotlParameters.setCache(btnCache.getSelection());
-		ocelotlParameters.setEpCache(spinnerEPPageSize.getSelection());
-		ocelotlParameters.setPageCache(spinnerPageSize.getSelection());
+		ocelotlParameters.setEventsPerThread(spinnerPageSize.getSelection());
 		ocelotlParameters.setThread(spinnerThread.getSelection());
 		// TODO manage number format exception
 		try {

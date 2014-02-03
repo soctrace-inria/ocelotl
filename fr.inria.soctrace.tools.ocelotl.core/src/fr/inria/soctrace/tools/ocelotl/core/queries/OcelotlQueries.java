@@ -31,11 +31,11 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQuery.EventIterator;
+import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEvent;
 
-public class OcelotlQueries implements IOcelotlQueries {
+public class OcelotlQueries {
 
 	private final OcelotlParameters	ocelotlParameters;
 	private OcelotlTraceSearch	traceSearch;
@@ -45,12 +45,7 @@ public class OcelotlQueries implements IOcelotlQueries {
 		this.ocelotlParameters = ocelotlParameters;
 	}
 
-	@Override
-	public void checkTimeStamps() {
-		// TODO calculer le max
-	}
 
-	@Override
 	public List<EventProducer> getAllEventProducers() throws SoCTraceException {
 		final TraceDBObject traceDB = new TraceDBObject(ocelotlParameters.getTrace().getDbName(), DBMode.DB_OPEN);
 		final EventProducerQuery eventProducerQuery = new EventProducerQuery(traceDB);
