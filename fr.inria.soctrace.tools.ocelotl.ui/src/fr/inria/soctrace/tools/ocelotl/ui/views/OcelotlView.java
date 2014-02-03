@@ -640,7 +640,7 @@ public class OcelotlView extends ViewPart {
 
 		final Group groupAggregationOperator = new Group(sashAggreg, SWT.NONE);
 		groupAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupAggregationOperator.setText("Time Microscopic Description");
+		groupAggregationOperator.setText("Microscopic Description");
 		groupAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
