@@ -393,34 +393,37 @@ public class OcelotlView extends ViewPart {
 	}
 
 	private class TraceAdapter extends SelectionAdapter {
+		private Trace	trace;
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			final String title = "Loading Trace";
+			comboTime.removeAll();
+			comboSpace.removeAll();
+			trace = traceMap.get(comboTraces.getSelectionIndex());
 			final Job job = new Job(title) {
 
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
 					try {
+						try {
+							confDataLoader.load(trace);
+						} catch (final SoCTraceException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						monitor.done();
 						Display.getDefault().syncExec(new Runnable() {
 
 							@Override
 							public void run() {
-								try {
-									confDataLoader.load(traceMap.get(comboTraces.getSelectionIndex()));
-								} catch (final SoCTraceException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
+
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-								comboTime.removeAll();
 								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName()))
 									comboTime.add(op);
 								comboTime.setText("");
-								comboSpace.removeAll();
 								btnRemoveEventProducer.notifyListeners(SWT.Selection, new Event());
 								btnAddAllEventProducer.notifyListeners(SWT.Selection, new Event());
 							}
@@ -770,12 +773,15 @@ public class OcelotlView extends ViewPart {
 		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupQualityCurveSettings.setText("Quality Curve Settings");
 		groupQualityCurveSettings.setLayout(new GridLayout(3, false));
+		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
 		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnNormalize.setSelection(false);
 		btnNormalize.setText("Normalize Qualities");
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
+		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnGrowingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -787,7 +793,7 @@ public class OcelotlView extends ViewPart {
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
 		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		sashFormTSandCurve.setWeights(new int[] { 280, 50 });
+		sashFormTSandCurve.setWeights(new int[] { 222, 67 });
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 
 		final SashForm sashForm = new SashForm(sashFormTimeAggregationParameters, SWT.VERTICAL);
@@ -845,7 +851,7 @@ public class OcelotlView extends ViewPart {
 		btnRun.setText("RUN!");
 		new Label(compositeGetParameters, SWT.NONE);
 		sashForm.setWeights(new int[] { 249, 46 });
-		sashFormTimeAggregationParameters.setWeights(new int[] { 241, 344 });
+		sashFormTimeAggregationParameters.setWeights(new int[] { 227, 361 });
 		btnRun.addSelectionListener(new GetAggregationAdapter());
 		textRun.addModifyListener(new ParameterModifyListener());
 
