@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
 
 
-public class StateDistributionView extends StateDistributionBaseView {
+public class StateDistributionView extends DistributionBaseView {
 
 
 	public StateDistributionView(Shell shell) {

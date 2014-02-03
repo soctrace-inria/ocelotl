@@ -50,13 +50,12 @@ import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
-import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.StateDistributionConfig;
+import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.ISettingApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-
-public abstract class StateDistributionBaseView extends ApplicationWindow implements ISettingApplicationWindow {
+public abstract class DistributionBaseView extends ApplicationWindow implements ISettingApplicationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 
@@ -65,7 +64,6 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 			return ((EventType) element).getName();
 		}
 	}
-
 
 	private class RemoveSelectionAdapter extends SelectionAdapter {
 
@@ -109,15 +107,15 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 		}
 	}
 
-	protected OcelotlView	ocelotlView;
+	protected OcelotlView				ocelotlView;
 
-	protected ListViewer	listViewerIdleStates;
+	protected ListViewer				listViewerIdleStates;
 
-	protected ListViewer	listViewerEventTypes;
+	protected ListViewer				listViewerEventTypes;
 
-	protected StateDistributionConfig	config;
+	protected DistributionConfig	config;
 
-	public StateDistributionBaseView(final Shell shell) {
+	public DistributionBaseView(final Shell shell) {
 		super(shell);
 		ocelotlView = null;
 		config = null;
@@ -126,7 +124,7 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 	@Override
 	protected void configureShell(final Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Pajé Aggregation Operator Settings");
+		newShell.setText("Aggregation Operator Settings");
 	}
 
 	@Override
@@ -138,7 +136,7 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 
 		final Group groupEventTypes = new Group(sashFormGlobal, SWT.NONE);
 		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupEventTypes.setText("Set GenericState Event Types");
+		groupEventTypes.setText("Set Event Types");
 		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
 		gl_groupEventTypes.horizontalSpacing = 0;
 		groupEventTypes.setLayout(gl_groupEventTypes);
@@ -187,6 +185,7 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 		buttonOK.setText("OK");
 		buttonOK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		buttonOK.setImage(null);
+		sashFormGlobal.setWeights(new int[] { 207, 53 });
 		buttonOK.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -198,13 +197,13 @@ public abstract class StateDistributionBaseView extends ApplicationWindow implem
 		return sashFormGlobal;
 
 	}
-	
+
 	abstract public void setParameters();
 
 	@Override
 	public void init(final OcelotlView ocelotlView, final ITraceTypeConfig config) {
 		this.ocelotlView = ocelotlView;
-		this.config = (StateDistributionConfig) config;
+		this.config = (DistributionConfig) config;
 	}
 
 }

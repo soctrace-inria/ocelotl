@@ -89,7 +89,7 @@ public class EventDistribution extends _2DMicroDescription {
 
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
-		DeltaManager dm = new DeltaManager();
+		dm = new DeltaManager();
 		dm.start();
 		final List<GenericReducedEvent> fullEvents = ((OcelotlQueries) ocelotlQueries).getReducedEvents(eventProducers);
 		eventsNumber = fullEvents.size();

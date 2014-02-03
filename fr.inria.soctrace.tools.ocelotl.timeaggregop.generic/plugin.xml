@@ -9,7 +9,7 @@
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.EventDistribution"
             generic="true"
             operator="Event Distribution"
-            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.EventDistributionConfig"
+            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.EventDistributionView"
             spatial_compatibility="Parts"
             trace_formats="ALL">
@@ -18,7 +18,7 @@
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.StateDistribution"
             generic="true"
             operator="State Distribution (Small Traces)"
-            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.StateDistributionConfig"
+            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.StateDistributionView"
             spatial_compatibility="Parts, StateProportion"
             trace_formats="ALL">
@@ -27,7 +27,7 @@
             class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.StateDistributionIterator"
             generic="true"
             operator="State Distribution (Large Traces)"
-            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.StateDistributionConfig"
+            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.StateDistributionView"
             spatial_compatibility="Parts, StateProportion"
             trace_formats="ALL">

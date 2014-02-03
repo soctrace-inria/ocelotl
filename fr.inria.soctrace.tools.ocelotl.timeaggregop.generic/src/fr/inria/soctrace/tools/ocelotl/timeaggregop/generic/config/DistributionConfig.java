@@ -25,11 +25,11 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
-public class StateDistributionConfig implements ITraceTypeConfig {
+public class DistributionConfig implements ITraceTypeConfig {
 
 	private List<EventType>		types			= new LinkedList<EventType>();
 
-	public StateDistributionConfig() {
+	public DistributionConfig() {
 		super();
 	}
 
