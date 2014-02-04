@@ -5,7 +5,7 @@ import java.util.List;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
 
-public abstract class TimeAggregation {
+public abstract class TimeAggregation implements ITimeAggregation{
 	
 	protected int size;
 	List<List<DLPQuality>> qualities;
