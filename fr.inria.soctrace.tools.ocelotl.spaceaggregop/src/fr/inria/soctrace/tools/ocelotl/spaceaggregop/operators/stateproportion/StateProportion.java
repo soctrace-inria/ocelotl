@@ -25,7 +25,7 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.TimeAggregation3Manager;
 
 public class StateProportion extends SpaceAggregationOperator {
 
@@ -46,9 +46,9 @@ public class StateProportion extends SpaceAggregationOperator {
 	private void aggregateStates() {
 		for (final Part part : parts)
 			for (int i = part.getStartPart(); i < part.getEndPart(); i++)
-				for (final String ep : ((MLPAggregManager) lpaggregManager).getEventProducers())
+				for (final String ep : ((TimeAggregation3Manager) lpaggregManager).getEventProducers())
 					for (final String state : states)
-						((PartMap) part.getData()).addElement(state, ((MLPAggregManager) lpaggregManager).getTimeSliceMatrix().getMatrix().get(i).get(ep).get(state).doubleValue());
+						((PartMap) part.getData()).addElement(state, ((TimeAggregation3Manager) lpaggregManager).getTimeSliceMatrix().getMatrix().get(i).get(ep).get(state).doubleValue());
 
 	}
 
@@ -95,7 +95,7 @@ public class StateProportion extends SpaceAggregationOperator {
 	}
 
 	private void initStates() {
-		states = ((MLPAggregManager) lpaggregManager).getKeys();
+		states = ((TimeAggregation3Manager) lpaggregManager).getKeys();
 		for (final Part part : parts)
 			for (final String state : states)
 				((PartMap) part.getData()).putElement(state, 0.0);

@@ -17,4 +17,5 @@ public interface ITimeAggregation {
 	
 	public void computeQualities(boolean normalization);
 
+	public List<Double> getParameters();
 }

@@ -32,9 +32,9 @@ public class OcelotlParameters {
 	private List<EventProducer>	eventProducers		= new ArrayList<EventProducer>();
 	private int					timeSlicesNumber	= 1;
 	private TimeRegion			timeRegion;
-	private float				parameter			= 0;
+	private double				parameter			= 0;
 	private boolean				normalize			= false;
-	private float				threshold			= (float) 0.001;
+	private double				threshold			= 0.001;
 	private Trace				trace				= null;
 	private int					maxEventProducers	= 0;
 	private String				timeAggOperator;
@@ -56,7 +56,7 @@ public class OcelotlParameters {
 		return maxEventProducers;
 	}
 
-	public float getParameter() {
+	public double getParameter() {
 		return parameter;
 	}
 
@@ -68,7 +68,7 @@ public class OcelotlParameters {
 		return thread;
 	}
 
-	public float getThreshold() {
+	public double getThreshold() {
 		return threshold;
 	}
 
@@ -116,7 +116,7 @@ public class OcelotlParameters {
 		this.normalize = normalize;
 	}
 
-	public void setParameter(final float parameter) {
+	public void setParameter(final double parameter) {
 		this.parameter = parameter;
 	}
 
@@ -128,7 +128,7 @@ public class OcelotlParameters {
 		this.thread = thread;
 	}
 
-	public void setThreshold(final float threshold) {
+	public void setThreshold(final double threshold) {
 		this.threshold = threshold;
 	}
 

@@ -286,9 +286,9 @@ public class OcelotlView extends ViewPart {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			final float p = Float.parseFloat(textRun.getText());
-			for (final float f : ocelotlCore.getLpaggregManager().getParameters())
+			for (final double f : ocelotlCore.getLpaggregManager().getParameters())
 				if (f > p) {
-					textRun.setText(Float.toString(f));
+					textRun.setText(Double.toString(f));
 					break;
 				}
 			btnRun.notifyListeners(SWT.Selection, new Event());
@@ -322,7 +322,7 @@ public class OcelotlView extends ViewPart {
 			final float p = Float.parseFloat(textRun.getText());
 			for (int f = ocelotlCore.getLpaggregManager().getParameters().size() - 1; f >= 0; f--)
 				if (ocelotlCore.getLpaggregManager().getParameters().get(f) < p) {
-					textRun.setText(Float.toString(ocelotlCore.getLpaggregManager().getParameters().get(f)));
+					textRun.setText(Double.toString(ocelotlCore.getLpaggregManager().getParameters().get(f)));
 					break;
 				}
 			btnRun.notifyListeners(SWT.Selection, new Event());

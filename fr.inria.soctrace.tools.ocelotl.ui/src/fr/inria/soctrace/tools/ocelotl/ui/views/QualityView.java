@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
@@ -43,7 +44,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.Quality;
+import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 
 /**
@@ -105,8 +106,9 @@ public class QualityView {
 	private final static int	TextOffset			= 2;
 	private final static long	MiniDivide			= 5;
 	private final static double	XGradNumber			= 10;
-	private List<Quality>		qualities;
-	private float				currentParameter;
+	private List<DLPQuality>		qualities;
+	private List<Double>			parameterList;
+	private double				currentParameter;
 	private final OcelotlView	ocelotlView;
 
 	private final static float	ParamLineWidth		= 1.8F;
@@ -122,6 +124,7 @@ public class QualityView {
 		root.removeAll();
 		if (ocelotlView.getCore().getLpaggregManager() != null) {
 			qualities = ocelotlView.getCore().getLpaggregManager().getQualities();
+			parameterList = new ArrayList<Double>(ocelotlView.getCore().getLpaggregManager().getParameters());
 			currentParameter = ocelotlView.getCore().getOcelotlParameters().getParameter();
 			if (qualities != null) {
 				drawXGrads();
@@ -152,10 +155,11 @@ public class QualityView {
 		final int width = root.getSize().width - XBorder - Border;
 		final int yOff = root.getSize().height() - YBorder;
 		final int height = root.getSize().height() - YBorder - Border;
-		qualities.add(new Quality(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss(), 1));
+		qualities.add(new DLPQuality(qualities.get(qualities.size() - 1)));
+		parameterList.add(1.0);
 		for (i = 1; i < qualities.size(); i++) {
-			final float cParam = 1 - qualities.get(i).getParameter();
-			final float nParam = 1 - qualities.get(i - 1).getParameter();
+			final double cParam = 1 - parameterList.get(i);
+			final double nParam = 1 - parameterList.get(i-1);
 			double cgain = qualities.get(qualities.size() - 1).getGain() - qualities.get(i).getGain();
 			double ngain = qualities.get(qualities.size() - 1).getGain() - qualities.get(i - 1).getGain();
 			double closs = qualities.get(qualities.size() - 1).getLoss() - qualities.get(i).getLoss();

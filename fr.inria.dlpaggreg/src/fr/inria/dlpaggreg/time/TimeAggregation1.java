@@ -46,7 +46,7 @@ public class TimeAggregation1 extends TimeAggregation {
 		}
 		for (int i=0; i<size; i++){
 			sumValues.get(i).set(0,values.get(i));
-			entValues.get(i).set(0,Complexity.entropyReduction(values.get(i), 0));
+			entValues.get(i).set(0,Complexity.entropyReduction(values.get(i), 0.0));
 		}
 		
 		for (int j=1; j<size; j++){

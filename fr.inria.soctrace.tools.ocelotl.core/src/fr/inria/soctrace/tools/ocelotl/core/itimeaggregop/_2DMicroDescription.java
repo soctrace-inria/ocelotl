@@ -27,8 +27,8 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.TimeAggregation2Manager;
 
 public abstract class _2DMicroDescription extends MultiThreadTimeAggregationOperator implements I2DMicroDescription {
 
@@ -76,8 +76,8 @@ public abstract class _2DMicroDescription extends MultiThreadTimeAggregationOper
 	}
 
 	@Override
-	public VLPAggregManager createManager() {
-		return new VLPAggregManager(this);
+	public TimeAggregation2Manager createManager() {
+		return new TimeAggregation2Manager(this);
 
 	}
 

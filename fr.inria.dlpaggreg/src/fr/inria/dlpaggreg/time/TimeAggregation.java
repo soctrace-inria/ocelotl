@@ -14,6 +14,10 @@ public abstract class TimeAggregation implements ITimeAggregation{
 	List<Double> parameters;
 	List<DLPQuality> qualityList;
 	
+	public List<Double> getParameters() {
+		return parameters;
+	}
+
 	public int getSize(){
 		return size;
 	}
@@ -79,7 +83,7 @@ public abstract class TimeAggregation implements ITimeAggregation{
 		parameters.add(max);
 		qualityList.add(bestQualityParamMax);
 		for (int i= qualityList.size()-1; i>0; i--){
-			if ((qualityList.get(i).getGain()==qualityList.get(i-1).getGain())&& (qualityList.get(i).getLoss()==qualityList.get(i-1).getLoss())){
+			if ((qualityList.get(i).compare(qualityList.get(i-1)))){
 				qualityList.remove(i);
 				parameters.remove(i);
 			}
@@ -88,7 +92,7 @@ public abstract class TimeAggregation implements ITimeAggregation{
 		
 	
 	private void addBestQualities(double min, double max, DLPQuality bestQualityParamMin, DLPQuality bestQualityParamMax, double threshold) {
-		if (!(bestQualityParamMin.compare(bestQualityParamMax)||(max-min<=threshold))){
+		if (!((bestQualityParamMin.compare(bestQualityParamMax)||(max-min<=threshold)))){
 			double parameter = min + ((max - min)/2);
 			DLPQuality bestQuality = new DLPQuality();
 			computeBestCuts(parameter);
@@ -115,7 +119,7 @@ public abstract class TimeAggregation implements ITimeAggregation{
 	}
 
 	private double pIC(double parameter, int i, int j){
-		return parameter * qualities.get(i).get(j).getGain() - (1.0-parameter) * qualities.get(i).get(j).getLoss();
+		return (parameter * qualities.get(i).get(j).getGain()) - ((1.0-parameter) * qualities.get(i).get(j).getLoss());
 	}
 	
 	public List<Integer> getParts(double parameter){

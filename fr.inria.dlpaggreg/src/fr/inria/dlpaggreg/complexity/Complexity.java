@@ -12,14 +12,14 @@ public class Complexity {
 		if (val>0)
 			return entropy(val) - ent;
 		else
-			return 0;
+			return 0.0;
 	}
 	
 	public static double entropyReductionExp(double val, double ent){
 		if (val>0)
 			return entropy(val+1) - ent;
 		else
-			return 0;
+			return 0.0;
 	}
 	
 	public static double divergence(int size, double val, double ent){

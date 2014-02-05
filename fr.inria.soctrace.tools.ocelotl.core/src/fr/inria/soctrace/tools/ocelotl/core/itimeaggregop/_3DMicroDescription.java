@@ -27,8 +27,8 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.MLPAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.TimeAggregation3Manager;
 
 public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOperator implements I3DMicroDescription {
 
@@ -78,8 +78,8 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 	}
 
 	@Override
-	public MLPAggregManager createManager() {
-		return new MLPAggregManager(this);
+	public TimeAggregation3Manager createManager() {
+		return new TimeAggregation3Manager(this);
 
 	}
 

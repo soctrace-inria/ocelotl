@@ -8,3 +8,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
+Export-Package: fr.inria.dlpaggreg.quality,
+ fr.inria.dlpaggreg.time

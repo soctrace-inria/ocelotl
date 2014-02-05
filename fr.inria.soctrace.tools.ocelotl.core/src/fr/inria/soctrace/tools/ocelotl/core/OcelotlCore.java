@@ -25,9 +25,9 @@ import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOper
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.ILPAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.PartManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.ITimeManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.PartManager;
 
 public class OcelotlCore {
 
@@ -43,7 +43,7 @@ public class OcelotlCore {
 	}
 
 	OcelotlParameters				ocelotlParameters;
-	ILPAggregManager				lpaggregManager;
+	ITimeManager				lpaggregManager;
 	PartManager						partManager;
 	TimeAggregationOperatorManager	timeOperators;
 	ITimeAggregationOperator		timeOperator;
@@ -93,7 +93,7 @@ public class OcelotlCore {
 
 	}
 
-	public ILPAggregManager getLpaggregManager() {
+	public ITimeManager getLpaggregManager() {
 		return lpaggregManager;
 	}
 

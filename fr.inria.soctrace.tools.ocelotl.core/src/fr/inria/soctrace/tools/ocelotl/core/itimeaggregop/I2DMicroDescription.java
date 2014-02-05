@@ -22,12 +22,12 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 import java.util.HashMap;
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.lpaggreg.VLPAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.TimeAggregation2Manager;
 
 public interface I2DMicroDescription extends ITimeAggregationOperator {
 
 	@Override
-	public VLPAggregManager createManager();
+	public TimeAggregation2Manager createManager();
 
 	public List<HashMap<String, Long>> getMatrix();
 }

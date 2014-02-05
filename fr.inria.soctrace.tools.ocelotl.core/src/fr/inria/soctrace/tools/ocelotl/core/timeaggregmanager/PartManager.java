@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
+package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 public class PartManager {
 
 	private OcelotlCore				lpaggregCore;
-	private ILPAggregManager		lpaggregManager;
+	private ITimeManager		lpaggregManager;
 	private final List<TimeRegion>	timeStamps	= new ArrayList<TimeRegion>();
 	private TimeRegion				traceRegion;
 	private int						timeSliceNumber;
@@ -58,7 +58,7 @@ public class PartManager {
 		return lpaggregCore;
 	}
 
-	public ILPAggregManager getLpaggregManager() {
+	public ITimeManager getLpaggregManager() {
 		return lpaggregManager;
 	}
 

@@ -17,11 +17,13 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.lpaggreg;
+package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
 
 import java.util.List;
 
-public interface ILPAggregManager {
+import fr.inria.dlpaggreg.quality.DLPQuality;
+
+public interface ITimeManager {
 
 	public void computeDichotomy();
 
@@ -33,11 +35,11 @@ public interface ILPAggregManager {
 
 	public List<String> getEventProducers();
 
-	public List<Float> getParameters();
+	public List<Double> getParameters();
 
 	public List<Integer> getParts();
 
-	public List<Quality> getQualities();
+	public List<DLPQuality> getQualities();
 
 	public void printParameters();
 

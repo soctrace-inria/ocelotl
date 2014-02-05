@@ -52,7 +52,7 @@ public class TimeAggregation2 extends TimeAggregation {
 		for (int i=0; i<size; i++){
 			for (int k=0; k<size2; k++){
 			sumValues.get(i).get(0).set(k,values.get(i).get(k));
-			entValues.get(i).get(0).set(k,Complexity.entropyReduction(values.get(i).get(k), 0));
+			entValues.get(i).get(0).set(k,Complexity.entropyReduction(values.get(i).get(k), 0.0));
 			}
 		}
 		
@@ -63,7 +63,7 @@ public class TimeAggregation2 extends TimeAggregation {
 				entValues.get(i).get(j).set(k, entValues.get(i).get(j-1).get(k)+entValues.get(i+j).get(0).get(k));
 				qualities.get(i).get(j).addToGain
 				(Complexity.entropyReduction(sumValues.get(i).get(j).get(k), entValues.get(i).get(j).get(k)));
-				qualities.get(i).get(j).setLoss
+				qualities.get(i).get(j).addToLoss
 				(Complexity.divergence(j+1, sumValues.get(i).get(j).get(k), entValues.get(i).get(j).get(k)));
 				}
 			}
