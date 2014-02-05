@@ -24,15 +24,13 @@ import fr.inria.soctrace.tools.ocelotl.core.state.State;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
-
 public class GenericState extends State {
 
 	public GenericState(final Event event, final TimeSliceManager timeSliceManager) {
 		super(timeSliceManager);
 		timeRegion = new TimeRegion(event.getTimestamp(), event.getLongPar());
 		eventProducerID = event.getEventProducer().getId();
-		stateType=event.getType().getName();
+		stateType = event.getType().getName();
 	}
-
 
 }

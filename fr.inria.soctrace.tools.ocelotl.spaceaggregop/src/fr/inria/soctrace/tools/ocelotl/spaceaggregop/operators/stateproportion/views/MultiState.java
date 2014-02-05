@@ -40,7 +40,7 @@ public class MultiState {
 	private static final int	Border		= 10;
 	private static final double	MinHeight	= 5.0;
 	private int					space		= 6;
-	StateProportion			distribution;
+	StateProportion				distribution;
 	IFigure						root;
 
 	public MultiState(final int index, final StateProportion distribution, final IFigure root, final int space) {

@@ -76,11 +76,18 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <import plugin="fr.inria.soctrace.lib.utils"/>
       <import plugin="org.eclipse.swt"/>
       <import plugin="fr.inria.soctrace.lib.slf4j"/>
-      <import plugin="org.apache.commons.lang"/>
       <import plugin="org.eclipse.draw2d"/>
       <import plugin="fr.inria.soctrace.framesoc.core"/>
       <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.wb.core.lib"/>
    </requires>
+
+   <plugin
+         id="fr.inria.dlpaggreg"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.core"

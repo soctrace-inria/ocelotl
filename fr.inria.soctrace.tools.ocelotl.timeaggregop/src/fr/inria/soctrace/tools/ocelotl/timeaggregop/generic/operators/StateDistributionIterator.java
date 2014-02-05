@@ -27,34 +27,28 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
-
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.state.GenericState;
 
-
-
 public class StateDistributionIterator extends _3DMicroDescription {
 
-	EventIterator it;
-	
 	class OcelotlThread extends Thread {
 
-		List<EventProducer>						eventProducers;
-		int										threadNumber;
-		int										thread;
-		int 									size;
+		List<EventProducer>	eventProducers;
+		int					threadNumber;
+		int					thread;
+		int					size;
 
 		public OcelotlThread(final int threadNumber, final int thread, final int size) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
-			this.size=size;
+			this.size = size;
 
 			start();
 		}
@@ -73,15 +67,14 @@ public class StateDistributionIterator extends _3DMicroDescription {
 			}
 		}
 
-
 		@Override
 		public void run() {
-			while(true){
+			while (true) {
 				final List<Event> events = getEvents(size);
-				if (events.size()==0)
+				if (events.size() == 0)
 					break;
 				IState state;
-				for (Event event: events) {
+				for (final Event event : events) {
 					state = new GenericState(event, timeSliceManager);
 					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
 					matrixUpdate(state, event.getEventProducer(), distrib);
@@ -89,7 +82,9 @@ public class StateDistributionIterator extends _3DMicroDescription {
 			}
 		}
 	}
-	
+
+	EventIterator	it;
+
 	public StateDistributionIterator() throws SoCTraceException {
 		super();
 	}
@@ -98,26 +93,14 @@ public class StateDistributionIterator extends _3DMicroDescription {
 		super(parameters);
 	}
 
-	private List<Event> getEvents(int size){
-		List<Event> events= new ArrayList<Event>();
-		synchronized (it){
-		for (int i=0; i<size; i++){
-			if (it.getNext()==null)
-				return events;
-			events.add(it.getEvent());
-			eventsNumber++;
-		}
-		}
-		return events;
-	}
-
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		it = ((OcelotlQueries) ocelotlQueries).getStateIterator(eventProducers);
-		//eventsNumber = fullEvents.size();
-		//dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
+		it = ocelotlQueries.getStateIterator(eventProducers);
+		// eventsNumber = fullEvents.size();
+		// dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " +
+		// fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -125,8 +108,21 @@ public class StateDistributionIterator extends _3DMicroDescription {
 			threadlist.add(new OcelotlThread(getOcelotlParameters().getThread(), t, getOcelotlParameters().getEventsPerThread()));
 		for (final Thread thread : threadlist)
 			thread.join();
-		((OcelotlQueries) ocelotlQueries).closeIterator();
+		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+
+	private List<Event> getEvents(final int size) {
+		final List<Event> events = new ArrayList<Event>();
+		synchronized (it) {
+			for (int i = 0; i < size; i++) {
+				if (it.getNext() == null)
+					return events;
+				events.add(it.getEvent());
+				eventsNumber++;
+			}
+		}
+		return events;
 	}
 
 	@Override
@@ -149,7 +145,5 @@ public class StateDistributionIterator extends _3DMicroDescription {
 		initVectors();
 		computeMatrix();
 	}
-
-
 
 }

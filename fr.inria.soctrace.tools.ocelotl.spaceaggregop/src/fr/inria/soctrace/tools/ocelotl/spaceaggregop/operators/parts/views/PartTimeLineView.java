@@ -9,12 +9,11 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
-public class PartTimeLineView extends TimeLineView{
+public class PartTimeLineView extends TimeLineView {
 
-	
-	private ColorManager colors = new ColorManager();
-	
-	public PartTimeLineView(OcelotlView ocelotlView) {
+	private final ColorManager	colors	= new ColorManager();
+
+	public PartTimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
 		// TODO Auto-generated constructor stub
 	}
@@ -34,7 +33,7 @@ public class PartTimeLineView extends TimeLineView{
 					part.getUpdateManager().performUpdate();
 					part.init();
 				}
-			else{
+			else {
 				final List<Integer> aggParts = new ArrayList<Integer>();
 				for (int i = 0; i <= parts.get(parts.size() - 1); i++)
 					aggParts.add(0);
@@ -53,9 +52,9 @@ public class PartTimeLineView extends TimeLineView{
 					part.getUpdateManager().performUpdate();
 					part.init();
 				}
-			} 
+			}
 		}
-		
+
 	}
-	
+
 }

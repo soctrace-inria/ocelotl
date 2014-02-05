@@ -109,7 +109,7 @@ public class TimeAggregationOperatorManager {
 
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg.getConfigurationElementsFor(POINT_ID);
-		System.out.println(config.length+ " Time aggregation operators detected:");
+		System.out.println(config.length + " Time aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final TimeAggregationOperatorResource resource = new TimeAggregationOperatorResource();
@@ -122,7 +122,7 @@ public class TimeAggregationOperatorManager {
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setBundle(e.getContributor().getName());
 			List.put(resource.getName(), resource);
-			System.out.println("    "+ resource.getName() + " "+resource.getTraceFormats());
+			System.out.println("    " + resource.getName() + " " + resource.getTraceFormats());
 		}
 	}
 

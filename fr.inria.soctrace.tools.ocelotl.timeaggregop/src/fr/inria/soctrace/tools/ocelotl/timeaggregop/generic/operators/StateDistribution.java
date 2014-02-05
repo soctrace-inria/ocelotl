@@ -36,16 +36,15 @@ import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.state.GenericState;
 
-
 public class StateDistribution extends _3DMicroDescription {
 
 	class OcelotlThread extends Thread {
 
-		List<EventProducer>						eventProducers;
-		Map<Integer, List<EventProxy>>			eventProxyList;
-		Map<Integer, List<Event>>				eventList;
-		int										threadNumber;
-		int										thread;
+		List<EventProducer>				eventProducers;
+		Map<Integer, List<EventProxy>>	eventProxyList;
+		Map<Integer, List<Event>>		eventList;
+		int								threadNumber;
+		int								thread;
 
 		@SuppressWarnings("unchecked")
 		public OcelotlThread(final List<EventProducer> eventProducers, final Object eventList, final int threadNumber, final int thread) {
@@ -57,7 +56,6 @@ public class StateDistribution extends _3DMicroDescription {
 
 			start();
 		}
-
 
 		private void matrixUpdate(final IState state, final EventProducer ep, final Map<Long, Long> distrib) {
 			synchronized (matrix) {
@@ -72,7 +70,6 @@ public class StateDistribution extends _3DMicroDescription {
 					matrixWrite(it, ep, state.getStateType(), distrib);
 			}
 		}
-
 
 		@Override
 		public void run() {
@@ -100,12 +97,11 @@ public class StateDistribution extends _3DMicroDescription {
 		super(parameters);
 	}
 
-
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<Event> fullEvents = ((OcelotlQueries) ocelotlQueries).getStates(eventProducers);
+		final List<Event> fullEvents = ocelotlQueries.getStates(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();
@@ -143,6 +139,5 @@ public class StateDistribution extends _3DMicroDescription {
 		initVectors();
 		computeMatrix();
 	}
-
 
 }

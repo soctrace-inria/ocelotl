@@ -34,7 +34,7 @@ public class PartFigure extends RectangleFigure {
 
 	private int					index;
 	private final int			value;
-	private final PartColor	color;
+	private final PartColor		color;
 	private final static int	textSize	= 15;
 	private final boolean		numbers;
 

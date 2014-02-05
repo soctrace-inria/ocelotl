@@ -23,25 +23,18 @@ import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
 
-
 public class StateDistributionView extends DistributionBaseView {
 
-
-	public StateDistributionView(Shell shell) {
+	public StateDistributionView(final Shell shell) {
 		super(shell);
 	}
 
 	@Override
 	public void setParameters() {
-		if (config.getTypes().isEmpty()){
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++){
-			if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory()==EventCategory.STATE) {
+		if (config.getTypes().isEmpty())
+			for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
+				if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory() == EventCategory.STATE)
 					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
-			}
-		}
-		}
 		listViewerEventTypes.setInput(config.getTypes());
 	}
 }
-
-

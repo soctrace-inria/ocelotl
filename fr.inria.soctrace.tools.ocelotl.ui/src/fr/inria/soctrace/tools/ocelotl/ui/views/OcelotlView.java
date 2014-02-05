@@ -504,7 +504,7 @@ public class OcelotlView extends ViewPart {
 		btnNormalize.setSelection(false);
 		btnGrowingQualities.setSelection(true);
 		btnDecreasingQualities.setSelection(false);
-		spinnerTSNumber.setSelection(100);
+		spinnerTSNumber.setSelection(50);
 		spinnerDivideDbQuery.setSelection(0);
 		spinnerEventSize.setSelection(10000);
 		spinnerThread.setSelection(8);

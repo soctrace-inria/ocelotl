@@ -31,15 +31,13 @@ package fr.inria.soctrace.tools.ocelotl.core.queries;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.LinkedList;
-import java.util.List;
 
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Link;
-import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
+import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.query.EventQuery;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
@@ -53,18 +51,18 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
  */
 public class IteratorQueries extends EventQuery {
 
-	EventIterator iterator = new EventIterator();
-	ResultSet rs = null;
-	private Statement	mystm;
-	
-	public class EventIterator{
-		
-		Event current = null;
-		
-		public Event getNext(){
+	public class EventIterator {
+
+		Event	current	= null;
+
+		public Event getEvent() {
+			return current;
+		}
+
+		public Event getNext() {
 			try {
-				current=rebuildNextEvent();
-				if (current!=null)
+				current = rebuildNextEvent();
+				if (current != null)
 					return current;
 			} catch (SQLException | SoCTraceException e) {
 				// TODO Auto-generated catch block
@@ -72,18 +70,19 @@ public class IteratorQueries extends EventQuery {
 			}
 			try {
 				mystm.close();
-			} catch (SQLException e) {
+			} catch (final SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return null;
 		}
-		
-		public Event getEvent(){
-			return current;
-		}
-		
+
 	}
+
+	EventIterator		iterator	= new EventIterator();
+	ResultSet			rs			= null;
+
+	private Statement	mystm;
 
 	/**
 	 * The constructor
@@ -95,21 +94,80 @@ public class IteratorQueries extends EventQuery {
 		super(traceDB);
 		clear();
 	}
-	
-	public Event rebuildNextEvent() throws SQLException, SoCTraceException{
-		if (rs.next()){
-			return rebuildEvent(rs);
-		}	
-		return null;
+
+	public EventIterator getIterator() throws SoCTraceException {
+
+		try {
+			final DeltaManager dm = new DeltaManager();
+			dm.start();
+
+			boolean first = true;
+			StringBuilder eventQuery = null;
+			eventQuery = new StringBuilder("SELECT * FROM " + FramesocTable.EVENT + " ");
+			loadParameters = false;
+
+			if (where)
+				eventQuery.append(" WHERE ");
+
+			if (elementWhere != null) {
+				first = false;
+				eventQuery.append(elementWhere.getSQLString());
+			}
+
+			if (typeWhere != null) {
+				if (!first)
+					eventQuery.append(" AND ");
+				else
+					first = false;
+				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
+			}
+
+			if (eventProducerWhere != null) {
+				if (!first)
+					eventQuery.append(" AND ");
+				else
+					first = false;
+				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
+			}
+
+			if (parametersConditions.size() > 0) {
+				if (!first)
+					eventQuery.append(" AND ");
+				else
+					first = false;
+
+				eventQuery.append(getParamConditionsString());
+			}
+
+			if (orderBy)
+				eventQuery.append(" ORDER BY " + orderByColumn + " " + orderByCriterium);
+
+			if (isLimitSet())
+				eventQuery.append(" LIMIT " + getLimit());
+
+			final String query = eventQuery.toString();
+
+			mystm = dbObj.getConnection().createStatement();
+
+			final DeltaManager steps = new DeltaManager();
+			steps.start();
+			rs = mystm.executeQuery(query);
+			steps.start();
+
+		} catch (final SQLException e) {
+			throw new SoCTraceException(e);
+		}
+
+		return iterator;
 	}
-	
-	private Event rebuildEvent(ResultSet rs) throws SQLException, SoCTraceException {
-		int category = rs.getInt(7);
-		Event e = Event.createCategorizedEvent(category, rs.getInt(1));
-		TraceDBObject traceDB = (TraceDBObject)dbObj;
-		EventType et = traceDB.getEventTypeCache().get(EventType.class, rs.getInt(2));
-		EventProducer s = getEventProducer(rs.getInt(3));
-		e.setEventProducer(s); 
+
+	private Event rebuildEvent(final ResultSet rs) throws SQLException, SoCTraceException {
+		final int category = rs.getInt(7);
+		final Event e = Event.createCategorizedEvent(category, rs.getInt(1));
+		final TraceDBObject traceDB = (TraceDBObject) dbObj;
+		final EventType et = traceDB.getEventTypeCache().get(EventType.class, rs.getInt(2));
+		final EventProducer s = getEventProducer(rs.getInt(3));
+		e.setEventProducer(s);
 		e.setCategory(rs.getInt(7));
 		e.setType(et);
 		e.setTimestamp(rs.getLong(4));
@@ -117,86 +175,15 @@ public class IteratorQueries extends EventQuery {
 		e.setPage(rs.getInt(6));
 		e.setLongPar(rs.getLong(8));
 		e.setDoublePar(rs.getDouble(9));
-		if (e.getCategory() == EventCategory.LINK){
-			((Link)e).setEndProducer(getEventProducer(((Double)e.getDoublePar()).intValue()));
-		}
+		if (e.getCategory() == EventCategory.LINK)
+			((Link) e).setEndProducer(getEventProducer(((Double) e.getDoublePar()).intValue()));
 		return e;
 	}
 
-	public EventIterator getIterator() throws SoCTraceException {
-
-			try {
-				DeltaManager dm = new DeltaManager();
-				dm.start();
-
-				boolean first = true;
-				StringBuilder eventQuery = null;
-				eventQuery = new StringBuilder("SELECT * FROM " + FramesocTable.EVENT + " ");
-				this.loadParameters=false;
-
-				if (where) {
-					eventQuery.append(" WHERE ");
-				}
-
-				if (elementWhere != null) {
-					first = false;
-					eventQuery.append(elementWhere.getSQLString());
-				}
-
-				if (typeWhere != null) {
-					if (!first)
-						eventQuery.append(" AND ");
-					else
-						first = false;
-					eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " 
-							+ FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
-				} 
-
-				if (eventProducerWhere != null) {
-					if (!first)
-						eventQuery.append(" AND ");
-					else
-						first = false;
-					eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " 
-							+ FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
-				} 
-
-				if (parametersConditions.size()>0) {
-					if (!first)
-						eventQuery.append(" AND ");
-					else
-						first = false;
-
-					eventQuery.append(getParamConditionsString());
-				}
-
-				if (orderBy) {
-					eventQuery.append(" ORDER BY " + orderByColumn + " " + orderByCriterium);
-				}
-				
-				if (isLimitSet()) {
-					eventQuery.append(" LIMIT " + getLimit());
-				}
-
-				String query = eventQuery.toString();
-
-				mystm = dbObj.getConnection().createStatement();
-
-				DeltaManager steps = new DeltaManager();
-				steps.start();
-				rs = mystm.executeQuery(query);
-				steps.start();
-
-				
-				
-
-			} catch (SQLException e) {
-				throw new SoCTraceException(e);
-			}
-
-		
-		return iterator;
+	public Event rebuildNextEvent() throws SQLException, SoCTraceException {
+		if (rs.next())
+			return rebuildEvent(rs);
+		return null;
 	}
-	
-	
+
 }

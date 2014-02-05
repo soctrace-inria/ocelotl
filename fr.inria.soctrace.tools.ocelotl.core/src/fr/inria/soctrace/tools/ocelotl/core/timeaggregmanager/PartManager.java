@@ -28,7 +28,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 public class PartManager {
 
 	private OcelotlCore				lpaggregCore;
-	private ITimeManager		lpaggregManager;
+	private ITimeManager			lpaggregManager;
 	private final List<TimeRegion>	timeStamps	= new ArrayList<TimeRegion>();
 	private TimeRegion				traceRegion;
 	private int						timeSliceNumber;

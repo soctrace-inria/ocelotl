@@ -4,9 +4,9 @@ import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.S
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
-public class StateProportionTimeLineView extends TimeLineView{
+public class StateProportionTimeLineView extends TimeLineView {
 
-	public StateProportionTimeLineView(OcelotlView ocelotlView) {
+	public StateProportionTimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
 		// TODO Auto-generated constructor stub
 	}
@@ -21,8 +21,8 @@ public class StateProportionTimeLineView extends TimeLineView{
 				final MultiState part = new MultiState(i, (StateProportion) ocelotlView.getCore().getSpaceOperator(), root, Space);
 				part.init();
 			}
-			
-		}		
+
+		}
 	}
-	
+
 }

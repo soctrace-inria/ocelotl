@@ -27,7 +27,7 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
 public class DistributionConfig implements ITraceTypeConfig {
 
-	private List<EventType>		types			= new LinkedList<EventType>();
+	private List<EventType>	types	= new LinkedList<EventType>();
 
 	public DistributionConfig() {
 		super();

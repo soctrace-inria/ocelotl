@@ -19,7 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views;
 
-import java.io.ObjectInputStream.GetField;
 import java.util.HashMap;
 
 import org.eclipse.swt.graphics.Color;
@@ -29,18 +28,19 @@ import org.eclipse.swt.widgets.Display;
 public class MPIColors {
 
 	public static HashMap<String, Color>	Colors	= new HashMap<String, Color>();
-	private static Device device;
+	private static Device					device;
 
 	static {
 		init();
 	}
-	
 
-	public static Color ocelotlColor(float r, float g, float b) {
-			// TODO Auto-generated constructor stub
-			return new Color(device, (int)r*255, (int)g*255, (int)b*255);
-		}
-		
+	static void addColor(final String name, final double r, final double g, final double b) {
+		Colors.put(name, ocelotlColor((float) r, (float) g, (float) b));
+	}
+
+	static void addColor(final String name, final float r, final float g, final float b) {
+		Colors.put(name, ocelotlColor(r, g, b));
+	}
 
 	private static void init() {
 		Colors.clear();
@@ -78,16 +78,16 @@ public class MPIColors {
 		Colors.put("Log", new Color(device, (int) (255 * 0.4), (int) (255 * 0.4), (int) (255 * 0.4)));
 		Colors.put("Trace", new Color(device, (int) (255 * 0.3), (int) (255 * 0.3), (int) (255 * 0.0)));
 
-//		5 12 11 underloaded "0 1 1"
-//		5 13 11 normal "1 1 1"
-//		5 14 11 violation "1 0 0"
-//		5 15 11 violation-det "0 1 0"
-//		5 16 11 violation-out "1 0 0"
-//		2 17 2 SERVICE
-//		5 18 17 free "1 1 1"
-//		5 19 17 booked "0 0 1"
-//		5 20 17 compute "1 0 1"
-//		5 21 17 reconfigure "1 1 0"
+		// 5 12 11 underloaded "0 1 1"
+		// 5 13 11 normal "1 1 1"
+		// 5 14 11 violation "1 0 0"
+		// 5 15 11 violation-det "0 1 0"
+		// 5 16 11 violation-out "1 0 0"
+		// 2 17 2 SERVICE
+		// 5 18 17 free "1 1 1"
+		// 5 19 17 booked "0 0 1"
+		// 5 20 17 compute "1 0 1"
+		// 5 21 17 reconfigure "1 1 0"
 		addColor("12", 0, 1, 1);
 		addColor("13", 1, 1, 1);
 		addColor("14", 1, 0, 0);
@@ -100,13 +100,10 @@ public class MPIColors {
 		addColor("21", 1, 1, 0);
 
 	}
-	
-	static void addColor(String name, float r, float g, float b){
-		Colors.put(name, ocelotlColor(r, g, b));
-	}
-	
-	static void addColor(String name, double r, double g, double b){
-		Colors.put(name, ocelotlColor((float)r, (float)g, (float)b));
+
+	public static Color ocelotlColor(final float r, final float g, final float b) {
+		// TODO Auto-generated constructor stub
+		return new Color(device, (int) r * 255, (int) g * 255, (int) b * 255);
 	}
 
 }

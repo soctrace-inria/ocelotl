@@ -30,18 +30,16 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
-import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEvent;
-
 
 public class EventDistribution extends _2DMicroDescription {
 
 	class OcelotlThread extends Thread {
 
-		List<EventProducer>				eventProducers;
+		List<EventProducer>						eventProducers;
 		Map<Integer, List<GenericReducedEvent>>	eventProxyList;
-		int								threadNumber;
-		int								thread;
+		int										threadNumber;
+		int										thread;
 
 		@SuppressWarnings("unchecked")
 		public OcelotlThread(final List<EventProducer> eventProducers, final Object eventList, final int threadNumber, final int thread, final boolean cached) {
@@ -53,9 +51,9 @@ public class EventDistribution extends _2DMicroDescription {
 			start();
 		}
 
-		private void matrixWrite(long slice, final EventProducer ep) {
+		private void matrixWrite(final long slice, final EventProducer ep) {
 			synchronized (matrix) {
-				matrix.get((int) slice).put(ep.getName(), matrix.get((int) slice).get(ep.getName())+1);
+				matrix.get((int) slice).put(ep.getName(), matrix.get((int) slice).get(ep.getName()) + 1);
 			}
 
 		}
@@ -63,10 +61,11 @@ public class EventDistribution extends _2DMicroDescription {
 		@Override
 		public void run() {
 			for (int t = getEP(); t < eventProducers.size(); t = getEP()) {
-				final EventProducer ep = eventProducers.get(t);;
+				final EventProducer ep = eventProducers.get(t);
+				;
 				final List<GenericReducedEvent> events = eventProxyList.get(ep.getId());
 				for (int i = 0; i < events.size() - 1; i++) {
-					long slice = timeSliceManager.getTimeSlice(events.get(i).TS);
+					final long slice = timeSliceManager.getTimeSlice(events.get(i).TS);
 					matrixWrite(slice, ep);
 				}
 				final int c = getCount();
@@ -74,8 +73,6 @@ public class EventDistribution extends _2DMicroDescription {
 					total(c);
 			}
 
-
-			
 		}
 	}
 
@@ -91,7 +88,7 @@ public class EventDistribution extends _2DMicroDescription {
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		final List<GenericReducedEvent> fullEvents = ((OcelotlQueries) ocelotlQueries).getReducedEvents(eventProducers);
+		final List<GenericReducedEvent> fullEvents = ocelotlQueries.getReducedEvents(eventProducers);
 		eventsNumber = fullEvents.size();
 		dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " + fullEvents.size() + " Events");
 		dm = new DeltaManager();

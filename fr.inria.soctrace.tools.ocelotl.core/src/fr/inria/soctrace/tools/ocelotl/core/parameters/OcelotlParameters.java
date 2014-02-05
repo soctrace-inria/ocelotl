@@ -52,6 +52,10 @@ public class OcelotlParameters {
 		return eventProducers;
 	}
 
+	public int getEventsPerThread() {
+		return eventsPerThread;
+	}
+
 	public int getMaxEventProducers() {
 		return maxEventProducers;
 	}
@@ -104,6 +108,10 @@ public class OcelotlParameters {
 		this.eventProducers = eventProducers;
 	}
 
+	public void setEventsPerThread(final int eventsPerThread) {
+		this.eventsPerThread = eventsPerThread;
+	}
+
 	public void setGrowingQualities(final boolean growingQualities) {
 		this.growingQualities = growingQualities;
 	}
@@ -150,14 +158,6 @@ public class OcelotlParameters {
 
 	public void setTraceTypeConfig(final ITraceTypeConfig iTraceTypeConfig) {
 		this.iTraceTypeConfig = iTraceTypeConfig;
-	}
-
-	public int getEventsPerThread() {
-		return eventsPerThread;
-	}
-
-	public void setEventsPerThread(int eventsPerThread) {
-		this.eventsPerThread = eventsPerThread;
 	}
 
 }

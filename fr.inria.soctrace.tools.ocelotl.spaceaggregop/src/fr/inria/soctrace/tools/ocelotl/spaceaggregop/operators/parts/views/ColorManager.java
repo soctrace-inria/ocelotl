@@ -33,10 +33,10 @@ import org.eclipse.draw2d.ColorConstants;
 public class ColorManager {
 
 	private final List<PartColor>	colors		= new ArrayList<PartColor>();
-	private static final int			incrementR	= 47;
-	private static final int			incrementG	= 77;
-	private static final int			incrementB	= 66;
-	private static final int			total		= 1000;
+	private static final int		incrementR	= 47;
+	private static final int		incrementG	= 77;
+	private static final int		incrementB	= 66;
+	private static final int		total		= 1000;
 
 	public ColorManager() {
 		super();

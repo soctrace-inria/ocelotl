@@ -58,35 +58,9 @@ public class TimeSliceManager {
 		return timeRegion;
 	}
 
-	public List<TimeSlice> getTimeSlices() {
-		return timeSlices;
-	}
-
-	public Map<Long, Long> getTimeSlicesDistribution(final TimeRegion testedTimeRegion) {
-		final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
-		long startSlice = Math.max(0, (testedTimeRegion.getTimeStampStart() - timeRegion.getTimeStampStart()) / sliceDuration - 1);
-		long temp = 0;
-		if ((testedTimeRegion.getTimeStampStart() - timeRegion.getTimeStampStart())>=0){
-		for (long i = startSlice; i < timeSlices.size(); i++) {
-			final TimeSlice it = timeSlices.get((int) i);
-			if (it.startIsInsideMe(testedTimeRegion.getTimeStampStart())) {
-				startSlice = it.getNumber();
-				break;
-			}
-		}
-		}
-		for (long i = startSlice; i < slicesNumber; i++) {
-			temp = timeSlices.get((int) i).regionInsideMe(testedTimeRegion);
-			if (temp == 0)
-				break;
-			else
-				timeSlicesDistribution.put(i, temp);
-		}
-		return timeSlicesDistribution;
-	}
-	
-	public long getTimeSlice(final long timeStamp){
-		//final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
+	public long getTimeSlice(final long timeStamp) {
+		// final Map<Long, Long> timeSlicesDistribution = new HashMap<Long,
+		// Long>();
 		long slice = Math.max(0, (timeStamp - timeRegion.getTimeStampStart()) / sliceDuration - 1);
 		for (long i = slice; i < timeSlices.size(); i++) {
 			final TimeSlice it = timeSlices.get((int) i);
@@ -95,7 +69,33 @@ public class TimeSliceManager {
 				break;
 			}
 		}
-		return slice;	
+		return slice;
+	}
+
+	public List<TimeSlice> getTimeSlices() {
+		return timeSlices;
+	}
+
+	public Map<Long, Long> getTimeSlicesDistribution(final TimeRegion testedTimeRegion) {
+		final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
+		long startSlice = Math.max(0, (testedTimeRegion.getTimeStampStart() - timeRegion.getTimeStampStart()) / sliceDuration - 1);
+		long temp = 0;
+		if (testedTimeRegion.getTimeStampStart() - timeRegion.getTimeStampStart() >= 0)
+			for (long i = startSlice; i < timeSlices.size(); i++) {
+				final TimeSlice it = timeSlices.get((int) i);
+				if (it.startIsInsideMe(testedTimeRegion.getTimeStampStart())) {
+					startSlice = it.getNumber();
+					break;
+				}
+			}
+		for (long i = startSlice; i < slicesNumber; i++) {
+			temp = timeSlices.get((int) i).regionInsideMe(testedTimeRegion);
+			if (temp == 0)
+				break;
+			else
+				timeSlicesDistribution.put(i, temp);
+		}
+		return timeSlicesDistribution;
 	}
 
 	public void printInfos() {

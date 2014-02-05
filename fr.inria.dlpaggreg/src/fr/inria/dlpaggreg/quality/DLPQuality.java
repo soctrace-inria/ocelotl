@@ -1,74 +1,74 @@
 package fr.inria.dlpaggreg.quality;
 
 public class DLPQuality {
-	
-	private double gain;
-	private double loss;
-	
+
+	private double	gain;
+	private double	loss;
+
 	public DLPQuality() {
 		super();
-		this.gain = 0;
-		this.loss = 0;
+		gain = 0;
+		loss = 0;
 	}
-	
-	public DLPQuality(double gain, double loss) {
+
+	public DLPQuality(final DLPQuality dLPQuality) {
+		super();
+		gain = dLPQuality.getGain();
+		loss = dLPQuality.getLoss();
+	}
+
+	public DLPQuality(final double gain, final double loss) {
 		super();
 		this.gain = gain;
 		this.loss = loss;
 	}
 
-	public DLPQuality(DLPQuality dLPQuality) {
-		super();
-		this.gain=dLPQuality.getGain();
-		this.loss=dLPQuality.getLoss();
+	public void addToGain(final double gain) {
+		this.gain += gain;
+	}
+
+	public void addToLoss(final double loss) {
+		this.loss += loss;
+	}
+
+	public void addToQuality(final DLPQuality dLPQuality) {
+		gain += dLPQuality.getGain();
+		loss += dLPQuality.getLoss();
+	}
+
+	public void addToQuality(final double gain, final double loss) {
+		this.gain += gain;
+		this.loss += loss;
+	}
+
+	public boolean compare(final DLPQuality dLPQuality) {
+		return getGain() == dLPQuality.getGain() && getLoss() == dLPQuality.getLoss();
 	}
 
 	public double getGain() {
 		return gain;
 	}
 
-	public void setGain(double gain) {
-		this.gain = gain;
-	}
-
 	public double getLoss() {
 		return loss;
 	}
 
-	public void setLoss(double loss) {
+	public void normalize(final DLPQuality dLPQuality) {
+		gain = gain / dLPQuality.getGain();
+		loss = loss / dLPQuality.getLoss();
+	}
+
+	public void setGain(final double gain) {
+		this.gain = gain;
+	}
+
+	public void setLoss(final double loss) {
 		this.loss = loss;
 	}
-	
-	public void setQuality(double gain, double loss){
+
+	public void setQuality(final double gain, final double loss) {
 		this.gain = gain;
 		this.loss = loss;
-	}
-	
-	public void addToGain(double gain){
-		this.gain+=gain;
-	}
-	
-	public void addToLoss(double loss){
-		this.loss+=loss;
-	}
-	
-	public void addToQuality(double gain, double loss){
-		this.gain += gain;
-		this.loss += loss;
-	}
-	
-	public void addToQuality(DLPQuality dLPQuality){
-		this.gain += dLPQuality.getGain();
-		this.loss += dLPQuality.getLoss();
-	}
-	
-	public boolean compare(DLPQuality dLPQuality){
-		return this.getGain()==dLPQuality.getGain()&&this.getLoss()==dLPQuality.getLoss();
-	}
-	
-	public void normalize(DLPQuality dLPQuality){
-		this.gain=this.gain/dLPQuality.getGain();
-		this.loss=this.loss/dLPQuality.getLoss();
 	}
 
 }

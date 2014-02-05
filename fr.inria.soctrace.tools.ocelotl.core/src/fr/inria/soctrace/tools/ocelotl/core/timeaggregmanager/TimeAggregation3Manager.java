@@ -27,8 +27,8 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
 
 public class TimeAggregation3Manager extends TimeAggregationManager {
 
-	I3DMicroDescription	timeSliceMatrix;
-	List<List<List<Double>>> values;
+	I3DMicroDescription			timeSliceMatrix;
+	List<List<List<Double>>>	values;
 
 	public TimeAggregation3Manager(final I3DMicroDescription timeSliceMatrix) {
 		super(timeSliceMatrix.getOcelotlParameters());
@@ -41,14 +41,14 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		values = new ArrayList<List<List<Double>>>();
 		for (int i = 0; i < timeSliceMatrix.getMatrix().size(); i++) {
 			values.add(new ArrayList<List<Double>>());
-			int j=0;
+			int j = 0;
 			for (final String key : timeSliceMatrix.getMatrix().get(i).keySet()) {
 				values.get(i).add(new ArrayList<Double>());
 				for (final String key2 : timeSliceMatrix.getMatrix().get(i).get(key).keySet())
 					values.get(i).get(j).add(timeSliceMatrix.getMatrix().get(i).get(key).get(key2).doubleValue());
 				j++;
 			}
-			
+
 		}
 		((TimeAggregation3) timeAggregation).setValues(values);
 

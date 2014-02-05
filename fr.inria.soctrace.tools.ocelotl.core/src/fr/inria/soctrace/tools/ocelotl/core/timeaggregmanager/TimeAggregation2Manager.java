@@ -28,7 +28,7 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I2DMicroDescription;
 public class TimeAggregation2Manager extends TimeAggregationManager {
 
 	I2DMicroDescription	matrix;
-	List<List<Double>> values;
+	List<List<Double>>	values;
 
 	public TimeAggregation2Manager(final I2DMicroDescription matrix) {
 		super(matrix.getOcelotlParameters());
@@ -38,7 +38,7 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 
 	@Override
 	public void fillVectors() {
-		values=new ArrayList<List<Double>>();
+		values = new ArrayList<List<Double>>();
 		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
 			values.add(new ArrayList<Double>());
 			for (final String key : matrix.getMatrix().get(i).keySet())

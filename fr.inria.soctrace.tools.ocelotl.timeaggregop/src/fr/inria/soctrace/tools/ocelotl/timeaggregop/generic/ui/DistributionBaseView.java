@@ -22,7 +22,6 @@ package fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -107,11 +106,11 @@ public abstract class DistributionBaseView extends ApplicationWindow implements 
 		}
 	}
 
-	protected OcelotlView				ocelotlView;
+	protected OcelotlView			ocelotlView;
 
-	protected ListViewer				listViewerIdleStates;
+	protected ListViewer			listViewerIdleStates;
 
-	protected ListViewer				listViewerEventTypes;
+	protected ListViewer			listViewerEventTypes;
 
 	protected DistributionConfig	config;
 
@@ -198,12 +197,12 @@ public abstract class DistributionBaseView extends ApplicationWindow implements 
 
 	}
 
-	abstract public void setParameters();
-
 	@Override
 	public void init(final OcelotlView ocelotlView, final ITraceTypeConfig config) {
 		this.ocelotlView = ocelotlView;
 		this.config = (DistributionConfig) config;
 	}
+
+	abstract public void setParameters();
 
 }

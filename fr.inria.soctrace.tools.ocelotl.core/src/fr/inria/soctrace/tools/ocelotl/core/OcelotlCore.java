@@ -43,7 +43,7 @@ public class OcelotlCore {
 	}
 
 	OcelotlParameters				ocelotlParameters;
-	ITimeManager				lpaggregManager;
+	ITimeManager					lpaggregManager;
 	PartManager						partManager;
 	TimeAggregationOperatorManager	timeOperators;
 	ITimeAggregationOperator		timeOperator;

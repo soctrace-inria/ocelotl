@@ -27,10 +27,10 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.ITimeManager;
 
 abstract public class SpaceAggregationOperator implements ISpaceAggregationOperator {
 
-	protected List<Part>		parts;
-	protected OcelotlCore		ocelotlCore;
-	protected int				timeSliceNumber;
-	protected long				timeSliceDuration;
+	protected List<Part>	parts;
+	protected OcelotlCore	ocelotlCore;
+	protected int			timeSliceNumber;
+	protected long			timeSliceDuration;
 	protected ITimeManager	lpaggregManager;
 
 	public SpaceAggregationOperator() {

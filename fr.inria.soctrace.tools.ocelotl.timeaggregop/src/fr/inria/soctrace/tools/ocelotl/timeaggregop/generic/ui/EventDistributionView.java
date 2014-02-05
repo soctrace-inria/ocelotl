@@ -21,25 +21,17 @@ package fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui;
 
 import org.eclipse.swt.widgets.Shell;
 
-import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
-
-
 public class EventDistributionView extends DistributionBaseView {
 
-
-	public EventDistributionView(Shell shell) {
+	public EventDistributionView(final Shell shell) {
 		super(shell);
 	}
 
 	@Override
 	public void setParameters() {
-		if (config.getTypes().isEmpty()){
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++){
-			config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
-		}
-		}
+		if (config.getTypes().isEmpty())
+			for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
+				config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
 		listViewerEventTypes.setInput(config.getTypes());
 	}
 }
-
-

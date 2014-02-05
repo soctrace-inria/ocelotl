@@ -29,7 +29,6 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public abstract class TimeAggregationManager implements ITimeManager {
 
-
 	protected List<Integer>			parts		= new ArrayList<Integer>();
 	protected List<DLPQuality>		qualities	= new ArrayList<DLPQuality>();
 	protected List<Double>			parameters	= new ArrayList<Double>();
@@ -47,8 +46,8 @@ public abstract class TimeAggregationManager implements ITimeManager {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
 		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(), 0.0, 1.0);
-		parameters=timeAggregation.getParameters();
-		qualities=timeAggregation.getQualityList();
+		parameters = timeAggregation.getParameters();
+		qualities = timeAggregation.getQualityList();
 		dm.end("LPAGGREG - PARAMETERS LIST");
 
 	}
@@ -57,7 +56,7 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	public void computeParts() {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		parts=timeAggregation.getParts(ocelotlParameters.getParameter());
+		parts = timeAggregation.getParts(ocelotlParameters.getParameter());
 		dm.end("LPAGGREG - COMPUTE PARTS");
 	}
 
