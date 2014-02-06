@@ -36,6 +36,17 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	protected ITimeAggregation		timeAggregation;
 	protected OcelotlParameters		ocelotlParameters;
 
+	static {
+		
+		try {
+			System.loadLibrary("lpaggregjni");
+		} catch (final UnsatisfiedLinkError e) {
+			System.err.println("Native code library failed to load. \n" + e);
+			System.exit(1);
+		}
+		System.err.println("Native code library loaded. \n");
+	}
+	
 	public TimeAggregationManager(final OcelotlParameters ocelotlParameters) {
 		super();
 		this.ocelotlParameters = ocelotlParameters;
