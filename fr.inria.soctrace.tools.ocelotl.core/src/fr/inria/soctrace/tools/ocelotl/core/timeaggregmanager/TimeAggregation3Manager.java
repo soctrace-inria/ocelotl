@@ -22,8 +22,10 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.dlpaggreg.time.TimeAggregation2;
 import fr.inria.dlpaggreg.time.TimeAggregation3;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class TimeAggregation3Manager extends TimeAggregationManager {
 
@@ -36,8 +38,8 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		reset();
 	}
 
-	@Override
-	public void fillVectors() {
+	
+	public void fillVectorsJava() {
 		values = new ArrayList<List<List<Double>>>();
 		for (int i = 0; i < timeSliceMatrix.getMatrix().size(); i++) {
 			values.add(new ArrayList<List<Double>>());
@@ -52,6 +54,19 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		}
 		((TimeAggregation3) timeAggregation).setValues(values);
 
+	}
+	
+	@Override
+	protected void fillVectorsJNI() {
+		for (int i = 0; i < timeSliceMatrix.getMatrix().size(); i++) {
+			((JNITimeAggregation3) timeAggregation).addMatrix();
+			for (final String key : timeSliceMatrix.getMatrix().get(i).keySet()) {
+				((JNITimeAggregation3) timeAggregation).addVector();
+				for (final String key2 : timeSliceMatrix.getMatrix().get(i).get(key).keySet())
+					((JNITimeAggregation3) timeAggregation).push_back(timeSliceMatrix.getMatrix().get(i).get(key).get(key2).doubleValue());
+			}
+		}
+		
 	}
 
 	@Override
@@ -69,8 +84,14 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 
 	@Override
 	public void reset() {
-		timeAggregation = new TimeAggregation3();
+		if (OcelotlParameters.isJniFlag())
+			timeAggregation = new JNITimeAggregation3();
+		else
+			timeAggregation = new TimeAggregation3();
 		fillVectors();
 	}
+
+
+
 
 }

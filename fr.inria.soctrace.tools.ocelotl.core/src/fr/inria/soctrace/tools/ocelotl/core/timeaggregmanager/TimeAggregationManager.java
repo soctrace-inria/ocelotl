@@ -37,14 +37,17 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	protected OcelotlParameters		ocelotlParameters;
 
 	static {
-		
+		OcelotlParameters.setJniFlag(true);
 		try {
 			System.loadLibrary("lpaggregjni");
+			System.err.println("Native library lpaggregjni loaded successfully. Tudo bem!\n");
 		} catch (final UnsatisfiedLinkError e) {
-			System.err.println("Native code library failed to load. \n" + e);
-			System.exit(1);
+			OcelotlParameters.setJniFlag(false);
+			System.err.println("Native library lpaggregjni failed to load.");
+			System.err.println("Ocelotl will use java code instead, but performance may decrease.");
+			System.err.println("You may need to manage JVM settings to allocate more memory to Ocelotl.");
 		}
-		System.err.println("Native code library loaded. \n");
+		
 	}
 	
 	public TimeAggregationManager(final OcelotlParameters ocelotlParameters) {
@@ -80,7 +83,17 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	}
 
 	@Override
-	public abstract void fillVectors();
+	public void fillVectors() {
+		if (OcelotlParameters.isJniFlag())
+			fillVectorsJNI();
+		else
+			fillVectorsJava();
+
+	}
+
+	protected abstract void fillVectorsJava();
+
+	protected abstract void fillVectorsJNI();
 
 	@Override
 	public List<Double> getParameters() {

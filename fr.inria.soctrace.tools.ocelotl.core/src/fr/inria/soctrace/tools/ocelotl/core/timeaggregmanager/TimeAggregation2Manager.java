@@ -24,20 +24,21 @@ import java.util.List;
 
 import fr.inria.dlpaggreg.time.TimeAggregation2;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I2DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class TimeAggregation2Manager extends TimeAggregationManager {
 
 	I2DMicroDescription	matrix;
-	List<List<Double>>	values;
+	
 
 	public TimeAggregation2Manager(final I2DMicroDescription matrix) {
 		super(matrix.getOcelotlParameters());
 		this.matrix = matrix;
 		reset();
 	}
-
-	@Override
-	public void fillVectors() {
+	
+	public void fillVectorsJava() {
+		List<List<Double>>	values;
 		values = new ArrayList<List<Double>>();
 		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
 			values.add(new ArrayList<Double>());
@@ -45,6 +46,15 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 				values.get(i).add(matrix.getMatrix().get(i).get(key).doubleValue());
 		}
 		((TimeAggregation2) timeAggregation).setValues(values);
+
+	}
+	
+	public void fillVectorsJNI() {
+		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
+			((JNITimeAggregation2) timeAggregation).addVector();
+			for (final String key : matrix.getMatrix().get(i).keySet())
+				((JNITimeAggregation2) timeAggregation).push_back(matrix.getMatrix().get(i).get(key).doubleValue());
+		}
 
 	}
 
@@ -59,7 +69,10 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 
 	@Override
 	public void reset() {
-		timeAggregation = new TimeAggregation2();
+		if (OcelotlParameters.isJniFlag())
+			timeAggregation = new JNITimeAggregation2();
+		else
+			timeAggregation = new TimeAggregation2();
 		fillVectors();
 	}
 

@@ -42,6 +42,7 @@ public class OcelotlParameters {
 	private boolean				growingQualities	= true;
 	private int					eventsPerThread		= 20;
 	private int					thread				= 5;
+	private static boolean		jniFlag=false;
 	private ITraceTypeConfig	iTraceTypeConfig;
 
 	public OcelotlParameters() {
@@ -158,6 +159,14 @@ public class OcelotlParameters {
 
 	public void setTraceTypeConfig(final ITraceTypeConfig iTraceTypeConfig) {
 		this.iTraceTypeConfig = iTraceTypeConfig;
+	}
+
+	public static boolean isJniFlag() {
+		return jniFlag;
+	}
+
+	public static void setJniFlag(boolean jniFlag) {
+		OcelotlParameters.jniFlag = jniFlag;
 	}
 
 }
