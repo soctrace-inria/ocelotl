@@ -29,6 +29,9 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlParameters {
 
+	//Modify to desactivate JNI
+	private static boolean		forceJava			= false;
+	
 	private List<EventProducer>	eventProducers		= new ArrayList<EventProducer>();
 	private int					timeSlicesNumber	= 1;
 	private TimeRegion			timeRegion;
@@ -167,6 +170,14 @@ public class OcelotlParameters {
 
 	public static void setJniFlag(boolean jniFlag) {
 		OcelotlParameters.jniFlag = jniFlag;
+	}
+
+	public static boolean isForceJava() {
+		return forceJava;
+	}
+
+	public void setForceJava(boolean forceJava) {
+		OcelotlParameters.forceJava = forceJava;
 	}
 
 }
