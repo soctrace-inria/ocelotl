@@ -82,7 +82,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.jface.window.ApplicationWindow:"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -92,7 +92,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java"/>
+                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig"/>
                </appinfo>
             </annotation>
          </attribute>

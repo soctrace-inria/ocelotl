@@ -374,6 +374,24 @@ public class OcelotlView extends ViewPart {
 			manager.openConfigWindows();
 		}
 	}
+	
+	private class Settings2SelectionAdapter extends SelectionAdapter {
+
+		private final OcelotlView	view;
+
+		public Settings2SelectionAdapter(final OcelotlView view) {
+			this.view = view;
+		}
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			//hasChanged = HasChanged.ALL;
+			if (comboSpace.getText().equals(""))
+				return;
+			final ConfigViewManager manager = new ConfigViewManager(view);
+			manager.openConfigWindows();
+		}
+	}
 
 	private class ThresholdModifyListener implements ModifyListener {
 
@@ -483,6 +501,7 @@ public class OcelotlView extends ViewPart {
 	private SashForm							sashFormView;
 	private TimeLineViewWrapper					timeLineViewWrapper;
 	private Button								btnAddAllEventProducer;
+	private Button	btnSettings2;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -689,29 +708,35 @@ public class OcelotlView extends ViewPart {
 		gd_composite.widthHint = 85;
 		composite.setLayoutData(gd_composite);
 		composite.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		composite.setLayout(new GridLayout(1, false));
-
-		comboSpace = new Combo(composite, SWT.READ_ONLY);
-		comboSpace.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		final GridData gd_combo = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-		gd_combo.widthHint = 170;
-		comboSpace.setLayoutData(gd_combo);
-		comboSpace.setText("");
-
-		comboSpace.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				if (confDataLoader.getCurrentTrace() == null)
-					return;
-				if (hasChanged == HasChanged.NOTHING)
-					hasChanged = HasChanged.PARAMETER;
-				ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
-				timeLineView = timeLineViewManager.create();
-				timeLineViewWrapper.setView(timeLineView);
-
-			}
-		});
+		composite.setLayout(new GridLayout(2, false));
+		
+				comboSpace = new Combo(composite, SWT.READ_ONLY);
+				comboSpace.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				final GridData gd_combo = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+				gd_combo.widthHint = 170;
+				comboSpace.setLayoutData(gd_combo);
+				comboSpace.setText("");
+				
+						comboSpace.addSelectionListener(new SelectionAdapter() {
+				
+							@Override
+							public void widgetSelected(final SelectionEvent e) {
+								if (confDataLoader.getCurrentTrace() == null)
+									return;
+								if (hasChanged == HasChanged.NOTHING)
+									hasChanged = HasChanged.PARAMETER;
+								ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
+								timeLineView = timeLineViewManager.create();
+								timeLineViewWrapper.setView(timeLineView);
+								btnSettings2.notifyListeners(SWT.Selection, new Event());
+				
+							}
+						});
+		
+		btnSettings2 = new Button(composite, SWT.NONE);
+		btnSettings2.setText("Settings");
+		btnSettings2.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
 		sashAggreg.setWeights(new int[] { 1, 1 });
 
 		final Group groupEventProducers = new Group(groupTSParameters, SWT.NONE);
@@ -851,7 +876,7 @@ public class OcelotlView extends ViewPart {
 		btnRun.setText("RUN!");
 		new Label(compositeGetParameters, SWT.NONE);
 		sashForm.setWeights(new int[] { 249, 46 });
-		sashFormTimeAggregationParameters.setWeights(new int[] { 227, 361 });
+		sashFormTimeAggregationParameters.setWeights(new int[] {269, 316});
 		btnRun.addSelectionListener(new GetAggregationAdapter());
 		textRun.addModifyListener(new ParameterModifyListener());
 

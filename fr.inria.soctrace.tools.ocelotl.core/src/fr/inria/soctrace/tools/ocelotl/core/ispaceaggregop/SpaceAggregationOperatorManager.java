@@ -32,6 +32,7 @@ import org.osgi.framework.Bundle;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
@@ -40,14 +41,16 @@ public class SpaceAggregationOperatorManager {
 	HashMap<String, SpaceAggregationOperatorResource>	List;
 	ISpaceAggregationOperator							selectedOperator;
 	String												selectedOperatorName;
-	ITraceTypeConfig									selectedConfig;
+	ISpaceConfig										selectedConfig;
 	OcelotlParameters									parameters;
 	OcelotlCore											ocelotlCore;
 
 	private static final String							POINT_ID				= "fr.inria.soctrace.tools.ocelotl.core.spaceaggregopext";	//$NON-NLS-1$
 	private static final String							OP_NAME					= "operator";												//$NON-NLS-1$
 	private static final String							OP_CLASS				= "class";													//$NON-NLS-1$
-	private static final String							OP_VISUALIZATION		= "visualization";											//$NON-NLS-1$
+	private static final String							OP_VISUALIZATION		= "visualization";		
+	private static final String							OP_PARAM_WIN			= "param_win";
+	private static final String							OP_PARAM_CONFIG			= "param_config";//$NON-NLS-1$
 																																			//	private static final String							OP_PARAM_WIN				= "param_win";												//$NON-NLS-1$
 																																			//	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
 	private static final String							OP_TIME_COMPATIBILITY	= "time_compatibility";									//$NON-NLS-1$
@@ -77,6 +80,8 @@ public class SpaceAggregationOperatorManager {
 		}
 		selectedOperator.setOcelotlCore(ocelotlCore);
 	}
+
+
 
 	public List<String> getOperators(final List<String> compatibility) {
 		System.out.println("Comparing Space Operator trace format with " + compatibility);
@@ -127,8 +132,8 @@ public class SpaceAggregationOperatorManager {
 			resource.setOperatorClass(e.getAttribute(OP_CLASS));
 			resource.setName(e.getAttribute(OP_NAME));
 			resource.setTimeCompatibility(e.getAttribute(OP_TIME_COMPATIBILITY));
-			// resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
-			// resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
+			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
+			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
 			resource.setBundle(e.getContributor().getName());
 			// System.out.println(resource.getBundle());
@@ -139,6 +144,15 @@ public class SpaceAggregationOperatorManager {
 
 	public void setSelectedOperator(final String name) {
 		selectedOperatorName = name;
+		final Bundle mybundle = Platform.getBundle(List.get(selectedOperatorName).getBundle());
+		try {
+			selectedConfig = (ISpaceConfig) mybundle.loadClass(List.get(selectedOperatorName).getParamConfig()).newInstance();
+			parameters.setSpaceConfig(selectedConfig);
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }

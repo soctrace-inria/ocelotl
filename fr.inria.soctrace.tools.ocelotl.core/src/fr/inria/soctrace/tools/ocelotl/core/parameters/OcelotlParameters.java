@@ -24,6 +24,7 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Trace;
+import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
@@ -47,6 +48,7 @@ public class OcelotlParameters {
 	private int					thread				= 5;
 	private static boolean		jniFlag=false;
 	private ITraceTypeConfig	iTraceTypeConfig;
+	private ISpaceConfig		iSpaceConfig;
 
 	public OcelotlParameters() {
 		super();
@@ -178,6 +180,14 @@ public class OcelotlParameters {
 
 	public void setForceJava(boolean forceJava) {
 		OcelotlParameters.forceJava = forceJava;
+	}
+
+	public ISpaceConfig getSpaceConfig() {
+		return iSpaceConfig;
+	}
+
+	public void setSpaceConfig(ISpaceConfig iSpaceConfig) {
+		this.iSpaceConfig = iSpaceConfig;
 	}
 
 }
