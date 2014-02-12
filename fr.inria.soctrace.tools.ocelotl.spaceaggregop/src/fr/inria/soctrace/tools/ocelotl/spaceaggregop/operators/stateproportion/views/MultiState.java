@@ -33,6 +33,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.StateProportion;
+import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.config.StateProportionConfig;
 
 public class MultiState {
 
@@ -42,6 +43,7 @@ public class MultiState {
 	private int					space		= 6;
 	StateProportion				distribution;
 	IFigure						root;
+	StateColorManager	colors;
 
 	public MultiState(final int index, final StateProportion distribution, final IFigure root, final int space) {
 		super();
@@ -49,7 +51,7 @@ public class MultiState {
 		this.distribution = distribution;
 		this.root = root;
 		this.space = space;
-
+		this.colors =((StateProportionConfig) distribution.getOcelotlCore().getOcelotlParameters().getSpaceConfig()).getColors();
 	}
 
 	public int getIndex() {
@@ -80,10 +82,7 @@ public class MultiState {
 				// value);
 				final RectangleFigure rect = new RectangleFigure();
 				rect.setBackgroundColor(ColorConstants.white);
-				if (MPIColors.Colors.containsKey(state))
-					rect.setBackgroundColor(MPIColors.Colors.get(state));
-				else
-					rect.setBackgroundColor(ColorConstants.black);
+				rect.setBackgroundColor(colors.getColor(state));
 				rect.setForegroundColor(ColorConstants.white);
 				final Label label = new Label(" " + state + " ");
 				rect.setToolTip(label);

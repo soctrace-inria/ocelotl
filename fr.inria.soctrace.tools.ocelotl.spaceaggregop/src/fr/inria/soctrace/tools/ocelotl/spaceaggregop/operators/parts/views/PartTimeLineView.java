@@ -11,7 +11,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
 public class PartTimeLineView extends TimeLineView {
 
-	private final ColorManager	colors	= new ColorManager();
+	private final PartColorManager	colors	= new PartColorManager();
 
 	public PartTimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);

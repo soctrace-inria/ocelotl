@@ -148,9 +148,7 @@ public class SpaceAggregationOperatorManager {
 		try {
 			selectedConfig = (ISpaceConfig) mybundle.loadClass(List.get(selectedOperatorName).getParamConfig()).newInstance();
 			parameters.setSpaceConfig(selectedConfig);
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException |NullPointerException e) {
 		}
 		
 	}

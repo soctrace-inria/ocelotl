@@ -388,7 +388,7 @@ public class OcelotlView extends ViewPart {
 			//hasChanged = HasChanged.ALL;
 			if (comboSpace.getText().equals(""))
 				return;
-			final ConfigViewManager manager = new ConfigViewManager(view);
+			final VisuConfigViewManager manager = new VisuConfigViewManager(view);
 			manager.openConfigWindows();
 		}
 	}

@@ -14,6 +14,8 @@
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.StateProportion"
             operator="State Proportion"
+            param_config="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.config.StateProportionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.config.StateProportionConfigView"
             time_compatibility="StateProportion"
             visualization="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views.StateProportionTimeLineView">
       </aggregation_operator>

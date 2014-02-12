@@ -30,7 +30,7 @@ import org.eclipse.draw2d.ColorConstants;
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
-public class ColorManager {
+public class PartColorManager {
 
 	private final List<PartColor>	colors		= new ArrayList<PartColor>();
 	private static final int		incrementR	= 47;
@@ -38,7 +38,7 @@ public class ColorManager {
 	private static final int		incrementB	= 66;
 	private static final int		total		= 1000;
 
-	public ColorManager() {
+	public PartColorManager() {
 		super();
 		colors.add(new PartColor(ColorConstants.red));
 		// colors.add(new PartColor(ColorConstants.blue));
