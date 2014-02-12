@@ -6,15 +6,18 @@ import java.util.List;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.config.PartsConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 
 public class PartTimeLineView extends TimeLineView {
 
 	private final PartColorManager	colors	= new PartColorManager();
+	private final PartsConfig config;
 
 	public PartTimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
+		this.config=(PartsConfig) ocelotlView.getParams().getSpaceConfig();
 		// TODO Auto-generated constructor stub
 	}
 
@@ -24,9 +27,9 @@ public class PartTimeLineView extends TimeLineView {
 		if (parts != null) {
 			while ((root.getSize().width - 2 * Border) / parts.size() - 2 < Space && Space != 0)
 				Space = Space - 1;
-			if (!aggregated)
+			if (!config.isAggregated())
 				for (int i = 0; i < parts.size(); i++) {
-					final PartFigure part = new PartFigure(i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()), numbers);
+					final PartFigure part = new PartFigure(i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()), config.isNumbers());
 					figures.add(part);
 					root.add(part, new Rectangle(new Point(i * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height / 2 - partHeight / 2), new Point((i + 1) * (root.getSize().width - 2 * Border) / parts.size() + Border - Space,
 							root.getSize().height / 2 + partHeight / 2)));
@@ -42,7 +45,7 @@ public class PartTimeLineView extends TimeLineView {
 				int j = 0;
 				for (int i = 0; i < aggParts.size(); i++) {
 					// TODO manage parts
-					final PartFigure part = new PartFigure(i, i, colors.getColors().get(j % colors.getColors().size()), numbers);
+					final PartFigure part = new PartFigure(i, i, colors.getColors().get(j % colors.getColors().size()), config.isNumbers());
 					figures.add(part);
 					root.add(
 							part,

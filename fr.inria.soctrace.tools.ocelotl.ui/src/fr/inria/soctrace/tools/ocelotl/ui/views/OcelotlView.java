@@ -241,7 +241,7 @@ public class OcelotlView extends ViewPart {
 								// "Parts", "Parts processing finished");
 								hasChanged = HasChanged.NOTHING;
 								timeLineView.deleteDiagram();
-								timeLineView.createDiagram(ocelotlCore.getLpaggregManager().getParts(), ocelotlParameters.getTimeRegion(), btnMergeAggregatedParts.getSelection(), btnShowNumbers.getSelection());
+								timeLineView.createDiagram(ocelotlCore.getLpaggregManager().getParts(), ocelotlParameters.getTimeRegion());
 								timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 								qualityView.createDiagram();
 							}
@@ -461,10 +461,8 @@ public class OcelotlView extends ViewPart {
 
 	public static final String					ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
 	public static final String					PLUGIN_ID		= Activator.PLUGIN_ID;
-	private Button								btnMergeAggregatedParts;
 	private Button								btnNormalize;
 	private Button								btnRun;
-	private Button								btnShowNumbers;
 	private Button								btnGrowingQualities;
 	private Button								btnDecreasingQualities;
 	private Button								btnSettings;
@@ -528,7 +526,6 @@ public class OcelotlView extends ViewPart {
 		spinnerEventSize.setSelection(10000);
 		spinnerThread.setSelection(8);
 		textRun.setText("1.0");
-		btnMergeAggregatedParts.setSelection(true);
 		producers.clear();
 		// types.clear();
 		// idles.clear();
@@ -947,28 +944,6 @@ public class OcelotlView extends ViewPart {
 		spinnerThread.setMinimum(1);
 		spinnerThread.setMaximum(1000000);
 		spinnerThread.setSelection(5);
-
-		final Group grpVisualizationSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
-		grpVisualizationSettings.setText("Visualization settings");
-		grpVisualizationSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpVisualizationSettings.setLayout(new GridLayout(1, false));
-
-		btnMergeAggregatedParts = new Button(grpVisualizationSettings, SWT.CHECK);
-		btnMergeAggregatedParts.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnMergeAggregatedParts.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		btnMergeAggregatedParts.setText("Merge Aggregated Parts");
-		btnMergeAggregatedParts.setSelection(true);
-
-		btnShowNumbers = new Button(grpVisualizationSettings, SWT.CHECK);
-		btnShowNumbers.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-			}
-		});
-		btnShowNumbers.setText("Show Part Numbers");
-		btnShowNumbers.setSelection(false);
-		btnShowNumbers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		sashFormGlobal.setWeights(new int[] { 254, 41, 368 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });

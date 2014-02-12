@@ -8,6 +8,8 @@
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.Parts"
             operator="Parts"
+            param_config="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.config.PartsConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.config.PartsConfigView"
             time_compatibility="Parts"
             visualization="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.views.PartTimeLineView">
       </aggregation_operator>

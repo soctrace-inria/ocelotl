@@ -25,3 +25,4 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.spaceaggregop;uses:="org.eclipse
    fr.inria.soctrace.tools.ocelotl.ui.views,
    org.eclipse.draw2d,
    fr.inria.soctrace.tools.ocelotl.ui.views.timelineview"
+Import-Package: org.eclipse.wb.swt

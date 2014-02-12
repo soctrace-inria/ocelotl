@@ -13,5 +13,5 @@ public interface ITimeLineView {
 
 	public void resizeDiagram();
 
-	void createDiagram(List<Integer> parts, TimeRegion time, boolean aggregated, boolean numbers);
+	void createDiagram(List<Integer> parts, TimeRegion time);
 }

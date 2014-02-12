@@ -186,8 +186,6 @@ abstract public class TimeLineView implements ITimeLineView {
 	protected TimeRegion					time;
 	protected TimeRegion					selectTime;
 	protected TimeRegion					resetTime;
-	protected boolean						aggregated		= false;
-	protected boolean						numbers			= true;
 	protected final static int				Border			= 10;
 	protected int							Space			= 6;
 	
@@ -235,13 +233,6 @@ abstract public class TimeLineView implements ITimeLineView {
 		return resetTime;
 	}
 
-	public boolean isAggregated() {
-		return aggregated;
-	}
-
-	public boolean isNumbers() {
-		return numbers;
-	}
 
 	public static int getBorder() {
 		return Border;
@@ -272,18 +263,16 @@ abstract public class TimeLineView implements ITimeLineView {
 	abstract protected void computeDiagram();
 
 	@Override
-	public void createDiagram(final List<Integer> parts, final TimeRegion time, final boolean aggregated, final boolean numbers) {
+	public void createDiagram(final List<Integer> parts, final TimeRegion time) {
 		root.removeAll();
 		figures.clear();
 		canvas.update();
-		this.aggregated = aggregated;
 		this.parts = parts;
 		this.time = time;
 		if (time != null) {
 			resetTime = new TimeRegion(time);
 			selectTime = new TimeRegion(time);
 		}
-		this.numbers = numbers;
 		Space = 6;
 		computeDiagram();
 	}
@@ -336,7 +325,7 @@ abstract public class TimeLineView implements ITimeLineView {
 
 	@Override
 	public void resizeDiagram() {
-		createDiagram(parts, time, aggregated, numbers);
+		createDiagram(parts, time);
 		root.repaint();
 	}
 }
