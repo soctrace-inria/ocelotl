@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class StateColorManager {
 	
-	static final String FILE = ".ocelotl";
+	static final String FILE = "configuration"+File.separator+".ocelotl";
 	static final String SEP = "sp@ce";
 	
 	Map<String, Color> colors = new HashMap<String, Color>();
@@ -126,7 +126,7 @@ public class StateColorManager {
 
 	public void testState(String name) {
 		if (!colors.containsKey(name))
-			colors.put(name, new Color(device, (int) (Math.random()*155)+100, (int) (Math.random()*155)+100, (int) (Math.random()*155)+100));
+			colors.put(name, new Color(device, (int) (Math.random()*255), (int) (Math.random()*255), (int) (Math.random()*255)));
 	}
 
 }
