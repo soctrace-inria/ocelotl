@@ -25,7 +25,7 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.TimeAggregation3Manager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 
 public class StateProportion extends SpaceAggregationOperator {
 

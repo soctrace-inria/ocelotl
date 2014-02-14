@@ -21,7 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.ITimeManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.ITimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
 public interface ITimeAggregationOperator {

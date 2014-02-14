@@ -1,12 +1,12 @@
-package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
+package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.LPAggregWrapper;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.OLPAggregWrapper;
 
 public class JNITimeAggregation2 extends JNITimeAggregation{
 
 	public JNITimeAggregation2() {
 		super();
-		jniWrapper = new LPAggregWrapper(2);
+		jniWrapper = new OLPAggregWrapper(2);
 	}
 	
 	public void addVector(){

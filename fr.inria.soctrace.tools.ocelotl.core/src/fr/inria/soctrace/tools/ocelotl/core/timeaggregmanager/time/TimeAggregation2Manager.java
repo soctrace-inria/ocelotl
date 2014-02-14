@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
+package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 
 import java.util.ArrayList;
 import java.util.List;

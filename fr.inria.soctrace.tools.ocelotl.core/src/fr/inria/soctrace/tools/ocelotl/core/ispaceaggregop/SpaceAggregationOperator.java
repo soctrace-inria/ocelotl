@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.ITimeManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.ITimeManager;
 
 abstract public class SpaceAggregationOperator implements ISpaceAggregationOperator {
 

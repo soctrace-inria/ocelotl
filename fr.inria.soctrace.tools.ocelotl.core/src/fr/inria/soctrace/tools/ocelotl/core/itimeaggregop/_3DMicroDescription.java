@@ -28,7 +28,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.TimeAggregation3Manager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 
 public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOperator implements I3DMicroDescription {
 

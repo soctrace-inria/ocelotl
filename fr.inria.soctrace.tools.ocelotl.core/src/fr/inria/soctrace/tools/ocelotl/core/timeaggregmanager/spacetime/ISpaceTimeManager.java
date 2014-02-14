@@ -17,17 +17,15 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
+package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime;
 
-import java.util.HashMap;
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
+import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 
-public interface I3DMicroDescription extends ITimeAggregationOperator {
+public interface ISpaceTimeManager extends IMicroDescManager{
 
-	@Override
-	public TimeAggregation3Manager createManager();
+	public List<Integer> getParts(String name);
 
-	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
 }

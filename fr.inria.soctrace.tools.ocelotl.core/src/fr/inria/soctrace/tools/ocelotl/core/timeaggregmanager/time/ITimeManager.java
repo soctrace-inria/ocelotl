@@ -17,34 +17,15 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
+package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 
 import java.util.List;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 
-public interface ITimeManager {
-
-	public void computeDichotomy();
-
-	public void computeParts();
-
-	public void computeQualities();
-
-	public void fillVectors();
-
-	public List<String> getEventProducers();
-
-	public List<Double> getParameters();
+public interface ITimeManager extends IMicroDescManager{
 
 	public List<Integer> getParts();
-
-	public List<DLPQuality> getQualities();
-
-	public void printParameters();
-
-	public void printParts();
-
-	public void reset();
 
 }

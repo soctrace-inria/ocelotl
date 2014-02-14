@@ -28,7 +28,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.TimeAggregation2Manager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
 
 public abstract class _2DMicroDescription extends MultiThreadTimeAggregationOperator implements I2DMicroDescription {
 

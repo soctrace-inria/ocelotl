@@ -39,6 +39,7 @@ public class MultiState {
 
 	private int					index;
 	private static final int	Border		= 10;
+	private static final int	SQ		= 3;
 	private static final double	MinHeight	= 5.0;
 	private int					space		= 6;
 	StateProportion				distribution;
@@ -110,9 +111,16 @@ public class MultiState {
 			aggString = aggString + aggList.get(aggList.size() - 1) + " ";
 			final Label label = new Label(aggString);
 			rect.setToolTip(label);
-			agg = Math.max(y1 * agg, MinHeight * m) / y1;
-			root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border), (int) (y0 - y1
+			if (y1 * agg> MinHeight * m){
+				agg = (y1 * agg) / y1;
+				root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border), (int) (y0 - y1
 					* (total + agg) / m))));
+			}else{
+				agg = (MinHeight * m) / y1;
+				root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + space/2), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border - space/2), (int) (y0 - y1
+					* (total + agg) / m))));
+			}
+				
 			label.getUpdateManager().performUpdate();
 			rect.getUpdateManager().performUpdate();
 		}

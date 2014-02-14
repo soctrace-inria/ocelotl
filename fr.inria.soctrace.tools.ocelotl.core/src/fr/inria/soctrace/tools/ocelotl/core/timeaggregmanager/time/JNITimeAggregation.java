@@ -1,15 +1,15 @@
-package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
+package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.dlpaggreg.time.ITimeAggregation;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.LPAggregWrapper;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.OLPAggregWrapper;
 
 public class JNITimeAggregation implements ITimeAggregation {
 	
-	protected LPAggregWrapper jniWrapper;
+	protected OLPAggregWrapper jniWrapper;
 	List<Double> parameters = new ArrayList<Double>();
 	List<DLPQuality> qualities = new ArrayList<DLPQuality>();
 
