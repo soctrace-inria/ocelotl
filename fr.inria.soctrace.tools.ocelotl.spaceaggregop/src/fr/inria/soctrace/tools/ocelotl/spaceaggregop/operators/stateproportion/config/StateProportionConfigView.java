@@ -51,11 +51,11 @@ import org.eclipse.swt.widgets.Shell;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
-import fr.inria.soctrace.tools.ocelotl.ui.views.ISetting2ApplicationWindow;
+import fr.inria.soctrace.tools.ocelotl.ui.views.IVisualizationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 
-public class StateProportionConfigView extends Dialog implements ISetting2ApplicationWindow {
+public class StateProportionConfigView extends Dialog implements IVisualizationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 

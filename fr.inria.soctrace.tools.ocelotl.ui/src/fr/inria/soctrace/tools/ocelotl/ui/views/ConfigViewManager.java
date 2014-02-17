@@ -37,11 +37,11 @@ public class ConfigViewManager {
 	}
 
 	public void openConfigWindows() {
-		ISettingApplicationWindow window = null;
+		IAggregationWindow window = null;
 
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getBundle());
-			window = (ISettingApplicationWindow) mybundle.loadClass(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
+			window = (IAggregationWindow) mybundle.loadClass(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

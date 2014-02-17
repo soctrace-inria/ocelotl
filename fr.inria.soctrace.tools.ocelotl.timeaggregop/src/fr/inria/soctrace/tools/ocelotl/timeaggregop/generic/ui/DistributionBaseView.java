@@ -53,10 +53,10 @@ import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
-import fr.inria.soctrace.tools.ocelotl.ui.views.ISettingApplicationWindow;
+import fr.inria.soctrace.tools.ocelotl.ui.views.IAggregationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-public abstract class DistributionBaseView extends Dialog implements ISettingApplicationWindow {
+public abstract class DistributionBaseView extends Dialog implements IAggregationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 

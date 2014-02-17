@@ -37,11 +37,11 @@ public class VisuConfigViewManager {
 	}
 
 	public void openConfigWindows() {
-		ISetting2ApplicationWindow window = null;
+		IVisualizationWindow window = null;
 
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getBundle());
-			window = (ISetting2ApplicationWindow) mybundle.loadClass(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
+			window = (IVisualizationWindow) mybundle.loadClass(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException | NullPointerException e) {
 			e.printStackTrace();
 			return;

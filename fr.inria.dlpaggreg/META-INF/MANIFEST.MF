@@ -9,4 +9,5 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.dlpaggreg.quality,
+ fr.inria.dlpaggreg.spacetime,
  fr.inria.dlpaggreg.time

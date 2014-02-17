@@ -63,7 +63,7 @@ import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ColorsChangeDescriptor;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.ModelEntity;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
-import fr.inria.soctrace.tools.ocelotl.ui.views.ISetting2ApplicationWindow;
+import fr.inria.soctrace.tools.ocelotl.ui.views.IVisualizationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 /**
@@ -71,7 +71,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class ManageColorsDialog extends Dialog implements ISetting2ApplicationWindow{
+public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 
 	/**
 	 * Model entity combo

@@ -2,7 +2,7 @@ package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 
-public interface ISetting2ApplicationWindow {
+public interface IVisualizationWindow {
 
 	public void init(OcelotlView view, ISpaceConfig config);
 	

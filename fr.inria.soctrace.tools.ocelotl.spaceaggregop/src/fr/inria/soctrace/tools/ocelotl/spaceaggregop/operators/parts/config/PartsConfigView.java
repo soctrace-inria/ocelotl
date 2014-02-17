@@ -35,13 +35,13 @@ import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
-import fr.inria.soctrace.tools.ocelotl.ui.views.ISetting2ApplicationWindow;
+import fr.inria.soctrace.tools.ocelotl.ui.views.IVisualizationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 import org.eclipse.swt.widgets.Label;
 
 
-public class PartsConfigView extends Dialog implements ISetting2ApplicationWindow {
+public class PartsConfigView extends Dialog implements IVisualizationWindow {
 
 
 	protected OcelotlView			ocelotlView;
