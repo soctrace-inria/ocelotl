@@ -187,7 +187,7 @@ abstract public class TimeLineView implements ITimeLineView {
 	protected TimeRegion					selectTime;
 	protected TimeRegion					resetTime;
 	protected final static int				Border			= 10;
-	protected int							Space			= 6;
+	protected int							Space			= 4;
 	
 	public static Color getSelectcolorfg() {
 		return selectColorFG;

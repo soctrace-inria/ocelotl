@@ -19,33 +19,47 @@
 
 package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.ImageFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.RectangleFigure;
+import org.eclipse.draw2d.ScalableFigure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.osgi.framework.Bundle;
 
+import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.StateProportion;
-import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.config.StateProportionConfig;
 
 public class MultiState {
 
 	private int					index;
 	private static final int	Border		= 10;
-	private static final int	SQ		= 3;
 	private static final double	MinHeight	= 5.0;
+	private int					MIN		= 6;
+	private int					MAX		= 32;
 	private int					space		= 6;
-	StateProportion				distribution;
-	IFigure						root;
-	StateColorManager	colors;
+	private StateProportion				distribution;
+	private IFigure						root;
+	private final String				DANGER;
+	private Device device;
+	private Image image;
 
 	public MultiState(final int index, final StateProportion distribution, final IFigure root, final int space) {
 		super();
@@ -53,7 +67,19 @@ public class MultiState {
 		this.distribution = distribution;
 		this.root = root;
 		this.space = space;
-		this.colors =((StateProportionConfig) distribution.getOcelotlCore().getOcelotlParameters().getSpaceConfig()).getColors();
+		this.device=Display.getCurrent();
+		Bundle bundle = Platform.getBundle("fr.inria.soctrace.tools.ocelotl.spaceaggregop");
+		URL fileURL = bundle.getEntry("icons/warning.ico");
+		File file = null;
+		try {
+		    file = new File(FileLocator.resolve(fileURL).toURI());
+		} catch (URISyntaxException e1) {
+		    e1.printStackTrace();
+		} catch (IOException e1) {
+		    e1.printStackTrace();
+		}
+		DANGER=file.getAbsolutePath();
+		image = new Image(device, DANGER);
 	}
 
 	public int getIndex() {
@@ -103,25 +129,31 @@ public class MultiState {
 		if (agg != 0) {
 			// System.out.println("Part " + index + " " + "Aggregate" + " " +
 			// agg);
-			final RectangleFigure rect = new RectangleFigure();
+			final ImageFigure rect = new ImageFigure();
+			final RectangleFigure rectAlt = new RectangleFigure();
 			rect.setBackgroundColor(ColorConstants.black);
 			rect.setForegroundColor(ColorConstants.white);
+			rectAlt.setBackgroundColor(ColorConstants.black);
+			rectAlt.setForegroundColor(ColorConstants.white);
+			
+			
 			String aggString = " ";
 			for (int i = 0; i < aggList.size() - 1; i++)
 				aggString = aggString + aggList.get(i) + " + ";
 			aggString = aggString + aggList.get(aggList.size() - 1) + " ";
 			final Label label = new Label(aggString);
 			rect.setToolTip(label);
-			if (y1 * agg> MinHeight * m){
-				agg = (y1 * agg) / y1;
+			rectAlt.setToolTip(label);
+				agg = Math.min(MAX,Math.min(Math.min(x0/d-2*space, (y0 - y1 * total / m)), Math.min(image.getBounds().height, image.getBounds().width)));
+				rect.setImage(new Image(device, image.getImageData().scaledTo((int)agg, (int)agg)));
+				rect.setSize((int)agg, (int)agg);
+				rectAlt.setSize((int)(x0/d-2*space), (int)MinHeight);
+				if (agg>MIN)
 				root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border), (int) (y0 - y1
-					* (total + agg) / m))));
-			}else{
-				agg = (MinHeight * m) / y1;
-				root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + space/2), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border - space/2), (int) (y0 - y1
-					* (total + agg) / m))));
-			}
-				
+					* (total) / m)-(int)agg)));		
+				else
+					root.add(rectAlt, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1+ Border), (int) (y0 - y1
+							* (total) / m)-(int) MinHeight)));
 			label.getUpdateManager().performUpdate();
 			rect.getUpdateManager().performUpdate();
 		}
