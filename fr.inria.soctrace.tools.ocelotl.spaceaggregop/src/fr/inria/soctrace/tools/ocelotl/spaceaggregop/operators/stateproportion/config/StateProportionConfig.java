@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.config;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,6 +40,14 @@ public class StateProportionConfig implements ISpaceConfig {
 	
 	public List<EventType> getTypes() {
 		return types;
+	}
+	
+	public List<String> getTypeNames() {
+		List<String> l = new ArrayList<String>();
+		for (EventType et: types){
+			l.add(et.getName());
+		}
+		return l;
 	}
 
 	public void setTypes(final List<EventType> types) {

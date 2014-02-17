@@ -30,6 +30,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.StateProportion;
@@ -83,7 +84,7 @@ public class MultiState {
 				// value);
 				final RectangleFigure rect = new RectangleFigure();
 				rect.setBackgroundColor(ColorConstants.white);
-				rect.setBackgroundColor(colors.getColor(state));
+				rect.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state).getSwtColor());
 				rect.setForegroundColor(ColorConstants.white);
 				final Label label = new Label(" " + state + " ");
 				rect.setToolTip(label);
