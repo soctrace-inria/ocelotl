@@ -19,9 +19,11 @@
 
 package fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -54,7 +56,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.ISettingApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-public abstract class DistributionBaseView extends ApplicationWindow implements ISettingApplicationWindow {
+public abstract class DistributionBaseView extends Dialog implements ISettingApplicationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 
@@ -113,28 +115,25 @@ public abstract class DistributionBaseView extends ApplicationWindow implements 
 	protected ListViewer			listViewerEventTypes;
 
 	protected DistributionConfig	config;
+	
+	private java.util.List<EventType> oldEventTypes;
 
-	public DistributionBaseView(final Shell shell) {
-		super(shell);
+	public DistributionBaseView(final Shell parent) {
+		super(parent);
 		ocelotlView = null;
 		config = null;
 	}
 
-	@Override
-	protected void configureShell(final Shell newShell) {
-		super.configureShell(newShell);
-		newShell.setText("Aggregation Operator Settings");
-	}
-
-	@Override
-	public Control createContents(final Composite parent) {
+	protected Control createDialogArea(Composite parent) {
+		oldEventTypes = new ArrayList<EventType>(config.getTypes());
 		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
+		Composite all = (Composite) super.createDialogArea(parent);
+		
+		final SashForm sashFormGlobal = new SashForm(all, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		final Group groupEventTypes = new Group(sashFormGlobal, SWT.NONE);
-		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		groupEventTypes.setText("Set Event Types");
 		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
 		gl_groupEventTypes.horizontalSpacing = 0;
@@ -145,7 +144,7 @@ public abstract class DistributionBaseView extends ApplicationWindow implements 
 		listViewerEventTypes.setLabelProvider(new EventTypeLabelProvider());
 		listViewerEventTypes.setComparator(new ViewerComparator());
 		final List listEventTypes = listViewerEventTypes.getList();
-		listEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		listEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		listEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		final ScrolledComposite scrCompositeEventTypeButtons = new ScrolledComposite(groupEventTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -158,51 +157,45 @@ public abstract class DistributionBaseView extends ApplicationWindow implements 
 
 		final Button btnAddEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
 		btnAddEventTypes.setText("Add");
-		btnAddEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		btnAddEventTypes.setImage(null);
 		btnAddEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnAddEventTypes.addSelectionListener(new TypesSelectionAdapter());
 
 		final Button btnRemoveEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
 		btnRemoveEventTypes.setText("Remove");
-		btnRemoveEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRemoveEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		btnRemoveEventTypes.setImage(null);
 		btnRemoveEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		scrCompositeEventTypeButtons.setContent(compositeEventTypeButtons);
 		scrCompositeEventTypeButtons.setMinSize(compositeEventTypeButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveEventTypes.addSelectionListener(new RemoveSelectionAdapter(listViewerEventTypes));
-
-		final Composite OK = new Composite(sashFormGlobal, SWT.NONE);
-		OK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		OK.setLayout(new FormLayout());
-
-		final Button buttonOK = new Button(OK, SWT.NONE);
-		final FormData fd_buttonOK = new FormData();
-		fd_buttonOK.bottom = new FormAttachment(100, -10);
-		fd_buttonOK.right = new FormAttachment(100, -10);
-		buttonOK.setLayoutData(fd_buttonOK);
-		buttonOK.setText("OK");
-		buttonOK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonOK.setImage(null);
-		sashFormGlobal.setWeights(new int[] { 207, 53 });
-		buttonOK.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				close();
-			}
-		});
 		setParameters();
 		return sashFormGlobal;
 
 	}
 
-	@Override
 	public void init(final OcelotlView ocelotlView, final ITraceTypeConfig config) {
 		this.ocelotlView = ocelotlView;
 		this.config = (DistributionConfig) config;
 	}
+	
+    @Override
+    protected void okPressed() {
+    	super.okPressed();
+    }
+    
+    @Override
+    protected void cancelPressed() {
+    	config.setTypes(oldEventTypes);
+    	super.cancelPressed();
+    }
 
-	abstract public void setParameters();
+	public abstract void setParameters();
+	
+	protected void configureShell(Shell newShell){
+		super.configureShell(newShell);
+		newShell.setText("Event Types Selection");
+	}
 
 }

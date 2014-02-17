@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.
 
 import java.util.LinkedList;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -54,7 +55,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.ISetting2ApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 
-public class StateProportionConfigView extends ApplicationWindow implements ISetting2ApplicationWindow {
+public class StateProportionConfigView extends Dialog implements ISetting2ApplicationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 
@@ -69,14 +70,13 @@ public class StateProportionConfigView extends ApplicationWindow implements ISet
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			config.initColors();
 			final IStructuredSelection selection = (IStructuredSelection) listViewerEventTypes.getSelection();
 			final Object obj = selection.getFirstElement();
 			final String state = ((EventType) obj).getName();
 			final ColorDialog dialog = new ColorDialog(getShell());
 			dialog.setRGB(config.getColors().getRGB(state));
 			config.getColors().setRGB(state, dialog.open());
-			config.getColors().updateFile();
+
 		}
 	}
 
@@ -95,19 +95,30 @@ public class StateProportionConfigView extends ApplicationWindow implements ISet
 	@Override
 	protected void configureShell(final Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Aggregation Operator Settings");
+		newShell.setText("Event Types Color");
 	}
+	
+    @Override
+    protected void okPressed() {
+		config.getColors().updateFile();
+    	super.okPressed();
+    }
+    
+    @Override
+    protected void cancelPressed() {
+    	config.initColors();
+    	super.cancelPressed();
+    }
 
-	@Override
-	public Control createContents(final Composite parent) {
+	protected Control createDialogArea(Composite parent) {
 		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
+		Composite all = (Composite) super.createDialogArea(parent);
+		final SashForm sashFormGlobal = new SashForm(all, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		final Group groupEventTypes = new Group(sashFormGlobal, SWT.NONE);
-		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupEventTypes.setText("Set Event Types");
+		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		groupEventTypes.setText("Set Event Type Color");
 		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
 		gl_groupEventTypes.horizontalSpacing = 0;
 		groupEventTypes.setLayout(gl_groupEventTypes);
@@ -117,7 +128,7 @@ public class StateProportionConfigView extends ApplicationWindow implements ISet
 		listViewerEventTypes.setLabelProvider(new EventTypeLabelProvider());
 		listViewerEventTypes.setComparator(new ViewerComparator());
 		final List listEventTypes = listViewerEventTypes.getList();
-		listEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		listEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		listEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
 		final ScrolledComposite scrCompositeEventTypeButtons = new ScrolledComposite(groupEventTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -130,34 +141,12 @@ public class StateProportionConfigView extends ApplicationWindow implements ISet
 
 		final Button btnAddEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
 		btnAddEventTypes.setText("Color");
-		btnAddEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAddEventTypes.setFont(SWTResourceManager.getFont("Cantarell",11, SWT.NORMAL));
 		btnAddEventTypes.setImage(null);
 		btnAddEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnAddEventTypes.addSelectionListener(new TypesSelectionAdapter());
 		scrCompositeEventTypeButtons.setContent(compositeEventTypeButtons);
 		scrCompositeEventTypeButtons.setMinSize(compositeEventTypeButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-		final Composite OK = new Composite(sashFormGlobal, SWT.NONE);
-		OK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		OK.setLayout(new FormLayout());
-
-		final Button buttonOK = new Button(OK, SWT.NONE);
-		final FormData fd_buttonOK = new FormData();
-		fd_buttonOK.bottom = new FormAttachment(100, -10);
-		fd_buttonOK.right = new FormAttachment(100, -10);
-		buttonOK.setLayoutData(fd_buttonOK);
-		buttonOK.setText("OK");
-		buttonOK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonOK.setImage(null);
-		sashFormGlobal.setWeights(new int[] { 207, 53 });
-		buttonOK.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				config.getColors().updateFile();
-				close();
-			}
-		});
 		setParameters();
 		setStates();
 		return sashFormGlobal;

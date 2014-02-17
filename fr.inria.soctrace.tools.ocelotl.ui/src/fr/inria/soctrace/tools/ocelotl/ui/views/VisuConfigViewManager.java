@@ -22,6 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.ui.views;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
@@ -46,8 +47,7 @@ public class VisuConfigViewManager {
 			return;
 		}
 		window.init(ocelotlView, ocelotlView.getCore().getOcelotlParameters().getSpaceConfig());
-		window.setBlockOnOpen(true);
-		((ApplicationWindow) window).open();
+		window.open();
 
 	}
 

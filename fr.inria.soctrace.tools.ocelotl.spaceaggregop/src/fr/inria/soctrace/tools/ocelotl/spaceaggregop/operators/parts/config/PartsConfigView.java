@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.config;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -37,8 +38,10 @@ import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.ISetting2ApplicationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
+import org.eclipse.swt.widgets.Label;
 
-public class PartsConfigView extends ApplicationWindow implements ISetting2ApplicationWindow {
+
+public class PartsConfigView extends Dialog implements ISetting2ApplicationWindow {
 
 
 	protected OcelotlView			ocelotlView;
@@ -62,53 +65,34 @@ public class PartsConfigView extends ApplicationWindow implements ISetting2Appli
 	}
 
 	@Override
-	public Control createContents(final Composite parent) {
+	protected Control createDialogArea(Composite parent) {
 		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
-		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-		final Composite OK = new Composite(sashFormGlobal, SWT.NONE);
-		OK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		OK.setLayout(new FormLayout());
-
-		final Button buttonOK = new Button(OK, SWT.NONE);
-		final FormData fd_buttonOK = new FormData();
-		fd_buttonOK.bottom = new FormAttachment(100, -10);
-		fd_buttonOK.right = new FormAttachment(100, -10);
-		buttonOK.setLayoutData(fd_buttonOK);
-		buttonOK.setText("OK");
-		buttonOK.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonOK.setImage(null);
+		Composite all = (Composite) super.createDialogArea(parent);
 		
-		Composite composite = new Composite(OK, SWT.NONE);
-		composite.setLayoutData(new FormData());
-		
-		btnAggregateParts = new Button(composite, SWT.CHECK);
-		btnAggregateParts.setSize(101, 22);
-		btnAggregateParts.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnAggregateParts = new Button(all, SWT.CHECK);
+		btnAggregateParts.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		btnAggregateParts.setSelection(config.isAggregated());
 		btnAggregateParts.setText("Aggregate parts");
 		
 		
-		btnShowPartNumber = new Button(composite, SWT.CHECK);
-		btnShowPartNumber.setLocation(0, 0);
-		btnShowPartNumber.setSize(165, 126);
-		btnShowPartNumber.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnShowPartNumber = new Button(all, SWT.CHECK);
+		btnShowPartNumber.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		btnShowPartNumber.setSelection(config.isNumbers());
 		btnShowPartNumber.setText("Show part number");
-		sashFormGlobal.setWeights(new int[] { 53 });
-		buttonOK.addSelectionListener(new SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				setParameters();
-				close();
-			}
-		});
-		return sashFormGlobal;
+		return all;
 
 	}
+	
+    @Override
+    protected void okPressed() {
+    	setParameters();
+    	super.okPressed();
+    }
+    
+    @Override
+    protected void cancelPressed() {
+    	super.cancelPressed();
+    }
 
 	private void setParameters() {
 		config.setAggregated(btnAggregateParts.getSelection());
