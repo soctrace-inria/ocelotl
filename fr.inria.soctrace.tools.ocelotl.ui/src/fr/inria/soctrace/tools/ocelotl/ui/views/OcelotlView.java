@@ -598,7 +598,9 @@ public class OcelotlView extends ViewPart {
 		lblTSNumber.setText("Timeslice Number");
 
 		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
-		spinnerTSNumber.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1);
+		gd_spinnerTSNumber.widthHint = 100;
+		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
 		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		spinnerTSNumber.setMaximum(10000);
 		spinnerTSNumber.setMinimum(1);

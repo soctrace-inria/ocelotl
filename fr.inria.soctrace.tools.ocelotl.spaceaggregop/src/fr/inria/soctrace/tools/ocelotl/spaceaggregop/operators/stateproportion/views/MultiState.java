@@ -34,10 +34,12 @@ import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ImageFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.ScalableFigure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -50,16 +52,14 @@ import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.S
 public class MultiState {
 
 	private int					index;
-	private static final int	Border		= 10;
-	private static final double	MinHeight	= 5.0;
-	private int					MIN		= 6;
-	private int					MAX		= 32;
+	private static final int	Border		= StateProportionTimeLineView.Border;
+	private static final int	MinHeight	= 6;
+	private static final int			IconMin		= 6;
+	private static final int			IconMax		= 32;
 	private int					space		= 6;
-	private StateProportion				distribution;
-	private IFigure						root;
-	private final String				DANGER;
-	private Device device;
-	private Image image;
+	private StateProportion		distribution;
+	private IFigure				root;
+	private IconManager 		iconManager;
 
 	public MultiState(final int index, final StateProportion distribution, final IFigure root, final int space) {
 		super();
@@ -67,19 +67,8 @@ public class MultiState {
 		this.distribution = distribution;
 		this.root = root;
 		this.space = space;
-		this.device=Display.getCurrent();
-		Bundle bundle = Platform.getBundle("fr.inria.soctrace.tools.ocelotl.spaceaggregop");
-		URL fileURL = bundle.getEntry("icons/warning.ico");
-		File file = null;
-		try {
-		    file = new File(FileLocator.resolve(fileURL).toURI());
-		} catch (URISyntaxException e1) {
-		    e1.printStackTrace();
-		} catch (IOException e1) {
-		    e1.printStackTrace();
-		}
-		DANGER=file.getAbsolutePath();
-		image = new Image(device, DANGER);
+		this.iconManager = new IconManager();
+
 	}
 
 	public int getIndex() {
@@ -129,12 +118,12 @@ public class MultiState {
 		if (agg != 0) {
 			// System.out.println("Part " + index + " " + "Aggregate" + " " +
 			// agg);
-			final ImageFigure rect = new ImageFigure();
-			final RectangleFigure rectAlt = new RectangleFigure();
-			rect.setBackgroundColor(ColorConstants.black);
-			rect.setForegroundColor(ColorConstants.white);
-			rectAlt.setBackgroundColor(ColorConstants.black);
-			rectAlt.setForegroundColor(ColorConstants.white);
+			final ImageFigure icon = new ImageFigure();
+			final RectangleFigure rectangle = new RectangleFigure();
+			icon.setBackgroundColor(ColorConstants.black);
+			icon.setForegroundColor(ColorConstants.white);
+			rectangle.setBackgroundColor(ColorConstants.black);
+			rectangle.setForegroundColor(ColorConstants.white);
 			
 			
 			String aggString = " ";
@@ -142,20 +131,38 @@ public class MultiState {
 				aggString = aggString + aggList.get(i) + " + ";
 			aggString = aggString + aggList.get(aggList.size() - 1) + " ";
 			final Label label = new Label(aggString);
-			rect.setToolTip(label);
-			rectAlt.setToolTip(label);
-				agg = Math.min(MAX,Math.min(Math.min(x0/d-2*space, (y0 - y1 * total / m)), Math.min(image.getBounds().height, image.getBounds().width)));
-				rect.setImage(new Image(device, image.getImageData().scaledTo((int)agg, (int)agg)));
-				rect.setSize((int)agg, (int)agg);
-				rectAlt.setSize((int)(x0/d-2*space), (int)MinHeight);
-				if (agg>MIN)
-				root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border), (int) (y0 - y1
-					* (total) / m)-(int)agg)));		
-				else
-					root.add(rectAlt, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1+ Border), (int) (y0 - y1
-							* (total) / m)-(int) MinHeight)));
+			icon.setToolTip(label);
+			rectangle.setToolTip(label);
+			final PolylineConnection lineDash = new PolylineConnection();
+			lineDash.setBackgroundColor(ColorConstants.lightGray);
+			lineDash.setForegroundColor(ColorConstants.lightGray);
+			lineDash.setLineWidth(2);
+			lineDash.setLineStyle(SWT.LINE_DASH);
+				if (y1 * agg /m > MinHeight){
+					root.add(rectangle, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border),
+							(int) (y0 + 1 - y1 * (total + agg) / m))));
+				}
+				else{
+					int size = (int) Math.min(IconMax,Math.min(x0/d-2*space, (y0 - y1 * total / m)));
+				if (size>IconMin){
+					icon.setImage(iconManager.getImage(size));
+
+					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m) - 1), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border), (int) (y0 - y1
+							* (total) / m)- 1));
+					root.add(lineDash);
+				root.add(icon, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m) - 2), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border), (int) (y0 - y1
+					* (total) / m)- size - 2)));
+				}
+				else{
+					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m) - 1), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border), (int) (y0 - y1
+							* (total) / m)- 1));
+					root.add(lineDash);
+				}
+			
+				}
 			label.getUpdateManager().performUpdate();
-			rect.getUpdateManager().performUpdate();
+			icon.getUpdateManager().performUpdate();
+				
 		}
 	}
 

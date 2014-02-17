@@ -186,7 +186,7 @@ abstract public class TimeLineView implements ITimeLineView {
 	protected TimeRegion					time;
 	protected TimeRegion					selectTime;
 	protected TimeRegion					resetTime;
-	protected final static int				Border			= 10;
+	public final static int					Border			= 10;
 	protected int							Space			= 4;
 	
 	public static Color getSelectcolorfg() {
