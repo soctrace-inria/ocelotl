@@ -32,7 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregati
 
 public abstract class _2DMicroDescription extends MultiThreadTimeAggregationOperator implements I2DMicroDescription {
 
-	protected List<HashMap<String, Long>>	matrix;
+	protected List<HashMap<EventProducer, Long>>	matrix;
 
 	public _2DMicroDescription() throws SoCTraceException {
 		super();
@@ -82,7 +82,7 @@ public abstract class _2DMicroDescription extends MultiThreadTimeAggregationOper
 	}
 
 	@Override
-	public List<HashMap<String, Long>> getMatrix() {
+	public List<HashMap<EventProducer, Long>> getMatrix() {
 		return matrix;
 	}
 
@@ -98,19 +98,19 @@ public abstract class _2DMicroDescription extends MultiThreadTimeAggregationOper
 
 	@Override
 	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<String, Long>>();
+		matrix = new ArrayList<HashMap<EventProducer, Long>>();
 		final List<EventProducer> producers = getOcelotlParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
-			matrix.add(new HashMap<String, Long>());
+			matrix.add(new HashMap<EventProducer, Long>());
 
 			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep.getName(), 0L);
+				matrix.get((int) i).put(ep, 0L);
 		}
 	}
 
 	public void matrixWrite(final long it, final EventProducer ep, final Map<Long, Long> distrib) {
 		synchronized (matrix) {
-			matrix.get((int) it).put(ep.getName(), matrix.get((int) it).get(ep.getName()) + distrib.get(it));
+			matrix.get((int) it).put(ep, matrix.get((int) it).get(ep) + distrib.get(it));
 		}
 	}
 
@@ -119,12 +119,12 @@ public abstract class _2DMicroDescription extends MultiThreadTimeAggregationOper
 		System.out.println();
 		System.out.println("Distribution Vectors");
 		int i = 0;
-		for (final HashMap<String, Long> it : matrix) {
+		for (final HashMap<EventProducer, Long> it : matrix) {
 			System.out.println();
 			System.out.println("slice " + i++);
 			System.out.println();
-			for (final String ep : it.keySet())
-				System.out.println(ep + " = " + it.get(ep));
+			for (final EventProducer ep : it.keySet())
+				System.out.println(ep.getName() + " = " + it.get(ep));
 		}
 	}
 

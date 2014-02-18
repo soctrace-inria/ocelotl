@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion;
 
 import java.util.List;
 
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
@@ -46,7 +47,7 @@ public class StateProportion extends SpaceAggregationOperator {
 	private void aggregateStates() {
 		for (final Part part : parts)
 			for (int i = part.getStartPart(); i < part.getEndPart(); i++)
-				for (final String ep : ((TimeAggregation3Manager) lpaggregManager).getEventProducers())
+				for (final EventProducer ep : ((TimeAggregation3Manager) lpaggregManager).getEventProducers())
 					for (final String state : states)
 						((PartMap) part.getData()).addElement(state, ((TimeAggregation3Manager) lpaggregManager).getTimeSliceMatrix().getMatrix().get(i).get(ep).get(state).doubleValue());
 

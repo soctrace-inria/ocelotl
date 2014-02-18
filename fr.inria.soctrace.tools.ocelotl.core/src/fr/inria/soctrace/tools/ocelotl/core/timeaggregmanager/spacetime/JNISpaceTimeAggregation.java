@@ -42,7 +42,7 @@ public class JNISpaceTimeAggregation implements ISpaceTimeAggregation {
 
 	@Override
 	public void computeParts(double parameter) {
-		jniWrapper.computeParts((float) parameter);
+		jniWrapper.computeParts(parameter);
 	}
 
 	@Override

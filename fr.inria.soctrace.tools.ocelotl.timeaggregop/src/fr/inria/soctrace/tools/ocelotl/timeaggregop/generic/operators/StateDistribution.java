@@ -59,12 +59,12 @@ public class StateDistribution extends _3DMicroDescription {
 
 		private void matrixUpdate(final IState state, final EventProducer ep, final Map<Long, Long> distrib) {
 			synchronized (matrix) {
-				if (!matrix.get(0).get(ep.getName()).containsKey(state.getStateType())) {
+				if (!matrix.get(0).get(ep).containsKey(state.getStateType())) {
 					System.out.println("Adding " + state.getStateType() + " state");
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
-						for (final String epstring : matrix.get(incr).keySet())
-							matrixPushType(incr, epstring, state.getStateType(), distrib);
+						for (final EventProducer epset : matrix.get(incr).keySet())
+							matrixPushType(incr, epset, state.getStateType(), distrib);
 				}
 				for (final long it : distrib.keySet())
 					matrixWrite(it, ep, state.getStateType(), distrib);

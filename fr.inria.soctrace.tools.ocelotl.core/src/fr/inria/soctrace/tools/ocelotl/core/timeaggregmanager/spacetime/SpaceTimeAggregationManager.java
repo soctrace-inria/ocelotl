@@ -20,20 +20,23 @@
 package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.dlpaggreg.spacetime.ISpaceTimeAggregation;
 import fr.inria.dlpaggreg.time.ITimeAggregation;
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
-	protected List<Integer>			parts		= new ArrayList<Integer>();
+	protected Map<EventProducer,List<Integer>>			parts		= new HashMap<EventProducer, List<Integer>>();
 	protected List<DLPQuality>		qualities	= new ArrayList<DLPQuality>();
 	protected List<Double>			parameters	= new ArrayList<Double>();
-	protected List<List<Boolean>>	eqMatrix;
-	protected ITimeAggregation		timeAggregation;
+	protected ISpaceTimeAggregation		timeAggregation;
 	protected OcelotlParameters		ocelotlParameters;
 
 
@@ -58,7 +61,12 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	public void computeParts() {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		parts = timeAggregation.getParts(ocelotlParameters.getParameter());
+		timeAggregation.computeParts(ocelotlParameters.getParameter());
+		for (EventProducer ep:getEventProducers()){
+			parts.put(ep,new ArrayList<Integer>());
+			parts.get(ep).addAll(timeAggregation.getParts(ep.getId()));
+			
+		}
 		dm.end("LPAGGREG - COMPUTE PARTS");
 	}
 
@@ -89,8 +97,8 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public List<Integer> getParts(String name) {
-		return parts;
+	public List<Integer> getParts(EventProducer ep) {
+		return parts.get(ep);
 	}
 
 	@Override
@@ -109,14 +117,20 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
 	@Override
 	public void printParts() {
-		System.out.println();
-		System.out.println("Parts :");
-		for (final int i : parts)
-			System.out.print(i + " ");
-		System.out.println();
+//		System.out.println();
+//		System.out.println("Parts :");
+//		for (final int i : parts)
+//			System.out.print(i + " ");
+//		System.out.println();
 	}
 
 	@Override
 	public abstract void reset();
+
+	@Override
+	public Map<EventProducer, List<Integer>> getParts() {
+		return parts;
+		
+	}
 
 }

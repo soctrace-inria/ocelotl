@@ -23,11 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 
 public interface ISpaceTimeManager extends IMicroDescManager{
 
-	public List<Integer> getParts(String name);
-	public Map<String, List<Integer>> getParts();
+	public List<Integer> getParts(EventProducer ep);
+	public Map<EventProducer, List<Integer>> getParts();
 
 }

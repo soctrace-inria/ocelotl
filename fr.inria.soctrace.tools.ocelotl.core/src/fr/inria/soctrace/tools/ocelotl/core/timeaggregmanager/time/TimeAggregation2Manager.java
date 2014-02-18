@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.dlpaggreg.time.TimeAggregation2;
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I2DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
@@ -42,7 +43,7 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 		values = new ArrayList<List<Double>>();
 		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
 			values.add(new ArrayList<Double>());
-			for (final String key : matrix.getMatrix().get(i).keySet())
+			for (final EventProducer key : matrix.getMatrix().get(i).keySet())
 				values.get(i).add(matrix.getMatrix().get(i).get(key).doubleValue());
 		}
 		((TimeAggregation2) timeAggregation).setValues(values);
@@ -52,15 +53,15 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 	public void fillVectorsJNI() {
 		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
 			((JNITimeAggregation2) timeAggregation).addVector();
-			for (final String key : matrix.getMatrix().get(i).keySet())
+			for (final EventProducer key : matrix.getMatrix().get(i).keySet())
 				((JNITimeAggregation2) timeAggregation).push_back(matrix.getMatrix().get(i).get(key).doubleValue());
 		}
 
 	}
 
 	@Override
-	public List<String> getEventProducers() {
-		return new ArrayList<String>(matrix.getMatrix().get(0).keySet());
+	public List<EventProducer> getEventProducers() {
+		return new ArrayList<EventProducer>(matrix.getMatrix().get(0).keySet());
 	}
 
 	public I2DMicroDescription getTimeSliceMatrix() {

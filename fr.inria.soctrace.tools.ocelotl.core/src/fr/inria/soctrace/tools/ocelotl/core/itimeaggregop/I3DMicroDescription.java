@@ -22,6 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 import java.util.HashMap;
 import java.util.List;
 
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 
 public interface I3DMicroDescription extends ITimeAggregationOperator {
@@ -29,5 +30,5 @@ public interface I3DMicroDescription extends ITimeAggregationOperator {
 	@Override
 	public TimeAggregation3Manager createManager();
 
-	public List<HashMap<String, HashMap<String, Long>>> getMatrix();
+	public List<HashMap<EventProducer, HashMap<String, Long>>> getMatrix();
 }

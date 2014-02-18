@@ -3,6 +3,7 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
 import java.util.List;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.lib.model.EventProducer;
 
 public interface IMicroDescManager {
 
@@ -14,7 +15,7 @@ public interface IMicroDescManager {
 
 	public void fillVectors();
 
-	public List<String> getEventProducers();
+	public List<EventProducer> getEventProducers();
 
 	public List<Double> getParameters();
 

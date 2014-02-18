@@ -32,7 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregati
 
 public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOperator implements I3DMicroDescription {
 
-	protected List<HashMap<String, HashMap<String, Long>>>	matrix;
+	protected List<HashMap<EventProducer, HashMap<String, Long>>>	matrix;
 	List<String>											keys;
 
 	public _3DMicroDescription() {
@@ -84,7 +84,7 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 	}
 
 	@Override
-	public List<HashMap<String, HashMap<String, Long>>> getMatrix() {
+	public List<HashMap<EventProducer, HashMap<String, Long>>> getMatrix() {
 		return matrix;
 	}
 
@@ -100,35 +100,36 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 
 	@Override
 	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<String, HashMap<String, Long>>>();
+		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Long>>>();
 		final List<EventProducer> producers = getOcelotlParameters().getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
-			matrix.add(new HashMap<String, HashMap<String, Long>>());
+			matrix.add(new HashMap<EventProducer, HashMap<String, Long>>());
 
 			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep.getName(), new HashMap<String, Long>());
+				matrix.get((int) i).put(ep, new HashMap<String, Long>());
 		}
 	}
 
-	public void matrixPushType(final int incr, final String epstring, final String key, final Map<Long, Long> distrib) {
-		matrix.get(incr).get(epstring).put(key, 0L);
+	public void matrixPushType(final int incr, final EventProducer ep, final String key, final Map<Long, Long> distrib) {
+		matrix.get(incr).get(ep).put(key, 0L);
 	}
 
 	public void matrixWrite(final long it, final EventProducer ep, final String key, final Map<Long, Long> distrib) {
-		matrix.get((int) it).get(ep.getName()).put(key, matrix.get((int) it).get(ep.getName()).get(key) + distrib.get(it));
+		matrix.get((int) it).get(ep).put(key, matrix.get((int) it).get(ep).get(key) + distrib.get(it));
 	}
 
 	@Override
+
 	public void print() {
 		System.out.println();
 		System.out.println("Distribution Vectors");
 		int i = 0;
-		for (final HashMap<String, HashMap<String, Long>> it : matrix) {
+		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
 			System.out.println();
 			System.out.println("slice " + i++);
 			System.out.println();
-			for (final String ep : it.keySet())
-				System.out.println(ep + " = " + it.get(ep));
+			for (final EventProducer ep : it.keySet())
+				System.out.println(ep.getName() + " = " + it.get(ep));
 		}
 	}
 
