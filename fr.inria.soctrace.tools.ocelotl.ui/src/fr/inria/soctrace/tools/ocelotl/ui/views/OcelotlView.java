@@ -71,7 +71,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.ResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.ITimeLineView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
 
@@ -241,7 +241,7 @@ public class OcelotlView extends ViewPart {
 								// "Parts", "Parts processing finished");
 								hasChanged = HasChanged.NOTHING;
 								timeLineView.deleteDiagram();
-								timeLineView.createDiagram(ocelotlCore.getLpaggregManager().getParts(), ocelotlParameters.getTimeRegion());
+								timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
 								timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 								qualityView.createDiagram();
 							}
@@ -472,7 +472,7 @@ public class OcelotlView extends ViewPart {
 	private HasChanged							hasChanged		= HasChanged.ALL;
 
 	private ListViewer							listViewerEventProducers;
-	private ITimeLineView						timeLineView;
+	private IAggregatedView						timeLineView;
 	private final OcelotlCore					ocelotlCore;
 	private final OcelotlParameters				ocelotlParameters;
 	private Text								textRun;

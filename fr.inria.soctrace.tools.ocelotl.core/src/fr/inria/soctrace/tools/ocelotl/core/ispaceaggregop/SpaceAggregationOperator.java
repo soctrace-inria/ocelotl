@@ -82,7 +82,7 @@ abstract public class SpaceAggregationOperator implements ISpaceAggregationOpera
 	@Override
 	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
-		lpaggregManager = ocelotlCore.getLpaggregManager();
+		lpaggregManager = (ITimeManager) ocelotlCore.getLpaggregManager();
 		timeSliceNumber = ocelotlCore.getOcelotlParameters().getTimeSlicesNumber();
 		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion().getTimeDuration() / timeSliceNumber;
 		parts = new ArrayList<Part>();

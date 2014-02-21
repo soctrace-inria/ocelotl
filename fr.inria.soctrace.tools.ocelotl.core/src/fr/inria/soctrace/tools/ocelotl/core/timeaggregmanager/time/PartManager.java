@@ -35,11 +35,7 @@ public class PartManager {
 
 	public PartManager(final OcelotlCore lpaggregCore) {
 		super();
-		this.lpaggregCore = lpaggregCore;
-		lpaggregManager = lpaggregCore.getLpaggregManager();
-		timeSliceNumber = lpaggregManager.getParts().size();
-		traceRegion = lpaggregCore.getOcelotlParameters().getTimeRegion();
-		computeTimeStamps();
+		setLpaggregCore(lpaggregCore);
 	}
 
 	private void computeTimeStamps() {
@@ -96,7 +92,7 @@ public class PartManager {
 
 	public void setLpaggregCore(final OcelotlCore lpaggregCore) {
 		this.lpaggregCore = lpaggregCore;
-		lpaggregManager = lpaggregCore.getLpaggregManager();
+		lpaggregManager = (ITimeManager) lpaggregCore.getLpaggregManager();
 		timeSliceNumber = lpaggregManager.getParts().size();
 		traceRegion = lpaggregCore.getOcelotlParameters().getTimeRegion();
 		computeTimeStamps();

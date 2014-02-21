@@ -46,7 +46,7 @@ public class TimeLineViewWrapper {
 	private Figure							root;
 	private Canvas							canvas;
 	private final OcelotlView				ocelotlView;
-	private ITimeLineView					view;
+	private IAggregatedView					view;
 	private final List<ControlListener>		controlListeners		= new ArrayList<ControlListener>();
 	private final List<MouseListener>		mouseListeners			= new ArrayList<MouseListener>();
 	private final List<MouseMotionListener>	mouseMotionListeners	= new ArrayList<MouseMotionListener>();
@@ -106,7 +106,7 @@ public class TimeLineViewWrapper {
 		return root;
 	}
 
-	public ITimeLineView getView() {
+	public IAggregatedView getView() {
 		return view;
 	}
 
@@ -126,7 +126,7 @@ public class TimeLineViewWrapper {
 		return canvas;
 	}
 
-	public void setView(final ITimeLineView view) {
+	public void setView(final IAggregatedView view) {
 		this.view = view;
 		view.init(this);
 	}

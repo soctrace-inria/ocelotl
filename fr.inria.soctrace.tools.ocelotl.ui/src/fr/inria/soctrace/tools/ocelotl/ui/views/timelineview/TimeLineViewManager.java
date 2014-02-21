@@ -35,11 +35,11 @@ public class TimeLineViewManager {
 		this.ocelotlView = ocelotlView;
 	}
 
-	public ITimeLineView create() {
-		ITimeLineView timeLineView = null;
+	public IAggregatedView create() {
+		IAggregatedView timeLineView = null;
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getBundle());
-			timeLineView = (ITimeLineView) mybundle.loadClass(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+			timeLineView = (IAggregatedView) mybundle.loadClass(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -38,6 +38,8 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregationManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -46,7 +48,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
-abstract public class TimeLineView implements ITimeLineView {
+abstract public class TimeLineView implements IAggregatedView {
 
 	private class SelectFigure extends RectangleFigure {
 
@@ -228,7 +230,11 @@ abstract public class TimeLineView implements ITimeLineView {
 	abstract protected void computeDiagram();
 
 	@Override
-	public void createDiagram(final List<Integer> parts, final TimeRegion time) {
+	public void createDiagram(IMicroDescManager manager, final TimeRegion time) {
+		createDiagram(((TimeAggregationManager) manager).getParts(), time);
+	}
+	
+	public void createDiagram(List<Integer> parts, final TimeRegion time) {
 		root.removeAll();
 		figures.clear();
 		canvas.update();
