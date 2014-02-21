@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="timeaggregopext" name="TimeAggregationOperatorExt" schema="schema/timeaggregopext.exsd"/>
-   <extension-point id="spaceaggregopext" name="Space Aggreg Operator" schema="schema/spaceaggregopext.exsd"/>
+   <extension-point id="microscopicdescription" name="Microscopic Description" schema="schema/microscopicdescription.exsd"/>
+   <extension-point id="visualization" name="Visualization" schema="schema/visualization.exsd"/>
 
 </plugin>

@@ -4,22 +4,22 @@
    <extension
          id="idGenericTime"
          name="GenericTimeAggregationOperators"
-         point="fr.inria.soctrace.tools.ocelotl.core.timeaggregopext">
+         point="fr.inria.soctrace.tools.ocelotl.core.microscopicdescription">
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.EventDistribution"
+            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistribution"
             generic="true"
             operator="Event Distribution"
-            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.DistributionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.EventDistributionView"
+            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.EventDistributionView"
             spatial_compatibility="Parts"
             trace_formats="ALL">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators.StateDistributionTimeIterator"
+            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionTimeIterator"
             generic="true"
             operator="State Distribution"
-            param_config="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config.DistributionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui.StateDistributionView"
+            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.StateDistributionView"
             spatial_compatibility="Parts, StateProportion"
             trace_formats="ALL">
       </aggregation_operator>

@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GenericTimeAggOp
-Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.timeaggregop;singleton:=true
+Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.microdesc;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.Activator
+Bundle-Activator: fr.inria.soctrace.tools.ocelotl.microdesc.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  fr.inria.soctrace.lib.model,
@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.tools.ocelotl.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Export-Package: fr.inria.soctrace.tools.ocelotl.timeaggregop.generic,
- fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.config,
- fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.operators,
- fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.ui
+Export-Package: fr.inria.soctrace.tools.ocelotl.microdesc,
+ fr.inria.soctrace.tools.ocelotl.microdesc.config,
+ fr.inria.soctrace.tools.ocelotl.microdesc.operators,
+ fr.inria.soctrace.tools.ocelotl.microdesc.ui

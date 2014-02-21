@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Spaceaggregop
-Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.spaceaggregop;singleton:=true
+Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.visualizations;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: fr.inria.soctrace.tools.ocelotl.spaceaggregop.Activator
+Bundle-Activator: fr.inria.soctrace.tools.ocelotl.visualizations.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  fr.inria.soctrace.tools.ocelotl.ui,
@@ -15,15 +15,15 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.swt
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Export-Package: fr.inria.soctrace.tools.ocelotl.spaceaggregop;uses:="org.eclipse.ui.plugin,org.osgi.framework",
- fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
- fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.parts.views;
+Export-Package: fr.inria.soctrace.tools.ocelotl.visualizations;uses:="org.eclipse.ui.plugin,org.osgi.framework",
+ fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
+ fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts.views;
   uses:="fr.inria.soctrace.tools.ocelotl.ui.views,
    org.eclipse.swt.graphics,
    org.eclipse.draw2d,
    fr.inria.soctrace.tools.ocelotl.ui.views.timelineview",
- fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
- fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views;
+ fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
+ fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.views;
   uses:="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion,
    fr.inria.soctrace.tools.ocelotl.ui.views,
    org.eclipse.draw2d,

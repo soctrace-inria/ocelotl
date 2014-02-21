@@ -44,7 +44,7 @@ public class SpaceAggregationOperatorManager {
 	OcelotlParameters									parameters;
 	OcelotlCore											ocelotlCore;
 
-	private static final String							POINT_ID				= "fr.inria.soctrace.tools.ocelotl.core.spaceaggregopext";	//$NON-NLS-1$
+	private static final String							POINT_ID				= "fr.inria.soctrace.tools.ocelotl.core.visualization";	//$NON-NLS-1$
 	private static final String							OP_NAME					= "operator";												//$NON-NLS-1$
 	private static final String							OP_CLASS				= "class";													//$NON-NLS-1$
 	private static final String							OP_VISUALIZATION		= "visualization";		
