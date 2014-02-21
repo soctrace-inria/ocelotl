@@ -27,6 +27,7 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
@@ -35,7 +36,7 @@ import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.timeaggregop.generic.state.GenericState;
 
-public class StateDistributionIterator extends _3DMicroDescription {
+public class StateDistributionSpaceTimeIterator extends _2DSpaceTimeMicroDescription {
 
 	class OcelotlThread extends Thread {
 
@@ -85,11 +86,11 @@ public class StateDistributionIterator extends _3DMicroDescription {
 
 	EventIterator	it;
 
-	public StateDistributionIterator() throws SoCTraceException {
+	public StateDistributionSpaceTimeIterator() throws SoCTraceException {
 		super();
 	}
 
-	public StateDistributionIterator(final OcelotlParameters parameters) throws SoCTraceException {
+	public StateDistributionSpaceTimeIterator(final OcelotlParameters parameters) throws SoCTraceException {
 		super(parameters);
 	}
 

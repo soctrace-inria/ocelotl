@@ -6,14 +6,15 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
 	I3DMicroDescription	matrix;
 	
-	public SpaceTimeAggregation2Manager(I3DMicroDescription matrix) {
-		super(matrix.getOcelotlParameters());
+	public SpaceTimeAggregation2Manager(_2DSpaceTimeMicroDescription _2dSpaceTimeMicroDescription) {
+		super(_2dSpaceTimeMicroDescription.getOcelotlParameters());
 		reset();
 	}
 
