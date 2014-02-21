@@ -28,6 +28,7 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent,
  fr.inria.soctrace.tools.ocelotl.core.state,
  fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager,
+ fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime,
  fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
  fr.inria.soctrace.tools.ocelotl.core.timeslice

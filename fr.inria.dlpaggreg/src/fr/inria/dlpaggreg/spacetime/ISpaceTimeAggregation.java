@@ -19,4 +19,12 @@ public interface ISpaceTimeAggregation {
 	public List<DLPQuality> getQualityList();
 
 	public int getSize();
+
+	public void validate();
+
+	public void addNode(int id, int parentID);
+
+	public void addRoot(int id);
+
+	public void addLeaf(int id, int parentID, Object values);
 }

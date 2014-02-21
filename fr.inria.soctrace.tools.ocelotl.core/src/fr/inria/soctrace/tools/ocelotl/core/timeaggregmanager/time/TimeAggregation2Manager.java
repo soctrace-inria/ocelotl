@@ -38,10 +38,11 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 		reset();
 	}
 	
+	@Override
 	public void fillVectorsJava() {
 		List<List<Double>>	values;
 		values = new ArrayList<List<Double>>();
-		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
+		for (int i = 0; i < matrix.getVectorNumber(); i++) {
 			values.add(new ArrayList<Double>());
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet())
 				values.get(i).add(matrix.getMatrix().get(i).get(key).doubleValue());
@@ -50,8 +51,9 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 
 	}
 	
+	@Override
 	public void fillVectorsJNI() {
-		for (int i = 0; i < matrix.getVectorsNumber(); i++) {
+		for (int i = 0; i < matrix.getVectorNumber(); i++) {
 			((JNITimeAggregation2) timeAggregation).addVector();
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet())
 				((JNITimeAggregation2) timeAggregation).push_back(matrix.getMatrix().get(i).get(key).doubleValue());

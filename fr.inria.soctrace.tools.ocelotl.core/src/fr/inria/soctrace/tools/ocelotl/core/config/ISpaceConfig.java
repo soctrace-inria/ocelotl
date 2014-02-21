@@ -19,10 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.config;
 
-import java.util.List;
-
-import fr.inria.soctrace.lib.model.EventType;
-
 public interface ISpaceConfig {
 
 }

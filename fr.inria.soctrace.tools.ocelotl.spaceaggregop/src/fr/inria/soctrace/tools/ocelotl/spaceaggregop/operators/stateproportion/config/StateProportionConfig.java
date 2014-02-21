@@ -25,7 +25,6 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
-import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion.views.StateColorManager;
 
 public class StateProportionConfig implements ISpaceConfig {

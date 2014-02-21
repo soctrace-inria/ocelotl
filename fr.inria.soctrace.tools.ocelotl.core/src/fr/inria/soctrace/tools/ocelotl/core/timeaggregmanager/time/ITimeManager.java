@@ -21,7 +21,6 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 
 import java.util.List;
 
-import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 
 public interface ITimeManager extends IMicroDescManager{

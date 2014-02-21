@@ -20,24 +20,19 @@
 package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.dlpaggreg.spacetime.ISpaceTimeAggregation;
-import fr.inria.dlpaggreg.time.ITimeAggregation;
-import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
-	protected Map<EventProducer,List<Integer>>			parts		= new HashMap<EventProducer, List<Integer>>();
 	protected List<DLPQuality>		qualities	= new ArrayList<DLPQuality>();
 	protected List<Double>			parameters	= new ArrayList<Double>();
 	protected ISpaceTimeAggregation		timeAggregation;
 	protected OcelotlParameters		ocelotlParameters;
+	protected EventProducerHierarchy hierarchy;
 
 
 	
@@ -62,12 +57,13 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
 		timeAggregation.computeParts(ocelotlParameters.getParameter());
-		for (EventProducer ep:getEventProducers()){
-			parts.put(ep,new ArrayList<Integer>());
-			parts.get(ep).addAll(timeAggregation.getParts(ep.getId()));
-			
-		}
+		updateHierarchy();
 		dm.end("LPAGGREG - COMPUTE PARTS");
+	}
+
+	private void updateHierarchy() {
+		for (int id: hierarchy.getEventProducers().keySet())
+			hierarchy.setParts(id, timeAggregation.getParts(id));
 	}
 
 	@Override
@@ -78,18 +74,17 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 		dm.end("LPAGGREG - COMPUTE QUALITIES");
 	}
 
-	@Override
-	public void fillVectors() {
+	public void fillNodes() {
 		if (OcelotlParameters.isJniFlag())
-			fillVectorsJNI();
+			fillNodesJNI();
 		else
-			fillVectorsJava();
+			fillNodesJava();
 
 	}
 
-	protected abstract void fillVectorsJava();
+	protected abstract void fillNodesJava();
 
-	protected abstract void fillVectorsJNI();
+	protected abstract void fillNodesJNI();
 
 	@Override
 	public List<Double> getParameters() {
@@ -97,14 +92,22 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public List<Integer> getParts(EventProducer ep) {
-		return parts.get(ep);
-	}
-
-	@Override
 	public List<DLPQuality> getQualities() {
 		return qualities;
 	}
+	
+	protected void addHierarchyToJNI() {
+		AddRoot();
+		addNodes();
+		addLeaves();
+		timeAggregation.validate();
+	}
+
+	protected abstract void addLeaves();
+
+	protected abstract void addNodes();
+
+	protected abstract void AddRoot();
 
 	@Override
 	public void printParameters() {
@@ -126,11 +129,11 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
 	@Override
 	public abstract void reset();
-
+	
 	@Override
-	public Map<EventProducer, List<Integer>> getParts() {
-		return parts;
-		
+	public EventProducerHierarchy getHierarchy(){
+		return hierarchy;
 	}
+	
 
 }

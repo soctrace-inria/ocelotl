@@ -173,82 +173,47 @@ abstract public class TimeLineView implements ITimeLineView {
 
 	}
 
-	public final static Color				selectColorFG	= ColorConstants.blue;
+	public final static Color	selectColorFG	= ColorConstants.blue;
 
-	public final static Color				selectColorBG	= ColorConstants.lightGray;
+	public final static Color	selectColorBG	= ColorConstants.lightGray;
 
-	public final static Color				activeColorFG	= ColorConstants.black;
-	public final static Color				activeColorBG	= ColorConstants.darkBlue;
-	protected Figure						root;
-	protected Canvas						canvas;
-	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
-	protected List<Integer>					parts			= null;
-	protected TimeRegion					time;
-	protected TimeRegion					selectTime;
-	protected TimeRegion					resetTime;
-	public final static int					Border			= 10;
-	protected int							Space			= 4;
-	
-	public static Color getSelectcolorfg() {
-		return selectColorFG;
-	}
+	public final static Color	activeColorFG	= ColorConstants.black;
+	public final static Color	activeColorBG	= ColorConstants.darkBlue;
 
-	public static Color getSelectcolorbg() {
-		return selectColorBG;
+	public static Color getActivecolorbg() {
+		return activeColorBG;
 	}
 
 	public static Color getActivecolorfg() {
 		return activeColorFG;
 	}
 
-	public static Color getActivecolorbg() {
-		return activeColorBG;
-	}
-
-	public Figure getRoot() {
-		return root;
-	}
-
-	public Canvas getCanvas() {
-		return canvas;
-	}
-
-	public List<RectangleFigure> getFigures() {
-		return figures;
-	}
-
-	public List<Integer> getParts() {
-		return parts;
-	}
-
-	public TimeRegion getTime() {
-		return time;
-	}
-
-	public TimeRegion getSelectTime() {
-		return selectTime;
-	}
-
-	public TimeRegion getResetTime() {
-		return resetTime;
-	}
-
-
 	public static int getBorder() {
 		return Border;
 	}
 
-	public int getSpace() {
-		return Space;
+	public static Color getSelectcolorbg() {
+		return selectColorBG;
 	}
 
-	public OcelotlView getOcelotlView() {
-		return ocelotlView;
+	public static Color getSelectcolorfg() {
+		return selectColorFG;
 	}
 
-	public SelectFigure getSelectFigure() {
-		return selectFigure;
-	}
+	protected Figure						root;
+	protected Canvas						canvas;
+	protected final List<RectangleFigure>	figures	= new ArrayList<RectangleFigure>();
+	protected List<Integer>					parts	= null;
+
+	protected TimeRegion					time;
+
+	protected TimeRegion					selectTime;
+
+	protected TimeRegion					resetTime;
+
+	public final static int					Border	= 10;
+
+	protected int							Space	= 4;
 
 	protected final OcelotlView				ocelotlView;
 
@@ -293,13 +258,52 @@ abstract public class TimeLineView implements ITimeLineView {
 		root.repaint();
 	}
 
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public List<RectangleFigure> getFigures() {
+		return figures;
+	}
+
+	public OcelotlView getOcelotlView() {
+		return ocelotlView;
+	}
+
+	public List<Integer> getParts() {
+		return parts;
+	}
+
+	public TimeRegion getResetTime() {
+		return resetTime;
+	}
+
+	public Figure getRoot() {
+		return root;
+	}
+
+	public SelectFigure getSelectFigure() {
+		return selectFigure;
+	}
+
+	public TimeRegion getSelectTime() {
+		return selectTime;
+	}
+
+	public int getSpace() {
+		return Space;
+	}
+
+	public TimeRegion getTime() {
+		return time;
+	}
+
 	@Override
-	public void init(TimeLineViewWrapper wrapper) {
+	public void init(final TimeLineViewWrapper wrapper) {
 		root = wrapper.getRoot();
 		canvas = wrapper.getCanvas();
 		wrapper.cleanControlListeners();
-		wrapper.addControlListener(
-		new ControlListener() {
+		wrapper.addControlListener(new ControlListener() {
 
 			@Override
 			public void controlMoved(final ControlEvent arg0) {

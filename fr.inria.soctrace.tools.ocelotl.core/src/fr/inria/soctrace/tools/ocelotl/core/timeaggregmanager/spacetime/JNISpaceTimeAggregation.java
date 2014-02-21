@@ -5,10 +5,9 @@ import java.util.List;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.dlpaggreg.spacetime.ISpaceTimeAggregation;
-import fr.inria.dlpaggreg.time.ITimeAggregation;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.DLPAggregWrapper;
 
-public class JNISpaceTimeAggregation implements ISpaceTimeAggregation {
+public abstract class JNISpaceTimeAggregation implements ISpaceTimeAggregation {
 	
 	protected DLPAggregWrapper jniWrapper;
 	List<Double> parameters = new ArrayList<Double>();
@@ -54,13 +53,18 @@ public class JNISpaceTimeAggregation implements ISpaceTimeAggregation {
 	public int getSize() {
 		return jniWrapper.getPartNumber();
 	}
-
+	
 	@Override
-	public List<Integer> getParts(int id) {
-		List<Integer> parts = new ArrayList<Integer>();
-		for (int i=0; i<jniWrapper.getPartNumber(); i++)
+	public List<Integer> getParts(int id){
+		ArrayList<Integer> parts = new ArrayList<Integer>();
+		for (int i=0; i<getSize(); i++)
 			parts.add(jniWrapper.getPart(id, i));
 		return parts;
+	}
+	
+	@Override
+	public void validate(){
+		jniWrapper.validate();
 	}
 
 }

@@ -24,7 +24,6 @@ import java.util.List;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.dlpaggreg.time.ITimeAggregation;
-import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
@@ -70,7 +69,7 @@ public abstract class TimeAggregationManager implements ITimeManager {
 		dm.end("LPAGGREG - COMPUTE QUALITIES");
 	}
 
-	@Override
+	
 	public void fillVectors() {
 		if (OcelotlParameters.isJniFlag())
 			fillVectorsJNI();

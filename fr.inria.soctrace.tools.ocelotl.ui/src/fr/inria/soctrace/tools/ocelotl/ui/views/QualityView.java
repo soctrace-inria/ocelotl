@@ -106,8 +106,8 @@ public class QualityView {
 	private final static int	TextOffset			= 2;
 	private final static long	MiniDivide			= 5;
 	private final static double	XGradNumber			= 10;
-	private List<DLPQuality>		qualities;
-	private List<Double>			parameterList;
+	private List<DLPQuality>	qualities;
+	private List<Double>		parameterList;
 	private double				currentParameter;
 	private final OcelotlView	ocelotlView;
 
@@ -159,7 +159,7 @@ public class QualityView {
 		parameterList.add(1.0);
 		for (i = 1; i < qualities.size(); i++) {
 			final double cParam = 1 - parameterList.get(i);
-			final double nParam = 1 - parameterList.get(i-1);
+			final double nParam = 1 - parameterList.get(i - 1);
 			double cgain = qualities.get(qualities.size() - 1).getGain() - qualities.get(i).getGain();
 			double ngain = qualities.get(qualities.size() - 1).getGain() - qualities.get(i - 1).getGain();
 			double closs = qualities.get(qualities.size() - 1).getLoss() - qualities.get(i).getLoss();

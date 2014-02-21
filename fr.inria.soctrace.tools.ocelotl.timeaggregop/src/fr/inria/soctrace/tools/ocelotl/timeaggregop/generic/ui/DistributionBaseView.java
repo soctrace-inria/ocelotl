@@ -29,16 +29,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -124,6 +120,7 @@ public abstract class DistributionBaseView extends Dialog implements IAggregatio
 		config = null;
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		oldEventTypes = new ArrayList<EventType>(config.getTypes());
 		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -175,6 +172,7 @@ public abstract class DistributionBaseView extends Dialog implements IAggregatio
 
 	}
 
+	@Override
 	public void init(final OcelotlView ocelotlView, final ITraceTypeConfig config) {
 		this.ocelotlView = ocelotlView;
 		this.config = (DistributionConfig) config;
@@ -193,6 +191,7 @@ public abstract class DistributionBaseView extends Dialog implements IAggregatio
 
 	public abstract void setParameters();
 	
+	@Override
 	protected void configureShell(Shell newShell){
 		super.configureShell(newShell);
 		newShell.setText("Event Types Selection");

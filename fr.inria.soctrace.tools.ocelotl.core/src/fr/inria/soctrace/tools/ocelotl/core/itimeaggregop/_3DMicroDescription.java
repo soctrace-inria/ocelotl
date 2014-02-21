@@ -94,7 +94,7 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 	}
 
 	@Override
-	public int getVectorsNumber() {
+	public int getVectorNumber() {
 		return matrix.size();
 	}
 

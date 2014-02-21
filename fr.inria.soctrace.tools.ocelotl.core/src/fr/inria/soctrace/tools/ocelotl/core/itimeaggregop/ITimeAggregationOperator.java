@@ -34,7 +34,7 @@ public interface ITimeAggregationOperator {
 
 	public int getVectorSize();
 
-	public int getVectorsNumber();
+	public int getVectorNumber();
 
 	public void initVectors() throws SoCTraceException;
 

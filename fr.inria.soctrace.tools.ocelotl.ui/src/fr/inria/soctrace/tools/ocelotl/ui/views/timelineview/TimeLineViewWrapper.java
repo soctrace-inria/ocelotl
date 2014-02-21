@@ -41,29 +41,73 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
-public class TimeLineViewWrapper{
+public class TimeLineViewWrapper {
 
-	private Figure						root;
-	private Canvas						canvas;
-	private final OcelotlView			ocelotlView;
-	private ITimeLineView view;
-	private List<ControlListener> controlListeners = new ArrayList<ControlListener>();
-	private List<MouseListener> mouseListeners = new ArrayList<MouseListener>();
-	private List<MouseMotionListener> mouseMotionListeners = new ArrayList<MouseMotionListener>();
-	
-	
-	
-	public Figure getRoot() {
-		return root;
+	private Figure							root;
+	private Canvas							canvas;
+	private final OcelotlView				ocelotlView;
+	private ITimeLineView					view;
+	private final List<ControlListener>		controlListeners		= new ArrayList<ControlListener>();
+	private final List<MouseListener>		mouseListeners			= new ArrayList<MouseListener>();
+	private final List<MouseMotionListener>	mouseMotionListeners	= new ArrayList<MouseMotionListener>();
+
+	public TimeLineViewWrapper(final OcelotlView ocelotlView) {
+		super();
+		this.ocelotlView = ocelotlView;
+	}
+
+	public void addControlListener(final ControlListener controlListener) {
+		controlListeners.add(controlListener);
+		canvas.addControlListener(controlListener);
+
+	}
+
+	public void addMouseListener(final MouseListener mouse) {
+		mouseListeners.add(mouse);
+		root.addMouseListener(mouse);
+
+	}
+
+	public void addMouseMotionListener(final MouseMotionListener mouse) {
+		mouseMotionListeners.add(mouse);
+		root.addMouseMotionListener(mouse);
+
+	}
+
+	public void cleanControlListeners() {
+		for (final ControlListener c : controlListeners)
+			canvas.removeControlListener(c);
+		controlListeners.clear();
+	}
+
+	public void cleanMouseListeners() {
+		for (final MouseListener m : mouseListeners)
+			root.removeMouseListener(m);
+		mouseListeners.clear();
+
+	}
+
+	public void cleanMouseMotionListeners() {
+		for (final MouseMotionListener m : mouseMotionListeners)
+			root.removeMouseMotionListener(m);
+		mouseMotionListeners.clear();
+
 	}
 
 	public Canvas getCanvas() {
 		return canvas;
 	}
 
-	public TimeLineViewWrapper(final OcelotlView ocelotlView) {
-		super();
-		this.ocelotlView = ocelotlView;
+	public OcelotlView getOcelotlView() {
+		return ocelotlView;
+	}
+
+	public Figure getRoot() {
+		return root;
+	}
+
+	public ITimeLineView getView() {
+		return view;
 	}
 
 	public Canvas init(final Composite parent) {
@@ -82,58 +126,9 @@ public class TimeLineViewWrapper{
 		return canvas;
 	}
 
-	public OcelotlView getOcelotlView() {
-		return ocelotlView;
-	}
-
-	public ITimeLineView getView() {
-		return view;
-	}
-
-	public void setView(ITimeLineView view) {
+	public void setView(final ITimeLineView view) {
 		this.view = view;
 		view.init(this);
-	}
-
-	public void cleanControlListeners() {
-		for (ControlListener c: controlListeners){
-			canvas.removeControlListener(c);
-		}
-		controlListeners.clear();	
-	}
-
-	public void addControlListener(ControlListener controlListener) {
-		controlListeners.add(controlListener);
-		canvas.addControlListener(controlListener);
-		
-	}
-
-	public void cleanMouseListeners() {
-		for (MouseListener m: mouseListeners){
-			root.removeMouseListener(m);
-		}
-		mouseListeners.clear();	
-		
-	}
-
-	public void cleanMouseMotionListeners() {
-		for (MouseMotionListener m: mouseMotionListeners){
-			root.removeMouseMotionListener(m);
-		}
-		mouseMotionListeners.clear();	
-		
-	}
-
-	public void addMouseListener(MouseListener mouse) {
-		mouseListeners.add(mouse);
-		root.addMouseListener(mouse);
-		
-	}
-
-	public void addMouseMotionListener(MouseMotionListener mouse) {
-		mouseMotionListeners.add(mouse);
-		root.addMouseMotionListener(mouse);
-		
 	}
 
 }

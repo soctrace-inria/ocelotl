@@ -13,8 +13,6 @@ public interface IMicroDescManager {
 
 	public void computeQualities();
 
-	public void fillVectors();
-
 	public List<EventProducer> getEventProducers();
 
 	public List<Double> getParameters();

@@ -165,7 +165,8 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
         
         textFilter = new Text(all, SWT.BORDER);
         textFilter.addModifyListener(new ModifyListener() {
-        	public void modifyText(ModifyEvent e) {
+        	@Override
+			public void modifyText(ModifyEvent e) {
         		tableViewer.refresh();
         	}
         });
@@ -196,7 +197,8 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
         gd_table.widthHint = 422;
         table.setLayoutData(gd_table);
         tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-        	public void selectionChanged(SelectionChangedEvent event) {
+        	@Override
+			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection selection = (IStructuredSelection)tableViewer.getSelection();
 				if (selection.size() <= 0) {
 					btnEdit.setEnabled(false);				
