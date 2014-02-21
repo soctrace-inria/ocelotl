@@ -44,7 +44,7 @@ public class OcelotlCore {
 	}
 
 	OcelotlParameters				ocelotlParameters;
-	IMicroDescManager					lpaggregManager;
+	IMicroDescManager				lpaggregManager;
 	PartManager						partManager;
 	TimeAggregationOperatorManager	timeOperators;
 	ITimeAggregationOperator		timeOperator;
@@ -108,8 +108,7 @@ public class OcelotlCore {
 			lpaggregManager.computeParts();
 			lpaggregManager.printParts();
 			setSpaceOperator();
-			partManager = new PartManager(this);//TODO manage that!
-			partManager.print();
+			lpaggregManager.print(this);
 		}
 
 	}

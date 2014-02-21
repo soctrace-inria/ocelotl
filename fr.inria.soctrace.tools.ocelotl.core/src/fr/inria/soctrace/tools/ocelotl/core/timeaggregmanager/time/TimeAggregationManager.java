@@ -25,6 +25,7 @@ import java.util.List;
 import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.dlpaggreg.time.ITimeAggregation;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public abstract class TimeAggregationManager implements ITimeManager {
@@ -117,5 +118,11 @@ public abstract class TimeAggregationManager implements ITimeManager {
 
 	@Override
 	public abstract void reset();
+	
+	@Override
+	public void print(OcelotlCore core){
+		PartManager partManager = new PartManager(core);
+		partManager.print();
+	}
 
 }

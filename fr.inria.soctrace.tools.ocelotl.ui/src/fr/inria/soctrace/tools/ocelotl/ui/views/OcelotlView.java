@@ -28,7 +28,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
@@ -56,9 +59,13 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
 
+import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
+import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
+import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Trace;
@@ -457,6 +464,24 @@ public class OcelotlView extends ViewPart {
 			job.schedule();
 
 		}
+	}
+	
+	private Action createGanttAction() {
+		ImageDescriptor img = ResourceManager.getPluginImageDescriptor(Activator.PLUGIN_ID, "icons/gantt.png");
+		Action showGantt = new Action("Show Gantt Chart", img) {
+			@Override
+			public void run() {
+				if (confDataLoader.getCurrentTrace() == null)
+					return;
+				TraceIntervalDescriptor des = new TraceIntervalDescriptor();
+				des.setTrace(ocelotlParameters.getTrace());
+				
+				des.setStartTimestamp(getTimeRegion().getTimeStampStart());
+				des.setEndTimestamp(getTimeRegion().getTimeStampEnd());
+				FramesocBus.getInstance().post(FramesocBusTopic.TOPIC_UI_HISTOGRAM_INTERVAL_DISPLAY_GANTT, des);
+			}
+		};
+		return showGantt;
 	}
 
 	public static final String					ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
@@ -951,6 +976,10 @@ public class OcelotlView extends ViewPart {
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });
 
 		// clean all
+		IActionBars actionBars = getViewSite().getActionBars();
+		IToolBarManager toolBar = actionBars.getToolBarManager();
+		toolBar.add(createGanttAction());
+		
 		cleanAll();
 
 	}

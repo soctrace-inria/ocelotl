@@ -21,9 +21,11 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.dlpaggreg.spacetime.ISpaceTimeAggregation;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
@@ -135,5 +137,9 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 		return hierarchy;
 	}
 	
+	@Override
+	public void print(OcelotlCore core){
+		
+	}
 
 }

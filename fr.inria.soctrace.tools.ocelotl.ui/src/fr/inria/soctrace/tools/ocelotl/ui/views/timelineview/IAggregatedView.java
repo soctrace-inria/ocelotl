@@ -14,4 +14,9 @@ public interface IAggregatedView {
 	public void init(TimeLineViewWrapper wrapper);
 
 	public void resizeDiagram();
+	
+	public long getStart();
+	
+	public long getEnd();
+
 }

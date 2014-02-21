@@ -4,6 +4,7 @@ import java.util.List;
 
 import fr.inria.dlpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 
 public interface IMicroDescManager {
 
@@ -24,5 +25,7 @@ public interface IMicroDescManager {
 	public void printParts();
 
 	public void reset();
+
+	public void print(OcelotlCore core);
 	
 }

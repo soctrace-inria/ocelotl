@@ -338,4 +338,14 @@ abstract public class TimeLineView implements IAggregatedView {
 		createDiagram(parts, time);
 		root.repaint();
 	}
+	
+	public long getStart(){
+			return selectTime.getTimeStampStart();
+		
+	}
+
+public long getEnd(){
+	return selectTime.getTimeStampEnd();
+}
+
 }
