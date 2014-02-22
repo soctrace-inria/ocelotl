@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts.views;
+package fr.inria.soctrace.tools.ocelotl.visualizations.parts.views;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;

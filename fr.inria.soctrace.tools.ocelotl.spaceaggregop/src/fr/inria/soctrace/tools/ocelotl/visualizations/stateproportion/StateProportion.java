@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion;
+package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion;
 
 import java.util.List;
 

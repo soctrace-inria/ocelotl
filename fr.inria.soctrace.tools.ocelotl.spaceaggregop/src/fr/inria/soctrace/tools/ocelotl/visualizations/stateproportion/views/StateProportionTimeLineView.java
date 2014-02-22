@@ -1,8 +1,8 @@
-package fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.views;
+package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views;
 
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
-import fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.StateProportion;
+import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion;
 
 public class StateProportionTimeLineView extends TimeLineView {
 

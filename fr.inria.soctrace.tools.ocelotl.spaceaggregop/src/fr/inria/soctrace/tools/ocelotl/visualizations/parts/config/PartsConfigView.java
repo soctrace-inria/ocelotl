@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts.config;
+package fr.inria.soctrace.tools.ocelotl.visualizations.parts.config;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;

@@ -8,7 +8,7 @@
  * Contributors:
  *     Generoso Pagano - initial API and implementation
  ******************************************************************************/
-package fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.config;
+package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.config;
 
 import java.util.Collection;
 import java.util.HashMap;

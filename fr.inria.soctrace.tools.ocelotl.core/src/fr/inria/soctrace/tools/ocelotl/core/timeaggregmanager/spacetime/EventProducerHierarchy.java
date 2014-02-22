@@ -25,6 +25,7 @@ public class EventProducerHierarchy {
 		private int weight=1;
 		private Aggregation aggregated=Aggregation.NULL;
 		private Object values;
+		private int index;
 		
 		public EventProducerNode(EventProducer ep) {
 			me=ep;
@@ -125,6 +126,26 @@ public class EventProducerHierarchy {
 				this.values = values;
 			else
 				values= null;
+		}
+
+		public void setChildIndex() {
+			if (this==root){
+				index=0;
+			}
+			int currentweight=0;
+			for (EventProducerNode e: childrenNodes){
+				e.setIndex(currentweight+index);
+				e.setChildIndex();
+				currentweight=e.getWeight();
+			}
+		}
+
+		public int getIndex() {
+			return index;
+		}
+
+		public void setIndex(int index) {
+			this.index = index;
 		}	
 		
 	}
@@ -156,6 +177,7 @@ public class EventProducerHierarchy {
 						orphans.get(orphan).destroy();
 			}
 		}
+		root.setChildIndex();
 		
 	}
 	

@@ -6,20 +6,20 @@
          name="GenericSpaceAggregationOperators"
          point="fr.inria.soctrace.tools.ocelotl.core.visualization">
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts.Parts"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.parts.Parts"
             operator="Parts"
-            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts.config.PartsConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts.config.PartsConfigView"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.parts.config.PartsConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.parts.config.PartsConfigView"
             time_compatibility="Parts"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts.views.PartTimeLineView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartTimeLineView">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.StateProportion"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion"
             operator="State Proportion"
-            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.config.StateProportionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.config.ManageColorsDialog"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.config.StateProportionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.config.ManageColorsDialog"
             time_compatibility="StateProportion"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.views.StateProportionTimeLineView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views.StateProportionTimeLineView">
       </aggregation_operator>
    </extension>
 

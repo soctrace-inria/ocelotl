@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.views;
+package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,7 @@ import org.eclipse.swt.SWT;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.visualizations.operators.stateproportion.StateProportion;
+import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion;
 
 public class MultiState {
 

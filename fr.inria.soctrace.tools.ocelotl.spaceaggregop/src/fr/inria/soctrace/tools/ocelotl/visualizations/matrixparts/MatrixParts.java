@@ -17,33 +17,31 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.operators.parts.config;
+package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts;
 
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
 
-public class PartsConfig implements ISpaceConfig {
+public class MatrixParts extends SpaceAggregationOperator {
 
-	private boolean numbers=false;
-	private boolean aggregated=true;
-	
-	public boolean isAggregated() {
-		return aggregated;
-	}
-	public void setAggregated(boolean aggregated) {
-		this.aggregated = aggregated;
-	}
-	public boolean isNumbers() {
-		return numbers;
-	}
-	public void setNumbers(boolean numbers) {
-		this.numbers = numbers;
-	}
-	public PartsConfig() {
+	final public static String	descriptor	= "Matrix Parts";
+
+	public MatrixParts() {
 		super();
-		this.numbers=false;
-		this.aggregated=true;
 	}
-	
-	
+
+	public MatrixParts(final OcelotlCore ocelotlCore) {
+		super(ocelotlCore);
+	}
+
+	@Override
+	protected void computeParts() {
+		initParts();
+	}
+
+	@Override
+	public String descriptor() {
+		return descriptor;
+	}
 
 }
