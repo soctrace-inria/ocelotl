@@ -20,9 +20,10 @@
 package fr.inria.soctrace.tools.ocelotl.visualizations.parts;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
 
-public class Parts extends SpaceAggregationOperator {
+public class Parts extends SpaceTAggregationOperator {
 
 	final public static String	descriptor	= "No Aggregation";
 
@@ -43,5 +44,7 @@ public class Parts extends SpaceAggregationOperator {
 	public String descriptor() {
 		return descriptor;
 	}
+	
+
 
 }

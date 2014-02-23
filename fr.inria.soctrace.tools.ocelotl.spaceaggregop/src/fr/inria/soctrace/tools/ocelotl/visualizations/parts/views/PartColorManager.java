@@ -37,7 +37,7 @@ public class PartColorManager {
 	private static final int		incrementG	= 77;
 	private static final int		incrementB	= 66;
 	private static final int 		incrementW  = 22;
-	private static final int		total		= 10000;
+	private static final int		total		= 1000000;
 	private int 					watchDog	= 0;
 	private static final int 		watchDogThreshold	= 100;
 

@@ -8,13 +8,15 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 
 public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
-	I3DMicroDescription	matrix;
+	_2DSpaceTimeMicroDescription matrix;
 	
 	public SpaceTimeAggregation2Manager(_2DSpaceTimeMicroDescription _2dSpaceTimeMicroDescription) {
 		super(_2dSpaceTimeMicroDescription.getOcelotlParameters());
+		matrix= _2dSpaceTimeMicroDescription;
 		reset();
 	}
 
@@ -36,8 +38,8 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 			for (int i=0; i<matrix.getVectorNumber(); i++)
 				values.add(matrix.getMatrix().get(i).get(ep));	
 			hierarchy.setValues(ep, values);
-			addHierarchyToJNI();
 		}
+		addHierarchyToJNI();
 	}
 
 
@@ -51,13 +53,21 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
 	@Override
 	protected void addNodes() {
-		for (int id: hierarchy.getNodes().keySet())
-			timeAggregation.addNode(id, hierarchy.getParentID(id));
+		addChildren(hierarchy.getRoot().getID());
 		
+	}
+	
+	protected void addChildren(int id){
+		for (EventProducerNode epn:hierarchy.getEventProducerNodes().get(id).getChildrenNodes()){
+			if (!epn.getChildrenNodes().isEmpty()){
+				timeAggregation.addNode(epn.getID(), id);
+				addChildren(epn.getID());	
+			}
+		}
 	}
 
 	@Override
-	protected void AddRoot() {
+	protected void addRoot() {
 		timeAggregation.addRoot(hierarchy.getRoot().getID());
 		
 	}

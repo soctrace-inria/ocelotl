@@ -87,9 +87,8 @@ public class EventProducerHierarchy {
 		public void addChild(EventProducerNode child){
 			childrenNodes.add(child);
 			if (leaves.containsKey(id))
-				leaves.remove(id);
-			else
-				weight++;
+				leaves.remove(id);	
+			
 		}
 
 		public EventProducer getMe() {
@@ -127,6 +126,17 @@ public class EventProducerHierarchy {
 			else
 				values= null;
 		}
+		public int setWeight(){
+			if (childrenNodes.isEmpty())
+				return weight;
+			else
+				weight=0;
+			for (EventProducerNode epn: childrenNodes){
+				weight+=epn.setWeight();
+			}
+			return weight;
+		}
+		
 
 		public void setChildIndex() {
 			if (this==root){
@@ -136,7 +146,7 @@ public class EventProducerHierarchy {
 			for (EventProducerNode e: childrenNodes){
 				e.setIndex(currentweight+index);
 				e.setChildIndex();
-				currentweight=e.getWeight();
+				currentweight+=e.getWeight();
 			}
 		}
 
@@ -177,6 +187,7 @@ public class EventProducerHierarchy {
 						orphans.get(orphan).destroy();
 			}
 		}
+		root.setWeight();
 		root.setChildIndex();
 		
 	}

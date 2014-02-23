@@ -27,12 +27,6 @@ public interface ISpaceAggregationOperator {
 
 	public OcelotlCore getOcelotlCore();
 
-	public Part getPart(int i);
-
-	public int getPartNumber();
-
-	public int getSliceNumber();
-
 	public void setOcelotlCore(OcelotlCore ocelotlCore);
 
 }

@@ -99,17 +99,18 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 	
 	protected void addHierarchyToJNI() {
-		AddRoot();
+		addRoot();
 		addNodes();
 		addLeaves();
 		timeAggregation.validate();
+		
 	}
 
 	protected abstract void addLeaves();
 
 	protected abstract void addNodes();
 
-	protected abstract void AddRoot();
+	protected abstract void addRoot();
 
 	@Override
 	public void printParameters() {

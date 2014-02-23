@@ -17,32 +17,16 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts;
+package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
 
-public class MatrixParts extends SpaceAggregationOperator {
+public interface ISpaceTAggregationOperator extends ISpaceAggregationOperator{
 
-	final public static String	descriptor	= "Matrix Parts";
+	public Part getPart(int i);
 
-	public MatrixParts() {
-		super();
-	}
+	public int getPartNumber();
 
-	public MatrixParts(final OcelotlCore ocelotlCore) {
-		super(ocelotlCore);
-	}
-
-	@Override
-	protected void computeParts() {
-		
-	}
-
-	@Override
-	public String descriptor() {
-		return descriptor;
-	}
+	public int getSliceNumber();
 
 }
