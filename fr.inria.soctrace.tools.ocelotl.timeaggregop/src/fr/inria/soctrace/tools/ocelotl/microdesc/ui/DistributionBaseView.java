@@ -449,6 +449,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		sashFormGlobal.setWeights(new int[] { 1 });
 		producers.clear();
 		producers.addAll(params.getEventProducers());
+		listViewerEventProducers.setInput(producers);
 		if (producers.isEmpty())
 			btnAddAllEventProducer.notifyListeners(SWT.Selection, new Event());
 		setParameters();
