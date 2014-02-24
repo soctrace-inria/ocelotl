@@ -34,6 +34,7 @@ import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
 
 public class StateDistribution extends _3DMicroDescription {
@@ -112,8 +113,8 @@ public class StateDistribution extends _3DMicroDescription {
 		for (final Event e : fullEvents)
 			eventList.get(e.getEventProducer().getId()).add(e);
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < Math.min(getOcelotlParameters().getThread(), eventProducers.size()); t++)
-			threadlist.add(new OcelotlThread(eventProducers, eventList, getOcelotlParameters().getThread(), t));
+		for (int t = 0; t < Math.min(((DistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getThreadNumber(), eventProducers.size()); t++)
+			threadlist.add(new OcelotlThread(eventProducers, eventList, ((DistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getThreadNumber(), t));
 		for (final Thread thread : threadlist)
 			thread.join();
 		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");

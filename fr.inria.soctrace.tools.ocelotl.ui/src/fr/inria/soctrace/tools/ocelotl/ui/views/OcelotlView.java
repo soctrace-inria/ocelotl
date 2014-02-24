@@ -94,85 +94,6 @@ import org.eclipse.swt.custom.StackLayout;
  */
 public class OcelotlView extends ViewPart {
 
-	private class AddAllEventProducersAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (confDataLoader.getCurrentTrace() == null)
-				return;
-			producers.clear();
-			producers.addAll(confDataLoader.getProducers());
-			listViewerEventProducers.setInput(producers);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
-	private class AddEventProducersAdapter extends SelectionAdapter {
-
-		// all - input
-		java.util.List<Object> diff(final java.util.List<EventProducer> all, final java.util.List<EventProducer> input) {
-			final java.util.List<Object> tmp = new LinkedList<>();
-			for (final Object oba : all)
-				tmp.add(oba);
-			tmp.removeAll(input);
-			return tmp;
-		}
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (confDataLoader.getCurrentTrace() == null)
-				return;
-
-			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new EventProducerLabelProvider());
-			dialog.setTitle("Select Event Producers");
-			dialog.setMessage("Select a String (* = any string, ? = any char):");
-			dialog.setElements(diff(confDataLoader.getProducers(), producers).toArray());
-			dialog.setMultipleSelection(true);
-			if (dialog.open() == Window.CANCEL)
-				return;
-			for (final Object o : dialog.getResult())
-				producers.add((EventProducer) o);
-			listViewerEventProducers.setInput(producers);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
-	private class AddResultsEventProducersAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (confDataLoader.getCurrentTrace() == null)
-				return;
-
-			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new AnalysisResultLabelProvider());
-			dialog.setTitle("Select a Result");
-			dialog.setMessage("Select a String (* = any string, ? = any char):");
-			dialog.setElements(confDataLoader.getResults().toArray());
-			dialog.setMultipleSelection(false);
-			if (dialog.open() == Window.CANCEL)
-				return;
-			for (final Object o : dialog.getResult())
-				try {
-					for (final EventProducer ep : confDataLoader.getProducersFromResult((AnalysisResult) o))
-						if (!producers.contains(ep))
-							producers.add(ep);
-				} catch (final SoCTraceException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			listViewerEventProducers.setInput(producers);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
-	private class AnalysisResultLabelProvider extends LabelProvider {
-
-		@Override
-		public String getText(final Object element) {
-			return ((AnalysisResult) element).getDescription();
-		}
-	}
-
 	private class ConfModificationListener implements ModifyListener {
 
 		@Override
@@ -205,14 +126,6 @@ public class OcelotlView extends ViewPart {
 				ocelotlParameters.setGrowingQualities(false);
 				qualityView.createDiagram();
 			}
-		}
-	}
-
-	private class EventProducerLabelProvider extends LabelProvider {
-
-		@Override
-		public String getText(final Object element) {
-			return ((EventProducer) element).getName();
 		}
 	}
 
@@ -351,23 +264,6 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
-	private class ResetSelectionAdapter extends SelectionAdapter {
-
-		private final ListViewer	viewer;
-
-		public ResetSelectionAdapter(final ListViewer viewer) {
-			this.viewer = viewer;
-		}
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			final Collection<?> c = (Collection<?>) viewer.getInput();
-			c.clear();
-			viewer.refresh(false);
-			hasChanged = HasChanged.ALL;
-		}
-	}
-
 	private class Settings2SelectionAdapter extends SelectionAdapter {
 
 		private final OcelotlView	view;
@@ -453,8 +349,10 @@ public class OcelotlView extends ViewPart {
 								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName()))
 									comboTime.add(op);
 								comboTime.setText("");
-								btnRemoveEventProducer.notifyListeners(SWT.Selection, new Event());
-								btnAddAllEventProducer.notifyListeners(SWT.Selection, new Event());
+								// btnRemoveEventProducer.notifyListeners(SWT.Selection,
+								// new Event());
+								// btnAddAllEventProducer.notifyListeners(SWT.Selection,
+								// new Event());
 							}
 						});
 					} catch (final Exception e) {
@@ -488,47 +386,45 @@ public class OcelotlView extends ViewPart {
 		return showGantt;
 	}
 
-	public static final String					ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
-	public static final String					PLUGIN_ID		= Activator.PLUGIN_ID;
-	private Button								btnNormalize;
-	private Button								btnRun;
-	private Button								btnGrowingQualities;
-	private Button								btnDecreasingQualities;
-	private Button								btnSettings;
-	private Combo								comboTime;
-	private Combo								comboTraces;
-	private final ConfDataLoader				confDataLoader	= new ConfDataLoader();
-	private HasChanged							hasChanged		= HasChanged.ALL;
+	public static final String			ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
+	public static final String			PLUGIN_ID		= Activator.PLUGIN_ID;
+	private Button						btnNormalize;
+	private Button						btnRun;
+	private Button						btnGrowingQualities;
+	private Button						btnDecreasingQualities;
+	private Button						btnSettings;
+	private Combo						comboTime;
+	private Combo						comboTraces;
+	private final ConfDataLoader		confDataLoader	= new ConfDataLoader();
+	private HasChanged					hasChanged		= HasChanged.ALL;
 
-	private ListViewer							listViewerEventProducers;
-	private IAggregatedView						timeLineView;
-	private final OcelotlCore					ocelotlCore;
-	private final OcelotlParameters				ocelotlParameters;
-	private Text								textRun;
-	private final java.util.List<EventProducer>	producers		= new LinkedList<EventProducer>();
-	private QualityView							qualityView;
-	private Spinner								spinnerDivideDbQuery;
-	private Spinner								spinnerThread;
-	private Spinner								spinnerEventSize;
-	private Spinner								spinnerTSNumber;
-	private Text								textThreshold;
-	private TimeAxisView						timeAxisView;
-	private Text								textTimestampEnd;
-	private Text								textTimestampStart;
+	private IAggregatedView				timeLineView;
+	private final OcelotlCore			ocelotlCore;
+	private final OcelotlParameters		ocelotlParameters;
+	private Text						textRun;
+	private QualityView					qualityView;
+	private Spinner						spinnerDivideDbQuery;
+	private Spinner						spinnerThread;
+	private Spinner						spinnerEventSize;
+	private Spinner						spinnerTSNumber;
+	private Text						textThreshold;
+	private TimeAxisView				timeAxisView;
+	private Text						textTimestampEnd;
+	private Text						textTimestampStart;
 
-	final Map<Integer, Trace>					traceMap		= new HashMap<Integer, Trace>();
+	final Map<Integer, Trace>			traceMap		= new HashMap<Integer, Trace>();
 
-	private Button								buttonDown;
-	private Button								buttonUp;
-	private Combo								comboSpace;
-	private Button								btnRemoveEventProducer;
-	private Canvas								canvasMatrixView;
-	private final TimeLineViewManager			timeLineViewManager;
-	private Composite							compositeMatrixView;
-	private SashForm							sashFormView;
-	private TimeLineViewWrapper					timeLineViewWrapper;
-	private Button								btnAddAllEventProducer;
-	private Button								btnSettings2;
+	private Button						buttonDown;
+	private Button						buttonUp;
+	private Combo						comboSpace;
+	private Button						btnRemoveEventProducer;
+	private Canvas						canvasMatrixView;
+	private final TimeLineViewManager	timeLineViewManager;
+	private Composite					compositeMatrixView;
+	private SashForm					sashFormView;
+	private TimeLineViewWrapper			timeLineViewWrapper;
+	private Button						btnAddAllEventProducer;
+	private Button						btnSettings2;
 
 	// private Control canvasTimeAxisView;
 	// private Control //canvasQualityView;
@@ -554,14 +450,11 @@ public class OcelotlView extends ViewPart {
 		btnGrowingQualities.setSelection(true);
 		btnDecreasingQualities.setSelection(false);
 		spinnerTSNumber.setSelection(50);
-		spinnerDivideDbQuery.setSelection(0);
-		spinnerEventSize.setSelection(10000);
-		spinnerThread.setSelection(8);
 		textRun.setText("1.0");
-		producers.clear();
+		// producers.clear();
 		// types.clear();
 		// idles.clear();
-		listViewerEventProducers.setInput(producers);
+		// listViewerEventProducers.setInput(producers);
 		// TODO config paje
 	}
 
@@ -583,31 +476,116 @@ public class OcelotlView extends ViewPart {
 		final TabItem tbtmTimeAggregationParameters = new TabItem(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setText("Trace Overview");
 
-		final SashForm sashFormTimeAggregationParameters = new SashForm(tabFolder, SWT.NONE);
-		tbtmTimeAggregationParameters.setControl(sashFormTimeAggregationParameters);
-
-		final SashForm sashFormTSandCurve = new SashForm(sashFormTimeAggregationParameters, SWT.NONE);
+		final SashForm sashFormTSandCurve = new SashForm(tabFolder, SWT.NONE);
+		tbtmTimeAggregationParameters.setControl(sashFormTSandCurve);
 		sashFormTSandCurve.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		
-				final Group groupTraces = new Group(sashFormTSandCurve, SWT.NONE);
-				groupTraces.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-				groupTraces.setText("Trace");
-				groupTraces.setLayout(new GridLayout(2, false));
-				comboTraces = new Combo(groupTraces, SWT.READ_ONLY);
-				final GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-				gd_comboTraces.widthHint = 180;
-				comboTraces.setLayoutData(gd_comboTraces);
-				comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-				
-						final Button buttonRefresh = new Button(groupTraces, SWT.NONE);
-						buttonRefresh.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/load.png"));
-						buttonRefresh.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(final SelectionEvent e) {
-								refreshTraces();
-							}
-						});
-						comboTraces.addSelectionListener(new TraceAdapter());
+
+		final Group groupTraces = new Group(sashFormTSandCurve, SWT.NONE);
+		groupTraces.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupTraces.setText("Trace");
+		groupTraces.setLayout(new GridLayout(1, false));
+
+		Composite composite_1 = new Composite(groupTraces, SWT.NONE);
+		GridData gd_composite_1 = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_composite_1.widthHint = 285;
+		composite_1.setLayoutData(gd_composite_1);
+		composite_1.setLayout(new GridLayout(2, false));
+		comboTraces = new Combo(composite_1, SWT.READ_ONLY);
+		GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_comboTraces.widthHint = 179;
+		comboTraces.setLayoutData(gd_comboTraces);
+		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		final Button buttonRefresh = new Button(composite_1, SWT.NONE);
+		buttonRefresh.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/load.png"));
+		buttonRefresh.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				refreshTraces();
+			}
+		});
+		comboTraces.addSelectionListener(new TraceAdapter());
+
+		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
+		groupAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupAggregationOperator.setText("Microscopic Description");
+		groupAggregationOperator.setLayout(new GridLayout(1, false));
+
+		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
+		compositeAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		compositeAggregationOperator.setLayout(new GridLayout(2, false));
+		final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		gd_compositeAggregationOperator.widthHint = 85;
+		compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
+
+		comboTime = new Combo(compositeAggregationOperator, SWT.READ_ONLY);
+		final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		gd_comboAggregationOperator.widthHint = 170;
+		comboTime.setLayoutData(gd_comboAggregationOperator);
+		comboTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		comboTime.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				if (confDataLoader.getCurrentTrace() == null)
+					return;
+				hasChanged = HasChanged.ALL;
+				ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
+				comboSpace.removeAll();
+				for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility()))
+					comboSpace.add(op);
+				comboSpace.setText("");
+				btnSettings.notifyListeners(SWT.Selection, new Event());
+
+			}
+		});
+		comboTime.setText("");
+
+		btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
+		btnSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnSettings.setText("Settings");
+		btnSettings.addSelectionListener(new SettingsSelectionAdapter(this));
+		comboTime.setText("");
+
+		final Group grpSpaceAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
+		grpSpaceAggregationOperator.setText("Visualization");
+		grpSpaceAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		grpSpaceAggregationOperator.setLayout(new GridLayout(1, false));
+
+		final Composite composite = new Composite(grpSpaceAggregationOperator, SWT.NONE);
+		final GridData gd_composite = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		gd_composite.widthHint = 85;
+		composite.setLayoutData(gd_composite);
+		composite.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		composite.setLayout(new GridLayout(2, false));
+
+		comboSpace = new Combo(composite, SWT.READ_ONLY);
+		comboSpace.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		final GridData gd_combo = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		gd_combo.widthHint = 170;
+		comboSpace.setLayoutData(gd_combo);
+		comboSpace.setText("");
+
+		comboSpace.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				if (confDataLoader.getCurrentTrace() == null)
+					return;
+				if (hasChanged == HasChanged.NOTHING)
+					hasChanged = HasChanged.PARAMETER;
+				ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
+				timeLineView = timeLineViewManager.create();
+				timeLineViewWrapper.setView(timeLineView);
+				btnSettings2.notifyListeners(SWT.Selection, new Event());
+
+			}
+		});
+
+		btnSettings2 = new Button(composite, SWT.NONE);
+		btnSettings2.setText("Settings");
+		btnSettings2.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
 
 		int index = 0;
 		for (final Trace t : confDataLoader.getTraces()) {
@@ -616,169 +594,6 @@ public class OcelotlView extends ViewPart {
 			index++;
 		}
 		;
-				
-						final Group grpSpaceAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
-						grpSpaceAggregationOperator.setText("Visualization");
-						grpSpaceAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						grpSpaceAggregationOperator.setLayout(new GridLayout(1, false));
-						
-								final Composite composite = new Composite(grpSpaceAggregationOperator, SWT.NONE);
-								final GridData gd_composite = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-								gd_composite.widthHint = 85;
-								composite.setLayoutData(gd_composite);
-								composite.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								composite.setLayout(new GridLayout(2, false));
-								
-										comboSpace = new Combo(composite, SWT.READ_ONLY);
-										comboSpace.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-										final GridData gd_combo = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-										gd_combo.widthHint = 170;
-										comboSpace.setLayoutData(gd_combo);
-										comboSpace.setText("");
-										
-												comboSpace.addSelectionListener(new SelectionAdapter() {
-										
-													@Override
-													public void widgetSelected(final SelectionEvent e) {
-														if (confDataLoader.getCurrentTrace() == null)
-															return;
-														if (hasChanged == HasChanged.NOTHING)
-															hasChanged = HasChanged.PARAMETER;
-														ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
-														timeLineView = timeLineViewManager.create();
-														timeLineViewWrapper.setView(timeLineView);
-														btnSettings2.notifyListeners(SWT.Selection, new Event());
-										
-													}
-												});
-												
-														btnSettings2 = new Button(composite, SWT.NONE);
-														btnSettings2.setText("Settings");
-														btnSettings2.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-														btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
-		
-				final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
-				groupAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-				groupAggregationOperator.setText("Microscopic Description");
-				groupAggregationOperator.setLayout(new GridLayout(1, false));
-				
-						final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
-						compositeAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						compositeAggregationOperator.setLayout(new GridLayout(2, false));
-						final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-						gd_compositeAggregationOperator.widthHint = 85;
-						compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
-						
-								comboTime = new Combo(compositeAggregationOperator, SWT.READ_ONLY);
-								final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-								gd_comboAggregationOperator.widthHint = 170;
-								comboTime.setLayoutData(gd_comboAggregationOperator);
-								comboTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								comboTime.addSelectionListener(new SelectionAdapter() {
-
-									@Override
-									public void widgetSelected(final SelectionEvent e) {
-										if (confDataLoader.getCurrentTrace() == null)
-											return;
-										hasChanged = HasChanged.ALL;
-										ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
-										comboSpace.removeAll();
-										for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility()))
-											comboSpace.add(op);
-										comboSpace.setText("");
-										btnSettings.notifyListeners(SWT.Selection, new Event());
-
-									}
-								});
-								comboTime.setText("");
-								
-										btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
-										btnSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-										btnSettings.setText("Settings");
-										btnSettings.addSelectionListener(new SettingsSelectionAdapter(this));
-										comboTime.setText("");
-		
-				final Group groupEventProducers = new Group(sashFormTSandCurve, SWT.NONE);
-				groupEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-				groupEventProducers.setText("Event Producers");
-				final GridLayout gl_groupEventProducers = new GridLayout(2, false);//
-				gl_groupEventProducers.horizontalSpacing = 0;
-				groupEventProducers.setLayout(gl_groupEventProducers);
-				
-						listViewerEventProducers = new ListViewer(groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-						listViewerEventProducers.setContentProvider(new ArrayContentProvider());
-						listViewerEventProducers.setLabelProvider(new EventProducerLabelProvider());
-						listViewerEventProducers.setComparator(new ViewerComparator());
-						final List listEventProducers = listViewerEventProducers.getList();
-						listEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						final GridData gd_listEventProducers = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-						gd_listEventProducers.heightHint = 79;
-						gd_listEventProducers.widthHint = 120;
-						listEventProducers.setLayoutData(gd_listEventProducers);
-						
-								final ScrolledComposite scrCompositeEventProducerButtons = new ScrolledComposite(groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-								scrCompositeEventProducerButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
-								scrCompositeEventProducerButtons.setExpandHorizontal(true);
-								scrCompositeEventProducerButtons.setExpandVertical(true);
-								
-										final Composite compositeEventProducerButtons = new Composite(scrCompositeEventProducerButtons, SWT.NONE);
-										compositeEventProducerButtons.setLayout(new GridLayout(1, false));
-										final Button btnAddEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
-										btnAddEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-										btnAddEventProducer.setText("Add");
-										btnAddEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-										btnAddEventProducer.setImage(null);
-										
-												btnAddAllEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
-												btnAddAllEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-												btnAddAllEventProducer.setText("Add All");
-												btnAddAllEventProducer.setImage(null);
-												btnAddAllEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-												btnAddAllEventProducer.addSelectionListener(new AddAllEventProducersAdapter());
-												
-														final Button btnAddResult = new Button(compositeEventProducerButtons, SWT.NONE);
-														btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-														btnAddResult.setText("Add Result");
-														btnAddResult.setImage(null);
-														btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-														btnAddResult.addSelectionListener(new AddResultsEventProducersAdapter());
-														btnRemoveEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
-														btnRemoveEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-														btnRemoveEventProducer.setText("Reset");
-														btnRemoveEventProducer.addSelectionListener(new ResetSelectionAdapter(listViewerEventProducers));
-														btnRemoveEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-														btnRemoveEventProducer.setImage(null);
-														scrCompositeEventProducerButtons.setContent(compositeEventProducerButtons);
-														scrCompositeEventProducerButtons.setMinSize(compositeEventProducerButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-														btnAddEventProducer.addSelectionListener(new AddEventProducersAdapter());
-
-		final Group groupQualityCurveSettings = new Group(sashFormTSandCurve, SWT.NONE);
-		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupQualityCurveSettings.setText("Quality Curve Settings");
-		groupQualityCurveSettings.setLayout(new GridLayout(3, false));
-		new Label(groupQualityCurveSettings, SWT.NONE);
-
-		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
-		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnNormalize.setSelection(false);
-		btnNormalize.setText("Normalize Qualities");
-		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
-		new Label(groupQualityCurveSettings, SWT.NONE);
-		new Label(groupQualityCurveSettings, SWT.NONE);
-
-		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
-		btnGrowingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnGrowingQualities.setText("Complexity (green), Information (red)");
-		btnGrowingQualities.setSelection(true);
-		btnGrowingQualities.addSelectionListener(new GrowingQualityRadioSelectionAdapter());
-		btnGrowingQualities.setSelection(false);
-
-		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
-		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
-		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		sashFormTSandCurve.setWeights(new int[] { 144, 144, 144, 144, 67 });
-		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
-		sashFormTimeAggregationParameters.setWeights(new int[] { 269 });
 		// canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// final TabItem tbtmTraceParameters = new TabItem(tabFolder, SWT.NONE);
@@ -789,78 +604,148 @@ public class OcelotlView extends ViewPart {
 		// tbtmTraceParameters.setControl(sashFormTraceParameter);
 
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
-		tbtmAdvancedParameters.setText("Advanced Parameters");
+		tbtmAdvancedParameters.setText("Quality curves");
 
 		final SashForm sashFormAdvancedParameters = new SashForm(tabFolder, SWT.VERTICAL);
 		sashFormAdvancedParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		tbtmAdvancedParameters.setControl(sashFormAdvancedParameters);
 
-		final Group grpCacheManagement = new Group(sashFormAdvancedParameters, SWT.NONE);
-		grpCacheManagement.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpCacheManagement.setText("Iterator Management");
-		grpCacheManagement.setLayout(new GridLayout(2, false));
+		final Group groupQualityCurveSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
+		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupQualityCurveSettings.setText("Quality Curve Settings");
+		groupQualityCurveSettings.setLayout(new GridLayout(4, false));
+		new Label(groupQualityCurveSettings, SWT.NONE);
 
-		final Label lblPageSize = new Label(grpCacheManagement, SWT.NONE);
-		lblPageSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblPageSize.setText("Event Number Retrieved by Threads");
+		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
+		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnNormalize.setSelection(false);
+		btnNormalize.setText("Normalize Qualities");
+		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 
-		spinnerEventSize = new Spinner(grpCacheManagement, SWT.BORDER);
-		spinnerEventSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerEventSize.addModifyListener(new ConfModificationListener());
-		spinnerEventSize.setMinimum(100);
-		spinnerEventSize.setMaximum(10000000);
-		spinnerEventSize.setSelection(100000);
+		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
+		btnGrowingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnGrowingQualities.setText("Complexity gain(green), Information gain(red)");
+		btnGrowingQualities.setSelection(true);
+		btnGrowingQualities.addSelectionListener(new GrowingQualityRadioSelectionAdapter());
+		btnGrowingQualities.setSelection(false);
 
-		final Group grpDivideDbQuery = new Group(sashFormAdvancedParameters, SWT.NONE);
-		grpDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpDivideDbQuery.setText("Query Management");
-		grpDivideDbQuery.setLayout(new GridLayout(2, false));
-
-		final Label lblDivideDbQueries = new Label(grpDivideDbQuery, SWT.NONE);
-		lblDivideDbQueries.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblDivideDbQueries.setText("Event Producers per Query (0=All)");
-
-		spinnerDivideDbQuery = new Spinner(grpDivideDbQuery, SWT.BORDER);
-		spinnerDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerDivideDbQuery.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		spinnerDivideDbQuery.addModifyListener(new ConfModificationListener());
-		spinnerDivideDbQuery.setMinimum(0);
-		spinnerDivideDbQuery.setMaximum(1000000);
-		spinnerDivideDbQuery.setSelection(0);
-
-		final Group grpMultiThread = new Group(sashFormAdvancedParameters, SWT.NONE);
-		grpMultiThread.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		grpMultiThread.setText("Multi Threading");
-		grpMultiThread.setLayout(new GridLayout(2, false));
-
-		final Label lblThread = new Label(grpMultiThread, SWT.NONE);
-		lblThread.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblThread.setText("Working Threads");
-
-		spinnerThread = new Spinner(grpMultiThread, SWT.BORDER);
-		spinnerThread.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerThread.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		spinnerThread.addModifyListener(new ConfModificationListener());
-		spinnerThread.setMinimum(1);
-		spinnerThread.setMaximum(1000000);
-		spinnerThread.setSelection(5);
+		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
+		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
+		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
+		sashFormAdvancedParameters.setWeights(new int[] { 1 });
 
 		SashForm sashForm_1 = new SashForm(sashFormGlobal, SWT.BORDER);
 		sashFormView = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashFormView.setSashWidth(0);
-		compositeMatrixView = new Composite(sashFormView, SWT.NONE);
+
+		SashForm sashForm_4 = new SashForm(sashFormView, SWT.VERTICAL);
+		compositeMatrixView = new Composite(sashForm_4, SWT.NONE);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
 		canvasMatrixView = timeLineViewWrapper.init(compositeMatrixView);
 		compositeMatrixView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		final Composite compositeTimeAxisView = new Composite(sashFormView, SWT.NONE);
+		final Composite compositeTimeAxisView = new Composite(sashForm_4, SWT.NONE);
 		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final Canvas canvasTimeAxisView = timeAxisView.initDiagram(compositeTimeAxisView);
 		compositeTimeAxisView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		sashFormView.setWeights(new int[] { 220, 57 });
+		sashForm_4.setWeights(new int[] { 305, 43 });
+
+		final Group groupTime = new Group(sashFormView, SWT.NONE);
+		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupTime.setLayout(new GridLayout(14, false));
+
+		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
+		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblStartTimestamp.setText("Start");
+
+		textTimestampStart = new Text(groupTime, SWT.BORDER);
+		GridData gd_textTimestampStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_textTimestampStart.minimumWidth = 50;
+		textTimestampStart.setLayoutData(gd_textTimestampStart);
+		textTimestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
+		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblEndTimestamp.setText("End");
+
+		textTimestampEnd = new Text(groupTime, SWT.BORDER);
+		GridData gd_textTimestampEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_textTimestampEnd.minimumWidth = 50;
+		textTimestampEnd.setLayoutData(gd_textTimestampEnd);
+		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		final Button btnReset = new Button(groupTime, SWT.NONE);
+		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		btnReset.setText("Reset");
+
+		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
+		lblTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblTSNumber.setText("Timeslice Number");
+
+		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
+		final GridData gd_spinnerTSNumber = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_spinnerTSNumber.minimumWidth = 50;
+		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
+		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		spinnerTSNumber.setMaximum(10000);
+		spinnerTSNumber.setMinimum(1);
+		spinnerTSNumber.setSelection(200);
+
+		final Label lblThreshold = new Label(groupTime, SWT.NONE);
+		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblThreshold.setText("Threshold");
+
+		textThreshold = new Text(groupTime, SWT.BORDER);
+		GridData gd_textThreshold = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_textThreshold.minimumWidth = 50;
+		textThreshold.setLayoutData(gd_textThreshold);
+		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		final Label lblParameter = new Label(groupTime, SWT.NONE);
+		lblParameter.setText("Parameter");
+		lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		// btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
+		// btnGetParameters.setFont(SWTResourceManager.getFont("Cantarell", 8,
+		// SWT.NORMAL));
+		// btnGetParameters.setText("Get");
+
+		textRun = new Text(groupTime, SWT.BORDER);
+		GridData gd_textRun = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_textRun.minimumWidth = 50;
+		textRun.setLayoutData(gd_textRun);
+		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		buttonDown = new Button(groupTime, SWT.NONE);
+		buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonDown.setText("<");
+
+		buttonUp = new Button(groupTime, SWT.NONE);
+		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonUp.setText(">");
+		btnRun = new Button(groupTime, SWT.NONE);
+		btnRun.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
+		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRun.setText("RUN!");
+		sashFormView.setWeights(new int[] { 352, 39 });
+		btnRun.addSelectionListener(new GetAggregationAdapter());
+		buttonUp.addSelectionListener(new ParameterUpAdapter());
+		buttonDown.addSelectionListener(new ParameterDownAdapter());
+		textRun.addModifyListener(new ParameterModifyListener());
+
+		// btnGetParameters.addSelectionListener(new GetParametersAdapter());
+		textThreshold.addModifyListener(new ThresholdModifyListener());
+		spinnerTSNumber.addModifyListener(new ConfModificationListener());
+		btnReset.addSelectionListener(new ResetListener());
+		textTimestampEnd.addModifyListener(new ConfModificationListener());
+		textTimestampStart.addModifyListener(new ConfModificationListener());
 
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
+
+		SashForm sashForm_3 = new SashForm(sashForm, SWT.NONE);
 
 		final Composite compositeQualityView = new Composite(sashForm, SWT.NONE);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -874,103 +759,16 @@ public class OcelotlView extends ViewPart {
 
 		SashForm sashForm_2 = new SashForm(sashForm, SWT.VERTICAL);
 
-		final Group groupTime = new Group(sashForm_2, SWT.NONE);
-		groupTime.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupTime.setLayout(new GridLayout(7, false));
+		// Button btnHide = new Button(group, SWT.NONE);
+		// btnHide.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true,
+		// false, 1, 1));
+		// btnHide.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell",
+		// 8, SWT.NORMAL));
+		// btnHide.setText("Hide");
 
-		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
-		lblStartTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
-		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblStartTimestamp.setText("Start");
-
-		textTimestampStart = new Text(groupTime, SWT.BORDER);
-		textTimestampStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-		textTimestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
-		lblEndTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
-		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblEndTimestamp.setText("End");
-
-		textTimestampEnd = new Text(groupTime, SWT.BORDER);
-		textTimestampEnd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		final Button btnReset = new Button(groupTime, SWT.NONE);
-		btnReset.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
-		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		btnReset.setText("Reset");
-
-		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
-		lblTSNumber.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
-		lblTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblTSNumber.setText("Timeslice Number");
-
-		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
-		final GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1);
-		gd_spinnerTSNumber.widthHint = 100;
-		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
-		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerTSNumber.setMaximum(10000);
-		spinnerTSNumber.setMinimum(1);
-		spinnerTSNumber.setSelection(200);
-		spinnerTSNumber.addModifyListener(new ConfModificationListener());
-
-		Group group = new Group(sashForm_2, SWT.NONE);
-		group.setLayout(new GridLayout(7, false));
-
-		final Label lblThreshold = new Label(group, SWT.NONE);
-		lblThreshold.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
-		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblThreshold.setText("Threshold");
-
-		textThreshold = new Text(group, SWT.BORDER);
-		GridData gd_textThreshold = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
-		gd_textThreshold.widthHint = 119;
-		textThreshold.setLayoutData(gd_textThreshold);
-		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		final Label lblParameter = new Label(group, SWT.NONE);
-		lblParameter.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		lblParameter.setText("Parameter");
-		lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		// btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
-		// btnGetParameters.setFont(SWTResourceManager.getFont("Cantarell", 8,
-		// SWT.NORMAL));
-		// btnGetParameters.setText("Get");
-
-		textRun = new Text(group, SWT.BORDER);
-		GridData gd_textRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_textRun.widthHint = 90;
-		textRun.setLayoutData(gd_textRun);
-		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		buttonDown = new Button(group, SWT.NONE);
-		buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonDown.setText("<");
-
-		buttonUp = new Button(group, SWT.NONE);
-		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonUp.setText(">");
-		btnRun = new Button(group, SWT.NONE);
-		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
-		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRun.setText("RUN!");
-		btnRun.addSelectionListener(new GetAggregationAdapter());
-		buttonUp.addSelectionListener(new ParameterUpAdapter());
-		buttonDown.addSelectionListener(new ParameterDownAdapter());
-		textRun.addModifyListener(new ParameterModifyListener());
-
-		// btnGetParameters.addSelectionListener(new GetParametersAdapter());
-		textThreshold.addModifyListener(new ThresholdModifyListener());
-		btnReset.addSelectionListener(new ResetListener());
-		textTimestampEnd.addModifyListener(new ConfModificationListener());
-		textTimestampStart.addModifyListener(new ConfModificationListener());
-		sashForm_2.setWeights(new int[] { 1, 1 });
-		sashForm.setWeights(new int[] {258, 72});
-		sashForm_1.setWeights(new int[] {556, 355});
-		sashFormGlobal.setWeights(new int[] {205, 288});
+		sashForm.setWeights(new int[] { 42, 270, 73 });
+		sashForm_1.setWeights(new int[] { 655, 254 });
+		sashFormGlobal.setWeights(new int[] { 98, 395 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });
 
@@ -1039,15 +837,15 @@ public class OcelotlView extends ViewPart {
 	public void setConfiguration() {
 
 		ocelotlParameters.setTrace(confDataLoader.getCurrentTrace());
-		ocelotlParameters.setEventProducers(producers);
+		// ocelotlParameters.setEventProducers(producers);
 		// ocelotlParameters.setEventTypes(types);
 		// ocelotlParameters.setSleepingStates(idles);
 		ocelotlParameters.setNormalize(btnNormalize.getSelection());
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
-		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
+		// ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
-		ocelotlParameters.setEventsPerThread(spinnerEventSize.getSelection());
-		ocelotlParameters.setThread(spinnerThread.getSelection());
+		// ocelotlParameters.setEventsPerThread(spinnerEventSize.getSelection());
+		// ocelotlParameters.setThread(spinnerThread.getSelection());
 		// TODO manage number format exception
 		try {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());

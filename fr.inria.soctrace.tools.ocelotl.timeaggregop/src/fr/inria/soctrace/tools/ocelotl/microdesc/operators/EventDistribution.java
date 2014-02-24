@@ -31,6 +31,7 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent.GenericReducedEvent;
+import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 
 public class EventDistribution extends _2DMicroDescription {
 
@@ -99,8 +100,8 @@ public class EventDistribution extends _2DMicroDescription {
 		for (final GenericReducedEvent e : fullEvents)
 			eventList.get(e.EP).add(e);
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < getOcelotlParameters().getThread(); t++)
-			threadlist.add(new OcelotlThread(eventProducers, eventList, getOcelotlParameters().getThread(), t, true));
+		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getThreadNumber(); t++)
+			threadlist.add(new OcelotlThread(eventProducers, eventList, ((DistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getThreadNumber(), t, true));
 		for (final Thread thread : threadlist)
 			thread.join();
 		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");

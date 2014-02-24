@@ -44,8 +44,7 @@ public class OcelotlParameters {
 	private String				timeAggOperator;
 	private String				spaceAggOperator;
 	private boolean				growingQualities	= true;
-	private int					eventsPerThread		= 20;
-	private int					thread				= 5;
+
 	private static boolean		jniFlag=false;
 	private ITraceTypeConfig	iTraceTypeConfig;
 	private ISpaceConfig		iSpaceConfig;
@@ -58,10 +57,6 @@ public class OcelotlParameters {
 		return eventProducers;
 	}
 
-	public int getEventsPerThread() {
-		return eventsPerThread;
-	}
-
 	public int getMaxEventProducers() {
 		return maxEventProducers;
 	}
@@ -72,10 +67,6 @@ public class OcelotlParameters {
 
 	public String getSpaceAggOperator() {
 		return spaceAggOperator;
-	}
-
-	public int getThread() {
-		return thread;
 	}
 
 	public double getThreshold() {
@@ -114,9 +105,6 @@ public class OcelotlParameters {
 		this.eventProducers = eventProducers;
 	}
 
-	public void setEventsPerThread(final int eventsPerThread) {
-		this.eventsPerThread = eventsPerThread;
-	}
 
 	public void setGrowingQualities(final boolean growingQualities) {
 		this.growingQualities = growingQualities;
@@ -136,10 +124,6 @@ public class OcelotlParameters {
 
 	public void setSpaceAggOperator(final String spaceAggOperator) {
 		this.spaceAggOperator = spaceAggOperator;
-	}
-
-	public void setThread(final int thread) {
-		this.thread = thread;
 	}
 
 	public void setThreshold(final double threshold) {

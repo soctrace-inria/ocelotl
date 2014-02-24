@@ -26,4 +26,5 @@ Import-Package: fr.inria.soctrace.framesoc.ui.model,
 Export-Package: fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt,
  fr.inria.soctrace.tools.ocelotl.ui.loaders,
  fr.inria.soctrace.tools.ocelotl.ui.views,
- fr.inria.soctrace.tools.ocelotl.ui.views.timelineview
+ fr.inria.soctrace.tools.ocelotl.ui.views.timelineview,
+ org.eclipse.wb.swt
