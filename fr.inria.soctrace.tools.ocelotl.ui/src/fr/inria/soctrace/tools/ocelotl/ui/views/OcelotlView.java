@@ -35,6 +35,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -82,6 +83,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
+
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.custom.StackLayout;
@@ -115,18 +117,6 @@ public class OcelotlView extends ViewPart {
 			}
 		}
 
-	}
-
-	private class DecreasingQualityRadioSelectionAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (btnDecreasingQualities.getSelection()) {
-				btnGrowingQualities.setSelection(false);
-				ocelotlParameters.setGrowingQualities(false);
-				qualityView.createDiagram();
-			}
-		}
 	}
 
 	private class GetAggregationAdapter extends SelectionAdapter {
@@ -183,6 +173,7 @@ public class OcelotlView extends ViewPart {
 		}
 	}
 
+
 	private class GrowingQualityRadioSelectionAdapter extends SelectionAdapter {
 
 		@Override
@@ -190,6 +181,18 @@ public class OcelotlView extends ViewPart {
 			if (btnGrowingQualities.getSelection()) {
 				btnDecreasingQualities.setSelection(false);
 				ocelotlParameters.setGrowingQualities(true);
+				qualityView.createDiagram();
+			}
+		}
+	}
+	
+	private class DecreasingQualityRadioSelectionAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (btnDecreasingQualities.getSelection()) {
+				btnGrowingQualities.setSelection(false);
+				ocelotlParameters.setGrowingQualities(false);
 				qualityView.createDiagram();
 			}
 		}
@@ -448,7 +451,6 @@ public class OcelotlView extends ViewPart {
 		textTimestampEnd.setText("0");
 		btnNormalize.setSelection(false);
 		btnGrowingQualities.setSelection(true);
-		btnDecreasingQualities.setSelection(false);
 		spinnerTSNumber.setSelection(50);
 		textRun.setText("1.0");
 		// producers.clear();
@@ -467,16 +469,24 @@ public class OcelotlView extends ViewPart {
 		timeAxisView = new TimeAxisView();
 		qualityView = new QualityView(this);
 		timeLineViewWrapper = new TimeLineViewWrapper(this);
+
+	
+
+		SashForm sashForm_1 = new SashForm(sashFormGlobal, SWT.BORDER);
+		sashForm_1.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
+		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 		// canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
 		// canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		final TabFolder tabFolder = new TabFolder(sashFormGlobal, SWT.NONE);
+		final TabFolder tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
 		final TabItem tbtmTimeAggregationParameters = new TabItem(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setText("Trace Overview");
 
-		final SashForm sashFormTSandCurve = new SashForm(tabFolder, SWT.NONE);
+		final SashForm sashFormTSandCurve = new SashForm(tabFolder, SWT.VERTICAL);
 		tbtmTimeAggregationParameters.setControl(sashFormTSandCurve);
 		sashFormTSandCurve.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
@@ -505,6 +515,13 @@ public class OcelotlView extends ViewPart {
 			}
 		});
 		comboTraces.addSelectionListener(new TraceAdapter());
+		int index = 0;
+		for (final Trace t : confDataLoader.getTraces()) {
+			comboTraces.add(t.getAlias(), index);
+			traceMap.put(index, t);
+			index++;
+		}
+		;
 
 		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
 		groupAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -586,14 +603,6 @@ public class OcelotlView extends ViewPart {
 		btnSettings2.setText("Settings");
 		btnSettings2.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
-
-		int index = 0;
-		for (final Trace t : confDataLoader.getTraces()) {
-			comboTraces.add(t.getAlias(), index);
-			traceMap.put(index, t);
-			index++;
-		}
-		;
 		// canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// final TabItem tbtmTraceParameters = new TabItem(tabFolder, SWT.NONE);
@@ -613,7 +622,7 @@ public class OcelotlView extends ViewPart {
 		final Group groupQualityCurveSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
 		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupQualityCurveSettings.setText("Quality Curve Settings");
-		groupQualityCurveSettings.setLayout(new GridLayout(4, false));
+		groupQualityCurveSettings.setLayout(new GridLayout(2, false));
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
@@ -621,6 +630,7 @@ public class OcelotlView extends ViewPart {
 		btnNormalize.setSelection(false);
 		btnNormalize.setText("Normalize Qualities");
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
+		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnGrowingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -628,16 +638,30 @@ public class OcelotlView extends ViewPart {
 		btnGrowingQualities.setSelection(true);
 		btnGrowingQualities.addSelectionListener(new GrowingQualityRadioSelectionAdapter());
 		btnGrowingQualities.setSelection(false);
+		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
-		btnDecreasingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnDecreasingQualities.setSelection(false);
+		btnDecreasingQualities.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 		sashFormAdvancedParameters.setWeights(new int[] { 1 });
 
-		SashForm sashForm_1 = new SashForm(sashFormGlobal, SWT.BORDER);
+		final Composite compositeQualityView = new Composite(sashForm, SWT.NONE);
+		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		final Canvas canvasQualityView = qualityView.initDiagram(compositeQualityView);
+		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
+
+		// Button btnHide = new Button(group, SWT.NONE);
+		// btnHide.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true,
+		// false, 1, 1));
+		// btnHide.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell",
+		// 8, SWT.NORMAL));
+		// btnHide.setText("Hide");
+
+		sashForm.setWeights(new int[] { 128, 270 });
 		sashFormView = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
-		sashFormView.setSashWidth(0);
 
 		SashForm sashForm_4 = new SashForm(sashFormView, SWT.VERTICAL);
 		compositeMatrixView = new Composite(sashForm_4, SWT.NONE);
@@ -652,7 +676,11 @@ public class OcelotlView extends ViewPart {
 		compositeTimeAxisView.setLayout(new FillLayout(SWT.HORIZONTAL));
 		sashForm_4.setWeights(new int[] { 305, 43 });
 
-		final Group groupTime = new Group(sashFormView, SWT.NONE);
+		Composite composite_2 = new Composite(sashFormView, SWT.NONE);
+		composite_2.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		composite_2.setLayout(new FillLayout(SWT.HORIZONTAL));
+
+		final Group groupTime = new Group(composite_2, SWT.BORDER);
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTime.setLayout(new GridLayout(14, false));
@@ -730,7 +758,7 @@ public class OcelotlView extends ViewPart {
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRun.setText("RUN!");
-		sashFormView.setWeights(new int[] { 352, 39 });
+		sashFormView.setWeights(new int[] { 442, 47 });
 		btnRun.addSelectionListener(new GetAggregationAdapter());
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
 		buttonDown.addSelectionListener(new ParameterDownAdapter());
@@ -742,33 +770,8 @@ public class OcelotlView extends ViewPart {
 		btnReset.addSelectionListener(new ResetListener());
 		textTimestampEnd.addModifyListener(new ConfModificationListener());
 		textTimestampStart.addModifyListener(new ConfModificationListener());
-
-		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
-
-		SashForm sashForm_3 = new SashForm(sashForm, SWT.NONE);
-
-		final Composite compositeQualityView = new Composite(sashForm, SWT.NONE);
-		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		final Canvas canvasQualityView = qualityView.initDiagram(compositeQualityView);
-		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
-
-		// canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
-		// canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
-		// canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		SashForm sashForm_2 = new SashForm(sashForm, SWT.VERTICAL);
-
-		// Button btnHide = new Button(group, SWT.NONE);
-		// btnHide.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true,
-		// false, 1, 1));
-		// btnHide.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell",
-		// 8, SWT.NORMAL));
-		// btnHide.setText("Hide");
-
-		sashForm.setWeights(new int[] { 42, 270, 73 });
-		sashForm_1.setWeights(new int[] { 655, 254 });
-		sashFormGlobal.setWeights(new int[] { 98, 395 });
+		sashForm_1.setWeights(new int[] { 254, 655 });
+		sashFormGlobal.setWeights(new int[] { 395 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });
 

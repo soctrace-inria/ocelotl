@@ -25,7 +25,7 @@
             class="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.MatrixParts"
             operator="Matrix"
             time_compatibility="Matrix"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.StateProportionMatrixView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.PartMatrixView">
       </aggregation_operator>
    </extension>
 

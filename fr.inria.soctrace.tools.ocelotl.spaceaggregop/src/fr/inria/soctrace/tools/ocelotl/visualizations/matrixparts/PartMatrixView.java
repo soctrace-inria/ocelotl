@@ -6,11 +6,11 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
 import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion;
 
-public class StateProportionMatrixView extends MatrixView {
+public class PartMatrixView extends MatrixView {
 
 	private PartColorManager colors;
 
-	public StateProportionMatrixView(final OcelotlView ocelotlView) {
+	public PartMatrixView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
 		colors = new PartColorManager();
 	}

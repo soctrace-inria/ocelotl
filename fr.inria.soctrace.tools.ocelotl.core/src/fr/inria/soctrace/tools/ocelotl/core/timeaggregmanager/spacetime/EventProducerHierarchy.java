@@ -126,6 +126,13 @@ public class EventProducerHierarchy {
 			else
 				values= null;
 		}
+		
+		public void setParentValues(Object values) {
+			if (!leaves.containsKey(id))
+				this.values = values;
+			else
+				values= null;
+		}
 		public int setWeight(){
 			if (childrenNodes.isEmpty())
 				return weight;
@@ -228,6 +235,10 @@ public class EventProducerHierarchy {
 	
 	public void setValues(EventProducer ep, Object values){
 			eventProducerNodes.get(ep.getId()).setValues(values);
+	}
+	
+	public void setParentValues(EventProducer ep, Object values){
+		eventProducerNodes.get(ep.getId()).setParentValues(values);
 	}
 
 	public void setParts(int id, List<Integer> parts) {

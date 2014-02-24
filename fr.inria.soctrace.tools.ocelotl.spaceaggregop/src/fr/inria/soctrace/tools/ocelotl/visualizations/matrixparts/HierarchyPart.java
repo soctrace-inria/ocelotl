@@ -47,7 +47,7 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views.Icon
 public class HierarchyPart {
 
 	private int					index;
-	private static final int	Border		= StateProportionMatrixView.Border;
+	private static final int	Border		= PartMatrixView.Border;
 	private static final int	Space		= 2;
 	private EventProducerHierarchy hierarchy;
 	private IFigure				root;
@@ -74,86 +74,9 @@ public class HierarchyPart {
 		logicHeight = hierarchy.getRoot().getWeight();
 		print(hierarchy.getRoot().getID(), 0, (int) logicWidth);
 	}
-//		
-//	
-//		for (final String state : states) {
-//			final double value = ((PartMap) distribution.getPart(index).getData()).getElements().get(state);
-//			if (value > 0) {
-//				// System.out.println("Part " + index + " " + state + " " +
-//				// value);
-//				final RectangleFigure rect = new RectangleFigure();
-//				rect.setBackgroundColor(ColorConstants.white);
-//				rect.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state).getSwtColor());
-//				rect.setForegroundColor(ColorConstants.white);
-//				final Label label = new Label(" " + state + " ");
-//				rect.setToolTip(label);
-//				if (y1 * value / m > MinHeight) {
-//					root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * width / logicWidth + Border), (int) (rootHeight - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * width / logicWidth - space + 1 + Border),
-//							(int) (rootHeight + 1 - y1 * (total + value) / m))));
-//					total += value;
-//				} else {
-//					agg += value;
-//					aggList.add(state);
-//				}
-//				label.getUpdateManager().performUpdate();
-//				rect.getUpdateManager().performUpdate();
-//			}
-//		}
-//		if (agg != 0) {
-//			// System.out.println("Part " + index + " " + "Aggregate" + " " +
-//			// agg);
-//			final ImageFigure icon = new ImageFigure();
-//			final RectangleFigure rectangle = new RectangleFigure();
-//			icon.setBackgroundColor(ColorConstants.black);
-//			icon.setForegroundColor(ColorConstants.white);
-//			rectangle.setBackgroundColor(ColorConstants.black);
-//			rectangle.setForegroundColor(ColorConstants.white);
-//			
-//			
-//			String aggString = " ";
-//			for (int i = 0; i < aggList.size() - 1; i++)
-//				aggString = aggString + aggList.get(i) + " + ";
-//			aggString = aggString + aggList.get(aggList.size() - 1) + " ";
-//			final Label label = new Label(aggString);
-//			icon.setToolTip(label);
-//			rectangle.setToolTip(label);
-//			final PolylineConnection lineDash = new PolylineConnection();
-//			lineDash.setBackgroundColor(ColorConstants.lightGray);
-//			lineDash.setForegroundColor(ColorConstants.lightGray);
-//			lineDash.setLineWidth(2);
-//			lineDash.setLineStyle(SWT.LINE_DASH);
-//				if (y1 * agg /m > MinHeight){
-//					root.add(rectangle, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * width / logicWidth + Border), (int) (rootHeight - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * width / logicWidth - space + 1 + Border),
-//							(int) (rootHeight + 1 - y1 * (total + agg) / m))));
-//				}
-//				else{
-//					int size = (int) Math.min(IconMax,Math.min(width/logicWidth-2*space, (rootHeight - y1 * total / m)));
-//				if (size>IconMin){
-//					icon.setImage(iconManager.getImage(size));
-//
-//					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * width / logicWidth + Border + 1), (int) (rootHeight - y1 * total / m) - 1), new Point((int) (distribution.getPart(index).getEndPart() * width / logicWidth - space + Border), (int) (rootHeight - y1
-//							* (total) / m)- 1));
-//					root.add(lineDash);
-//				root.add(icon, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * width / logicWidth + Border), (int) (rootHeight - y1 * total / m) - 2), new Point((int) (distribution.getPart(index).getEndPart() * width / logicWidth - space + 1 + Border), (int) (rootHeight - y1
-//					* (total) / m)- size - 2)));
-//				}
-//				else{
-//					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * width / logicWidth + Border + 1), (int) (rootHeight - y1 * total / m) - 1), new Point((int) (distribution.getPart(index).getEndPart() * width / logicWidth - space + Border), (int) (rootHeight - y1
-//							* (total) / m)- 1));
-//					root.add(lineDash);
-//				}
-//			
-//				}
-//			label.getUpdateManager().performUpdate();
-//			icon.getUpdateManager().performUpdate();
-//				
-//		}
-//	}
 	
 	public void print(int id, int start, int end){
 		EventProducerNode epn=hierarchy.getEventProducerNodes().get(id);
-		int s=start;
-		int e=end;
 		int size=1;
 		List<Part> parts = new ArrayList<Part>();
 		
