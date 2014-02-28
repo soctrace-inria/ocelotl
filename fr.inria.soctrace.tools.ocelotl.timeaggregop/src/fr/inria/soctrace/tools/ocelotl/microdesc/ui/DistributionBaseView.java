@@ -323,6 +323,12 @@ public abstract class DistributionBaseView extends Dialog implements
 				.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveEventTypes.addSelectionListener(new RemoveSelectionAdapter(
 				listViewerEventTypes));
+		Button btnResetEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
+		btnResetEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnResetEventTypes.setText("Reset");
+		btnResetEventTypes.addSelectionListener(new ResetSelectionAdapter(listViewerEventTypes));
+		btnResetEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		btnResetEventTypes.setImage(null);
 
 		TabItem tbtmNewItem_2 = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem_2.setText("Event Producers");
