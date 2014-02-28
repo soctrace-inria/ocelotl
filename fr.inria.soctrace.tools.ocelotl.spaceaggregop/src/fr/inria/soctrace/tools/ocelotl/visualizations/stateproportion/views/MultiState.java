@@ -123,8 +123,8 @@ public class MultiState {
 			icon.setToolTip(label);
 			rectangle.setToolTip(label);
 			final PolylineConnection lineDash = new PolylineConnection();
-			lineDash.setBackgroundColor(ColorConstants.lightGray);
-			lineDash.setForegroundColor(ColorConstants.lightGray);
+			lineDash.setBackgroundColor(ColorConstants.black);
+			lineDash.setForegroundColor(ColorConstants.black);
 			lineDash.setLineWidth(2);
 			lineDash.setLineStyle(SWT.LINE_DASH);
 				if (y1 * agg /m > MinHeight){
