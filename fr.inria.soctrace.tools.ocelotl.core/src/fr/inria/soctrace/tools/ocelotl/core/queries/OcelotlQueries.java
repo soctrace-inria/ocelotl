@@ -62,94 +62,6 @@ public class OcelotlQueries {
 		return eplist;
 	}
 
-	public List<EventProxy> getAllEventProxies() throws SoCTraceException {
-		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-		final List<EventProxy> elist = traceSearch.getEventProxies(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
-		traceSearch.uninitialize();
-		return elist;
-	}
-
-	public List<Event> getAllEvents() throws SoCTraceException {
-		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-		final List<Event> elist = traceSearch.getEvents(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
-		traceSearch.uninitialize();
-		return elist;
-	}
-
-	public List<GenericReducedEvent> getAllReducedEvents() throws SoCTraceException {
-		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-		final List<GenericReducedEvent> elist = traceSearch.getReducedEvents(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
-		traceSearch.uninitialize();
-		return elist;
-	}
-
-	public List<Event> getAllStates() throws SoCTraceException {
-		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-		final List<Event> elist = traceSearch.getStates(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
-		traceSearch.uninitialize();
-		return elist;
-	}
-
-	public List<EventProxy> getEventProxies(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getAllEventProxies();
-		else {
-			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-			final List<EventProxy> elist = traceSearch.getEventProxies(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
-			traceSearch.uninitialize();
-			return elist;
-		}
-	}
-
-	public List<Event> getEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getAllEvents();
-		else {
-			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-			final List<Event> elist = traceSearch.getEvents(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
-			traceSearch.uninitialize();
-			return elist;
-		}
-	}
-
-//	public List<Event> getEventsLight(final List<EventProducer> eventProducers) throws SoCTraceException {
-//		if (eventProducers.size() == getAllEventProducers().size())
-//			return getAllEvents();
-//		else {
-//			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-//			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-//			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-//			final List<Event> elist = traceSearch.getEventsLight(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
-//			traceSearch.uninitialize();
-//			return elist;
-//		}
-//	}
-
-	public List<GenericReducedEvent> getReducedEvents(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getAllReducedEvents();
-		else {
-			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-			final List<GenericReducedEvent> elist = traceSearch.getReducedEvents(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
-			traceSearch.uninitialize();
-			return elist;
-		}
-	}
-
 	public EventIterator getStateIterator() throws SoCTraceException {
 		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
 		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
@@ -194,30 +106,5 @@ public class OcelotlQueries {
 		}
 	}
 
-	public List<EventProxy> getStateProxies(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getAllEventProxies();
-		else {
-			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-			final List<EventProxy> elist = traceSearch.getStateProxies(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
-			traceSearch.uninitialize();
-			return elist;
-		}
-	}
-
-	public List<Event> getStates(final List<EventProducer> eventProducers) throws SoCTraceException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getAllStates();
-		else {
-			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-			final List<Event> elist = traceSearch.getStates(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
-			traceSearch.uninitialize();
-			return elist;
-		}
-	}
 
 }
