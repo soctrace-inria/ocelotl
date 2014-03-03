@@ -110,7 +110,7 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 		}
 	}
 
-	public void matrixPushType(final int incr, final EventProducer ep, final String key, final Map<Long, Long> distrib) {
+	public void matrixPushType(final int incr, final EventProducer ep, final String key) {
 		matrix.get(incr).get(ep).put(key, 0L);
 	}
 

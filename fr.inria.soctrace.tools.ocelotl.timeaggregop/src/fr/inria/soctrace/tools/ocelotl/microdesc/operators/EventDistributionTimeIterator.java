@@ -36,7 +36,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
 
-public class StateDistributionTimeIterator extends _3DMicroDescription {
+public class EventDistributionTimeIterator extends _3DMicroDescription {
 
 	class OcelotlThread extends Thread {
 
@@ -53,18 +53,25 @@ public class StateDistributionTimeIterator extends _3DMicroDescription {
 
 			start();
 		}
-
-		private void matrixUpdate(final IState state, final EventProducer ep, final Map<Long, Long> distrib) {
+		
+		private void matrixWrite(final long slice, final EventProducer ep, String type) {
 			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(state.getStateType())) {
-					System.out.println("Adding " + state.getStateType() + " state");
+				matrix.get((int) slice).get(ep).put(type, matrix.get((int) slice).get(ep).get(type) + 1);
+			}
+
+		}
+
+		private void matrixUpdate(final Event event, final EventProducer ep) {
+			synchronized (matrix) {
+				if (!matrix.get(0).get(ep).containsKey(event.getType().getName())) {
+					System.out.println("Adding " + event.getType().getName() + " state");
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr).keySet())
-							matrixPushType(incr, epset, state.getStateType());
+							matrixPushType(incr, epset, event.getType().getName());
 				}
-				for (final long it : distrib.keySet())
-					matrixWrite(it, ep, state.getStateType(), distrib);
+				final long slice = timeSliceManager.getTimeSlice(event.getTimestamp());
+					matrixWrite(slice, ep, event.getType().getName());
 			}
 		}
 
@@ -74,11 +81,9 @@ public class StateDistributionTimeIterator extends _3DMicroDescription {
 				final List<Event> events = getEvents(size);
 				if (events.size() == 0)
 					break;
-				IState state;
 				for (final Event event : events) {
-					state = new GenericState(event, timeSliceManager);
-					final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
-					matrixUpdate(state, event.getEventProducer(), distrib);
+					//final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+					matrixUpdate(event, event.getEventProducer());
 				}
 			}
 		}
@@ -86,11 +91,11 @@ public class StateDistributionTimeIterator extends _3DMicroDescription {
 
 	EventIterator	it;
 
-	public StateDistributionTimeIterator() throws SoCTraceException {
+	public EventDistributionTimeIterator() throws SoCTraceException {
 		super();
 	}
 
-	public StateDistributionTimeIterator(final OcelotlParameters parameters) throws SoCTraceException {
+	public EventDistributionTimeIterator(final OcelotlParameters parameters) throws SoCTraceException {
 		super(parameters);
 	}
 
@@ -98,7 +103,7 @@ public class StateDistributionTimeIterator extends _3DMicroDescription {
 	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
 		dm = new DeltaManager();
 		dm.start();
-		it = ocelotlQueries.getStateIterator(eventProducers);
+		it = ocelotlQueries.getEventIterator(eventProducers);
 		// eventsNumber = fullEvents.size();
 		// dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " +
 		// fullEvents.size() + " Events");

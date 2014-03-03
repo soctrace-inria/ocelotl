@@ -54,7 +54,7 @@ public class EventDistribution extends _2DMicroDescription {
 
 		private void matrixWrite(final long slice, final EventProducer ep) {
 			synchronized (matrix) {
-				matrix.get((int) slice).put(ep, matrix.get((int) slice).get(ep.getName()) + 1);
+				matrix.get((int) slice).put(ep, matrix.get((int) slice).get(ep) + 1);
 			}
 
 		}

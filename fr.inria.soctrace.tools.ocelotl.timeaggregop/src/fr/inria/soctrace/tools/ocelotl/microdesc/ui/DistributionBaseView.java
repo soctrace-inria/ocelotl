@@ -21,6 +21,8 @@ package fr.inria.soctrace.tools.ocelotl.microdesc.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -193,16 +195,26 @@ public abstract class DistributionBaseView extends Dialog implements
 			viewer.refresh(false);
 		}
 	}
+	
+
 
 	private class TypesSelectionAdapter extends SelectionAdapter {
 
 		// all - input
-		java.util.List<Object> diff(final java.util.List<EventType> all,
+		java.util.List<EventType> diff(final java.util.List<EventType> all,
 				final java.util.List<EventType> input) {
-			final java.util.List<Object> tmp = new LinkedList<>();
-			for (final Object oba : all)
+			final java.util.List<EventType> tmp = new ArrayList<>();
+			for (final EventType oba : all)
 				tmp.add(oba);
 			tmp.removeAll(input);
+			Collections.sort(tmp, new Comparator<EventType>() {
+
+				@Override
+				public int compare(EventType arg0, EventType arg1) {
+					return arg0.getName().compareToIgnoreCase(arg1.getName());
+				}
+				
+			});
 			return tmp;
 		}
 
@@ -211,9 +223,8 @@ public abstract class DistributionBaseView extends Dialog implements
 			if (ocelotlView.getConfDataLoader().getCurrentTrace() == null)
 				return;
 			final ListSelectionDialog dialog = new ListSelectionDialog(
-					getShell(), diff(
-							ocelotlView.getConfDataLoader().getTypes(),
-							config.getTypes()), new ArrayContentProvider(),
+					getShell(), diff(getEventTypes(), config.getTypes()
+), new ArrayContentProvider(),
 					new EventTypeLabelProvider(), "Select Event Types");
 			if (dialog.open() == Window.CANCEL)
 				return;
@@ -222,6 +233,8 @@ public abstract class DistributionBaseView extends Dialog implements
 			listViewerEventTypes.setInput(config.getTypes());
 		}
 	}
+	
+	
 
 	protected OcelotlView ocelotlView;
 
@@ -492,6 +505,10 @@ public abstract class DistributionBaseView extends Dialog implements
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText("Microscopic Description Settings");
+	}
+	
+	protected java.util.List<EventType> getEventTypes(){
+		return ocelotlView.getConfDataLoader().getTypes();
 	}
 
 }

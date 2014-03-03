@@ -19,8 +19,11 @@
 
 package fr.inria.soctrace.tools.ocelotl.microdesc.ui;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.widgets.Shell;
 
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
 
 public class StateDistributionView extends DistributionBaseView {
@@ -36,5 +39,13 @@ public class StateDistributionView extends DistributionBaseView {
 				if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory() == EventCategory.STATE)
 					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
 		listViewerEventTypes.setInput(config.getTypes());
+	}
+	
+	protected java.util.List<EventType> getEventTypes(){
+		java.util.List<EventType> types = new ArrayList<EventType>();
+		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
+			if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory() == EventCategory.STATE)
+				types.add(ocelotlView.getConfDataLoader().getTypes().get(i));
+		return types;
 	}
 }

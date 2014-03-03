@@ -297,6 +297,58 @@ public class OcelotlTraceSearch extends TraceSearch {
 		SimpleCondition d2 = null;
 
 		if (region != null) {
+			if (traceDB.getMaxTimestamp() != region.getTimeStampEnd())
+				and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd())));
+			if (traceDB.getMinTimestamp() != region.getTimeStampStart())
+				and.addCondition(new SimpleCondition("TIMESTAMP", ComparisonOperation.GE, Long.toString(region.getTimeStampStart())));
+		}
+		
+//		if (and.getNumberOfConditions() == 1)
+//			and.addCondition(new SimpleCondition("CATEGORY", ComparisonOperation.EQ, String.valueOf(EventCategory.)));
+		if (and.getNumberOfConditions() >= 2)
+			query.setElementWhere(and);
+		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+		query.setLoadParameters(false);
+		// traceDB.close();
+		return query.getIterator();
+	}
+	
+	public EventIterator getEventIterator(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
+		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+
+		// types
+		if (eventTypes != null) {
+			if (eventTypes.size() == 0)
+				return null;
+			final ValueListString vls = new ValueListString();
+			for (final EventType et : eventTypes)
+				vls.addValue(String.valueOf(et.getId()));
+			query.setTypeWhere(new SimpleCondition("EVENT_TYPE_ID", ComparisonOperation.IN, vls.getValueString()));
+		}
+
+		// eventProducers
+		if (eventProducers != null) {
+			if (eventProducers.size() == 0)
+				return null;
+			final ValueListString vls = new ValueListString();
+			for (final EventProducer ep : eventProducers)
+				vls.addValue(String.valueOf(ep.getId()));
+			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID", ComparisonOperation.IN, vls.getValueString()));
+		}
+
+		// intervals
+		final LogicalCondition ort = new LogicalCondition(LogicalOperation.OR);
+		final LogicalCondition andt = new LogicalCondition(LogicalOperation.AND);
+		final LogicalCondition andd = new LogicalCondition(LogicalOperation.AND);
+		SimpleCondition t1 = null;
+		SimpleCondition t2 = null;
+		SimpleCondition d1 = null;
+		SimpleCondition d2 = null;
+
+		if (region != null) {
 			if (traceDB.getMaxTimestamp() > region.getTimeStampEnd())
 				t2 = new SimpleCondition("TIMESTAMP", ComparisonOperation.LE, Long.toString(region.getTimeStampEnd()));
 			if (traceDB.getMinTimestamp() < region.getTimeStampStart()) {

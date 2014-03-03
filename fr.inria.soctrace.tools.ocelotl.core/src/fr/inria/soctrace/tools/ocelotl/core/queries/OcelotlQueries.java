@@ -171,6 +171,28 @@ public class OcelotlQueries {
 			return it;
 		}
 	}
+	
+	public EventIterator getEventIterator() throws SoCTraceException {
+		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
+		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+		final EventIterator it = traceSearch.getEventIterator(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
+		// traceSearch.uninitialize();
+		return it;
+	}
+
+	public EventIterator getEventIterator(final List<EventProducer> eventProducers) throws SoCTraceException {
+		if (eventProducers.size() == getAllEventProducers().size())
+			return getStateIterator();
+		else {
+			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch().initialize();
+			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion().getTimeStampStart(), ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+			final EventIterator it = traceSearch.getEventIterator(ocelotlParameters.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers);
+			// traceSearch.uninitialize();
+			return it;
+		}
+	}
 
 	public List<EventProxy> getStateProxies(final List<EventProducer> eventProducers) throws SoCTraceException {
 		if (eventProducers.size() == getAllEventProducers().size())
