@@ -27,6 +27,7 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
@@ -36,7 +37,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
 
-public class StateDistributionTimeIterator extends _3DMicroDescription {
+public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
 	class OcelotlThread extends Thread {
 
@@ -61,7 +62,7 @@ public class StateDistributionTimeIterator extends _3DMicroDescription {
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr).keySet())
-							matrixPushType(incr, epset, state.getStateType());
+							matrixPushType(incr, epset, state.getStateType(), distrib);
 				}
 				for (final long it : distrib.keySet())
 					matrixWrite(it, ep, state.getStateType(), distrib);
@@ -86,11 +87,11 @@ public class StateDistributionTimeIterator extends _3DMicroDescription {
 
 	EventIterator	it;
 
-	public StateDistributionTimeIterator() throws SoCTraceException {
+	public StateDistributionSpaceTime() throws SoCTraceException {
 		super();
 	}
 
-	public StateDistributionTimeIterator(final OcelotlParameters parameters) throws SoCTraceException {
+	public StateDistributionSpaceTime(final OcelotlParameters parameters) throws SoCTraceException {
 		super(parameters);
 	}
 

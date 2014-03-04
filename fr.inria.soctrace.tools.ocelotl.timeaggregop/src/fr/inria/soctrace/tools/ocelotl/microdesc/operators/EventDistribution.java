@@ -36,7 +36,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
 
-public class EventDistributionTimeIterator extends _3DMicroDescription {
+public class EventDistribution extends _3DMicroDescription {
 
 	class OcelotlThread extends Thread {
 
@@ -91,11 +91,11 @@ public class EventDistributionTimeIterator extends _3DMicroDescription {
 
 	EventIterator	it;
 
-	public EventDistributionTimeIterator() throws SoCTraceException {
+	public EventDistribution() throws SoCTraceException {
 		super();
 	}
 
-	public EventDistributionTimeIterator(final OcelotlParameters parameters) throws SoCTraceException {
+	public EventDistribution(final OcelotlParameters parameters) throws SoCTraceException {
 		super(parameters);
 	}
 

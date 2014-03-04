@@ -6,7 +6,7 @@
          name="GenericTimeAggregationOperators"
          point="fr.inria.soctrace.tools.ocelotl.core.microscopicdescription">
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistributionTimeIterator"
+            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistribution"
             generic="true"
             operator="Event Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
@@ -15,7 +15,7 @@
             trace_formats="ALL">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionTimeIterator"
+            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistribution"
             generic="true"
             operator="State Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
@@ -24,9 +24,9 @@
             trace_formats="ALL">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionSpaceTimeIterator"
+            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionSpaceTime"
             generic="true"
-            operator="State Distribution (2D)"
+            operator="State Distribution Tree"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.StateDistributionView"
             spatial_compatibility="Matrix"
