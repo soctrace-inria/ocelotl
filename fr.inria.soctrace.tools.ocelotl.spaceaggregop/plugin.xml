@@ -14,12 +14,12 @@
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartTimeLineView">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion"
-            operator="State Proportion"
-            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.config.StateProportionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.config.ManageColorsDialog"
-            time_compatibility="StateProportion"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views.StateProportionTimeLineView">
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion"
+            operator="Proportion"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
+            time_compatibility="Proportion"
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.StateProportionTimeLineView">
       </aggregation_operator>
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.MatrixParts"

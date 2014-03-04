@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views;
+package fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views;
 
 import java.io.File;
 import java.io.IOException;

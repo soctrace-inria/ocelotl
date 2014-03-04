@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.config;
+package fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,14 +25,14 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
-import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views.StateColorManager;
+import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.StateColorManager;
 
-public class StateProportionConfig implements ISpaceConfig {
+public class ProportionConfig implements ISpaceConfig {
 
 	private List<EventType>	types	= new LinkedList<EventType>();
 	private StateColorManager colors;
 
-	public StateProportionConfig() {
+	public ProportionConfig() {
 		super();
 	}
 

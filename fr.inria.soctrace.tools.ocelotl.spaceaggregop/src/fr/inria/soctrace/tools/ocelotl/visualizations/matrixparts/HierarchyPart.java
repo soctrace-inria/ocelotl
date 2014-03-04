@@ -41,8 +41,8 @@ import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion;
-import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views.IconManager;
+import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
+import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.IconManager;
 
 public class HierarchyPart {
 

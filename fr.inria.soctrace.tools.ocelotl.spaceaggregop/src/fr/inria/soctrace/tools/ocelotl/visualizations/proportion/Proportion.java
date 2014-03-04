@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion;
+package fr.inria.soctrace.tools.ocelotl.visualizations.proportion;
 
 import java.util.List;
 
@@ -28,18 +28,18 @@ import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 
-public class StateProportion extends SpaceTAggregationOperator {
+public class Proportion extends SpaceTAggregationOperator {
 
 	public final static String	descriptor	= "State Distribution";
 	private List<String>		states;
 	private double				max;
 
-	public StateProportion() {
+	public Proportion() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public StateProportion(final OcelotlCore ocelotlCore) {
+	public Proportion(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
 		// TODO Auto-generated constructor stub
 	}

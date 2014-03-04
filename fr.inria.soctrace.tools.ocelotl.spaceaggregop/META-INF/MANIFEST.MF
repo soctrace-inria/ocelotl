@@ -22,8 +22,8 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.visualizations;uses:="org.eclips
    org.eclipse.swt.graphics,
    org.eclipse.draw2d,
    fr.inria.soctrace.tools.ocelotl.ui.views.timelineview",
- fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
- fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views;
+ fr.inria.soctrace.tools.ocelotl.visualizations.proportion;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
+ fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views;
   uses:="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion,
    fr.inria.soctrace.tools.ocelotl.ui.views,
    org.eclipse.draw2d,

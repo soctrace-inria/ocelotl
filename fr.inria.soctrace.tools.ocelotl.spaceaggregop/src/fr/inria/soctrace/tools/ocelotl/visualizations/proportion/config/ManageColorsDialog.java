@@ -8,7 +8,7 @@
  * Contributors:
  *     Generoso Pagano - initial API and implementation
  ******************************************************************************/
-package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.config;
+package fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -121,7 +121,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 
 	private OcelotlView ocelotlView;
 
-	private StateProportionConfig config;
+	private ProportionConfig config;
 	private final static String ET_NAME="Event Types";
 			
 	/**
@@ -374,7 +374,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 	@Override
 	public void init(OcelotlView ocelotlView, ISpaceConfig config) {
 		this.ocelotlView = ocelotlView;
-		this.config = (StateProportionConfig) config;
+		this.config = (ProportionConfig) config;
 		
 	}
 } 

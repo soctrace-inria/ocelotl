@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.config;
+package fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -47,7 +47,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.IVisualizationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 
-public class StateProportionConfigView extends Dialog implements IVisualizationWindow {
+public class ProportionConfigView extends Dialog implements IVisualizationWindow {
 
 	private class EventTypeLabelProvider extends LabelProvider {
 
@@ -76,9 +76,9 @@ public class StateProportionConfigView extends Dialog implements IVisualizationW
 
 	protected ListViewer			listViewerEventTypes;
 
-	protected StateProportionConfig	config;
+	protected ProportionConfig	config;
 
-	public StateProportionConfigView(final Shell shell) {
+	public ProportionConfigView(final Shell shell) {
 		super(shell);
 		ocelotlView = null;
 		config = null;
@@ -149,7 +149,7 @@ public class StateProportionConfigView extends Dialog implements IVisualizationW
 	@Override
 	public void init(final OcelotlView ocelotlView, final ISpaceConfig config) {
 		this.ocelotlView = ocelotlView;
-		this.config = (StateProportionConfig) config;
+		this.config = (ProportionConfig) config;
 	}
 
 	private void setParameters() {

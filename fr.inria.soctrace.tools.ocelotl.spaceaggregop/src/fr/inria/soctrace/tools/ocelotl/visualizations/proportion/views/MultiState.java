@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views;
+package fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,7 @@ import org.eclipse.swt.SWT;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion;
+import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 
 public class MultiState {
 
@@ -46,11 +46,11 @@ public class MultiState {
 	private static final int			IconMin		= 6;
 	private static final int			IconMax		= 32;
 	private int					space		= 6;
-	private StateProportion		distribution;
+	private Proportion		distribution;
 	private IFigure				root;
 	private IconManager 		iconManager;
 
-	public MultiState(final int index, final StateProportion distribution, final IFigure root, final int space) {
+	public MultiState(final int index, final Proportion distribution, final IFigure root, final int space) {
 		super();
 		setIndex(index);
 		this.distribution = distribution;
@@ -127,6 +127,7 @@ public class MultiState {
 			lineDash.setForegroundColor(ColorConstants.black);
 			lineDash.setLineWidth(2);
 			lineDash.setLineStyle(SWT.LINE_DASH);
+			lineDash.setToolTip(label);
 				if (y1 * agg /m > MinHeight){
 					root.add(rectangle, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border),
 							(int) (y0 + 1 - y1 * (total + agg) / m))));

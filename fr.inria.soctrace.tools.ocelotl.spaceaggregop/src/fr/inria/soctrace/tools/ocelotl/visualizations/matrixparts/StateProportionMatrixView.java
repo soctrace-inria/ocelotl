@@ -4,7 +4,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.MatrixView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion;
+import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 
 public class StateProportionMatrixView extends MatrixView {
 

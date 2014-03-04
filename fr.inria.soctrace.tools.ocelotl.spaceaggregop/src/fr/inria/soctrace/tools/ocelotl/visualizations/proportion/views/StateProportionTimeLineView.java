@@ -1,10 +1,10 @@
-package fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.views;
+package fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views;
 
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceTAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
-import fr.inria.soctrace.tools.ocelotl.visualizations.stateproportion.StateProportion;
+import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 
 public class StateProportionTimeLineView extends TimeLineView {
 
@@ -20,7 +20,7 @@ public class StateProportionTimeLineView extends TimeLineView {
 				Space = Space - 1;
 			for (int i = 0; i < ((ISpaceTAggregationOperator) ocelotlView.getCore().getSpaceOperator()).getPartNumber(); i++) {
 				// TODO manage parts
-				final MultiState part = new MultiState(i, (StateProportion) ocelotlView.getCore().getSpaceOperator(), root, Space);
+				final MultiState part = new MultiState(i, (Proportion) ocelotlView.getCore().getSpaceOperator(), root, Space);
 				part.init();
 			}
 
