@@ -21,12 +21,6 @@
             time_compatibility="Proportion"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.StateProportionTimeLineView">
       </aggregation_operator>
-      <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.MatrixParts"
-            operator="Matrix"
-            time_compatibility="Matrix"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.PartMatrixView">
-      </aggregation_operator>
    </extension>
 
 </plugin>
