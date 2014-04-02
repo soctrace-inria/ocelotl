@@ -76,7 +76,6 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 			resetTime = new TimeRegion(time);
 			selectTime = new TimeRegion(time);
 		}
-		Space = 6;
 		computeDiagram();
 	}
 	

@@ -281,7 +281,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
     	saveColors();
     	ColorsChangeDescriptor des = new ColorsChangeDescriptor();
     	des.setEntity(entity);
-    	FramesocBus.getInstance().post(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED, des);
+    	FramesocBus.getInstance().send(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED, des);
     	super.okPressed();
     }
     

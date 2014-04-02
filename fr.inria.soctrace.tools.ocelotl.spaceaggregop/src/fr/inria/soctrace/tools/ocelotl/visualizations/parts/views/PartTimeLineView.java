@@ -24,19 +24,16 @@ public class PartTimeLineView extends TimeLineView {
 	@Override
 	protected void computeDiagram() {
 		final int partHeight = (int) (root.getSize().height / 1.1 - Border);
-		if (parts != null) {
-			while ((root.getSize().width - 2 * Border) / parts.size() - 2 < Space && Space != 0)
-				Space = Space - 1;
-			if (!config.isAggregated())
+		if (!config.isAggregated())
 				for (int i = 0; i < parts.size(); i++) {
 					final PartFigure part = new PartFigure(i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()), config.isNumbers());
 					figures.add(part);
-					root.add(part, new Rectangle(new Point(i * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height / 2 - partHeight / 2), new Point((i + 1) * (root.getSize().width - 2 * Border) / parts.size() + Border - Space,
+					root.add(part, new Rectangle(new Point(i * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height / 2 - partHeight / 2), new Point((i + 1) * (root.getSize().width - 2 * Border) / parts.size() + Border - space,
 							root.getSize().height / 2 + partHeight / 2)));
 					part.getUpdateManager().performUpdate();
 					part.init();
 				}
-			else {
+		else {
 				final List<Integer> aggParts = new ArrayList<Integer>();
 				for (int i = 0; i <= parts.get(parts.size() - 1); i++)
 					aggParts.add(0);
@@ -49,7 +46,7 @@ public class PartTimeLineView extends TimeLineView {
 					figures.add(part);
 					root.add(
 							part,
-							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - Space + Border, 0 + root
+							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - space + Border, 0 + root
 									.getSize().height / 10)));
 					j = j + aggParts.get(i);
 					part.getUpdateManager().performUpdate();
@@ -58,6 +55,6 @@ public class PartTimeLineView extends TimeLineView {
 			}
 		}
 
-	}
+	
 
 }

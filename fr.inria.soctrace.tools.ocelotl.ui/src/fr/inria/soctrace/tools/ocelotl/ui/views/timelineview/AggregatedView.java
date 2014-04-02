@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
@@ -47,6 +46,32 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 abstract public class AggregatedView implements IAggregatedView {
+	
+	protected Figure						root;
+	protected Canvas						canvas;
+	protected final List<RectangleFigure>	figures	= new ArrayList<RectangleFigure>();
+
+	protected TimeRegion					time;
+
+	protected TimeRegion					selectTime;
+
+	protected TimeRegion					resetTime;
+
+	public final static int					Border	= 10;
+
+	protected final int						Space	= 3;
+
+	protected final OcelotlView				ocelotlView;
+
+	private SelectFigure					selectFigure;
+	
+
+	public final static Color	selectColorFG	= ColorConstants.blue;
+
+	public final static Color	selectColorBG	= ColorConstants.lightGray;
+
+	public final static Color	activeColorFG	= ColorConstants.black;
+	public final static Color	activeColorBG	= ColorConstants.darkBlue;
 
 	private class SelectFigure extends RectangleFigure {
 
@@ -78,7 +103,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	}
 
 	static public enum State {
-		PRESSED_D, DRAG_D, PRESSED_G, RELEASED;
+		PRESSED_D, DRAG_D, PRESSED_G, DRAG_G, RELEASED;
 	}
 
 	class TimeMouseListener implements MouseListener, MouseMotionListener {
@@ -94,8 +119,8 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseDragged(final MouseEvent arg0) {
-			if ((state == State.PRESSED_D || state == State.DRAG_D) && arg0.getLocation().getDistance(currentPoint) > 10) {
-				state = State.DRAG_D;
+			if ((state == State.PRESSED_G || state == State.DRAG_G) && arg0.getLocation().getDistance(currentPoint) > 10) {
+				state = State.DRAG_G;
 				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
 				p3 = Math.max(p3, resetTime.getTimeStampStart());
 				p3 = Math.min(p3, resetTime.getTimeStampEnd());
@@ -144,7 +169,8 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mousePressed(final MouseEvent arg0) {
-			state = State.PRESSED_D;
+			if(arg0.button==1){
+			state = State.PRESSED_G;
 			long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
 			p3 = Math.max(p3, resetTime.getTimeStampStart());
 			p3 = Math.min(p3, resetTime.getTimeStampEnd());
@@ -154,10 +180,12 @@ abstract public class AggregatedView implements IAggregatedView {
 			ocelotlView.setTimeRegion(selectTime);
 			ocelotlView.getTimeAxisView().select(selectTime, false);
 			selectFigure.draw(selectTime, false);
+			}
 		}
 
 		@Override
 		public void mouseReleased(final MouseEvent arg0) {
+			if (state == State.PRESSED_G || state == State.DRAG_G){
 			state = State.RELEASED;
 			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
 				ocelotlView.getTimeAxisView().select(selectTime, true);
@@ -169,16 +197,11 @@ abstract public class AggregatedView implements IAggregatedView {
 				root.repaint();
 			}
 			selectTime = new TimeRegion(resetTime);
+			}
 		}
 
 	}
 
-	public final static Color	selectColorFG	= ColorConstants.blue;
-
-	public final static Color	selectColorBG	= ColorConstants.lightGray;
-
-	public final static Color	activeColorFG	= ColorConstants.black;
-	public final static Color	activeColorBG	= ColorConstants.darkBlue;
 
 	public static Color getActivecolorbg() {
 		return activeColorBG;
@@ -200,23 +223,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		return selectColorFG;
 	}
 
-	protected Figure						root;
-	protected Canvas						canvas;
-	protected final List<RectangleFigure>	figures	= new ArrayList<RectangleFigure>();
 
-	protected TimeRegion					time;
-
-	protected TimeRegion					selectTime;
-
-	protected TimeRegion					resetTime;
-
-	public final static int					Border	= 10;
-
-	protected int							Space	= 4;
-
-	protected final OcelotlView				ocelotlView;
-
-	private SelectFigure					selectFigure;
 
 	public AggregatedView(final OcelotlView ocelotlView) {
 		super();
@@ -235,6 +242,11 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public Canvas getCanvas() {
 		return canvas;
+	}
+
+	@Override
+	public long getEnd() {
+		return selectTime.getTimeStampEnd();
 	}
 
 	public List<RectangleFigure> getFigures() {
@@ -263,6 +275,12 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public int getSpace() {
 		return Space;
+	}
+
+	@Override
+	public long getStart() {
+		return selectTime.getTimeStampStart();
+
 	}
 
 	public TimeRegion getTime() {
@@ -297,16 +315,5 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
 	}
-
-
-	
-	public long getStart(){
-			return selectTime.getTimeStampStart();
-		
-	}
-
-public long getEnd(){
-	return selectTime.getTimeStampEnd();
-}
 
 }

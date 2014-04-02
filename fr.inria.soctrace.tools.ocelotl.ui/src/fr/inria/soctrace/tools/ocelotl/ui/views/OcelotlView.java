@@ -382,7 +382,7 @@ public class OcelotlView extends ViewPart {
 
 				des.setStartTimestamp(getTimeRegion().getTimeStampStart());
 				des.setEndTimestamp(getTimeRegion().getTimeStampEnd());
-				FramesocBus.getInstance().post(FramesocBusTopic.TOPIC_UI_HISTOGRAM_INTERVAL_DISPLAY_GANTT, des);
+				FramesocBus.getInstance().send(FramesocBusTopic.TOPIC_UI_GANTT_DISPLAY_TIME_INTERVAL, des);
 			}
 		};
 		return showGantt;
@@ -405,9 +405,6 @@ public class OcelotlView extends ViewPart {
 	private final OcelotlParameters		ocelotlParameters;
 	private Text						textRun;
 	private QualityView					qualityView;
-	private Spinner						spinnerDivideDbQuery;
-	private Spinner						spinnerThread;
-	private Spinner						spinnerEventSize;
 	private Spinner						spinnerTSNumber;
 	private Text						textThreshold;
 	private TimeAxisView				timeAxisView;
@@ -419,17 +416,11 @@ public class OcelotlView extends ViewPart {
 	private Button						buttonDown;
 	private Button						buttonUp;
 	private Combo						comboSpace;
-	private Button						btnRemoveEventProducer;
-	private Canvas						canvasMatrixView;
 	private final TimeLineViewManager	timeLineViewManager;
 	private Composite					compositeMatrixView;
 	private SashForm					sashFormView;
 	private TimeLineViewWrapper			timeLineViewWrapper;
-	private Button						btnAddAllEventProducer;
 	private Button						btnSettings2;
-
-	// private Control canvasTimeAxisView;
-	// private Control //canvasQualityView;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -475,15 +466,16 @@ public class OcelotlView extends ViewPart {
 		sashFormView = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 
 		SashForm sashForm_4 = new SashForm(sashFormView, SWT.VERTICAL);
+		sashForm_4.setSashWidth(0);
 		compositeMatrixView = new Composite(sashForm_4, SWT.NONE);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
-		canvasMatrixView = timeLineViewWrapper.init(compositeMatrixView);
+		timeLineViewWrapper.init(compositeMatrixView);
 		compositeMatrixView.setLayout(new FillLayout(SWT.HORIZONTAL));
 		final Composite compositeTimeAxisView = new Composite(sashForm_4, SWT.NONE);
 		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		final Canvas canvasTimeAxisView = timeAxisView.initDiagram(compositeTimeAxisView);
+		timeAxisView.initDiagram(compositeTimeAxisView);
 		compositeTimeAxisView.setLayout(new FillLayout(SWT.HORIZONTAL));
 		sashForm_4.setWeights(new int[] { 305, 43 });
 
@@ -746,17 +738,9 @@ public class OcelotlView extends ViewPart {
 		final Composite compositeQualityView = new Composite(sashForm, SWT.NONE);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		final Canvas canvasQualityView = qualityView.initDiagram(compositeQualityView);
+		qualityView.initDiagram(compositeQualityView);
 		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
-
-		// Button btnHide = new Button(group, SWT.NONE);
-		// btnHide.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true,
-		// false, 1, 1));
-		// btnHide.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell",
-		// 8, SWT.NORMAL));
-		// btnHide.setText("Hide");
-
-		sashForm.setWeights(new int[] { 128, 270 });
+		sashForm.setWeights(new int[] {196, 293});
 		btnRun.addSelectionListener(new GetAggregationAdapter());
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
 		buttonDown.addSelectionListener(new ParameterDownAdapter());
