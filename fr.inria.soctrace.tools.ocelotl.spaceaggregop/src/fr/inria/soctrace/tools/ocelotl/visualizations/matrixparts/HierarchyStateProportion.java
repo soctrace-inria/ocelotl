@@ -97,7 +97,7 @@ public class HierarchyStateProportion {
 		
 		for (Part p:parts){
 			if (((AggregatedData) p.getData()).isAggregated())
-				addRectangle(p.getStartPart(), epn.getIndex(), p.getEndPart(), epn.getWeight(), ((AggregatedData) p.getData()).getValue());
+				addRectangle(p.getStartPart(), epn.getIndex(), p.getEndPart(), epn.getWeight(), ((AggregatedData) p.getData()).getValue(), epn.getMe().getName());
 			else
 				printChildren(id, p.getStartPart(), p.getEndPart());
 		}	
@@ -109,15 +109,15 @@ public class HierarchyStateProportion {
 			print(ep.getID(), start, end);
 	}
 	
-	public void addRectangle(int logicX, int logicY, int sizeX, int sizeY, int number){
+	public void addRectangle(int logicX, int logicY, int sizeX, int sizeY, int number, String name){
 		final RectangleFigure rectangle = new RectangleFigure();
 		rectangle.setBackgroundColor(colors.getColors().get(number).getBg());
 		rectangle.setLineWidth(2);
 		rectangle.setForegroundColor(colors.getColors().get(number).getBg());
-		rectangle.setToolTip(new Label(String.valueOf(number)));
-		int xa=(int) (logicX * width / logicWidth + Border);
+		rectangle.setToolTip(new Label(" "+name+" "));
+		int xa=(int) (((double) logicX * (double) (width / logicWidth)) + Border);
 		int ya=(int) (rootHeight - height + height * logicY / logicHeight);
-		int xb=xa+(int) (sizeX * width / logicWidth + Border)-Space;
+		int xb=xa+(int) ((double) sizeX * ( double) (width / logicWidth) + Border)-Space;
 		int yb=(int) (ya + height * sizeY / logicHeight);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 	}

@@ -34,6 +34,13 @@ public class Part {
 		this.endPart = endPart;
 		this.data = data;
 	}
+	
+	public Part(final int startPart, final IPartData data) {
+		super();
+		this.startPart = startPart;
+		this.endPart = startPart;
+		this.data = data;
+	}
 
 	public IPartData getData() {
 		return data;
@@ -62,6 +69,10 @@ public class Part {
 
 	public void setStartPart(final int startPart) {
 		this.startPart = startPart;
+	}
+	
+	public void incrSize(){
+		endPart++;
 	}
 
 }

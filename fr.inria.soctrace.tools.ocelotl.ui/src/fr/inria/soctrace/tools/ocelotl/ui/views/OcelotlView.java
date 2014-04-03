@@ -441,7 +441,7 @@ public class OcelotlView extends ViewPart {
 		textTimestampEnd.setText("0");
 		btnNormalize.setSelection(false);
 		btnGrowingQualities.setSelection(true);
-		spinnerTSNumber.setSelection(50);
+		spinnerTSNumber.setSelection(20);
 		textRun.setText("1.0");
 		// producers.clear();
 		// types.clear();
