@@ -315,5 +315,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
 	}
+	
+	
 
 }
