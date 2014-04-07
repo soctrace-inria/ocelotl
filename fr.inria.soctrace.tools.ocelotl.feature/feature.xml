@@ -97,14 +97,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          unpack="false"/>
 
    <plugin
-         id="fr.inria.soctrace.tools.ocelotl.spaceaggregop"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="fr.inria.soctrace.tools.ocelotl.timeaggregop"
+         id="fr.inria.soctrace.tools.ocelotl.microdesc"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -112,6 +105,13 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="fr.inria.soctrace.tools.ocelotl.visualizations"
          download-size="0"
          install-size="0"
          version="0.0.0"
