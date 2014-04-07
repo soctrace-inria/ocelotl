@@ -1,11 +1,14 @@
 package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.lib.model.EventType;
 
 public class EventProducerHierarchy {
 	
@@ -102,6 +105,17 @@ public class EventProducerHierarchy {
 		public List<EventProducerNode> getChildrenNodes() {
 			return childrenNodes;
 		}
+		
+		public void sortChildrenNodes() {
+			Collections.sort(childrenNodes, new Comparator<EventProducerNode>() {
+				@Override
+				public int compare(EventProducerNode arg0,
+						EventProducerNode arg1) {
+					return arg0.getMe().getName().compareToIgnoreCase(arg1.getMe().getName());
+				}
+				
+			});
+		}
 
 		public void destroy() {
 			for (EventProducerNode child: childrenNodes){
@@ -149,6 +163,7 @@ public class EventProducerHierarchy {
 			if (this==root){
 				index=0;
 			}
+			sortChildrenNodes();
 			int currentweight=0;
 			for (EventProducerNode e: childrenNodes){
 				e.setIndex(currentweight+index);

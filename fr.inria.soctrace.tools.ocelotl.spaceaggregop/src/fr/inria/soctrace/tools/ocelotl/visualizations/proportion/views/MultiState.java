@@ -45,7 +45,7 @@ public class MultiState {
 	private static final int	MinHeight	= 6;
 	private static final int			IconMin		= 6;
 	private static final int			IconMax		= 32;
-	private int					space		= 6;
+	private int					space		= 2;
 	private Proportion		distribution;
 	private IFigure				root;
 	private IconManager 		iconManager;
@@ -92,9 +92,9 @@ public class MultiState {
 				rect.setForegroundColor(ColorConstants.white);
 				final Label label = new Label(" " + state + " ");
 				rect.setToolTip(label);
-				if (y1 * value / m > MinHeight) {
-					root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border),
-							(int) (y0 + 1 - y1 * (total + value) / m))));
+				if (y1 * value / m - space > MinHeight) {
+					root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border),
+							(int) (y0 + space - y1 * (total + value) / m))));
 					total += value;
 				} else {
 					agg += value;
@@ -128,24 +128,28 @@ public class MultiState {
 			lineDash.setLineWidth(2);
 			lineDash.setLineStyle(SWT.LINE_DASH);
 			lineDash.setToolTip(label);
-				if (y1 * agg /m > MinHeight){
-					root.add(rectangle, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border),
-							(int) (y0 + 1 - y1 * (total + agg) / m))));
+				if (y1 * agg /m - space > MinHeight){
+					root.add(rectangle, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), 
+							new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border),
+							(int) (y0 + space - y1 * (total + agg) / m))));
 				}
 				else{
 					int size = (int) Math.min(IconMax,Math.min(x0/d-2*space, (y0 - y1 * total / m)));
 				if (size>IconMin){
 					icon.setImage(iconManager.getImage(size));
 
-					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m) - 1), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border), (int) (y0 - y1
-							* (total) / m)- 1));
+					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m)), 
+							new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space - 1 + Border), (int) (y0 - y1
+							* (total) / m)));
 					root.add(lineDash);
-				root.add(icon, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m) - 2), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + 1 + Border), (int) (y0 - y1
-					* (total) / m)- size - 2)));
+				root.add(icon, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m) - space), 
+						new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border), (int) (y0 - y1
+					* (total) / m)- size - space)));
 				}
 				else{
-					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m) - 1), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border), (int) (y0 - y1
-							* (total) / m)- 1));
+					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m)), 
+							new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space -1 + Border), (int) (y0 - y1
+							* (total) / m)));
 					root.add(lineDash);
 				}
 			

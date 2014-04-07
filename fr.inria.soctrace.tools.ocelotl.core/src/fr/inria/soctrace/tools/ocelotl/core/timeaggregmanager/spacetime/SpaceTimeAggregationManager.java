@@ -60,6 +60,12 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 		dm.start();
 		timeAggregation.computeParts(ocelotlParameters.getParameter());
 		updateHierarchy();
+		int i=0;
+		for (i=0; i< parameters.size()-1;i++)
+			if (ocelotlParameters.getParameter()==parameters.get(i))
+				break;
+			
+		System.out.println("parameter: "+ocelotlParameters.getParameter()+", gain: "+ qualities.get(i).getGain() +", loss: "+ qualities.get(i).getLoss());
 		dm.end("LPAGGREG - COMPUTE PARTS");
 	}
 

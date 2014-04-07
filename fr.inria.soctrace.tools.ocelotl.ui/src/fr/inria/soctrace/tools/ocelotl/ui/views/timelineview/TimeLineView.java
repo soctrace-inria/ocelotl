@@ -52,10 +52,17 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 
 	
 	protected List<Integer>					parts	= null;
+	protected int	space;
 
 	public TimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
 
+	}
+	
+	private void computeSpace(){
+		space=Space;
+		while ((root.getSize().width - 2 * Border) / parts.size() - space < space && space > 0)
+			space = space - 1;
 	}
 
 	abstract protected void computeDiagram();
@@ -75,8 +82,10 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 			resetTime = new TimeRegion(time);
 			selectTime = new TimeRegion(time);
 		}
-		Space = 6;
-		computeDiagram();
+		if (parts!=null){
+			computeSpace();
+			computeDiagram();
+		}
 	}
 	
 
