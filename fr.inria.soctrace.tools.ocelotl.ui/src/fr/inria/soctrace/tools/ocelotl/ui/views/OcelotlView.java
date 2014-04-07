@@ -474,10 +474,11 @@ public class OcelotlView extends ViewPart {
 		timeLineViewWrapper.init(compositeMatrixView);
 		compositeMatrixView.setLayout(new FillLayout(SWT.HORIZONTAL));
 		final Composite compositeTimeAxisView = new Composite(sashForm_4, SWT.NONE);
-		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		compositeTimeAxisView.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		timeAxisView.initDiagram(compositeTimeAxisView);
-		compositeTimeAxisView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		sashForm_4.setWeights(new int[] { 305, 43 });
+		FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
+		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
+		sashForm_4.setWeights(new int[] {402, 40});
 
 		Composite composite_2 = new Composite(sashFormView, SWT.NONE);
 		composite_2.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
