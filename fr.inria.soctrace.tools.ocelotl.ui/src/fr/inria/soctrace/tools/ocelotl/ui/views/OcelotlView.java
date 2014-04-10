@@ -59,6 +59,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -481,8 +482,30 @@ public class OcelotlView extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
+			Display display = Display.getCurrent();
+		
+	       display.addFilter(SWT.KeyDown, new Listener() {
+
+	            public void handleEvent(Event e) {
+	    			switch(e.keyCode){
+	    			case(SWT.ARROW_LEFT):
+	    				buttonDown.notifyListeners(SWT.Selection, new Event());
+	    				break;
+	    			case(SWT.ARROW_RIGHT):
+	    				buttonUp.notifyListeners(SWT.Selection, new Event());
+	    				break;
+	    			case(SWT.CR):
+	    				btnRun.notifyListeners(SWT.Selection, new Event());
+	    				break;
+	    			case(SWT.ESC):
+	    				btnReset.notifyListeners(SWT.Selection, new Event());
+	    				break;
+	    			}
+	    			
+	    		
+	            }
+	        });
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		parent.addKeyListener(new OcelotlKeyListener());
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		timeAxisView = new TimeAxisView();

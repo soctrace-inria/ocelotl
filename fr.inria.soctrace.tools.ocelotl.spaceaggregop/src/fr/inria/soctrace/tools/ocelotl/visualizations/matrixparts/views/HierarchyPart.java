@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion;
+package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,13 +47,11 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventPro
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.VisualAggregatedData;
-import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
 import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.IconManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.StateColorManager;
 
-public class HierarchyProportion {
+public class HierarchyPart {
 
 	private int					index;
 	private static final int	Border		= PartMatrixView.Border;
@@ -66,17 +64,17 @@ public class HierarchyProportion {
 	private double logicWidth;
 	private double logicHeight;
 	private int minLogicWeight = 3;
+	private PartColorManager colors;
 	private List<Integer> xendlist;
-	private MatrixProportion proportion;
 
-	public HierarchyProportion(MatrixProportion proportion, EventProducerHierarchy hierarchy, final IFigure root, int space) {
+	public HierarchyPart(EventProducerHierarchy hierarchy, final IFigure root, PartColorManager colors, int space) {
 		super();
 		setIndex(index);
 		this.root = root;
 		this.hierarchy = hierarchy;
+		this.colors = colors;
 		xendlist=new ArrayList<Integer>();
 		this.space=space;
-		this.proportion=proportion;
 	}
 
 	private void initX(){
@@ -119,7 +117,7 @@ public class HierarchyProportion {
 		List<Part> parts = computeParts(epn, start, end);
 		for (Part p:parts){
 			if (((VisualAggregatedData) p.getData()).isAggregated())			
-				drawStandardAggregate(p.getStartPart(), epn.getIndex(), p.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn);
+				drawStandardAggregate(p.getStartPart(), epn.getIndex(), p.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn.getMe().getName());
 			else{
 				boolean aggy=false;
 				for (EventProducerNode ep: epn.getChildrenNodes()){
@@ -134,9 +132,9 @@ public class HierarchyProportion {
 					List<Part> aggParts = computeCommonCuts(epn, p.getStartPart(), p.getEndPart());
 					for (Part pagg: aggParts){
 					if (((VisualAggregatedData) pagg.getData()).isNoCutInside())	
-						drawCleanVisualAggregate(pagg.getStartPart(), epn.getIndex(), pagg.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn);
+						drawCleanVisualAggregate(pagg.getStartPart(), epn.getIndex(), pagg.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn.getMe().getName());
 					else
-						drawNotCleanVisualAggregate(pagg.getStartPart(), epn.getIndex(), pagg.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn);
+						drawNotCleanVisualAggregate(pagg.getStartPart(), epn.getIndex(), pagg.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn.getMe().getName());
 
 					}	
 				}
@@ -198,15 +196,13 @@ public class HierarchyProportion {
 			print(ep.getID(), start, end);
 	}
 	
-	private void drawStandardAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, EventProducerNode epn){
+	private void drawStandardAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, String name){
 		final RectangleFigure rectangle = new RectangleFigure();
-		MajState state=proportion.getMajState(epn, logicX, logicX2);
-		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
-		rectangle.setForegroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
-		rectangle.setAlpha(state.getAmplitude255());
+		rectangle.setBackgroundColor(colors.getColors().get(number).getBg());
+		rectangle.setForegroundColor(colors.getColors().get(number).getBg());
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
+		rectangle.setToolTip(new Label(" "+name+" "));
 		int xa=(int) (((double) logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight);
 		int xb=xendlist.get(logicX2);
@@ -214,41 +210,47 @@ public class HierarchyProportion {
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 	}
 	
-	private void drawNotCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, EventProducerNode epn){
+	private void drawNotCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, String name){
 		final RectangleFigure rectangle = new RectangleFigure();
-		MajState state=proportion.getMajState(epn, logicX, logicX2);
-		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setBackgroundColor(ColorConstants.white);
 		rectangle.setForegroundColor(ColorConstants.black);
-		rectangle.setAlpha(state.getAmplitude255());
+		
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
-
+		rectangle.setToolTip(new Label(" "+name+" "));
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
 		Label lab = new Label("?");
 		lab.setTextAlignment(PositionConstants.CENTER);
 		lab.setLabelAlignment(SWT.CENTER);
-		lab.setForegroundColor(ColorConstants.black);
+		lab.setForegroundColor(ColorConstants.red);
 		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
-		rectangle.add(lab, BorderLayout.CENTER);
+		//rectangle.add(lab, BorderLayout.CENTER);
 		int xa=(int) (((double) logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight);
 		int xb=xendlist.get(logicX2);
 		int yb=(int) (ya + sizeY * logicHeight)- space;
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
+		final PolylineConnection line = new PolylineConnection();
+		line.setBackgroundColor(ColorConstants.black);
+		line.setForegroundColor(ColorConstants.black);
+		line.setEndpoints(new Point(xa, ya), new Point(xb, yb));
+		root.add(line);
+		final PolylineConnection line2 = new PolylineConnection();
+		line2.setBackgroundColor(ColorConstants.black);
+		line2.setForegroundColor(ColorConstants.black);
+		line2.setEndpoints(new Point(xa, yb), new Point(xb, ya));
+		root.add(line2);
 	}
 	
-	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, EventProducerNode epn){
+	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, String name){
 		final RectangleFigure rectangle = new RectangleFigure();
-		MajState state=proportion.getMajState(epn, logicX, logicX2);
-		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setBackgroundColor(ColorConstants.white);
 		rectangle.setForegroundColor(ColorConstants.black);
-		rectangle.setAlpha(state.getAmplitude255());
+		
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
-
+		rectangle.setToolTip(new Label(" "+name+" "));
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
 		Label lab = new Label("?");
@@ -262,6 +264,12 @@ public class HierarchyProportion {
 		int xb=xendlist.get(logicX2);
 		int yb=(int) (ya + sizeY * logicHeight)- space;
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
+		final PolylineConnection line = new PolylineConnection();
+		line.setBackgroundColor(ColorConstants.black);
+		line.setForegroundColor(ColorConstants.black);
+		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
+		root.add(line);
+
 	}
 
 	private void setIndex(final int index) {
