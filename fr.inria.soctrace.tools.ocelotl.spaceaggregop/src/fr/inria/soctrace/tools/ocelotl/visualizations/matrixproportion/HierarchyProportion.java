@@ -206,7 +206,7 @@ public class HierarchyProportion {
 		rectangle.setAlpha(state.getAmplitude255());
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%)"));
+		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
 		int xa=(int) (((double) logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight);
 		int xb=xendlist.get(logicX2);
@@ -222,7 +222,7 @@ public class HierarchyProportion {
 		rectangle.setAlpha(state.getAmplitude255());
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%)"));
+		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
 
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
@@ -247,7 +247,7 @@ public class HierarchyProportion {
 		rectangle.setAlpha(state.getAmplitude255());
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%)"));
+		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
 
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);

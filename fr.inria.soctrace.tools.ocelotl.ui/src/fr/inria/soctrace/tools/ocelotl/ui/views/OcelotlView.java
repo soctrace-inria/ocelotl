@@ -41,6 +41,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -387,6 +389,31 @@ public class OcelotlView extends ViewPart {
 		};
 		return showGantt;
 	}
+	
+	private class OcelotlKeyListener extends KeyAdapter{
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			switch(e.keyCode){
+			case(SWT.ARROW_LEFT):
+				buttonDown.notifyListeners(SWT.Selection, new Event());
+				break;
+			case(SWT.ARROW_RIGHT):
+				buttonUp.notifyListeners(SWT.Selection, new Event());
+				break;
+			case(SWT.CR):
+				btnRun.notifyListeners(SWT.Selection, new Event());
+				break;
+			case(SWT.ESC):
+				btnReset.notifyListeners(SWT.Selection, new Event());
+				break;
+			}
+			
+		}
+		
+		
+		
+	}
 
 	public static final String			ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
 	public static final String			PLUGIN_ID		= Activator.PLUGIN_ID;
@@ -421,6 +448,7 @@ public class OcelotlView extends ViewPart {
 	private SashForm					sashFormView;
 	private TimeLineViewWrapper			timeLineViewWrapper;
 	private Button						btnSettings2;
+	private Button	btnReset;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -432,6 +460,7 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
+		
 	}
 
 	private void cleanAll() {
@@ -453,7 +482,7 @@ public class OcelotlView extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-
+		parent.addKeyListener(new OcelotlKeyListener());
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		timeAxisView = new TimeAxisView();
@@ -509,7 +538,7 @@ public class OcelotlView extends ViewPart {
 		textTimestampEnd.setLayoutData(gd_textTimestampEnd);
 		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
-		final Button btnReset = new Button(groupTime, SWT.NONE);
+		btnReset = new Button(groupTime, SWT.NONE);
 		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
 		btnReset.setText("Reset");
 
