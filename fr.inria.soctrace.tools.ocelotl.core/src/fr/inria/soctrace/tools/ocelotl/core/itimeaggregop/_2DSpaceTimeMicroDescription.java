@@ -34,7 +34,6 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregati
 public abstract class _2DSpaceTimeMicroDescription extends MultiThreadTimeAggregationOperator implements I2DSpaceTimeMicroDescription {
 
 	protected List<HashMap<EventProducer, HashMap<String, Long>>>	matrix;
-	List<String>											keys;
 
 	public _2DSpaceTimeMicroDescription() {
 		super();
@@ -52,7 +51,6 @@ public abstract class _2DSpaceTimeMicroDescription extends MultiThreadTimeAggreg
 
 	@Override
 	public void computeMatrix() throws SoCTraceException {
-		keys = new ArrayList<String>();
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();

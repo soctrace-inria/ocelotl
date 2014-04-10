@@ -25,8 +25,6 @@ import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOper
 
 public class Parts extends SpaceTAggregationOperator {
 
-	final public static String	descriptor	= "No Aggregation";
-
 	public Parts() {
 		super();
 	}
@@ -39,12 +37,5 @@ public class Parts extends SpaceTAggregationOperator {
 	protected void computeParts() {
 		initParts();
 	}
-
-	@Override
-	public String descriptor() {
-		return descriptor;
-	}
-	
-
 
 }

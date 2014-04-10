@@ -33,7 +33,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregati
 public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOperator implements I3DMicroDescription {
 
 	protected List<HashMap<EventProducer, HashMap<String, Long>>>	matrix;
-	List<String>											keys;
+
 
 	public _3DMicroDescription() {
 		super();
@@ -51,7 +51,6 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 
 	@Override
 	public void computeMatrix() throws SoCTraceException {
-		keys = new ArrayList<String>();
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();

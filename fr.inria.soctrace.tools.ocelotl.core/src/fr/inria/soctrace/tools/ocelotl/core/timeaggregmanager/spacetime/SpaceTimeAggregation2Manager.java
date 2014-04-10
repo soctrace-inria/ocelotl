@@ -24,6 +24,10 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	public List<EventProducer> getEventProducers() {
 		return new ArrayList<EventProducer>(matrix.getMatrix().get(0).keySet());
 	}
+	
+	public List<String> getKeys() {
+		return new ArrayList<String>(matrix.getMatrix().get(0).get(getEventProducers().get(0)).keySet());
+	}
 
 	@Override
 	protected void fillNodesJava() {

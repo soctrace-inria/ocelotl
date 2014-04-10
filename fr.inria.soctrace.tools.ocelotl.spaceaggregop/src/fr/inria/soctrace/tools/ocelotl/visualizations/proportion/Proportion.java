@@ -30,7 +30,6 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregati
 
 public class Proportion extends SpaceTAggregationOperator {
 
-	public final static String	descriptor	= "State Distribution";
 	private List<String>		states;
 	private double				max;
 
@@ -67,11 +66,6 @@ public class Proportion extends SpaceTAggregationOperator {
 		aggregateStates();
 		normalize();
 		computeMax();
-	}
-
-	@Override
-	public String descriptor() {
-		return descriptor;
 	}
 
 	public double getMax() {

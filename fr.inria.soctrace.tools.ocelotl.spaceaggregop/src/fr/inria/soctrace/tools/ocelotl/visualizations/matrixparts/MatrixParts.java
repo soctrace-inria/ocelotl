@@ -27,15 +27,13 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.AggregatedData;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceSTAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 
-public class MatrixParts extends SpaceAggregationOperator {
+public class MatrixParts extends SpaceSTAggregationOperator {
 
-	final public static String	descriptor	= "Matrix Parts";
-	
-	
 	public MatrixParts() {
 		super();
 	}
@@ -47,13 +45,12 @@ public class MatrixParts extends SpaceAggregationOperator {
 	@Override
 	protected void computeParts() {
 	}
-	
 
-	
 
 	@Override
-	public String descriptor() {
-		return descriptor;
+	protected void initParts() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

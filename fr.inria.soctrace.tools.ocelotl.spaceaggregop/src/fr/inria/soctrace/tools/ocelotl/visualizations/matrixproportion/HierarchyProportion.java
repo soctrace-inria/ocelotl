@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts;
+package fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,12 +46,14 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventPro
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.Aggregation;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
+import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.VisualAggregatedData;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
 import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.IconManager;
+import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.StateColorManager;
 
-public class HierarchyPart {
+public class HierarchyProportion {
 
 	private int					index;
 	private static final int	Border		= PartMatrixView.Border;
@@ -64,17 +66,17 @@ public class HierarchyPart {
 	private double logicWidth;
 	private double logicHeight;
 	private int minLogicWeight = 3;
-	private PartColorManager colors;
 	private List<Integer> xendlist;
+	private MatrixProportion proportion;
 
-	public HierarchyPart(EventProducerHierarchy hierarchy, final IFigure root, PartColorManager colors, int space) {
+	public HierarchyProportion(MatrixProportion proportion, EventProducerHierarchy hierarchy, final IFigure root, int space) {
 		super();
 		setIndex(index);
 		this.root = root;
 		this.hierarchy = hierarchy;
-		this.colors = colors;
 		xendlist=new ArrayList<Integer>();
 		this.space=space;
+		this.proportion=proportion;
 	}
 
 	private void initX(){
@@ -117,7 +119,7 @@ public class HierarchyPart {
 		List<Part> parts = computeParts(epn, start, end);
 		for (Part p:parts){
 			if (((VisualAggregatedData) p.getData()).isAggregated())			
-				drawStandardAggregate(p.getStartPart(), epn.getIndex(), p.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn.getMe().getName());
+				drawStandardAggregate(p.getStartPart(), epn.getIndex(), p.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn);
 			else{
 				boolean aggy=false;
 				for (EventProducerNode ep: epn.getChildrenNodes()){
@@ -132,9 +134,9 @@ public class HierarchyPart {
 					List<Part> aggParts = computeCommonCuts(epn, p.getStartPart(), p.getEndPart());
 					for (Part pagg: aggParts){
 					if (((VisualAggregatedData) pagg.getData()).isNoCutInside())	
-						drawCleanVisualAggregate(pagg.getStartPart(), epn.getIndex(), pagg.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn.getMe().getName());
+						drawCleanVisualAggregate(pagg.getStartPart(), epn.getIndex(), pagg.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn);
 					else
-						drawNotCleanVisualAggregate(pagg.getStartPart(), epn.getIndex(), pagg.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn.getMe().getName());
+						drawNotCleanVisualAggregate(pagg.getStartPart(), epn.getIndex(), pagg.getEndPart(), epn.getWeight(), ((VisualAggregatedData) p.getData()).getValue(), epn);
 
 					}	
 				}
@@ -196,13 +198,15 @@ public class HierarchyPart {
 			print(ep.getID(), start, end);
 	}
 	
-	private void drawStandardAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, String name){
+	private void drawStandardAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, EventProducerNode epn){
 		final RectangleFigure rectangle = new RectangleFigure();
-		rectangle.setBackgroundColor(colors.getColors().get(number).getBg());
-		rectangle.setForegroundColor(colors.getColors().get(number).getBg());
+		MajState state=proportion.getMajState(epn, logicX, logicX2);
+		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setForegroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setAlpha(state.getAmplitude255());
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+name+" "));
+		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%)"));
 		int xa=(int) (((double) logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight);
 		int xb=xendlist.get(logicX2);
@@ -210,20 +214,22 @@ public class HierarchyPart {
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 	}
 	
-	private void drawNotCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, String name){
+	private void drawNotCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, EventProducerNode epn){
 		final RectangleFigure rectangle = new RectangleFigure();
-		rectangle.setBackgroundColor(ColorConstants.white);
-		rectangle.setForegroundColor(ColorConstants.red);
-		
+		MajState state=proportion.getMajState(epn, logicX, logicX2);
+		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setForegroundColor(ColorConstants.black);
+		rectangle.setAlpha(state.getAmplitude255());
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+name+" "));
+		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%)"));
+
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
 		Label lab = new Label("?");
 		lab.setTextAlignment(PositionConstants.CENTER);
 		lab.setLabelAlignment(SWT.CENTER);
-		lab.setForegroundColor(ColorConstants.red);
+		lab.setForegroundColor(ColorConstants.black);
 		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 		rectangle.add(lab, BorderLayout.CENTER);
 		int xa=(int) (((double) logicX * logicWidth + Border));
@@ -233,14 +239,16 @@ public class HierarchyPart {
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 	}
 	
-	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, String name){
+	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, EventProducerNode epn){
 		final RectangleFigure rectangle = new RectangleFigure();
-		rectangle.setBackgroundColor(ColorConstants.white);
+		MajState state=proportion.getMajState(epn, logicX, logicX2);
+		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setForegroundColor(ColorConstants.black);
-		
+		rectangle.setAlpha(state.getAmplitude255());
 		rectangle.setLineWidth(2);
 
-		rectangle.setToolTip(new Label(" "+name+" "));
+		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%)"));
+
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
 		Label lab = new Label("?");
