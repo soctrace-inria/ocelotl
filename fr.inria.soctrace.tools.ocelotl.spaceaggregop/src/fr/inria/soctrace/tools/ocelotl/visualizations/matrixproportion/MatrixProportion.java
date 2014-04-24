@@ -83,7 +83,7 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 					for (String state:getStates())
 						proportions.get(node).get(i).put(state, 
 						proportions.get(node).get(i).get(state)+proportions.get(child).get(i).get(state)
-						/node.getChildrenNodes().size());	
+						/((double)node.getChildrenNodes().size()));	
 				}
 			}
 				
