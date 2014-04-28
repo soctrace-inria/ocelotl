@@ -60,6 +60,7 @@ public class HierarchyProportion {
 	private int					index;
 	private static final int	Border		= PartMatrixView.Border;
 	private int	space		= 3;
+	private int rectangleBorder = 1;
 	private EventProducerHierarchy hierarchy;
 	private IFigure				root;
 	private double rootHeight;
@@ -205,8 +206,8 @@ public class HierarchyProportion {
 		MajState state=proportion.getMajState(epn, logicX, logicX2);
 		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setForegroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
-		rectangle.setAlpha(state.getAmplitude255());
-		rectangle.setLineWidth(2);
+		rectangle.setAlpha(state.getAmplitude255M());
+		rectangle.setLineWidth(1);
 
 		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
 		int xa=(int) (((double) logicX * logicWidth + Border));
@@ -221,11 +222,9 @@ public class HierarchyProportion {
 		MajState state=proportion.getMajState(epn, logicX, logicX2);
 		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setForegroundColor(ColorConstants.black);
-		rectangle.setAlpha(state.getAmplitude255());
-		rectangle.setLineWidth(2);
-
+		rectangle.setAlpha(state.getAmplitude255M());
+		rectangle.setLineWidth(1);
 		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
-
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
 		Label lab = new Label("?");
@@ -243,14 +242,47 @@ public class HierarchyProportion {
 		line.setBackgroundColor(ColorConstants.black);
 		line.setForegroundColor(ColorConstants.black);
 		line.setEndpoints(new Point(xa, ya), new Point(xb, yb));
-		line.setAlpha(state.getAmplitude255());
+		line.setAntialias(SWT.ON);
+		line.setLineWidth(1);
+		//line.setAlpha(state.getAmplitude255());
 		root.add(line);
 		final PolylineConnection line2 = new PolylineConnection();
 		line2.setBackgroundColor(ColorConstants.black);
 		line2.setForegroundColor(ColorConstants.black);
 		line2.setEndpoints(new Point(xa, yb), new Point(xb, ya));
-		line2.setAlpha(state.getAmplitude255());
+		line2.setAntialias(SWT.ON);
+		line2.setLineWidth(1);
 		root.add(line2);
+		//line2.setAlpha(state.getAmplitude255());
+		drawRectangleBorder(xa, xb, ya, yb);
+
+	}
+	
+	private void drawRectangleBorder(int xa, int xb, int ya, int yb){
+		final PolylineConnection rect1 = new PolylineConnection();
+		rect1.setBackgroundColor(ColorConstants.black);
+		rect1.setForegroundColor(ColorConstants.black);
+		rect1.setLineWidth(rectangleBorder);
+		rect1.setEndpoints(new Point(xa, ya), new Point(xb, ya));
+		final PolylineConnection rect2 = new PolylineConnection();
+		rect2.setBackgroundColor(ColorConstants.black);
+		rect2.setForegroundColor(ColorConstants.black);
+		rect2.setLineWidth(rectangleBorder);
+		rect2.setEndpoints(new Point(xa, yb), new Point(xb, yb));
+		final PolylineConnection rect3 = new PolylineConnection();
+		rect3.setBackgroundColor(ColorConstants.black);
+		rect3.setForegroundColor(ColorConstants.black);
+		rect3.setLineWidth(rectangleBorder);
+		rect3.setEndpoints(new Point(xa, ya), new Point(xa, yb));
+		final PolylineConnection rect4 = new PolylineConnection();
+		rect4.setBackgroundColor(ColorConstants.black);
+		rect4.setForegroundColor(ColorConstants.black);
+		rect4.setLineWidth(rectangleBorder);
+		rect4.setEndpoints(new Point(xb, ya), new Point(xb, yb));
+		root.add(rect1);
+		root.add(rect2);
+		root.add(rect3);
+		root.add(rect4);
 	}
 	
 	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, EventProducerNode epn){
@@ -258,8 +290,8 @@ public class HierarchyProportion {
 		MajState state=proportion.getMajState(epn, logicX, logicX2);
 		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setForegroundColor(ColorConstants.black);
-		rectangle.setAlpha(state.getAmplitude255());
-		rectangle.setLineWidth(2);
+		rectangle.setAlpha(state.getAmplitude255M());
+		rectangle.setLineWidth(1);
 
 		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
 
@@ -280,8 +312,12 @@ public class HierarchyProportion {
 		line.setBackgroundColor(ColorConstants.black);
 		line.setForegroundColor(ColorConstants.black);
 		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
-		line.setAlpha(state.getAmplitude255());
+		line.setLineWidth(1);
+		line.setAntialias(SWT.ON);
+		//line.setAlpha(state.getAmplitude255M());
 		root.add(line);
+		drawRectangleBorder(xa, xb, ya, yb);
+		
 	}
 
 	private void setIndex(final int index) {
