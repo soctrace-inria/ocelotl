@@ -13,15 +13,12 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.framesoc.core,
  fr.inria.soctrace.lib.search,
  org.eclipse.draw2d,
- org.eclipse.swt,
- org.eclipse.jface,
  fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.dlpaggreg
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: fr.inria.soctrace.framesoc.ui.model,
  fr.inria.soctrace.tools.ocelotl.core,
- fr.inria.soctrace.tools.ocelotl.core.itimeaggregop,
  fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager
 Export-Package: fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt,
  fr.inria.soctrace.tools.ocelotl.ui.loaders,
