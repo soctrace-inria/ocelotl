@@ -472,7 +472,7 @@ public class OcelotlView extends ViewPart {
 		textTimestampEnd.setText("0");
 		btnNormalize.setSelection(false);
 		btnGrowingQualities.setSelection(true);
-		spinnerTSNumber.setSelection(20);
+		spinnerTSNumber.setSelection(30);
 		textRun.setText("1.0");
 		// producers.clear();
 		// types.clear();
@@ -530,7 +530,7 @@ public class OcelotlView extends ViewPart {
 		timeAxisView.initDiagram(compositeTimeAxisView);
 		FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
 		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
-		sashForm_4.setWeights(new int[] { 402, 40 });
+		sashForm_4.setWeights(new int[] {398, 13});
 
 		ScrolledComposite scrolledComposite = new ScrolledComposite(sashFormView, SWT.BORDER | SWT.H_SCROLL);
 		scrolledComposite.setExpandHorizontal(true);
@@ -629,7 +629,7 @@ public class OcelotlView extends ViewPart {
 		textTimestampStart.addModifyListener(new ConfModificationListener());
 		scrolledComposite.setContent(groupTime);
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashFormView.setWeights(new int[] {391, 57});
+		sashFormView.setWeights(new int[] {432, 16});
 
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
@@ -809,7 +809,7 @@ public class OcelotlView extends ViewPart {
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		qualityView.initDiagram(compositeQualityView);
 		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		sashForm.setWeights(new int[] { 196, 293 });
+		sashForm.setWeights(new int[] {111, 337});
 		sashForm_1.setWeights(new int[] {447, 142});
 		sashFormGlobal.setWeights(new int[] { 395 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });

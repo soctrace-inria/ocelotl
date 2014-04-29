@@ -70,6 +70,7 @@ public class HierarchyProportion {
 	private double logicHeight;
 	private int minLogicWeight = 3;
 	private List<Integer> xendlist;
+	private List<Integer> yendlist;
 	private MatrixProportion proportion;
 
 	public HierarchyProportion(MatrixProportion proportion, EventProducerHierarchy hierarchy, final IFigure root, int space) {
@@ -78,6 +79,7 @@ public class HierarchyProportion {
 		this.root = root;
 		this.hierarchy = hierarchy;
 		xendlist=new ArrayList<Integer>();
+		yendlist=new ArrayList<Integer>();
 		this.space=space;
 		this.proportion=proportion;
 	}
@@ -88,13 +90,20 @@ public class HierarchyProportion {
 			xendlist.add((int)(i*logicWidth+Border-space));
 	}
 	
+	private void initY(){
+		yendlist.clear();
+		for (int i=0; i<=hierarchy.getRoot().getWeight(); i++)
+			yendlist.add((int)(rootHeight - height + i * logicHeight -space - Border));
+	}
+	
 	public void draw() {
 		rootHeight = root.getSize().height;
-		height = rootHeight - Border;
+		height = rootHeight - (2* Border);
 		width = root.getSize().width - (2 * Border);
 		logicWidth = (double) width/(double) (hierarchy.getRoot().getParts().size());
 		logicHeight = (double) height/(double) hierarchy.getRoot().getWeight();
 		initX();
+		initY();
 		print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot().getParts().size());
 	}
 	
@@ -211,9 +220,9 @@ public class HierarchyProportion {
 
 		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
 		int xa=(int) (((double) logicX * logicWidth + Border));
-		int ya=(int) (rootHeight - height + logicY * logicHeight);
+		int ya=(int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb=xendlist.get(logicX2);
-		int yb=(int) (ya + sizeY * logicHeight)- space;
+		int yb=yendlist.get(logicY+sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 	}
 	
@@ -234,9 +243,9 @@ public class HierarchyProportion {
 		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 		//rectangle.add(lab, BorderLayout.CENTER);
 		int xa=(int) (((double) logicX * logicWidth + Border));
-		int ya=(int) (rootHeight - height + logicY * logicHeight);
+		int ya=(int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb=xendlist.get(logicX2);
-		int yb=(int) (ya + sizeY * logicHeight)- space;
+		int yb=yendlist.get(logicY+sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 		final PolylineConnection line = new PolylineConnection();
 		line.setBackgroundColor(ColorConstants.black);
@@ -304,9 +313,9 @@ public class HierarchyProportion {
 		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 		//rectangle.add(lab, BorderLayout.CENTER);
 		int xa=(int) (((double) logicX * logicWidth + Border));
-		int ya=(int) (rootHeight - height + logicY * logicHeight);
+		int ya=(int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb=xendlist.get(logicX2);
-		int yb=(int) (ya + sizeY * logicHeight)- space;
+		int yb=yendlist.get(logicY+sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 		final PolylineConnection line = new PolylineConnection();
 		line.setBackgroundColor(ColorConstants.black);
