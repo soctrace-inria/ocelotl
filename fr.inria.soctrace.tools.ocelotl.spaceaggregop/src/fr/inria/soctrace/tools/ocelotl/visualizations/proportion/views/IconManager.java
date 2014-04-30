@@ -29,7 +29,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.wb.swt.ResourceManager;
 import org.osgi.framework.Bundle;
+
+import fr.inria.soctrace.framesoc.ui.Activator;
 
 public class IconManager {
 	
@@ -66,6 +69,8 @@ public class IconManager {
 		}
 		file.getAbsolutePath();
 		Image image = new Image(device, file.getAbsolutePath());
+		// TODO: try using this method to avoid path issues
+		// ResourceManager.getPluginImageDescriptor(Activator.PLUGIN_ID, "icons/save.png");
 		return new Image(device, image.getImageData().scaledTo(s, s));
 	}
 
