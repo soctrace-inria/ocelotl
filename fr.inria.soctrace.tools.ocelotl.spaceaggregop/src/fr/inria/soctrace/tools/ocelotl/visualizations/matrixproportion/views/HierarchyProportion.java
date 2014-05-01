@@ -68,7 +68,7 @@ public class HierarchyProportion {
 	private double width;
 	private double logicWidth;
 	private double logicHeight;
-	private int minLogicWeight = 3;
+	private int minLogicWeight = 1;
 	private List<Integer> xendlist;
 	private List<Integer> yendlist;
 	private MatrixProportion proportion;
