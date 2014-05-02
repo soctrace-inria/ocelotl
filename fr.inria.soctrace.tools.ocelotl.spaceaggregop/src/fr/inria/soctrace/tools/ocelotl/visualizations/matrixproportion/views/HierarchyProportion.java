@@ -37,6 +37,7 @@ import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.AggregatedData;
@@ -59,6 +60,8 @@ public class HierarchyProportion {
 
 	private int					index;
 	private static final int	Border		= PartMatrixView.Border;
+	private static final int ColorThreshold = 175;
+	private static final int AlphaThreshold = 190;
 	private int	space		= 3;
 	private int rectangleBorder = 1;
 	private EventProducerHierarchy hierarchy;
@@ -230,7 +233,7 @@ public class HierarchyProportion {
 		final RectangleFigure rectangle = new RectangleFigure();
 		MajState state=proportion.getMajState(epn, logicX, logicX2);
 		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
-		rectangle.setForegroundColor(ColorConstants.black);
+		rectangle.setForegroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setAlpha(state.getAmplitude255M());
 		rectangle.setLineWidth(1);
 		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
@@ -248,22 +251,29 @@ public class HierarchyProportion {
 		int yb=yendlist.get(logicY+sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 		final PolylineConnection line = new PolylineConnection();
-		line.setBackgroundColor(ColorConstants.black);
-		line.setForegroundColor(ColorConstants.black);
+		Color color=ColorConstants.black;
+		boolean light=isColorLight(rectangle.getBackgroundColor(), rectangle.getAlpha());
+		if (!light){
+			color=ColorConstants.white;
+		}
+		line.setBackgroundColor(color);
+		line.setForegroundColor(color);
 		line.setEndpoints(new Point(xa, ya), new Point(xb, yb));
 		line.setAntialias(SWT.ON);
 		line.setLineWidth(1);
 		//line.setAlpha(state.getAmplitude255());
 		root.add(line);
 		final PolylineConnection line2 = new PolylineConnection();
-		line2.setBackgroundColor(ColorConstants.black);
-		line2.setForegroundColor(ColorConstants.black);
+		line2.setBackgroundColor(color);
+		line2.setForegroundColor(color);
 		line2.setEndpoints(new Point(xa, yb), new Point(xb, ya));
 		line2.setAntialias(SWT.ON);
 		line2.setLineWidth(1);
 		root.add(line2);
 		//line2.setAlpha(state.getAmplitude255());
-		drawRectangleBorder(xa, xb, ya, yb);
+		if (light){
+			drawRectangleBorder(xa, xb, ya, yb);
+		}
 
 	}
 	
@@ -294,11 +304,15 @@ public class HierarchyProportion {
 		root.add(rect4);
 	}
 	
+	private boolean isColorLight(Color color, int alpha){
+		return (alpha<AlphaThreshold||((color.getBlue()<ColorThreshold)&&(color.getRed()<ColorThreshold)&&(color.getGreen()<ColorThreshold)));
+	}
+	
 	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2, int sizeY, int number, EventProducerNode epn){
 		final RectangleFigure rectangle = new RectangleFigure();
 		MajState state=proportion.getMajState(epn, logicX, logicX2);
 		rectangle.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
-		rectangle.setForegroundColor(ColorConstants.black);
+		rectangle.setForegroundColor(FramesocColorManager.getInstance().getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setAlpha(state.getAmplitude255M());
 		rectangle.setLineWidth(1);
 
@@ -318,14 +332,20 @@ public class HierarchyProportion {
 		int yb=yendlist.get(logicY+sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 		final PolylineConnection line = new PolylineConnection();
-		line.setBackgroundColor(ColorConstants.black);
-		line.setForegroundColor(ColorConstants.black);
+		Color color=ColorConstants.black;
+		boolean light=isColorLight(rectangle.getBackgroundColor(), rectangle.getAlpha());
+		if (!light){
+			color=ColorConstants.white;
+		}
+		line.setBackgroundColor(color);
+		line.setForegroundColor(color);
 		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
 		line.setLineWidth(1);
 		line.setAntialias(SWT.ON);
-		//line.setAlpha(state.getAmplitude255M());
 		root.add(line);
-		drawRectangleBorder(xa, xb, ya, yb);
+		if (light){
+			drawRectangleBorder(xa, xb, ya, yb);
+		}
 		
 	}
 
