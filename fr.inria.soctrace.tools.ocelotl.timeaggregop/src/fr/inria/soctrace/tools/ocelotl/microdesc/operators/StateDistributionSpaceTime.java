@@ -28,7 +28,6 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;

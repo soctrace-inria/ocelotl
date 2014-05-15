@@ -21,7 +21,6 @@ package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
@@ -31,10 +30,8 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
-import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
-import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
 
 public class EventDistribution extends _3DMicroDescription {
 
