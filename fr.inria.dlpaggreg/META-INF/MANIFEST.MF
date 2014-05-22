@@ -12,3 +12,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.dlpaggreg.quality,
  fr.inria.dlpaggreg.spacetime,
  fr.inria.dlpaggreg.time
+

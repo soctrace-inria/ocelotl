@@ -67,21 +67,24 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.wb.swt.ResourceManager;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
+import fr.inria.soctrace.framesoc.ui.perspective.FramesocPartManager;
+import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
-import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.ResourceManager;
-import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
@@ -144,21 +147,49 @@ public class OcelotlView extends ViewPart {
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-					try {
-						if (hasChanged != HasChanged.PARAMETER)
-							ocelotlCore.computeDichotomy(hasChanged);
-						// textRun.setText(String.valueOf(ocelotlCore.getLpaggregManager().getParameters().get(ocelotlCore.getLpaggregManager().getParameters().size()
-						// - 1)));
-						// setConfiguration();
+						if (hasChanged != HasChanged.PARAMETER){
+							try {
+								ocelotlCore.computeDichotomy(hasChanged);
+							} catch (SoCTraceException e) {
+								e.printStackTrace();
+								return Status.CANCEL_STATUS;
+							} catch (final OcelotlException e) {
+								monitor.done();
+								Display.getDefault().syncExec(new Runnable() {
+
+									@Override
+									public void run() {
+										hasChanged = HasChanged.ALL;
+										MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+									}
+								});
+								return Status.CANCEL_STATUS;
+								}
+						}
+							
 						hasChanged = HasChanged.PARAMETER;
-						ocelotlCore.computeParts(hasChanged);
+						try {
+							ocelotlCore.computeParts(hasChanged);
+						} catch (SoCTraceException e) {
+							e.printStackTrace();
+							return Status.CANCEL_STATUS;
+						} catch (final OcelotlException e) {
+							monitor.done();
+							Display.getDefault().syncExec(new Runnable() {
+
+								@Override
+								public void run() {
+									hasChanged = HasChanged.ALL;
+									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+								}
+							});
+							return Status.CANCEL_STATUS;
+							}
 						monitor.done();
 						Display.getDefault().syncExec(new Runnable() {
 
 							@Override
 							public void run() {
-								// MessageDialog.openInformation(getSite().getShell(),
-								// "Parts", "Parts processing finished");
 								hasChanged = HasChanged.NOTHING;
 								timeLineView.deleteDiagram();
 								timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
@@ -166,12 +197,8 @@ public class OcelotlView extends ViewPart {
 								qualityView.createDiagram();
 							}
 						});
-					} catch (final Exception e) {
-						e.printStackTrace();
-						return Status.CANCEL_STATUS;
-					}
 					return Status.OK_STATUS;
-				}
+					}
 			};
 			job.setUser(true);
 			job.schedule();
@@ -818,7 +845,8 @@ public class OcelotlView extends ViewPart {
 		// clean all
 		IActionBars actionBars = getViewSite().getActionBars();
 		IToolBarManager toolBar = actionBars.getToolBarManager();
-		toolBar.add(createGanttAction());
+		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.GANTT_CHART_VIEW_ID))
+			toolBar.add(createGanttAction());
 
 		cleanAll();
 

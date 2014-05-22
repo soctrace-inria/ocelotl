@@ -40,6 +40,7 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxy;
 import fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy.EventProxyQuery;
@@ -66,7 +67,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		}
 	}
 	
-	public EventIterator getEventIterator(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public EventIterator getEventIterator(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException, OcelotlException {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
@@ -75,7 +76,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
-				return null;
+				throw new OcelotlException(OcelotlException.INVALIDQUERY);	
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
@@ -85,7 +86,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
-				return null;
+				throw new OcelotlException(OcelotlException.INVALIDQUERY);	
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));
@@ -109,7 +110,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		return query.getIterator();
 	}
 	
-	public EventIterator getStateIterator(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException {
+	public EventIterator getStateIterator(final Trace t, final List<EventType> eventTypes, final List<IntervalDesc> intervals, final List<EventProducer> eventProducers) throws SoCTraceException, OcelotlException {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
 		final TimeRegion region = new TimeRegion(intervals.get(0).t1, intervals.get(0).t2);
@@ -118,7 +119,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
-				return null;
+				throw new OcelotlException(OcelotlException.INVALIDQUERY);	
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
@@ -128,7 +129,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
-				return null;
+				throw new OcelotlException(OcelotlException.INVALIDQUERY);	
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));
@@ -176,7 +177,6 @@ public class OcelotlTraceSearch extends TraceSearch {
 			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
-		// traceDB.close();
 		return query.getIterator();
 	}
 

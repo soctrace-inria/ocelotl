@@ -27,8 +27,7 @@ import org.eclipse.draw2d.RoundedRectangle;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.SWT;
-
-import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 public class PartFigure extends RectangleFigure {
 

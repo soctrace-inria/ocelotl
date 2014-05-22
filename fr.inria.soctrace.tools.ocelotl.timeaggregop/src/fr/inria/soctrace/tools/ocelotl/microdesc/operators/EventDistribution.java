@@ -27,6 +27,7 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
@@ -89,24 +90,19 @@ public class EventDistribution extends _3DMicroDescription {
 		}
 	}
 
-	EventIterator	it;
-
 	public EventDistribution() throws SoCTraceException {
 		super();
 	}
 
-	public EventDistribution(final OcelotlParameters parameters) throws SoCTraceException {
+	public EventDistribution(final OcelotlParameters parameters) throws SoCTraceException, OcelotlException {
 		super(parameters);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManager();
 		dm.start();
 		it = ocelotlQueries.getEventIterator(eventProducers);
-		// eventsNumber = fullEvents.size();
-		// dm.end("QUERIES : " + eventProducers.size() + " Event Producers : " +
-		// fullEvents.size() + " Events");
 		dm = new DeltaManager();
 		dm.start();
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -116,19 +112,6 @@ public class EventDistribution extends _3DMicroDescription {
 			thread.join();
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
-	}
-
-	private List<Event> getEvents(final int size) {
-		final List<Event> events = new ArrayList<Event>();
-		synchronized (it) {
-			for (int i = 0; i < size; i++) {
-				if (it.getNext() == null)
-					return events;
-				events.add(it.getEvent());
-				eventsNumber++;
-			}
-		}
-		return events;
 	}
 
 	@Override
@@ -142,7 +125,7 @@ public class EventDistribution extends _3DMicroDescription {
 	}
 
 	@Override
-	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
+	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException, OcelotlException {
 		this.parameters = parameters;
 		ocelotlQueries = new OcelotlQueries(parameters);
 		count = 0;
