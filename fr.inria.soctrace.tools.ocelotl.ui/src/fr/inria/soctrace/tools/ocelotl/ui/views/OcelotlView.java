@@ -32,6 +32,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -46,31 +49,42 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.wb.swt.ResourceManager;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocPartManager;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
+import fr.inria.soctrace.lib.model.AnalysisResult;
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
-import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.ResourceManager;
-import fr.inria.soctrace.tools.ocelotl.ui.com.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
 
 /**
  * Main view for LPAggreg Paje Tool
@@ -122,21 +136,49 @@ public class OcelotlView extends ViewPart {
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-					try {
-						if (hasChanged != HasChanged.PARAMETER)
-							ocelotlCore.computeDichotomy(hasChanged);
-						// textRun.setText(String.valueOf(ocelotlCore.getLpaggregManager().getParameters().get(ocelotlCore.getLpaggregManager().getParameters().size()
-						// - 1)));
-						// setConfiguration();
+						if (hasChanged != HasChanged.PARAMETER){
+							try {
+								ocelotlCore.computeDichotomy(hasChanged);
+							} catch (SoCTraceException e) {
+								e.printStackTrace();
+								return Status.CANCEL_STATUS;
+							} catch (final OcelotlException e) {
+								monitor.done();
+								Display.getDefault().syncExec(new Runnable() {
+
+									@Override
+									public void run() {
+										hasChanged = HasChanged.ALL;
+										MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+									}
+								});
+								return Status.CANCEL_STATUS;
+								}
+						}
+							
 						hasChanged = HasChanged.PARAMETER;
-						ocelotlCore.computeParts(hasChanged);
+						try {
+							ocelotlCore.computeParts(hasChanged);
+						} catch (SoCTraceException e) {
+							e.printStackTrace();
+							return Status.CANCEL_STATUS;
+						} catch (final OcelotlException e) {
+							monitor.done();
+							Display.getDefault().syncExec(new Runnable() {
+
+								@Override
+								public void run() {
+									hasChanged = HasChanged.ALL;
+									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+								}
+							});
+							return Status.CANCEL_STATUS;
+							}
 						monitor.done();
 						Display.getDefault().syncExec(new Runnable() {
 
 							@Override
 							public void run() {
-								// MessageDialog.openInformation(getSite().getShell(),
-								// "Parts", "Parts processing finished");
 								hasChanged = HasChanged.NOTHING;
 								timeLineView.deleteDiagram();
 								timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
@@ -144,12 +186,8 @@ public class OcelotlView extends ViewPart {
 								qualityView.createDiagram();
 							}
 						});
-					} catch (final Exception e) {
-						e.printStackTrace();
-						return Status.CANCEL_STATUS;
-					}
 					return Status.OK_STATUS;
-				}
+					}
 			};
 			job.setUser(true);
 			job.schedule();
@@ -372,6 +410,29 @@ public class OcelotlView extends ViewPart {
 		return showGantt;
 	}
 
+	private class OcelotlKeyListener extends KeyAdapter {
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			switch (e.keyCode) {
+			case (SWT.ARROW_LEFT):
+				buttonDown.notifyListeners(SWT.Selection, new Event());
+				break;
+			case (SWT.ARROW_RIGHT):
+				buttonUp.notifyListeners(SWT.Selection, new Event());
+				break;
+			case (SWT.CR):
+				btnRun.notifyListeners(SWT.Selection, new Event());
+				break;
+			case (SWT.ESC):
+				btnReset.notifyListeners(SWT.Selection, new Event());
+				break;
+			}
+
+		}
+
+	}
+
 	public static final String			ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
 	public static final String			PLUGIN_ID		= Activator.PLUGIN_ID;
 	private Button						btnNormalize;
@@ -405,6 +466,7 @@ public class OcelotlView extends ViewPart {
 	private SashForm					sashFormView;
 	private TimeLineViewWrapper			timeLineViewWrapper;
 	private Button						btnSettings2;
+	private Button						btnReset;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -416,6 +478,7 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
+
 	}
 
 	private void cleanAll() {
@@ -425,7 +488,7 @@ public class OcelotlView extends ViewPart {
 		textTimestampEnd.setText("0");
 		btnNormalize.setSelection(false);
 		btnGrowingQualities.setSelection(true);
-		spinnerTSNumber.setSelection(20);
+		spinnerTSNumber.setSelection(30);
 		textRun.setText("1.0");
 		// producers.clear();
 		// types.clear();
@@ -436,8 +499,29 @@ public class OcelotlView extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
-		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		Display display = Display.getCurrent();
 
+		display.addFilter(SWT.KeyDown, new Listener() {
+
+			public void handleEvent(Event e) {
+				switch (e.keyCode) {
+				case (SWT.ARROW_LEFT):
+					buttonDown.notifyListeners(SWT.Selection, new Event());
+					break;
+				case (SWT.ARROW_RIGHT):
+					buttonUp.notifyListeners(SWT.Selection, new Event());
+					break;
+				case (SWT.CR):
+					btnRun.notifyListeners(SWT.Selection, new Event());
+					break;
+				case (SWT.ESC):
+					btnReset.notifyListeners(SWT.Selection, new Event());
+					break;
+				}
+
+			}
+		});
+		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		timeAxisView = new TimeAxisView();
@@ -448,51 +532,55 @@ public class OcelotlView extends ViewPart {
 		sashForm_1.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		sashFormView = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
+		sashFormView.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-		SashForm sashForm_4 = new SashForm(sashFormView, SWT.VERTICAL);
-		sashForm_4.setSashWidth(0);
-		compositeMatrixView = new Composite(sashForm_4, SWT.NONE);
+		SashForm sashForm_4 = new SashForm(sashFormView, SWT.BORDER | SWT.VERTICAL);
+		compositeMatrixView = new Composite(sashForm_4, SWT.BORDER);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
 		timeLineViewWrapper.init(compositeMatrixView);
 		compositeMatrixView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		final Composite compositeTimeAxisView = new Composite(sashForm_4, SWT.NONE);
-		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		final Composite compositeTimeAxisView = new Composite(sashForm_4, SWT.BORDER);
+		compositeTimeAxisView.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		timeAxisView.initDiagram(compositeTimeAxisView);
-		compositeTimeAxisView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		sashForm_4.setWeights(new int[] { 305, 43 });
+		FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
+		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
+		sashForm_4.setWeights(new int[] {398, 13});
 
-		Composite composite_2 = new Composite(sashFormView, SWT.NONE);
-		composite_2.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
-		composite_2.setLayout(new FillLayout(SWT.HORIZONTAL));
+		ScrolledComposite scrolledComposite = new ScrolledComposite(sashFormView, SWT.BORDER | SWT.H_SCROLL);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setExpandVertical(true);
 
-		final Group groupTime = new Group(composite_2, SWT.BORDER);
+		Group groupTime = new Group(scrolledComposite, SWT.NONE);
+		groupTime.setSize(422, 110);
+		groupTime.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupTime.setLayout(new GridLayout(14, false));
+		groupTime.setLayout(new GridLayout(17, false));
 
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblStartTimestamp.setText("Start");
 
 		textTimestampStart = new Text(groupTime, SWT.BORDER);
-		GridData gd_textTimestampStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_textTimestampStart.minimumWidth = 50;
+		GridData gd_textTimestampStart = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
+		gd_textTimestampStart.widthHint = 150;
 		textTimestampStart.setLayoutData(gd_textTimestampStart);
 		textTimestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
 		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
+		lblEndTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		lblEndTimestamp.setText("End");
 
 		textTimestampEnd = new Text(groupTime, SWT.BORDER);
-		GridData gd_textTimestampEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_textTimestampEnd.minimumWidth = 50;
+		GridData gd_textTimestampEnd = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
+		gd_textTimestampEnd.widthHint = 150;
 		textTimestampEnd.setLayoutData(gd_textTimestampEnd);
 		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
-		final Button btnReset = new Button(groupTime, SWT.NONE);
+		btnReset = new Button(groupTime, SWT.NONE);
 		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
 		btnReset.setText("Reset");
 
@@ -501,8 +589,8 @@ public class OcelotlView extends ViewPart {
 		lblTSNumber.setText("Timeslice Number");
 
 		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
-		final GridData gd_spinnerTSNumber = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_spinnerTSNumber.minimumWidth = 50;
+		GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_spinnerTSNumber.widthHint = 100;
 		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
 		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		spinnerTSNumber.setMaximum(10000);
@@ -514,8 +602,8 @@ public class OcelotlView extends ViewPart {
 		lblThreshold.setText("Threshold");
 
 		textThreshold = new Text(groupTime, SWT.BORDER);
-		GridData gd_textThreshold = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_textThreshold.minimumWidth = 50;
+		GridData gd_textThreshold = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_textThreshold.widthHint = 100;
 		textThreshold.setLayoutData(gd_textThreshold);
 		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 
@@ -528,24 +616,36 @@ public class OcelotlView extends ViewPart {
 		// btnGetParameters.setText("Get");
 
 		textRun = new Text(groupTime, SWT.BORDER);
-		GridData gd_textRun = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_textRun.minimumWidth = 50;
+		GridData gd_textRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_textRun.widthHint = 100;
 		textRun.setLayoutData(gd_textRun);
 		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		buttonDown = new Button(groupTime, SWT.NONE);
-		buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonDown.setText("<");
-
-		buttonUp = new Button(groupTime, SWT.NONE);
-		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonUp.setText(">");
+		textRun.addModifyListener(new ParameterModifyListener());
+		
+				buttonDown = new Button(groupTime, SWT.NONE);
+				buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				buttonDown.setText("<");
+				buttonDown.addSelectionListener(new ParameterDownAdapter());
+		
+				buttonUp = new Button(groupTime, SWT.NONE);
+				buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				buttonUp.setText(">");
+				buttonUp.addSelectionListener(new ParameterUpAdapter());
 		btnRun = new Button(groupTime, SWT.NONE);
-		btnRun.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRun.setText("RUN!");
-		sashFormView.setWeights(new int[] { 442, 47 });
+		btnRun.addSelectionListener(new GetAggregationAdapter());
+
+		// btnGetParameters.addSelectionListener(new GetParametersAdapter());
+		textThreshold.addModifyListener(new ThresholdModifyListener());
+		spinnerTSNumber.addModifyListener(new ConfModificationListener());
+		btnReset.addSelectionListener(new ResetListener());
+		textTimestampEnd.addModifyListener(new ConfModificationListener());
+		textTimestampStart.addModifyListener(new ConfModificationListener());
+		scrolledComposite.setContent(groupTime);
+		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		sashFormView.setWeights(new int[] {432, 16});
 
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
@@ -674,6 +774,7 @@ public class OcelotlView extends ViewPart {
 		btnSettings2 = new Button(composite, SWT.NONE);
 		btnSettings2.setText("Settings");
 		btnSettings2.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		sashFormTSandCurve.setWeights(new int[] {1, 1, 1});
 		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
 		// canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -724,19 +825,8 @@ public class OcelotlView extends ViewPart {
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		qualityView.initDiagram(compositeQualityView);
 		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		sashForm.setWeights(new int[] {196, 293});
-		btnRun.addSelectionListener(new GetAggregationAdapter());
-		buttonUp.addSelectionListener(new ParameterUpAdapter());
-		buttonDown.addSelectionListener(new ParameterDownAdapter());
-		textRun.addModifyListener(new ParameterModifyListener());
-
-		// btnGetParameters.addSelectionListener(new GetParametersAdapter());
-		textThreshold.addModifyListener(new ThresholdModifyListener());
-		spinnerTSNumber.addModifyListener(new ConfModificationListener());
-		btnReset.addSelectionListener(new ResetListener());
-		textTimestampEnd.addModifyListener(new ConfModificationListener());
-		textTimestampStart.addModifyListener(new ConfModificationListener());
-		sashForm_1.setWeights(new int[] { 655, 254 });
+		sashForm.setWeights(new int[] {111, 337});
+		sashForm_1.setWeights(new int[] {447, 142});
 		sashFormGlobal.setWeights(new int[] { 395 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
 		// sashFormGlobal.setWeights(new int[] { 172, 286 });

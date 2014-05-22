@@ -32,6 +32,7 @@ import org.osgi.framework.Bundle;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class TimeAggregationOperatorManager {
@@ -62,7 +63,7 @@ public class TimeAggregationOperatorManager {
 		}
 	}
 
-	public void activateSelectedOperator() {
+	public void activateSelectedOperator() throws OcelotlException {
 		try {
 			selectedOperator.setOcelotlParameters(parameters);
 		} catch (SoCTraceException | InterruptedException e) {

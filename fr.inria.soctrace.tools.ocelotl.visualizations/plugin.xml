@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="idGenericSpace"
+         name="GenericSpaceAggregationOperators"
+         point="fr.inria.soctrace.tools.ocelotl.core.visualization">
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.parts.Parts"
+            operator="Parts"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.parts.config.PartsConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.parts.config.PartsConfigView"
+            time_compatibility="Parts"
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartTimeLineView">
+      </aggregation_operator>
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion"
+            operator="Proportion"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
+            time_compatibility="Proportion"
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.StateProportionTimeLineView">
+      </aggregation_operator>
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.MatrixParts"
+            operator="Matrix"
+            time_compatibility="Matrix"
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView">
+      </aggregation_operator>
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MatrixProportion"
+            operator="Main Event"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
+            time_compatibility="Matrix"
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.views.ProportionMatrixView">
+      </aggregation_operator>
+   </extension>
+
+</plugin>

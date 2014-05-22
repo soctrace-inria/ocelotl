@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.core;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
@@ -81,7 +82,7 @@ public class OcelotlCore {
 
 	}
 
-	public void compute(final HasChanged hasChanged) throws SoCTraceException {
+	public void compute(final HasChanged hasChanged) throws SoCTraceException, OcelotlException {
 		if (hasChanged == HasChanged.ALL) {
 			setTimeOperator();
 			lpaggregManager = timeOperator.createManager();
@@ -93,7 +94,7 @@ public class OcelotlCore {
 
 	}
 
-	public void computeDichotomy(final HasChanged hasChanged) throws SoCTraceException {
+	public void computeDichotomy(final HasChanged hasChanged) throws SoCTraceException, OcelotlException {
 		compute(hasChanged);
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
 			lpaggregManager.computeDichotomy();
@@ -102,7 +103,7 @@ public class OcelotlCore {
 
 	}
 
-	public void computeParts(final HasChanged hasChanged) throws SoCTraceException {
+	public void computeParts(final HasChanged hasChanged) throws SoCTraceException, OcelotlException {
 		compute(hasChanged);
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.PARAMETER) {
 			lpaggregManager.computeParts();
@@ -161,7 +162,7 @@ public class OcelotlCore {
 
 	}
 
-	public void setTimeOperator() {
+	public void setTimeOperator() throws OcelotlException {
 		timeOperators.activateSelectedOperator();
 		timeOperator = timeOperators.getSelectedOperator();
 	}

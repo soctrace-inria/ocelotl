@@ -20,8 +20,8 @@
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
 public class AggregatedData implements IPartData{
-	boolean aggregated=true;
-	int value=-2;
+	private boolean aggregated=true;
+	private int value=-2;
 
 	public boolean isAggregated() {
 		return aggregated;

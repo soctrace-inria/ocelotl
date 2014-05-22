@@ -27,19 +27,20 @@ import java.util.Map;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 
 public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOperator implements I3DMicroDescription {
 
 	protected List<HashMap<EventProducer, HashMap<String, Long>>>	matrix;
-	List<String>											keys;
+
 
 	public _3DMicroDescription() {
 		super();
 	}
 
-	public _3DMicroDescription(final OcelotlParameters parameters) throws SoCTraceException {
+	public _3DMicroDescription(final OcelotlParameters parameters) throws SoCTraceException, OcelotlException {
 		super();
 		try {
 			setOcelotlParameters(parameters);
@@ -50,28 +51,18 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 	}
 
 	@Override
-	public void computeMatrix() throws SoCTraceException {
-		keys = new ArrayList<String>();
+	public void computeMatrix() throws SoCTraceException, OcelotlException, InterruptedException {
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
 		final int epsize = getOcelotlParameters().getEventProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0 || epsize < getOcelotlParameters().getMaxEventProducers())
-			try {
 				computeSubMatrix(getOcelotlParameters().getEventProducers());
-			} catch (final InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		else {
 			final List<EventProducer> producers = getOcelotlParameters().getEventProducers().size() == 0 ? ocelotlQueries.getAllEventProducers() : getOcelotlParameters().getEventProducers();
 			for (int i = 0; i < epsize; i = i + getOcelotlParameters().getMaxEventProducers())
-				try {
 					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + getOcelotlParameters().getMaxEventProducers())));
-				} catch (final InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
 		}
 
 		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");

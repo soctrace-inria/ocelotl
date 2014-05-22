@@ -18,6 +18,7 @@ Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.config,
  fr.inria.soctrace.tools.ocelotl.core.constants,
+ fr.inria.soctrace.tools.ocelotl.core.exceptions,
  fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,
  fr.inria.soctrace.tools.ocelotl.core.itimeaggregop,
  fr.inria.soctrace.tools.ocelotl.core.parameters,

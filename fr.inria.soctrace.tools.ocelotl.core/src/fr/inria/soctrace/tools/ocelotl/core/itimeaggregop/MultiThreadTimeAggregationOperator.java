@@ -19,18 +19,23 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
+import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
 public abstract class MultiThreadTimeAggregationOperator {
 
 	protected TimeSliceManager	timeSliceManager;
+	protected EventIterator	it;
 	protected int				count	= 0;
 	protected int				epit	= 0;
 	protected DeltaManager		dm;
@@ -39,9 +44,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected OcelotlParameters	parameters;
 	protected OcelotlQueries	ocelotlQueries;
 
-	abstract protected void computeMatrix() throws SoCTraceException, InterruptedException;
+	abstract protected void computeMatrix() throws SoCTraceException, InterruptedException, OcelotlException;
 
-	abstract protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException;
+	abstract protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException, OcelotlException;
 
 	public synchronized int getCount() {
 		count++;
@@ -65,19 +70,32 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	abstract protected void initVectors() throws SoCTraceException;
 
-	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException {
+	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException, OcelotlException {
 		this.parameters = parameters;
-		// ocelotlQueries = new OcelotlQueries(parameters);
-		// ocelotlQueries.checkTimeStamps();
 		count = 0;
 		epit = 0;
 		timeSliceManager = new TimeSliceManager(getOcelotlParameters().getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initQueries();
 		initVectors();
 		computeMatrix();
+		if (eventsNumber==0)
+				throw new OcelotlException(OcelotlException.NOEVENTS);
 	}
 
 	public void total(final int rows) {
 		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
+	}
+	
+	public List<Event> getEvents(final int size) {
+		final List<Event> events = new ArrayList<Event>();
+		synchronized (it) {
+			for (int i = 0; i < size; i++) {
+				if (it.getNext() == null)
+					return events;
+				events.add(it.getEvent());
+				eventsNumber++;
+			}
+		}
+		return events;
 	}
 }

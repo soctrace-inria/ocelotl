@@ -44,9 +44,6 @@ abstract public class SpaceAggregationOperator implements ISpaceAggregationOpera
 	}
 
 	abstract protected void computeParts();
-	
-	@Override
-	abstract public String descriptor();
 
 	@Override
 	public OcelotlCore getOcelotlCore() {
