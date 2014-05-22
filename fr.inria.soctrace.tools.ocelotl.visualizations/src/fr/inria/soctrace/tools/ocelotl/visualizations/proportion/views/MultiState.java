@@ -66,8 +66,8 @@ public class MultiState {
 
 	public void init() {
 		double total = 0;
-		final double y0 = root.getSize().height;
-		final double y1 = 9.0 / 10.0 * root.getSize().height;
+		final double y0 = root.getSize().height - Border;
+		final double y1 = 9.0 / 10.0 * root.getSize().height - Border;
 		final double x0 = root.getSize().width - 2 * Border;
 		final double d = distribution.getSliceNumber();
 		final double m = distribution.getMax();
