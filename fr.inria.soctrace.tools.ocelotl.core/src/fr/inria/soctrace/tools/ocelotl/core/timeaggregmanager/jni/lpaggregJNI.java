@@ -9,140 +9,49 @@
 package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni;
 
 public class lpaggregJNI {
-	public final static native long new_OLPAggregWrapper(int jarg1);
-
-	public final static native void delete_OLPAggregWrapper(long jarg1);
-
-	public final static native int OLPAggregWrapper_getPart(long jarg1,
-			OLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native int OLPAggregWrapper_getPartNumber(long jarg1,
-			OLPAggregWrapper jarg1_);
-
-	public final static native float OLPAggregWrapper_getParameter(long jarg1,
-			OLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native int OLPAggregWrapper_getParameterNumber(
-			long jarg1, OLPAggregWrapper jarg1_);
-
-	public final static native double OLPAggregWrapper_getGainByIndex(
-			long jarg1, OLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native double OLPAggregWrapper_getGainByParameter(
-			long jarg1, OLPAggregWrapper jarg1_, float jarg2);
-
-	public final static native double OLPAggregWrapper_getLossByIndex(
-			long jarg1, OLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native double OLPAggregWrapper_getLossByParameter(
-			long jarg1, OLPAggregWrapper jarg1_, float jarg2);
-
-	public final static native void OLPAggregWrapper_computeQualities(
-			long jarg1, OLPAggregWrapper jarg1_, boolean jarg2);
-
-	public final static native void OLPAggregWrapper_computeParts(long jarg1,
-			OLPAggregWrapper jarg1_, float jarg2);
-
-	public final static native void OLPAggregWrapper_computeDichotomy(
-			long jarg1, OLPAggregWrapper jarg1_, float jarg2);
-
-	public final static native void OLPAggregWrapper_setValue__SWIG_0(
-			long jarg1, OLPAggregWrapper jarg1_, int jarg2, double jarg3);
-
-	public final static native void OLPAggregWrapper_push_back__SWIG_0(
-			long jarg1, OLPAggregWrapper jarg1_, double jarg2);
-
-	public final static native void OLPAggregWrapper_addVector__SWIG_0(
-			long jarg1, OLPAggregWrapper jarg1_);
-
-	public final static native void OLPAggregWrapper_setValue__SWIG_1(
-			long jarg1, OLPAggregWrapper jarg1_, int jarg2, int jarg3,
-			double jarg4);
-
-	public final static native void OLPAggregWrapper_push_back__SWIG_1(
-			long jarg1, OLPAggregWrapper jarg1_, int jarg2, double jarg3);
-
-	public final static native void OLPAggregWrapper_addMatrix(long jarg1,
-			OLPAggregWrapper jarg1_);
-
-	public final static native void OLPAggregWrapper_setValue__SWIG_2(
-			long jarg1, OLPAggregWrapper jarg1_, int jarg2, int jarg3,
-			int jarg4, double jarg5);
-
-	public final static native void OLPAggregWrapper_addVector__SWIG_1(
-			long jarg1, OLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native void OLPAggregWrapper_push_back__SWIG_2(
-			long jarg1, OLPAggregWrapper jarg1_, int jarg2, int jarg3,
-			double jarg4);
-
-	public final static native long new_DLPAggregWrapper(int jarg1);
-
-	public final static native void delete_DLPAggregWrapper(long jarg1);
-
-	public final static native int DLPAggregWrapper_newLeaf(long jarg1,
-			DLPAggregWrapper jarg1_, int jarg2, int jarg3);
-
-	public final static native int DLPAggregWrapper_newNode(long jarg1,
-			DLPAggregWrapper jarg1_, int jarg2, int jarg3);
-
-	public final static native int DLPAggregWrapper_newRoot(long jarg1,
-			DLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native void DLPAggregWrapper_validate(long jarg1,
-			DLPAggregWrapper jarg1_);
-
-	public final static native boolean DLPAggregWrapper_hasFullAggregation(
-			long jarg1, DLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native int DLPAggregWrapper_getPart(long jarg1,
-			DLPAggregWrapper jarg1_, int jarg2, int jarg3);
-
-	public final static native int DLPAggregWrapper_getPartNumber(long jarg1,
-			DLPAggregWrapper jarg1_);
-
-	public final static native float DLPAggregWrapper_getParameter(long jarg1,
-			DLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native int DLPAggregWrapper_getParameterNumber(
-			long jarg1, DLPAggregWrapper jarg1_);
-
-	public final static native double DLPAggregWrapper_getGainByIndex(
-			long jarg1, DLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native double DLPAggregWrapper_getGainByParameter(
-			long jarg1, DLPAggregWrapper jarg1_, double jarg2);
-
-	public final static native double DLPAggregWrapper_getLossByIndex(
-			long jarg1, DLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native double DLPAggregWrapper_getLossByParameter(
-			long jarg1, DLPAggregWrapper jarg1_, double jarg2);
-
-	public final static native void DLPAggregWrapper_computeQualities(
-			long jarg1, DLPAggregWrapper jarg1_, boolean jarg2);
-
-	public final static native void DLPAggregWrapper_computeParts(long jarg1,
-			DLPAggregWrapper jarg1_, double jarg2);
-
-	public final static native void DLPAggregWrapper_computeDichotomy(
-			long jarg1, DLPAggregWrapper jarg1_, float jarg2);
-
-	public final static native void DLPAggregWrapper_setValue__SWIG_0(
-			long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3,
-			double jarg4);
-
-	public final static native void DLPAggregWrapper_push_back__SWIG_0(
-			long jarg1, DLPAggregWrapper jarg1_, int jarg2, double jarg3);
-
-	public final static native void DLPAggregWrapper_addVector(long jarg1,
-			DLPAggregWrapper jarg1_, int jarg2);
-
-	public final static native void DLPAggregWrapper_setValue__SWIG_1(
-			long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3,
-			int jarg4, double jarg5);
-
-	public final static native void DLPAggregWrapper_push_back__SWIG_1(
-			long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3,
-			double jarg4);
+  public final static native long new_OLPAggregWrapper(int jarg1);
+  public final static native void delete_OLPAggregWrapper(long jarg1);
+  public final static native int OLPAggregWrapper_getPart(long jarg1, OLPAggregWrapper jarg1_, int jarg2);
+  public final static native int OLPAggregWrapper_getPartNumber(long jarg1, OLPAggregWrapper jarg1_);
+  public final static native float OLPAggregWrapper_getParameter(long jarg1, OLPAggregWrapper jarg1_, int jarg2);
+  public final static native int OLPAggregWrapper_getParameterNumber(long jarg1, OLPAggregWrapper jarg1_);
+  public final static native double OLPAggregWrapper_getGainByIndex(long jarg1, OLPAggregWrapper jarg1_, int jarg2);
+  public final static native double OLPAggregWrapper_getGainByParameter(long jarg1, OLPAggregWrapper jarg1_, float jarg2);
+  public final static native double OLPAggregWrapper_getLossByIndex(long jarg1, OLPAggregWrapper jarg1_, int jarg2);
+  public final static native double OLPAggregWrapper_getLossByParameter(long jarg1, OLPAggregWrapper jarg1_, float jarg2);
+  public final static native void OLPAggregWrapper_computeQualities(long jarg1, OLPAggregWrapper jarg1_, boolean jarg2);
+  public final static native void OLPAggregWrapper_computeParts(long jarg1, OLPAggregWrapper jarg1_, float jarg2);
+  public final static native void OLPAggregWrapper_computeDichotomy(long jarg1, OLPAggregWrapper jarg1_, float jarg2);
+  public final static native void OLPAggregWrapper_setValue__SWIG_0(long jarg1, OLPAggregWrapper jarg1_, int jarg2, double jarg3);
+  public final static native void OLPAggregWrapper_push_back__SWIG_0(long jarg1, OLPAggregWrapper jarg1_, double jarg2);
+  public final static native void OLPAggregWrapper_addVector__SWIG_0(long jarg1, OLPAggregWrapper jarg1_);
+  public final static native void OLPAggregWrapper_setValue__SWIG_1(long jarg1, OLPAggregWrapper jarg1_, int jarg2, int jarg3, double jarg4);
+  public final static native void OLPAggregWrapper_push_back__SWIG_1(long jarg1, OLPAggregWrapper jarg1_, int jarg2, double jarg3);
+  public final static native void OLPAggregWrapper_addMatrix(long jarg1, OLPAggregWrapper jarg1_);
+  public final static native void OLPAggregWrapper_setValue__SWIG_2(long jarg1, OLPAggregWrapper jarg1_, int jarg2, int jarg3, int jarg4, double jarg5);
+  public final static native void OLPAggregWrapper_addVector__SWIG_1(long jarg1, OLPAggregWrapper jarg1_, int jarg2);
+  public final static native void OLPAggregWrapper_push_back__SWIG_2(long jarg1, OLPAggregWrapper jarg1_, int jarg2, int jarg3, double jarg4);
+  public final static native long new_DLPAggregWrapper(int jarg1);
+  public final static native void delete_DLPAggregWrapper(long jarg1);
+  public final static native int DLPAggregWrapper_newLeaf(long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3);
+  public final static native int DLPAggregWrapper_newNode(long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3);
+  public final static native int DLPAggregWrapper_newRoot(long jarg1, DLPAggregWrapper jarg1_, int jarg2);
+  public final static native void DLPAggregWrapper_validate(long jarg1, DLPAggregWrapper jarg1_);
+  public final static native boolean DLPAggregWrapper_hasFullAggregation(long jarg1, DLPAggregWrapper jarg1_, int jarg2);
+  public final static native int DLPAggregWrapper_getPart(long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3);
+  public final static native int DLPAggregWrapper_getPartNumber(long jarg1, DLPAggregWrapper jarg1_);
+  public final static native float DLPAggregWrapper_getParameter(long jarg1, DLPAggregWrapper jarg1_, int jarg2);
+  public final static native int DLPAggregWrapper_getParameterNumber(long jarg1, DLPAggregWrapper jarg1_);
+  public final static native double DLPAggregWrapper_getGainByIndex(long jarg1, DLPAggregWrapper jarg1_, int jarg2);
+  public final static native double DLPAggregWrapper_getGainByParameter(long jarg1, DLPAggregWrapper jarg1_, double jarg2);
+  public final static native double DLPAggregWrapper_getLossByIndex(long jarg1, DLPAggregWrapper jarg1_, int jarg2);
+  public final static native double DLPAggregWrapper_getLossByParameter(long jarg1, DLPAggregWrapper jarg1_, double jarg2);
+  public final static native void DLPAggregWrapper_computeQualities(long jarg1, DLPAggregWrapper jarg1_, boolean jarg2);
+  public final static native void DLPAggregWrapper_computeParts(long jarg1, DLPAggregWrapper jarg1_, double jarg2);
+  public final static native void DLPAggregWrapper_computeDichotomy(long jarg1, DLPAggregWrapper jarg1_, float jarg2);
+  public final static native void DLPAggregWrapper_setValue__SWIG_0(long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3, double jarg4);
+  public final static native void DLPAggregWrapper_push_back__SWIG_0(long jarg1, DLPAggregWrapper jarg1_, int jarg2, double jarg3);
+  public final static native void DLPAggregWrapper_addVector(long jarg1, DLPAggregWrapper jarg1_, int jarg2);
+  public final static native void DLPAggregWrapper_setValue__SWIG_1(long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3, int jarg4, double jarg5);
+  public final static native void DLPAggregWrapper_push_back__SWIG_1(long jarg1, DLPAggregWrapper jarg1_, int jarg2, int jarg3, double jarg4);
 }
