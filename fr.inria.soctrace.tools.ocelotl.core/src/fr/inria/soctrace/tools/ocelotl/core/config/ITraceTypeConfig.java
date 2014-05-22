@@ -27,5 +27,4 @@ public interface ITraceTypeConfig {
 
 	public List<EventType> getTypes();
 
-
 }

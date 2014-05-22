@@ -20,9 +20,9 @@
 package fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy;
 
 public class EventProxy {
-	public int	ID;
-	public int	EP;
-	public int	PAGE;
+	public int ID;
+	public int EP;
+	public int PAGE;
 
 	public EventProxy(final int id, final int ep, final int page) {
 		ID = id;

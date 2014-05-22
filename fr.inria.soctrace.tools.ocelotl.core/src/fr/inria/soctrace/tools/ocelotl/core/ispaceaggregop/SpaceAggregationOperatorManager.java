@@ -37,22 +37,22 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class SpaceAggregationOperatorManager {
 
-	HashMap<String, SpaceAggregationOperatorResource>	List;
-	ISpaceAggregationOperator							selectedOperator;
-	String												selectedOperatorName;
-	ISpaceConfig										selectedConfig;
-	OcelotlParameters									parameters;
-	OcelotlCore											ocelotlCore;
+	HashMap<String, SpaceAggregationOperatorResource> List;
+	ISpaceAggregationOperator selectedOperator;
+	String selectedOperatorName;
+	ISpaceConfig selectedConfig;
+	OcelotlParameters parameters;
+	OcelotlCore ocelotlCore;
 
-	private static final String							POINT_ID				= "fr.inria.soctrace.tools.ocelotl.core.visualization";	//$NON-NLS-1$
-	private static final String							OP_NAME					= "operator";												//$NON-NLS-1$
-	private static final String							OP_CLASS				= "class";													//$NON-NLS-1$
-	private static final String							OP_VISUALIZATION		= "visualization";		
-	private static final String							OP_PARAM_WIN			= "param_win";
-	private static final String							OP_PARAM_CONFIG			= "param_config";//$NON-NLS-1$
-																																			//	private static final String							OP_PARAM_WIN				= "param_win";												//$NON-NLS-1$
-																																			//	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
-	private static final String							OP_TIME_COMPATIBILITY	= "time_compatibility";									//$NON-NLS-1$
+	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.visualization"; //$NON-NLS-1$
+	private static final String OP_NAME = "operator"; //$NON-NLS-1$
+	private static final String OP_CLASS = "class"; //$NON-NLS-1$
+	private static final String OP_VISUALIZATION = "visualization";
+	private static final String OP_PARAM_WIN = "param_win";
+	private static final String OP_PARAM_CONFIG = "param_config";//$NON-NLS-1$
+																	//	private static final String							OP_PARAM_WIN				= "param_win";												//$NON-NLS-1$
+																	//	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
+	private static final String OP_TIME_COMPATIBILITY = "time_compatibility"; //$NON-NLS-1$
 
 	public SpaceAggregationOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
@@ -68,22 +68,25 @@ public class SpaceAggregationOperatorManager {
 	}
 
 	public void activateSelectedOperator() {
-		final Bundle mybundle = Platform.getBundle(List.get(selectedOperatorName).getBundle());
+		final Bundle mybundle = Platform.getBundle(List.get(
+				selectedOperatorName).getBundle());
 		try {
 
-			selectedOperator = (ISpaceAggregationOperator) mybundle.loadClass(List.get(selectedOperatorName).getOperatorClass()).newInstance();
+			selectedOperator = (ISpaceAggregationOperator) mybundle.loadClass(
+					List.get(selectedOperatorName).getOperatorClass())
+					.newInstance();
 
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		selectedOperator.setOcelotlCore(ocelotlCore);
 	}
 
-
-
 	public List<String> getOperators(final List<String> compatibility) {
-		System.out.println("Comparing Space Operator trace format with " + compatibility);
+		System.out.println("Comparing Space Operator trace format with "
+				+ compatibility);
 		final List<String> op = new ArrayList<String>();
 		for (final SpaceAggregationOperatorResource r : List.values()) {
 			System.out.println(r.getTimeCompatibility());
@@ -123,8 +126,10 @@ public class SpaceAggregationOperatorManager {
 		List = new HashMap<String, SpaceAggregationOperatorResource>();
 
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
-		final IConfigurationElement[] config = reg.getConfigurationElementsFor(POINT_ID);
-		System.out.println(config.length + " Space aggregation operators detected:");
+		final IConfigurationElement[] config = reg
+				.getConfigurationElementsFor(POINT_ID);
+		System.out.println(config.length
+				+ " Space aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final SpaceAggregationOperatorResource resource = new SpaceAggregationOperatorResource();
@@ -137,19 +142,24 @@ public class SpaceAggregationOperatorManager {
 			resource.setBundle(e.getContributor().getName());
 			// System.out.println(resource.getBundle());
 			List.put(resource.getName(), resource);
-			System.out.println("    " + resource.getName() + " " + resource.getTimeCompatibility());
+			System.out.println("    " + resource.getName() + " "
+					+ resource.getTimeCompatibility());
 		}
 	}
 
 	public void setSelectedOperator(final String name) {
 		selectedOperatorName = name;
-		final Bundle mybundle = Platform.getBundle(List.get(selectedOperatorName).getBundle());
+		final Bundle mybundle = Platform.getBundle(List.get(
+				selectedOperatorName).getBundle());
 		try {
-			selectedConfig = (ISpaceConfig) mybundle.loadClass(List.get(selectedOperatorName).getParamConfig()).newInstance();
+			selectedConfig = (ISpaceConfig) mybundle.loadClass(
+					List.get(selectedOperatorName).getParamConfig())
+					.newInstance();
 			parameters.setSpaceConfig(selectedConfig);
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException |NullPointerException e) {
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException | NullPointerException e) {
 		}
-		
+
 	}
 
 }

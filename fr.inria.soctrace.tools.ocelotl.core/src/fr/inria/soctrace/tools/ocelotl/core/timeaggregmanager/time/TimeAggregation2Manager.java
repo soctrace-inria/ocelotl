@@ -29,34 +29,35 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class TimeAggregation2Manager extends TimeAggregationManager {
 
-	I2DMicroDescription	matrix;
-	
+	I2DMicroDescription matrix;
 
 	public TimeAggregation2Manager(final I2DMicroDescription matrix) {
 		super(matrix.getOcelotlParameters());
 		this.matrix = matrix;
 		reset();
 	}
-	
+
 	@Override
 	public void fillVectorsJava() {
-		List<List<Double>>	values;
+		List<List<Double>> values;
 		values = new ArrayList<List<Double>>();
 		for (int i = 0; i < matrix.getVectorNumber(); i++) {
 			values.add(new ArrayList<Double>());
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet())
-				values.get(i).add(matrix.getMatrix().get(i).get(key).doubleValue());
+				values.get(i).add(
+						matrix.getMatrix().get(i).get(key).doubleValue());
 		}
 		((TimeAggregation2) timeAggregation).setValues(values);
 
 	}
-	
+
 	@Override
 	public void fillVectorsJNI() {
 		for (int i = 0; i < matrix.getVectorNumber(); i++) {
 			((JNITimeAggregation2) timeAggregation).addVector();
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet())
-				((JNITimeAggregation2) timeAggregation).push_back(matrix.getMatrix().get(i).get(key).doubleValue());
+				((JNITimeAggregation2) timeAggregation).push_back(matrix
+						.getMatrix().get(i).get(key).doubleValue());
 		}
 
 	}

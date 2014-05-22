@@ -19,20 +19,16 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.ISpaceTimeManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.ITimeManager;
 
-abstract public class SpaceAggregationOperator implements ISpaceAggregationOperator {
+abstract public class SpaceAggregationOperator implements
+		ISpaceAggregationOperator {
 
-	protected OcelotlCore	ocelotlCore;
-	protected int			timeSliceNumber;
-	protected long			timeSliceDuration;
-	protected ISpaceTimeManager	lpaggregManager;
+	protected OcelotlCore ocelotlCore;
+	protected int timeSliceNumber;
+	protected long timeSliceDuration;
+	protected ISpaceTimeManager lpaggregManager;
 
 	public SpaceAggregationOperator() {
 		super();
@@ -54,8 +50,11 @@ abstract public class SpaceAggregationOperator implements ISpaceAggregationOpera
 	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
 		lpaggregManager = (ISpaceTimeManager) ocelotlCore.getLpaggregManager();
-		timeSliceNumber = ocelotlCore.getOcelotlParameters().getTimeSlicesNumber();
-		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion().getTimeDuration() / timeSliceNumber;
+		timeSliceNumber = ocelotlCore.getOcelotlParameters()
+				.getTimeSlicesNumber();
+		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()
+				.getTimeDuration()
+				/ timeSliceNumber;
 	}
 
 }

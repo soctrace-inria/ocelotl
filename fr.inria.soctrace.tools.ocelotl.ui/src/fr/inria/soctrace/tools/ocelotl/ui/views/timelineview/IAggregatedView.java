@@ -28,12 +28,12 @@ public interface IAggregatedView {
 
 	public void deleteDiagram();
 
+	public long getEnd();
+
+	public long getStart();
+
 	public void init(TimeLineViewWrapper wrapper);
 
 	public void resizeDiagram();
-	
-	public long getStart();
-	
-	public long getEnd();
 
 }

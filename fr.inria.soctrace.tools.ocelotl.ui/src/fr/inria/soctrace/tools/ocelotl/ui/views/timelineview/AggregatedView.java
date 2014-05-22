@@ -46,32 +46,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 abstract public class AggregatedView implements IAggregatedView {
-	
-	protected Figure						root;
-	protected Canvas						canvas;
-	protected final List<RectangleFigure>	figures	= new ArrayList<RectangleFigure>();
-
-	protected TimeRegion					time;
-
-	protected TimeRegion					selectTime;
-
-	protected TimeRegion					resetTime;
-
-	public final static int					Border	= 10;
-
-	protected final int						Space	= 3;
-
-	protected final OcelotlView				ocelotlView;
-
-	private SelectFigure					selectFigure;
-	
-
-	public final static Color	selectColorFG	= ColorConstants.blue;
-
-	public final static Color	selectColorBG	= ColorConstants.lightGray;
-
-	public final static Color	activeColorFG	= ColorConstants.black;
-	public final static Color	activeColorBG	= ColorConstants.darkBlue;
 
 	private class SelectFigure extends RectangleFigure {
 
@@ -169,39 +143,41 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mousePressed(final MouseEvent arg0) {
-			if(arg0.button==1){
-			state = State.PRESSED_G;
-			long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
-			p3 = Math.max(p3, resetTime.getTimeStampStart());
-			p3 = Math.min(p3, resetTime.getTimeStampEnd());
-			selectTime.setTimeStampStart(p3);
-			selectTime.setTimeStampEnd(p3);
-			currentPoint = arg0.getLocation();
-			ocelotlView.setTimeRegion(selectTime);
-			ocelotlView.getTimeAxisView().select(selectTime, false);
-			selectFigure.draw(selectTime, false);
+			if (arg0.button == 1) {
+				state = State.PRESSED_G;
+				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
+				p3 = Math.max(p3, resetTime.getTimeStampStart());
+				p3 = Math.min(p3, resetTime.getTimeStampEnd());
+				selectTime.setTimeStampStart(p3);
+				selectTime.setTimeStampEnd(p3);
+				currentPoint = arg0.getLocation();
+				ocelotlView.setTimeRegion(selectTime);
+				ocelotlView.getTimeAxisView().select(selectTime, false);
+				selectFigure.draw(selectTime, false);
 			}
 		}
 
 		@Override
 		public void mouseReleased(final MouseEvent arg0) {
-			if (state == State.PRESSED_G || state == State.DRAG_G){
-			state = State.RELEASED;
-			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-				ocelotlView.getTimeAxisView().select(selectTime, true);
-				selectFigure.draw(selectTime, true);
-			} else {
-				ocelotlView.getTimeAxisView().resizeDiagram();
-				if (selectFigure.getParent() != null)
-					root.remove(selectFigure);
-				root.repaint();
-			}
-			selectTime = new TimeRegion(resetTime);
+			if (state == State.PRESSED_G || state == State.DRAG_G) {
+				state = State.RELEASED;
+				if (!ocelotlView.getTimeRegion().compareTimeRegion(time)&& selectTime.getTimeDuration()>0) {
+					ocelotlView.getTimeAxisView().select(selectTime, true);
+					selectFigure.draw(selectTime, true);
+				} else {
+					ocelotlView.getTimeAxisView().resizeDiagram();
+					if (selectFigure.getParent() != null)
+						root.remove(selectFigure);
+					root.repaint();
+					if(selectTime.getTimeDuration()==0){
+						ocelotlView.setTimeRegion(resetTime);
+					}
+									}
+				selectTime = new TimeRegion(resetTime);
 			}
 		}
 
 	}
-
 
 	public static Color getActivecolorbg() {
 		return activeColorBG;
@@ -210,6 +186,33 @@ abstract public class AggregatedView implements IAggregatedView {
 	public static Color getActivecolorfg() {
 		return activeColorFG;
 	}
+
+	protected Figure						root;
+
+	protected Canvas						canvas;
+
+	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
+
+	protected TimeRegion					time;
+
+	protected TimeRegion					selectTime;
+
+	protected TimeRegion					resetTime;
+
+	public final static int					Border			= 10;
+
+	protected final int						Space			= 3;
+	protected final OcelotlView				ocelotlView;
+
+	private SelectFigure					selectFigure;
+
+	public final static Color				selectColorFG	= ColorConstants.blue;
+
+	public final static Color				selectColorBG	= ColorConstants.lightGray;
+
+	public final static Color				activeColorFG	= ColorConstants.black;
+
+	public final static Color				activeColorBG	= ColorConstants.darkBlue;
 
 	public static int getBorder() {
 		return Border;
@@ -222,8 +225,6 @@ abstract public class AggregatedView implements IAggregatedView {
 	public static Color getSelectcolorfg() {
 		return selectColorFG;
 	}
-
-
 
 	public AggregatedView(final OcelotlView ocelotlView) {
 		super();
@@ -315,7 +316,5 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
 	}
-	
-	
 
 }

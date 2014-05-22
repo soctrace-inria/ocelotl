@@ -19,15 +19,15 @@ public class MajState {
 	}
 	
 	public int getAmplitude255(){
-		return (int) ((double) (amplitude*255.0));
+		return (int) (amplitude*255.0);
 	} 
 	
 	public int getAmplitude255M(){
-		return (int) ((Math.min((double) amplitude*255.0, 255.0)));
+		return (int) ((Math.min(amplitude*255.0, 255.0)));
 	} 
 	
 	public int getAmplitude100(){
-		return (int) ((double) (amplitude*100.0));
+		return (int) (amplitude*100.0);
 	}
 	public MajState(String state, double amplitude) {
 		super();

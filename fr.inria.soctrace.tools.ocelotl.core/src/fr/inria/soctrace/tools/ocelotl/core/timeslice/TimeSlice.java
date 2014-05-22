@@ -23,9 +23,9 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class TimeSlice {
 
-	private TimeRegion	timeRegion;
-	private long		number;
-	private long		value	= -1;
+	private TimeRegion timeRegion;
+	private long number;
+	private long value = -1;
 
 	public TimeSlice(final TimeRegion timeRegion, final long number) {
 		super();
@@ -33,7 +33,8 @@ public class TimeSlice {
 		this.number = number;
 	}
 
-	public TimeSlice(final TimeRegion timeRegion, final long number, final long value) {
+	public TimeSlice(final TimeRegion timeRegion, final long number,
+			final long value) {
 		super();
 		this.timeRegion = timeRegion;
 		this.number = number;
@@ -53,16 +54,29 @@ public class TimeSlice {
 	}
 
 	public long regionInsideMe(final TimeRegion testedTimeRegion) {
-		if (testedTimeRegion.getTimeStampStart() >= timeRegion.getTimeStampStart() && testedTimeRegion.getTimeStampStart() <= timeRegion.getTimeStampEnd()) {
-			if (testedTimeRegion.getTimeStampEnd() < timeRegion.getTimeStampEnd())
-				return testedTimeRegion.getTimeStampEnd() - testedTimeRegion.getTimeStampStart();
+		if (testedTimeRegion.getTimeStampStart() >= timeRegion
+				.getTimeStampStart()
+				&& testedTimeRegion.getTimeStampStart() <= timeRegion
+						.getTimeStampEnd()) {
+			if (testedTimeRegion.getTimeStampEnd() < timeRegion
+					.getTimeStampEnd())
+				return testedTimeRegion.getTimeStampEnd()
+						- testedTimeRegion.getTimeStampStart();
 			else
-				return timeRegion.getTimeStampEnd() - testedTimeRegion.getTimeStampStart();
-		} else if (testedTimeRegion.getTimeStampStart() < timeRegion.getTimeStampStart())
-			if (testedTimeRegion.getTimeStampEnd() <= timeRegion.getTimeStampEnd() && testedTimeRegion.getTimeStampEnd() >= timeRegion.getTimeStampStart())
-				return testedTimeRegion.getTimeStampEnd() - timeRegion.getTimeStampStart();
-			else if (testedTimeRegion.getTimeStampEnd() > timeRegion.getTimeStampEnd())
-				return timeRegion.getTimeStampEnd() - timeRegion.getTimeStampStart();
+				return timeRegion.getTimeStampEnd()
+						- testedTimeRegion.getTimeStampStart();
+		} else if (testedTimeRegion.getTimeStampStart() < timeRegion
+				.getTimeStampStart())
+			if (testedTimeRegion.getTimeStampEnd() <= timeRegion
+					.getTimeStampEnd()
+					&& testedTimeRegion.getTimeStampEnd() >= timeRegion
+							.getTimeStampStart())
+				return testedTimeRegion.getTimeStampEnd()
+						- timeRegion.getTimeStampStart();
+			else if (testedTimeRegion.getTimeStampEnd() > timeRegion
+					.getTimeStampEnd())
+				return timeRegion.getTimeStampEnd()
+						- timeRegion.getTimeStampStart();
 		return 0;
 	}
 
@@ -79,7 +93,8 @@ public class TimeSlice {
 	}
 
 	public boolean startIsInsideMe(final long eventStart) {
-		return eventStart >= timeRegion.getTimeStampStart() && eventStart <= timeRegion.getTimeStampEnd();
+		return eventStart >= timeRegion.getTimeStampStart()
+				&& eventStart <= timeRegion.getTimeStampEnd();
 	}
 
 }

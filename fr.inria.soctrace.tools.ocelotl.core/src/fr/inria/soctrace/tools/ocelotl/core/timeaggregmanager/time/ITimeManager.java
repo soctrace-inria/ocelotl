@@ -23,7 +23,7 @@ import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 
-public interface ITimeManager extends IMicroDescManager{
+public interface ITimeManager extends IMicroDescManager {
 
 	public List<Integer> getParts();
 

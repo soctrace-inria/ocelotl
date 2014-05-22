@@ -35,13 +35,17 @@ public class StateDistributionView extends DistributionBaseView {
 	@Override
 	public void setParameters() {
 		if (config.getTypes().isEmpty())
-			for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-				if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory() == EventCategory.STATE)
-					config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
+			for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes()
+					.size(); i++)
+				if (ocelotlView.getConfDataLoader().getTypes().get(i)
+						.getCategory() == EventCategory.STATE)
+					config.getTypes().add(
+							ocelotlView.getConfDataLoader().getTypes().get(i));
 		listViewerEventTypes.setInput(config.getTypes());
 	}
-	
-	protected java.util.List<EventType> getEventTypes(){
+
+	@Override
+	protected java.util.List<EventType> getEventTypes() {
 		java.util.List<EventType> types = new ArrayList<EventType>();
 		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
 			if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory() == EventCategory.STATE)

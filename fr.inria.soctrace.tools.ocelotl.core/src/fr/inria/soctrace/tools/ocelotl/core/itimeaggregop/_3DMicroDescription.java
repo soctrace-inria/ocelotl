@@ -31,16 +31,17 @@ import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 
-public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOperator implements I3DMicroDescription {
+public abstract class _3DMicroDescription extends
+		MultiThreadTimeAggregationOperator implements I3DMicroDescription {
 
-	protected List<HashMap<EventProducer, HashMap<String, Long>>>	matrix;
-
+	protected List<HashMap<EventProducer, HashMap<String, Long>>> matrix;
 
 	public _3DMicroDescription() {
 		super();
 	}
 
-	public _3DMicroDescription(final OcelotlParameters parameters) throws SoCTraceException, OcelotlException {
+	public _3DMicroDescription(final OcelotlParameters parameters)
+			throws SoCTraceException, OcelotlException {
 		super();
 		try {
 			setOcelotlParameters(parameters);
@@ -51,21 +52,29 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 	}
 
 	@Override
-	public void computeMatrix() throws SoCTraceException, OcelotlException, InterruptedException {
+	public void computeMatrix() throws SoCTraceException, OcelotlException,
+			InterruptedException {
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
 		final int epsize = getOcelotlParameters().getEventProducers().size();
-		if (getOcelotlParameters().getMaxEventProducers() == 0 || epsize < getOcelotlParameters().getMaxEventProducers())
-				computeSubMatrix(getOcelotlParameters().getEventProducers());
+		if (getOcelotlParameters().getMaxEventProducers() == 0
+				|| epsize < getOcelotlParameters().getMaxEventProducers())
+			computeSubMatrix(getOcelotlParameters().getEventProducers());
 		else {
-			final List<EventProducer> producers = getOcelotlParameters().getEventProducers().size() == 0 ? ocelotlQueries.getAllEventProducers() : getOcelotlParameters().getEventProducers();
-			for (int i = 0; i < epsize; i = i + getOcelotlParameters().getMaxEventProducers())
-					computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i + getOcelotlParameters().getMaxEventProducers())));
+			final List<EventProducer> producers = getOcelotlParameters()
+					.getEventProducers().size() == 0 ? ocelotlQueries
+					.getAllEventProducers() : getOcelotlParameters()
+					.getEventProducers();
+			for (int i = 0; i < epsize; i = i
+					+ getOcelotlParameters().getMaxEventProducers())
+				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i
+						+ getOcelotlParameters().getMaxEventProducers())));
 
 		}
 
-		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize + " Event Producers, " + eventsNumber + " Events");
+		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize
+				+ " Event Producers, " + eventsNumber + " Events");
 	}
 
 	@Override
@@ -92,7 +101,8 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 	@Override
 	public void initVectors() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Long>>>();
-		final List<EventProducer> producers = getOcelotlParameters().getEventProducers();
+		final List<EventProducer> producers = getOcelotlParameters()
+				.getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
 			matrix.add(new HashMap<EventProducer, HashMap<String, Long>>());
 
@@ -101,16 +111,20 @@ public abstract class _3DMicroDescription extends MultiThreadTimeAggregationOper
 		}
 	}
 
-	public void matrixPushType(final int incr, final EventProducer ep, final String key) {
+	public void matrixPushType(final int incr, final EventProducer ep,
+			final String key) {
 		matrix.get(incr).get(ep).put(key, 0L);
 	}
 
-	public void matrixWrite(final long it, final EventProducer ep, final String key, final Map<Long, Long> distrib) {
-		matrix.get((int) it).get(ep).put(key, matrix.get((int) it).get(ep).get(key) + distrib.get(it));
+	public void matrixWrite(final long it, final EventProducer ep,
+			final String key, final Map<Long, Long> distrib) {
+		matrix.get((int) it)
+				.get(ep)
+				.put(key,
+						matrix.get((int) it).get(ep).get(key) + distrib.get(it));
 	}
 
 	@Override
-
 	public void print() {
 		System.out.println();
 		System.out.println("Distribution Vectors");

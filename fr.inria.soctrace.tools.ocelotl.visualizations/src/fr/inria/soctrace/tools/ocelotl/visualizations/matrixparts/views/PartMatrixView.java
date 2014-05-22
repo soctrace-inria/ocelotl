@@ -22,9 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views;
 
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.MatrixView;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 
 public class PartMatrixView extends MatrixView {
 

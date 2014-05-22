@@ -24,12 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.AggregatedData;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceSTAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregation2Manager;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 
@@ -83,7 +78,7 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 					for (String state:getStates())
 						proportions.get(node).get(i).put(state, 
 						proportions.get(node).get(i).get(state)+proportions.get(child).get(i).get(state)
-						/((double)node.getChildrenNodes().size()));	
+						/(node.getChildrenNodes().size()));	
 				}
 			}
 				
@@ -99,7 +94,7 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 			double amp=0.0;
 			for (int i=start; i<end; i++)
 				amp+=proportions.get(epn).get(i).get(state);
-			amp/=((double)(end-start));
+			amp/=(end-start);
 			if (amp>max){
 				maj= new MajState(state, amp);
 				max=amp;

@@ -28,13 +28,12 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperat
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.ITimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.PartManager;
 
 public class OcelotlCore {
 
-	private static final boolean	DEBUG	= true;
-	private static final boolean	TEST	= true;
+	private static final boolean DEBUG = true;
+	private static final boolean TEST = true;
 
 	public static boolean isDebug() {
 		return DEBUG;
@@ -44,45 +43,52 @@ public class OcelotlCore {
 		return TEST;
 	}
 
-	OcelotlParameters				ocelotlParameters;
-	IMicroDescManager				lpaggregManager;
-	PartManager						partManager;
-	TimeAggregationOperatorManager	timeOperators;
-	ITimeAggregationOperator		timeOperator;
-	SpaceAggregationOperatorManager	spaceOperators;
-	ISpaceAggregationOperator		spaceOperator;
-	
+	OcelotlParameters ocelotlParameters;
+	IMicroDescManager lpaggregManager;
+	PartManager partManager;
+	TimeAggregationOperatorManager timeOperators;
+	ITimeAggregationOperator timeOperator;
+	SpaceAggregationOperatorManager spaceOperators;
+	ISpaceAggregationOperator spaceOperator;
+
 	static {
 		OcelotlParameters.setJniFlag(false);
-		if (!OcelotlParameters.isForceJava()){
-		try {
-			System.loadLibrary("lpaggregjni");
-			OcelotlParameters.setJniFlag(true);
-			System.err.println("Native library lpaggregjni loaded successfully. Tudo bem!\n");
-		} catch (final UnsatisfiedLinkError e) {
-			System.err.println("Native library lpaggregjni failed to load.");
-			System.err.println("Ocelotl will use java code instead, but performance may decrease.");
-			System.err.println("You may need to manage JVM settings to allocate more memory to Ocelotl.");
+		if (!OcelotlParameters.isForceJava()) {
+			try {
+				System.loadLibrary("lpaggregjni");
+				OcelotlParameters.setJniFlag(true);
+				System.err
+						.println("Native library lpaggregjni loaded successfully. Tudo bem!\n");
+			} catch (final UnsatisfiedLinkError e) {
+				System.err
+						.println("Native library lpaggregjni failed to load.");
+				System.err
+						.println("Ocelotl will use java code instead, but performance may decrease.");
+				System.err
+						.println("You may need to manage JVM settings to allocate more memory to Ocelotl.");
+			}
+		} else {
+			System.err
+					.println("Native library lpaggregjni utilization desactivated. Performance may decrease.");
+			System.err
+					.println("You may need to manage JVM settings to allocate more memory to Ocelotl.");
 		}
-		}
-		else{
-			System.err.println("Native library lpaggregjni utilization desactivated. Performance may decrease.");
-			System.err.println("You may need to manage JVM settings to allocate more memory to Ocelotl.");
-		}
-		
+
 	}
 
 	public OcelotlCore() {
 		super();
 	}
 
-	public OcelotlCore(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
+	public OcelotlCore(final OcelotlParameters ocelotlParameters)
+			throws SoCTraceException {
 		super();
 		init(ocelotlParameters);
 
 	}
 
-	public void compute(final HasChanged hasChanged) throws SoCTraceException, OcelotlException {
+	public void compute(final HasChanged hasChanged) throws SoCTraceException,
+			OcelotlException {
 		if (hasChanged == HasChanged.ALL) {
 			setTimeOperator();
 			lpaggregManager = timeOperator.createManager();
@@ -94,18 +100,22 @@ public class OcelotlCore {
 
 	}
 
-	public void computeDichotomy(final HasChanged hasChanged) throws SoCTraceException, OcelotlException {
+	public void computeDichotomy(final HasChanged hasChanged)
+			throws SoCTraceException, OcelotlException {
 		compute(hasChanged);
-		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
+		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE
+				|| hasChanged == HasChanged.THRESHOLD) {
 			lpaggregManager.computeDichotomy();
 			lpaggregManager.printParameters();
 		}
 
 	}
 
-	public void computeParts(final HasChanged hasChanged) throws SoCTraceException, OcelotlException {
+	public void computeParts(final HasChanged hasChanged)
+			throws SoCTraceException, OcelotlException {
 		compute(hasChanged);
-		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.PARAMETER) {
+		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE
+				|| hasChanged == HasChanged.PARAMETER) {
 			lpaggregManager.computeParts();
 			lpaggregManager.printParts();
 			setSpaceOperator();
@@ -146,7 +156,8 @@ public class OcelotlCore {
 		return timeOperators;
 	}
 
-	public void init(final OcelotlParameters ocelotlParameters) throws SoCTraceException {
+	public void init(final OcelotlParameters ocelotlParameters)
+			throws SoCTraceException {
 		setOcelotlParameters(ocelotlParameters);
 		timeOperators = new TimeAggregationOperatorManager(ocelotlParameters);
 		spaceOperators = new SpaceAggregationOperatorManager(this);

@@ -30,8 +30,10 @@ public class EventDistributionView extends DistributionBaseView {
 	@Override
 	public void setParameters() {
 		if (config.getTypes().isEmpty())
-			for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-				config.getTypes().add(ocelotlView.getConfDataLoader().getTypes().get(i));
+			for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes()
+					.size(); i++)
+				config.getTypes().add(
+						ocelotlView.getConfDataLoader().getTypes().get(i));
 		listViewerEventTypes.setInput(config.getTypes());
 	}
 }

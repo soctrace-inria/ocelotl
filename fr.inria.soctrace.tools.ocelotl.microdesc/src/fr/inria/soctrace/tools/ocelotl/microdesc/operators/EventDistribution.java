@@ -29,7 +29,6 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
@@ -38,12 +37,13 @@ public class EventDistribution extends _3DMicroDescription {
 
 	class OcelotlThread extends Thread {
 
-		List<EventProducer>	eventProducers;
-		int					threadNumber;
-		int					thread;
-		int					size;
+		List<EventProducer> eventProducers;
+		int threadNumber;
+		int thread;
+		int size;
 
-		public OcelotlThread(final int threadNumber, final int thread, final int size) {
+		public OcelotlThread(final int threadNumber, final int thread,
+				final int size) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
@@ -51,25 +51,34 @@ public class EventDistribution extends _3DMicroDescription {
 
 			start();
 		}
-		
-		private void matrixWrite(final long slice, final EventProducer ep, String type) {
+
+		private void matrixWrite(final long slice, final EventProducer ep,
+				String type) {
 			synchronized (matrix) {
-				matrix.get((int) slice).get(ep).put(type, matrix.get((int) slice).get(ep).get(type) + 1);
+				matrix.get((int) slice)
+						.get(ep)
+						.put(type,
+								matrix.get((int) slice).get(ep).get(type) + 1);
 			}
 
 		}
 
 		private void matrixUpdate(final Event event, final EventProducer ep) {
 			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(event.getType().getName())) {
-					System.out.println("Adding " + event.getType().getName() + " state");
+				if (!matrix.get(0).get(ep)
+						.containsKey(event.getType().getName())) {
+					System.out.println("Adding " + event.getType().getName()
+							+ " state");
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
-						for (final EventProducer epset : matrix.get(incr).keySet())
-							matrixPushType(incr, epset, event.getType().getName());
+						for (final EventProducer epset : matrix.get(incr)
+								.keySet())
+							matrixPushType(incr, epset, event.getType()
+									.getName());
 				}
-				final long slice = timeSliceManager.getTimeSlice(event.getTimestamp());
-					matrixWrite(slice, ep, event.getType().getName());
+				final long slice = timeSliceManager.getTimeSlice(event
+						.getTimestamp());
+				matrixWrite(slice, ep, event.getType().getName());
 			}
 		}
 
@@ -80,7 +89,8 @@ public class EventDistribution extends _3DMicroDescription {
 				if (events.size() == 0)
 					break;
 				for (final Event event : events) {
-					//final Map<Long, Long> distrib = state.getTimeSlicesDistribution();
+					// final Map<Long, Long> distrib =
+					// state.getTimeSlicesDistribution();
 					matrixUpdate(event, event.getEventProducer());
 				}
 			}
@@ -91,24 +101,32 @@ public class EventDistribution extends _3DMicroDescription {
 		super();
 	}
 
-	public EventDistribution(final OcelotlParameters parameters) throws SoCTraceException, OcelotlException {
+	public EventDistribution(final OcelotlParameters parameters)
+			throws SoCTraceException, OcelotlException {
 		super(parameters);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException, OcelotlException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManager();
 		dm.start();
 		it = ocelotlQueries.getEventIterator(eventProducers);
 		dm = new DeltaManager();
 		dm.start();
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getThreadNumber(); t++)
-			threadlist.add(new OcelotlThread(((DistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getThreadNumber(), t, ((DistributionConfig) getOcelotlParameters().getTraceTypeConfig()).getEventsPerThread()));
+		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
+				.getTraceTypeConfig()).getThreadNumber(); t++)
+			threadlist.add(new OcelotlThread(
+					((DistributionConfig) getOcelotlParameters()
+							.getTraceTypeConfig()).getThreadNumber(), t,
+					((DistributionConfig) getOcelotlParameters()
+							.getTraceTypeConfig()).getEventsPerThread()));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION : " + getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+		dm.end("VECTORS COMPUTATION : "
+				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	@Override
@@ -122,12 +140,14 @@ public class EventDistribution extends _3DMicroDescription {
 	}
 
 	@Override
-	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException, OcelotlException {
+	public void setOcelotlParameters(final OcelotlParameters parameters)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		this.parameters = parameters;
 		ocelotlQueries = new OcelotlQueries(parameters);
 		count = 0;
 		epit = 0;
-		timeSliceManager = new TimeSliceManager(getOcelotlParameters().getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		timeSliceManager = new TimeSliceManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initVectors();
 		computeMatrix();
 	}

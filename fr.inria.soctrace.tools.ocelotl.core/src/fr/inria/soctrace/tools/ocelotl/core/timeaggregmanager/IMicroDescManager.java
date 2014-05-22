@@ -47,5 +47,5 @@ public interface IMicroDescManager {
 	public void reset();
 
 	public void print(OcelotlCore core);
-	
+
 }

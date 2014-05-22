@@ -27,9 +27,9 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 
 public class DistributionConfig implements ITraceTypeConfig {
 
-	private List<EventType>	types	= new LinkedList<EventType>();
-	private int					eventsPerThread		= 10000;
-	private int					threadNumber		= 8;
+	private List<EventType> types = new LinkedList<EventType>();
+	private int eventsPerThread = 10000;
+	private int threadNumber = 8;
 
 	public DistributionConfig() {
 		super();

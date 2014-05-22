@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class PartMap implements IPartData {
 
-	Map<String, Double>	elements;
+	Map<String, Double> elements;
 
 	public PartMap() {
 		super();
@@ -56,7 +56,8 @@ public class PartMap implements IPartData {
 		return total;
 	}
 
-	public void normalizeElements(final long timeSliceDuration, final int partNumber) {
+	public void normalizeElements(final long timeSliceDuration,
+			final int partNumber) {
 		for (final String key : elements.keySet())
 			divideElement(key, (double) timeSliceDuration * (double) partNumber);
 	}

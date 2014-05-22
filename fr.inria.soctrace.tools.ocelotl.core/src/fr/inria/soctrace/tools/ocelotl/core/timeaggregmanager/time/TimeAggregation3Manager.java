@@ -29,8 +29,8 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class TimeAggregation3Manager extends TimeAggregationManager {
 
-	I3DMicroDescription			matrix;
-	List<List<List<Double>>>	values;
+	I3DMicroDescription matrix;
+	List<List<List<Double>>> values;
 
 	public TimeAggregation3Manager(final I3DMicroDescription timeSliceMatrix) {
 		super(timeSliceMatrix.getOcelotlParameters());
@@ -38,7 +38,6 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		reset();
 	}
 
-	
 	@Override
 	public void fillVectorsJava() {
 		values = new ArrayList<List<List<Double>>>();
@@ -47,8 +46,12 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 			int j = 0;
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet()) {
 				values.get(i).add(new ArrayList<Double>());
-				for (final String key2 : matrix.getMatrix().get(i).get(key).keySet())
-					values.get(i).get(j).add(matrix.getMatrix().get(i).get(key).get(key2).doubleValue());
+				for (final String key2 : matrix.getMatrix().get(i).get(key)
+						.keySet())
+					values.get(i)
+							.get(j)
+							.add(matrix.getMatrix().get(i).get(key).get(key2)
+									.doubleValue());
 				j++;
 			}
 
@@ -56,18 +59,21 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		((TimeAggregation3) timeAggregation).setValues(values);
 
 	}
-	
+
 	@Override
 	protected void fillVectorsJNI() {
 		for (int i = 0; i < matrix.getMatrix().size(); i++) {
 			((JNITimeAggregation3) timeAggregation).addMatrix();
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet()) {
 				((JNITimeAggregation3) timeAggregation).addVector();
-				for (final String key2 : matrix.getMatrix().get(i).get(key).keySet())
-					((JNITimeAggregation3) timeAggregation).push_back(matrix.getMatrix().get(i).get(key).get(key2).doubleValue());
+				for (final String key2 : matrix.getMatrix().get(i).get(key)
+						.keySet())
+					((JNITimeAggregation3) timeAggregation).push_back(matrix
+							.getMatrix().get(i).get(key).get(key2)
+							.doubleValue());
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -76,7 +82,8 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 	}
 
 	public List<String> getKeys() {
-		return new ArrayList<String>(matrix.getMatrix().get(0).get(getEventProducers().get(0)).keySet());
+		return new ArrayList<String>(matrix.getMatrix().get(0)
+				.get(getEventProducers().get(0)).keySet());
 	}
 
 	public I3DMicroDescription getTimeSliceMatrix() {
@@ -91,8 +98,5 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 			timeAggregation = new TimeAggregation3();
 		fillVectors();
 	}
-
-
-
 
 }

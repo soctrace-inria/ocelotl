@@ -20,9 +20,9 @@
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
 public class Part {
-	private int			startPart;
-	private int			endPart;
-	private IPartData	data;
+	private int startPart;
+	private int endPart;
+	private IPartData data;
 
 	public Part() {
 		super();
@@ -34,7 +34,7 @@ public class Part {
 		this.endPart = endPart;
 		this.data = data;
 	}
-	
+
 	public Part(final int startPart, final IPartData data) {
 		super();
 		this.startPart = startPart;
@@ -70,18 +70,19 @@ public class Part {
 	public void setStartPart(final int startPart) {
 		this.startPart = startPart;
 	}
-	
-	public void incrSize(){
+
+	public void incrSize() {
 		endPart++;
 	}
 
 	public boolean compare(Part p2) {
-		return (this.startPart==p2.getStartPart())&&(this.endPart==p2.getEndPart());
+		return (this.startPart == p2.getStartPart())
+				&& (this.endPart == p2.getEndPart());
 	}
-	
+
 	@Override
-	public String toString(){
-		String s="start: "+startPart+", end: "+endPart;
+	public String toString() {
+		String s = "start: " + startPart + ", end: " + endPart;
 		return s;
 	}
 

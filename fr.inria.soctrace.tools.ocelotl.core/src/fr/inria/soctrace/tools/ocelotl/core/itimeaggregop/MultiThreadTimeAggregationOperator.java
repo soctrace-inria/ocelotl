@@ -34,19 +34,22 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
 public abstract class MultiThreadTimeAggregationOperator {
 
-	protected TimeSliceManager	timeSliceManager;
-	protected EventIterator	it;
-	protected int				count	= 0;
-	protected int				epit	= 0;
-	protected DeltaManager		dm;
-	public final static int		EPCOUNT	= 200;
-	protected int				eventsNumber;
-	protected OcelotlParameters	parameters;
-	protected OcelotlQueries	ocelotlQueries;
+	protected TimeSliceManager timeSliceManager;
+	protected EventIterator it;
+	protected int count = 0;
+	protected int epit = 0;
+	protected DeltaManager dm;
+	public final static int EPCOUNT = 200;
+	protected int eventsNumber;
+	protected OcelotlParameters parameters;
+	protected OcelotlQueries ocelotlQueries;
 
-	abstract protected void computeMatrix() throws SoCTraceException, InterruptedException, OcelotlException;
+	abstract protected void computeMatrix() throws SoCTraceException,
+			InterruptedException, OcelotlException;
 
-	abstract protected void computeSubMatrix(final List<EventProducer> eventProducers) throws SoCTraceException, InterruptedException, OcelotlException;
+	abstract protected void computeSubMatrix(
+			final List<EventProducer> eventProducers) throws SoCTraceException,
+			InterruptedException, OcelotlException;
 
 	public synchronized int getCount() {
 		count++;
@@ -70,22 +73,24 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	abstract protected void initVectors() throws SoCTraceException;
 
-	public void setOcelotlParameters(final OcelotlParameters parameters) throws SoCTraceException, InterruptedException, OcelotlException {
+	public void setOcelotlParameters(final OcelotlParameters parameters)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		this.parameters = parameters;
 		count = 0;
 		epit = 0;
-		timeSliceManager = new TimeSliceManager(getOcelotlParameters().getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		timeSliceManager = new TimeSliceManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initQueries();
 		initVectors();
 		computeMatrix();
-		if (eventsNumber==0)
-				throw new OcelotlException(OcelotlException.NOEVENTS);
+		if (eventsNumber == 0)
+			throw new OcelotlException(OcelotlException.NOEVENTS);
 	}
 
 	public void total(final int rows) {
 		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
 	}
-	
+
 	public List<Event> getEvents(final int size) {
 		final List<Event> events = new ArrayList<Event>();
 		synchronized (it) {

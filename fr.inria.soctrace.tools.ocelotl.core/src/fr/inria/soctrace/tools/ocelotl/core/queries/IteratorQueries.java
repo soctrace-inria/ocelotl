@@ -53,7 +53,7 @@ public class IteratorQueries extends EventQuery {
 
 	public class EventIterator {
 
-		Event	current	= null;
+		Event current = null;
 
 		public Event getEvent() {
 			return current;
@@ -79,10 +79,10 @@ public class IteratorQueries extends EventQuery {
 
 	}
 
-	EventIterator		iterator	= new EventIterator();
-	ResultSet			rs			= null;
+	EventIterator iterator = new EventIterator();
+	ResultSet rs = null;
 
-	private Statement	mystm;
+	private Statement mystm;
 
 	/**
 	 * The constructor
@@ -103,7 +103,8 @@ public class IteratorQueries extends EventQuery {
 
 			boolean first = true;
 			StringBuilder eventQuery = null;
-			eventQuery = new StringBuilder("SELECT * FROM " + FramesocTable.EVENT + " ");
+			eventQuery = new StringBuilder("SELECT * FROM "
+					+ FramesocTable.EVENT + " ");
 			loadParameters = false;
 
 			if (where)
@@ -119,7 +120,9 @@ public class IteratorQueries extends EventQuery {
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
+				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM "
+						+ FramesocTable.EVENT_TYPE + " WHERE "
+						+ typeWhere.getSQLString() + " ) )");
 			}
 
 			if (eventProducerWhere != null) {
@@ -127,7 +130,9 @@ public class IteratorQueries extends EventQuery {
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
+				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM "
+						+ FramesocTable.EVENT_PRODUCER + " WHERE "
+						+ eventProducerWhere.getSQLString() + " ) )");
 			}
 
 			if (parametersConditions.size() > 0) {
@@ -140,7 +145,8 @@ public class IteratorQueries extends EventQuery {
 			}
 
 			if (orderBy)
-				eventQuery.append(" ORDER BY " + orderByColumn + " " + orderByCriterium);
+				eventQuery.append(" ORDER BY " + orderByColumn + " "
+						+ orderByCriterium);
 
 			if (isLimitSet())
 				eventQuery.append(" LIMIT " + getLimit());
@@ -161,11 +167,13 @@ public class IteratorQueries extends EventQuery {
 		return iterator;
 	}
 
-	private Event rebuildEvent(final ResultSet rs) throws SQLException, SoCTraceException {
+	private Event rebuildEvent(final ResultSet rs) throws SQLException,
+			SoCTraceException {
 		final int category = rs.getInt(7);
 		final Event e = Event.createCategorizedEvent(category, rs.getInt(1));
 		final TraceDBObject traceDB = (TraceDBObject) dbObj;
-		final EventType et = traceDB.getEventTypeCache().get(EventType.class, rs.getInt(2));
+		final EventType et = traceDB.getEventTypeCache().get(EventType.class,
+				rs.getInt(2));
 		final EventProducer s = getEventProducer(rs.getInt(3));
 		e.setEventProducer(s);
 		e.setCategory(rs.getInt(7));
@@ -176,7 +184,8 @@ public class IteratorQueries extends EventQuery {
 		e.setLongPar(rs.getLong(8));
 		e.setDoublePar(rs.getDouble(9));
 		if (e.getCategory() == EventCategory.LINK)
-			((Link) e).setEndProducer(getEventProducer(((Double) e.getDoublePar()).intValue()));
+			((Link) e).setEndProducer(getEventProducer(((Double) e
+					.getDoublePar()).intValue()));
 		return e;
 	}
 

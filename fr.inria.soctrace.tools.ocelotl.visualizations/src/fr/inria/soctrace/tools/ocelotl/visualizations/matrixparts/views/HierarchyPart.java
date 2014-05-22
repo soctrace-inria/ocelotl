@@ -20,36 +20,27 @@
 package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.ImageFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.AggregatedData;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.Aggregation;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.VisualAggregatedData;
 import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
-import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.IconManager;
 
 public class HierarchyPart {
 
@@ -87,8 +78,8 @@ public class HierarchyPart {
 		rootHeight = root.getSize().height;
 		height = rootHeight - Border;
 		width = root.getSize().width - (2 * Border);
-		logicWidth = (double) width/(double) (hierarchy.getRoot().getParts().size());
-		logicHeight = (double) height/(double) hierarchy.getRoot().getWeight();
+		logicWidth = width/(hierarchy.getRoot().getParts().size());
+		logicHeight = height/hierarchy.getRoot().getWeight();
 		initX();
 		print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot().getParts().size());
 	}
@@ -121,7 +112,7 @@ public class HierarchyPart {
 			else{
 				boolean aggy=false;
 				for (EventProducerNode ep: epn.getChildrenNodes()){
-					if (((double) ep.getWeight()*logicHeight-(double) space)<minLogicWeight){
+					if ((ep.getWeight()*logicHeight-space)<minLogicWeight){
 						aggy=true;
 						break;
 					}
@@ -203,7 +194,7 @@ public class HierarchyPart {
 		rectangle.setLineWidth(2);
 
 		rectangle.setToolTip(new Label(" "+name+" "));
-		int xa=(int) (((double) logicX * logicWidth + Border));
+		int xa=(int) ((logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight);
 		int xb=xendlist.get(logicX2);
 		int yb=(int) (ya + sizeY * logicHeight)- space;
@@ -226,7 +217,7 @@ public class HierarchyPart {
 		lab.setForegroundColor(ColorConstants.red);
 		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 		//rectangle.add(lab, BorderLayout.CENTER);
-		int xa=(int) (((double) logicX * logicWidth + Border));
+		int xa=(int) ((logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight);
 		int xb=xendlist.get(logicX2);
 		int yb=(int) (ya + sizeY * logicHeight)- space;
@@ -259,7 +250,7 @@ public class HierarchyPart {
 		lab.setForegroundColor(ColorConstants.black);
 		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 		//rectangle.add(lab, BorderLayout.CENTER);
-		int xa=(int) (((double) logicX * logicWidth + Border));
+		int xa=(int) ((logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight);
 		int xb=xendlist.get(logicX2);
 		int yb=(int) (ya + sizeY * logicHeight)- space;

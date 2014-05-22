@@ -37,20 +37,20 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class TimeAggregationOperatorManager {
 
-	HashMap<String, TimeAggregationOperatorResource>	List;
-	ITimeAggregationOperator							selectedOperator;
-	String												selectedOperatorName;
-	ITraceTypeConfig									selectedConfig;
-	OcelotlParameters									parameters;
+	HashMap<String, TimeAggregationOperatorResource> List;
+	ITimeAggregationOperator selectedOperator;
+	String selectedOperatorName;
+	ITraceTypeConfig selectedConfig;
+	OcelotlParameters parameters;
 
-	private static final String							POINT_ID					= "fr.inria.soctrace.tools.ocelotl.core.microscopicdescription";	//$NON-NLS-1$
-	private static final String							OP_NAME						= "operator";												//$NON-NLS-1$
-	private static final String							OP_CLASS					= "class";													//$NON-NLS-1$
-	private static final String							OP_TRACE_FORMATS			= "trace_formats";											//$NON-NLS-1$
-	private static final String							OP_PARAM_WIN				= "param_win";												//$NON-NLS-1$
-	private static final String							OP_SPATIAL_COMPATIBILITY	= "spatial_compatibility";									//$NON-NLS-1$
-	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
-	private static final String							OP_GENERIC					= "generic";												//$NON-NLS-1$
+	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.microscopicdescription"; //$NON-NLS-1$
+	private static final String OP_NAME = "operator"; //$NON-NLS-1$
+	private static final String OP_CLASS = "class"; //$NON-NLS-1$
+	private static final String OP_TRACE_FORMATS = "trace_formats"; //$NON-NLS-1$
+	private static final String OP_PARAM_WIN = "param_win"; //$NON-NLS-1$
+	private static final String OP_SPATIAL_COMPATIBILITY = "spatial_compatibility"; //$NON-NLS-1$
+	private static final String OP_PARAM_CONFIG = "param_config"; //$NON-NLS-1$
+	private static final String OP_GENERIC = "generic"; //$NON-NLS-1$
 
 	public TimeAggregationOperatorManager(final OcelotlParameters parameters) {
 		super();
@@ -73,7 +73,8 @@ public class TimeAggregationOperatorManager {
 	}
 
 	public List<String> getOperators(final String traceType) {
-		System.out.println("Comparing Time Operator trace format with " + traceType);
+		System.out.println("Comparing Time Operator trace format with "
+				+ traceType);
 		final List<String> op = new ArrayList<String>();
 		for (final TimeAggregationOperatorResource r : List.values()) {
 			System.out.println(r.getTraceFormats());
@@ -109,8 +110,10 @@ public class TimeAggregationOperatorManager {
 		List = new HashMap<String, TimeAggregationOperatorResource>();
 
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
-		final IConfigurationElement[] config = reg.getConfigurationElementsFor(POINT_ID);
-		System.out.println(config.length + " Time aggregation operators detected:");
+		final IConfigurationElement[] config = reg
+				.getConfigurationElementsFor(POINT_ID);
+		System.out.println(config.length
+				+ " Time aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final TimeAggregationOperatorResource resource = new TimeAggregationOperatorResource();
@@ -118,12 +121,14 @@ public class TimeAggregationOperatorManager {
 			resource.setName(e.getAttribute(OP_NAME));
 			resource.setGeneric(e.getAttribute(OP_GENERIC).contains("true"));
 			resource.setTraceFormats(e.getAttribute(OP_TRACE_FORMATS));
-			resource.setSpaceCompatibility(e.getAttribute(OP_SPATIAL_COMPATIBILITY));
+			resource.setSpaceCompatibility(e
+					.getAttribute(OP_SPATIAL_COMPATIBILITY));
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setBundle(e.getContributor().getName());
 			List.put(resource.getName(), resource);
-			System.out.println("    " + resource.getName() + " " + resource.getTraceFormats());
+			System.out.println("    " + resource.getName() + " "
+					+ resource.getTraceFormats());
 		}
 	}
 
@@ -131,16 +136,20 @@ public class TimeAggregationOperatorManager {
 		final Bundle mybundle = Platform.getBundle(List.get(name).getBundle());
 		try {
 
-			selectedOperator = (ITimeAggregationOperator) mybundle.loadClass(List.get(name).getOperatorClass()).newInstance();
+			selectedOperator = (ITimeAggregationOperator) mybundle.loadClass(
+					List.get(name).getOperatorClass()).newInstance();
 			selectedOperatorName = name;
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
-			selectedConfig = (ITraceTypeConfig) mybundle.loadClass(List.get(name).getParamConfig()).newInstance();
+			selectedConfig = (ITraceTypeConfig) mybundle.loadClass(
+					List.get(name).getParamConfig()).newInstance();
 			parameters.setTraceTypeConfig(selectedConfig);
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

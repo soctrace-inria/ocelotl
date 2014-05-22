@@ -63,13 +63,15 @@ public class GenericReducedEventQuery extends EventQuery {
 		clear();
 	}
 
-	public List<GenericReducedEvent> getReducedEventList() throws SoCTraceException {
+	public List<GenericReducedEvent> getReducedEventList()
+			throws SoCTraceException {
 		try {
 			final DeltaManager dm = new DeltaManager();
 			dm.start();
 
 			boolean first = true;
-			final StringBuffer eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
+			final StringBuffer eventQuery = new StringBuffer("SELECT * FROM "
+					+ FramesocTable.EVENT + " ");
 
 			if (where)
 				eventQuery.append(" WHERE ");
@@ -84,7 +86,9 @@ public class GenericReducedEventQuery extends EventQuery {
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
+				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM "
+						+ FramesocTable.EVENT_TYPE + " WHERE "
+						+ typeWhere.getSQLString() + " ) )");
 			}
 
 			if (eventProducerWhere != null) {
@@ -92,7 +96,9 @@ public class GenericReducedEventQuery extends EventQuery {
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
+				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM "
+						+ FramesocTable.EVENT_PRODUCER + " WHERE "
+						+ eventProducerWhere.getSQLString() + " ) )");
 			}
 
 			if (parametersConditions.size() > 0) {
@@ -105,7 +111,8 @@ public class GenericReducedEventQuery extends EventQuery {
 			}
 
 			if (orderBy)
-				eventQuery.append(" ORDER BY " + orderByColumn + " " + orderByCriterium);
+				eventQuery.append(" ORDER BY " + orderByColumn + " "
+						+ orderByCriterium);
 
 			final String query = eventQuery.toString();
 			debug(query);
@@ -126,7 +133,8 @@ public class GenericReducedEventQuery extends EventQuery {
 
 	}
 
-	private List<GenericReducedEvent> rebuildReducedEvent(final ResultSet rs) throws SoCTraceException {
+	private List<GenericReducedEvent> rebuildReducedEvent(final ResultSet rs)
+			throws SoCTraceException {
 
 		final HashMap<Integer, GenericReducedEvent> list = new HashMap<Integer, GenericReducedEvent>();
 		final LinkedList<GenericReducedEvent> llist = new LinkedList<GenericReducedEvent>();
@@ -137,7 +145,11 @@ public class GenericReducedEventQuery extends EventQuery {
 		try {
 
 			while (rs.next()) {
-				final GenericReducedEvent re = new GenericReducedEvent(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), traceDB.getEventTypeCache().get(EventType.class, rs.getInt(2)).getName());
+				final GenericReducedEvent re = new GenericReducedEvent(
+						rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"),
+						rs.getInt("PAGE"), rs.getLong("TIMESTAMP"), traceDB
+								.getEventTypeCache()
+								.get(EventType.class, rs.getInt(2)).getName());
 				list.put(re.ID, re);
 				llist.add(re);
 				vls.addValue(String.valueOf(re.ID));

@@ -19,20 +19,10 @@
 
 package fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.wb.swt.ResourceManager;
-import org.osgi.framework.Bundle;
-
-
 import fr.inria.soctrace.tools.ocelotl.visualizations.Activator;
 
 public class IconManager {

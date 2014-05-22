@@ -67,7 +67,7 @@ import org.eclipse.swt.widgets.TabItem;
 
 public abstract class DistributionBaseView extends Dialog implements
 		IAggregationWindow {
-	
+
 	private class AddAllEventProducersAdapter extends SelectionAdapter {
 
 		@Override
@@ -75,14 +75,15 @@ public abstract class DistributionBaseView extends Dialog implements
 			producers.clear();
 			producers.addAll(ocelotlView.getConfDataLoader().getProducers());
 			listViewerEventProducers.setInput(producers);
-			//hasChanged = HasChanged.ALL;
+			// hasChanged = HasChanged.ALL;
 		}
 	}
 
 	private class AddEventProducersAdapter extends SelectionAdapter {
 
 		// all - input
-		java.util.List<Object> diff(final java.util.List<EventProducer> all, final java.util.List<EventProducer> input) {
+		java.util.List<Object> diff(final java.util.List<EventProducer> all,
+				final java.util.List<EventProducer> input) {
 			final java.util.List<Object> tmp = new LinkedList<>();
 			for (final Object oba : all)
 				tmp.add(oba);
@@ -93,17 +94,20 @@ public abstract class DistributionBaseView extends Dialog implements
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 
-			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), new EventProducerLabelProvider());
+			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(
+					getShell(), new EventProducerLabelProvider());
 			dialog.setTitle("Select Event Producers");
 			dialog.setMessage("Select a String (* = any string, ? = any char):");
-			dialog.setElements(diff(ocelotlView.getConfDataLoader().getProducers(), producers).toArray());
+			dialog.setElements(diff(
+					ocelotlView.getConfDataLoader().getProducers(), producers)
+					.toArray());
 			dialog.setMultipleSelection(true);
 			if (dialog.open() == Window.CANCEL)
 				return;
 			for (final Object o : dialog.getResult())
 				producers.add((EventProducer) o);
 			listViewerEventProducers.setInput(producers);
-			//hasChanged = HasChanged.ALL;
+			// hasChanged = HasChanged.ALL;
 		}
 	}
 
@@ -112,17 +116,20 @@ public abstract class DistributionBaseView extends Dialog implements
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 
-
-			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), new AnalysisResultLabelProvider());
+			final ElementListSelectionDialog dialog = new ElementListSelectionDialog(
+					getShell(), new AnalysisResultLabelProvider());
 			dialog.setTitle("Select a Result");
 			dialog.setMessage("Select a String (* = any string, ? = any char):");
-			dialog.setElements(ocelotlView.getConfDataLoader().getResults().toArray());
+			dialog.setElements(ocelotlView.getConfDataLoader().getResults()
+					.toArray());
 			dialog.setMultipleSelection(false);
 			if (dialog.open() == Window.CANCEL)
 				return;
 			for (final Object o : dialog.getResult())
 				try {
-					for (final EventProducer ep : ocelotlView.getConfDataLoader().getProducersFromResult((AnalysisResult) o))
+					for (final EventProducer ep : ocelotlView
+							.getConfDataLoader().getProducersFromResult(
+									(AnalysisResult) o))
 						if (!producers.contains(ep))
 							producers.add(ep);
 				} catch (final SoCTraceException e1) {
@@ -130,13 +137,13 @@ public abstract class DistributionBaseView extends Dialog implements
 					e1.printStackTrace();
 				}
 			listViewerEventProducers.setInput(producers);
-			//hasChanged = HasChanged.ALL;
+			// hasChanged = HasChanged.ALL;
 		}
 	}
-	
+
 	private class ResetSelectionAdapter extends SelectionAdapter {
 
-		private final ListViewer	viewer;
+		private final ListViewer viewer;
 
 		public ResetSelectionAdapter(final ListViewer viewer) {
 			this.viewer = viewer;
@@ -147,7 +154,7 @@ public abstract class DistributionBaseView extends Dialog implements
 			final Collection<?> c = (Collection<?>) viewer.getInput();
 			c.clear();
 			viewer.refresh(false);
-			//hasChanged = HasChanged.ALL;
+			// hasChanged = HasChanged.ALL;
 		}
 	}
 
@@ -158,7 +165,6 @@ public abstract class DistributionBaseView extends Dialog implements
 			return ((AnalysisResult) element).getDescription();
 		}
 	}
-	
 
 	private class EventTypeLabelProvider extends LabelProvider {
 
@@ -167,7 +173,6 @@ public abstract class DistributionBaseView extends Dialog implements
 			return ((EventType) element).getName();
 		}
 	}
-	
 
 	private class EventProducerLabelProvider extends LabelProvider {
 
@@ -195,8 +200,6 @@ public abstract class DistributionBaseView extends Dialog implements
 			viewer.refresh(false);
 		}
 	}
-	
-
 
 	private class TypesSelectionAdapter extends SelectionAdapter {
 
@@ -213,7 +216,7 @@ public abstract class DistributionBaseView extends Dialog implements
 				public int compare(EventType arg0, EventType arg1) {
 					return arg0.getName().compareToIgnoreCase(arg1.getName());
 				}
-				
+
 			});
 			return tmp;
 		}
@@ -223,9 +226,9 @@ public abstract class DistributionBaseView extends Dialog implements
 			if (ocelotlView.getConfDataLoader().getCurrentTrace() == null)
 				return;
 			final ListSelectionDialog dialog = new ListSelectionDialog(
-					getShell(), diff(getEventTypes(), config.getTypes()
-), new ArrayContentProvider(),
-					new EventTypeLabelProvider(), "Select Event Types");
+					getShell(), diff(getEventTypes(), config.getTypes()),
+					new ArrayContentProvider(), new EventTypeLabelProvider(),
+					"Select Event Types");
 			if (dialog.open() == Window.CANCEL)
 				return;
 			for (final Object o : dialog.getResult())
@@ -233,8 +236,6 @@ public abstract class DistributionBaseView extends Dialog implements
 			listViewerEventTypes.setInput(config.getTypes());
 		}
 	}
-	
-	
 
 	protected OcelotlView ocelotlView;
 
@@ -253,11 +254,10 @@ public abstract class DistributionBaseView extends Dialog implements
 	private Spinner spinnerDivideDbQuery;
 
 	private Spinner spinnerThread;
-	
-	private ListViewer							listViewerEventProducers;
-	
-	private final java.util.List<EventProducer>	producers		= new LinkedList<EventProducer>();
 
+	private ListViewer listViewerEventProducers;
+
+	private final java.util.List<EventProducer> producers = new LinkedList<EventProducer>();
 
 	public DistributionBaseView(final Shell parent) {
 		super(parent);
@@ -336,70 +336,101 @@ public abstract class DistributionBaseView extends Dialog implements
 				.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		btnRemoveEventTypes.addSelectionListener(new RemoveSelectionAdapter(
 				listViewerEventTypes));
-		Button btnResetEventTypes = new Button(compositeEventTypeButtons, SWT.NONE);
-		btnResetEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		Button btnResetEventTypes = new Button(compositeEventTypeButtons,
+				SWT.NONE);
+		btnResetEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+				true, false, 1, 1));
 		btnResetEventTypes.setText("Reset");
-		btnResetEventTypes.addSelectionListener(new ResetSelectionAdapter(listViewerEventTypes));
-		btnResetEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		btnResetEventTypes.addSelectionListener(new ResetSelectionAdapter(
+				listViewerEventTypes));
+		btnResetEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
 		btnResetEventTypes.setImage(null);
 
 		TabItem tbtmNewItem_2 = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem_2.setText("Event Producers");
-		
+
 		final Group groupEventProducers = new Group(tabFolder, SWT.NONE);
 		tbtmNewItem_2.setControl(groupEventProducers);
-		groupEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		groupEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
 		groupEventProducers.setText("Event Producers");
 		final GridLayout gl_groupEventProducers = new GridLayout(2, false);//
 		gl_groupEventProducers.horizontalSpacing = 0;
 		groupEventProducers.setLayout(gl_groupEventProducers);
-		
-				listViewerEventProducers = new ListViewer(groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-				listViewerEventProducers.setContentProvider(new ArrayContentProvider());
-				listViewerEventProducers.setLabelProvider(new EventProducerLabelProvider());
-				listViewerEventProducers.setComparator(new ViewerComparator());
-				final List listEventProducers = listViewerEventProducers.getList();
-				listEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-				final GridData gd_listEventProducers = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-				gd_listEventProducers.heightHint = 79;
-				gd_listEventProducers.widthHint = 120;
-				listEventProducers.setLayoutData(gd_listEventProducers);
-				
-						final ScrolledComposite scrCompositeEventProducerButtons = new ScrolledComposite(groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-						scrCompositeEventProducerButtons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
-						scrCompositeEventProducerButtons.setExpandHorizontal(true);
-						scrCompositeEventProducerButtons.setExpandVertical(true);
-						
-								final Composite compositeEventProducerButtons = new Composite(scrCompositeEventProducerButtons, SWT.NONE);
-								compositeEventProducerButtons.setLayout(new GridLayout(1, false));
-								final Button btnAddEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
-								btnAddEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-								btnAddEventProducer.setText("Add");
-								btnAddEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-								btnAddEventProducer.setImage(null);
-								
-										Button btnAddAllEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
-										btnAddAllEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-										btnAddAllEventProducer.setText("Add All");
-										btnAddAllEventProducer.setImage(null);
-										btnAddAllEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-										btnAddAllEventProducer.addSelectionListener(new AddAllEventProducersAdapter());
-										
-												final Button btnAddResult = new Button(compositeEventProducerButtons, SWT.NONE);
-												btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-												btnAddResult.setText("Add Result");
-												btnAddResult.setImage(null);
-												btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-												btnAddResult.addSelectionListener(new AddResultsEventProducersAdapter());
-												Button btnRemoveEventProducer = new Button(compositeEventProducerButtons, SWT.NONE);
-												btnRemoveEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-												btnRemoveEventProducer.setText("Reset");
-												btnRemoveEventProducer.addSelectionListener(new ResetSelectionAdapter(listViewerEventProducers));
-												btnRemoveEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-												btnRemoveEventProducer.setImage(null);
-												scrCompositeEventProducerButtons.setContent(compositeEventProducerButtons);
-												scrCompositeEventProducerButtons.setMinSize(compositeEventProducerButtons.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-												btnAddEventProducer.addSelectionListener(new AddEventProducersAdapter());
+
+		listViewerEventProducers = new ListViewer(groupEventProducers,
+				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		listViewerEventProducers.setContentProvider(new ArrayContentProvider());
+		listViewerEventProducers
+				.setLabelProvider(new EventProducerLabelProvider());
+		listViewerEventProducers.setComparator(new ViewerComparator());
+		final List listEventProducers = listViewerEventProducers.getList();
+		listEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
+		final GridData gd_listEventProducers = new GridData(SWT.FILL, SWT.FILL,
+				true, true, 1, 1);
+		gd_listEventProducers.heightHint = 79;
+		gd_listEventProducers.widthHint = 120;
+		listEventProducers.setLayoutData(gd_listEventProducers);
+
+		final ScrolledComposite scrCompositeEventProducerButtons = new ScrolledComposite(
+				groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrCompositeEventProducerButtons.setLayoutData(new GridData(SWT.FILL,
+				SWT.FILL, false, true, 1, 1));
+		scrCompositeEventProducerButtons.setExpandHorizontal(true);
+		scrCompositeEventProducerButtons.setExpandVertical(true);
+
+		final Composite compositeEventProducerButtons = new Composite(
+				scrCompositeEventProducerButtons, SWT.NONE);
+		compositeEventProducerButtons.setLayout(new GridLayout(1, false));
+		final Button btnAddEventProducer = new Button(
+				compositeEventProducerButtons, SWT.NONE);
+		btnAddEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+				true, false, 1, 1));
+		btnAddEventProducer.setText("Add");
+		btnAddEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
+		btnAddEventProducer.setImage(null);
+
+		Button btnAddAllEventProducer = new Button(
+				compositeEventProducerButtons, SWT.NONE);
+		btnAddAllEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+				false, false, 1, 1));
+		btnAddAllEventProducer.setText("Add All");
+		btnAddAllEventProducer.setImage(null);
+		btnAddAllEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
+				11, SWT.NORMAL));
+		btnAddAllEventProducer
+				.addSelectionListener(new AddAllEventProducersAdapter());
+
+		final Button btnAddResult = new Button(compositeEventProducerButtons,
+				SWT.NONE);
+		btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 1, 1));
+		btnAddResult.setText("Add Result");
+		btnAddResult.setImage(null);
+		btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
+		btnAddResult
+				.addSelectionListener(new AddResultsEventProducersAdapter());
+		Button btnRemoveEventProducer = new Button(
+				compositeEventProducerButtons, SWT.NONE);
+		btnRemoveEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+				true, false, 1, 1));
+		btnRemoveEventProducer.setText("Reset");
+		btnRemoveEventProducer.addSelectionListener(new ResetSelectionAdapter(
+				listViewerEventProducers));
+		btnRemoveEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
+				11, SWT.NORMAL));
+		btnRemoveEventProducer.setImage(null);
+		scrCompositeEventProducerButtons
+				.setContent(compositeEventProducerButtons);
+		scrCompositeEventProducerButtons
+				.setMinSize(compositeEventProducerButtons.computeSize(
+						SWT.DEFAULT, SWT.DEFAULT));
+		btnAddEventProducer
+				.addSelectionListener(new AddEventProducersAdapter());
 
 		TabItem tbtmNewItem_1 = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem_1.setText("Advanced Settings");
@@ -418,7 +449,8 @@ public abstract class DistributionBaseView extends Dialog implements
 		lblPageSize.setText("Event Number Retrieved by Threads");
 
 		spinnerEventSize = new Spinner(grpCacheManagement, SWT.BORDER);
-		spinnerEventSize.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		spinnerEventSize.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 1, 1));
 		spinnerEventSize.setFont(SWTResourceManager.getFont("Cantarell", 11,
 				SWT.NORMAL));
 		spinnerEventSize.setMinimum(100);
@@ -506,8 +538,8 @@ public abstract class DistributionBaseView extends Dialog implements
 		super.configureShell(newShell);
 		newShell.setText("Microscopic Description Settings");
 	}
-	
-	protected java.util.List<EventType> getEventTypes(){
+
+	protected java.util.List<EventType> getEventTypes() {
 		return ocelotlView.getConfDataLoader().getTypes();
 	}
 

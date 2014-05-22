@@ -30,14 +30,12 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
-	protected List<DLPQuality>		qualities	= new ArrayList<DLPQuality>();
-	protected List<Double>			parameters	= new ArrayList<Double>();
-	protected ISpaceTimeAggregation		timeAggregation;
-	protected OcelotlParameters		ocelotlParameters;
+	protected List<DLPQuality> qualities = new ArrayList<DLPQuality>();
+	protected List<Double> parameters = new ArrayList<Double>();
+	protected ISpaceTimeAggregation timeAggregation;
+	protected OcelotlParameters ocelotlParameters;
 	protected EventProducerHierarchy hierarchy;
 
-
-	
 	public SpaceTimeAggregationManager(final OcelotlParameters ocelotlParameters) {
 		super();
 		this.ocelotlParameters = ocelotlParameters;
@@ -47,7 +45,8 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	public void computeDichotomy() {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(), 0.0, 1.0);
+		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(),
+				0.0, 1.0);
 		parameters = timeAggregation.getParameters();
 		qualities = timeAggregation.getQualityList();
 		dm.end("LPAGGREG - PARAMETERS LIST");
@@ -60,17 +59,19 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 		dm.start();
 		timeAggregation.computeParts(ocelotlParameters.getParameter());
 		updateHierarchy();
-		int i=0;
-		for (i=0; i< parameters.size()-1;i++)
-			if (ocelotlParameters.getParameter()==parameters.get(i))
+		int i = 0;
+		for (i = 0; i < parameters.size() - 1; i++)
+			if (ocelotlParameters.getParameter() == parameters.get(i))
 				break;
-			
-		System.out.println("parameter: "+ocelotlParameters.getParameter()+", gain: "+ qualities.get(i).getGain() +", loss: "+ qualities.get(i).getLoss());
+
+		System.out.println("parameter: " + ocelotlParameters.getParameter()
+				+ ", gain: " + qualities.get(i).getGain() + ", loss: "
+				+ qualities.get(i).getLoss());
 		dm.end("LPAGGREG - COMPUTE PARTS");
 	}
 
 	private void updateHierarchy() {
-		for (int id: hierarchy.getEventProducers().keySet())
+		for (int id : hierarchy.getEventProducers().keySet())
 			hierarchy.setParts(id, timeAggregation.getParts(id));
 	}
 
@@ -103,13 +104,13 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	public List<DLPQuality> getQualities() {
 		return qualities;
 	}
-	
+
 	protected void addHierarchyToJNI() {
 		addRoot();
 		addNodes();
 		addLeaves();
 		timeAggregation.validate();
-		
+
 	}
 
 	protected abstract void addLeaves();
@@ -129,24 +130,24 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
 	@Override
 	public void printParts() {
-//		System.out.println();
-//		System.out.println("Parts :");
-//		for (final int i : parts)
-//			System.out.print(i + " ");
-//		System.out.println();
+		// System.out.println();
+		// System.out.println("Parts :");
+		// for (final int i : parts)
+		// System.out.print(i + " ");
+		// System.out.println();
 	}
 
 	@Override
 	public abstract void reset();
-	
+
 	@Override
-	public EventProducerHierarchy getHierarchy(){
+	public EventProducerHierarchy getHierarchy() {
 		return hierarchy;
 	}
-	
+
 	@Override
-	public void print(OcelotlCore core){
-		
+	public void print(OcelotlCore core) {
+
 	}
 
 }

@@ -48,7 +48,7 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
  */
 public class EventProxyQuery extends EventQuery {
 
-	private static final boolean	USE_JOIN	= false;
+	private static final boolean USE_JOIN = false;
 
 	/**
 	 * The constructor
@@ -71,9 +71,14 @@ public class EventProxyQuery extends EventQuery {
 			StringBuffer eventQuery = null;
 			if (USE_JOIN) {
 				debug("Experimental ocelotlQueries with join");
-				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " join " + FramesocTable.EVENT_PARAM + " on " + FramesocTable.EVENT + ".ID = " + FramesocTable.EVENT_PARAM + ".EVENT_ID ");
+				eventQuery = new StringBuffer("SELECT * FROM "
+						+ FramesocTable.EVENT + " join "
+						+ FramesocTable.EVENT_PARAM + " on "
+						+ FramesocTable.EVENT + ".ID = "
+						+ FramesocTable.EVENT_PARAM + ".EVENT_ID ");
 			} else
-				eventQuery = new StringBuffer("SELECT * FROM " + FramesocTable.EVENT + " ");
+				eventQuery = new StringBuffer("SELECT * FROM "
+						+ FramesocTable.EVENT + " ");
 
 			if (where)
 				eventQuery.append(" WHERE ");
@@ -88,7 +93,9 @@ public class EventProxyQuery extends EventQuery {
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_TYPE + " WHERE " + typeWhere.getSQLString() + " ) )");
+				eventQuery.append("( EVENT_TYPE_ID IN ( SELECT ID FROM "
+						+ FramesocTable.EVENT_TYPE + " WHERE "
+						+ typeWhere.getSQLString() + " ) )");
 			}
 
 			if (eventProducerWhere != null) {
@@ -96,7 +103,9 @@ public class EventProxyQuery extends EventQuery {
 					eventQuery.append(" AND ");
 				else
 					first = false;
-				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM " + FramesocTable.EVENT_PRODUCER + " WHERE " + eventProducerWhere.getSQLString() + " ) )");
+				eventQuery.append("( EVENT_PRODUCER_ID IN ( SELECT ID FROM "
+						+ FramesocTable.EVENT_PRODUCER + " WHERE "
+						+ eventProducerWhere.getSQLString() + " ) )");
 			}
 
 			if (parametersConditions.size() > 0) {
@@ -109,7 +118,8 @@ public class EventProxyQuery extends EventQuery {
 			}
 
 			if (orderBy)
-				eventQuery.append(" ORDER BY " + orderByColumn + " " + orderByCriterium);
+				eventQuery.append(" ORDER BY " + orderByColumn + " "
+						+ orderByCriterium);
 
 			final String query = eventQuery.toString();
 			debug(query);
@@ -131,13 +141,15 @@ public class EventProxyQuery extends EventQuery {
 
 	}
 
-	private List<EventProxy> rebuildEventID(final ResultSet rs) throws SoCTraceException {
+	private List<EventProxy> rebuildEventID(final ResultSet rs)
+			throws SoCTraceException {
 
 		final List<EventProxy> list = new LinkedList<EventProxy>();
 		try {
 
 			while (rs.next())
-				list.add(new EventProxy(rs.getInt("ID"), rs.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE")));
+				list.add(new EventProxy(rs.getInt("ID"), rs
+						.getInt("EVENT_PRODUCER_ID"), rs.getInt("PAGE")));
 			return list;
 		} catch (final SQLException e) {
 			throw new SoCTraceException(e);

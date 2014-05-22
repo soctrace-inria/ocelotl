@@ -30,14 +30,13 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public abstract class TimeAggregationManager implements ITimeManager {
 
-	protected List<Integer>			parts		= new ArrayList<Integer>();
-	protected List<DLPQuality>		qualities	= new ArrayList<DLPQuality>();
-	protected List<Double>			parameters	= new ArrayList<Double>();
-	protected List<List<Boolean>>	eqMatrix;
-	protected ITimeAggregation		timeAggregation;
-	protected OcelotlParameters		ocelotlParameters;
+	protected List<Integer> parts = new ArrayList<Integer>();
+	protected List<DLPQuality> qualities = new ArrayList<DLPQuality>();
+	protected List<Double> parameters = new ArrayList<Double>();
+	protected List<List<Boolean>> eqMatrix;
+	protected ITimeAggregation timeAggregation;
+	protected OcelotlParameters ocelotlParameters;
 
-	
 	public TimeAggregationManager(final OcelotlParameters ocelotlParameters) {
 		super();
 		this.ocelotlParameters = ocelotlParameters;
@@ -47,7 +46,8 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	public void computeDichotomy() {
 		final DeltaManager dm = new DeltaManager();
 		dm.start();
-		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(), 0.0, 1.0);
+		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(),
+				0.0, 1.0);
 		parameters = timeAggregation.getParameters();
 		qualities = timeAggregation.getQualityList();
 		dm.end("LPAGGREG - PARAMETERS LIST");
@@ -70,7 +70,6 @@ public abstract class TimeAggregationManager implements ITimeManager {
 		dm.end("LPAGGREG - COMPUTE QUALITIES");
 	}
 
-	
 	public void fillVectors() {
 		if (OcelotlParameters.isJniFlag())
 			fillVectorsJNI();
@@ -118,9 +117,9 @@ public abstract class TimeAggregationManager implements ITimeManager {
 
 	@Override
 	public abstract void reset();
-	
+
 	@Override
-	public void print(OcelotlCore core){
+	public void print(OcelotlCore core) {
 		PartManager partManager = new PartManager(core);
 		partManager.print();
 	}

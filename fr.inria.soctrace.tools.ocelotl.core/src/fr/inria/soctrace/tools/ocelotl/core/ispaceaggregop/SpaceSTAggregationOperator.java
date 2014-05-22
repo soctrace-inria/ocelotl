@@ -19,22 +19,18 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.ISpaceTimeManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.ITimeManager;
 
-abstract public class SpaceSTAggregationOperator implements ISpaceSTAggregationOperator {
+abstract public class SpaceSTAggregationOperator implements
+		ISpaceSTAggregationOperator {
 
 	protected EventProducerHierarchy hierarchy;
-	protected OcelotlCore	ocelotlCore;
-	protected int			timeSliceNumber;
-	protected long			timeSliceDuration;
-	protected ISpaceTimeManager	lpaggregManager;
+	protected OcelotlCore ocelotlCore;
+	protected int timeSliceNumber;
+	protected long timeSliceDuration;
+	protected ISpaceTimeManager lpaggregManager;
 
 	public SpaceSTAggregationOperator() {
 		super();
@@ -58,8 +54,6 @@ abstract public class SpaceSTAggregationOperator implements ISpaceSTAggregationO
 	}
 
 	abstract protected void initParts();
-	
-
 
 	@Override
 	public EventProducerHierarchy getHierarchy() {
@@ -70,8 +64,11 @@ abstract public class SpaceSTAggregationOperator implements ISpaceSTAggregationO
 	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
 		lpaggregManager = (ISpaceTimeManager) ocelotlCore.getLpaggregManager();
-		timeSliceNumber = ocelotlCore.getOcelotlParameters().getTimeSlicesNumber();
-		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion().getTimeDuration() / timeSliceNumber;
+		timeSliceNumber = ocelotlCore.getOcelotlParameters()
+				.getTimeSlicesNumber();
+		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()
+				.getTimeDuration()
+				/ timeSliceNumber;
 		hierarchy = lpaggregManager.getHierarchy();
 		initParts();
 		computeParts();

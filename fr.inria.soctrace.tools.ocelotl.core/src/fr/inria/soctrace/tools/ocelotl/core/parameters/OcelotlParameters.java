@@ -30,24 +30,24 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlParameters {
 
-	//Modify to desactivate JNI
-	private static boolean		forceJava			= false;
-	
-	private List<EventProducer>	eventProducers		= new ArrayList<EventProducer>();
-	private int					timeSlicesNumber	= 1;
-	private TimeRegion			timeRegion;
-	private double				parameter			= 0;
-	private boolean				normalize			= false;
-	private double				threshold			= 0.001;
-	private Trace				trace				= null;
-	private int					maxEventProducers	= 0;
-	private String				timeAggOperator;
-	private String				spaceAggOperator;
-	private boolean				growingQualities	= true;
+	// Modify to desactivate JNI
+	private static boolean forceJava = false;
 
-	private static boolean		jniFlag=false;
-	private ITraceTypeConfig	iTraceTypeConfig;
-	private ISpaceConfig		iSpaceConfig;
+	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
+	private int timeSlicesNumber = 1;
+	private TimeRegion timeRegion;
+	private double parameter = 0;
+	private boolean normalize = false;
+	private double threshold = 0.001;
+	private Trace trace = null;
+	private int maxEventProducers = 0;
+	private String timeAggOperator;
+	private String spaceAggOperator;
+	private boolean growingQualities = true;
+
+	private static boolean jniFlag = false;
+	private ITraceTypeConfig iTraceTypeConfig;
+	private ISpaceConfig iSpaceConfig;
 
 	public OcelotlParameters() {
 		super();
@@ -104,7 +104,6 @@ public class OcelotlParameters {
 	public void setEventProducers(final List<EventProducer> eventProducers) {
 		this.eventProducers = eventProducers;
 	}
-
 
 	public void setGrowingQualities(final boolean growingQualities) {
 		this.growingQualities = growingQualities;

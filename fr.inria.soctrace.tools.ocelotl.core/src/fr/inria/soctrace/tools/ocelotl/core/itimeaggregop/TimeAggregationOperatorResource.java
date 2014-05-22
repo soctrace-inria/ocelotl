@@ -24,22 +24,26 @@ import java.util.List;
 
 public class TimeAggregationOperatorResource {
 
-	String			operatorClass;
+	String operatorClass;
 
-	String			name;
+	String name;
 
-	boolean			generic;
-	List<String>	traceFormats		= new ArrayList<String>();
-	List<String>	spaceCompatibility	= new ArrayList<String>();
-	String			paramWinClass;
-	String			paramConfig;
-	String			bundle;
+	boolean generic;
+	List<String> traceFormats = new ArrayList<String>();
+	List<String> spaceCompatibility = new ArrayList<String>();
+	String paramWinClass;
+	String paramConfig;
+	String bundle;
 
 	public TimeAggregationOperatorResource() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public TimeAggregationOperatorResource(final String operatorClass, final String name, final boolean generic, final List<String> traceFormats, final List<String> spaceCompatibility, final String paramWinClass, final String paramConfig, final String bundle) {
+	public TimeAggregationOperatorResource(final String operatorClass,
+			final String name, final boolean generic,
+			final List<String> traceFormats,
+			final List<String> spaceCompatibility, final String paramWinClass,
+			final String paramConfig, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
@@ -51,7 +55,11 @@ public class TimeAggregationOperatorResource {
 		this.bundle = bundle;
 	}
 
-	public TimeAggregationOperatorResource(final String operatorClass, final String name, final boolean generic, final String traceFormats, final String spaceCompatibility, final String paramWinClass, final String paramConfig, final String bundle) {
+	public TimeAggregationOperatorResource(final String operatorClass,
+			final String name, final boolean generic,
+			final String traceFormats, final String spaceCompatibility,
+			final String paramWinClass, final String paramConfig,
+			final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;

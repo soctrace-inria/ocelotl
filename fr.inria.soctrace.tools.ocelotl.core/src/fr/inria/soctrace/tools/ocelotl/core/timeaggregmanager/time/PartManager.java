@@ -27,11 +27,11 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class PartManager {
 
-	private OcelotlCore				lpaggregCore;
-	private ITimeManager			lpaggregManager;
-	private final List<TimeRegion>	timeStamps	= new ArrayList<TimeRegion>();
-	private TimeRegion				traceRegion;
-	private int						timeSliceNumber;
+	private OcelotlCore lpaggregCore;
+	private ITimeManager lpaggregManager;
+	private final List<TimeRegion> timeStamps = new ArrayList<TimeRegion>();
+	private TimeRegion traceRegion;
+	private int timeSliceNumber;
 
 	public PartManager(final OcelotlCore lpaggregCore) {
 		super();
@@ -40,14 +40,23 @@ public class PartManager {
 
 	private void computeTimeStamps() {
 		int oldPart = 0;
-		timeStamps.add(new TimeRegion(traceRegion.getTimeStampStart(), traceRegion.getTimeStampEnd()));
+		timeStamps.add(new TimeRegion(traceRegion.getTimeStampStart(),
+				traceRegion.getTimeStampEnd()));
 		for (int i = 1; i < lpaggregManager.getParts().size() - 1; i++)
 			if (lpaggregManager.getParts().get(i) != oldPart) {
-				timeStamps.get(timeStamps.size() - 1).setTimeStampEnd(traceRegion.getTimeStampStart() + traceRegion.getTimeDuration() * i / timeSliceNumber);
-				timeStamps.add(new TimeRegion(traceRegion.getTimeStampStart() + traceRegion.getTimeDuration() * i / timeSliceNumber, traceRegion.getTimeStampStart() + traceRegion.getTimeDuration() * i / timeSliceNumber));
+				timeStamps.get(timeStamps.size() - 1).setTimeStampEnd(
+						traceRegion.getTimeStampStart()
+								+ traceRegion.getTimeDuration() * i
+								/ timeSliceNumber);
+				timeStamps.add(new TimeRegion(traceRegion.getTimeStampStart()
+						+ traceRegion.getTimeDuration() * i / timeSliceNumber,
+						traceRegion.getTimeStampStart()
+								+ traceRegion.getTimeDuration() * i
+								/ timeSliceNumber));
 				oldPart = lpaggregManager.getParts().get(i);
 			}
-		timeStamps.get(timeStamps.size() - 1).setTimeStampEnd(traceRegion.getTimeStampEnd());
+		timeStamps.get(timeStamps.size() - 1).setTimeStampEnd(
+				traceRegion.getTimeStampEnd());
 	}
 
 	public OcelotlCore getLpaggregCore() {
@@ -76,16 +85,21 @@ public class PartManager {
 		System.out.println("AGGREGATION RESULTS");
 		System.out.println("*******************");
 		System.out.println("");
-		System.out.println("Time region:  [" + traceRegion.getTimeStampStart() + " - " + traceRegion.getTimeStampEnd() + "] - duration: " + traceRegion.getTimeDuration());
+		System.out.println("Time region:  [" + traceRegion.getTimeStampStart()
+				+ " - " + traceRegion.getTimeStampEnd() + "] - duration: "
+				+ traceRegion.getTimeDuration());
 		System.out.println("Time slice number: " + timeSliceNumber);
-		System.out.println("Aggregation timeOperator: " + lpaggregCore.getOcelotlParameters().getTimeAggOperator());
-		System.out.println("Gain/Loss parameter p: " + lpaggregCore.getOcelotlParameters().getParameter());
+		System.out.println("Aggregation timeOperator: "
+				+ lpaggregCore.getOcelotlParameters().getTimeAggOperator());
+		System.out.println("Gain/Loss parameter p: "
+				+ lpaggregCore.getOcelotlParameters().getParameter());
 		System.out.println("*******************");
 		System.out.println("");
 		System.out.println("Aggregation timestamps:");
 		for (final TimeRegion tr : timeStamps)
 			System.out.print(tr.getTimeStampStart() + ", ");
-		System.out.print(timeStamps.get(timeStamps.size() - 1).getTimeStampEnd());
+		System.out.print(timeStamps.get(timeStamps.size() - 1)
+				.getTimeStampEnd());
 		System.out.println();
 		System.out.println();
 	}

@@ -21,8 +21,8 @@ package fr.inria.soctrace.tools.ocelotl.core.timeregion;
 
 public class TimeRegion {
 
-	private long	timeStampStart	= 0;
-	private long	timeStampEnd	= Long.MAX_VALUE;
+	private long timeStampStart = 0;
+	private long timeStampEnd = Long.MAX_VALUE;
 
 	public TimeRegion() {
 		super();
@@ -41,7 +41,8 @@ public class TimeRegion {
 	}
 
 	public boolean compareTimeRegion(final TimeRegion timeRegion) {
-		return getTimeStampStart() == timeRegion.getTimeStampStart() && getTimeStampEnd() == timeRegion.getTimeStampEnd();
+		return getTimeStampStart() == timeRegion.getTimeStampStart()
+				&& getTimeStampEnd() == timeRegion.getTimeStampEnd();
 	}
 
 	public boolean containsTimeStamp(final long timeStamp) {
@@ -81,7 +82,8 @@ public class TimeRegion {
 
 	@Override
 	public String toString() {
-		return "TimeRegion [timeStampStart=" + timeStampStart + ", timeStampEnd=" + timeStampEnd + "]";
+		return "TimeRegion [timeStampStart=" + timeStampStart
+				+ ", timeStampEnd=" + timeStampEnd + "]";
 	}
 
 }

@@ -20,20 +20,16 @@
 package fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.views;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.ImageFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
@@ -41,9 +37,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.AggregatedData;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.Aggregation;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
@@ -51,10 +45,6 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.VisualAggregat
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MatrixProportion;
-import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
-import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.IconManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.StateColorManager;
 
 public class HierarchyProportion {
 
@@ -103,8 +93,8 @@ public class HierarchyProportion {
 		rootHeight = root.getSize().height;
 		height = rootHeight - (2* Border);
 		width = root.getSize().width - (2 * Border);
-		logicWidth = (double) width/(double) (hierarchy.getRoot().getParts().size());
-		logicHeight = (double) height/(double) hierarchy.getRoot().getWeight();
+		logicWidth = width/(hierarchy.getRoot().getParts().size());
+		logicHeight = height/hierarchy.getRoot().getWeight();
 		initX();
 		initY();
 		print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot().getParts().size());
@@ -138,7 +128,7 @@ public class HierarchyProportion {
 			else{
 				boolean aggy=false;
 				for (EventProducerNode ep: epn.getChildrenNodes()){
-					if (((double) ep.getWeight()*logicHeight-(double) space)<minLogicWeight){
+					if ((ep.getWeight()*logicHeight-space)<minLogicWeight){
 						aggy=true;
 						break;
 					}
@@ -222,7 +212,7 @@ public class HierarchyProportion {
 		rectangle.setLineWidth(1);
 
 		rectangle.setToolTip(new Label(" "+epn.getMe().getName()+" ("+state.getState()+", "+state.getAmplitude100()+"%) "));
-		int xa=(int) (((double) logicX * logicWidth + Border));
+		int xa=(int) ((logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb=xendlist.get(logicX2);
 		int yb=yendlist.get(logicY+sizeY);
@@ -245,7 +235,7 @@ public class HierarchyProportion {
 		lab.setForegroundColor(ColorConstants.black);
 		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 		//rectangle.add(lab, BorderLayout.CENTER);
-		int xa=(int) (((double) logicX * logicWidth + Border));
+		int xa=(int) ((logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb=xendlist.get(logicX2);
 		int yb=yendlist.get(logicY+sizeY);
@@ -326,7 +316,7 @@ public class HierarchyProportion {
 		lab.setForegroundColor(ColorConstants.black);
 		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 		//rectangle.add(lab, BorderLayout.CENTER);
-		int xa=(int) (((double) logicX * logicWidth + Border));
+		int xa=(int) ((logicX * logicWidth + Border));
 		int ya=(int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb=xendlist.get(logicX2);
 		int yb=yendlist.get(logicY+sizeY);

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
@@ -32,10 +31,11 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventPro
 public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
 	_2DSpaceTimeMicroDescription matrix;
-	
-	public SpaceTimeAggregation2Manager(_2DSpaceTimeMicroDescription _2dSpaceTimeMicroDescription) {
+
+	public SpaceTimeAggregation2Manager(
+			_2DSpaceTimeMicroDescription _2dSpaceTimeMicroDescription) {
 		super(_2dSpaceTimeMicroDescription.getOcelotlParameters());
-		matrix= _2dSpaceTimeMicroDescription;
+		matrix = _2dSpaceTimeMicroDescription;
 		reset();
 	}
 
@@ -43,9 +43,10 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	public List<EventProducer> getEventProducers() {
 		return new ArrayList<EventProducer>(matrix.getMatrix().get(0).keySet());
 	}
-	
+
 	public List<String> getKeys() {
-		return new ArrayList<String>(matrix.getMatrix().get(0).get(getEventProducers().get(0)).keySet());
+		return new ArrayList<String>(matrix.getMatrix().get(0)
+				.get(getEventProducers().get(0)).keySet());
 	}
 
 	@Override
@@ -56,35 +57,35 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
 	@Override
 	protected void fillNodesJNI() {
-		for (EventProducer ep: getEventProducers()){
-			List<HashMap<String, Long>> values=new ArrayList<HashMap<String, Long>>();
-			for (int i=0; i<matrix.getVectorNumber(); i++)
-				values.add(matrix.getMatrix().get(i).get(ep));	
+		for (EventProducer ep : getEventProducers()) {
+			List<HashMap<String, Long>> values = new ArrayList<HashMap<String, Long>>();
+			for (int i = 0; i < matrix.getVectorNumber(); i++)
+				values.add(matrix.getMatrix().get(i).get(ep));
 			hierarchy.setValues(ep, values);
 		}
 		addHierarchyToJNI();
 	}
 
-
-
 	@Override
 	protected void addLeaves() {
-		for (int id: hierarchy.getLeaves().keySet())
-			timeAggregation.addLeaf(id, hierarchy.getParentID(id), hierarchy.getValues(id));
-		
+		for (int id : hierarchy.getLeaves().keySet())
+			timeAggregation.addLeaf(id, hierarchy.getParentID(id),
+					hierarchy.getValues(id));
+
 	}
 
 	@Override
 	protected void addNodes() {
 		addChildren(hierarchy.getRoot().getID());
-		
+
 	}
-	
-	protected void addChildren(int id){
-		for (EventProducerNode epn:hierarchy.getEventProducerNodes().get(id).getChildrenNodes()){
-			if (!epn.getChildrenNodes().isEmpty()){
+
+	protected void addChildren(int id) {
+		for (EventProducerNode epn : hierarchy.getEventProducerNodes().get(id)
+				.getChildrenNodes()) {
+			if (!epn.getChildrenNodes().isEmpty()) {
 				timeAggregation.addNode(epn.getID(), id);
-				addChildren(epn.getID());	
+				addChildren(epn.getID());
 			}
 		}
 	}
@@ -92,7 +93,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	@Override
 	protected void addRoot() {
 		timeAggregation.addRoot(hierarchy.getRoot().getID());
-		
+
 	}
 
 	@Override
@@ -100,15 +101,15 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 		setHierarchy();
 		if (OcelotlParameters.isJniFlag())
 			timeAggregation = new JNISpaceTimeAggregation2();
-	//	else
-	//		timeAggregation = new SpaceTimeAggregation2();
-		//TODO implements
+		// else
+		// timeAggregation = new SpaceTimeAggregation2();
+		// TODO implements
 		fillNodes();
 
 	}
-	
-	private void setHierarchy(){
-		hierarchy=new EventProducerHierarchy(getEventProducers());
+
+	private void setHierarchy() {
+		hierarchy = new EventProducerHierarchy(getEventProducers());
 	}
 
 }

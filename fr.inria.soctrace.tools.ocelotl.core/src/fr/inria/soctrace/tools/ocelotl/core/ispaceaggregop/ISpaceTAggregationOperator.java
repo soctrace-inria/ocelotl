@@ -19,9 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-
-public interface ISpaceTAggregationOperator extends ISpaceAggregationOperator{
+public interface ISpaceTAggregationOperator extends ISpaceAggregationOperator {
 
 	public Part getPart(int i);
 

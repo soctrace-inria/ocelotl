@@ -19,13 +19,12 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop;
 
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
 
-public interface ISpaceSTAggregationOperator extends ISpaceAggregationOperator{
+public interface ISpaceSTAggregationOperator extends ISpaceAggregationOperator {
 
 	public EventProducerHierarchy getHierarchy();
 
 	public int getSliceNumber();
-	
+
 }

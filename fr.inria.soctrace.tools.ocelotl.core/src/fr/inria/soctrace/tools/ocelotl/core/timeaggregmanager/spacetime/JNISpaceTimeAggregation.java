@@ -27,12 +27,11 @@ import fr.inria.dlpaggreg.spacetime.ISpaceTimeAggregation;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.DLPAggregWrapper;
 
 public abstract class JNISpaceTimeAggregation implements ISpaceTimeAggregation {
-	
+
 	protected DLPAggregWrapper jniWrapper;
 	List<Double> parameters = new ArrayList<Double>();
 	List<DLPQuality> qualities = new ArrayList<DLPQuality>();
 
-	
 	public JNISpaceTimeAggregation() {
 		super();
 	}
@@ -42,9 +41,10 @@ public abstract class JNISpaceTimeAggregation implements ISpaceTimeAggregation {
 		jniWrapper.computeDichotomy((float) threshold);
 		parameters.clear();
 		qualities.clear();
-		for (int i=0; i<jniWrapper.getParameterNumber(); i++){
+		for (int i = 0; i < jniWrapper.getParameterNumber(); i++) {
 			parameters.add((double) jniWrapper.getParameter(i));
-			qualities.add(new DLPQuality(jniWrapper.getGainByIndex(i), jniWrapper.getLossByIndex(i)));
+			qualities.add(new DLPQuality(jniWrapper.getGainByIndex(i),
+					jniWrapper.getLossByIndex(i)));
 		}
 	}
 
@@ -72,17 +72,17 @@ public abstract class JNISpaceTimeAggregation implements ISpaceTimeAggregation {
 	public int getSize() {
 		return jniWrapper.getPartNumber();
 	}
-	
+
 	@Override
-	public List<Integer> getParts(int id){
+	public List<Integer> getParts(int id) {
 		ArrayList<Integer> parts = new ArrayList<Integer>();
-		for (int i=0; i<getSize(); i++)
+		for (int i = 0; i < getSize(); i++)
 			parts.add(jniWrapper.getPart(id, i));
 		return parts;
 	}
-	
+
 	@Override
-	public void validate(){
+	public void validate() {
 		jniWrapper.validate();
 	}
 

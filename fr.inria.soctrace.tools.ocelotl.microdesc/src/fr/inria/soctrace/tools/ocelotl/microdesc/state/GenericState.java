@@ -26,7 +26,8 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
 public class GenericState extends State {
 
-	public GenericState(final Event event, final TimeSliceManager timeSliceManager) {
+	public GenericState(final Event event,
+			final TimeSliceManager timeSliceManager) {
 		super(timeSliceManager);
 		timeRegion = new TimeRegion(event.getTimestamp(), event.getLongPar());
 		eventProducerID = event.getEventProducer().getId();

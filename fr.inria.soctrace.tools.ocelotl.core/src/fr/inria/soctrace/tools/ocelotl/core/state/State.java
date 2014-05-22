@@ -26,10 +26,10 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
 public abstract class State implements IState {
 
-	protected String					stateType		= null;
-	protected TimeRegion				timeRegion		= null;
-	protected int						eventProducerID	= -1;
-	protected final TimeSliceManager	timeSliceManager;
+	protected String stateType = null;
+	protected TimeRegion timeRegion = null;
+	protected int eventProducerID = -1;
+	protected final TimeSliceManager timeSliceManager;
 
 	public State(final TimeSliceManager timeSliceManager) {// TODO
 		this.timeSliceManager = timeSliceManager;

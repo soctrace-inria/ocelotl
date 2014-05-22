@@ -28,11 +28,11 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class TimeSliceManager {
 
-	private final List<TimeSlice>	timeSlices	= new ArrayList<TimeSlice>();
-	private final TimeRegion		timeRegion;
-	private long					slicesNumber;
+	private final List<TimeSlice> timeSlices = new ArrayList<TimeSlice>();
+	private final TimeRegion timeRegion;
+	private long slicesNumber;
 
-	private long					sliceDuration;
+	private long sliceDuration;
 
 	public TimeSliceManager(final TimeRegion timeRegion, final long slicesNumber) {// TODO
 		// use
@@ -61,7 +61,8 @@ public class TimeSliceManager {
 	public long getTimeSlice(final long timeStamp) {
 		// final Map<Long, Long> timeSlicesDistribution = new HashMap<Long,
 		// Long>();
-		long slice = Math.max(0, (timeStamp - timeRegion.getTimeStampStart()) / sliceDuration - 1);
+		long slice = Math.max(0, (timeStamp - timeRegion.getTimeStampStart())
+				/ sliceDuration - 1);
 		for (long i = slice; i < timeSlices.size(); i++) {
 			final TimeSlice it = timeSlices.get((int) i);
 			if (it.startIsInsideMe(timeStamp)) {
@@ -76,11 +77,16 @@ public class TimeSliceManager {
 		return timeSlices;
 	}
 
-	public Map<Long, Long> getTimeSlicesDistribution(final TimeRegion testedTimeRegion) {
+	public Map<Long, Long> getTimeSlicesDistribution(
+			final TimeRegion testedTimeRegion) {
 		final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
-		long startSlice = Math.max(0, (testedTimeRegion.getTimeStampStart() - timeRegion.getTimeStampStart()) / sliceDuration - 1);
+		long startSlice = Math.max(
+				0,
+				(testedTimeRegion.getTimeStampStart() - timeRegion
+						.getTimeStampStart()) / sliceDuration - 1);
 		long temp = 0;
-		if (testedTimeRegion.getTimeStampStart() - timeRegion.getTimeStampStart() >= 0)
+		if (testedTimeRegion.getTimeStampStart()
+				- timeRegion.getTimeStampStart() >= 0)
 			for (long i = startSlice; i < timeSlices.size(); i++) {
 				final TimeSlice it = timeSlices.get((int) i);
 				if (it.startIsInsideMe(testedTimeRegion.getTimeStampStart())) {
@@ -99,7 +105,8 @@ public class TimeSliceManager {
 	}
 
 	public void printInfos() {
-		System.out.println("TimeSliceManager: " + slicesNumber + " slices, " + sliceDuration + " ns duration");
+		System.out.println("TimeSliceManager: " + slicesNumber + " slices, "
+				+ sliceDuration + " ns duration");
 	}
 
 	public void setValues(final List<Integer> values) {
@@ -111,7 +118,8 @@ public class TimeSliceManager {
 		int i = 0;
 		long currentTime = timeRegion.getTimeStampStart();
 		while (currentTime < timeRegion.getTimeStampEnd()) {
-			timeSlices.add(new TimeSlice(new TimeRegion(currentTime, currentTime + sliceDuration), i));
+			timeSlices.add(new TimeSlice(new TimeRegion(currentTime,
+					currentTime + sliceDuration), i));
 			currentTime += sliceDuration;
 			i++;
 		}

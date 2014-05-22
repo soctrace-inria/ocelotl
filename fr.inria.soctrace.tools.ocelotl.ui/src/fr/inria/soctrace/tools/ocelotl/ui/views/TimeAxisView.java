@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 
 /**
  * Time Axis View : part representation, according to LP algorithm result
@@ -61,11 +61,11 @@ public class TimeAxisView {
 
 		public void draw(final TimeRegion timeRegion, final boolean active) {
 			if (active) {
-				setForegroundColor(TimeLineView.activeColorFG);
-				setBackgroundColor(TimeLineView.activeColorBG);
+				setForegroundColor(AggregatedView.activeColorFG);
+				setBackgroundColor(AggregatedView.activeColorBG);
 			} else {
-				setForegroundColor(TimeLineView.selectColorFG);
-				setBackgroundColor(TimeLineView.selectColorBG);
+				setForegroundColor(AggregatedView.selectColorFG);
+				setBackgroundColor(AggregatedView.selectColorBG);
 			}
 			root.add(this,
 					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height - 2), new Point(
@@ -77,21 +77,21 @@ public class TimeAxisView {
 	Figure				root;
 	Canvas				canvas;
 	TimeRegion			time;
-	final static int	Height			= 100;
-	final static int	Border			= 10;
-	final static int	TimeAxisWidth	= 1;
-	final static long	Divide			= 10;
-	double				GradNumber		= 10.0;
-	double				GradDuration	= 10.0;
-	final static long	GradWidthMin	= 50;
-	double				GradWidth		= 50;
-	final static int	GradHeight		= 8;
-	final static int	TextWidth		= 50;
-	final static int	TextHeight		= 20;
-	final static long	MiniDivide		= 5;
-	final static int	MiniGradHeight	= 4;
-	final static int 	TextPositionOffset = 2;
-	int					Space			= 6;
+	final static int	Height				= 100;
+	final static int	Border				= 10;
+	final static int	TimeAxisWidth		= 1;
+	final static long	Divide				= 10;
+	double				GradNumber			= 10.0;
+	double				GradDuration		= 10.0;
+	final static long	GradWidthMin		= 50;
+	double				GradWidth			= 50;
+	final static int	GradHeight			= 8;
+	final static int	TextWidth			= 50;
+	final static int	TextHeight			= 20;
+	final static long	MiniDivide			= 5;
+	final static int	MiniGradHeight		= 4;
+	final static int	TextPositionOffset	= 2;
+	int					Space				= 6;
 	SelectFigure		selectFigure;
 
 	public TimeAxisView() {
@@ -125,7 +125,7 @@ public class TimeAxisView {
 		NumberFormat formatter = null;
 		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
 		formatter = new DecimalFormat("0.00E0");
-		int linePosition=root.getSize().height() - TextHeight / 2 - TextPositionOffset - Border;
+		final int linePosition = root.getSize().height() - TextHeight / 2 - TextPositionOffset - Border;
 		for (int i = 0; i < (int) GradNumber + 1; i++) {
 			final RectangleFigure rectangle = new RectangleFigure();
 			root.add(rectangle, new Rectangle(new Point((int) (i * GradWidth) + Border, linePosition), new Point(new Point((int) (i * GradWidth) + Border + TimeAxisWidth, linePosition - GradHeight))));
@@ -154,7 +154,8 @@ public class TimeAxisView {
 				final RectangleFigure rectangle2 = new RectangleFigure();
 				if ((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide) > root.getSize().width() - Border)
 					break;
-				root.add(rectangle2, new Rectangle(new Point((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide), linePosition), new Point(new Point((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide), linePosition - MiniGradHeight))));
+				root.add(rectangle2, new Rectangle(new Point((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide), linePosition), new Point(new Point((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide), linePosition
+						- MiniGradHeight))));
 				rectangle2.setBackgroundColor(ColorConstants.gray);
 				rectangle2.setForegroundColor(ColorConstants.gray);
 				rectangle2.setLineWidth(1);
@@ -163,7 +164,7 @@ public class TimeAxisView {
 	}
 
 	public void drawMainLine() {
-		int linePosition=root.getSize().height() - TextHeight / 2 - TextPositionOffset - Border;
+		final int linePosition = root.getSize().height() - TextHeight / 2 - TextPositionOffset - Border;
 		final RectangleFigure rectangle = new RectangleFigure();
 		root.add(rectangle, new Rectangle(new Point(Border, linePosition + TimeAxisWidth), new Point(root.getSize().width() - Border, linePosition)));
 		rectangle.setBackgroundColor(ColorConstants.darkGray);

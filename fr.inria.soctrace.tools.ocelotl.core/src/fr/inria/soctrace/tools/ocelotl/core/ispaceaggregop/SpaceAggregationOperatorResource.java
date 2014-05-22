@@ -24,20 +24,22 @@ import java.util.List;
 
 public class SpaceAggregationOperatorResource {
 
-	String			operatorClass;
-	String			name;
-	List<String>	timeCompatibility	= new ArrayList<String>();
-	String 			paramWinClass;
-	String 			paramConfig;
-	String			visualization;
-	String			bundle;
+	String operatorClass;
+	String name;
+	List<String> timeCompatibility = new ArrayList<String>();
+	String paramWinClass;
+	String paramConfig;
+	String visualization;
+	String bundle;
 
 	public SpaceAggregationOperatorResource() {
 		// TODO Auto-generated constructor stub
 	}
 
-
-	public SpaceAggregationOperatorResource(final String operatorClass, final String name, final List<String> timeCompatibility, final String visualization, String paramWinClass, String paramConfig,  final String bundle) {
+	public SpaceAggregationOperatorResource(final String operatorClass,
+			final String name, final List<String> timeCompatibility,
+			final String visualization, String paramWinClass,
+			String paramConfig, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
@@ -76,13 +78,13 @@ public class SpaceAggregationOperatorResource {
 		this.name = name;
 	}
 
-	 public String getParamConfig() {
-	 return paramConfig;
-	 }
-	
-	 public String getParamWinClass() {
-	 return paramWinClass;
-	 }
+	public String getParamConfig() {
+		return paramConfig;
+	}
+
+	public String getParamWinClass() {
+		return paramWinClass;
+	}
 
 	public void setOperatorClass(final String operatorClass) {
 		this.operatorClass = operatorClass;
@@ -98,13 +100,12 @@ public class SpaceAggregationOperatorResource {
 		this.visualization = visualization;
 	}
 
+	public void setParamConfig(final String paramConfig) {
+		this.paramConfig = paramConfig;
+	}
 
-	 public void setParamConfig(final String paramConfig) {
-	 this.paramConfig = paramConfig;
-	 }
-	
-	 public void setParamWinClass(final String paramWinClass) {
-	 this.paramWinClass = paramWinClass;
-	 }
+	public void setParamWinClass(final String paramWinClass) {
+		this.paramWinClass = paramWinClass;
+	}
 
 }
