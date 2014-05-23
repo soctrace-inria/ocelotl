@@ -539,7 +539,7 @@ public class OcelotlView extends ViewPart {
 		timeAxisView.initDiagram(compositeTimeAxisView);
 		final FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
 		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
-		sashForm_4.setWeights(new int[] { 398, 13 });
+		sashForm_4.setWeights(new int[] {388, 24});
 
 		final ScrolledComposite scrolledComposite = new ScrolledComposite(sashFormView, SWT.BORDER | SWT.H_SCROLL);
 		scrolledComposite.setExpandHorizontal(true);
@@ -625,6 +625,9 @@ public class OcelotlView extends ViewPart {
 		buttonUp.setText(">");
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
 		btnRun = new Button(groupTime, SWT.NONE);
+		GridData gd_btnRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_btnRun.minimumHeight = 10;
+		btnRun.setLayoutData(gd_btnRun);
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnRun.setText("RUN!");
@@ -638,7 +641,7 @@ public class OcelotlView extends ViewPart {
 		textTimestampStart.addModifyListener(new ConfModificationListener());
 		scrolledComposite.setContent(groupTime);
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashFormView.setWeights(new int[] { 432, 16 });
+		sashFormView.setWeights(new int[] {418, 36});
 
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
@@ -662,6 +665,7 @@ public class OcelotlView extends ViewPart {
 
 		final Composite composite_1 = new Composite(groupTraces, SWT.NONE);
 		final GridData gd_composite_1 = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_composite_1.minimumHeight = 20;
 		gd_composite_1.widthHint = 285;
 		composite_1.setLayoutData(gd_composite_1);
 		composite_1.setLayout(new GridLayout(2, false));
@@ -696,6 +700,7 @@ public class OcelotlView extends ViewPart {
 		compositeAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		compositeAggregationOperator.setLayout(new GridLayout(2, false));
 		final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		gd_compositeAggregationOperator.minimumHeight = 20;
 		gd_compositeAggregationOperator.widthHint = 85;
 		compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
 
@@ -736,6 +741,7 @@ public class OcelotlView extends ViewPart {
 
 		final Composite composite = new Composite(grpSpaceAggregationOperator, SWT.NONE);
 		final GridData gd_composite = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		gd_composite.minimumHeight = 20;
 		gd_composite.widthHint = 85;
 		composite.setLayoutData(gd_composite);
 		composite.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -800,14 +806,14 @@ public class OcelotlView extends ViewPart {
 
 		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnGrowingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnGrowingQualities.setText("Complexity gain(green), Information gain(red)");
+		btnGrowingQualities.setText("Complexity gain (green)\nInformation gain (red)");
 		btnGrowingQualities.setSelection(true);
 		btnGrowingQualities.addSelectionListener(new GrowingQualityRadioSelectionAdapter());
 		btnGrowingQualities.setSelection(false);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
-		btnDecreasingQualities.setText("Complexity reduction (green), Information loss (red)");
+		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)");
 		btnDecreasingQualities.setSelection(false);
 		btnDecreasingQualities.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
@@ -818,7 +824,7 @@ public class OcelotlView extends ViewPart {
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		qualityView.initDiagram(compositeQualityView);
 		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		sashForm.setWeights(new int[] { 111, 337 });
+		sashForm.setWeights(new int[] {158, 296});
 		sashForm_1.setWeights(new int[] { 447, 142 });
 		sashFormGlobal.setWeights(new int[] { 395 });
 		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
