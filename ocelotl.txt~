@@ -1,0 +1,26 @@
+================================================================================
+Ocelotl tool for FrameSoC - version 
+================================================================================
+
+May, 30th 2014
+================
+How to use the KPTrace tools for FrameSoC:
+
+- [Parser]
+	- Go to the FrameSoC menu -> Trace Analysis -> Import Trace
+	- Select the KPTrace Parser
+	- Browse to the trace files to import and select all the .kpt, .kpm or
+	System.map and .meta file if any
+	- Click on the OK button
+	- When the importation is complete, the imported trace is available in the
+	FrameSoC tree, under "com.st.framesoc.kptrace.0.2"
+
+- [Viewer]
+	- Go to the FrameSoC menu -> Trace Analysis -> Launch Analysis Tool
+	- Select the KPTRaceViewer tool
+	- Select the trace to work with in the next window and click on the OK button
+	- The viewer will open showing the time chart of the first page of the trace
+	- The viewer provides a tool bar for the zoom actions and to open the
+	event properties view
+	- To navigate the pages, a scroll bar appears below the time chart to select
+	the page to visualize

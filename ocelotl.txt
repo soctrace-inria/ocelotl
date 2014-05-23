@@ -1,0 +1,118 @@
+==========================================================================================
+Ocelotl tool for FrameSoC - 0.1.0
+==========================================================================================
+
+May, 23rd 2014
+================
+How to use the Ocelotl tool for FrameSoC:
+
+------------------------------------------------------------------------------------------
+
+- [Launch the tool]
+	- Go to the FrameSoC menu -> Trace Analysis -> Launch Analysis Tool
+        - Select the Ocelotl tool
+        - No argument is needed
+
+------------------------------------------------------------------------------------------
+
+- [Trace Selection]
+        - In the Trace Overview tab, select a Trace
+
+- [Microscopic Description Settings]
+        - The Microscopic Description combo becomes then available:
+            - Select "Event Distribution" for an analysis based on the event occurences.
+              This type of analysis is compatible with all the traces.
+            - Select "State Distribution" for an analysis based on the event duration.
+              This analysis requires some specifics types of events (states).
+              Some trace formats are not compatible with this analysis.
+        - A setting window opens automatically. Choose:
+            - The Event Types that are involved in the analysis 
+            - The Event Producers (the resources that produce the events) that are 
+            involved in the analysis.
+              Add Result button enables to load a set of Event Producers saved as an 
+              analysis result by an other tool.
+            - You may want to configure Advanced Settings.
+                - Event Number Retrieved by Threads: enables to configure how much events
+                  are loaded by threads for each iteration during the trace reading.
+                - Event Producers per Query: enables to divide the query into several queries
+                  with a fixed number of Event Producers.
+                  This functionnality is useful if the disk space is low, as the temp directory 
+                  is used to store the query result during the trace reading.
+                  - Working Threads: enables to change the number of active thread during the
+                  trace reading.
+              Careful, modify these values may decrease the trace reading performances.
+
+- [Visualization Settings]
+        - The Visualization combo becomes then available:
+            - Select "Parts" for a visualization showing aggregates that corresponds to an
+            homogeneous behavior in the trace. The aggregates are separated by a blank space
+            and a different color
+            Settings: 
+              - Aggregate parts : gathers time slices that belong to the same aggregate.
+                If not active, each time slice is separated, and their aggregation is shown
+                thanks to their color.
+                Show part number : attributes a number to each aggregate to help to
+                distinguish them.
+            - Select "Proportions" for a visualization showing the same aggregates, but also
+            the proportion of event occurences (resp. the ratio of state duration) for each 
+            aggregate.
+            Settings:
+              - For each event, you can customize the color
+
+- [Quality Curves]
+        - The tab Quality Curves enables to change the apparence of complexity and information
+        curves provided by the aggregation algorithm:
+            - Normalize Qualities normalizes the curves and scale them to [0:1], which improves
+            their reading
+            - You may choose rising curves (complexity gain, information gain) or decreasing
+            curves (complexity reduction, information loss)
+
+- [Time Settings]
+        - You may change the trace time bounds thanks to the Start and End fields on the bottom
+        of on the window. Reset enables to get the original value back.
+        - Timeslice Number field corresponds to the number of time slices that will be used to
+        compute the aggregation. It is adviced to tune this parameter in order to find a
+        granularity that is convenient to the analysis. As the aggregation aglorithm complexity
+        is dependant on this parameter, it is adviced to incremente it progressively to keep
+        good performances.
+
+- [Threshold]
+        - This parameter determines the quality curves precision. More its value decreases,
+        more the precision increases. However, a too weak value may be responsible of
+        bad performances. We advice to keep the default value/
+
+------------------------------------------------------------------------------------------
+
+- [Run an Analysis]
+        - After having set the configuration, click on RUN! (or press ENTER on the keyboard)
+          The aggregation is then computing. It can take a while.
+        - When it is finished, the visualization and the curves are shown.
+
+- [Change the Aggregation strength]
+        - In order to find a relevant aggregation, you may tune the parameter. There is three
+        ways:
+            - Click on the curves. The corresponding parameter is retrieved, and used to show
+            the associated aggregation.
+            - Use < and > buttons (or use left and right arrow on the keyboard). It enables
+            to increment or decrement the parameter.
+            - Enter a value manually, in the Paramter field. The value is comprised between
+            1 and 0.
+        A value of 1 means that the aggregation strength is maximal: all the trace is 
+        disaggregated. Convertheless, a value of 0 means that each time slice is disaggregated.
+        A intermediate value provides a compromise between both extrema.
+
+- [Zoom]
+        - Once you obtain an interesting aggregation level, you may want to focus on a
+        particular time area. Select this area by clicking and dragging with the left button of
+        your mouse. Then, click on RUN! or press ENTER.
+
+- [Switch to a Gantt Chart (not available in SET 1.0)]
+        - If a generic Gantt Chart is available, you can switch to it by clicking on the
+        corresponding button on the corner right. The Gantt Chart will show the trace part
+        with the time bounds shown in the Start and End fields. You may focus on an area
+        by selecting it with the mouse left button drag and then switching directly to the Gantt,
+        without loading the aggregation with the RUN! button.
+
+
+- [Known Issues]
+        - You may need to redimension manually the different views, according to your resolution.
