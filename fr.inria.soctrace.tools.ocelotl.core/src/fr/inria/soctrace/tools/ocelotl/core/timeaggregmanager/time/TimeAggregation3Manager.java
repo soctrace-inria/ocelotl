@@ -25,7 +25,6 @@ import java.util.List;
 import fr.inria.dlpaggreg.time.JNITimeAggregation3;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
-import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class TimeAggregation3Manager extends TimeAggregationManager {
 
