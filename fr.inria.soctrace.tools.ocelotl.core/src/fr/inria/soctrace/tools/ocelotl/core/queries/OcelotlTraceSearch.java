@@ -75,7 +75,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
-				throw new OcelotlException(OcelotlException.INVALIDQUERY);
+				throw new OcelotlException(OcelotlException.NOETS);
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
@@ -86,7 +86,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
-				throw new OcelotlException(OcelotlException.INVALIDQUERY);
+				throw new OcelotlException(OcelotlException.NOEPS);
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));
@@ -105,9 +105,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 								.getTimeStampStart())));
 		}
 
-		// if (and.getNumberOfConditions() == 1)
-		// and.addCondition(new SimpleCondition("CATEGORY",
-		// ComparisonOperation.EQ, String.valueOf(EventCategory.)));
+		if (and.getNumberOfConditions() == 1)
+		and.addCondition(new SimpleCondition("1", ComparisonOperation.EQ, String.valueOf(1)));
 		if (and.getNumberOfConditions() >= 2)
 			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
@@ -130,7 +129,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
-				throw new OcelotlException(OcelotlException.INVALIDQUERY);
+				throw new OcelotlException(OcelotlException.NOETS);
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
@@ -141,7 +140,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
-				throw new OcelotlException(OcelotlException.INVALIDQUERY);
+				throw new OcelotlException(OcelotlException.NOEPS);
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));

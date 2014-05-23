@@ -71,7 +71,7 @@ public class OcelotlCore {
 			try{
 			lpaggregManager = timeOperator.createManager();
 			}catch (UnsatisfiedLinkError e){
-				throw new OcelotlException("Native library can not be loaded");
+				throw new OcelotlException(OcelotlException.JNI);
 			}
 		}
 		// vectors.print();

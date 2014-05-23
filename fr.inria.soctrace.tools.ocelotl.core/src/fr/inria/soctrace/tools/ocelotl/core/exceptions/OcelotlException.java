@@ -6,8 +6,12 @@ public class OcelotlException extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public static final String INVALIDQUERY = "Invalid query : modify your settings";
-	public static final String NOEVENTS = "No events found";
+	public static final String INVALIDQUERY = "Error: Invalid query";
+	public static final String NOEPS = "Error: No event producers selected";
+	public static final String NOETS = "Error: No event types selected";
+	public static final String NOEVENTS = "Error: No events found";
+	public static final String JNI = "Error: no native library found";
+
 
 	public OcelotlException() {
 		super();
