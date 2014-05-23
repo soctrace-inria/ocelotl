@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DLPaggreg
-Bundle-SymbolicName: fr.inria.dlpaggreg
+Bundle-SymbolicName: fr.inria.lpaggreg
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: fr.inria.dlpaggreg.Activator
 Require-Bundle: org.eclipse.ui,
