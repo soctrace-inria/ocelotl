@@ -2,7 +2,7 @@
 <feature
       id="fr.inria.soctrace.tools.ocelotl.feature"
       label="Ocelotl"
-      version="1.0.0.qualifier">
+      version="0.1.0.qualifier">
 
    <description>
       Ocelotl Analysis Tool
