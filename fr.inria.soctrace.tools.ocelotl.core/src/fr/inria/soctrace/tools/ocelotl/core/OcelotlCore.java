@@ -51,30 +51,7 @@ public class OcelotlCore {
 	SpaceAggregationOperatorManager spaceOperators;
 	ISpaceAggregationOperator spaceOperator;
 
-	static {
-		OcelotlParameters.setJniFlag(false);
-		if (!OcelotlParameters.isForceJava()) {
-			try {
-				System.loadLibrary("lpaggregjni");
-				OcelotlParameters.setJniFlag(true);
-				System.err
-						.println("Native library lpaggregjni loaded successfully. Tudo bem!\n");
-			} catch (final UnsatisfiedLinkError e) {
-				System.err
-						.println("Native library lpaggregjni failed to load.");
-				System.err
-						.println("Ocelotl will use java code instead, but performance may decrease.");
-				System.err
-						.println("You may need to manage JVM settings to allocate more memory to Ocelotl.");
-			}
-		} else {
-			System.err
-					.println("Native library lpaggregjni utilization desactivated. Performance may decrease.");
-			System.err
-					.println("You may need to manage JVM settings to allocate more memory to Ocelotl.");
-		}
 
-	}
 
 	public OcelotlCore() {
 		super();

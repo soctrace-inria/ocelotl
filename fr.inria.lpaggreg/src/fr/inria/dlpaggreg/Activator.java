@@ -3,6 +3,7 @@ package fr.inria.dlpaggreg;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -13,6 +14,17 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator	plugin;
+	
+	static {
+			try {
+				System.loadLibrary("lpaggregjni");
+				System.err
+						.println("Native library lpaggregjni loaded successfully. Tudo bem!\n");
+			} catch (final UnsatisfiedLinkError e) {
+				System.err
+						.println("Native library lpaggregjni failed to load.");
+			}
+	}
 
 	/**
 	 * Returns the shared instance

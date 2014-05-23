@@ -17,9 +17,10 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
+package fr.inria.dlpaggreg.time;
 
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.OLPAggregWrapper;
+import fr.inria.dlpaggreg.jni.OLPAggregWrapper;
+
 
 public class JNITimeAggregation3 extends JNITimeAggregation {
 

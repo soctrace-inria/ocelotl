@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni;
+package fr.inria.dlpaggreg.jni;
 
 public class OLPAggregWrapper {
   private long swigCPtr;

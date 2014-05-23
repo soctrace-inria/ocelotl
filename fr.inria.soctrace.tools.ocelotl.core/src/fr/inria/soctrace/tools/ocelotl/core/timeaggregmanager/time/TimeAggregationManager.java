@@ -70,17 +70,8 @@ public abstract class TimeAggregationManager implements ITimeManager {
 		dm.end("LPAGGREG - COMPUTE QUALITIES");
 	}
 
-	public void fillVectors() {
-		if (OcelotlParameters.isJniFlag())
-			fillVectorsJNI();
-		else
-			fillVectorsJava();
 
-	}
-
-	protected abstract void fillVectorsJava();
-
-	protected abstract void fillVectorsJNI();
+	protected abstract void fillVectors();
 
 	@Override
 	public List<Double> getParameters() {

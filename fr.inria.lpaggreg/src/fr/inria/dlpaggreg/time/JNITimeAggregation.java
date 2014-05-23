@@ -17,14 +17,13 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
+package fr.inria.dlpaggreg.time;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.dlpaggreg.jni.OLPAggregWrapper;
 import fr.inria.dlpaggreg.quality.DLPQuality;
-import fr.inria.dlpaggreg.time.ITimeAggregation;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.OLPAggregWrapper;
 
 public class JNITimeAggregation implements ITimeAggregation {
 

@@ -22,7 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.dlpaggreg.time.TimeAggregation3;
+import fr.inria.dlpaggreg.time.JNITimeAggregation3;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
@@ -38,30 +38,9 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		reset();
 	}
 
-	@Override
-	public void fillVectorsJava() {
-		values = new ArrayList<List<List<Double>>>();
-		for (int i = 0; i < matrix.getMatrix().size(); i++) {
-			values.add(new ArrayList<List<Double>>());
-			int j = 0;
-			for (final EventProducer key : matrix.getMatrix().get(i).keySet()) {
-				values.get(i).add(new ArrayList<Double>());
-				for (final String key2 : matrix.getMatrix().get(i).get(key)
-						.keySet())
-					values.get(i)
-							.get(j)
-							.add(matrix.getMatrix().get(i).get(key).get(key2)
-									.doubleValue());
-				j++;
-			}
-
-		}
-		((TimeAggregation3) timeAggregation).setValues(values);
-
-	}
 
 	@Override
-	protected void fillVectorsJNI() {
+	protected void fillVectors() {
 		for (int i = 0; i < matrix.getMatrix().size(); i++) {
 			((JNITimeAggregation3) timeAggregation).addMatrix();
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet()) {
@@ -92,10 +71,7 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 
 	@Override
 	public void reset() {
-		if (OcelotlParameters.isJniFlag())
-			timeAggregation = new JNITimeAggregation3();
-		else
-			timeAggregation = new TimeAggregation3();
+		timeAggregation = new JNITimeAggregation3();
 		fillVectors();
 	}
 

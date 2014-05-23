@@ -17,13 +17,13 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime;
+package fr.inria.dlpaggreg.spacetime;
 
 import java.util.HashMap;
 import java.util.List;
 
-import fr.inria.dlpaggreg.spacetime.ISpaceTimeAggregation;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.jni.DLPAggregWrapper;
+import fr.inria.dlpaggreg.jni.DLPAggregWrapper;
+
 
 public class JNISpaceTimeAggregation2 extends JNISpaceTimeAggregation implements
 		ISpaceTimeAggregation {
