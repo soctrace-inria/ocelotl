@@ -28,7 +28,7 @@ import fr.inria.dlpaggreg.jni.DLPAggregWrapper;
 public class JNISpaceTimeAggregation2 extends JNISpaceTimeAggregation implements
 		ISpaceTimeAggregation {
 
-	public JNISpaceTimeAggregation2() {
+	public JNISpaceTimeAggregation2(){
 		super();
 		jniWrapper = new DLPAggregWrapper(2);
 	}

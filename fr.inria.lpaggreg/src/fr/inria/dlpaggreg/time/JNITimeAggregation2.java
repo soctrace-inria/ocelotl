@@ -23,7 +23,7 @@ import fr.inria.dlpaggreg.jni.OLPAggregWrapper;
 
 public class JNITimeAggregation2 extends JNITimeAggregation {
 
-	public JNITimeAggregation2() {
+	public JNITimeAggregation2(){
 		super();
 		jniWrapper = new OLPAggregWrapper(2);
 	}

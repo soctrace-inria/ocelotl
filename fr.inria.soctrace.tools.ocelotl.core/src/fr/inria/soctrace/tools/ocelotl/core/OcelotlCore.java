@@ -68,7 +68,11 @@ public class OcelotlCore {
 			OcelotlException {
 		if (hasChanged == HasChanged.ALL) {
 			setTimeOperator();
+			try{
 			lpaggregManager = timeOperator.createManager();
+			}catch (UnsatisfiedLinkError e){
+				throw new OcelotlException("Native library can not be loaded");
+			}
 		}
 		// vectors.print();
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE)
