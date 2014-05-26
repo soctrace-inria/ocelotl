@@ -10,7 +10,7 @@ public class OcelotlException extends Exception {
 	public static final String NOEPS = "Error: No event producers selected";
 	public static final String NOETS = "Error: No event types selected";
 	public static final String NOEVENTS = "Error: No events found";
-	public static final String JNI = "Error: no native library found";
+	public static final String JNI = "Error: problem with native library";
 
 
 	public OcelotlException() {
