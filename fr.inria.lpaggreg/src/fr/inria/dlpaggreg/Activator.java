@@ -17,12 +17,14 @@ public class Activator extends AbstractUIPlugin {
 	
 	static {
 			try {
+				//System.loadLibrary("lpaggreg");
 				System.loadLibrary("lpaggregjni");
 				System.err
 						.println("Native library lpaggregjni loaded successfully. Tudo bem!\n");
 			} catch (final UnsatisfiedLinkError e) {
 				System.err
 						.println("Native library lpaggregjni failed to load.");
+				e.printStackTrace();
 			}
 	}
 
