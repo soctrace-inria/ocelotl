@@ -1,8 +1,8 @@
-package fr.inria.dlpaggreg.spacetime;
+package fr.inria.lpaggreg.spacetime;
 
 import java.util.List;
 
-import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.lpaggreg.quality.DLPQuality;
 
 public interface ISpaceTimeAggregation {
 

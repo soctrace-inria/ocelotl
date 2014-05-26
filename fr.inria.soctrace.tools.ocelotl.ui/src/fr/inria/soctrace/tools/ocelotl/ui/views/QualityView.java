@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.lpaggreg.quality.DLPQuality;
 
 /**
  * _2DCacheMicroDescription View : part representation, according to LP

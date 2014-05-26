@@ -17,21 +17,21 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.dlpaggreg.time;
+package fr.inria.lpaggreg.spacetime;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.dlpaggreg.jni.OLPAggregWrapper;
-import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.lpaggreg.jni.DLPAggregWrapper;
+import fr.inria.lpaggreg.quality.DLPQuality;
 
-public class JNITimeAggregation implements ITimeAggregation {
+public abstract class JNISpaceTimeAggregation implements ISpaceTimeAggregation {
 
-	protected OLPAggregWrapper jniWrapper;
+	protected DLPAggregWrapper jniWrapper;
 	List<Double> parameters = new ArrayList<Double>();
 	List<DLPQuality> qualities = new ArrayList<DLPQuality>();
 
-	public JNITimeAggregation() {
+	public JNISpaceTimeAggregation() {
 		super();
 	}
 
@@ -58,12 +58,8 @@ public class JNITimeAggregation implements ITimeAggregation {
 	}
 
 	@Override
-	public List<Integer> getParts(double parameter) {
-		jniWrapper.computeParts((float) parameter);
-		List<Integer> parts = new ArrayList<Integer>();
-		for (int i = 0; i < jniWrapper.getPartNumber(); i++)
-			parts.add(jniWrapper.getPart(i));
-		return parts;
+	public void computeParts(double parameter) {
+		jniWrapper.computeParts(parameter);
 	}
 
 	@Override
@@ -74,6 +70,19 @@ public class JNITimeAggregation implements ITimeAggregation {
 	@Override
 	public int getSize() {
 		return jniWrapper.getPartNumber();
+	}
+
+	@Override
+	public List<Integer> getParts(int id) {
+		ArrayList<Integer> parts = new ArrayList<Integer>();
+		for (int i = 0; i < getSize(); i++)
+			parts.add(jniWrapper.getPart(id, i));
+		return parts;
+	}
+
+	@Override
+	public void validate() {
+		jniWrapper.validate();
 	}
 
 }

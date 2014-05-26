@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package fr.inria.dlpaggreg.jni;
+package fr.inria.lpaggreg.jni;
 
 public class OLPAggregWrapper {
   private long swigCPtr;

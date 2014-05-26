@@ -22,7 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.dlpaggreg.time.JNITimeAggregation2;
+import fr.inria.lpaggreg.time.JNITimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I2DMicroDescription;
 

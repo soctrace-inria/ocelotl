@@ -1,4 +1,4 @@
-package fr.inria.dlpaggreg;
+package fr.inria.lpaggreg;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

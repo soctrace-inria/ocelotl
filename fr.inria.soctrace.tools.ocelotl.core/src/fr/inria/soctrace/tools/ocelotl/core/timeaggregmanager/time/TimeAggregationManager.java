@@ -22,8 +22,8 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.dlpaggreg.quality.DLPQuality;
-import fr.inria.dlpaggreg.time.ITimeAggregation;
+import fr.inria.lpaggreg.quality.DLPQuality;
+import fr.inria.lpaggreg.time.ITimeAggregation;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;

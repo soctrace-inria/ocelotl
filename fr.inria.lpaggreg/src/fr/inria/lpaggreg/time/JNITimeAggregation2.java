@@ -17,20 +17,15 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.dlpaggreg.time;
+package fr.inria.lpaggreg.time;
 
-import fr.inria.dlpaggreg.jni.OLPAggregWrapper;
+import fr.inria.lpaggreg.jni.OLPAggregWrapper;
 
+public class JNITimeAggregation2 extends JNITimeAggregation {
 
-public class JNITimeAggregation3 extends JNITimeAggregation {
-
-	public JNITimeAggregation3(){
+	public JNITimeAggregation2(){
 		super();
-		jniWrapper = new OLPAggregWrapper(3);
-	}
-
-	public void addMatrix() {
-		jniWrapper.addMatrix();
+		jniWrapper = new OLPAggregWrapper(2);
 	}
 
 	public void addVector() {

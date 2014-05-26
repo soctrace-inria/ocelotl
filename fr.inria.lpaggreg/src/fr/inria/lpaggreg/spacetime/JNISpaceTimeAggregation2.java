@@ -17,12 +17,12 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.dlpaggreg.spacetime;
+package fr.inria.lpaggreg.spacetime;
 
 import java.util.HashMap;
 import java.util.List;
 
-import fr.inria.dlpaggreg.jni.DLPAggregWrapper;
+import fr.inria.lpaggreg.jni.DLPAggregWrapper;
 
 
 public class JNISpaceTimeAggregation2 extends JNISpaceTimeAggregation implements

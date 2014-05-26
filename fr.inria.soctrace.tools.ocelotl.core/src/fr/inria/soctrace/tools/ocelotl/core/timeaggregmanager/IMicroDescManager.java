@@ -21,7 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager;
 
 import java.util.List;
 
-import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;

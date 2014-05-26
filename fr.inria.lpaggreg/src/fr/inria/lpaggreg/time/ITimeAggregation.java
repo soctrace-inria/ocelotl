@@ -1,8 +1,8 @@
-package fr.inria.dlpaggreg.time;
+package fr.inria.lpaggreg.time;
 
 import java.util.List;
 
-import fr.inria.dlpaggreg.quality.DLPQuality;
+import fr.inria.lpaggreg.quality.DLPQuality;
 
 public interface ITimeAggregation {
 

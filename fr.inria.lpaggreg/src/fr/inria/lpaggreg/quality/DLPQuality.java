@@ -1,4 +1,4 @@
-package fr.inria.dlpaggreg.quality;
+package fr.inria.lpaggreg.quality;
 
 public class DLPQuality {
 
