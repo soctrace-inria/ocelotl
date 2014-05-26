@@ -42,7 +42,7 @@ public class PartTimeLineView extends TimeLineView {
 
 	@Override
 	protected void computeDiagram() {
-		final int partHeight = (int) (root.getSize().height / 1.1 - Border);
+		final int partHeight = (int) (root.getSize().height / 1.1 - 2* Border);
 		if (!config.isAggregated())
 				for (int i = 0; i < parts.size(); i++) {
 					final PartFigure part = new PartFigure(i, parts.get(i), colors.getColors().get(parts.get(i) % colors.getColors().size()), config.isNumbers());
@@ -65,8 +65,7 @@ public class PartTimeLineView extends TimeLineView {
 					figures.add(part);
 					root.add(
 							part,
-							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - space + Border, 0 + root
-									.getSize().height / 10)));
+							new Rectangle(new Point(j * (root.getSize().width - 2 * Border) / parts.size() + Border, root.getSize().height - Border), new Point((j + aggParts.get(i)) * (root.getSize().width - 2 * Border) / parts.size() - space + Border, Border)));
 					j = j + aggParts.get(i);
 					part.getUpdateManager().performUpdate();
 					part.init();
