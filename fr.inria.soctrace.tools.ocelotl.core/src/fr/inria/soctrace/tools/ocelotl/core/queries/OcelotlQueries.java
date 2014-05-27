@@ -117,7 +117,7 @@ public class OcelotlQueries {
 			final List<EventProducer> eventProducers) throws SoCTraceException,
 			OcelotlException {
 		if (eventProducers.size() == getAllEventProducers().size())
-			return getStateIterator();
+			return getEventIterator();
 		else {
 			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
 					.initialize();
