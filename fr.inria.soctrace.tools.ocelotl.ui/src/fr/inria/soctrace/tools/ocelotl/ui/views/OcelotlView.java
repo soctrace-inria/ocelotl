@@ -489,6 +489,24 @@ public class OcelotlView extends ViewPart {
 		return showGantt;
 	}
 
+	private Action createTableAction() {
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor(Activator.PLUGIN_ID, "icons/table.png");
+		final Action showTable = new Action("Show Event Table", img) {
+			@Override
+			public void run() {
+				if (confDataLoader.getCurrentTrace() == null)
+					return;
+				final TraceIntervalDescriptor des = new TraceIntervalDescriptor();
+				des.setTrace(ocelotlParameters.getTrace());
+
+				des.setStartTimestamp(getTimeRegion().getTimeStampStart());
+				des.setEndTimestamp(getTimeRegion().getTimeStampEnd());
+				FramesocBus.getInstance().send(FramesocBusTopic.TOPIC_UI_TABLE_DISPLAY_TIME_INTERVAL, des);
+			}
+		};
+		return showTable;
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 		final Display display = Display.getCurrent();
@@ -835,6 +853,8 @@ public class OcelotlView extends ViewPart {
 		final IToolBarManager toolBar = actionBars.getToolBarManager();
 		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.GANTT_CHART_VIEW_ID))
 			toolBar.add(createGanttAction());
+		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.EVENT_TABLE_VIEW_ID))
+			toolBar.add(createTableAction());	
 
 		cleanAll();
 
