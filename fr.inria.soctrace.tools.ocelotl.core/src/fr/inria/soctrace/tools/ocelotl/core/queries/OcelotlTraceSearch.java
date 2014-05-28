@@ -106,7 +106,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		}
 
 		if (and.getNumberOfConditions() == 1)
-		and.addCondition(new SimpleCondition("1", ComparisonOperation.EQ, String.valueOf(1)));
+		and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, String.valueOf(1)));
 		if (and.getNumberOfConditions() >= 2)
 			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
