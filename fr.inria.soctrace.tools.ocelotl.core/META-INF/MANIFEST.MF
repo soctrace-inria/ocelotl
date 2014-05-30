@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.lib.storage,
  fr.inria.soctrace.lib.search,
  fr.inria.soctrace.lib.utils,
- fr.inria.lpaggreg
+ fr.inria.lpaggreg,
+ fr.inria.soctrace.lib.slf4j;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.ocelotl.core,
@@ -30,5 +31,6 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime,
  fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
- fr.inria.soctrace.tools.ocelotl.core.timeslice
+ fr.inria.soctrace.tools.ocelotl.core.timeslice,
+ fr.inria.soctrace.tools.ocelotl.core.util
 

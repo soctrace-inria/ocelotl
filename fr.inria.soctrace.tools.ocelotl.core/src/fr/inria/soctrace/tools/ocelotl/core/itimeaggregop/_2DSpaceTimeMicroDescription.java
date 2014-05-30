@@ -24,19 +24,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregation2Manager;
+import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
 
 public abstract class _2DSpaceTimeMicroDescription extends
 		MultiThreadTimeAggregationOperator implements
 		I2DSpaceTimeMicroDescription {
 
 	protected List<HashMap<EventProducer, HashMap<String, Long>>> matrix;
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(_2DSpaceTimeMicroDescription.class);
+	
 	public _2DSpaceTimeMicroDescription() {
 		super();
 	}
@@ -56,7 +62,7 @@ public abstract class _2DSpaceTimeMicroDescription extends
 	public void computeMatrix() throws SoCTraceException, OcelotlException,
 			InterruptedException {
 		eventsNumber = 0;
-		final DeltaManager dm = new DeltaManager();
+		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		final int epsize = getOcelotlParameters().getEventProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0
@@ -128,15 +134,15 @@ public abstract class _2DSpaceTimeMicroDescription extends
 
 	@Override
 	public void print() {
-		System.out.println();
-		System.out.println("Distribution Vectors");
+		logger.debug("");
+		logger.debug("Distribution Vectors");
 		int i = 0;
 		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
-			System.out.println();
-			System.out.println("slice " + i++);
-			System.out.println();
+			logger.debug("");
+			logger.debug("slice " + i++);
+			logger.debug("");
 			for (final EventProducer ep : it.keySet())
-				System.out.println(ep.getName() + " = " + it.get(ep));
+				logger.debug(ep.getName() + " = " + it.get(ep));
 		}
 	}
 

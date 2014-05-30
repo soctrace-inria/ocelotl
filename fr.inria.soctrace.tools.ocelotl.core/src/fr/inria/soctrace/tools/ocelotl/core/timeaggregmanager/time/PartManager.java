@@ -22,6 +22,9 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
@@ -32,6 +35,9 @@ public class PartManager {
 	private final List<TimeRegion> timeStamps = new ArrayList<TimeRegion>();
 	private TimeRegion traceRegion;
 	private int timeSliceNumber;
+	
+	private static final Logger logger = LoggerFactory.getLogger(PartManager.class);
+	
 
 	public PartManager(final OcelotlCore lpaggregCore) {
 		super();
@@ -80,28 +86,32 @@ public class PartManager {
 	}
 
 	public void print() {
-		System.out.println("");
-		System.out.println("*******************");
-		System.out.println("AGGREGATION RESULTS");
-		System.out.println("*******************");
-		System.out.println("");
-		System.out.println("Time region:  [" + traceRegion.getTimeStampStart()
+	
+
+		logger.info("");
+		logger.info("*******************");
+		logger.info("AGGREGATION RESULTS");
+		logger.info("*******************");
+		logger.info("");
+		logger.info("Time region:  [" + traceRegion.getTimeStampStart()
 				+ " - " + traceRegion.getTimeStampEnd() + "] - duration: "
 				+ traceRegion.getTimeDuration());
-		System.out.println("Time slice number: " + timeSliceNumber);
-		System.out.println("Aggregation timeOperator: "
+		logger.info("Time slice number: " + timeSliceNumber);
+		logger.info("Aggregation timeOperator: "
 				+ lpaggregCore.getOcelotlParameters().getTimeAggOperator());
-		System.out.println("Gain/Loss parameter p: "
+		logger.info("Gain/Loss parameter p: "
 				+ lpaggregCore.getOcelotlParameters().getParameter());
-		System.out.println("*******************");
-		System.out.println("");
-		System.out.println("Aggregation timestamps:");
+		logger.info("*******************");
+		logger.info("");
+		logger.info("Aggregation timestamps:");
+		StringBuffer buff = new StringBuffer();
 		for (final TimeRegion tr : timeStamps)
-			System.out.print(tr.getTimeStampStart() + ", ");
-		System.out.print(timeStamps.get(timeStamps.size() - 1)
+			buff.append(tr.getTimeStampStart() + ", ");
+		buff.append(timeStamps.get(timeStamps.size() - 1)
 				.getTimeStampEnd());
-		System.out.println();
-		System.out.println();
+		logger.info(buff.toString());
+		logger.info("");
+
 	}
 
 	public void setLpaggregCore(final OcelotlCore lpaggregCore) {

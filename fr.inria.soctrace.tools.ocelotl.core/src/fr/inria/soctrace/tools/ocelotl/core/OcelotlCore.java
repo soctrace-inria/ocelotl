@@ -51,8 +51,6 @@ public class OcelotlCore {
 	SpaceAggregationOperatorManager spaceOperators;
 	ISpaceAggregationOperator spaceOperator;
 
-
-
 	public OcelotlCore() {
 		super();
 	}

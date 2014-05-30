@@ -29,6 +29,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
@@ -54,6 +56,9 @@ public class SpaceAggregationOperatorManager {
 																	//	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
 	private static final String OP_TIME_COMPATIBILITY = "time_compatibility"; //$NON-NLS-1$
 
+	private static final Logger logger = LoggerFactory.getLogger(SpaceAggregationOperatorManager.class);
+	
+	
 	public SpaceAggregationOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
 		this.ocelotlCore = ocelotlCore;
@@ -85,11 +90,13 @@ public class SpaceAggregationOperatorManager {
 	}
 
 	public List<String> getOperators(final List<String> compatibility) {
-		System.out.println("Comparing Space Operator trace format with "
+		logger.debug("Comparing Space Operator trace format with "
 				+ compatibility);
 		final List<String> op = new ArrayList<String>();
 		for (final SpaceAggregationOperatorResource r : List.values()) {
-			System.out.println(r.getTimeCompatibility());
+			StringBuffer buff = new StringBuffer();
+			buff.append(r.getTimeCompatibility());
+			logger.debug(buff.toString());
 			for (final String comp : compatibility)
 				for (final String s : r.getTimeCompatibility())
 					if (s.equals(comp))
@@ -128,7 +135,7 @@ public class SpaceAggregationOperatorManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		System.out.println(config.length
+		logger.debug(config.length
 				+ " Space aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
@@ -140,9 +147,9 @@ public class SpaceAggregationOperatorManager {
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
 			resource.setBundle(e.getContributor().getName());
-			// System.out.println(resource.getBundle());
+			// logger.debug(resource.getBundle());
 			List.put(resource.getName(), resource);
-			System.out.println("    " + resource.getName() + " "
+			logger.debug("    " + resource.getName() + " "
 					+ resource.getTimeCompatibility());
 		}
 	}

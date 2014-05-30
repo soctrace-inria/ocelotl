@@ -23,21 +23,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
 
 public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
+	private static final Logger logger = LoggerFactory.getLogger(StateDistributionSpaceTime.class);
+	
+	
 	class OcelotlThread extends Thread {
 
 		List<EventProducer> eventProducers;
@@ -59,7 +65,7 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 				final Map<Long, Long> distrib) {
 			synchronized (matrix) {
 				if (!matrix.get(0).get(ep).containsKey(state.getStateType())) {
-					System.out.println("Adding " + state.getStateType()
+					logger.debug("Adding " + state.getStateType()
 							+ " state");
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
@@ -102,10 +108,10 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers)
 			throws SoCTraceException, InterruptedException, OcelotlException {
-		dm = new DeltaManager();
+		dm = new DeltaManagerOcelotl();
 		dm.start();
 		it = ocelotlQueries.getStateIterator(eventProducers);
-		dm = new DeltaManager();
+		dm = new DeltaManagerOcelotl();
 		dm.start();
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()

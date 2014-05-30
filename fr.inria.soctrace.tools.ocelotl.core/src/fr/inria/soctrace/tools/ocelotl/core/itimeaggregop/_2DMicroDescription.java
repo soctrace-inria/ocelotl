@@ -24,17 +24,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
+import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
 
 public abstract class _2DMicroDescription extends
 		MultiThreadTimeAggregationOperator implements I2DMicroDescription {
 
 	protected List<HashMap<EventProducer, Long>> matrix;
+	
+	private static final Logger logger = LoggerFactory.getLogger(_2DMicroDescription.class);
 
 	public _2DMicroDescription() throws SoCTraceException {
 		super();
@@ -55,7 +61,7 @@ public abstract class _2DMicroDescription extends
 	public void computeMatrix() throws SoCTraceException, OcelotlException,
 			InterruptedException {
 		eventsNumber = 0;
-		final DeltaManager dmt = new DeltaManager();
+		final DeltaManager dmt = new DeltaManagerOcelotl();
 		dmt.start();
 		final int epsize = getOcelotlParameters().getEventProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0
@@ -121,15 +127,15 @@ public abstract class _2DMicroDescription extends
 
 	@Override
 	public void print() {
-		System.out.println();
-		System.out.println("Distribution Vectors");
+		logger.debug("");
+		logger.debug("Distribution Vectors");
 		int i = 0;
 		for (final HashMap<EventProducer, Long> it : matrix) {
-			System.out.println();
-			System.out.println("slice " + i++);
-			System.out.println();
+			logger.debug("");
+			logger.debug("slice " + i++);
+			logger.debug("");
 			for (final EventProducer ep : it.keySet())
-				System.out.println(ep.getName() + " = " + it.get(ep));
+				logger.debug(ep.getName() + " = " + it.get(ep));
 		}
 	}
 

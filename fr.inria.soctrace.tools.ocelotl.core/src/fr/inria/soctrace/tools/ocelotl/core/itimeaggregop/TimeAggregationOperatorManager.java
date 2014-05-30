@@ -29,6 +29,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
@@ -52,6 +54,8 @@ public class TimeAggregationOperatorManager {
 	private static final String OP_PARAM_CONFIG = "param_config"; //$NON-NLS-1$
 	private static final String OP_GENERIC = "generic"; //$NON-NLS-1$
 
+	private static final Logger logger = LoggerFactory.getLogger(TimeAggregationOperatorManager.class);
+	
 	public TimeAggregationOperatorManager(final OcelotlParameters parameters) {
 		super();
 		this.parameters = parameters;
@@ -73,11 +77,13 @@ public class TimeAggregationOperatorManager {
 	}
 
 	public List<String> getOperators(final String traceType) {
-		System.out.println("Comparing Time Operator trace format with "
+		logger.debug("Comparing Time Operator trace format with "
 				+ traceType);
 		final List<String> op = new ArrayList<String>();
 		for (final TimeAggregationOperatorResource r : List.values()) {
-			System.out.println(r.getTraceFormats());
+			StringBuffer buff = new StringBuffer();
+			buff.append(r.getTraceFormats());
+			logger.debug(buff.toString());
 			if (r.isGeneric())
 				op.add(r.getName());
 			else if (r.getTraceFormats().contains(traceType))
@@ -112,7 +118,7 @@ public class TimeAggregationOperatorManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		System.out.println(config.length
+		logger.debug(config.length
 				+ " Time aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
@@ -127,7 +133,7 @@ public class TimeAggregationOperatorManager {
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setBundle(e.getContributor().getName());
 			List.put(resource.getName(), resource);
-			System.out.println("    " + resource.getName() + " "
+			logger.debug("    " + resource.getName() + " "
 					+ resource.getTraceFormats());
 		}
 	}

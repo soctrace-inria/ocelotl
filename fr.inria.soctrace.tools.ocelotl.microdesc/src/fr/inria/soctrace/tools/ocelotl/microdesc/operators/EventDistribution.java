@@ -22,19 +22,25 @@ package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 
 public class EventDistribution extends _3DMicroDescription {
 
+	private static final Logger logger = LoggerFactory.getLogger(EventDistribution.class);
+	
+	
 	class OcelotlThread extends Thread {
 
 		List<EventProducer> eventProducers;
@@ -67,7 +73,7 @@ public class EventDistribution extends _3DMicroDescription {
 			synchronized (matrix) {
 				if (!matrix.get(0).get(ep)
 						.containsKey(event.getType().getName())) {
-					System.out.println("Adding " + event.getType().getName()
+					logger.debug("Adding " + event.getType().getName()
 							+ " state");
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
@@ -109,10 +115,10 @@ public class EventDistribution extends _3DMicroDescription {
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers)
 			throws SoCTraceException, InterruptedException, OcelotlException {
-		dm = new DeltaManager();
+		dm = new DeltaManagerOcelotl();
 		dm.start();
 		it = ocelotlQueries.getEventIterator(eventProducers);
-		dm = new DeltaManager();
+		dm = new DeltaManagerOcelotl();
 		dm.start();
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()

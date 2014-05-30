@@ -22,11 +22,15 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.lpaggreg.spacetime.ISpaceTimeAggregation;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
 
 public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
@@ -35,6 +39,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	protected ISpaceTimeAggregation timeAggregation;
 	protected OcelotlParameters ocelotlParameters;
 	protected EventProducerHierarchy hierarchy;
+	private static final Logger logger = LoggerFactory.getLogger(SpaceTimeAggregationManager.class);
 
 	public SpaceTimeAggregationManager(final OcelotlParameters ocelotlParameters) {
 		super();
@@ -43,7 +48,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
 	@Override
 	public void computeDichotomy() {
-		final DeltaManager dm = new DeltaManager();
+		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(),
 				0.0, 1.0);
@@ -55,7 +60,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
 	@Override
 	public void computeParts() {
-		final DeltaManager dm = new DeltaManager();
+		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeParts(ocelotlParameters.getParameter());
 		updateHierarchy();
@@ -64,7 +69,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 			if (ocelotlParameters.getParameter() == parameters.get(i))
 				break;
 
-		System.out.println("parameter: " + ocelotlParameters.getParameter()
+		logger.debug("parameter: " + ocelotlParameters.getParameter()
 				+ ", gain: " + qualities.get(i).getGain() + ", loss: "
 				+ qualities.get(i).getLoss());
 		dm.end("LPAGGREG - COMPUTE PARTS");
@@ -77,7 +82,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
 	@Override
 	public void computeQualities() {
-		final DeltaManager dm = new DeltaManager();
+		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeQualities(ocelotlParameters.isNormalize());
 		dm.end("LPAGGREG - COMPUTE QUALITIES");
@@ -121,20 +126,22 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
 	@Override
 	public void printParameters() {
-		System.out.println();
-		System.out.println("Parameters :");
+		logger.info("");
+		logger.info("Parameters :");
+		StringBuffer buff = new StringBuffer();
 		for (final Double i : parameters)
-			System.out.print(i + " ");
-		System.out.println();
+			buff.append(i + " ");
+		logger.info(buff.toString());
 	}
 
 	@Override
 	public void printParts() {
-		// System.out.println();
-		// System.out.println("Parts :");
+		// logger.debug(");
+		// logger.debug("Parts :");
+		//StringBuffer buff = new StringBuffer();
 		// for (final int i : parts)
-		// System.out.print(i + " ");
-		// System.out.println();
+		//	buff.append(i + " ");
+		//logger.debug(buff.toString());
 	}
 
 	@Override

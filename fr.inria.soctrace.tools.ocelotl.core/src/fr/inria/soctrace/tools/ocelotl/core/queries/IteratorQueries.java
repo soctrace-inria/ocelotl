@@ -42,6 +42,7 @@ import fr.inria.soctrace.lib.query.EventQuery;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.storage.utils.SQLConstants.FramesocTable;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
 
 /**
  * OcelotlQueries class for Event self-defining-pattern tables.
@@ -98,7 +99,7 @@ public class IteratorQueries extends EventQuery {
 	public EventIterator getIterator() throws SoCTraceException {
 
 		try {
-			final DeltaManager dm = new DeltaManager();
+			final DeltaManager dm = new DeltaManagerOcelotl();
 			dm.start();
 
 			boolean first = true;
@@ -155,7 +156,7 @@ public class IteratorQueries extends EventQuery {
 
 			mystm = dbObj.getConnection().createStatement();
 
-			final DeltaManager steps = new DeltaManager();
+			final DeltaManager steps = new DeltaManagerOcelotl();
 			steps.start();
 			rs = mystm.executeQuery(query);
 			steps.start();

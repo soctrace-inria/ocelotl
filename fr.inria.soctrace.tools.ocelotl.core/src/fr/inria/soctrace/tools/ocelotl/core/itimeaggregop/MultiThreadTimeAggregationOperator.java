@@ -25,12 +25,12 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
 
 public abstract class MultiThreadTimeAggregationOperator {
 
@@ -38,7 +38,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected EventIterator it;
 	protected int count = 0;
 	protected int epit = 0;
-	protected DeltaManager dm;
+	protected DeltaManagerOcelotl dm;
 	public final static int EPCOUNT = 200;
 	protected int eventsNumber;
 	protected OcelotlParameters parameters;
