@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
@@ -49,6 +51,7 @@ public class MultiState {
 	private Proportion		distribution;
 	private IFigure				root;
 	private IconManager 		iconManager;
+	private static final int	Light = 225;
 
 	public MultiState(final int index, final Proportion distribution, final IFigure root, final int space) {
 		super();
@@ -63,8 +66,16 @@ public class MultiState {
 	public int getIndex() {
 		return index;
 	}
+	
+	public boolean isTooLight(Color color){
+		if (color.getGreen()>Light&&color.getBlue()>Light&&color.getRed()>Light)
+			return true;
+		return false;
+		
+	}
 
 	public void init() {
+		DecimalFormat valueFormat= new DecimalFormat("0.00E0");
 		double total = 0;
 		final double y0 = root.getSize().height - Border;
 		final double y1 = 9.0 / 10.0 * root.getSize().height - Border;
@@ -90,15 +101,24 @@ public class MultiState {
 				rect.setBackgroundColor(ColorConstants.white);
 				rect.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state).getSwtColor());
 				rect.setForegroundColor(ColorConstants.white);
-				final Label label = new Label(" " + state + " ");
+				rect.setLineWidth(0);
+				if (isTooLight(rect.getBackgroundColor())){
+					rect.setForegroundColor(ColorConstants.black);
+					rect.setLineWidth(1);
+				}
+				final Label label = new Label(" " + state + ": " + valueFormat.format(value)+" ");
 				rect.setToolTip(label);
 				if (y1 * value / m - space > MinHeight) {
+					if (isTooLight(rect.getBackgroundColor()))
+						root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border -1),
+								(int) (y0 + space - y1 * (total + value) / m))));
+					else
 					root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border),
 							(int) (y0 + space - y1 * (total + value) / m))));
 					total += value;
 				} else {
 					agg += value;
-					aggList.add(state);
+					aggList.add(state + ": " + valueFormat.format(value));
 				}
 				label.getUpdateManager().performUpdate();
 				rect.getUpdateManager().performUpdate();
@@ -117,7 +137,7 @@ public class MultiState {
 			
 			String aggString = " ";
 			for (int i = 0; i < aggList.size() - 1; i++)
-				aggString = aggString + aggList.get(i) + " + ";
+				aggString = aggString + aggList.get(i) + "; ";
 			aggString = aggString + aggList.get(aggList.size() - 1) + " ";
 			final Label label = new Label(aggString);
 			icon.setToolTip(label);
