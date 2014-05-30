@@ -23,7 +23,8 @@
             spatial_compatibility="Parts, Proportion"
             trace_formats="ALL">
       </aggregation_operator>
-            <aggregation_operator
+      <!--
+      <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionSpaceTime"
             generic="true"
             operator="Hierarchical State Distribution"
@@ -32,6 +33,7 @@
             spatial_compatibility="Matrix"
             trace_formats="ALL">
       </aggregation_operator>
+      -->
    </extension>
 
 </plugin>
