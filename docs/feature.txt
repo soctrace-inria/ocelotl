@@ -5,9 +5,15 @@ How to generate a feature for Ocelotl?
 
   In the plugin fr.inria.soctrace.tools.ocelotl.feature, click on feature.xml.
   In the Plug-ins tab, add all the plug-ins and fragments that are part of Ocelotl.
+  
+  If fragments containing platform-specific code are added, then specify in the right part the OS and the arch for which they were written for.
 
 2) Generate the feature:
 -------------------------
+
+  If exporting multi-platform fragments:
+  	Install the delta pack for your version of eclipse (follow the instructions at this address: http://ugosan.org/eclipse-rcp-delta-pack/)
+  	IMPORTANT: Do not check Export Source when exporting the feature, otherwise fragments for other platforms than the host platform won't be exported
 
   Right click on the feature package, Export, Plug-in Development, Deployable features
 
@@ -16,7 +22,7 @@ How to generate a feature for Ocelotl?
     Select Archive file, browse and type a name for the archive
 
   In Options tab
-    Select Export source, Generate source bundles
+    Select Export source, Generate source bundles (Note: leave unchecked if exporting multi-platform fragments)
     Select Package as individual Jar archives
       Select Generate p2 repository
       Select Categorize repository, add the file category.xml from the feature
