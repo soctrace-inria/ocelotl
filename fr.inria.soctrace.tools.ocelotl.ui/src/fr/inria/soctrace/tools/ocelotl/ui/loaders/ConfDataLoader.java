@@ -24,7 +24,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.framesoc.core.FramesocManager;
+import fr.inria.soctrace.framesoc.core.tools.model.FramesocTool;
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.AnalysisResultSearchData;
 import fr.inria.soctrace.lib.model.EventProducer;
@@ -58,6 +62,8 @@ public class ConfDataLoader {
 	private long					minTimestamp;
 	private long					maxTimestamp;
 	private List<AnalysisResult>	results;
+	
+	private static final Logger logger = LoggerFactory.getLogger(ConfDataLoader.class);
 
 	/** The constructor. */
 	public ConfDataLoader() {
@@ -159,8 +165,8 @@ public class ConfDataLoader {
 		Printer.printTraceList(traces);
 		Printer.printIModelElementsList(producers);
 		Printer.printIModelElementsList(types);
-		System.out.println("min ts: " + minTimestamp);
-		System.out.println("max ts: " + maxTimestamp);
+		logger.debug("min ts: " + minTimestamp);
+		logger.debug("max ts: " + maxTimestamp);
 	}
 
 }

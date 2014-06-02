@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class TimeSliceManager {
@@ -33,6 +36,7 @@ public class TimeSliceManager {
 	private long slicesNumber;
 
 	private long sliceDuration;
+	private static final Logger logger = LoggerFactory.getLogger(TimeSliceManager.class);
 
 	public TimeSliceManager(final TimeRegion timeRegion, final long slicesNumber) {// TODO
 		// use
@@ -105,7 +109,7 @@ public class TimeSliceManager {
 	}
 
 	public void printInfos() {
-		System.out.println("TimeSliceManager: " + slicesNumber + " slices, "
+		logger.info("TimeSliceManager: " + slicesNumber + " slices, "
 				+ sliceDuration + " ns duration");
 	}
 

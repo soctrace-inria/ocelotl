@@ -21,8 +21,11 @@ package fr.inria.soctrace.tools.ocelotl.ui;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.framesoc.core.tools.model.FramesocTool;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 /**
@@ -32,15 +35,17 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  */
 public class OcelotlTool extends FramesocTool {
 
+	private static final Logger logger = LoggerFactory.getLogger(FramesocTool.class);
+
 	public OcelotlTool() {
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void launch(final String[] args) {
-		System.out.println("Arguments");
+		logger.debug("Arguments");
 		for (final String s : args)
-			System.out.println(s);
+			logger.debug(s);
 
 		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		try {

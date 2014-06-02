@@ -33,7 +33,7 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
-import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
+import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 
 public class EventDistribution extends _3DMicroDescription {

@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.core.util;
+package fr.inria.soctrace.tools.ocelotl.core.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

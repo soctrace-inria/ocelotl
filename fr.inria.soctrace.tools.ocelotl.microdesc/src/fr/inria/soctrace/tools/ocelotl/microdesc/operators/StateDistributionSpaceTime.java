@@ -35,7 +35,7 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
-import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
+import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
 

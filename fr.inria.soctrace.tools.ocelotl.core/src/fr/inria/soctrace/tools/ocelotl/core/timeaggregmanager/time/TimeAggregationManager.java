@@ -30,7 +30,7 @@ import fr.inria.lpaggreg.time.ITimeAggregation;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
+import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class TimeAggregationManager implements ITimeManager {
 

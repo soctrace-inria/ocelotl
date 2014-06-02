@@ -30,7 +30,7 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
-import fr.inria.soctrace.tools.ocelotl.core.util.DeltaManagerOcelotl;
+import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class MultiThreadTimeAggregationOperator {
 

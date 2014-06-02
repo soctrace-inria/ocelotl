@@ -32,6 +32,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -43,7 +45,7 @@ public class StateColorManager {
 	Map<String, Color> colors = new HashMap<String, Color>();
 	final Device device;
 	
-	
+	private static final Logger logger = LoggerFactory.getLogger(StateColorManager.class);
 
 	public StateColorManager() {
 		super();
@@ -56,9 +58,9 @@ public class StateColorManager {
     	try {	 
   	      File file = new File(FILE);
   	      if (file.createNewFile()){
-  	        System.out.println("Ocelotl state color configuration not found, creating file");
+  	        logger.debug("Ocelotl state color configuration not found, creating file");
   	      }else{
-  	        System.out.println("Ocelotl state color configuration found: "+file.getAbsolutePath());
+  	        logger.debug("Ocelotl state color configuration found: "+file.getAbsolutePath());
   	      }
       	} catch (IOException e) {
   	      e.printStackTrace();
