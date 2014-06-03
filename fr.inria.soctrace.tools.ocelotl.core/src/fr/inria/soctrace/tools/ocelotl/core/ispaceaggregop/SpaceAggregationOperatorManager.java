@@ -58,7 +58,6 @@ public class SpaceAggregationOperatorManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(SpaceAggregationOperatorManager.class);
 	
-	
 	public SpaceAggregationOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
 		this.ocelotlCore = ocelotlCore;

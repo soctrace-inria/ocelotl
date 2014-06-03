@@ -12,7 +12,8 @@ Require-Bundle: fr.inria.soctrace.framesoc.core,
  fr.inria.soctrace.lib.storage,
  org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.jface
+ org.eclipse.jface,
+ fr.inria.soctrace.lib.slf4j;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ManifestVersion: 2
 Import-Package: fr.inria.soctrace.tools.filters.timefilter

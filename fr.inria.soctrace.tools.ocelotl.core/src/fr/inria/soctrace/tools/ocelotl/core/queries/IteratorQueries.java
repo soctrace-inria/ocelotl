@@ -32,6 +32,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
@@ -51,6 +54,8 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
  * 
  */
 public class IteratorQueries extends EventQuery {
+	
+	private static final Logger logger = LoggerFactory.getLogger(IteratorQueries.class);
 
 	public class EventIterator {
 
@@ -153,6 +158,7 @@ public class IteratorQueries extends EventQuery {
 				eventQuery.append(" LIMIT " + getLimit());
 
 			final String query = eventQuery.toString();
+			logger.debug(query);
 
 			mystm = dbObj.getConnection().createStatement();
 

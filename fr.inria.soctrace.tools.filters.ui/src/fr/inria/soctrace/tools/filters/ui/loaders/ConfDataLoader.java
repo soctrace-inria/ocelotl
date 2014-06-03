@@ -24,6 +24,9 @@ package fr.inria.soctrace.tools.filters.ui.loaders;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.framesoc.core.FramesocManager;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
@@ -34,6 +37,7 @@ import fr.inria.soctrace.lib.search.utils.Printer;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
+import fr.inria.soctrace.tools.filters.ui.FilterTool;
 
 /**
  * Convenience class to load Trace data related to Filter tool configuration.
@@ -48,6 +52,8 @@ public class ConfDataLoader {
 	private long			maxTimestamp;
 	private TraceDBObject	traceDB			= null;
 	private List<EventType>	types;
+	
+	private static final Logger logger = LoggerFactory.getLogger(ConfDataLoader.class);
 
 	/**
 	 * The constructor.
@@ -108,8 +114,8 @@ public class ConfDataLoader {
 	 */
 	public void print() {
 		Printer.printTraceList(traces);
-		System.out.println("min ts: " + minTimestamp);
-		System.out.println("max ts: " + maxTimestamp);
+		logger.debug("min ts: " + minTimestamp);
+		logger.debug("max ts: " + maxTimestamp);
 	}
 
 	public List<EventType> getTypes() {

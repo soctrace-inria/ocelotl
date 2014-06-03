@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.framesoc.core.tools.model.FramesocTool;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 /**

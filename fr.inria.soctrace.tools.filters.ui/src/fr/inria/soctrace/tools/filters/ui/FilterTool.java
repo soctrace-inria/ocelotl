@@ -25,17 +25,21 @@ package fr.inria.soctrace.tools.filters.ui;
 
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.framesoc.core.tools.model.FramesocTool;
 import fr.inria.soctrace.tools.filters.ui.views.FilterView;
 
 public class FilterTool extends FramesocTool {
 
+	private static final Logger logger = LoggerFactory.getLogger(FilterTool.class);
+	
 	@Override
 	public void launch(String[] args) {
-		System.out.println("Arguments");
+		logger.debug("Arguments");
 		for (String s : args) {
-			System.out.println(s);
+			logger.debug(s);
 		}
 
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

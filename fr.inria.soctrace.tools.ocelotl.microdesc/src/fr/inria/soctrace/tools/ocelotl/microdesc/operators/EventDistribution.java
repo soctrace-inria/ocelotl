@@ -40,7 +40,6 @@ public class EventDistribution extends _3DMicroDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventDistribution.class);
 	
-	
 	class OcelotlThread extends Thread {
 
 		List<EventProducer> eventProducers;
