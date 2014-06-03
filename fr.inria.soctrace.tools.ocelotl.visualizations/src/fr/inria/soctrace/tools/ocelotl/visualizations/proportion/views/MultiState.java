@@ -139,8 +139,8 @@ public class MultiState {
 			}
 		}
 		if (agg != 0) {
-			 System.out.println("Part " + index + " " + "Aggregate" + " " +
-			 agg);
+			// System.out.println("Part " + index + " " + "Aggregate" + " " +
+			// agg);
 			final ImageFigure icon = new ImageFigure();
 			final RectangleFigure rectangle = new RectangleFigure();
 			icon.setBackgroundColor(ColorConstants.black);
