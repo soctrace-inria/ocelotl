@@ -73,7 +73,7 @@ public class EventDistribution extends _3DMicroDescription {
 				if (!matrix.get(0).get(ep)
 						.containsKey(event.getType().getName())) {
 					logger.debug("Adding " + event.getType().getName()
-							+ " state");
+							+ " event");
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr)
