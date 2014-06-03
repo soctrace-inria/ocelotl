@@ -457,13 +457,13 @@ public class OcelotlView extends ViewPart {
 
 	private void cleanAll() {
 		hasChanged = HasChanged.ALL;
-		textThreshold.setText("0.001");
-		textTimestampStart.setText("0");
-		textTimestampEnd.setText("0");
-		btnNormalize.setSelection(false);
-		btnGrowingQualities.setSelection(true);
-		spinnerTSNumber.setSelection(30);
-		textRun.setText("1.0");
+		textThreshold.setText(OcelotlDefaultParameterConstants.Threshold);
+		textTimestampStart.setText(OcelotlDefaultParameterConstants.TimestampStart);
+		textTimestampEnd.setText(OcelotlDefaultParameterConstants.TimestampEnd);
+		btnNormalize.setSelection(OcelotlDefaultParameterConstants.Normalize);
+		btnGrowingQualities.setSelection(OcelotlDefaultParameterConstants.GrowingQualities);
+		spinnerTSNumber.setSelection(OcelotlDefaultParameterConstants.TimeSliceNumber);
+		textRun.setText(OcelotlDefaultParameterConstants.RunParameter);
 		// producers.clear();
 		// types.clear();
 		// idles.clear();
@@ -569,6 +569,14 @@ public class OcelotlView extends ViewPart {
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupTime.setLayout(new GridLayout(17, false));
+		btnRun = new Button(groupTime, SWT.NONE);
+		GridData gd_btnRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_btnRun.minimumHeight = 10;
+		btnRun.setLayoutData(gd_btnRun);
+		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
+		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRun.setText("RUN!");
+		btnRun.addSelectionListener(new GetAggregationAdapter());
 
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -642,14 +650,6 @@ public class OcelotlView extends ViewPart {
 		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		buttonUp.setText(">");
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
-		btnRun = new Button(groupTime, SWT.NONE);
-		GridData gd_btnRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_btnRun.minimumHeight = 10;
-		btnRun.setLayoutData(gd_btnRun);
-		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
-		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRun.setText("RUN!");
-		btnRun.addSelectionListener(new GetAggregationAdapter());
 
 		// btnGetParameters.addSelectionListener(new GetParametersAdapter());
 		textThreshold.addModifyListener(new ThresholdModifyListener());

@@ -42,40 +42,41 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 
 public class MultiState {
 
-	private int					index;
-	private static final int	Border		= StateProportionTimeLineView.Border;
-	private static final int	MinHeight	= 6;
-	private static final int			IconMin		= 6;
-	private static final int			IconMax		= 32;
-	private int					space		= 2;
-	private Proportion		distribution;
-	private IFigure				root;
-	private IconManager 		iconManager;
-	private static final int	Light = 225;
+	private int index;
+	private static final int Border = StateProportionTimeLineView.Border;
+	private static final int MinHeight = 6;
+	private static final int IconMin = 6;
+	private static final int IconMax = 32;
+	private int space = 2;
+	private Proportion distribution;
+	private IFigure root;
+	private IconManager iconManager;
+	private static final int Light = 225;
 
-	public MultiState(final int index, final Proportion distribution, final IFigure root, final int space) {
+	public MultiState(final int index, final Proportion distribution,
+			final IFigure root, final int space) {
 		super();
 		setIndex(index);
 		this.distribution = distribution;
 		this.root = root;
 		this.space = space;
 		this.iconManager = new IconManager();
-
 	}
 
 	public int getIndex() {
 		return index;
 	}
-	
-	public boolean isTooLight(Color color){
-		if (color.getGreen()>Light&&color.getBlue()>Light&&color.getRed()>Light)
+
+	public boolean isTooLight(Color color) {
+		if (color.getGreen() > Light && color.getBlue() > Light
+				&& color.getRed() > Light)
 			return true;
 		return false;
-		
+
 	}
 
 	public void init() {
-		DecimalFormat valueFormat= new DecimalFormat("0.00E0");
+		DecimalFormat valueFormat = new DecimalFormat("0.00E0");
 		double total = 0;
 		final double y0 = root.getSize().height - Border;
 		final double y1 = 9.0 / 10.0 * root.getSize().height - Border;
@@ -93,28 +94,41 @@ public class MultiState {
 			}
 		});
 		for (final String state : states) {
-			final double value = ((PartMap) distribution.getPart(index).getData()).getElements().get(state);
+			final double value = ((PartMap) distribution.getPart(index)
+					.getData()).getElements().get(state);
 			if (value > 0) {
 				// System.out.println("Part " + index + " " + state + " " +
 				// value);
 				final RectangleFigure rect = new RectangleFigure();
 				rect.setBackgroundColor(ColorConstants.white);
-				rect.setBackgroundColor(FramesocColorManager.getInstance().getEventTypeColor(state).getSwtColor());
+				rect.setBackgroundColor(FramesocColorManager.getInstance()
+						.getEventTypeColor(state).getSwtColor());
 				rect.setForegroundColor(ColorConstants.white);
 				rect.setLineWidth(0);
-				if (isTooLight(rect.getBackgroundColor())){
+				if (isTooLight(rect.getBackgroundColor())) {
 					rect.setForegroundColor(ColorConstants.black);
 					rect.setLineWidth(1);
 				}
-				final Label label = new Label(" " + state + ": " + valueFormat.format(value)+" ");
+				final Label label = new Label(" " + state + ": "
+						+ valueFormat.format(value) + " ");
 				rect.setToolTip(label);
 				if (y1 * value / m - space > MinHeight) {
 					if (isTooLight(rect.getBackgroundColor()))
-						root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border -1),
+						root.add(rect, new Rectangle(new Point(
+								(int) (distribution.getPart(index)
+										.getStartPart() * x0 / d + Border + 1),
+								(int) (y0 - y1 * total / m)), new Point(
+								(int) (distribution.getPart(index).getEndPart()
+										* x0 / d - space + Border - 1),
 								(int) (y0 + space - y1 * (total + value) / m))));
 					else
-					root.add(rect, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border),
-							(int) (y0 + space - y1 * (total + value) / m))));
+						root.add(rect, new Rectangle(new Point(
+								(int) (distribution.getPart(index)
+										.getStartPart() * x0 / d + Border),
+								(int) (y0 - y1 * total / m)), new Point(
+								(int) (distribution.getPart(index).getEndPart()
+										* x0 / d - space + Border), (int) (y0
+										+ space - y1 * (total + value) / m))));
 					total += value;
 				} else {
 					agg += value;
@@ -125,16 +139,15 @@ public class MultiState {
 			}
 		}
 		if (agg != 0) {
-			// System.out.println("Part " + index + " " + "Aggregate" + " " +
-			// agg);
+			 System.out.println("Part " + index + " " + "Aggregate" + " " +
+			 agg);
 			final ImageFigure icon = new ImageFigure();
 			final RectangleFigure rectangle = new RectangleFigure();
 			icon.setBackgroundColor(ColorConstants.black);
 			icon.setForegroundColor(ColorConstants.white);
 			rectangle.setBackgroundColor(ColorConstants.black);
 			rectangle.setForegroundColor(ColorConstants.white);
-			
-			
+
 			String aggString = " ";
 			for (int i = 0; i < aggList.size() - 1; i++)
 				aggString = aggString + aggList.get(i) + "; ";
@@ -148,35 +161,49 @@ public class MultiState {
 			lineDash.setLineWidth(2);
 			lineDash.setLineStyle(SWT.LINE_DASH);
 			lineDash.setToolTip(label);
-				if (y1 * agg /m - space > MinHeight){
-					root.add(rectangle, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m)), 
-							new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border),
-							(int) (y0 + space - y1 * (total + agg) / m))));
-				}
-				else{
-					int size = (int) Math.min(IconMax,Math.min(x0/d-2*space, (y0 - y1 * total / m)));
-				if (size>IconMin){
+			if (y1 * agg / m - space > MinHeight) {
+				root.add(rectangle, new Rectangle(new Point((int) (distribution
+						.getPart(index).getStartPart() * x0 / d + Border),
+						(int) (y0 - y1 * total / m)), new Point(
+						(int) (distribution.getPart(index).getEndPart() * x0
+								/ d - space + Border), (int) (y0 + space - y1
+								* (total + agg) / m))));
+			} else {
+				int size = (int) Math.min(IconMax,
+						Math.min(x0 / d - 2 * space, (y0 - y1 * total / m)));
+				if (size > IconMin) {
 					icon.setImage(iconManager.getImage(size));
 
-					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m)), 
-							new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space - 1 + Border), (int) (y0 - y1
-							* (total) / m)));
+					lineDash.setEndpoints(new Point(
+							(int) (distribution.getPart(index).getStartPart()
+									* x0 / d + Border + 1), (int) (y0 - y1
+									* total / m)), new Point(
+							(int) (distribution.getPart(index).getEndPart()
+									* x0 / d - space - 1 + Border),
+							(int) (y0 - y1 * (total) / m)));
 					root.add(lineDash);
-				root.add(icon, new Rectangle(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border), (int) (y0 - y1 * total / m) - space), 
-						new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space + Border), (int) (y0 - y1
-					* (total) / m)- size - space)));
-				}
-				else{
-					lineDash.setEndpoints(new Point((int) (distribution.getPart(index).getStartPart() * x0 / d + Border + 1), (int) (y0 - y1 * total / m)), 
-							new Point((int) (distribution.getPart(index).getEndPart() * x0 / d - space -1 + Border), (int) (y0 - y1
-							* (total) / m)));
+					root.add(icon, new Rectangle(new Point((int) (distribution
+							.getPart(index).getStartPart() * x0 / d + Border),
+							(int) (y0 - y1 * total / m) - space), new Point(
+							(int) (distribution.getPart(index).getEndPart()
+									* x0 / d - space + Border), (int) (y0 - y1
+									* (total) / m)
+									- size - space)));
+				} else {
+					lineDash.setEndpoints(new Point(
+							(int) (distribution.getPart(index).getStartPart()
+									* x0 / d + Border + 1), (int) (y0 - y1
+									* total / m)), new Point(
+							(int) (distribution.getPart(index).getEndPart()
+									* x0 / d - space - 1 + Border),
+							(int) (y0 - y1 * (total) / m)));
 					root.add(lineDash);
 				}
-			
-				}
+
+			}
 			label.getUpdateManager().performUpdate();
 			icon.getUpdateManager().performUpdate();
-				
+
 		}
 	}
 

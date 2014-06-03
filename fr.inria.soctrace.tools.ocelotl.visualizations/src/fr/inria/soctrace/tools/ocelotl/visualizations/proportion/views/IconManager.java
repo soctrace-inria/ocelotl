@@ -32,27 +32,31 @@ public class IconManager {
 
 	public IconManager() {
 		super();
-		this.device=Display.getCurrent();
+		this.device = Display.getCurrent();
 	}
 	
-	public Image getImage(int size){
-		int s=16;
-		if(size>=256)
-			s=256;
-		else if (size>=48)
-			s=48;
-		else if (size>=32)
-			s=32;
-		else if (size>=24)
-			s=24;
-		Image image = ResourceManager.getPluginImage(Activator.PLUGIN_ID, "icons/info"+s+".png");
-		if (size<16)
-			s=size;
-	return new Image(device, image.getImageData().scaledTo(s, s));
+	public Image getImage(int size) {
+		int s = 16;
+		if (size >= 256)
+			s = 256;
+		else if (size >= 48)
+			s = 48;
+		else if (size >= 32)
+			s = 32;
+		else if (size >= 24)
+			s = 24;
+
+		Image image = ResourceManager.getPluginImage(Activator.PLUGIN_ID,
+				"icons/info" + s + ".png");
+		if (size < 16)
+			s = size;
+
+		return new Image(device, image.getImageData().scaledTo(s, s));
 	}
 
 	public Image getBackupImage() {
-		return ResourceManager.getPluginImage(Activator.PLUGIN_ID, "icons/backup.png");
+		return ResourceManager.getPluginImage(Activator.PLUGIN_ID,
+				"icons/backup.png");
 	}
 	
 	
