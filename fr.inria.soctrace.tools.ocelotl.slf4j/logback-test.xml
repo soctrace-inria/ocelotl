@@ -1,0 +1,13 @@
+<configuration>
+	<appender name="OCELOTL" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- Ocelotl -->
+	<logger name="fr.inria.soctrace.tools.ocelotl" level="info">
+		<appender-ref ref="OCELOTL"/>
+	</logger>	
+</configuration>
+

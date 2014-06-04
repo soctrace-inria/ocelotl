@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.lib.model,
  fr.inria.soctrace.framesoc.core,
  fr.inria.soctrace.framesoc.ui,
- fr.inria.soctrace.lib.slf4j;bundle-version="1.0.0"
+ fr.inria.soctrace.tools.ocelotl.slf4j;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.ocelotl.visualizations;uses:="org.eclipse.ui.plugin,org.osgi.framework",
