@@ -9,17 +9,17 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Precision Threshold
 	 */
-	public static final String Threshold = "0.001";
+	public static final double Threshold = 0.001;
 	
 	/**
 	 * Starting timestamp
 	 */
-	public static final String TimestampStart = "0";
+	public static final long TimestampStart = 0;
 	
 	/**
 	 * Ending timestamp
 	 */
-	public static final String TimestampEnd = "0";
+	public static final long TimestampEnd = 0;
 	
 	/**
 	 * Should the quality be normalized ?
@@ -39,5 +39,5 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Gain/Loss ratio
 	 */
-	public static final String RunParameter = "1.0";
+	public static final double RunParameter = 1.0;
 }

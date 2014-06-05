@@ -457,18 +457,13 @@ public class OcelotlView extends ViewPart {
 
 	private void cleanAll() {
 		hasChanged = HasChanged.ALL;
-		textThreshold.setText(OcelotlDefaultParameterConstants.Threshold);
-		textTimestampStart.setText(OcelotlDefaultParameterConstants.TimestampStart);
-		textTimestampEnd.setText(OcelotlDefaultParameterConstants.TimestampEnd);
+		textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
+		textTimestampStart.setText(String.valueOf(OcelotlDefaultParameterConstants.TimestampStart));
+		textTimestampEnd.setText(String.valueOf(OcelotlDefaultParameterConstants.TimestampEnd));
 		btnNormalize.setSelection(OcelotlDefaultParameterConstants.Normalize);
 		btnGrowingQualities.setSelection(OcelotlDefaultParameterConstants.GrowingQualities);
 		spinnerTSNumber.setSelection(OcelotlDefaultParameterConstants.TimeSliceNumber);
-		textRun.setText(OcelotlDefaultParameterConstants.RunParameter);
-		// producers.clear();
-		// types.clear();
-		// idles.clear();
-		// listViewerEventProducers.setInput(producers);
-		// TODO config paje
+		textRun.setText(String.valueOf(OcelotlDefaultParameterConstants.RunParameter));
 	}
 
 	private Action createGanttAction() {
@@ -614,7 +609,6 @@ public class OcelotlView extends ViewPart {
 		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		spinnerTSNumber.setMaximum(10000);
 		spinnerTSNumber.setMinimum(1);
-		spinnerTSNumber.setSelection(200);
 
 		final Label lblThreshold = new Label(groupTime, SWT.NONE);
 		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -629,10 +623,6 @@ public class OcelotlView extends ViewPart {
 		final Label lblParameter = new Label(groupTime, SWT.NONE);
 		lblParameter.setText("Parameter");
 		lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		// btnGetParameters = new Button(compositeGetParameters, SWT.NONE);
-		// btnGetParameters.setFont(SWTResourceManager.getFont("Cantarell", 8,
-		// SWT.NORMAL));
-		// btnGetParameters.setText("Get");
 
 		textRun = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
@@ -651,7 +641,6 @@ public class OcelotlView extends ViewPart {
 		buttonUp.setText(">");
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
 
-		// btnGetParameters.addSelectionListener(new GetParametersAdapter());
 		textThreshold.addModifyListener(new ThresholdModifyListener());
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
@@ -663,8 +652,6 @@ public class OcelotlView extends ViewPart {
 
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
-		// canvasMatrixView.setLayoutData(new GridData(GridData.FILL_BOTH));
-		// canvasTimeAxisView.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		final TabFolder tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
@@ -793,14 +780,6 @@ public class OcelotlView extends ViewPart {
 		btnSettings2.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		sashFormTSandCurve.setWeights(new int[] { 1, 1, 1 });
 		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
-		// canvasQualityView.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		// final TabItem tbtmTraceParameters = new TabItem(tabFolder, SWT.NONE);
-		// tbtmTraceParameters.setText("Trace Parameters");
-
-		// final SashForm sashFormTraceParameter = new SashForm(tabFolder,
-		// SWT.VERTICAL);
-		// tbtmTraceParameters.setControl(sashFormTraceParameter);
 
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
 		tbtmAdvancedParameters.setText("Quality curves");
@@ -845,10 +824,7 @@ public class OcelotlView extends ViewPart {
 		sashForm.setWeights(new int[] {158, 296});
 		sashForm_1.setWeights(new int[] { 447, 142 });
 		sashFormGlobal.setWeights(new int[] { 395 });
-		// sashFormAdvancedParameters.setWeights(new int[] { 112, 374 });
-		// sashFormGlobal.setWeights(new int[] { 172, 286 });
-
-		// clean all
+		
 		final IActionBars actionBars = getViewSite().getActionBars();
 		final IToolBarManager toolBar = actionBars.getToolBarManager();
 		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.GANTT_CHART_VIEW_ID))
@@ -916,16 +892,9 @@ public class OcelotlView extends ViewPart {
 	public void setConfiguration() {
 
 		ocelotlParameters.setTrace(confDataLoader.getCurrentTrace());
-		// ocelotlParameters.setEventProducers(producers);
-		// ocelotlParameters.setEventTypes(types);
-		// ocelotlParameters.setSleepingStates(idles);
 		ocelotlParameters.setNormalize(btnNormalize.getSelection());
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
-		// ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
-		// ocelotlParameters.setEventsPerThread(spinnerEventSize.getSelection());
-		// ocelotlParameters.setThread(spinnerThread.getSelection());
-		// TODO manage number format exception
 		try {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());
