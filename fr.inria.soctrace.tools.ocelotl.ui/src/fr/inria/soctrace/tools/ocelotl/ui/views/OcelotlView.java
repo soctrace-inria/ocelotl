@@ -563,15 +563,8 @@ public class OcelotlView extends ViewPart {
 		groupTime.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		groupTime.setLayout(new GridLayout(17, false));
-		btnRun = new Button(groupTime, SWT.NONE);
-		GridData gd_btnRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_btnRun.minimumHeight = 10;
-		btnRun.setLayoutData(gd_btnRun);
-		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
-		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnRun.setText("RUN!");
-		btnRun.addSelectionListener(new GetAggregationAdapter());
+		groupTime.setLayout(new GridLayout(11, false));
+		new Label(groupTime, SWT.NONE);
 
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
@@ -609,39 +602,6 @@ public class OcelotlView extends ViewPart {
 		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		spinnerTSNumber.setMaximum(10000);
 		spinnerTSNumber.setMinimum(1);
-
-		final Label lblThreshold = new Label(groupTime, SWT.NONE);
-		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblThreshold.setText("Threshold");
-
-		textThreshold = new Text(groupTime, SWT.BORDER);
-		final GridData gd_textThreshold = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_textThreshold.widthHint = 100;
-		textThreshold.setLayoutData(gd_textThreshold);
-		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		final Label lblParameter = new Label(groupTime, SWT.NONE);
-		lblParameter.setText("Parameter");
-		lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		textRun = new Text(groupTime, SWT.BORDER);
-		final GridData gd_textRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_textRun.widthHint = 100;
-		textRun.setLayoutData(gd_textRun);
-		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		textRun.addModifyListener(new ParameterModifyListener());
-
-		buttonDown = new Button(groupTime, SWT.NONE);
-		buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonDown.setText("<");
-		buttonDown.addSelectionListener(new ParameterDownAdapter());
-
-		buttonUp = new Button(groupTime, SWT.NONE);
-		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		buttonUp.setText(">");
-		buttonUp.addSelectionListener(new ParameterUpAdapter());
-
-		textThreshold.addModifyListener(new ThresholdModifyListener());
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
 		textTimestampEnd.addModifyListener(new ConfModificationListener());
@@ -791,7 +751,8 @@ public class OcelotlView extends ViewPart {
 		final Group groupQualityCurveSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
 		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupQualityCurveSettings.setText("Quality Curve Settings");
-		groupQualityCurveSettings.setLayout(new GridLayout(2, false));
+		groupQualityCurveSettings.setLayout(new GridLayout(4, false));
+		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
@@ -799,6 +760,8 @@ public class OcelotlView extends ViewPart {
 		btnNormalize.setSelection(false);
 		btnNormalize.setText("Normalize Qualities");
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
+		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
@@ -808,21 +771,74 @@ public class OcelotlView extends ViewPart {
 		btnGrowingQualities.addSelectionListener(new GrowingQualityRadioSelectionAdapter());
 		btnGrowingQualities.setSelection(false);
 		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)");
 		btnDecreasingQualities.setSelection(false);
 		btnDecreasingQualities.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				new Label(groupQualityCurveSettings, SWT.NONE);
+				new Label(groupQualityCurveSettings, SWT.NONE);
+						new Label(groupQualityCurveSettings, SWT.NONE);
+				
+						final Label lblThreshold = new Label(groupQualityCurveSettings, SWT.NONE);
+						lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+						lblThreshold.setText("X Axis Maximal Precision");
+						
+								textThreshold = new Text(groupQualityCurveSettings, SWT.BORDER);
+								GridData gd_textThreshold = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+								gd_textThreshold.widthHint = 89;
+								textThreshold.setLayoutData(gd_textThreshold);
+								textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+								
+										textThreshold.addModifyListener(new ThresholdModifyListener());
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 		sashFormAdvancedParameters.setWeights(new int[] { 1 });
+		
 
 		final Composite compositeQualityView = new Composite(sashForm, SWT.NONE);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		qualityView.initDiagram(compositeQualityView);
 		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
-		sashForm.setWeights(new int[] {158, 296});
-		sashForm_1.setWeights(new int[] { 447, 142 });
+										
+										ScrolledComposite scrolledComposite_1 = new ScrolledComposite(sashForm, SWT.BORDER | SWT.H_SCROLL);
+										scrolledComposite_1.setExpandHorizontal(true);
+										scrolledComposite_1.setExpandVertical(true);
+										
+										Group group = new Group(scrolledComposite_1, SWT.NONE);
+										group.setLayout(new GridLayout(5, false));
+										
+												final Label lblParameter = new Label(group, SWT.NONE);
+												lblParameter.setText("Parameter");
+												lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+												
+														textRun = new Text(group, SWT.BORDER);
+														GridData gd_textRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+														gd_textRun.widthHint = 100;
+														textRun.setLayoutData(gd_textRun);
+														textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+														
+																buttonDown = new Button(group, SWT.NONE);
+																buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+																buttonDown.setText("<");
+																
+																		buttonUp = new Button(group, SWT.NONE);
+																		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+																		buttonUp.setText(">");
+																		btnRun = new Button(group, SWT.NONE);
+																		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
+																		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+																		btnRun.setText("RUN!");
+										btnRun.addSelectionListener(new GetAggregationAdapter());
+										buttonUp.addSelectionListener(new ParameterUpAdapter());
+										buttonDown.addSelectionListener(new ParameterDownAdapter());
+										textRun.addModifyListener(new ParameterModifyListener());
+										scrolledComposite_1.setContent(group);
+										scrolledComposite_1.setMinSize(group.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+										sashForm.setWeights(new int[] {148, 267, 35});
+		sashForm_1.setWeights(new int[] {678, 222});
 		sashFormGlobal.setWeights(new int[] { 395 });
 		
 		final IActionBars actionBars = getViewSite().getActionBars();
