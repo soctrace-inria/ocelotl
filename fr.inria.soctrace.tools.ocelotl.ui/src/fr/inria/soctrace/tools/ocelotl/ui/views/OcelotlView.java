@@ -226,10 +226,14 @@ public class OcelotlView extends ViewPart {
 		public void keyPressed(final KeyEvent e) {
 			switch (e.keyCode) {
 			case SWT.ARROW_LEFT:
-				buttonDown.notifyListeners(SWT.Selection, new Event());
+				//Make sure we are not in an editable field
+				if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					buttonDown.notifyListeners(SWT.Selection, new Event());
 				break;
 			case SWT.ARROW_RIGHT:
-				buttonUp.notifyListeners(SWT.Selection, new Event());
+				//Make sure we are not in an editable field
+				if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					buttonUp.notifyListeners(SWT.Selection, new Event());
 				break;
 			case SWT.CR:
 				btnRun.notifyListeners(SWT.Selection, new Event());
@@ -248,13 +252,15 @@ public class OcelotlView extends ViewPart {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			final float p = Float.parseFloat(textRun.getText());
-			for (final double f : ocelotlCore.getLpaggregManager().getParameters())
-				if (f > p) {
-					textRun.setText(Double.toString(f));
-					break;
+			if (ocelotlCore.getLpaggregManager() != null) {
+				for (final double f : ocelotlCore.getLpaggregManager().getParameters()) {
+					if (f > p) {
+						textRun.setText(Double.toString(f));
+						btnRun.notifyListeners(SWT.Selection, new Event());
+						break;
+					}
 				}
-			btnRun.notifyListeners(SWT.Selection, new Event());
-
+			}
 		}
 
 	}
@@ -282,12 +288,15 @@ public class OcelotlView extends ViewPart {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			final float p = Float.parseFloat(textRun.getText());
-			for (int f = ocelotlCore.getLpaggregManager().getParameters().size() - 1; f >= 0; f--)
-				if (ocelotlCore.getLpaggregManager().getParameters().get(f) < p) {
-					textRun.setText(Double.toString(ocelotlCore.getLpaggregManager().getParameters().get(f)));
-					break;
+			if (ocelotlCore.getLpaggregManager() != null) {
+				for (int f = ocelotlCore.getLpaggregManager().getParameters().size() - 1; f >= 0; f--) {
+					if (ocelotlCore.getLpaggregManager().getParameters().get(f) < p) {
+						textRun.setText(Double.toString(ocelotlCore.getLpaggregManager().getParameters().get(f)));
+						btnRun.notifyListeners(SWT.Selection, new Event());
+						break;
+					}
 				}
-			btnRun.notifyListeners(SWT.Selection, new Event());
+			}
 		}
 
 	}
@@ -297,8 +306,11 @@ public class OcelotlView extends ViewPart {
 		public void widgetSelected(final SelectionEvent e) {
 			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
-			timeLineView.resizeDiagram();
-			timeAxisView.resizeDiagram();
+			if(timeLineView != null)
+			{
+				timeLineView.resizeDiagram();
+				timeAxisView.resizeDiagram();
+			}
 		}
 	}
 
@@ -512,9 +524,13 @@ public class OcelotlView extends ViewPart {
 			public void handleEvent(final Event e) {
 				switch (e.keyCode) {
 				case SWT.ARROW_LEFT:
+					//Make sure we are not in an editable field
+					if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonDown.notifyListeners(SWT.Selection, new Event());
 					break;
 				case SWT.ARROW_RIGHT:
+					//Make sure we are not in an editable field
+					if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonUp.notifyListeners(SWT.Selection, new Event());
 					break;
 				case SWT.CR:
