@@ -105,7 +105,6 @@ public class OcelotlView extends ViewPart {
 				textTimestampStart.setText("0");
 			}
 		}
-
 	}
 
 	private class DecreasingQualityRadioSelectionAdapter extends SelectionAdapter {
@@ -121,6 +120,11 @@ public class OcelotlView extends ViewPart {
 	}
 
 	private class GetAggregationAdapter extends SelectionAdapter {
+		
+		//Prevent the simultaneous execution of multiple threads leading to random crashes
+		private Object lock = new Object();
+		//Global flag signaling that a job already is running 
+		private boolean running = false;
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
@@ -128,10 +132,31 @@ public class OcelotlView extends ViewPart {
 				return;
 			if (comboTime.getText().equals(""))
 				return;
+			
+			//Mutex zone
+			synchronized (lock) {
+				//If a job is already running
+				if (running == true)
+				{
+					//reset the displayed value to the actual value to avoid displaying a wrong value
+					textRun.setText(Double.toString(ocelotlParameters.getParameter()));
+			
+					//and discard the new job
+					return;
+				}
+				
+				//else we are starting a job
+				running = true;
+			}
+			
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
+			{
 				hasChanged = HasChanged.PARAMETER;
+			}
 			else
+			{
 				textRun.setText("1.0");
+			}
 			setConfiguration();
 			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
@@ -155,6 +180,9 @@ public class OcelotlView extends ViewPart {
 									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 								}
 							});
+							synchronized (lock) {
+								running = false;
+							}
 							return Status.CANCEL_STATUS;
 						}
 
@@ -163,6 +191,9 @@ public class OcelotlView extends ViewPart {
 						ocelotlCore.computeParts(hasChanged);
 					} catch (final SoCTraceException e) {
 						e.printStackTrace();
+						synchronized (lock) {
+							running = false;
+						}
 						return Status.CANCEL_STATUS;
 					} catch (final OcelotlException e) {
 						monitor.done();
@@ -174,6 +205,9 @@ public class OcelotlView extends ViewPart {
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 							}
 						});
+						synchronized (lock) {
+							running = false;
+						}
 						return Status.CANCEL_STATUS;
 					}
 					monitor.done();
@@ -188,12 +222,21 @@ public class OcelotlView extends ViewPart {
 							qualityView.createDiagram();
 						}
 					});
-					return Status.OK_STATUS;
+				
+					synchronized (lock) {
+						running = false;
+					}
+					return Status.OK_STATUS;	
 				}
 			};
-			job.setUser(true);
+			job.setUser(true);	
 			job.schedule();
-
+			
+			if(job.getResult() == Status.OK_STATUS)
+			{
+				//Setting the actual computed value
+				textRun.setText(Double.toString(ocelotlParameters.getParameter()));
+			}
 		}
 	}
 
@@ -242,9 +285,7 @@ public class OcelotlView extends ViewPart {
 				btnReset.notifyListeners(SWT.Selection, new Event());
 				break;
 			}
-
 		}
-
 	}
 
 	private class ParameterDownAdapter extends SelectionAdapter {
@@ -296,9 +337,9 @@ public class OcelotlView extends ViewPart {
 						break;
 					}
 				}
+
 			}
 		}
-
 	}
 
 	private class ResetListener extends SelectionAdapter {
