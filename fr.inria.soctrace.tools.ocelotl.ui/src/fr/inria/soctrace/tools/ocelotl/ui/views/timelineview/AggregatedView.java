@@ -161,6 +161,9 @@ abstract public class AggregatedView implements IAggregatedView {
 		public void mouseReleased(final MouseEvent arg0) {
 			if (state == State.PRESSED_G || state == State.DRAG_G) {
 				state = State.RELEASED;
+				if(time == null)
+					return;
+							
 				if (!ocelotlView.getTimeRegion().compareTimeRegion(time)&& selectTime.getTimeDuration()>0) {
 					ocelotlView.getTimeAxisView().select(selectTime, true);
 					selectFigure.draw(selectTime, true);

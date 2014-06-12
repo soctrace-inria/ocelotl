@@ -87,7 +87,6 @@ public class OcelotlCore {
 			lpaggregManager.computeDichotomy();
 			lpaggregManager.printParameters();
 		}
-
 	}
 
 	public void computeParts(final HasChanged hasChanged)
@@ -100,7 +99,6 @@ public class OcelotlCore {
 			setSpaceOperator();
 			lpaggregManager.print(this);
 		}
-
 	}
 
 	public IMicroDescManager getLpaggregManager() {

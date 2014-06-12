@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import fr.inria.lpaggreg.quality.DLPQuality;
 
-
 /**
  * _2DCacheMicroDescription View : part representation, according to LP
  * algorithm result
@@ -61,7 +60,6 @@ public class QualityView {
 	class ParamMouseListener implements MouseListener {
 
 		State	state	= State.RELEASED;
-		
 
 		@Override
 		public void mouseDoubleClicked(final MouseEvent arg0) {
@@ -85,7 +83,6 @@ public class QualityView {
 		public void mouseReleased(final MouseEvent arg0) {
 			state = State.RELEASED;
 			ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
-
 		}
 
 	}
@@ -114,13 +111,13 @@ public class QualityView {
 	private List<Double>		parameterList;
 	private double				currentParameter;
 	private final OcelotlView	ocelotlView;
-	private double	maxValue;
-	private double	minValue;
+	private double				maxValue;
+	private double				minValue;
 
 	private final static float	ParamLineWidth		= 1.8F;
 
 	private final static float	QualityLineWidth	= 2.0F;
-	private static final Logger logger = LoggerFactory.getLogger(QualityView.class);
+	private static final Logger	logger				= LoggerFactory.getLogger(QualityView.class);
 
 	public QualityView(final OcelotlView lpaggregView) {
 		super();
@@ -133,17 +130,17 @@ public class QualityView {
 			qualities = ocelotlView.getCore().getLpaggregManager().getQualities();
 			parameterList = new ArrayList<Double>(ocelotlView.getCore().getLpaggregManager().getParameters());
 			currentParameter = ocelotlView.getCore().getOcelotlParameters().getParameter();
-			if (qualities != null && (root.getSize().width()>(XBorder+Border)*1.5)) {
+			if (qualities != null && (root.getSize().width() > (XBorder + Border) * 1.5)) {
 				maxValue = Math.max(qualities.get(qualities.size() - 1).getGain(), qualities.get(qualities.size() - 1).getLoss());
 				minValue = Math.min(0, Math.min(qualities.get(0).getGain(), qualities.get(0).getLoss()));
-				if (maxValue==0.0&& minValue==0.0){
+				if (maxValue == 0.0 && minValue == 0.0) {
 					drawError();
-				}else{
-				drawXGrads();
-				drawYGrads();
-				drawXYLines();
-				drawQualities();
-				drawParam();
+				} else {
+					drawXGrads();
+					drawYGrads();
+					drawXYLines();
+					drawQualities();
+					drawParam();
 				}
 			}
 			canvas.update();
@@ -152,7 +149,7 @@ public class QualityView {
 
 	private void drawError() {
 		final RectangleFigure rectangleText = new RectangleFigure();
-		root.add(rectangleText, new Rectangle(new Point(XBorder, (int) ((root.getSize().height() - YBorder - Border)/3)), new Point(new Point( root.getSize().width() - XBorder, (int) ((root.getSize().height() - YBorder - Border)/2)))));
+		root.add(rectangleText, new Rectangle(new Point(XBorder, (int) ((root.getSize().height() - YBorder - Border) / 3)), new Point(new Point(root.getSize().width() - XBorder, (int) ((root.getSize().height() - YBorder - Border) / 2)))));
 		rectangleText.setBackgroundColor(ColorConstants.white);
 		rectangleText.setForegroundColor(ColorConstants.white);
 		final Label label = new Label("Error: unable to get several aggregations");
@@ -166,7 +163,7 @@ public class QualityView {
 		rectangleText.setLayoutManager(layout);
 		rectangleText.setBackgroundColor(root.getBackgroundColor());
 		rectangleText.setForegroundColor(root.getBackgroundColor());
-		
+
 	}
 
 	public void drawParam() {
@@ -228,10 +225,10 @@ public class QualityView {
 
 	public void drawXGrads() {
 		double width = (root.getSize().width - XBorder - Border) / XGradNumber;
-		double xGradNumber= XGradNumber;
-		while (width<TextWidth&&width>1){
-			xGradNumber/=2;
-			width = (root.getSize().width - XBorder - Border)/xGradNumber;
+		double xGradNumber = XGradNumber;
+		while (width < TextWidth && width > 1) {
+			xGradNumber /= 2;
+			width = (root.getSize().width - XBorder - Border) / xGradNumber;
 		}
 		final PolylineConnection lineEnd = new PolylineConnection();
 		lineEnd.setEndpoints(new Point((int) (xGradNumber * width + XBorder), root.getSize().height() - YBorder), new Point(new Point((int) (xGradNumber * width + XBorder), Border)));
@@ -247,13 +244,13 @@ public class QualityView {
 			line.setLineWidth(1);
 			root.add(line);
 			final RectangleFigure rectangleText = new RectangleFigure();
-			root.add(rectangleText, new Rectangle(new Point((int) (i * width + XBorder - width/2), root.getSize().height() - YBorder + TextOffset), new Point(new Point((int) ((i+1) * width + XBorder- width/2), root.getSize().height()
-					- YBorder - AxisWidth + TextHeight + TextOffset))));
-			final float value = (float) ((10 - (i*XGradNumber/xGradNumber)) * 0.1 );
+			root.add(rectangleText, new Rectangle(new Point((int) (i * width + XBorder - width / 2), root.getSize().height() - YBorder + TextOffset), new Point(new Point((int) ((i + 1) * width + XBorder - width / 2), root.getSize().height() - YBorder
+					- AxisWidth + TextHeight + TextOffset))));
+			final float value = (float) ((10 - (i * XGradNumber / xGradNumber)) * 0.1);
 			final Label label = new Label("" + value);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(ColorConstants.darkGray);
-			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight/2, SWT.NORMAL));
+			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			rectangleText.setLineWidth(1);
 			rectangleText.add(label);
 			rectangleText.setBackgroundColor(root.getBackgroundColor());
@@ -261,18 +258,18 @@ public class QualityView {
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 			rectangleText.setLayoutManager(layout);
-			if (i*(XGradNumber/xGradNumber) != (int) XGradNumber && width / MiniDivide > YGradWidthMin / 2)
+			if (i * (XGradNumber / xGradNumber) != (int) XGradNumber && width / MiniDivide > YGradWidthMin / 2)
 				for (int j = 1; j < 5; j++) {
-					if (((i * width + XBorder) + (int) (j * width / MiniDivide))<xGradNumber*width + XBorder){
-					final PolylineConnection lineDash = new PolylineConnection();
-					lineDash.setEndpoints(new Point((int) (i * width + XBorder) + (int) (j * width / MiniDivide), root.getSize().height() - YBorder), new Point(new Point((int) (i * width + XBorder) + (int) (j * width / MiniDivide), Border)));
-					lineDash.setBackgroundColor(ColorConstants.lightGray);
-					lineDash.setForegroundColor(ColorConstants.lightGray);
-					lineDash.setLineWidth(1);
-					lineDash.setLineStyle(SWT.LINE_DASH);
-					root.add(lineDash);
+					if (((i * width + XBorder) + (int) (j * width / MiniDivide)) < xGradNumber * width + XBorder) {
+						final PolylineConnection lineDash = new PolylineConnection();
+						lineDash.setEndpoints(new Point((int) (i * width + XBorder) + (int) (j * width / MiniDivide), root.getSize().height() - YBorder), new Point(new Point((int) (i * width + XBorder) + (int) (j * width / MiniDivide), Border)));
+						lineDash.setBackgroundColor(ColorConstants.lightGray);
+						lineDash.setForegroundColor(ColorConstants.lightGray);
+						lineDash.setLineWidth(1);
+						lineDash.setLineStyle(SWT.LINE_DASH);
+						root.add(lineDash);
+					}
 				}
-			}
 		}
 	}
 
@@ -313,7 +310,7 @@ public class QualityView {
 			root.add(rectangleText, new Rectangle(new Point(XBorder - TextWidth - TextOffset, (int) (height - i * yGradWidth) + TextHeight / 3), new Point(new Point(XBorder - TextOffset, (int) (height - i * yGradWidth - TextHeight / 1.5)))));
 			rectangleText.setBackgroundColor(ColorConstants.white);
 			rectangleText.setForegroundColor(ColorConstants.white);
-			final double value = i == yGradNumber ? maxValue - minValue: (double) ((long) (i * qualityWidth * 10) / 10.0);
+			final double value = i == yGradNumber ? maxValue - minValue : (double) ((long) (i * qualityWidth * 10) / 10.0);
 			String text = formatter.format(value);
 			if (value < 1000)
 				text = String.valueOf(value);
@@ -384,7 +381,7 @@ public class QualityView {
 		for (int j = 1; j < i; j++)
 			temp *= 10;
 		qualityWidth = (double) temp / (double) factor;
-		yGradNumber = (maxValue - minValue)/ qualityWidth;
+		yGradNumber = (maxValue - minValue) / qualityWidth;
 		yGradWidth = (root.getSize().height - YBorder - Border) / yGradNumber;
 		while (yGradWidth < YGradWidthMin && yGradNumber > 6) {
 			yGradNumber /= 2;

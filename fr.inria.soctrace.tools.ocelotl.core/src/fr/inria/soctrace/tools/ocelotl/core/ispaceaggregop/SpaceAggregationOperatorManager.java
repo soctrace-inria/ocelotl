@@ -75,7 +75,6 @@ public class SpaceAggregationOperatorManager {
 		final Bundle mybundle = Platform.getBundle(List.get(
 				selectedOperatorName).getBundle());
 		try {
-
 			selectedOperator = (ISpaceAggregationOperator) mybundle.loadClass(
 					List.get(selectedOperatorName).getOperatorClass())
 					.newInstance();

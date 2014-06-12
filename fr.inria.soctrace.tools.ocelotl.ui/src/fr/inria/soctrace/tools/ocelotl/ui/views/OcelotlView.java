@@ -132,6 +132,8 @@ public class OcelotlView extends ViewPart {
 				return;
 			if (comboTime.getText().equals(""))
 				return;
+			if (comboSpace.getText().equals(""))
+				return;
 			
 			//Mutex zone
 			synchronized (lock) {
@@ -278,6 +280,7 @@ public class OcelotlView extends ViewPart {
 				if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonUp.notifyListeners(SWT.Selection, new Event());
 				break;
+			case SWT.KEYPAD_CR:
 			case SWT.CR:
 				btnRun.notifyListeners(SWT.Selection, new Event());
 				break;
@@ -505,7 +508,6 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
-
 	}
 
 	private void cleanAll() {
@@ -567,13 +569,14 @@ public class OcelotlView extends ViewPart {
 				case SWT.ARROW_LEFT:
 					//Make sure we are not in an editable field
 					if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-					buttonDown.notifyListeners(SWT.Selection, new Event());
+						buttonDown.notifyListeners(SWT.Selection, new Event());
 					break;
 				case SWT.ARROW_RIGHT:
 					//Make sure we are not in an editable field
 					if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-					buttonUp.notifyListeners(SWT.Selection, new Event());
+						buttonUp.notifyListeners(SWT.Selection, new Event());
 					break;
+				case SWT.KEYPAD_CR:
 				case SWT.CR:
 					btnRun.notifyListeners(SWT.Selection, new Event());
 					break;
@@ -686,7 +689,7 @@ public class OcelotlView extends ViewPart {
 		groupTraces.setLayout(new GridLayout(1, false));
 
 		final Composite composite_1 = new Composite(groupTraces, SWT.NONE);
-		final GridData gd_composite_1 = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		final GridData gd_composite_1 = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_composite_1.minimumHeight = 20;
 		gd_composite_1.widthHint = 285;
 		composite_1.setLayoutData(gd_composite_1);
@@ -721,7 +724,7 @@ public class OcelotlView extends ViewPart {
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
 		compositeAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		compositeAggregationOperator.setLayout(new GridLayout(2, false));
-		final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_compositeAggregationOperator.minimumHeight = 20;
 		gd_compositeAggregationOperator.widthHint = 85;
 		compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
@@ -762,7 +765,7 @@ public class OcelotlView extends ViewPart {
 		grpSpaceAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite composite = new Composite(grpSpaceAggregationOperator, SWT.NONE);
-		final GridData gd_composite = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		final GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_composite.minimumHeight = 20;
 		gd_composite.widthHint = 85;
 		composite.setLayoutData(gd_composite);
@@ -788,7 +791,6 @@ public class OcelotlView extends ViewPart {
 				timeLineView = timeLineViewManager.create();
 				timeLineViewWrapper.setView(timeLineView);
 				btnSettings2.notifyListeners(SWT.Selection, new Event());
-
 			}
 		});
 
@@ -859,45 +861,47 @@ public class OcelotlView extends ViewPart {
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		qualityView.initDiagram(compositeQualityView);
 		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
-										
-										ScrolledComposite scrolledComposite_1 = new ScrolledComposite(sashForm, SWT.BORDER | SWT.H_SCROLL);
-										scrolledComposite_1.setExpandHorizontal(true);
-										scrolledComposite_1.setExpandVertical(true);
-										
-										Group group = new Group(scrolledComposite_1, SWT.NONE);
-										group.setLayout(new GridLayout(5, false));
-										
-												final Label lblParameter = new Label(group, SWT.NONE);
-												lblParameter.setText("Parameter");
-												lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-												
-														textRun = new Text(group, SWT.BORDER);
-														GridData gd_textRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-														gd_textRun.widthHint = 100;
-														textRun.setLayoutData(gd_textRun);
-														textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-														
-																buttonDown = new Button(group, SWT.NONE);
-																buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-																buttonDown.setText("<");
-																
-																		buttonUp = new Button(group, SWT.NONE);
-																		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-																		buttonUp.setText(">");
-																		btnRun = new Button(group, SWT.NONE);
-																		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
-																		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-																		btnRun.setText("RUN!");
-										btnRun.addSelectionListener(new GetAggregationAdapter());
-										buttonUp.addSelectionListener(new ParameterUpAdapter());
-										buttonDown.addSelectionListener(new ParameterDownAdapter());
-										textRun.addModifyListener(new ParameterModifyListener());
-										scrolledComposite_1.setContent(group);
-										scrolledComposite_1.setMinSize(group.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-										sashForm.setWeights(new int[] {148, 267, 35});
-		sashForm_1.setWeights(new int[] {678, 222});
-		sashFormGlobal.setWeights(new int[] { 395 });
+
+		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(sashForm, SWT.BORDER | SWT.H_SCROLL);
+		scrolledComposite_1.setExpandHorizontal(true);
+		scrolledComposite_1.setExpandVertical(true);
+
+		Group group = new Group(scrolledComposite_1, SWT.NONE);
+		group.setLayout(new GridLayout(5, false));
+
+		final Label lblParameter = new Label(group, SWT.NONE);
+		lblParameter.setText("Parameter");
+		lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		textRun = new Text(group, SWT.BORDER);
+		GridData gd_textRun = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_textRun.widthHint = 100;
+		textRun.setLayoutData(gd_textRun);
+		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+
+		buttonDown = new Button(group, SWT.NONE);
+		buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonDown.setText("<");
+
+		buttonUp = new Button(group, SWT.NONE);
+		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonUp.setText(">");
+		btnRun = new Button(group, SWT.NONE);
+		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
+		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRun.setText("RUN!");
+		btnRun.setBackground(SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY));
 		
+		btnRun.addSelectionListener(new GetAggregationAdapter());
+		buttonUp.addSelectionListener(new ParameterUpAdapter());
+		buttonDown.addSelectionListener(new ParameterDownAdapter());
+		textRun.addModifyListener(new ParameterModifyListener());
+		scrolledComposite_1.setContent(group);
+		scrolledComposite_1.setMinSize(group.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		sashForm.setWeights(new int[] { 148, 267, 35 });
+		sashForm_1.setWeights(new int[] { 678, 222 });
+		sashFormGlobal.setWeights(new int[] { 395 });
+
 		final IActionBars actionBars = getViewSite().getActionBars();
 		final IToolBarManager toolBar = actionBars.getToolBarManager();
 		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.GANTT_CHART_VIEW_ID))
