@@ -744,21 +744,20 @@ public class OcelotlView extends ViewPart {
 				ocelotlParameters.getEventProducers().clear();
 				ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
 				comboSpace.removeAll();
-				for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility()))
-				{
+				for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility())) {
 					comboSpace.add(op);
-					
-					//It the operator "Proportion" is found, then set it as default
-					if(op.equals("Proportion"))
-					{
+
+					// It the operator "Proportion" is found, then set it as
+					// default
+					if (op.equals("Proportion")) {
 						comboSpace.setText(op);
-						//Set "proportion" as operator in Ocelotl
+						// Set "proportion" as operator in Ocelotl
 						comboSpace.notifyListeners(SWT.Selection, new Event());
 					}
 				}
-				
-				//If the default operator was not found
-				if(comboSpace.getText() == null)
+
+				// If the default operator was not found
+				if (comboSpace.getText() == null)
 					comboSpace.setText("");
 				btnSettings.notifyListeners(SWT.Selection, new Event());
 
@@ -803,7 +802,6 @@ public class OcelotlView extends ViewPart {
 				ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
 				timeLineView = timeLineViewManager.create();
 				timeLineViewWrapper.setView(timeLineView);
-				btnSettings2.notifyListeners(SWT.Selection, new Event());
 			}
 		});
 

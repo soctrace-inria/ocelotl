@@ -143,7 +143,7 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mousePressed(final MouseEvent arg0) {
-			if (arg0.button == 1) {
+			if (arg0.button == 1 && resetTime != null) {
 				state = State.PRESSED_G;
 				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
 				p3 = Math.max(p3, resetTime.getTimeStampStart());
