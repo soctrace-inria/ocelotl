@@ -745,8 +745,21 @@ public class OcelotlView extends ViewPart {
 				ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
 				comboSpace.removeAll();
 				for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility()))
+				{
 					comboSpace.add(op);
-				comboSpace.setText("");
+					
+					//It the operator "Proportion" is found, then set it as default
+					if(op.equals("Proportion"))
+					{
+						comboSpace.setText(op);
+						//Set "proportion" as operator in Ocelotl
+						comboSpace.notifyListeners(SWT.Selection, new Event());
+					}
+				}
+				
+				//If the default operator was not found
+				if(comboSpace.getText() == null)
+					comboSpace.setText("");
 				btnSettings.notifyListeners(SWT.Selection, new Event());
 
 			}
