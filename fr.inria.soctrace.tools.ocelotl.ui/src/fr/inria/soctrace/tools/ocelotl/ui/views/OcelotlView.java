@@ -61,6 +61,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
+import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
+import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocPartManager;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
@@ -84,8 +86,9 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class OcelotlView extends ViewPart {
-
+public class OcelotlView extends ViewPart implements IFramesocBusListener {
+	
+	
 	private class ConfModificationListener implements ModifyListener {
 
 		@Override
@@ -509,6 +512,11 @@ public class OcelotlView extends ViewPart {
 	private TimeLineViewWrapper			timeLineViewWrapper;
 	private Button						btnSettings2;
 	private Button						btnReset;
+	
+	/**
+	 * Followed topics
+	 */
+	protected FramesocBusTopicList topics = null;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -520,6 +528,11 @@ public class OcelotlView extends ViewPart {
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
+		
+		//Register update to synchronize traces
+		topics = new FramesocBusTopicList(this);
+		topics.addTopic(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED);
+		topics.registerAll();
 	}
 
 	private void cleanAll() {
@@ -531,6 +544,12 @@ public class OcelotlView extends ViewPart {
 		btnGrowingQualities.setSelection(OcelotlDefaultParameterConstants.GrowingQualities);
 		spinnerTSNumber.setSelection(OcelotlDefaultParameterConstants.TimeSliceNumber);
 		textRun.setText(String.valueOf(OcelotlDefaultParameterConstants.RunParameter));
+	}
+	
+	@Override
+	public void dispose() {
+		topics.unregisterAll();
+		super.dispose();
 	}
 
 	private Action createGanttAction() {
@@ -705,21 +724,12 @@ public class OcelotlView extends ViewPart {
 		gd_composite_1.minimumHeight = 20;
 		gd_composite_1.widthHint = 285;
 		composite_1.setLayoutData(gd_composite_1);
-		composite_1.setLayout(new GridLayout(2, false));
+		composite_1.setLayout(new GridLayout(1, false));
 		comboTraces = new Combo(composite_1, SWT.READ_ONLY);
 		final GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_comboTraces.widthHint = 179;
 		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-
-		final Button buttonRefresh = new Button(composite_1, SWT.NONE);
-		buttonRefresh.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/load.png"));
-		buttonRefresh.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				refreshTraces();
-			}
-		});
 		comboTraces.addSelectionListener(new TraceAdapter());
 		int index = 0;
 		for (final Trace t : confDataLoader.getTraces()) {
@@ -1012,5 +1022,13 @@ public class OcelotlView extends ViewPart {
 	public void setTimeRegion(final TimeRegion time) {
 		textTimestampStart.setText(String.valueOf(time.getTimeStampStart()));
 		textTimestampEnd.setText(String.valueOf(time.getTimeStampEnd()));
+	}
+
+	//When receiving a notification, update the trace list
+	@Override
+	public void handle(String topic, Object data) {
+		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED)) {
+				refreshTraces();
+			}
 	}
 }

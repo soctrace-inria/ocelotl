@@ -167,16 +167,13 @@ public class ConfDataLoader {
 	 * @return true if the trace contains at least one event type 
 	 * belonging to the category  
 	 */
-	public boolean hasEventOfCategory(int aCategory)
-	{
-		for(EventType anEventType : getTypes())
-		{
-			if(anEventType.getCategory() == aCategory)
-			{
+	public boolean hasEventOfCategory(int aCategory) {
+		for (EventType anEventType : getTypes()) {
+			if (anEventType.getCategory() == aCategory) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
