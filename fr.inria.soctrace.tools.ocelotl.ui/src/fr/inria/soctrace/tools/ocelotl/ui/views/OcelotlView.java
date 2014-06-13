@@ -66,6 +66,7 @@ import fr.inria.soctrace.framesoc.ui.perspective.FramesocPartManager;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -441,7 +442,18 @@ public class OcelotlView extends ViewPart {
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
 								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName()))
+								{
+									if(op.equals("State Distribution"))
+									{
+										//Check if a trace has states 
+										//If it does not then don't propose it
+										if(!confDataLoader.hasEventOfCategory(EventCategory.STATE))
+											continue;
+									}
+									
 									comboTime.add(op);
+								}
+								
 								comboTime.setText("");
 								// btnRemoveEventProducer.notifyListeners(SWT.Selection,
 								// new Event());

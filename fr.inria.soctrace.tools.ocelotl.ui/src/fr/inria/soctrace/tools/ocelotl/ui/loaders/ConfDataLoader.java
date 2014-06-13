@@ -34,6 +34,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.ISearchable;
 import fr.inria.soctrace.lib.model.Trace;
+import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.query.AnalysisResultQuery;
 import fr.inria.soctrace.lib.query.EventProducerQuery;
@@ -157,6 +158,26 @@ public class ConfDataLoader {
 			}
 		});
 		return traces;
+	}
+	
+	/**
+	 * Check of the loaded trace has events of a specific category
+	 * @param must be one of the constant defining a category in {@link EventCategory}
+	 * (i.e. STATE, LINK, VARIABLE, PUNCTUAL_EVENT)
+	 * @return true if the trace contains at least one event type 
+	 * belonging to the category  
+	 */
+	public boolean hasEventOfCategory(int aCategory)
+	{
+		for(EventType anEventType : getTypes())
+		{
+			if(anEventType.getCategory() == aCategory)
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/** Debug print method */
