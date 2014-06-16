@@ -68,7 +68,6 @@ import fr.inria.soctrace.framesoc.ui.perspective.FramesocPartManager;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -524,6 +523,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		//Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED);
+		topics.addTopic(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED);
+		topics.addTopic(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED);
 		topics.registerAll();
 	}
 
@@ -1019,8 +1020,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	//When receiving a notification, update the trace list
 	@Override
 	public void handle(String topic, Object data) {
-		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED)) {
-				refreshTraces();
-			}
+		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED) || topic.equals(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED) || topic.equals(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED)) {
+			refreshTraces();
+		}
 	}
 }
