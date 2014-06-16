@@ -24,6 +24,8 @@ import java.util.List;
 
 public class TimeAggregationOperatorResource {
 
+	private static final String Split = ", ";
+
 	String operatorClass;
 
 	String name;
@@ -31,6 +33,7 @@ public class TimeAggregationOperatorResource {
 	boolean generic;
 	List<String> traceFormats = new ArrayList<String>();
 	List<String> spaceCompatibility = new ArrayList<String>();
+	List<String> eventCategory = new ArrayList<String>();
 	String paramWinClass;
 	String paramConfig;
 	String bundle;
@@ -43,7 +46,7 @@ public class TimeAggregationOperatorResource {
 			final String name, final boolean generic,
 			final List<String> traceFormats,
 			final List<String> spaceCompatibility, final String paramWinClass,
-			final String paramConfig, final String bundle) {
+			final String paramConfig, final List<String> eventCategory, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
@@ -52,6 +55,7 @@ public class TimeAggregationOperatorResource {
 		this.spaceCompatibility = spaceCompatibility;
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
+		this.eventCategory = eventCategory;
 		this.bundle = bundle;
 	}
 
@@ -132,9 +136,15 @@ public class TimeAggregationOperatorResource {
 	}
 
 	public void setSpaceCompatibility(final String spaceCompatibility) {
-		final String[] tmp = spaceCompatibility.split(", ");
-		for (final String s : tmp)
-			this.spaceCompatibility.add(s);
+		decompose(this.spaceCompatibility, spaceCompatibility);
+	}
+	
+	public void setEventCategory(final List<String> eventCategory) {
+		this.eventCategory = eventCategory;
+	}
+
+	public void setEventCategory(final String eventCategory) {
+		decompose(this.eventCategory, eventCategory);
 	}
 
 	public void setTraceFormats(final List<String> traceFormats) {
@@ -142,10 +152,20 @@ public class TimeAggregationOperatorResource {
 	}
 
 	public void setTraceFormats(final String traceFormats) {
-		final String[] tmp = traceFormats.split(", ");
-		for (final String s : tmp)
-			this.traceFormats.add(s);
+		decompose(this.traceFormats, traceFormats);
 
+	}
+	
+	private List<String> decompose(List<String> list, String string){
+		final String[] tmp = string.split(Split);
+		list.clear();
+		for (final String s : tmp)
+			list.add(s);
+		return list;
+	}
+
+	public List<String> getEventCategory() {
+		return eventCategory;
 	}
 
 }

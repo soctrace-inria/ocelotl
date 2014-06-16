@@ -62,6 +62,11 @@ public class ConfDataLoader {
 	private long					minTimestamp;
 	private long					maxTimestamp;
 	private List<AnalysisResult>	results;
+	public final static String 					STATE="STATE";
+	public final static String 					PUNCTUAL_EVENT="EVENT";
+	public final static String 					LINK="LINK";
+	public final static String 					VARIABLE="VARIABLE";
+	public final static String 					ALL="ALL";
 	
 	private static final Logger logger = LoggerFactory.getLogger(ConfDataLoader.class);
 
@@ -184,6 +189,21 @@ public class ConfDataLoader {
 		Printer.printIModelElementsList(types);
 		logger.debug("min ts: " + minTimestamp);
 		logger.debug("max ts: " + maxTimestamp);
+	}
+
+	public List<String> getCategories() {
+		ArrayList<String> category = new ArrayList<String>();
+		if (hasEventOfCategory(EventCategory.STATE))
+			category.add(STATE);
+		if (hasEventOfCategory(EventCategory.PUNCTUAL_EVENT))
+			category.add(PUNCTUAL_EVENT);
+		if (hasEventOfCategory(EventCategory.LINK))
+			category.add(LINK);
+		if (hasEventOfCategory(EventCategory.VARIABLE))
+			category.add(VARIABLE);
+		if (!category.isEmpty())
+			category.add(ALL);
+		return category;
 	}
 
 }

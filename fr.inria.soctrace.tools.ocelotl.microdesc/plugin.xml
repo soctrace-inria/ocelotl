@@ -7,6 +7,7 @@
          point="fr.inria.soctrace.tools.ocelotl.core.microscopicdescription">
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistribution"
+            event_category="ALL"
             generic="true"
             operator="Event Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
@@ -16,6 +17,7 @@
       </aggregation_operator>
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistribution"
+            event_category="STATE"
             generic="true"
             operator="State Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"

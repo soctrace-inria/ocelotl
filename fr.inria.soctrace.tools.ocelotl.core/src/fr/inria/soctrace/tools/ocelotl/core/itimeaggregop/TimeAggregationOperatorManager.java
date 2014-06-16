@@ -32,6 +32,7 @@ import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -53,6 +54,7 @@ public class TimeAggregationOperatorManager {
 	private static final String OP_SPATIAL_COMPATIBILITY = "spatial_compatibility"; //$NON-NLS-1$
 	private static final String OP_PARAM_CONFIG = "param_config"; //$NON-NLS-1$
 	private static final String OP_GENERIC = "generic"; //$NON-NLS-1$
+	private static final String OP_EVENT_CATEGORY = "event_category"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(TimeAggregationOperatorManager.class);
 	
@@ -76,7 +78,7 @@ public class TimeAggregationOperatorManager {
 		}
 	}
 
-	public List<String> getOperators(final String traceType) {
+	public List<String> getOperators(final String traceType, final List<String> category) {
 		logger.debug("Comparing Time Operator trace format with "
 				+ traceType);
 		final List<String> op = new ArrayList<String>();
@@ -84,10 +86,14 @@ public class TimeAggregationOperatorManager {
 			StringBuffer buff = new StringBuffer();
 			buff.append(r.getTraceFormats());
 			logger.debug(buff.toString());
-			if (r.isGeneric())
-				op.add(r.getName());
-			else if (r.getTraceFormats().contains(traceType))
-				op.add(r.getName());
+			if (r.isGeneric()||r.getTraceFormats().contains(traceType)){
+				for (String cat: category){
+				if(r.getEventCategory().contains(cat)){
+					op.add(r.getName());
+					break;
+				}
+				}
+			}
 		}
 		Collections.sort(op, new Comparator<String>() {
 
@@ -131,6 +137,7 @@ public class TimeAggregationOperatorManager {
 					.getAttribute(OP_SPATIAL_COMPATIBILITY));
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
+			resource.setEventCategory(e.getAttribute(OP_EVENT_CATEGORY));
 			resource.setBundle(e.getContributor().getName());
 			List.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "

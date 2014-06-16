@@ -444,16 +444,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName()))
+								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories()))
 								{
-									if(op.equals("State Distribution"))
-									{
-										//Check if a trace has states 
-										//If it does not then don't propose it
-										if(!confDataLoader.hasEventOfCategory(EventCategory.STATE))
-											continue;
-									}
-									
 									comboTime.add(op);
 								}
 								
