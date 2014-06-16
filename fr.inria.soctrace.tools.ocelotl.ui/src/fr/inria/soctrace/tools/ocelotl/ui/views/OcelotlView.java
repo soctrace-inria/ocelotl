@@ -912,10 +912,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		buttonUp.setText(">");
 		btnRun = new Button(group, SWT.NONE);
+		btnRun.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
-		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
 		btnRun.setText("RUN!");
-		btnRun.setBackground(SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY));
 		
 		btnRun.addSelectionListener(new GetAggregationAdapter());
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
