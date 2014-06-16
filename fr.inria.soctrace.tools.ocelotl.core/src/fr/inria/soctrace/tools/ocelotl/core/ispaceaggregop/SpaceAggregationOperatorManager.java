@@ -55,6 +55,7 @@ public class SpaceAggregationOperatorManager {
 																	//	private static final String							OP_PARAM_WIN				= "param_win";												//$NON-NLS-1$
 																	//	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
 	private static final String OP_TIME_COMPATIBILITY = "time_compatibility"; //$NON-NLS-1$
+	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(SpaceAggregationOperatorManager.class);
 	
@@ -105,9 +106,8 @@ public class SpaceAggregationOperatorManager {
 
 			@Override
 			public int compare(final String arg0, final String arg1) {
-				return arg0.compareTo(arg1);
+				return  List.get(arg0).getSelectionPriority() - List.get(arg1).getSelectionPriority();
 			}
-
 		});
 		return op;
 	}
@@ -144,6 +144,7 @@ public class SpaceAggregationOperatorManager {
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
+			resource.setSelectionPriority(Integer.parseInt(e.getAttribute(OP_SELECTION_PRIORITY)));
 			resource.setBundle(e.getContributor().getName());
 			// logger.debug(resource.getBundle());
 			List.put(resource.getName(), resource);

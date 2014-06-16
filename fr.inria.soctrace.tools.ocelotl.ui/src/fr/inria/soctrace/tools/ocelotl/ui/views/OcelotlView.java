@@ -761,19 +761,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				comboSpace.removeAll();
 				for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility())) {
 					comboSpace.add(op);
-
-					// It the operator "Proportion" is found, then set it as
-					// default
-					if (op.equals("Proportion")) {
-						comboSpace.setText(op);
-						// Set "proportion" as operator in Ocelotl
-						comboSpace.notifyListeners(SWT.Selection, new Event());
-					}
 				}
 
-				// If the default operator was not found
-				if (comboSpace.getText() == null)
-					comboSpace.setText("");
+				// Since the operator are sorted by priority, set the default
+				// choice to first item
+				if (comboSpace.getItems().length != 0) {
+					comboSpace.setText(comboSpace.getItem(0));
+					// Set the selected operator as operator in Ocelotl
+					comboSpace.notifyListeners(SWT.Selection, new Event());
+				}
+	
 				btnSettings.notifyListeners(SWT.Selection, new Event());
 
 			}

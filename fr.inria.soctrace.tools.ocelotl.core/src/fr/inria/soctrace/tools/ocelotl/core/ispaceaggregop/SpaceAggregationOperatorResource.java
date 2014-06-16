@@ -31,6 +31,7 @@ public class SpaceAggregationOperatorResource {
 	String paramConfig;
 	String visualization;
 	String bundle;
+	int selectionPriority;
 
 	public SpaceAggregationOperatorResource() {
 		// TODO Auto-generated constructor stub
@@ -39,7 +40,7 @@ public class SpaceAggregationOperatorResource {
 	public SpaceAggregationOperatorResource(final String operatorClass,
 			final String name, final List<String> timeCompatibility,
 			final String visualization, String paramWinClass,
-			String paramConfig, final String bundle) {
+			String paramConfig, final int selectionPriority, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
@@ -47,6 +48,7 @@ public class SpaceAggregationOperatorResource {
 		this.visualization = visualization;
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
+		this.selectionPriority = selectionPriority;
 		this.bundle = bundle;
 	}
 
@@ -108,4 +110,12 @@ public class SpaceAggregationOperatorResource {
 		this.paramWinClass = paramWinClass;
 	}
 
+	public int getSelectionPriority() {
+		return selectionPriority;
+	}
+
+	public void setSelectionPriority(int selectionPriority) {
+		this.selectionPriority = selectionPriority;
+	}
+	
 }
