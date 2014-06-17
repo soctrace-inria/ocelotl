@@ -39,7 +39,7 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class SpaceAggregationOperatorManager {
 
-	HashMap<String, SpaceAggregationOperatorResource> List;
+	HashMap<String, SpaceAggregationOperatorResource> operatorList;
 	ISpaceAggregationOperator selectedOperator;
 	String selectedOperatorName;
 	ISpaceConfig selectedConfig;
@@ -73,11 +73,11 @@ public class SpaceAggregationOperatorManager {
 	}
 
 	public void activateSelectedOperator() {
-		final Bundle mybundle = Platform.getBundle(List.get(
+		final Bundle mybundle = Platform.getBundle(operatorList.get(
 				selectedOperatorName).getBundle());
 		try {
 			selectedOperator = (ISpaceAggregationOperator) mybundle.loadClass(
-					List.get(selectedOperatorName).getOperatorClass())
+					operatorList.get(selectedOperatorName).getOperatorClass())
 					.newInstance();
 
 		} catch (InstantiationException | IllegalAccessException
@@ -92,7 +92,7 @@ public class SpaceAggregationOperatorManager {
 		logger.debug("Comparing Space Operator trace format with "
 				+ compatibility);
 		final List<String> op = new ArrayList<String>();
-		for (final SpaceAggregationOperatorResource r : List.values()) {
+		for (final SpaceAggregationOperatorResource r : operatorList.values()) {
 			StringBuffer buff = new StringBuffer();
 			buff.append(r.getTimeCompatibility());
 			logger.debug(buff.toString());
@@ -106,7 +106,16 @@ public class SpaceAggregationOperatorManager {
 
 			@Override
 			public int compare(final String arg0, final String arg1) {
-				return  List.get(arg0).getSelectionPriority() - List.get(arg1).getSelectionPriority();
+				int diff = operatorList.get(arg0).getSelectionPriority() - operatorList.get(arg1).getSelectionPriority();
+				
+				//If the two operators have the same priority
+				if (diff == 0)
+				{
+					//Sort them alphabetically
+					return arg0.compareTo(arg1);
+				}
+
+				return diff;
 			}
 		});
 		return op;
@@ -117,7 +126,7 @@ public class SpaceAggregationOperatorManager {
 	}
 
 	public SpaceAggregationOperatorResource getSelectedOperatorResource() {
-		return List.get(selectedOperatorName);
+		return operatorList.get(selectedOperatorName);
 	}
 
 	// private void init() throws SoCTraceException {
@@ -128,7 +137,7 @@ public class SpaceAggregationOperatorManager {
 	// }
 
 	private void init() throws SoCTraceException {
-		List = new HashMap<String, SpaceAggregationOperatorResource>();
+		operatorList = new HashMap<String, SpaceAggregationOperatorResource>();
 
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
@@ -147,7 +156,7 @@ public class SpaceAggregationOperatorManager {
 			resource.setSelectionPriority(Integer.parseInt(e.getAttribute(OP_SELECTION_PRIORITY)));
 			resource.setBundle(e.getContributor().getName());
 			// logger.debug(resource.getBundle());
-			List.put(resource.getName(), resource);
+			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
 					+ resource.getTimeCompatibility());
 		}
@@ -155,11 +164,11 @@ public class SpaceAggregationOperatorManager {
 
 	public void setSelectedOperator(final String name) {
 		selectedOperatorName = name;
-		final Bundle mybundle = Platform.getBundle(List.get(
+		final Bundle mybundle = Platform.getBundle(operatorList.get(
 				selectedOperatorName).getBundle());
 		try {
 			selectedConfig = (ISpaceConfig) mybundle.loadClass(
-					List.get(selectedOperatorName).getParamConfig())
+					operatorList.get(selectedOperatorName).getParamConfig())
 					.newInstance();
 			parameters.setSpaceConfig(selectedConfig);
 		} catch (InstantiationException | IllegalAccessException

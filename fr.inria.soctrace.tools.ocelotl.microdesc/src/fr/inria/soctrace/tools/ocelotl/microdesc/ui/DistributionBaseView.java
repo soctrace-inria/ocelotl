@@ -110,7 +110,26 @@ public abstract class DistributionBaseView extends Dialog implements
 			// hasChanged = HasChanged.ALL;
 		}
 	}
+	
+	private class RemoveEventProducerAdapter extends SelectionAdapter {
 
+		private final ListViewer viewer;
+
+		public RemoveEventProducerAdapter(final ListViewer viewer) {
+			this.viewer = viewer;
+		}
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			final IStructuredSelection selection = (IStructuredSelection) viewer
+					.getSelection();
+			final Object obj = selection.getFirstElement();
+			final Collection<?> c = (Collection<?>) viewer.getInput();
+			c.remove(obj);
+			viewer.refresh(false);
+		}
+	}
+	
 	private class AddResultsEventProducersAdapter extends SelectionAdapter {
 
 		@Override
@@ -403,7 +422,7 @@ public abstract class DistributionBaseView extends Dialog implements
 				11, SWT.NORMAL));
 		btnAddAllEventProducer
 				.addSelectionListener(new AddAllEventProducersAdapter());
-
+			
 		final Button btnAddResult = new Button(compositeEventProducerButtons,
 				SWT.NONE);
 		btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
@@ -414,16 +433,31 @@ public abstract class DistributionBaseView extends Dialog implements
 				SWT.NORMAL));
 		btnAddResult
 				.addSelectionListener(new AddResultsEventProducersAdapter());
-		Button btnRemoveEventProducer = new Button(
+		
+		final Button btnRemoveEventProducer = new Button(
 				compositeEventProducerButtons, SWT.NONE);
 		btnRemoveEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
 				true, false, 1, 1));
-		btnRemoveEventProducer.setText("Reset");
-		btnRemoveEventProducer.addSelectionListener(new ResetSelectionAdapter(
-				listViewerEventProducers));
+		btnRemoveEventProducer.setText("Remove");
 		btnRemoveEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
 				11, SWT.NORMAL));
 		btnRemoveEventProducer.setImage(null);
+		btnRemoveEventProducer.setImage(null);
+		btnRemoveEventProducer
+				.addSelectionListener(new RemoveEventProducerAdapter(
+						listViewerEventProducers));
+
+		
+		Button btnResetEventProducer = new Button(
+				compositeEventProducerButtons, SWT.NONE);
+		btnResetEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+				true, false, 1, 1));
+		btnResetEventProducer.setText("Remove All");
+		btnResetEventProducer.addSelectionListener(new ResetSelectionAdapter(
+				listViewerEventProducers));
+		btnResetEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
+				11, SWT.NORMAL));
+		btnResetEventProducer.setImage(null);
 		scrCompositeEventProducerButtons
 				.setContent(compositeEventProducerButtons);
 		scrCompositeEventProducerButtons
