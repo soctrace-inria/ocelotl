@@ -76,7 +76,6 @@ public class EventProducerHierarchy {
 					if (part != -1) {
 						aggregated = Aggregation.PARTIAL;
 					}
-
 				}
 			}
 		}

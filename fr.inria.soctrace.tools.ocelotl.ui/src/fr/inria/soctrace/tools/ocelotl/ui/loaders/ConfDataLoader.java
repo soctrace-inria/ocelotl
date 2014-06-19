@@ -166,7 +166,7 @@ public class ConfDataLoader {
 	}
 	
 	/**
-	 * Check of the loaded trace has events of a specific category
+	 * Check if the loaded trace has events of a specific category
 	 * @param must be one of the constant defining a category in {@link EventCategory}
 	 * (i.e. STATE, LINK, VARIABLE, PUNCTUAL_EVENT)
 	 * @return true if the trace contains at least one event type 

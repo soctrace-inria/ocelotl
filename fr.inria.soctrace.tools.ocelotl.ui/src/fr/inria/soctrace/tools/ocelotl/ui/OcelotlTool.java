@@ -52,7 +52,6 @@ public class OcelotlTool extends FramesocTool {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

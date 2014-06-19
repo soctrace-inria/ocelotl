@@ -63,75 +63,98 @@ public class OcelotlQueries {
 		return eplist;
 	}
 
+	/**
+	 * 
+	 * @return an EventIterator on all events of the category State produced by
+	 *         the event producers in eventProducers
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
 	public EventIterator getStateIterator() throws SoCTraceException,
 			OcelotlException {
-		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
-				.initialize();
-		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion()
-				.getTimeStampStart(), ocelotlParameters.getTimeRegion()
-				.getTimeStampEnd()));
-		final EventIterator it = traceSearch.getStateIterator(ocelotlParameters
-				.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(),
-				time, null);
-		// traceSearch.uninitialize();
-		return it;
+		return getStateIterator(null);
 	}
 
+	/**
+	 * 
+	 * @param eventProducers
+	 *            list of event producers from which to select all the state. A
+	 *            null value means all event producers.
+	 * @return an EventIterator on all events of the category State produced by
+	 *         the event producers in eventProducers
+	 * @return
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
 	public EventIterator getStateIterator(
 			final List<EventProducer> eventProducers) throws SoCTraceException,
 			OcelotlException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getStateIterator();
-		else {
-			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
-					.initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion()
-					.getTimeStampStart(), ocelotlParameters.getTimeRegion()
-					.getTimeStampEnd()));
-			final EventIterator it = traceSearch.getStateIterator(
-					ocelotlParameters.getTrace(), ocelotlParameters
-							.getTraceTypeConfig().getTypes(), time,
+
+		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
+				.initialize();
+		final List<IntervalDesc> time = setTimeInterval();
+
+		// If we do not filter event producers
+		if (eventProducers == null
+				|| eventProducers.size() == getAllEventProducers().size()) {
+			return traceSearch.getStateIterator(ocelotlParameters.getTrace(),
+					ocelotlParameters.getTraceTypeConfig().getTypes(), time,
+					null);
+		} else {
+			return traceSearch.getStateIterator(ocelotlParameters.getTrace(),
+					ocelotlParameters.getTraceTypeConfig().getTypes(), time,
 					eventProducers);
-			return it;
 		}
 	}
 
+	/**
+	 * 
+	 * @return an EventIterator on all events without filtering
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
 	public EventIterator getEventIterator() throws SoCTraceException,
 			OcelotlException {
+		return getEventIterator(null);
+	}
+
+	/**
+	 * 
+	 * @param eventProducers
+	 *            list of event producers from which to select all the events. A
+	 *            null value means all event producers.
+	 * @return an EventIterator on all events produced by the event producers in
+	 *         eventProducers
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
+	public EventIterator getEventIterator(
+			final List<EventProducer> eventProducers) throws SoCTraceException,
+			OcelotlException {
+
 		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
 				.initialize();
+		final List<IntervalDesc> time = setTimeInterval();
+
+		// If we do not filter event producers
+		if (eventProducers == null
+				|| eventProducers.size() == getAllEventProducers().size()) {
+			return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
+					ocelotlParameters.getTraceTypeConfig().getTypes(), time,
+					null);
+		} else {
+			return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
+					ocelotlParameters.getTraceTypeConfig().getTypes(), time,
+					eventProducers);
+		}
+	}
+	
+	public List<IntervalDesc> setTimeInterval() {
 		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
 		time.add(new IntervalDesc(ocelotlParameters.getTimeRegion()
 				.getTimeStampStart(), ocelotlParameters.getTimeRegion()
 				.getTimeStampEnd()));
-		final EventIterator it = traceSearch.getEventIterator(ocelotlParameters
-				.getTrace(), ocelotlParameters.getTraceTypeConfig().getTypes(),
-				time, null);
-		// traceSearch.uninitialize();
-		return it;
-	}
 
-	public EventIterator getEventIterator(
-			final List<EventProducer> eventProducers) throws SoCTraceException,
-			OcelotlException {
-		if (eventProducers.size() == getAllEventProducers().size())
-			return getEventIterator();
-		else {
-			traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
-					.initialize();
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(ocelotlParameters.getTimeRegion()
-					.getTimeStampStart(), ocelotlParameters.getTimeRegion()
-					.getTimeStampEnd()));
-			final EventIterator it = traceSearch.getEventIterator(
-					ocelotlParameters.getTrace(), ocelotlParameters
-							.getTraceTypeConfig().getTypes(), time,
-					eventProducers);
-			// traceSearch.uninitialize();
-			return it;
-		}
+		return time;
 	}
-
 }

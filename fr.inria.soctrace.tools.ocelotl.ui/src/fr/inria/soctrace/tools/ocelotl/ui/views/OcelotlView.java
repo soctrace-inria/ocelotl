@@ -764,15 +764,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				}
 
 				// Since the operator are sorted by priority, set the default
-				// choice to first item
+				// choice to the first item
 				if (comboSpace.getItems().length != 0) {
 					comboSpace.setText(comboSpace.getItem(0));
 					// Set the selected operator as operator in Ocelotl
 					comboSpace.notifyListeners(SWT.Selection, new Event());
 				}
-	
-				btnSettings.notifyListeners(SWT.Selection, new Event());
-
+				
+				setDefaultDescriptionSettings();
 			}
 		});
 		comboTime.setText("");
@@ -1020,5 +1019,21 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED) || topic.equals(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED) || topic.equals(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED)) {
 			refreshTraces();
 		}
+	}
+	
+	/**
+	 * Set the default microdescription settings
+	 */
+	public void setDefaultDescriptionSettings() {
+		hasChanged = HasChanged.ALL;
+		
+		//Init operator specific configuration
+		ocelotlParameters.getTraceTypeConfig().init(confDataLoader);
+
+		if (ocelotlParameters.getEventProducers().isEmpty())
+			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
+
+		ocelotlParameters.setMaxEventProducers(0);
+		ocelotlParameters.getTraceTypeConfig().getTypes().addAll(confDataLoader.getTypes());
 	}
 }

@@ -46,7 +46,6 @@ public class ConfigViewManager {
 		}
 		window.init(ocelotlView, ocelotlView.getCore().getOcelotlParameters().getTraceTypeConfig());
 		window.open();
-
 	}
 
 }
