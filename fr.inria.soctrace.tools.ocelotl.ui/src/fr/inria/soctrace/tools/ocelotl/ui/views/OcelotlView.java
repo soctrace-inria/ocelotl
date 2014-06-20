@@ -1026,14 +1026,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	 */
 	public void setDefaultDescriptionSettings() {
 		hasChanged = HasChanged.ALL;
-		
-		//Init operator specific configuration
+
+		// Init operator specific configuration
 		ocelotlParameters.getTraceTypeConfig().init(confDataLoader);
 
 		if (ocelotlParameters.getEventProducers().isEmpty())
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
 
-		ocelotlParameters.setMaxEventProducers(0);
-		ocelotlParameters.getTraceTypeConfig().getTypes().addAll(confDataLoader.getTypes());
+		ocelotlParameters.setMaxEventProducers(OcelotlDefaultParameterConstants.EventProducersPerQuery);
 	}
 }

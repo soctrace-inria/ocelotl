@@ -40,4 +40,9 @@ public class OcelotlDefaultParameterConstants {
 	 * Gain/Loss ratio
 	 */
 	public static final double RunParameter = 1.0;
+	
+	/**
+	 * Number of event producer per query (0 = all)
+	 */
+	public static final int EventProducersPerQuery = 0;
 }

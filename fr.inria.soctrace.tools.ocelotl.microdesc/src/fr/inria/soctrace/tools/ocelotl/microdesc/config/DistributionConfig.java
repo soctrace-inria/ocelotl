@@ -78,8 +78,8 @@ public class DistributionConfig implements ITraceTypeConfig {
 		ConfDataLoader aConfDataLoader = (ConfDataLoader) anObject;
 
 		if (getTypes().isEmpty())
-			setTypes(aConfDataLoader.getTypes());
-		
+			getTypes().addAll(aConfDataLoader.getTypes());
+
 		setThreadNumber(DefaultSettingsConstant.threadNumber);
 		setEventsPerThread(DefaultSettingsConstant.eventsPerThread);
 	}

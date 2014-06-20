@@ -50,6 +50,7 @@ public class PartFigure extends RectangleFigure {
 		return index;
 	}
 
+	//Draw the part visualization of the aggregates
 	public void init() {
 		removeAll();
 		final RoundedRectangle roundedRectangle = new RoundedRectangle();

@@ -44,13 +44,16 @@ public class MultiState {
 
 	private int index;
 	private static final int Border = StateProportionTimeLineView.Border;
+	//Minimal height for a rectangle to be displayed
 	private static final int MinHeight = 6;
+	//Minimal size of the icon to be displayed
 	private static final int IconMin = 6;
 	private static final int IconMax = 32;
 	private int space = 2;
 	private Proportion distribution;
 	private IFigure root;
 	private IconManager iconManager;
+	//Minimum value to consider a color too ligth
 	private static final int Light = 225;
 
 	public MultiState(final int index, final Proportion distribution,
@@ -75,18 +78,25 @@ public class MultiState {
 
 	}
 
+	
+	//Draw the proportion visualization of the aggregates
 	public void init() {
 		DecimalFormat valueFormat = new DecimalFormat("0.00E0");
 		double total = 0;
+		
+		//Height of the drawing area
 		final double y0 = root.getSize().height - Border;
 		final double y1 = 9.0 / 10.0 * root.getSize().height - Border;
+		//Width of the drawing area
 		final double x0 = root.getSize().width - 2 * Border;
 		final double d = distribution.getSliceNumber();
+		//Highest value among the aggregates
 		final double m = distribution.getMax();
 		double agg = 0;
 		final List<String> aggList = new ArrayList<String>();
 		final List<String> states = new ArrayList<String>();
 		states.addAll(distribution.getStates());
+		//Sort states alphabetically
 		Collections.sort(states, new Comparator<String>() {
 			@Override
 			public int compare(final String o1, final String o2) {
@@ -105,6 +115,7 @@ public class MultiState {
 						.getEventTypeColor(state).getSwtColor());
 				rect.setForegroundColor(ColorConstants.white);
 				rect.setLineWidth(0);
+				//If the color is too light add a border
 				if (isTooLight(rect.getBackgroundColor())) {
 					rect.setForegroundColor(ColorConstants.black);
 					rect.setLineWidth(1);
@@ -112,7 +123,9 @@ public class MultiState {
 				final Label label = new Label(" " + state + ": "
 						+ valueFormat.format(value) + " ");
 				rect.setToolTip(label);
+				//If the height of the state proportion is big enough
 				if (y1 * value / m - space > MinHeight) {
+					//Draw a rectangle
 					if (isTooLight(rect.getBackgroundColor()))
 						root.add(rect, new Rectangle(new Point(
 								(int) (distribution.getPart(index)
@@ -130,7 +143,7 @@ public class MultiState {
 										* x0 / d - space + Border), (int) (y0
 										+ space - y1 * (total + value) / m))));
 					total += value;
-				} else {
+				} else { // else aggregates it
 					agg += value;
 					aggList.add(state + ": " + valueFormat.format(value));
 				}
@@ -161,14 +174,16 @@ public class MultiState {
 			lineDash.setLineWidth(2);
 			lineDash.setLineStyle(SWT.LINE_DASH);
 			lineDash.setToolTip(label);
+			//If the aggregated state proportion is high enough
 			if (y1 * agg / m - space > MinHeight) {
+				//Display a rectangle
 				root.add(rectangle, new Rectangle(new Point((int) (distribution
 						.getPart(index).getStartPart() * x0 / d + Border),
 						(int) (y0 - y1 * total / m)), new Point(
 						(int) (distribution.getPart(index).getEndPart() * x0
 								/ d - space + Border), (int) (y0 + space - y1
 								* (total + agg) / m))));
-			} else {
+			} else { // else display as a dash line and an icon
 				int size = (int) Math.min(IconMax,
 						Math.min(x0 / d - 2 * space, (y0 - y1 * total / m)));
 				if (size > IconMin) {
