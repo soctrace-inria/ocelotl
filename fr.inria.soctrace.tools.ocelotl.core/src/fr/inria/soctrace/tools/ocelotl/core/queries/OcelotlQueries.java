@@ -72,7 +72,7 @@ public class OcelotlQueries {
 	 */
 	public EventIterator getStateIterator() throws SoCTraceException,
 			OcelotlException {
-		return getStateIterator(null);
+		return getStateIterator(getAllEventProducers());
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class OcelotlQueries {
 	 */
 	public EventIterator getEventIterator() throws SoCTraceException,
 			OcelotlException {
-		return getEventIterator(null);
+		return getEventIterator(getAllEventProducers());
 	}
 
 	/**
