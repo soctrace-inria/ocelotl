@@ -69,7 +69,7 @@ public class DistributionConfig implements ITraceTypeConfig {
 	 * 		Must be of type ConfDataLoader. Typed as Object to avoid circular dependency
 	 */
 	public void init(Object anObject) {
-		if (!anObject.getClass().getSimpleName().equals("ConfDataLoader")) {
+		if (! (anObject instanceof ConfDataLoader)) {
 			System.err
 					.println("Wrong class given in argument: expected an object of type ConfDataLoader");
 			return;

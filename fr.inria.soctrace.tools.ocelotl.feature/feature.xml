@@ -3,6 +3,7 @@
       id="fr.inria.soctrace.tools.ocelotl.feature"
       label="Ocelotl"
       version="0.1.2.qualifier"
+      plugin="fr.inria.soctrace.tools.ocelotl.core"
       os="linux,win32"
       arch="x86,x86_64">
 

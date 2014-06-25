@@ -99,12 +99,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp())
 					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
 			} catch (final NumberFormatException err) {
-				textTimestampEnd.setText("0");
+				textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
 			}
 			try {
 				if (Long.parseLong(textTimestampStart.getText()) < confDataLoader.getMinTimestamp() || Long.parseLong(textTimestampStart.getText()) > confDataLoader.getMaxTimestamp())
 					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 			} catch (final NumberFormatException err) {
+				textTimestampStart.setText("0");
+			}
+			
+			if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText()))
+			{
+				textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
 				textTimestampStart.setText("0");
 			}
 		}
@@ -131,26 +137,29 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
+			// If no trace is selected
 			if (confDataLoader.getCurrentTrace() == null)
 				return;
+			// If no microscopic distribution is selected
 			if (comboTime.getText().equals(""))
 				return;
+			// If no visualization is selected
 			if (comboSpace.getText().equals(""))
 				return;
 			
-			//Mutex zone
+			// Mutex zone
 			synchronized (lock) {
-				//If a job is already running
-				if (running == true)
-				{
-					//reset the displayed value to the actual value to avoid displaying a wrong value
+				// If a job is already running
+				if (running == true) {
+					// reset the displayed value to the actual value to avoid
+					// displaying a wrong value
 					textRun.setText(Double.toString(ocelotlParameters.getParameter()));
-			
-					//and discard the new job
+
+					// and discard the new job
 					return;
 				}
-				
-				//else we are starting a job
+
+				// else we are starting a job
 				running = true;
 			}
 			
@@ -878,13 +887,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		sashFormAdvancedParameters.setWeights(new int[] { 1 });
 		
 
-		final Composite compositeQualityView = new Composite(sashForm, SWT.NONE);
+		final Composite compositeQualityView = new Composite(sashForm, SWT.BORDER);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		qualityView.initDiagram(compositeQualityView);
 		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(sashForm, SWT.BORDER | SWT.H_SCROLL);
+		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(sashForm, SWT.H_SCROLL);
 		scrolledComposite_1.setExpandHorizontal(true);
 		scrolledComposite_1.setExpandVertical(true);
 
@@ -909,7 +918,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		buttonUp.setText(">");
 		btnRun = new Button(group, SWT.NONE);
-		btnRun.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		btnRun.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/1366759976_white_tiger.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
 		btnRun.setText("RUN!");

@@ -87,7 +87,7 @@ public class ConfDataLoader {
 	}
 
 	public long getMaxTimestamp() {
-		return maxTimestamp;
+		return Math.max(1, maxTimestamp);
 	}
 
 	public long getMinTimestamp() {
@@ -113,7 +113,6 @@ public class ConfDataLoader {
 				prodFromResult.add(ep);
 		return prodFromResult;
 		// TODO test with cast, please
-
 	}
 
 	public List<AnalysisResult> getResults() {

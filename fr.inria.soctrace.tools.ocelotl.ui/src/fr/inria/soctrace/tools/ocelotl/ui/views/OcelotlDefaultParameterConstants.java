@@ -19,7 +19,7 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Ending timestamp
 	 */
-	public static final long TimestampEnd = 0;
+	public static final long TimestampEnd = 1;
 	
 	/**
 	 * Should the quality be normalized ?
