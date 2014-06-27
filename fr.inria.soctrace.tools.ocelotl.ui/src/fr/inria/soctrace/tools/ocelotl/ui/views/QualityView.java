@@ -136,8 +136,8 @@ public class QualityView {
 				if (maxValue == 0.0 && minValue == 0.0) {
 					drawError();
 				} else {
-					drawXGrads();
 					drawYGrads();
+					drawXGrads();
 					drawXYLines();
 					drawQualities();
 					drawParam();

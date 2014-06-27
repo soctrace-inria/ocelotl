@@ -110,9 +110,15 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			
 			if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText()))
 			{
-				textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
-				textTimestampStart.setText("0");
+				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
+				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 			}
+			else
+			{
+				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+			}
+
 		}
 	}
 
@@ -137,16 +143,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			// If no trace is selected
-			if (confDataLoader.getCurrentTrace() == null)
+			// Check that inputs are valid
+			try {
+				checkInputs();
+			} catch (OcelotlException exception) {
+				MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
 				return;
-			// If no microscopic distribution is selected
-			if (comboTime.getText().equals(""))
-				return;
-			// If no visualization is selected
-			if (comboSpace.getText().equals(""))
-				return;
-			
+			}
+					
 			// Mutex zone
 			synchronized (lock) {
 				// If a job is already running
@@ -847,7 +851,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
 		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnNormalize.setSelection(false);
+		btnNormalize.setSelection(true);
 		btnNormalize.setText("Normalize Qualities");
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 		new Label(groupQualityCurveSettings, SWT.NONE);
@@ -1044,4 +1048,68 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		ocelotlParameters.setMaxEventProducers(OcelotlDefaultParameterConstants.EventProducersPerQuery);
 	}
+	
+	/**
+	 *  Check that inputs are valid
+	 * @throws OcelotlException
+	 */
+	public void checkInputs() throws OcelotlException {
+		checkTrace();
+		checkMicroscopicDescription();
+		checkVisualization();
+		checkTimeStamp();
+	}
+
+	/**
+	 * Check that a trace was selected
+	 * 
+	 * @return true if everything fine, false otherwise
+	 * @throws OcelotlException 
+	 */
+	public void checkTrace() throws OcelotlException {
+		// If no trace is selected
+		if (confDataLoader.getCurrentTrace() == null)
+			throw new OcelotlException(OcelotlException.NOTRACE);
+	}
+
+	/**
+	 * Check that a microscopic description was selected
+	 * 
+	 * @return true if everything fine, false otherwise
+	 * @throws OcelotlException 
+	 */
+	public void checkMicroscopicDescription() throws OcelotlException {
+		// If no microscopic distribution is selected
+		if (comboTime.getText().equals(""))
+			throw new OcelotlException(OcelotlException.NOMICROSCOPICDESCRIPTION);
+	}
+
+	/**
+	 * Check that visualization was selected
+	 * 
+	 * @return true if everything fine, false otherwise
+	 * @throws OcelotlException 
+	 */
+	public void checkVisualization() throws OcelotlException {
+		// If no visualization is selected
+		if (comboSpace.getText().equals(""))
+			throw new OcelotlException(OcelotlException.NOVISUALIZATION);
+	}
+
+	/**
+	 * Check that the timestamps are valid
+	 * 
+	 * @return true if everything fine, false otherwise
+	 * @throws OcelotlException
+	 */
+	public void checkTimeStamp() throws OcelotlException {
+		// If the starting timestamp is greater than the ending one
+		if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText())) {
+			// Reset to default values
+			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
+			textTimestampStart.setText("0");
+			throw new OcelotlException(OcelotlException.INVALIDTIMERANGE);
+		}
+	}
+	
 }
