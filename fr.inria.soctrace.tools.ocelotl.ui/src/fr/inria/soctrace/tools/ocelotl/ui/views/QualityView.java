@@ -232,15 +232,15 @@ public class QualityView {
 		}
 		final PolylineConnection lineEnd = new PolylineConnection();
 		lineEnd.setEndpoints(new Point((int) (xGradNumber * width + XBorder), root.getSize().height() - YBorder), new Point(new Point((int) (xGradNumber * width + XBorder), Border)));
-		lineEnd.setBackgroundColor(ColorConstants.lightGray);
-		lineEnd.setForegroundColor(ColorConstants.lightGray);
+		lineEnd.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		lineEnd.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		lineEnd.setLineWidth(1);
 		root.add(lineEnd);
 		for (int i = 0; i < xGradNumber + 1; i++) {
 			final PolylineConnection line = new PolylineConnection();
 			line.setEndpoints(new Point((int) (i * width + XBorder), root.getSize().height() - YBorder), new Point(new Point((int) (i * width + XBorder), Border)));
-			line.setBackgroundColor(ColorConstants.lightGray);
-			line.setForegroundColor(ColorConstants.lightGray);
+			line.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+			line.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			line.setLineWidth(1);
 			root.add(line);
 			final RectangleFigure rectangleText = new RectangleFigure();
@@ -249,7 +249,7 @@ public class QualityView {
 			final float value = (float) ((10 - (i * XGradNumber / xGradNumber)) * 0.1);
 			final Label label = new Label("" + value);
 			label.setLabelAlignment(SWT.CENTER);
-			label.setForegroundColor(ColorConstants.darkGray);
+			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			rectangleText.setLineWidth(1);
 			rectangleText.add(label);
@@ -263,8 +263,8 @@ public class QualityView {
 					if (((i * width + XBorder) + (int) (j * width / MiniDivide)) < xGradNumber * width + XBorder) {
 						final PolylineConnection lineDash = new PolylineConnection();
 						lineDash.setEndpoints(new Point((int) (i * width + XBorder) + (int) (j * width / MiniDivide), root.getSize().height() - YBorder), new Point(new Point((int) (i * width + XBorder) + (int) (j * width / MiniDivide), Border)));
-						lineDash.setBackgroundColor(ColorConstants.lightGray);
-						lineDash.setForegroundColor(ColorConstants.lightGray);
+						lineDash.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+						lineDash.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 						lineDash.setLineWidth(1);
 						lineDash.setLineStyle(SWT.LINE_DASH);
 						root.add(lineDash);
@@ -277,11 +277,11 @@ public class QualityView {
 		final RectangleFigure rectangleX = new RectangleFigure();
 		final RectangleFigure rectangleY = new RectangleFigure();
 		root.add(rectangleX, new Rectangle(new Point(XBorder, root.getSize().height() - YBorder + AxisWidth), new Point(root.getSize().width() - Border, root.getSize().height() - YBorder)));
-		rectangleX.setBackgroundColor(ColorConstants.darkGray);
-		rectangleX.setForegroundColor(ColorConstants.darkGray);
+		rectangleX.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		rectangleX.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		root.add(rectangleY, new Rectangle(new Point(XBorder - AxisWidth, Border), new Point(XBorder, root.getSize().height() - YBorder)));
-		rectangleY.setBackgroundColor(ColorConstants.darkGray);
-		rectangleY.setForegroundColor(ColorConstants.darkGray);
+		rectangleY.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		rectangleY.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		rectangleX.setLineWidth(1);
 		rectangleY.setLineWidth(1);
 	}
@@ -295,28 +295,28 @@ public class QualityView {
 		final double height = root.getSize().height - YBorder;
 		final PolylineConnection lineEnd = new PolylineConnection();
 		lineEnd.setEndpoints(new Point(XBorder, (int) (height - yGradNumber * yGradWidth)), new Point((int) (width + XBorder), (int) (height - yGradNumber * yGradWidth)));
-		lineEnd.setBackgroundColor(ColorConstants.lightGray);
-		lineEnd.setForegroundColor(ColorConstants.lightGray);
+		lineEnd.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		lineEnd.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		lineEnd.setLineWidth(1);
 		root.add(lineEnd);
 		for (int i = 0; i < (int) yGradNumber + 1; i++) {
 			final PolylineConnection line = new PolylineConnection();
 			line.setEndpoints(new Point(XBorder, (int) (height - i * yGradWidth)), new Point((int) (width + XBorder), (int) (height - i * yGradWidth)));
-			line.setBackgroundColor(ColorConstants.lightGray);
-			line.setForegroundColor(ColorConstants.lightGray);
+			line.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+			line.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			line.setLineWidth(1);
 			root.add(line);
 			final RectangleFigure rectangleText = new RectangleFigure();
 			root.add(rectangleText, new Rectangle(new Point(XBorder - TextWidth - TextOffset, (int) (height - i * yGradWidth) + TextHeight / 3), new Point(new Point(XBorder - TextOffset, (int) (height - i * yGradWidth - TextHeight / 1.5)))));
-			rectangleText.setBackgroundColor(ColorConstants.white);
-			rectangleText.setForegroundColor(ColorConstants.white);
+			rectangleText.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+			rectangleText.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			final double value = i == yGradNumber ? maxValue - minValue : (double) ((long) (i * qualityWidth * 10) / 10.0);
 			String text = formatter.format(value);
 			if (value < 1000)
 				text = String.valueOf(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
-			label.setForegroundColor(ColorConstants.darkGray);
+			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			rectangleText.setLineWidth(1);
 			rectangleText.add(label);
