@@ -10,7 +10,7 @@
       <view
             category="fr.inria.soctrace.tools.ocelotl.ui.category"
             class="fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView"
-            icon="icons/1366759976_white_tiger.png"
+            icon="icons/ocelotl16.png"
             id="fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"
             name="Ocelotl"
             restorable="true">
