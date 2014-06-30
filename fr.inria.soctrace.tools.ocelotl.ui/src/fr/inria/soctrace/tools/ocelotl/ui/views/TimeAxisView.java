@@ -129,8 +129,8 @@ public class TimeAxisView {
 		for (int i = 0; i < (int) GradNumber + 1; i++) {
 			final RectangleFigure rectangle = new RectangleFigure();
 			root.add(rectangle, new Rectangle(new Point((int) (i * GradWidth) + Border, linePosition), new Point(new Point((int) (i * GradWidth) + Border + TimeAxisWidth, linePosition - GradHeight))));
-			rectangle.setBackgroundColor(ColorConstants.darkGray);
-			rectangle.setForegroundColor(ColorConstants.darkGray);
+			rectangle.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+			rectangle.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			rectangle.setLineWidth(1);
 			final RectangleFigure rectangleText = new RectangleFigure();
 			if (i != (int) GradNumber)
@@ -143,7 +143,7 @@ public class TimeAxisView {
 			final String text = formatter.format(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
-			label.setForegroundColor(ColorConstants.darkGray);
+			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			rectangleText.setLineWidth(1);
 			rectangleText.add(label);
@@ -156,8 +156,8 @@ public class TimeAxisView {
 					break;
 				root.add(rectangle2, new Rectangle(new Point((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide), linePosition), new Point(new Point((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide), linePosition
 						- MiniGradHeight))));
-				rectangle2.setBackgroundColor(ColorConstants.gray);
-				rectangle2.setForegroundColor(ColorConstants.gray);
+				rectangle2.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+				rectangle2.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 				rectangle2.setLineWidth(1);
 			}
 		}
@@ -167,8 +167,8 @@ public class TimeAxisView {
 		final int linePosition = root.getSize().height() - TextHeight / 2 - TextPositionOffset - Border;
 		final RectangleFigure rectangle = new RectangleFigure();
 		root.add(rectangle, new Rectangle(new Point(Border, linePosition + TimeAxisWidth), new Point(root.getSize().width() - Border, linePosition)));
-		rectangle.setBackgroundColor(ColorConstants.darkGray);
-		rectangle.setForegroundColor(ColorConstants.darkGray);
+		rectangle.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		rectangle.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		rectangle.setLineWidth(1);
 	}
 

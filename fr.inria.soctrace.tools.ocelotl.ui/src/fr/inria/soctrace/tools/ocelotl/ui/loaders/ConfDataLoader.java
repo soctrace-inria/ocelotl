@@ -106,9 +106,9 @@ public class ConfDataLoader {
 		final List<ISearchable> search = data.getElements();
 		final List<Integer> id = new ArrayList<Integer>();
 		final List<EventProducer> prodFromResult = new ArrayList<EventProducer>();
-		for (final ISearchable s : search)
+		for (final ISearchable s: search)
 			id.add(s.getId());
-		for (final EventProducer ep : producers)
+		for (final EventProducer ep: producers)
 			if (id.contains(ep.getId()))
 				prodFromResult.add(ep);
 		return prodFromResult;
@@ -155,6 +155,8 @@ public class ConfDataLoader {
 		final TraceQuery tQuery = new TraceQuery(sysDB);
 		traces = tQuery.getList();
 		sysDB.close();
+		
+		//Sort alphabetically
 		Collections.sort(traces, new Comparator<Trace>() {
 			@Override
 			public int compare(final Trace arg0, final Trace arg1) {

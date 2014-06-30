@@ -10,8 +10,11 @@ public class OcelotlException extends Exception {
 	public static final String NOEPS = "Error: No event producers selected";
 	public static final String NOETS = "Error: No event types selected";
 	public static final String NOEVENTS = "Error: No events found";
-	public static final String JNI = "Error: problem with native library";
-
+	public static final String JNI =  "Error: problem with native library";
+	public static final String NOTRACE = "Error: No trace selected";
+	public static final String NOMICROSCOPICDESCRIPTION = "Error: No microscopic description selected";
+	public static final String NOVISUALIZATION = "Error: No visualitazion selected";
+	public static final String INVALIDTIMERANGE = "Error: The starting timestamp is greater than the ending timestamp";
 
 	public OcelotlException() {
 		super();

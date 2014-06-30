@@ -24,7 +24,7 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Should the quality be normalized ?
 	 */
-	public static final boolean Normalize = false;
+	public static final boolean Normalize = true;
 	
 	/**
 	 * Should the curves show increasing quality ?
@@ -35,6 +35,17 @@ public class OcelotlDefaultParameterConstants {
 	 * Number of time slices
 	 */
 	public static final int TimeSliceNumber = 100;
+	
+	/**
+	 * Minimal Number of timeslices
+	 */
+	public static final int minTimeslice = 2;
+	
+	/**
+	 * Minimal Number of timeslices
+	 */
+	public static final int maxTimeslice = 10000;
+	
 	
 	/**
 	 * Gain/Loss ratio
