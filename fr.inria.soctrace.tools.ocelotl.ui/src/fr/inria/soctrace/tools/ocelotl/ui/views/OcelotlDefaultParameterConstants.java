@@ -37,6 +37,17 @@ public class OcelotlDefaultParameterConstants {
 	public static final int TimeSliceNumber = 100;
 	
 	/**
+	 * Minimal Number of timeslices
+	 */
+	public static final int minTimeslice = 2;
+	
+	/**
+	 * Minimal Number of timeslices
+	 */
+	public static final int maxTimeslice = 10000;
+	
+	
+	/**
 	 * Gain/Loss ratio
 	 */
 	public static final double RunParameter = 1.0;

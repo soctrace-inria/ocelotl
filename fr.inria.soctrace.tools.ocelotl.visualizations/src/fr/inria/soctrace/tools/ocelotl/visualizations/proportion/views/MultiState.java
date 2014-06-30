@@ -163,7 +163,7 @@ public class MultiState {
 
 			String aggString = " ";
 			for (int i = 0; i < aggList.size() - 1; i++)
-				aggString = aggString + aggList.get(i) + "; ";
+				aggString = aggString + aggList.get(i) + " \n ";
 			aggString = aggString + aggList.get(aggList.size() - 1) + " ";
 			final Label label = new Label(aggString);
 			icon.setToolTip(label);

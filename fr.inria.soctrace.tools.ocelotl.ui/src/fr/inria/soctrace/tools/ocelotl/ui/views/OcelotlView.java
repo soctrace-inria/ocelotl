@@ -110,11 +110,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			
 			if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText()))
 			{
+				// Set font colors to red
 				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 			}
 			else
 			{
+				// Set font colors to normal color
 				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			}
@@ -147,6 +149,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			try {
 				checkInputs();
 			} catch (OcelotlException exception) {
+				// If inputs are wrong, display the reason
 				MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
 				return;
 			}
@@ -187,6 +190,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							ocelotlCore.computeDichotomy(hasChanged);
 						} catch (final SoCTraceException e) {
 							e.printStackTrace();
+							synchronized (lock) {
+								running = false;
+							}
 							return Status.CANCEL_STATUS;
 						} catch (final OcelotlException e) {
 							monitor.done();
@@ -604,13 +610,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			public void handleEvent(final Event e) {
 				switch (e.keyCode) {
 				case SWT.ARROW_LEFT:
-					//Make sure we are not in an editable field
-					if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					// Make sure we are not in an editable field
+					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 						buttonDown.notifyListeners(SWT.Selection, new Event());
 					break;
 				case SWT.ARROW_RIGHT:
-					//Make sure we are not in an editable field
-					if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					// Make sure we are not in an editable field
+					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 						buttonUp.notifyListeners(SWT.Selection, new Event());
 					break;
 				case SWT.KEYPAD_CR:
@@ -621,7 +627,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					btnReset.notifyListeners(SWT.Selection, new Event());
 					break;
 				}
-
 			}
 		});
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -697,8 +702,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		gd_spinnerTSNumber.widthHint = 100;
 		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
 		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		spinnerTSNumber.setMaximum(10000);
-		spinnerTSNumber.setMinimum(1);
+		spinnerTSNumber.setMaximum(OcelotlDefaultParameterConstants.maxTimeslice);
+		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
 		textTimestampEnd.addModifyListener(new ConfModificationListener());
@@ -776,7 +781,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					comboSpace.add(op);
 				}
 
-				// Since the operator are sorted by priority, set the default
+				// Since the operators are sorted by priority, set the default
 				// choice to the first item
 				if (comboSpace.getItems().length != 0) {
 					comboSpace.setText(comboSpace.getItem(0));
@@ -1050,8 +1055,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	}
 	
 	/**
-	 *  Check that inputs are valid
-	 * @throws OcelotlException
+	 * Check that inputs are valid
+	 * 
+	 * @throws OcelotlException if one input is not valid
 	 */
 	public void checkInputs() throws OcelotlException {
 		checkTrace();
@@ -1063,8 +1069,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	/**
 	 * Check that a trace was selected
 	 * 
-	 * @return true if everything fine, false otherwise
-	 * @throws OcelotlException 
+	 * @throws OcelotlException if no trace was selected
 	 */
 	public void checkTrace() throws OcelotlException {
 		// If no trace is selected
@@ -1075,8 +1080,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	/**
 	 * Check that a microscopic description was selected
 	 * 
-	 * @return true if everything fine, false otherwise
-	 * @throws OcelotlException 
+	 * @throws OcelotlException if no description was selected
 	 */
 	public void checkMicroscopicDescription() throws OcelotlException {
 		// If no microscopic distribution is selected
@@ -1087,8 +1091,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	/**
 	 * Check that visualization was selected
 	 * 
-	 * @return true if everything fine, false otherwise
-	 * @throws OcelotlException 
+	 * @throws OcelotlException if no visualization was selected
 	 */
 	public void checkVisualization() throws OcelotlException {
 		// If no visualization is selected
@@ -1099,8 +1102,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	/**
 	 * Check that the timestamps are valid
 	 * 
-	 * @return true if everything fine, false otherwise
-	 * @throws OcelotlException
+	 * @throws OcelotlException if timestamps are not valid
 	 */
 	public void checkTimeStamp() throws OcelotlException {
 		// If the starting timestamp is greater than the ending one

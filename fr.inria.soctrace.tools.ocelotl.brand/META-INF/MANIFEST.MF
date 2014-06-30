@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ocelotl
+Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.brand
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: INRIA

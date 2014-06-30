@@ -21,6 +21,16 @@ package fr.inria.soctrace.tools.ocelotl.core.constants;
 
 public class OcelotlConstants {
 
+	/**
+	 * States of the state machine
+	 * ALL: 
+	 * TS: number of time slices has changed
+	 * NORMALIZE: quality curve normalization has changed 
+	 * PARAMETER: parameter has changed
+	 * EQ: 
+	 * NOTHING: nothing has changed
+	 *
+	 */
 	static public enum HasChanged {
 		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
 	}

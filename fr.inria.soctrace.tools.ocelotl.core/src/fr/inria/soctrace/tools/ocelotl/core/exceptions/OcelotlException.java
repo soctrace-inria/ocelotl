@@ -14,7 +14,7 @@ public class OcelotlException extends Exception {
 	public static final String NOTRACE = "Error: No trace selected";
 	public static final String NOMICROSCOPICDESCRIPTION = "Error: No microscopic description selected";
 	public static final String NOVISUALIZATION = "Error: No visualitazion selected";
-	public static final String INVALIDTIMERANGE = "Error: The final timestamp is smaller than the starting timestamp";
+	public static final String INVALIDTIMERANGE = "Error: The starting timestamp is greater than the ending timestamp";
 
 	public OcelotlException() {
 		super();
