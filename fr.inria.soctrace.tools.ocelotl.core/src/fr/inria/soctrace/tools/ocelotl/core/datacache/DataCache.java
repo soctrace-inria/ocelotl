@@ -14,6 +14,11 @@ public class DataCache {
 	private static final Logger logger = LoggerFactory.getLogger(DataCache.class);
 
 	protected HashMap<OcelotlParameters, String> cachedData;
+	protected int timeSliceMultiple = 1;
+
+	public int getTimeSliceMultiple() {
+		return timeSliceMultiple;
+	}
 
 	public DataCache() {
 		super();
@@ -48,16 +53,17 @@ public class DataCache {
 	 */
 	protected boolean similarParameters(OcelotlParameters op1,
 			OcelotlParameters op2) {
-		// Are timestamps equals
+		// Are timestamps equals ?
 		if (!op1.getTimeRegion().compareTimeRegion(op2.getTimeRegion()))
 			return false;
 
 		// Is the number of slices of cached data divisible by the tested number
-		// of slices
-		// (op1.getTimeSlicesNumber() <= op2.getTimeSlicesNumber() &&
+		// of slices ?
 		if (!(op2.getTimeSlicesNumber() % op1.getTimeSlicesNumber() == 0))
 			return false;
 
+		timeSliceMultiple = op2.getTimeSlicesNumber() / op1.getTimeSlicesNumber();
+				
 		return true;
 	}
 

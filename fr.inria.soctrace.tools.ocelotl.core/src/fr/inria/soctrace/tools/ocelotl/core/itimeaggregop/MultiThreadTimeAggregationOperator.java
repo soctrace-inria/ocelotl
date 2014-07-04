@@ -31,7 +31,6 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
@@ -62,9 +61,23 @@ public abstract class MultiThreadTimeAggregationOperator {
 			final List<EventProducer> eventProducers) throws SoCTraceException,
 			InterruptedException, OcelotlException;
 	
+	/**
+	 * Convert the matrix values in one String in CSV format
+	 * 
+	 * @return the String containing the matrix values
+	 */
 	public abstract String matrixToCSV();
 
-	public abstract void rebuildMatrix(String[] values);
+	/**
+	 * Fill the matrix with value from the cache file
+	 * 
+	 * @param values
+	 *            Array of String containing a value of the matrix
+	 * @param sliceMultiple
+	 *            used to compute the current slice number if the number of time
+	 *            slices is a divisor of the of the cached data
+	 */
+	public abstract void rebuildMatrix(String[] values, int sliceMultiple);
 
 	public synchronized int getCount() {
 		count++;
@@ -109,7 +122,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// save the newly computed matrix + parameters
 			dm.start();
 			saveMatrix();
-			dm.end("Save matrix to cache");
+			dm.end("Save the matrix to cache");
 		}
 
 		if (eventsNumber == 0)
@@ -176,22 +189,23 @@ public abstract class MultiThreadTimeAggregationOperator {
 	/**
 	 * Load matrix value from a cache file
 	 * 
-	 * @param aFilepath path to the cache file
+	 * @param aFilepath
+	 *            path to the cache file
 	 */
 	public void loadFromCache(String aFilepath) {
 		try {
 			dm = new DeltaManagerOcelotl();
-			dm.start()
+			dm.start();
 			BufferedReader bufFileReader = new BufferedReader(new FileReader(
 					aFilepath));
-;
+
 			String header, line;
 			header = bufFileReader.readLine();
 			// read data
 			while ((line = bufFileReader.readLine()) != null) {
 				String[] values = line.split(CSVDelimiter);
 				// fill matrix
-				rebuildMatrix(values);
+				rebuildMatrix(values, dataCache.getTimeSliceMultiple());
 			}
 
 			bufFileReader.close();

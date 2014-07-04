@@ -115,18 +115,32 @@ public abstract class _3DMatrixMicroDescription extends
 		return stringBuf.toString();
 	}
 
-	public void rebuildMatrix(String[] values) {
+	@Override
+	public void rebuildMatrix(String[] values, int sliceMultiple) {
 		int slice = Integer.parseInt(values[0]);
 		int epID = Integer.parseInt(values[1]);
 		String evType = values[2];
 		long value = Long.parseLong(values[3]);
-		final List<EventProducer> producers = getOcelotlParameters().getEventProducers();
-		for (EventProducer ep: producers)
-		{
-			if(ep.getId() == epID)
+		final List<EventProducer> producers = getOcelotlParameters()
+				.getEventProducers();
+
+		// Look for the right producer
+		for (EventProducer ep : producers) {
+
+			if (ep.getId() == epID) {
+				// If the number of time slice is a multiple of the cached time
+				// slice number
+				if (sliceMultiple > 1) {
+					// Compute the correct slice number
+					slice = slice / sliceMultiple;
+
+					// And add the value to the one already in the matrix
+					if (matrix.get(slice).get(ep).get(evType) != null)
+						value = matrix.get(slice).get(ep).get(evType) + value;
+				}
+
 				matrix.get(slice).get(ep).put(evType, value);
+			}
 		}
 	}
-		
-
 }
