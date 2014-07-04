@@ -19,30 +19,17 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregation2Manager;
-import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class _2DSpaceTimeMicroDescription extends
-		MultiThreadTimeAggregationOperator implements
-		I2DSpaceTimeMicroDescription {
+		_3DMatrixMicroDescription implements I2DSpaceTimeMicroDescription {
 
-	protected List<HashMap<EventProducer, HashMap<String, Long>>> matrix;
-	
-	private static final Logger logger = LoggerFactory.getLogger(_2DSpaceTimeMicroDescription.class);
-	
 	public _2DSpaceTimeMicroDescription() {
 		super();
 	}
@@ -59,91 +46,13 @@ public abstract class _2DSpaceTimeMicroDescription extends
 	}
 
 	@Override
-	public void computeMatrix() throws SoCTraceException, OcelotlException,
-			InterruptedException {
-		eventsNumber = 0;
-		final DeltaManager dm = new DeltaManagerOcelotl();
-		dm.start();
-		final int epsize = getOcelotlParameters().getEventProducers().size();
-		if (getOcelotlParameters().getMaxEventProducers() == 0
-				|| epsize < getOcelotlParameters().getMaxEventProducers())
-			computeSubMatrix(getOcelotlParameters().getEventProducers());
-
-		else {
-			final List<EventProducer> producers = getOcelotlParameters()
-					.getEventProducers().size() == 0 ? ocelotlQueries
-					.getAllEventProducers() : getOcelotlParameters()
-					.getEventProducers();
-			for (int i = 0; i < epsize; i = i
-					+ getOcelotlParameters().getMaxEventProducers())
-				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i
-						+ getOcelotlParameters().getMaxEventProducers())));
-
-		}
-
-		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize
-				+ " Event Producers, " + eventsNumber + " Events");
-	}
-
-	@Override
 	public SpaceTimeAggregation2Manager createManager() {
 		return new SpaceTimeAggregation2Manager(this);
 
-	}
-
-	@Override
-	public List<HashMap<EventProducer, HashMap<String, Long>>> getMatrix() {
-		return matrix;
-	}
-
-	@Override
-	public int getVectorSize() {
-		return matrix.get(0).size();
-	}
-
-	@Override
-	public int getVectorNumber() {
-		return matrix.size();
-	}
-
-	@Override
-	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Long>>>();
-		final List<EventProducer> producers = getOcelotlParameters()
-				.getEventProducers();
-		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
-			matrix.add(new HashMap<EventProducer, HashMap<String, Long>>());
-
-			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep, new HashMap<String, Long>());
-		}
 	}
 
 	public void matrixPushType(final int incr, final EventProducer ep,
 			final String key, final Map<Long, Long> distrib) {
 		matrix.get(incr).get(ep).put(key, 0L);
 	}
-
-	public void matrixWrite(final long it, final EventProducer ep,
-			final String key, final Map<Long, Long> distrib) {
-		matrix.get((int) it)
-				.get(ep)
-				.put(key,
-						matrix.get((int) it).get(ep).get(key) + distrib.get(it));
-	}
-
-	@Override
-	public void print() {
-		logger.debug("");
-		logger.debug("Distribution Vectors");
-		int i = 0;
-		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
-			logger.debug("");
-			logger.debug("slice " + i++);
-			logger.debug("");
-			for (final EventProducer ep : it.keySet())
-				logger.debug(ep.getName() + " = " + it.get(ep));
-		}
-	}
-
 }

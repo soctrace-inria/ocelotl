@@ -52,7 +52,25 @@ public class OcelotlParameters {
 	public OcelotlParameters() {
 		super();
 	}
-
+	
+	public OcelotlParameters(OcelotlParameters op) {
+		super();
+		this.eventProducers = op.eventProducers;
+		this.timeSlicesNumber = op.timeSlicesNumber;
+		this.timeRegion = op.timeRegion;
+		this.parameter = op.parameter;
+		this.normalize = op.normalize;
+		this.threshold = op.threshold;
+		this.trace = op.trace;
+		this.maxEventProducers = op.maxEventProducers;
+		this.timeAggOperator = op.timeAggOperator;
+		this.spaceAggOperator = op.spaceAggOperator;
+		this.growingQualities = op.growingQualities;
+		this.iTraceTypeConfig = op.iTraceTypeConfig;
+		this.iSpaceConfig = op.iSpaceConfig;
+	}
+	
+	
 	public List<EventProducer> getEventProducers() {
 		return eventProducers;
 	}

@@ -147,7 +147,6 @@ public class OcelotlCore {
 	public void setSpaceOperator() {
 		spaceOperators.activateSelectedOperator();
 		spaceOperator = spaceOperators.getSelectedOperator();
-
 	}
 
 	public void setTimeOperator() throws OcelotlException {

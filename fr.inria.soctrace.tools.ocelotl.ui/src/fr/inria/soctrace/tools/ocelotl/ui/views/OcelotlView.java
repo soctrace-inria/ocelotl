@@ -93,34 +93,33 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		@Override
 		public void modifyText(final ModifyEvent e) {
 			hasChanged = HasChanged.ALL;
-			if (confDataLoader.getCurrentTrace() == null)
+			if (confDataLoader.getCurrentTrace() == null || textTimestampStart.getText().isEmpty() || textTimestampEnd.getText().isEmpty())
 				return;
-			try {
-				if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp())
-					textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-			} catch (final NumberFormatException err) {
-				textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
-			}
-			try {
-				if (Long.parseLong(textTimestampStart.getText()) < confDataLoader.getMinTimestamp() || Long.parseLong(textTimestampStart.getText()) > confDataLoader.getMaxTimestamp())
-					textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
-			} catch (final NumberFormatException err) {
-				textTimestampStart.setText("0");
-			}
-			
-			if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText()))
-			{
-				// Set font colors to red
-				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
-				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
-			}
-			else
-			{
-				// Set font colors to normal color
-				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+
+			boolean invalidStart = false, invalidEnd = false;
+
+			if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText())) {
+				invalidStart = true;
+				invalidEnd = true;
 			}
 
+			if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp())
+				invalidEnd = true;
+			
+			if (Long.parseLong(textTimestampStart.getText()) < confDataLoader.getMinTimestamp() || Long.parseLong(textTimestampStart.getText()) > confDataLoader.getMaxTimestamp())
+				invalidStart = true;
+			
+			if (invalidStart)
+				// Set font color to red
+				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
+			else
+				// Set font color to normal color
+				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+
+			if (invalidEnd)
+				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
+			else
+				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		}
 	}
 
@@ -1102,15 +1101,28 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	/**
 	 * Check that the timestamps are valid
 	 * 
-	 * @throws OcelotlException if timestamps are not valid
+	 * @throws OcelotlException
+	 *             if at least one of the timestamps is not valid
 	 */
 	public void checkTimeStamp() throws OcelotlException {
 		// If the starting timestamp is greater than the ending one
+		if (confDataLoader.getCurrentTrace() == null || textTimestampStart.getText().isEmpty() || textTimestampEnd.getText().isEmpty())
+			throw new OcelotlException(OcelotlException.NOTIMESTAMP);
+
 		if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText())) {
 			// Reset to default values
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
 			textTimestampStart.setText("0");
 			throw new OcelotlException(OcelotlException.INVALIDTIMERANGE);
+		}
+		if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp()) {
+			textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
+			throw new OcelotlException(OcelotlException.INVALID_END_TIMESTAMP);
+		}
+
+		if (Long.parseLong(textTimestampStart.getText()) < confDataLoader.getMinTimestamp() || Long.parseLong(textTimestampStart.getText()) > confDataLoader.getMaxTimestamp()) {
+			textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
+			throw new OcelotlException(OcelotlException.INVALID_START_TIMESTAMP);
 		}
 	}
 	

@@ -1,22 +1,3 @@
-/* =====================================================================
- * Ocelotl Visualization Tool
- * =====================================================================
- * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
- * overview by using aggregation techniques
- *
- * (C) Copyright 2013 INRIA
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Damien Dosimont <damien.dosimont@imag.fr>
- *     Generoso Pagano <generoso.pagano@inria.fr>
- */
-
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import java.util.ArrayList;
@@ -31,38 +12,26 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
-public abstract class _2DMicroDescription extends
-		MultiThreadTimeAggregationOperator implements I2DMicroDescription {
+public abstract class _3DMatrixMicroDescription extends
+		MultiThreadTimeAggregationOperator {
 
-	protected List<HashMap<EventProducer, Long>> matrix;
-	
-	private static final Logger logger = LoggerFactory.getLogger(_2DMicroDescription.class);
+	protected List<HashMap<EventProducer, HashMap<String, Long>>> matrix;
 
-	public _2DMicroDescription() throws SoCTraceException {
+	private static final Logger logger = LoggerFactory
+			.getLogger(_3DMicroDescription.class);
+
+	public _3DMatrixMicroDescription() {
 		super();
-	}
-
-	public _2DMicroDescription(final OcelotlParameters parameters)
-			throws SoCTraceException, OcelotlException {
-		super();
-		try {
-			setOcelotlParameters(parameters);
-		} catch (final InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override
 	public void computeMatrix() throws SoCTraceException, OcelotlException,
 			InterruptedException {
 		eventsNumber = 0;
-		final DeltaManager dmt = new DeltaManagerOcelotl();
-		dmt.start();
+		final DeltaManager dm = new DeltaManagerOcelotl();
+		dm.start();
 		final int epsize = getOcelotlParameters().getEventProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0
 				|| epsize < getOcelotlParameters().getMaxEventProducers())
@@ -79,58 +48,48 @@ public abstract class _2DMicroDescription extends
 
 		}
 
-		dmt.end("TOTAL (QUERIES + COMPUTATION) : " + epsize
+		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize
 				+ " Event Producers, " + eventsNumber + " Events");
 	}
 
-	@Override
-	public TimeAggregation2Manager createManager() {
-		return new TimeAggregation2Manager(this);
-
-	}
-
-	@Override
-	public List<HashMap<EventProducer, Long>> getMatrix() {
+	public List<HashMap<EventProducer, HashMap<String, Long>>> getMatrix() {
 		return matrix;
 	}
 
-	@Override
 	public int getVectorSize() {
 		return matrix.get(0).size();
 	}
 
-	@Override
 	public int getVectorNumber() {
 		return matrix.size();
 	}
 
 	@Override
 	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<EventProducer, Long>>();
+		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Long>>>();
 		final List<EventProducer> producers = getOcelotlParameters()
 				.getEventProducers();
 		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
-			matrix.add(new HashMap<EventProducer, Long>());
+			matrix.add(new HashMap<EventProducer, HashMap<String, Long>>());
 
 			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep, 0L);
+				matrix.get((int) i).put(ep, new HashMap<String, Long>());
 		}
 	}
 
 	public void matrixWrite(final long it, final EventProducer ep,
-			final Map<Long, Long> distrib) {
-		synchronized (matrix) {
-			matrix.get((int) it).put(ep,
-					matrix.get((int) it).get(ep) + distrib.get(it));
-		}
+			final String key, final Map<Long, Long> distrib) {
+		matrix.get((int) it)
+				.get(ep)
+				.put(key,
+						matrix.get((int) it).get(ep).get(key) + distrib.get(it));
 	}
 
-	@Override
 	public void print() {
 		logger.debug("");
 		logger.debug("Distribution Vectors");
 		int i = 0;
-		for (final HashMap<EventProducer, Long> it : matrix) {
+		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
 			logger.debug("");
 			logger.debug("slice " + i++);
 			logger.debug("");
@@ -143,26 +102,31 @@ public abstract class _2DMicroDescription extends
 	public String matrixToCSV() {
 		StringBuffer stringBuf = new StringBuffer();
 		int slice = 0;
-		for (final HashMap<EventProducer, Long> it : matrix) {
+		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
 			for (final EventProducer ep : it.keySet()) {
-				stringBuf.append(slice + CSVDelimiter + ep.getId()
-						+ CSVDelimiter + it.get(ep) + "\n");
+				for (String value : it.get(ep).keySet()) {
+					stringBuf.append(slice + CSVDelimiter + ep.getId()
+							+ CSVDelimiter + value + CSVDelimiter
+							+ it.get(ep).get(value) + "\n");
+				}
 			}
 			slice++;
 		}
 		return stringBuf.toString();
 	}
-	
+
 	public void rebuildMatrix(String[] values) {
 		int slice = Integer.parseInt(values[0]);
 		int epID = Integer.parseInt(values[1]);
-		long value = Long.parseLong(values[2]);
+		String evType = values[2];
+		long value = Long.parseLong(values[3]);
 		final List<EventProducer> producers = getOcelotlParameters().getEventProducers();
 		for (EventProducer ep: producers)
 		{
 			if(ep.getId() == epID)
-				matrix.get(slice).put(ep, value);
+				matrix.get(slice).get(ep).put(evType, value);
 		}
 	}
+		
 
 }

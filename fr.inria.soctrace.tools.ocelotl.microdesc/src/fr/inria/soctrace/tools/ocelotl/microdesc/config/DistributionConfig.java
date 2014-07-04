@@ -29,7 +29,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 public class DistributionConfig implements ITraceTypeConfig {
 
 	private List<EventType> types = new LinkedList<EventType>();
-	private int eventsPerThread = 10000;
+	private int eventsPerThread = DefaultSettingsConstant.eventsPerThread;
 	private int threadNumber = 8;
 
 	public DistributionConfig() {

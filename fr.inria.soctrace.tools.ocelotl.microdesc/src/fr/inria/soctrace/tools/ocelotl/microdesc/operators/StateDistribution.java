@@ -34,7 +34,6 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.state.IState;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
@@ -135,19 +134,6 @@ public class StateDistribution extends _3DMicroDescription {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void setOcelotlParameters(final OcelotlParameters parameters)
-			throws SoCTraceException, InterruptedException, OcelotlException {
-		this.parameters = parameters;
-		ocelotlQueries = new OcelotlQueries(parameters);
-		count = 0;
-		epit = 0;
-		timeSliceManager = new TimeSliceManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
-		initVectors();
-		computeMatrix();
 	}
 
 }
