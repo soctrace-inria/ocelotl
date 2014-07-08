@@ -281,6 +281,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 			if (hasChanged != HasChanged.ALL)
 				hasChanged = HasChanged.NORMALIZE;
+			if(confDataLoader.getCurrentTrace() == null || comboSpace.getText().equals("") || comboTime.getText().equals(""))
+				return;
+			
 			btnRun.notifyListeners(SWT.Selection, new Event());
 		}
 	}
@@ -1051,6 +1054,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
 
 		ocelotlParameters.setMaxEventProducers(OcelotlDefaultParameterConstants.EventProducersPerQuery);
+		
+		if (ocelotlParameters.getTypes().isEmpty())
+			ocelotlParameters.getTypes().addAll(confDataLoader.getTypes());
 	}
 	
 	/**
@@ -1112,7 +1118,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText())) {
 			// Reset to default values
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
-			textTimestampStart.setText("0");
+			textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 			throw new OcelotlException(OcelotlException.INVALIDTIMERANGE);
 		}
 		if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp()) {

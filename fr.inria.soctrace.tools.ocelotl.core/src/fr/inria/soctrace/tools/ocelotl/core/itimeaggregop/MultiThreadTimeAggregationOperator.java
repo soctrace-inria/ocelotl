@@ -26,10 +26,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+
+import org.eclipse.core.resources.ResourcesPlugin;
 
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -53,6 +59,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected OcelotlParameters parameters;
 	protected OcelotlQueries ocelotlQueries;
 	protected DataCache dataCache = new DataCache();
+	protected ArrayList<String> typeNames = new ArrayList<String>();
 	
 	abstract protected void computeMatrix() throws SoCTraceException,
 			InterruptedException, OcelotlException;
@@ -67,17 +74,27 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * @return the String containing the matrix values
 	 */
 	public abstract String matrixToCSV();
+	
+
+	/**
+	 * Initialize the matrix with zero values
+	 * 
+	 * @param eventProducers
+	 *            List of event of the currently selected event producers
+	 */
+	public abstract void initMatrixToZero(
+			Collection<EventProducer> eventProducers);
 
 	/**
 	 * Fill the matrix with value from the cache file
 	 * 
 	 * @param values
-	 *            Array of String containing a value of the matrix
+	 *            Array of String containing the value and the indexes of the matrix
 	 * @param sliceMultiple
 	 *            used to compute the current slice number if the number of time
-	 *            slices is a divisor of the of the cached data
+	 *            slices is a divisor of the number of slices of the cached data
 	 */
-	public abstract void rebuildMatrix(String[] values, int sliceMultiple);
+	public abstract void rebuildMatrix(String[] values, EventProducer ep, int sliceMultiple);
 
 	public synchronized int getCount() {
 		count++;
@@ -123,10 +140,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 			dm.start();
 			saveMatrix();
 			dm.end("Save the matrix to cache");
-		}
+	
 
 		if (eventsNumber == 0)
 			throw new OcelotlException(OcelotlException.NOEVENTS);
+		}
 	}
 
 	public void total(final int rows) {
@@ -145,23 +163,25 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 		return events;
 	}
-	
+
 	/**
-	 * Save the matrix data to a cache file
+	 * Save the matrix data to a cache file. Save only the value that are
+	 * different from 0
 	 */
 	public void saveMatrix()
 	{
-		// Get workspace path
-		String workspaceDirectory = System.getProperty("java.io.tmpdir");
-		String filePath = workspaceDirectory +"/"+ System.currentTimeMillis();
-
+		String filePath = dataCache.getCacheDirectory() + "/" + parameters.getTrace().getAlias() + "_" + System.currentTimeMillis();
+		//System.out.println(filePath);
 		// Write to file,  
 		try {
 			PrintWriter writer = new PrintWriter(filePath, "UTF-8");
 
 			// write header (parameters)
-			// starTimestamp; endTimestamp; timeSliceNumber; parameter; threshold; matrixData
-			String header = parameters.getTimeRegion().getTimeStampStart()
+			// traceName; timeAggOp; spaceAggOp starTimestamp; endTimestamp; timeSliceNumber; parameter; threshold
+			String header = parameters.getTrace().getAlias() + CSVDelimiter + 
+					parameters.getTimeAggOperator() + CSVDelimiter + 
+					parameters.getSpaceAggOperator() + CSVDelimiter +
+					parameters.getTimeRegion().getTimeStampStart()
 					+ CSVDelimiter
 					+ parameters.getTimeRegion().getTimeStampEnd()
 					+ CSVDelimiter + parameters.getTimeSlicesNumber()
@@ -196,18 +216,38 @@ public abstract class MultiThreadTimeAggregationOperator {
 		try {
 			dm = new DeltaManagerOcelotl();
 			dm.start();
+
 			BufferedReader bufFileReader = new BufferedReader(new FileReader(
 					aFilepath));
 
-			String header, line;
-			header = bufFileReader.readLine();
-			// read data
-			while ((line = bufFileReader.readLine()) != null) {
-				String[] values = line.split(CSVDelimiter);
-				// fill matrix
-				rebuildMatrix(values, dataCache.getTimeSliceMultiple());
+			HashMap<String, EventProducer> eventProducers = new HashMap<String, EventProducer>();
+			for (EventProducer ep : parameters.getEventProducers()) {
+				eventProducers.put(String.valueOf(ep.getId()), ep);
 			}
 
+			typeNames.clear();
+			for (EventType evt : parameters.getTraceTypeConfig().getTypes()) {
+				typeNames.add(evt.getName());
+			}
+
+			//Fill the matrix with zeroes
+			initMatrixToZero(eventProducers.values());
+			
+			String line;
+			// Get header
+			line = bufFileReader.readLine();
+
+			// Read data
+			while ((line = bufFileReader.readLine()) != null) {
+				String[] values = line.split(CSVDelimiter);
+
+				// If the event producer is not filtered out
+				if (eventProducers.containsKey(values[1])) {
+					// Fill matrix
+					rebuildMatrix(values, eventProducers.get(values[1]),
+							dataCache.getTimeSliceMultiple());
+				}
+			}
 			bufFileReader.close();
 			dm.end("Load matrix from cache");
 

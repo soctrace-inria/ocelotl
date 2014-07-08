@@ -20,9 +20,11 @@
 package fr.inria.soctrace.tools.ocelotl.core.parameters;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
@@ -34,6 +36,7 @@ public class OcelotlParameters {
 	private static boolean forceJava = false;
 
 	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
+	private List<EventType> eventTypes = new LinkedList<EventType>();
 	private int timeSlicesNumber = 1;
 	private TimeRegion timeRegion;
 	private double parameter = 0;
@@ -56,6 +59,7 @@ public class OcelotlParameters {
 	public OcelotlParameters(OcelotlParameters op) {
 		super();
 		this.eventProducers = op.eventProducers;
+		this.eventTypes = op.eventTypes;
 		this.timeSlicesNumber = op.timeSlicesNumber;
 		this.timeRegion = op.timeRegion;
 		this.parameter = op.parameter;
@@ -83,6 +87,14 @@ public class OcelotlParameters {
 		return parameter;
 	}
 
+	public List<EventType> getTypes() {
+		return eventTypes;
+	}
+
+	public void setTypes(final List<EventType> types) {
+		this.eventTypes = types;
+	}
+	
 	public String getSpaceAggOperator() {
 		return spaceAggOperator;
 	}

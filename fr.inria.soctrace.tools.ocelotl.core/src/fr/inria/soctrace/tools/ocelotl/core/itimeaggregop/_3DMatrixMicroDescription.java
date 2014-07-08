@@ -1,10 +1,10 @@
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public abstract class _3DMatrixMicroDescription extends
 	protected List<HashMap<EventProducer, HashMap<String, Long>>> matrix;
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(_3DMicroDescription.class);
+			.getLogger(_3DMatrixMicroDescription.class);
 
 	public _3DMatrixMicroDescription() {
 		super();
@@ -104,10 +104,11 @@ public abstract class _3DMatrixMicroDescription extends
 		int slice = 0;
 		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
 			for (final EventProducer ep : it.keySet()) {
-				for (String value : it.get(ep).keySet()) {
+				for (String evtType : it.get(ep).keySet()) {
+					if(it.get(ep).get(evtType) != 0)
 					stringBuf.append(slice + CSVDelimiter + ep.getId()
-							+ CSVDelimiter + value + CSVDelimiter
-							+ it.get(ep).get(value) + "\n");
+							+ CSVDelimiter + evtType + CSVDelimiter
+							+ it.get(ep).get(evtType) + "\n");
 				}
 			}
 			slice++;
@@ -116,31 +117,41 @@ public abstract class _3DMatrixMicroDescription extends
 	}
 
 	@Override
-	public void rebuildMatrix(String[] values, int sliceMultiple) {
-		int slice = Integer.parseInt(values[0]);
-		int epID = Integer.parseInt(values[1]);
+	public void rebuildMatrix(String[] values, EventProducer ep,
+			int sliceMultiple) {
+
 		String evType = values[2];
+		
+		// If the event type is filtered out
+		if (!typeNames.contains(evType))
+			return;
+
+		int slice = Integer.parseInt(values[0]);
 		long value = Long.parseLong(values[3]);
-		final List<EventProducer> producers = getOcelotlParameters()
-				.getEventProducers();
 
-		// Look for the right producer
-		for (EventProducer ep : producers) {
+		// If the number of time slice is a multiple of the cached time
+		// slice number
+		if (sliceMultiple > 1) {
+			// Compute the correct slice number
+			slice = slice / sliceMultiple;
 
-			if (ep.getId() == epID) {
-				// If the number of time slice is a multiple of the cached time
-				// slice number
-				if (sliceMultiple > 1) {
-					// Compute the correct slice number
-					slice = slice / sliceMultiple;
+			// And add the value to the one already in the matrix
+			if (matrix.get(slice).get(ep).get(evType) != null)
+				value = matrix.get(slice).get(ep).get(evType) + value;
+		}
 
-					// And add the value to the one already in the matrix
-					if (matrix.get(slice).get(ep).get(evType) != null)
-						value = matrix.get(slice).get(ep).get(evType) + value;
+		matrix.get(slice).get(ep).put(evType, value);
+	}
+	
+	@Override
+	public void initMatrixToZero(Collection<EventProducer> eventProducers) {
+		for (int slice = 0; slice < timeSliceManager.getSlicesNumber(); slice++) {
+			for (EventProducer ep : eventProducers) {
+				for (String evType : typeNames) {
+					matrix.get(slice).get(ep).put(evType, 0L);
 				}
-
-				matrix.get(slice).get(ep).put(evType, value);
 			}
 		}
 	}
+	
 }

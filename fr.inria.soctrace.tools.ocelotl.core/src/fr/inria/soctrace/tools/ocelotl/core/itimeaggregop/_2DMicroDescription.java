@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,29 +155,30 @@ public abstract class _2DMicroDescription extends
 	}
 	
 	@Override
-	public void rebuildMatrix(String[] values, int sliceMultiple) {
+	public void rebuildMatrix(String[] values, EventProducer ep,
+			int sliceMultiple) {
 		int slice = Integer.parseInt(values[0]);
-		int epID = Integer.parseInt(values[1]);
 		long value = Long.parseLong(values[2]);
-		final List<EventProducer> producers = getOcelotlParameters()
-				.getEventProducers();
-		
-		for (EventProducer ep : producers) {
-			
-			if (ep.getId() == epID) {
-				// If the number of time slice is a multiple of the cached time
-				// slice number
-				if (sliceMultiple > 1) {
-					// Compute the correct slice number
-					slice = slice / sliceMultiple;
 
-					// And add the value to the one already in the matrix
-					if (matrix.get(slice).get(ep) != null)
-						value = matrix.get(slice).get(ep) + value;
-				}
-				matrix.get(slice).put(ep, value);
+		// If the number of time slice is a multiple of the cached time
+		// slice number
+		if (sliceMultiple > 1) {
+			// Compute the correct slice number
+			slice = slice / sliceMultiple;
+
+			// And add the value to the one already in the matrix
+			if (matrix.get(slice).get(ep) != null)
+				value = matrix.get(slice).get(ep) + value;
+		}
+		matrix.get(slice).put(ep, value);
+	}
+	
+	@Override
+	public void initMatrixToZero(Collection<EventProducer> eventProducers) {
+		for (int slice = 0; slice < timeSliceManager.getSlicesNumber(); slice++) {
+			for (EventProducer ep : eventProducers) {
+				matrix.get(slice).put(ep, 0L);
 			}
-
 		}
 	}
 

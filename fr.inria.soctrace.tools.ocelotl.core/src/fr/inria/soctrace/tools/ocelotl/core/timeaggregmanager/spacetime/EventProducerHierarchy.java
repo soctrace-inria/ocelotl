@@ -47,6 +47,9 @@ public class EventProducerHierarchy {
 		private int index;
 
 		public EventProducerNode(EventProducer ep) {
+			if(ep == null)
+				throw new NullPointerException();
+			
 			me = ep;
 			id = me.getId();
 			orphans.put(id, this);
