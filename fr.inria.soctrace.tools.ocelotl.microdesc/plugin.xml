@@ -28,6 +28,7 @@
       <!--
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionSpaceTime"
+            event_category="ALL"
             generic="true"
             operator="Hierarchical State Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"

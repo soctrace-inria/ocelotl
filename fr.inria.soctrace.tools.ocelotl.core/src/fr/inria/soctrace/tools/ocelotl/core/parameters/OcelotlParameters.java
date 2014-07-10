@@ -32,7 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlParameters {
 
-	// Modify to desactivate JNI
+	// Modify to deactivate JNI
 	private static boolean forceJava = false;
 
 	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
@@ -48,7 +48,7 @@ public class OcelotlParameters {
 	private String spaceAggOperator;
 	private boolean growingQualities = true;
 
-	private static boolean jniFlag = false;
+	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
 	private ISpaceConfig iSpaceConfig;
 

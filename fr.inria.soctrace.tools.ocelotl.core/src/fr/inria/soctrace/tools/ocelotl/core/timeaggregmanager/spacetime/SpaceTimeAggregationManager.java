@@ -55,7 +55,6 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 		parameters = timeAggregation.getParameters();
 		qualities = timeAggregation.getQualityList();
 		dm.end("LPAGGREG - PARAMETERS LIST");
-
 	}
 
 	@Override
@@ -136,12 +135,17 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 
 	@Override
 	public void printParts() {
-		// logger.debug(");
-		// logger.debug("Parts :");
-		//StringBuffer buff = new StringBuffer();
-		// for (final int i : parts)
-		//	buff.append(i + " ");
-		//logger.debug(buff.toString());
+		logger.debug("");
+		logger.debug("Parts :");
+		StringBuffer buff = new StringBuffer();
+		for (int id : hierarchy.getEventProducers().keySet()) {
+			buff.append(id + ": ");
+			for (final int i : timeAggregation.getParts(id)) {
+				buff.append(i + " ");
+			}
+			buff.append("\n");
+		}
+		logger.debug(buff.toString());
 	}
 
 	@Override

@@ -6,7 +6,7 @@
 	</appender>
 
 	<!-- Ocelotl -->
-	<logger name="fr.inria.soctrace.tools.ocelotl" level="info">
+	<logger name="fr.inria.soctrace.tools.ocelotl" level="off">
 		<appender-ref ref="OCELOTL"/>
 	</logger>	
 </configuration>

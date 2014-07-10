@@ -38,6 +38,17 @@ public class DataCache {
 		super();
 		cachedData = new HashMap<CacheParameters, String>();
 		cacheDirectory = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString() + "/ocelotlCache";
+		
+		//Check the existence of the cache directory
+		File dir = new File(cacheDirectory);
+		if(!dir.exists())
+		{
+			logger.debug("Cache directory (" + cacheDirectory + ") does not exist and will be created now");
+			
+			// Create the directory
+			dir.mkdirs();
+		}
+		
 		readCachedData();
 	}
 
@@ -124,7 +135,7 @@ public class DataCache {
 	}
 	
 	/**
-	 * Load from the given cache directory the existing cache files
+	 * Load the existing cache files from the given cache directory 
 	 */
 	private void readCachedData() {
 		File workDir = new File(cacheDirectory);

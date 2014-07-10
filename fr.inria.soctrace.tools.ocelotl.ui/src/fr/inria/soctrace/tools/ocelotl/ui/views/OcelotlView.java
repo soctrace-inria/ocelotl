@@ -105,9 +105,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 			if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp())
 				invalidEnd = true;
-			
+
 			if (Long.parseLong(textTimestampStart.getText()) < confDataLoader.getMinTimestamp() || Long.parseLong(textTimestampStart.getText()) > confDataLoader.getMaxTimestamp())
 				invalidStart = true;
+
 			
 			if (invalidStart)
 				// Set font color to red
@@ -184,7 +185,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-					if (hasChanged != HasChanged.PARAMETER)
+					if (hasChanged != HasChanged.PARAMETER) {
 						try {
 							ocelotlCore.computeDichotomy(hasChanged);
 						} catch (final SoCTraceException e) {
@@ -208,6 +209,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 							return Status.CANCEL_STATUS;
 						}
+					}
 
 					hasChanged = HasChanged.PARAMETER;
 					try {

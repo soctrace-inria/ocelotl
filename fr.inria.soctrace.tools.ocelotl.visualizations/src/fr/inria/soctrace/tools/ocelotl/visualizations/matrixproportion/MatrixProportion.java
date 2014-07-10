@@ -57,34 +57,43 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 	
 	@SuppressWarnings("unchecked")
 	private void computeProportions(EventProducerNode node) {
-		proportions.put(node, new ArrayList<HashMap<String,Double>>());
-		for (int i=0; i<node.getParts().size(); i++){
+		proportions.put(node, new ArrayList<HashMap<String, Double>>());
+		for (int i = 0; i < node.getParts().size(); i++) {
 			proportions.get(node).add(new HashMap<String, Double>());
-			for (String state:getStates())
-				proportions.get(node).get(i).put(state, 0.0);		
+			for (String state : getStates())
+				proportions.get(node).get(i).put(state, 0.0);
 		}
-		if (node.getChildrenNodes().isEmpty()){
-			for (int i=0; i<node.getParts().size(); i++){
-				for (String state:getStates())
-					proportions.get(node).get(i).put(state, 
-							((List<HashMap<String, Long>>)node.getValues()).get(i).get(state).doubleValue()
-							/(Long.valueOf(timeSliceDuration).doubleValue()));			
+		if (node.getChildrenNodes().isEmpty()) {
+			for (int i = 0; i < node.getParts().size(); i++) {
+				for (String state : getStates())
+					proportions
+							.get(node)
+							.get(i)
+							.put(state,
+									((List<HashMap<String, Long>>) node
+											.getValues()).get(i).get(state)
+											.doubleValue()
+											/ (Long.valueOf(timeSliceDuration)
+													.doubleValue()));
 			}
-		}
-		else{
-			for (EventProducerNode child:node.getChildrenNodes()){
+		} else {
+			for (EventProducerNode child : node.getChildrenNodes()) {
 				computeProportions(child);
-				for (int i=0; i<node.getParts().size(); i++){
-					for (String state:getStates())
-						proportions.get(node).get(i).put(state, 
-						proportions.get(node).get(i).get(state)+proportions.get(child).get(i).get(state)
-						/(node.getChildrenNodes().size()));	
+				for (int i = 0; i < node.getParts().size(); i++) {
+					for (String state : getStates())
+						proportions
+								.get(node)
+								.get(i)
+								.put(state,
+										proportions.get(node).get(i).get(state)
+												+ proportions.get(child).get(i)
+														.get(state)
+												/ (node.getChildrenNodes()
+														.size()));
 				}
 			}
-				
+
 		}
-			
-		
 	}
 
 	public MajState getMajState(EventProducerNode epn, int start, int end){

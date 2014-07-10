@@ -7,7 +7,7 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MatrixPro
 public class ProportionMatrixView extends MatrixView {
 
 	private MatrixProportion proportion;
-	
+
 	public ProportionMatrixView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
 	}
@@ -15,12 +15,11 @@ public class ProportionMatrixView extends MatrixView {
 	@Override
 	protected void computeDiagram() {
 		if (!hierarchy.getRoot().getParts().isEmpty()) {
-			proportion=(MatrixProportion) ocelotlView.getCore().getSpaceOperator();
-			HierarchyProportion hp=new HierarchyProportion(proportion, hierarchy, root, space);
+			proportion = (MatrixProportion) ocelotlView.getCore()
+					.getSpaceOperator();
+			HierarchyProportion hp = new HierarchyProportion(proportion,
+					hierarchy, root, space);
 			hp.draw();
-
-			
-
 		}
 	}
 

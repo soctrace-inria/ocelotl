@@ -95,7 +95,7 @@ public class OcelotlCore {
 		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE
 				|| hasChanged == HasChanged.PARAMETER) {
 			lpaggregManager.computeParts();
-			lpaggregManager.printParts();
+			//lpaggregManager.printParts();
 			setSpaceOperator();
 			lpaggregManager.print(this);
 		}

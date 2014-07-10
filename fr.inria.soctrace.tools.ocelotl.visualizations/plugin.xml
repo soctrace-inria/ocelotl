@@ -27,7 +27,7 @@
             class="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.MatrixParts"
             operator="Matrix"
             time_compatibility="Matrix"
-            selection_priority="1"
+            selection_priority="2"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView">
       </aggregation_operator>
       <aggregation_operator
@@ -36,7 +36,7 @@
             param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
             time_compatibility="Matrix"
-            selection_priority="2"
+            selection_priority="1"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.views.ProportionMatrixView">
       </aggregation_operator>
    </extension>

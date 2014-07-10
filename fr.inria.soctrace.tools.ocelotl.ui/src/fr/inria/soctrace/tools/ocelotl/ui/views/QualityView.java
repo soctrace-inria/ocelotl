@@ -349,7 +349,6 @@ public class QualityView {
 				canvas.redraw();
 				root.repaint();
 				resizeDiagram();
-
 			}
 
 			@Override
