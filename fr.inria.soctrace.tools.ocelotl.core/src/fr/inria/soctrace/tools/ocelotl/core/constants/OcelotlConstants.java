@@ -34,5 +34,15 @@ public class OcelotlConstants {
 	static public enum HasChanged {
 		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
 	}
+	
+	/**
+	 * Token used for the csv file format
+	 */
+	static public String CSVDelimiter = ";";
+	
+	/**
+	 * Number of field in the header of a cache file 
+	 */
+	static public int CACHE_HEADER_NORMAL_SIZE = 8;
 
 }

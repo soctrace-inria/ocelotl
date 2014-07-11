@@ -29,15 +29,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
@@ -46,8 +46,9 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class MultiThreadTimeAggregationOperator {
-
-	String CSVDelimiter = ";";
+	
+	private static final Logger logger = LoggerFactory
+			.getLogger(MultiThreadTimeAggregationOperator.class);
 	
 	protected TimeSliceManager timeSliceManager;
 	protected EventIterator it;
@@ -58,7 +59,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected int eventsNumber;
 	protected OcelotlParameters parameters;
 	protected OcelotlQueries ocelotlQueries;
-	protected DataCache dataCache = new DataCache();
 	protected ArrayList<String> typeNames = new ArrayList<String>();
 	
 	abstract protected void computeMatrix() throws SoCTraceException,
@@ -128,7 +128,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 		initQueries();
 		initVectors();
 
-		String cacheFile = dataCache.checkCache(parameters);
+		String cacheFile = parameters.getDataCache().checkCache(parameters);
 		// if there is a file and it is valid
 		if (!cacheFile.isEmpty()) {
 			// call computeMatrixFromFile()
@@ -169,25 +169,31 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 */
 	public void saveMatrix()
 	{
-		String filePath = dataCache.getCacheDirectory() + "/" + parameters.getTrace().getAlias() + "_" + System.currentTimeMillis();
-		//System.out.println(filePath);
+		String filePath = parameters.getDataCache().getCacheDirectory() + "/" + parameters.getTrace().getAlias() + "_" + System.currentTimeMillis();
+		
 		// Write to file,  
 		try {
 			PrintWriter writer = new PrintWriter(filePath, "UTF-8");
 
 			// write header (parameters)
-			// traceName; timeAggOp; spaceAggOp starTimestamp; endTimestamp; timeSliceNumber; parameter; threshold
-			String header = parameters.getTrace().getAlias() + CSVDelimiter + 
-					parameters.getTimeAggOperator() + CSVDelimiter + 
-					parameters.getSpaceAggOperator() + CSVDelimiter +
-					parameters.getTimeRegion().getTimeStampStart()
-					+ CSVDelimiter
+			// traceName; timeAggOp; spaceAggOp starTimestamp; endTimestamp;
+			// timeSliceNumber; parameter; threshold
+			String header = parameters.getTrace().getAlias()
+					+ OcelotlConstants.CSVDelimiter
+					+ parameters.getTimeAggOperator()
+					+ OcelotlConstants.CSVDelimiter
+					+ parameters.getSpaceAggOperator()
+					+ OcelotlConstants.CSVDelimiter
+					+ parameters.getTimeRegion().getTimeStampStart()
+					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getTimeRegion().getTimeStampEnd()
-					+ CSVDelimiter + parameters.getTimeSlicesNumber()
-					+ CSVDelimiter + parameters.getParameter() + CSVDelimiter
-					+ parameters.getThreshold() + "\n";
+					+ OcelotlConstants.CSVDelimiter
+					+ parameters.getTimeSlicesNumber()
+					+ OcelotlConstants.CSVDelimiter + parameters.getParameter()
+					+ OcelotlConstants.CSVDelimiter + parameters.getThreshold()
+					+ "\n";
 			writer.print(header);
-					
+
 			// Iterate over matrix and write data
 			writer.print(matrixToCSV());
 		
@@ -197,16 +203,17 @@ public abstract class MultiThreadTimeAggregationOperator {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.error("Could not write cache file in " + filePath);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		dataCache.saveData(parameters, filePath);
+		parameters.getDataCache().saveData(parameters, filePath);
 	}
 	
 	/**
-	 * Load matrix value from a cache file
+	 * Load matrix values from a cache file
 	 * 
 	 * @param aFilepath
 	 *            path to the cache file
@@ -238,13 +245,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 			// Read data
 			while ((line = bufFileReader.readLine()) != null) {
-				String[] values = line.split(CSVDelimiter);
+				String[] values = line.split(OcelotlConstants.CSVDelimiter);
 
 				// If the event producer is not filtered out
 				if (eventProducers.containsKey(values[1])) {
-					// Fill matrix
+					// Fill the matrix
 					rebuildMatrix(values, eventProducers.get(values[1]),
-							dataCache.getTimeSliceMultiple());
+							parameters.getDataCache().getTimeSliceFactor());
 				}
 			}
 			bufFileReader.close();

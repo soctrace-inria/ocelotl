@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
@@ -146,8 +147,10 @@ public abstract class _2DMicroDescription extends
 		int slice = 0;
 		for (final HashMap<EventProducer, Long> it : matrix) {
 			for (final EventProducer ep : it.keySet()) {
-				stringBuf.append(slice + CSVDelimiter + ep.getId()
-						+ CSVDelimiter + it.get(ep) + "\n");
+				if (it.get(ep) != 0)
+					stringBuf.append(slice + OcelotlConstants.CSVDelimiter
+							+ ep.getId() + OcelotlConstants.CSVDelimiter
+							+ it.get(ep) + "\n");
 			}
 			slice++;
 		}

@@ -45,6 +45,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -436,6 +437,30 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				hasChanged = HasChanged.THRESHOLD;
 		}
 	}
+	
+	private class DeleteDataCache extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			// Ask user confirmation
+			if(MessageDialog.openConfirm(getSite().getShell(), "Delete cached data", "This will delete all cached data. Do you want to continue ?"))
+				ocelotlParameters.getDataCache().deleteCache();
+		}
+	}
+	
+	private class ModifyDatacacheDirectory extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			DirectoryDialog dialog = new DirectoryDialog(getSite().getShell());
+		    String newCacheDir = dialog.open();
+		    if(newCacheDir != null)
+		    {
+		    	ocelotlParameters.getDataCache().setCacheDirectory(newCacheDir);
+		    	datacacheDirectory.setText(ocelotlParameters.getDataCache().getCacheDirectory());
+		    }
+		}
+	}
 
 	private class TraceAdapter extends SelectionAdapter {
 		private Trace	trace;
@@ -526,6 +551,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private TimeLineViewWrapper			timeLineViewWrapper;
 	private Button						btnSettings2;
 	private Button						btnReset;
+	private Button						btnDeleteDataCache;
+	private Text						datacacheDirectory;
+	private Text						datacacheSize;
+	private Button						btnChangeCacheDirectory;
 	
 	/**
 	 * Followed topics
@@ -722,6 +751,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		final TabFolder tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
+		
+		//Trace overview
 		final TabItem tbtmTimeAggregationParameters = new TabItem(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setText("Trace Overview");
 
@@ -844,6 +875,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		sashFormTSandCurve.setWeights(new int[] { 1, 1, 1 });
 		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
 
+		
+		//Quality curves settings
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
 		tbtmAdvancedParameters.setText("Quality curves");
 
@@ -881,25 +914,87 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)");
 		btnDecreasingQualities.setSelection(false);
 		btnDecreasingQualities.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-				new Label(groupQualityCurveSettings, SWT.NONE);
-				new Label(groupQualityCurveSettings, SWT.NONE);
-						new Label(groupQualityCurveSettings, SWT.NONE);
-				
-						final Label lblThreshold = new Label(groupQualityCurveSettings, SWT.NONE);
-						lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-						lblThreshold.setText("X Axis Maximal Precision");
-						
-								textThreshold = new Text(groupQualityCurveSettings, SWT.BORDER);
-								GridData gd_textThreshold = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
-								gd_textThreshold.widthHint = 89;
-								textThreshold.setLayoutData(gd_textThreshold);
-								textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-								
-										textThreshold.addModifyListener(new ThresholdModifyListener());
+		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
+
+		final Label lblThreshold = new Label(groupQualityCurveSettings, SWT.NONE);
+		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblThreshold.setText("X Axis Maximal Precision");
+
+		textThreshold = new Text(groupQualityCurveSettings, SWT.BORDER);
+		GridData gd_textThreshold = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		gd_textThreshold.widthHint = 89;
+		textThreshold.setLayoutData(gd_textThreshold);
+		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		new Label(groupQualityCurveSettings, SWT.NONE);
+
+		textThreshold.addModifyListener(new ThresholdModifyListener());
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 		sashFormAdvancedParameters.setWeights(new int[] { 1 });
 		
+		
 
+		// Datacache settings
+		final TabItem tbtmOcelotlSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtmOcelotlSettings.setText("Settings");
+		
+		final SashForm sashFormSettings = new SashForm(tabFolder, SWT.VERTICAL);
+		sashFormSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		tbtmOcelotlSettings.setControl(sashFormSettings);
+
+		final Group groupDataCacheSettings = new Group(sashFormSettings, SWT.NONE);
+		groupDataCacheSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupDataCacheSettings.setText("Data Cache Settings");
+		groupDataCacheSettings.setLayout(new GridLayout(2, false));
+		new Label(groupDataCacheSettings, SWT.NONE);
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
+		lblDataCacheDirectory.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_FOREGROUND));
+		lblDataCacheDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+		lblDataCacheDirectory.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblDataCacheDirectory.setText("Data cache directory:");
+
+		final GridData gd_dataCacheDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_dataCacheDir.widthHint = 75;
+		
+		datacacheDirectory = new Text(groupDataCacheSettings, SWT.BORDER);
+		datacacheDirectory.setLayoutData(gd_dataCacheDir);
+		datacacheDirectory.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		datacacheDirectory.setEditable(false);
+		datacacheDirectory.setText(ocelotlParameters.getDataCache().getCacheDirectory());
+		
+		btnChangeCacheDirectory = new Button(groupDataCacheSettings, SWT.PUSH);
+		btnChangeCacheDirectory.setText("Modify");
+		btnChangeCacheDirectory.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnChangeCacheDirectory.addSelectionListener(new ModifyDatacacheDirectory());
+
+		final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
+		lblDataCacheSize.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_FOREGROUND));
+		lblDataCacheSize.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		lblDataCacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblDataCacheSize.setText("Data cache size (-1 == no limit):");
+		
+		datacacheSize = new Text(groupDataCacheSettings, SWT.BORDER);
+		datacacheSize.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		datacacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		datacacheSize.setText(String.valueOf(ocelotlParameters.getDataCache().getCacheMaxSize()));
+		
+		final Label lblDataCacheSizeUnit = new Label(groupDataCacheSettings, SWT.NONE);
+		lblDataCacheSizeUnit.setForeground(SWTResourceManager.getColor(SWT.COLOR_TITLE_FOREGROUND));
+		lblDataCacheSizeUnit.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblDataCacheSizeUnit.setText(" MB");
+		
+		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
+		btnDeleteDataCache.setText("Delete cache");
+		btnDeleteDataCache.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		new Label(groupDataCacheSettings, SWT.NONE);
+		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
+		
+		
+		
+		// Quality curves display
 		final Composite compositeQualityView = new Composite(sashForm, SWT.BORDER);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));

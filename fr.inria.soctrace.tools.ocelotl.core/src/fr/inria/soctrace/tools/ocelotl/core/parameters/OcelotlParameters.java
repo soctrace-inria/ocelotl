@@ -28,6 +28,7 @@ import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlParameters {
@@ -47,6 +48,7 @@ public class OcelotlParameters {
 	private String timeAggOperator;
 	private String spaceAggOperator;
 	private boolean growingQualities = true;
+	private DataCache dataCache = new DataCache();
 
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
@@ -201,6 +203,14 @@ public class OcelotlParameters {
 
 	public void setSpaceConfig(ISpaceConfig iSpaceConfig) {
 		this.iSpaceConfig = iSpaceConfig;
+	}
+	
+	public DataCache getDataCache() {
+		return dataCache;
+	}
+
+	public void setDataCache(DataCache dataCache) {
+		this.dataCache = dataCache;
 	}
 
 }

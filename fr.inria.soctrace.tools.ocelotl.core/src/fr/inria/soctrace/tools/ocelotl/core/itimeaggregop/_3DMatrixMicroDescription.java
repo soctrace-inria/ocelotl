@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
@@ -106,8 +108,8 @@ public abstract class _3DMatrixMicroDescription extends
 			for (final EventProducer ep : it.keySet()) {
 				for (String evtType : it.get(ep).keySet()) {
 					if(it.get(ep).get(evtType) != 0)
-					stringBuf.append(slice + CSVDelimiter + ep.getId()
-							+ CSVDelimiter + evtType + CSVDelimiter
+					stringBuf.append(slice + OcelotlConstants.CSVDelimiter + ep.getId()
+							+ OcelotlConstants.CSVDelimiter + evtType + OcelotlConstants.CSVDelimiter
 							+ it.get(ep).get(evtType) + "\n");
 				}
 			}
