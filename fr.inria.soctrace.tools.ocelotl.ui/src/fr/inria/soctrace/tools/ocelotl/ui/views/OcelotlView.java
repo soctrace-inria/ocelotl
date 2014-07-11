@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -461,6 +462,25 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		    }
 		}
 	}
+	
+	private class saveDataListener extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
+
+			// Display a warning if the selected file already exists
+			dialog.setOverwrite(true);
+			// Set a default file name
+			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId());
+
+			String saveCachefile = dialog.open();
+
+			if (saveCachefile != null) {
+				ocelotlParameters.getDataCache().saveDataCacheTo(ocelotlParameters, saveCachefile);
+			}
+		}
+	}
 
 	private class TraceAdapter extends SelectionAdapter {
 		private Trace	trace;
@@ -555,6 +575,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Text						datacacheDirectory;
 	private Text						datacacheSize;
 	private Button						btnChangeCacheDirectory;
+	private Button						btnSaveData;
 	
 	/**
 	 * Followed topics
@@ -745,6 +766,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		sashFormView.setWeights(new int[] {418, 36});
 
+		btnSaveData = new Button(groupTime, SWT.NONE);
+		btnSaveData.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		btnSaveData.setText("Save Data");
+		btnSaveData.addSelectionListener(new saveDataListener());
+
+		
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 

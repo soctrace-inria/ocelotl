@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -185,11 +187,50 @@ public class DataCache {
 	 * @param aFilePath
 	 *            path to the file where the data were saved
 	 */
-	public void saveData(OcelotlParameters param, String aFilePath) {
+	public void saveData(OcelotlParameters oParam, String aFilePath) {
 		// TODO check for cache size
-		CacheParameters params = new CacheParameters(param);
+		CacheParameters params = new CacheParameters(oParam);
 
 		cachedData.put(params, aFilePath);
+	}
+
+	/**
+	 * Save the cache of the current trace to the specified path
+	 * 
+	 * @param oParam
+	 *            current parameters
+	 * @param destPath
+	 *            path to save the file
+	 */
+	public void saveDataCacheTo(OcelotlParameters oParam, String destPath) {
+		// Get the current cache file
+		CacheParameters params = new CacheParameters(oParam);
+		String sourcePath = "";
+		
+		//Look for the corresponding file
+		for(CacheParameters par: cachedData.keySet())
+		{
+			if(similarParameters(params, par))
+			{
+				sourcePath = cachedData.get(par);
+			}
+		}
+		
+		if (!sourcePath.isEmpty()) {
+			File source = new File(sourcePath);
+			File dest = new File(destPath);
+
+			try {
+				Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			logger.error("No corresponding cache file was found");
+		}
 	}
 
 	/**
