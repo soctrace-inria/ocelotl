@@ -24,7 +24,7 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Should the quality be normalized ?
 	 */
-	public static final boolean Normalize = true;
+	public static final boolean Normalize = false;
 	
 	/**
 	 * Should the curves show increasing quality ?
