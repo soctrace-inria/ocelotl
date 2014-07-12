@@ -27,7 +27,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
 public interface ITimeAggregationOperator {
 
-	public IMicroDescManager createManager();
+	public IMicroDescManager createManager() throws OcelotlException;
 
 	public OcelotlParameters getOcelotlParameters();
 

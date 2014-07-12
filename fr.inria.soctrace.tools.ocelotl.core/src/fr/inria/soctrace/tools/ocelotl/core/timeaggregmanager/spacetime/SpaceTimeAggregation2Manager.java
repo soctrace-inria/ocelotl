@@ -25,6 +25,7 @@ import java.util.List;
 
 import fr.inria.lpaggreg.spacetime.JNISpaceTimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
@@ -34,7 +35,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	_2DSpaceTimeMicroDescription matrix;
 
 	public SpaceTimeAggregation2Manager(
-			_2DSpaceTimeMicroDescription _2dSpaceTimeMicroDescription) {
+			_2DSpaceTimeMicroDescription _2dSpaceTimeMicroDescription) throws OcelotlException {
 		super(_2dSpaceTimeMicroDescription.getOcelotlParameters());
 		matrix = _2dSpaceTimeMicroDescription;
 		reset();
@@ -98,7 +99,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	}
 
 	@Override
-	public void reset() {
+	public void reset() throws OcelotlException {
 		setHierarchy();
 		if (OcelotlParameters.isJniFlag())
 			timeAggregation = new JNISpaceTimeAggregation2();
@@ -109,7 +110,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
 	}
 
-	private void setHierarchy() {
+	private void setHierarchy() throws OcelotlException {
 		hierarchy = new EventProducerHierarchy(getEventProducers());
 	}
 

@@ -573,6 +573,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button						btnDeleteDataCache;
 	private Text						datacacheDirectory;
 	private Button						btnChangeCacheDirectory;
+	private int 						TS=0;
 	
 	/**
 	 * Followed topics
@@ -833,6 +834,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				hasChanged = HasChanged.ALL;
 				ocelotlParameters.getEventProducers().clear();
 				ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
+				spinnerTSNumber.setSelection(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getTs());
 				comboSpace.removeAll();
 				for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility())) {
 					comboSpace.add(op);

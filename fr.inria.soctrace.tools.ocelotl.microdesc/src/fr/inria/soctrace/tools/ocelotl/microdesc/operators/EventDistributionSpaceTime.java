@@ -21,7 +21,6 @@ package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,17 +30,15 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
-import fr.inria.soctrace.tools.ocelotl.core.state.IState;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
-import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
 
-public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
+public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
-	private static final Logger logger = LoggerFactory.getLogger(StateDistributionSpaceTime.class);
-	
+	private static final Logger logger = LoggerFactory.getLogger(EventDistributionSpaceTime.class);
 	
 	class OcelotlThread extends Thread {
 
@@ -60,20 +57,32 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 			start();
 		}
 
-		private void matrixUpdate(final IState state, final EventProducer ep,
-				final Map<Long, Long> distrib) {
+		private void matrixWrite(final long slice, final EventProducer ep,
+				String type) {
 			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(state.getStateType())) {
-					logger.debug("Adding " + state.getStateType()
-							+ " state");
+				matrix.get((int) slice)
+						.get(ep)
+						.put(type,
+								matrix.get((int) slice).get(ep).get(type) + 1);
+			}
+		}
+
+		private void matrixUpdate(final Event event, final EventProducer ep) {
+			synchronized (matrix) {
+				if (!matrix.get(0).get(ep)
+						.containsKey(event.getType().getName())) {
+					logger.debug("Adding " + event.getType().getName()
+							+ " event");
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr)
 								.keySet())
-							matrixPushType(incr, epset, state.getStateType());
+							matrixPushType(incr, epset, event.getType()
+									.getName());
 				}
-				for (final long it : distrib.keySet())
-					matrixWrite(it, ep, state.getStateType(), distrib);
+				final long slice = timeSliceManager.getTimeSlice(event
+						.getTimestamp());
+				matrixWrite(slice, ep, event.getType().getName());
 			}
 		}
 
@@ -83,22 +92,20 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 				final List<Event> events = getEvents(size);
 				if (events.size() == 0)
 					break;
-				IState state;
 				for (final Event event : events) {
-					state = new GenericState(event, timeSliceManager);
-					final Map<Long, Long> distrib = state
-							.getTimeSlicesDistribution();
-					matrixUpdate(state, event.getEventProducer(), distrib);
+					// final Map<Long, Long> distrib =
+					// state.getTimeSlicesDistribution();
+					matrixUpdate(event, event.getEventProducer());
 				}
 			}
 		}
 	}
 
-	public StateDistributionSpaceTime() throws SoCTraceException {
+	public EventDistributionSpaceTime() throws SoCTraceException {
 		super();
 	}
 
-	public StateDistributionSpaceTime(final OcelotlParameters parameters)
+	public EventDistributionSpaceTime(final OcelotlParameters parameters)
 			throws SoCTraceException, OcelotlException {
 		super(parameters);
 	}
@@ -108,7 +115,7 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		it = ocelotlQueries.getStateIterator(eventProducers);
+		it = ocelotlQueries.getEventIterator(eventProducers);
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();

@@ -13,7 +13,9 @@
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.EventDistributionView"
             spatial_compatibility="Parts, Proportion"
-            trace_formats="ALL">
+            trace_formats="ALL"
+            ts_default_number="100"
+            unit="events">
       </aggregation_operator>
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistribution"
@@ -23,17 +25,33 @@
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.StateDistributionView"
             spatial_compatibility="Parts, Proportion"
-            trace_formats="ALL">
+            trace_formats="ALL"
+            ts_default_number="100"
+            unit="%TIME">
+      </aggregation_operator>
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistributionSpaceTime"
+            event_category="ALL"
+            generic="true"
+            operator="Hierarchical Event Distribution"
+            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.EventDistributionView"
+            spatial_compatibility="Matrix"
+            trace_formats="ALL"
+            ts_default_number="20"
+            unit="%TIME">
       </aggregation_operator>
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionSpaceTime"
-            event_category="ALL"
+            event_category="STATE"
             generic="true"
             operator="Hierarchical State Distribution"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.StateDistributionView"
-            spatial_compatibility="Matrix"
-            trace_formats="ALL">
+            spatial_compatibility="Matrix, SMode"
+            trace_formats="ALL"
+            ts_default_number="20"
+            unit="%TIME">
       </aggregation_operator>
    </extension>
 

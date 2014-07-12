@@ -23,12 +23,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregation2Manager;
 
 public interface I2DSpaceTimeMicroDescription extends ITimeAggregationOperator {
 
 	@Override
-	public SpaceTimeAggregation2Manager createManager();
+	public SpaceTimeAggregation2Manager createManager() throws OcelotlException;
 
 	public List<HashMap<EventProducer, HashMap<String, Long>>> getMatrix();
 }

@@ -36,6 +36,8 @@ public class TimeAggregationOperatorResource {
 	List<String> eventCategory = new ArrayList<String>();
 	String paramWinClass;
 	String paramConfig;
+	String unit;
+	int ts;
 	String bundle;
 
 	public TimeAggregationOperatorResource() {
@@ -46,7 +48,7 @@ public class TimeAggregationOperatorResource {
 			final String name, final boolean generic,
 			final List<String> traceFormats,
 			final List<String> spaceCompatibility, final String paramWinClass,
-			final String paramConfig, final List<String> eventCategory, final String bundle) {
+			final String paramConfig, final List<String> eventCategory, final String ts, final String unit, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
@@ -56,13 +58,15 @@ public class TimeAggregationOperatorResource {
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
 		this.eventCategory = eventCategory;
+		setTs(ts);
+		this.unit=unit;
 		this.bundle = bundle;
 	}
 
 	public TimeAggregationOperatorResource(final String operatorClass,
 			final String name, final boolean generic,
 			final String traceFormats, final String spaceCompatibility,
-			final String paramWinClass, final String paramConfig,
+			final String paramWinClass, final String paramConfig, final String ts, final String unit,
 			final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
@@ -81,6 +85,26 @@ public class TimeAggregationOperatorResource {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+
+	public int getTs() {
+		return ts;
+	}
+
+	public void setTs(String ts) {
+		try{
+		this.ts = Integer.parseInt(ts);
+		}catch (NumberFormatException e){
+			this.ts=0;
+		}
 	}
 
 	public String getOperatorClass() {

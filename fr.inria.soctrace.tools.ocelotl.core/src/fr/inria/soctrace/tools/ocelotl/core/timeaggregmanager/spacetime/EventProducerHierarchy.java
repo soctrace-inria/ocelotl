@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 
 public class EventProducerHierarchy {
 
@@ -212,7 +213,7 @@ public class EventProducerHierarchy {
 	private Map<Integer, EventProducer> eventProducers = new HashMap<Integer, EventProducer>();
 	private EventProducerNode root = null;
 
-	public EventProducerHierarchy(List<EventProducer> eventProducers) {
+	public EventProducerHierarchy(List<EventProducer> eventProducers) throws OcelotlException {
 		super();
 		for (EventProducer ep : eventProducers) {
 			this.eventProducers.put(ep.getId(), ep);
@@ -221,18 +222,18 @@ public class EventProducerHierarchy {
 		setHierarchy();
 	}
 
-	private void setHierarchy() {
+	private void setHierarchy() throws OcelotlException {
 		for (EventProducer ep : eventProducers.values()) {
 			if (!eventProducerNodes.containsKey(ep.getId()))
 				eventProducerNodes.put(ep.getId(), new EventProducerNode(ep));
 		}
 		if (!orphans.isEmpty()) {
-			System.err
-					.println("Careful: hierarchy is incomplete and some elements will be destroyed!");
-			for (Integer orphan : orphans.keySet()) {
-				if (orphans.containsKey(orphan))
-					orphans.get(orphan).destroy();
-			}
+		//	System.err.println("Careful: hierarchy is incomplete and some elements will be destroyed!");
+			throw new OcelotlException(OcelotlException.HIERARCHY);
+//			for (Integer orphan : orphans.keySet()) {
+//				if (orphans.containsKey(orphan))
+//					orphans.get(orphan).destroy();
+//			}
 		}
 		root.setWeight();
 		root.setChildIndex();

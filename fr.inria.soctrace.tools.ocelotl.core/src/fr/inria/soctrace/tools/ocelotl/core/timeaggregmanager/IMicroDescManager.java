@@ -44,7 +44,7 @@ public interface IMicroDescManager {
 
 	public void printParts();
 
-	public void reset();
+	public void reset() throws OcelotlException;
 
 	public void print(OcelotlCore core);
 

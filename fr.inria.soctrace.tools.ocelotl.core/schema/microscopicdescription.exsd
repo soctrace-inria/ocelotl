@@ -114,6 +114,28 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="ts_default_number" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="unit" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="%TIME">
+                  </enumeration>
+                  <enumeration value="events">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
       </complexType>
    </element>
 
