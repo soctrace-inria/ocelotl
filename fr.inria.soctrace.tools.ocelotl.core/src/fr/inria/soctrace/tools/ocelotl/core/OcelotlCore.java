@@ -20,7 +20,6 @@
 package fr.inria.soctrace.tools.ocelotl.core;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperatorManager;
@@ -59,46 +58,31 @@ public class OcelotlCore {
 			throws SoCTraceException {
 		super();
 		init(ocelotlParameters);
-
 	}
 
-	public void compute(final HasChanged hasChanged) throws SoCTraceException,
-			OcelotlException {
-		if (hasChanged == HasChanged.ALL) {
-			setTimeOperator();
-			try{
+	public void initTimeOperator() throws OcelotlException {
+		setTimeOperator();
+		try {
 			lpaggregManager = timeOperator.createManager();
-			}catch (UnsatisfiedLinkError e){
-				throw new OcelotlException(OcelotlException.JNI);
-			}
-		}
-		// vectors.print();
-		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE)
-			lpaggregManager.computeQualities();
-		// TODO clean dicho & parts
-
-	}
-
-	public void computeDichotomy(final HasChanged hasChanged)
-			throws SoCTraceException, OcelotlException {
-		compute(hasChanged);
-		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE
-				|| hasChanged == HasChanged.THRESHOLD) {
-			lpaggregManager.computeDichotomy();
-			lpaggregManager.printParameters();
+		} catch (UnsatisfiedLinkError e) {
+			throw new OcelotlException(OcelotlException.JNI);
 		}
 	}
 
-	public void computeParts(final HasChanged hasChanged)
-			throws SoCTraceException, OcelotlException {
-		compute(hasChanged);
-		if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE
-				|| hasChanged == HasChanged.PARAMETER) {
-			lpaggregManager.computeParts();
-			lpaggregManager.printParts();
-			setSpaceOperator();
-			lpaggregManager.print(this);
-		}
+	public void computeQualities() {
+		lpaggregManager.computeQualities();
+	}
+
+	public void computeDichotomy() throws OcelotlException {
+		lpaggregManager.computeDichotomy();
+		lpaggregManager.printParameters();
+	}
+
+	public void computeParts() {
+		lpaggregManager.computeParts();
+		// lpaggregManager.printParts();
+		setSpaceOperator();
+		lpaggregManager.print(this);
 	}
 
 	public IMicroDescManager getLpaggregManager() {
