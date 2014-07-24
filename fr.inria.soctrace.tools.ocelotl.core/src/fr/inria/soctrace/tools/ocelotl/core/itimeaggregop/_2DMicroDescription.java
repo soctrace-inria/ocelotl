@@ -145,7 +145,9 @@ public abstract class _2DMicroDescription extends
 	public String matrixToCSV() {
 		StringBuffer stringBuf = new StringBuffer();
 		int slice = 0;
+		// For each slice
 		for (final HashMap<EventProducer, Long> it : matrix) {
+			// for each event producer
 			for (final EventProducer ep : it.keySet()) {
 				if (it.get(ep) != 0)
 					stringBuf.append(slice + OcelotlConstants.CSVDelimiter
@@ -173,6 +175,7 @@ public abstract class _2DMicroDescription extends
 			if (matrix.get(slice).get(ep) != null)
 				value = matrix.get(slice).get(ep) + value;
 		}
+		
 		matrix.get(slice).put(ep, value);
 	}
 	

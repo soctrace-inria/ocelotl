@@ -104,13 +104,17 @@ public abstract class _3DMatrixMicroDescription extends
 	public String matrixToCSV() {
 		StringBuffer stringBuf = new StringBuffer();
 		int slice = 0;
+		// For each slice
 		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
+			// For each event producer
 			for (final EventProducer ep : it.keySet()) {
+				// For each event type
 				for (String evtType : it.get(ep).keySet()) {
-					if(it.get(ep).get(evtType) != 0)
-					stringBuf.append(slice + OcelotlConstants.CSVDelimiter + ep.getId()
-							+ OcelotlConstants.CSVDelimiter + evtType + OcelotlConstants.CSVDelimiter
-							+ it.get(ep).get(evtType) + "\n");
+					if (it.get(ep).get(evtType) != 0)
+						stringBuf.append(slice + OcelotlConstants.CSVDelimiter
+								+ ep.getId() + OcelotlConstants.CSVDelimiter
+								+ evtType + OcelotlConstants.CSVDelimiter
+								+ it.get(ep).get(evtType) + "\n");
 				}
 			}
 			slice++;

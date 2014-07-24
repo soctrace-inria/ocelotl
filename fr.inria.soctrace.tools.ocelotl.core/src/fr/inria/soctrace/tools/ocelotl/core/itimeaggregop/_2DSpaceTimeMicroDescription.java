@@ -19,8 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
-import java.util.Map;
-
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;

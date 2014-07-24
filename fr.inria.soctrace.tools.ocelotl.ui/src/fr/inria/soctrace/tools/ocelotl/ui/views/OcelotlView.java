@@ -89,24 +89,140 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper
  */
 public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	
-		private class SaveDataListener extends SelectionAdapter {
-		
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
-		
-					// Display a warning if the selected file already exists
-					dialog.setOverwrite(true);
-					// Set a default file name
-					dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId());
-		
-					String saveCachefile = dialog.open();
-		
-					if (saveCachefile != null) {
-						ocelotlParameters.getDataCache().saveDataCacheTo(ocelotlParameters, saveCachefile);
-					}
-				}
+	private class SaveDataListener extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (confDataLoader.getCurrentTrace() == null) {
+				MessageDialog.openInformation(getSite().getShell(), "Error", OcelotlException.NOTRACE);
+				return;
 			}
+
+			FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
+
+			// Display a warning if the selected file already exists
+			dialog.setOverwrite(true);
+			// Set a default file name
+			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId());
+
+			String saveCachefile = dialog.open();
+
+			if (saveCachefile != null) {
+				ocelotlParameters.getDataCache().saveDataCacheTo(ocelotlParameters, saveCachefile);
+			}
+		}
+	}
+
+	private class LoadDataListener extends SelectionAdapter {
+		private Trace	trace;
+		private String	loadCachefile;
+		private int		traceID;
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+
+			FileDialog dialog = new FileDialog(getSite().getShell(), SWT.OPEN);
+			loadCachefile = dialog.open();
+
+			if (loadCachefile != null) {
+				comboTime.removeAll();
+				comboSpace.removeAll();
+
+				final Job job = new Job("Loading trace from micro description") {
+
+					@Override
+					protected IStatus run(final IProgressMonitor monitor) {
+						monitor.beginTask("Gathering data from trace...", IProgressMonitor.UNKNOWN);
+						try {
+							traceID = ocelotlParameters.getDataCache().loadDataCache(loadCachefile, ocelotlParameters);
+							trace = null;
+
+							Display.getDefault().syncExec(new Runnable() {
+								@Override
+								public void run() {
+
+									// Look for the correct trace among the
+									// available traces
+									for (int aTraceIndex : traceMap.keySet()) {
+										if (traceMap.get(aTraceIndex).getId() == traceID) {
+											comboTraces.select(aTraceIndex);
+											trace = traceMap.get(comboTraces.getSelectionIndex());
+											break;
+										}
+									}
+								}
+							});
+
+							// If no trace was found
+							if (trace == null)
+								throw new OcelotlException(OcelotlException.INVALID_CACHED_TRACE);
+
+							// Load the trace
+							confDataLoader.load(trace);
+
+							monitor.beginTask("Loading cached data...", IProgressMonitor.UNKNOWN);
+							Display.getDefault().syncExec(new Runnable() {
+
+								@Override
+								public void run() {
+									// Load the aggregation operators
+									for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
+										comboTime.add(op);
+									}
+
+									comboTime.setText("");
+
+									// Search for the corresponding operator
+									for (int i = 0; i < comboTime.getItemCount(); i++) {
+										if (comboTime.getItem(i).equals(ocelotlParameters.getTimeAggOperator())) {
+											comboTime.select(i);
+											comboTime.notifyListeners(SWT.Selection, new Event());
+											break;
+										}
+									}
+
+									// If no operator was found
+									if (comboTime.getText().isEmpty())
+										try {
+											throw new OcelotlException(OcelotlException.INVALID_CACHED_OPERATOR);
+										} catch (OcelotlException e) {
+											MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+											return;
+										}
+
+									// Set the corresponding parameters
+									spinnerTSNumber.setSelection(ocelotlParameters.getTimeSlicesNumber());
+									textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
+									textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+
+									// And launch the display
+									btnRun.notifyListeners(SWT.Selection, new Event());
+								}
+							});
+
+						} catch (final OcelotlException exception) {
+							Display.getDefault().syncExec(new Runnable() {
+								@Override
+								public void run() {
+									// If inputs are wrong, display the reason
+									MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
+								}
+							});
+							return Status.CANCEL_STATUS;
+						} catch (SoCTraceException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						return Status.OK_STATUS;
+					}
+				};
+
+				job.setUser(true);
+				job.schedule();
+			}
+		}
+	}
+		
 	
 	private class ConfModificationListener implements ModifyListener {
 
@@ -129,7 +245,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			if (Long.parseLong(textTimestampStart.getText()) < confDataLoader.getMinTimestamp() || Long.parseLong(textTimestampStart.getText()) > confDataLoader.getMaxTimestamp())
 				invalidStart = true;
 
-			
 			if (invalidStart)
 				// Set font color to red
 				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
@@ -205,6 +320,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
+
 					if (hasChanged != HasChanged.PARAMETER) {
 						try {
 							ocelotlCore.computeDichotomy(hasChanged);
@@ -317,13 +433,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		public void keyPressed(final KeyEvent e) {
 			switch (e.keyCode) {
 			case SWT.ARROW_LEFT:
-				//Make sure we are not in an editable field
-				if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+				// Make sure we are not in an editable field
+				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonDown.notifyListeners(SWT.Selection, new Event());
 				break;
 			case SWT.ARROW_RIGHT:
-				//Make sure we are not in an editable field
-				if(!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+				// Make sure we are not in an editable field
+				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonUp.notifyListeners(SWT.Selection, new Event());
 				break;
 			case SWT.KEYPAD_CR:
@@ -482,7 +598,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	}
 
 	private class TraceAdapter extends SelectionAdapter {
-		private Trace	trace;
+		private Trace trace;
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
@@ -490,6 +606,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			comboTime.removeAll();
 			comboSpace.removeAll();
 			trace = traceMap.get(comboTraces.getSelectionIndex());
+	
 			final Job job = new Job(title) {
 
 				@Override
@@ -507,7 +624,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 							@Override
 							public void run() {
-
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
 								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories()))
@@ -581,7 +697,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	protected FramesocBusTopicList topics = null;
 	private Text text;
 
-	private Button	button_1;
+	private Button	btnSaveDataCache;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -793,12 +909,19 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		gd_composite_1.minimumHeight = 20;
 		gd_composite_1.widthHint = 285;
 		composite_1.setLayoutData(gd_composite_1);
-		composite_1.setLayout(new GridLayout(1, false));
+		composite_1.setLayout(new GridLayout(2, false));
 		comboTraces = new Combo(composite_1, SWT.READ_ONLY);
 		final GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_comboTraces.widthHint = 179;
 		comboTraces.setLayoutData(gd_comboTraces);
 		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		
+		Button btnLoadDataCache = new Button(composite_1, SWT.NONE);
+		btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
+		btnLoadDataCache.setToolTipText("Load a Microscopic Description");
+		btnLoadDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		btnLoadDataCache.addSelectionListener(new LoadDataListener());
+		
 		comboTraces.addSelectionListener(new TraceAdapter());
 		int index = 0;
 		for (final Trace t : confDataLoader.getTraces()) {
@@ -859,11 +982,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				btnSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 				btnSettings.addSelectionListener(new SettingsSelectionAdapter(this));
 		
-		button_1 = new Button(compositeAggregationOperator, SWT.NONE);
-		button_1.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
-		button_1.setToolTipText("Save Current Microscopic Description");
-		button_1.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		button_1.addSelectionListener(new SaveDataListener());
+		btnSaveDataCache = new Button(compositeAggregationOperator, SWT.NONE);
+		btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
+		btnSaveDataCache.setToolTipText("Save Current Microscopic Description");
+		btnSaveDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		btnSaveDataCache.addSelectionListener(new SaveDataListener());
 		comboTime.setText("");
 
 		final Group grpSpaceAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);

@@ -43,6 +43,6 @@ public class OcelotlConstants {
 	/**
 	 * Number of field in the header of a cache file 
 	 */
-	static public int CACHE_HEADER_NORMAL_SIZE = 8;
+	static public int CACHE_HEADER_NORMAL_SIZE = 9;
 
 }

@@ -19,7 +19,10 @@ public class OcelotlException extends Exception {
 	public static final String INVALID_END_TIMESTAMP = "Error: The provided ending timestamp is greater than the trace ending timestamp";
 	public static final String NOTIMESTAMP = "Error: At least one of the starting or ending timestamps is missing.";
 	public static final String HIERARCHY = "Error: The event producer hierarchy is incomplete.";
-
+	public static final String INVALID_CACHEFILE = "Error: The selected file is not a valid cache file.";
+	public static final String INVALID_CACHED_TRACE = "Error: The corresponding trace was not found in the databse.";
+	public static final String INVALID_CACHED_OPERATOR = "Error: The corresponding aggregation operator was not found.";
+	
 	public OcelotlException() {
 		super();
 	}

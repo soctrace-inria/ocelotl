@@ -69,15 +69,16 @@ public abstract class MultiThreadTimeAggregationOperator {
 			InterruptedException, OcelotlException;
 	
 	/**
-	 * Convert the matrix values in one String in CSV format
+	 * Convert the matrix values in one String formatted in CSV
 	 * 
 	 * @return the String containing the matrix values
 	 */
 	public abstract String matrixToCSV();
 	
-
 	/**
-	 * Initialize the matrix with zero values
+	 * Initialize the matrix with zero values. Since a lot of values in the
+	 * matrix are zeroes, this trick reduces the size of the cached data and
+	 * improves the performances of loading data from cache.
 	 * 
 	 * @param eventProducers
 	 *            List of event of the currently selected event producers
@@ -86,10 +87,10 @@ public abstract class MultiThreadTimeAggregationOperator {
 			Collection<EventProducer> eventProducers);
 
 	/**
-	 * Fill the matrix with value from the cache file
+	 * Fill the matrix with values from the cache file
 	 * 
 	 * @param values
-	 *            Array of String containing the value and the indexes of the matrix
+	 *            Array of Strings containing the values and the indexes of the matrix
 	 * @param sliceMultiple
 	 *            used to compute the current slice number if the number of time
 	 *            slices is a divisor of the number of slices of the cached data
@@ -164,12 +165,12 @@ public abstract class MultiThreadTimeAggregationOperator {
 	}
 
 	/**
-	 * Save the matrix data to a cache file. Save only the value that are
+	 * Save the matrix data to a cache file. Save only the values that are
 	 * different from 0
 	 */
 	public void saveMatrix()
 	{
-		String filePath = parameters.getDataCache().getCacheDirectory() + "/" + parameters.getTrace().getAlias() + "_" + System.currentTimeMillis();
+		String filePath = parameters.getDataCache().getCacheDirectory() + "/" + parameters.getTrace().getAlias() + "_" + parameters.getTrace().getId() + "_" + System.currentTimeMillis();
 		
 		// Write to file,  
 		try {
@@ -179,6 +180,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// traceName; timeAggOp; spaceAggOp starTimestamp; endTimestamp;
 			// timeSliceNumber; parameter; threshold
 			String header = parameters.getTrace().getAlias()
+					+ OcelotlConstants.CSVDelimiter
+					+ parameters.getTrace().getId()
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getTimeAggOperator()
 					+ OcelotlConstants.CSVDelimiter
@@ -247,6 +250,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 			while ((line = bufFileReader.readLine()) != null) {
 				String[] values = line.split(OcelotlConstants.CSVDelimiter);
 
+				//TODO check that the values are correct (two values per line)
+				
 				// If the event producer is not filtered out
 				if (eventProducers.containsKey(values[1])) {
 					// Fill the matrix
