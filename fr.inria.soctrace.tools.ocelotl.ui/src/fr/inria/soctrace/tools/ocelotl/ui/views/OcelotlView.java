@@ -71,6 +71,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
@@ -431,6 +432,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					try {
 						try {
 							confDataLoader.load(trace);
+							ocelotlParameters.setEventProducerHierarchy(new SimpleEventProducerHierarchy(confDataLoader.getProducers()));
 						} catch (final SoCTraceException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -935,7 +937,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			toolBar.add(createGanttAction());
 		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.EVENT_TABLE_VIEW_ID))
 			toolBar.add(createTableAction());	
-
+		
 		cleanAll();
 
 	}

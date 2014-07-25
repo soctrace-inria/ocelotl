@@ -26,10 +26,15 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -42,12 +47,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -61,25 +66,30 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IAggregationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 public abstract class DistributionBaseView extends Dialog implements
 		IAggregationWindow {
-
-	private class AddAllEventProducersAdapter extends SelectionAdapter {
+	
+	public class CheckAllEventProducersAdapter extends SelectionAdapter {
 
 		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			producers.clear();
-			producers.addAll(ocelotlView.getConfDataLoader().getProducers());
-			listViewerEventProducers.setInput(producers);
-			// hasChanged = HasChanged.ALL;
+		public void widgetSelected(SelectionEvent e) {
+			Object[] viewerElements = new FilterTreeContentProvider()
+					.getElements(params.getEventProducerHierarchy().getRoot());
+
+			for (int i = 0; i < viewerElements.length; i++) {
+				treeViewerEventProducer.setSubtreeChecked(viewerElements[i],
+						true);
+			}
+			updateSelectedEventProducer();
 		}
 	}
 
-	private class AddEventProducersAdapter extends SelectionAdapter {
+	private class AddEventProducerAdapter extends SelectionAdapter {
 
 		// all - input
 		java.util.List<Object> diff(final java.util.List<EventProducer> all,
@@ -104,31 +114,69 @@ public abstract class DistributionBaseView extends Dialog implements
 			dialog.setMultipleSelection(true);
 			if (dialog.open() == Window.CANCEL)
 				return;
-			for (final Object o : dialog.getResult())
-				producers.add((EventProducer) o);
-			listViewerEventProducers.setInput(producers);
-			// hasChanged = HasChanged.ALL;
+			for (final Object o : dialog.getResult()) {
+				for (SimpleEventProducerNode epNode : params
+						.getEventProducerHierarchy().getEventProducerNodes()
+						.values()) {
+					if ((epNode.getMe() == (EventProducer) o)) {
+						checkElement(epNode);
+						break;
+					}
+				}
+			}
+			updateSelectedEventProducer();
 		}
 	}
 	
-	private class RemoveEventProducerAdapter extends SelectionAdapter {
+	public class AddProducerNodeAdapter extends SelectionAdapter {
+		
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            TreeSelection selection = (TreeSelection) treeViewerEventProducer.getSelection();
 
-		private final ListViewer viewer;
+            for (Object element : selection.toArray()) {
+                checkElement(element);
+            }
 
-		public RemoveEventProducerAdapter(final ListViewer viewer) {
-			this.viewer = viewer;
-		}
+            updateSelectedEventProducer();
+        }
+    }
+	
+	
+	public class CheckSubtreeEventProducersAdapter extends SelectionAdapter {
 
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            TreeSelection selection = (TreeSelection) treeViewerEventProducer.getSelection();
+
+            for (Object element : selection.toArray()) {
+                checkElementAndSubtree(element);
+            }
+        }
+    }
+	
+	private class UncheckEventProducerAdapter extends SelectionAdapter {
 		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			final IStructuredSelection selection = (IStructuredSelection) viewer
-					.getSelection();
-			final Object obj = selection.getFirstElement();
-			final Collection<?> c = (Collection<?>) viewer.getInput();
-			c.remove(obj);
-			viewer.refresh(false);
+		public void widgetSelected(SelectionEvent e) {
+			TreeSelection selection = (TreeSelection) treeViewerEventProducer.getSelection();
+
+			for (Object element : selection.toArray()) {
+				uncheckElement(element);
+			}
+
+			updateSelectedEventProducer();
 		}
 	}
+
+	public class UnCheckAllEventProducersAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			treeViewerEventProducer.setCheckedElements(new Object[0]);
+			updateSelectedEventProducer();
+		}
+	}
+
 	
 	private class AddResultsEventProducersAdapter extends SelectionAdapter {
 
@@ -155,11 +203,11 @@ public abstract class DistributionBaseView extends Dialog implements
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			listViewerEventProducers.setInput(producers);
+			treeViewerEventProducer.setInput(producers);
 			// hasChanged = HasChanged.ALL;
 		}
 	}
-
+	
 	private class ResetSelectionAdapter extends SelectionAdapter {
 
 		private final ListViewer viewer;
@@ -192,12 +240,20 @@ public abstract class DistributionBaseView extends Dialog implements
 			return ((EventType) element).getName();
 		}
 	}
-
+	
 	private class EventProducerLabelProvider extends LabelProvider {
 
 		@Override
 		public String getText(final Object element) {
 			return ((EventProducer) element).getName();
+		}
+	}
+
+	private class SimpleEventProducerLabelProvider extends LabelProvider {
+
+		@Override
+		public String getText(final Object element) {
+			return ((SimpleEventProducerNode) element).getName();
 		}
 	}
 
@@ -273,8 +329,8 @@ public abstract class DistributionBaseView extends Dialog implements
 	private Spinner spinnerDivideDbQuery;
 
 	private Spinner spinnerThread;
-
-	private ListViewer listViewerEventProducers;
+	
+	protected CheckboxTreeViewer treeViewerEventProducer;
 
 	private final java.util.List<EventProducer> producers = new LinkedList<EventProducer>();
 
@@ -366,6 +422,8 @@ public abstract class DistributionBaseView extends Dialog implements
 				SWT.NORMAL));
 		btnResetEventTypes.setImage(null);
 
+		
+		// Tab event producers selection
 		TabItem tbtmNewItem_2 = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem_2.setText("Event Producers");
 
@@ -374,57 +432,62 @@ public abstract class DistributionBaseView extends Dialog implements
 		groupEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 11,
 				SWT.NORMAL));
 		groupEventProducers.setText("Event Producers");
-		final GridLayout gl_groupEventProducers = new GridLayout(2, false);//
-		gl_groupEventProducers.horizontalSpacing = 0;
-		groupEventProducers.setLayout(gl_groupEventProducers);
+		groupEventProducers.setLayout(new GridLayout());
 
-		listViewerEventProducers = new ListViewer(groupEventProducers,
-				SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		listViewerEventProducers.setContentProvider(new ArrayContentProvider());
-		listViewerEventProducers
-				.setLabelProvider(new EventProducerLabelProvider());
-		listViewerEventProducers.setComparator(new ViewerComparator());
-		final List listEventProducers = listViewerEventProducers.getList();
-		listEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
-		final GridData gd_listEventProducers = new GridData(SWT.FILL, SWT.FILL,
-				true, true, 1, 1);
-		gd_listEventProducers.heightHint = 79;
-		gd_listEventProducers.widthHint = 120;
-		listEventProducers.setLayoutData(gd_listEventProducers);
+	
+		// Tree viewer
+		treeViewerEventProducer = new CheckboxTreeViewer(groupEventProducers, SWT.BORDER | SWT.MULTI);
+		treeViewerEventProducer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
+		
+		GridData data = new GridData(GridData.FILL_BOTH);
+	    data.widthHint = convertWidthInCharsToPixels(60);
+	    data.heightHint = convertHeightInCharsToPixels(18);
+		
+        final Tree tree = treeViewerEventProducer.getTree(); 
+        tree.setLinesVisible(true);
+        tree.setLayoutData(data);
+        tree.setFont(parent.getFont());
 
-		final ScrolledComposite scrCompositeEventProducerButtons = new ScrolledComposite(
-				groupEventProducers, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrCompositeEventProducerButtons.setLayoutData(new GridData(SWT.FILL,
-				SWT.FILL, false, true, 1, 1));
-		scrCompositeEventProducerButtons.setExpandHorizontal(true);
-		scrCompositeEventProducerButtons.setExpandVertical(true);
+		treeViewerEventProducer.setContentProvider(new FilterTreeContentProvider());
+		treeViewerEventProducer
+				.setLabelProvider(new SimpleEventProducerLabelProvider());
+		treeViewerEventProducer.expandAll();
+		treeViewerEventProducer.setComparator(new ViewerComparator());
+		treeViewerEventProducer.addCheckStateListener(new CheckStateListener());
+		
+		// Buttons
+		Composite buttonComposite = new Composite(groupEventProducers, SWT.RIGHT);
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.horizontalSpacing = convertHorizontalDLUsToPixels(5);
+        buttonComposite.setLayout(layout);
+        buttonComposite.setFont(groupEventProducers.getFont());
+        GridData data2 = new GridData(GridData.HORIZONTAL_ALIGN_END
+                | GridData.GRAB_HORIZONTAL);
+        data2.grabExcessHorizontalSpace = true;
+        buttonComposite.setLayoutData(data2);
 
-		final Composite compositeEventProducerButtons = new Composite(
-				scrCompositeEventProducerButtons, SWT.NONE);
-		compositeEventProducerButtons.setLayout(new GridLayout(1, false));
-		final Button btnAddEventProducer = new Button(
-				compositeEventProducerButtons, SWT.NONE);
-		btnAddEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+		final Button btnCheckEventProducer = new Button(
+				buttonComposite, SWT.NONE);
+		btnCheckEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
 				true, false, 1, 1));
-		btnAddEventProducer.setText("Add");
-		btnAddEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 11,
+		btnCheckEventProducer.setText("Check");
+		btnCheckEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 11,
 				SWT.NORMAL));
-		btnAddEventProducer.setImage(null);
+		btnCheckEventProducer.setImage(null);
+		btnCheckEventProducer.addSelectionListener(new AddProducerNodeAdapter());
+				
+		Button btnCheckAllEventProducer = new Button(buttonComposite, SWT.NONE);
+		btnCheckAllEventProducer.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, false, false, 1, 1));
+		btnCheckAllEventProducer.setText("Check All");
+		btnCheckAllEventProducer.setImage(null);
+		btnCheckAllEventProducer.setFont(SWTResourceManager.getFont(
+				"Cantarell", 11, SWT.NORMAL));
+		btnCheckAllEventProducer
+				.addSelectionListener(new CheckAllEventProducersAdapter());
 
-		Button btnAddAllEventProducer = new Button(
-				compositeEventProducerButtons, SWT.NONE);
-		btnAddAllEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-				false, false, 1, 1));
-		btnAddAllEventProducer.setText("Add All");
-		btnAddAllEventProducer.setImage(null);
-		btnAddAllEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
-				11, SWT.NORMAL));
-		btnAddAllEventProducer
-				.addSelectionListener(new AddAllEventProducersAdapter());
-			
-		final Button btnAddResult = new Button(compositeEventProducerButtons,
-				SWT.NONE);
+		final Button btnAddResult = new Button(buttonComposite, SWT.NONE);
 		btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
 				false, 1, 1));
 		btnAddResult.setText("Add Result");
@@ -434,38 +497,63 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnAddResult
 				.addSelectionListener(new AddResultsEventProducersAdapter());
 		
-		final Button btnRemoveEventProducer = new Button(
-				compositeEventProducerButtons, SWT.NONE);
-		btnRemoveEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-				true, false, 1, 1));
-		btnRemoveEventProducer.setText("Remove");
-		btnRemoveEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
+		final Button btnUncheckEventProducer = new Button(buttonComposite,
+				SWT.NONE);
+		btnUncheckEventProducer.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, true, false, 1, 1));
+		btnUncheckEventProducer.setText("Uncheck");
+		btnUncheckEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
 				11, SWT.NORMAL));
-		btnRemoveEventProducer.setImage(null);
-		btnRemoveEventProducer.setImage(null);
-		btnRemoveEventProducer
-				.addSelectionListener(new RemoveEventProducerAdapter(
-						listViewerEventProducers));
+		btnUncheckEventProducer.setImage(null);
+		btnUncheckEventProducer.setImage(null);
+		btnUncheckEventProducer
+				.addSelectionListener(new UncheckEventProducerAdapter());
+
+		Button btnUncheckAllEventProducer = new Button(buttonComposite,
+				SWT.NONE);
+		btnUncheckAllEventProducer.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, true, false, 1, 1));
+		btnUncheckAllEventProducer.setText("Uncheck All");
+		btnUncheckAllEventProducer.setFont(SWTResourceManager.getFont(
+				"Cantarell", 11, SWT.NORMAL));
+		btnUncheckAllEventProducer.setImage(null);
+		btnUncheckAllEventProducer.addSelectionListener(new UnCheckAllEventProducersAdapter());
+		
+		Button btnCheckSubtreeEventProducer = new Button(buttonComposite,
+				SWT.NONE);
+		btnCheckSubtreeEventProducer.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, true, false, 1, 1));
+		btnCheckSubtreeEventProducer.setText("Check Subtree");
+		btnCheckSubtreeEventProducer.setFont(SWTResourceManager.getFont(
+				"Cantarell", 11, SWT.NORMAL));
+		btnCheckSubtreeEventProducer.setImage(null);
+		btnCheckSubtreeEventProducer.addSelectionListener(new CheckSubtreeEventProducersAdapter());
+		
+		Button btnUncheckSubtreeEventProducer = new Button(buttonComposite,
+				SWT.NONE);
+		btnUncheckSubtreeEventProducer.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, true, false, 1, 1));
+		btnUncheckSubtreeEventProducer.setText("Uncheck Subtree");
+		btnUncheckSubtreeEventProducer.setFont(SWTResourceManager.getFont(
+				"Cantarell", 11, SWT.NORMAL));
+		btnUncheckSubtreeEventProducer.setImage(null);
+		btnUncheckSubtreeEventProducer.addSelectionListener(new UncheckEventProducerAdapter());
+		
+		Button btnAddEventProducer = new Button(buttonComposite,
+				SWT.NONE);
+		btnAddEventProducer.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, true, false, 1, 1));
+		btnAddEventProducer.setText("Add");
+		btnAddEventProducer.setFont(SWTResourceManager.getFont(
+				"Cantarell", 11, SWT.NORMAL));
+		btnAddEventProducer.setImage(null);
+		btnAddEventProducer.addSelectionListener(new AddEventProducerAdapter());
+				
+		layout.numColumns = 4;
+        buttonComposite.setLayout(layout);
 
 		
-		Button btnResetEventProducer = new Button(
-				compositeEventProducerButtons, SWT.NONE);
-		btnResetEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-				true, false, 1, 1));
-		btnResetEventProducer.setText("Remove All");
-		btnResetEventProducer.addSelectionListener(new ResetSelectionAdapter(
-				listViewerEventProducers));
-		btnResetEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
-				11, SWT.NORMAL));
-		btnResetEventProducer.setImage(null);
-		scrCompositeEventProducerButtons
-				.setContent(compositeEventProducerButtons);
-		scrCompositeEventProducerButtons
-				.setMinSize(compositeEventProducerButtons.computeSize(
-						SWT.DEFAULT, SWT.DEFAULT));
-		btnAddEventProducer
-				.addSelectionListener(new AddEventProducersAdapter());
-
+		// Advanced Settings tab
 		TabItem tbtmNewItem_1 = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem_1.setText("Advanced Settings");
 
@@ -534,10 +622,9 @@ public abstract class DistributionBaseView extends Dialog implements
 		sashFormGlobal.setWeights(new int[] { 1 });
 		producers.clear();
 		producers.addAll(params.getEventProducers());
-		listViewerEventProducers.setInput(producers);
-		if (producers.isEmpty())
-			btnAddAllEventProducer.notifyListeners(SWT.Selection, new Event());
+		treeViewerEventProducer.setInput(params.getEventProducerHierarchy().getRoot());
 		setParameters();
+		updateTreeStatus();
 		return sashFormGlobal;
 
 	}
@@ -576,5 +663,94 @@ public abstract class DistributionBaseView extends Dialog implements
 	protected java.util.List<EventType> getEventTypes() {
 		return ocelotlView.getConfDataLoader().getTypes();
 	}
+	
+	/**
+	 * Synchronize the event producer tree view with the model
+	 */
+	protected void updateTreeStatus() {
+		for (SimpleEventProducerNode epNode : params
+				.getEventProducerHierarchy().getEventProducerNodes().values()) {
+			// If the producer is currently included
+			if (producers.contains(epNode.getMe())) {
+				// Check it
+				treeViewerEventProducer.setChecked(epNode, true);
+			} else {
+				treeViewerEventProducer.setChecked(epNode, false);
+			}
+		}
+	}
+	
+	/**
+	 * Synchronize the model with the event producer tree view
+	 */
+	protected void updateSelectedEventProducer() {
+		// Reset previously selected producers
+		producers.clear();
 
+		// Add checked producers
+		for (Object obj : treeViewerEventProducer.getCheckedElements()) {
+			SimpleEventProducerNode anEPNode = (SimpleEventProducerNode) obj;
+			producers.add(anEPNode.getMe());
+		}
+	}
+
+
+	/**
+	 * Check an element
+	 * 
+	 * @param element
+	 *            The element to check.
+	 */
+	protected void checkElement(Object element) {
+		treeViewerEventProducer.setChecked(element, true);
+	}
+
+	/**
+	 * Uncheck an element
+	 * 
+	 * @param element
+	 *            The element to uncheck.
+	 */
+	protected void uncheckElement(Object element) {
+		treeViewerEventProducer.setChecked(element, false);
+	}
+
+	/**
+	 * Private classes
+	 */
+	private class CheckStateListener implements ICheckStateListener {
+
+		@Override
+		public void checkStateChanged(CheckStateChangedEvent event) {
+			try {
+				SimpleEventProducerNode entry = (SimpleEventProducerNode) event
+						.getElement();
+				boolean checked = event.getChecked();
+				if (checked) {
+					checkElement(entry);
+				} else {
+					uncheckElement(entry);
+				}
+				
+				updateSelectedEventProducer();
+			} catch (ClassCastException e) {
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Check an element, all its parents and all its children.
+	 * 
+	 * @param element
+	 *            The element to check.
+	 */
+	private void checkElementAndSubtree(Object element) {
+		checkElement(element);
+
+		for (Object child : new FilterTreeContentProvider()
+				.getChildren(element)) {
+			checkElementAndSubtree(child);
+		}
+	}
 }

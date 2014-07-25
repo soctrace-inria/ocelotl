@@ -110,20 +110,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initQueries();
 		initVectors();
-		
-		String cacheFile = dataCache.checkCache(parameters);
-		// if there is a file and it is valid
-		if (!cacheFile.isEmpty()) {
-			// call computeMatrixFromFile()
-			loadFromCache(cacheFile);
-		} else {
-			computeMatrix();
-
-			// save the newly computed matrix + parameters
-			dm.start();
-			saveMatrix();
-			dm.end("Save the matrix to cache");
-		}
+		computeMatrix();
 
 		if (eventsNumber == 0)
 			throw new OcelotlException(OcelotlException.NOEVENTS);
