@@ -112,7 +112,6 @@ public class EventProducerHierarchy {
 			childrenNodes.add(child);
 			if (leaves.containsKey(id))
 				leaves.remove(id);
-
 		}
 
 		public EventProducer getMe() {
@@ -138,7 +137,6 @@ public class EventProducerHierarchy {
 									.getName()
 									.compareToIgnoreCase(arg1.getMe().getName());
 						}
-
 					});
 		}
 
@@ -204,7 +202,6 @@ public class EventProducerHierarchy {
 		public void setIndex(int index) {
 			this.index = index;
 		}
-
 	}
 
 	private Map<Integer, EventProducerNode> eventProducerNodes = new HashMap<Integer, EventProducerNode>();

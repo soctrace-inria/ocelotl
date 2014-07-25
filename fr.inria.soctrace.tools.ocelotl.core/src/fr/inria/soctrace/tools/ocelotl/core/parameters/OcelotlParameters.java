@@ -28,6 +28,7 @@ import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
@@ -38,6 +39,7 @@ public class OcelotlParameters {
 
 	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
 	private List<EventType> eventTypes = new LinkedList<EventType>();
+    private SimpleEventProducerHierarchy eventProducerHierarchy;
 	private int timeSlicesNumber = 1;
 	private TimeRegion timeRegion;
 	private double parameter = 0;
@@ -61,7 +63,7 @@ public class OcelotlParameters {
 	public OcelotlParameters(OcelotlParameters op) {
 		super();
 		this.eventProducers = op.eventProducers;
-		this.eventTypes = op.eventTypes;
+		this.eventProducerHierarchy = op.eventProducerHierarchy;
 		this.timeSlicesNumber = op.timeSlicesNumber;
 		this.timeRegion = op.timeRegion;
 		this.parameter = op.parameter;
@@ -211,6 +213,15 @@ public class OcelotlParameters {
 
 	public void setDataCache(DataCache dataCache) {
 		this.dataCache = dataCache;
+	}
+
+	public SimpleEventProducerHierarchy getEventProducerHierarchy() {
+		return eventProducerHierarchy;
+	}
+
+	public void setEventProducerHierarchy(
+			SimpleEventProducerHierarchy eventProducerHierarchy) {
+		this.eventProducerHierarchy = eventProducerHierarchy;
 	}
 
 

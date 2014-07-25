@@ -73,6 +73,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
@@ -241,10 +242,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 			if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp())
 				invalidEnd = true;
-
+			
 			if (Long.parseLong(textTimestampStart.getText()) < confDataLoader.getMinTimestamp() || Long.parseLong(textTimestampStart.getText()) > confDataLoader.getMaxTimestamp())
 				invalidStart = true;
-
+			
 			if (invalidStart)
 				// Set font color to red
 				textTimestampStart.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
@@ -272,11 +273,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	}
 
 	private class GetAggregationAdapter extends SelectionAdapter {
-		
-		//Prevent the simultaneous execution of multiple threads leading to random crashes
-		private Object lock = new Object();
-		//Global flag signaling that a job already is running 
-		private boolean running = false;
+
+		// Prevent the simultaneous execution of multiple threads leading to
+		// random crashes
+		private Object	lock	= new Object();
+		// Global flag signaling that a job is already running
+		private boolean	running	= false;
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
@@ -320,42 +322,23 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-
-					if (hasChanged != HasChanged.PARAMETER) {
-						try {
-							ocelotlCore.computeDichotomy(hasChanged);
-						} catch (final SoCTraceException e) {
-							e.printStackTrace();
-							synchronized (lock) {
-								running = false;
+                    try {
+						if (hasChanged != HasChanged.PARAMETER) {
+							if (hasChanged == HasChanged.ALL) {
+								ocelotlCore.initTimeOperator();
 							}
-							return Status.CANCEL_STATUS;
-						} catch (final OcelotlException e) {
-							monitor.done();
-							Display.getDefault().syncExec(new Runnable() {
+							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE)
+								ocelotlCore.computeQualities();
 
-								@Override
-								public void run() {
-									hasChanged = HasChanged.ALL;
-									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
-								}
-							});
-							synchronized (lock) {
-								running = false;
-							}
-							return Status.CANCEL_STATUS;
+							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD)
+								ocelotlCore.computeDichotomy();
 						}
-					}
 
-					hasChanged = HasChanged.PARAMETER;
-					try {
-						ocelotlCore.computeParts(hasChanged);
-					} catch (final SoCTraceException e) {
-						e.printStackTrace();
-						synchronized (lock) {
-							running = false;
-						}
-						return Status.CANCEL_STATUS;
+						hasChanged = HasChanged.PARAMETER;
+						
+						//if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.PARAMETER)
+						ocelotlCore.computeParts();
+					
 					} catch (final OcelotlException e) {
 						monitor.done();
 						Display.getDefault().syncExec(new Runnable() {
@@ -392,12 +375,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			};
 			job.setUser(true);	
 			job.schedule();
-			
-			if(job.getResult() == Status.OK_STATUS)
-			{
-				//Setting the actual computed value
-				textRun.setText(Double.toString(ocelotlParameters.getParameter()));
-			}
+
 		}
 	}
 
@@ -598,7 +576,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	}
 
 	private class TraceAdapter extends SelectionAdapter {
-		private Trace trace;
+		private Trace	trace;
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
@@ -615,6 +593,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					try {
 						try {
 							confDataLoader.load(trace);
+							ocelotlParameters.setEventProducerHierarchy(new SimpleEventProducerHierarchy(confDataLoader.getProducers()));
 						} catch (final SoCTraceException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -624,6 +603,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 							@Override
 							public void run() {
+
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
 								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories()))
@@ -883,7 +863,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		sashFormView.setWeights(new int[] {418, 36});
 
-		
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 
@@ -1090,7 +1069,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		textThreshold.addModifyListener(new ThresholdModifyListener());
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 		sashFormAdvancedParameters.setWeights(new int[] { 1 });
-		
 		
 
 		// Datacache settings
