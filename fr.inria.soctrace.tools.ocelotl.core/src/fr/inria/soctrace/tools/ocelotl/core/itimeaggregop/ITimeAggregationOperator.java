@@ -23,7 +23,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 
 public interface ITimeAggregationOperator {
 
@@ -31,7 +31,7 @@ public interface ITimeAggregationOperator {
 
 	public OcelotlParameters getOcelotlParameters();
 
-	public TimeSliceManager getTimeSlicesManager();
+	public TimeSliceStateManager getTimeSlicesManager();
 
 	public int getVectorSize();
 

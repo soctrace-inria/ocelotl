@@ -157,4 +157,47 @@ public class OcelotlQueries {
 
 		return time;
 	}
+	
+	/**
+	 * 
+	 * @return an EventIterator on all events of the category State produced by
+	 *         the event producers in eventProducers
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
+	public EventIterator getVariableIterator() throws SoCTraceException,
+			OcelotlException {
+		return getVariableIterator(getAllEventProducers());
+	}
+	
+	/**
+	 * 
+	 * @param eventProducers
+	 *            list of event producers from which to select all the variables. A
+	 *            null value means all event producers.
+	 * @return an EventIterator on all events of the category Variable produced by
+	 *         the event producers in eventProducers
+	 * @return
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
+	public EventIterator getVariableIterator(List<EventProducer> eventProducers) throws SoCTraceException, OcelotlException {
+		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
+		.initialize();
+final List<IntervalDesc> time = setTimeInterval();
+
+// If we do not filter event producers
+if (eventProducers == null
+		|| eventProducers.size() == getAllEventProducers().size()) {
+	return traceSearch.getVariableIterator(ocelotlParameters.getTrace(),
+			ocelotlParameters.getTraceTypeConfig().getTypes(), time,
+			null);
+} else {
+	return traceSearch.getVariableIterator(ocelotlParameters.getTrace(),
+			ocelotlParameters.getTraceTypeConfig().getTypes(), time,
+			eventProducers);
 }
+}
+	
+}
+

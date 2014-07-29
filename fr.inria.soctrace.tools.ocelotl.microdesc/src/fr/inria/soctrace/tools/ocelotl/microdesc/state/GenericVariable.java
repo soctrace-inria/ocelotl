@@ -17,42 +17,23 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.state;
+package fr.inria.soctrace.tools.ocelotl.microdesc.state;
 
-import java.util.Map;
-
+import fr.inria.soctrace.lib.model.Event;
+import fr.inria.soctrace.tools.ocelotl.core.state.State;
+import fr.inria.soctrace.tools.ocelotl.core.state.Variable;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 
-public abstract class State implements IState {
+public class GenericVariable extends Variable {
 
-	protected String stateType = null;
-	protected TimeRegion timeRegion = null;
-	protected int eventProducerID = -1;
-	protected final TimeSliceStateManager timeSliceManager;
-
-	public State(final TimeSliceStateManager timeSliceManager) {// TODO
-		this.timeSliceManager = timeSliceManager;
-	}
-
-	@Override
-	public int getEventProducerID() {
-		return eventProducerID;
-	}
-
-	@Override
-	public String getType() {
-		return stateType;
-	}
-
-	@Override
-	public TimeRegion getTimeRegion() {
-		return timeRegion;
-	}
-
-	@Override
-	public Map<Long, Long> getTimeSlicesDistribution() {
-		return timeSliceManager.getTimeSlicesDistribution(timeRegion);
+	public GenericVariable(final Event event,
+			final TimeSliceStateManager timeSliceManager) {
+		super(timeSliceManager);
+		timeRegion = new TimeRegion(event.getTimestamp(), event.getLongPar());
+		eventProducerID = event.getEventProducer().getId();
+		variableType = event.getType().getName();
+		value = event.getDoublePar();
 	}
 
 }

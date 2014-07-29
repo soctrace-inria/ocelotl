@@ -26,7 +26,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 public interface IState {
 	public int getEventProducerID();
 
-	public String getStateType();
+	public String getType();
 
 	public TimeRegion getTimeRegion();
 
