@@ -21,6 +21,8 @@ package fr.inria.soctrace.tools.ocelotl.microdesc.ui;
 
 import org.eclipse.swt.widgets.Shell;
 
+import fr.inria.soctrace.lib.model.EventType;
+
 public class EventDistributionView extends DistributionBaseView {
 
 	public EventDistributionView(final Shell shell) {
@@ -35,5 +37,10 @@ public class EventDistributionView extends DistributionBaseView {
 				config.getTypes().add(
 						ocelotlView.getConfDataLoader().getTypes().get(i));
 		listViewerEventTypes.setInput(config.getTypes());
+	}
+	
+
+	protected java.util.List<EventType> getEventTypes() {
+		return ocelotlView.getConfDataLoader().getTypes();
 	}
 }

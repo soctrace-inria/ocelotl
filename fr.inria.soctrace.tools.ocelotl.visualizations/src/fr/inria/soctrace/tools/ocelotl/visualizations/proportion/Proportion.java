@@ -48,7 +48,7 @@ public class Proportion extends SpaceTAggregationOperator {
 			for (int i = part.getStartPart(); i < part.getEndPart(); i++)
 				for (final EventProducer ep : ((TimeAggregation3Manager) lpaggregManager).getEventProducers())
 					for (final String state : states)
-						((PartMap) part.getData()).addElement(state, ((TimeAggregation3Manager) lpaggregManager).getTimeSliceMatrix().getMatrix().get(i).get(ep).get(state).doubleValue());
+						((PartMap) part.getData()).addElement(state, ((TimeAggregation3Manager) lpaggregManager).getTimeSliceMatrix().getMatrix().get(i).get(ep).get(state));
 
 	}
 

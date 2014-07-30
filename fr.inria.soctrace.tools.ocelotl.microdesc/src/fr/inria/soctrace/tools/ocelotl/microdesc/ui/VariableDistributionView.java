@@ -32,7 +32,7 @@ public class VariableDistributionView extends TypeDistributionView {
 		super(shell);
 	}
 
-	@Override
+
 	int getType() {
 		return EventCategory.VARIABLE;
 	}

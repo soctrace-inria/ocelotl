@@ -310,6 +310,8 @@ public abstract class DistributionBaseView extends Dialog implements
 				config.getTypes().add((EventType) o);
 			listViewerEventTypes.setInput(config.getTypes());
 		}
+
+
 	}
 
 	protected OcelotlView ocelotlView;
@@ -340,6 +342,8 @@ public abstract class DistributionBaseView extends Dialog implements
 		config = null;
 	}
 
+	protected abstract java.util.List<EventType> getEventTypes();
+	
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		oldEventTypes = new ArrayList<EventType>(config.getTypes());
@@ -660,9 +664,6 @@ public abstract class DistributionBaseView extends Dialog implements
 		newShell.setText("Microscopic Description Settings");
 	}
 
-	protected java.util.List<EventType> getEventTypes() {
-		return ocelotlView.getConfDataLoader().getTypes();
-	}
 	
 	/**
 	 * Synchronize the event producer tree view with the model

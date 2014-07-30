@@ -18,7 +18,7 @@ public class TimeSliceVariableManager extends TimeSliceStateManager{
 				0,
 				(testedTimeRegion.getTimeStampStart() - timeRegion
 						.getTimeStampStart()) / sliceDuration - 1);
-		long temp = 0;
+		double temp = 0;
 		if (testedTimeRegion.getTimeStampStart()
 				- timeRegion.getTimeStampStart() >= 0)
 			for (long i = startSlice; i < timeSlices.size(); i++) {

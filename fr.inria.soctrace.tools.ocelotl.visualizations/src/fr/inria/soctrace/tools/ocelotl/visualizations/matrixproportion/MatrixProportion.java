@@ -70,9 +70,8 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 							.get(node)
 							.get(i)
 							.put(state,
-									((List<HashMap<String, Long>>) node
+									((List<HashMap<String, Double>>) node
 											.getValues()).get(i).get(state)
-											.doubleValue()
 											/ (Long.valueOf(timeSliceDuration)
 													.doubleValue()));
 			}

@@ -53,7 +53,7 @@ public class TimeSlice {
 		return value;
 	}
 
-	public long regionInsideMe(final TimeRegion testedTimeRegion) {
+	public double regionInsideMe(final TimeRegion testedTimeRegion) {
 		if (testedTimeRegion.getTimeStampStart() >= timeRegion
 				.getTimeStampStart()
 				&& testedTimeRegion.getTimeStampStart() <= timeRegion

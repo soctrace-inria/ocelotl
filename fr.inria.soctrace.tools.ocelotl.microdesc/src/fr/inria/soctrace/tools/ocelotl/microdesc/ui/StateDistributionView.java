@@ -32,7 +32,6 @@ public class StateDistributionView extends TypeDistributionView {
 		super(shell);
 	}
 
-	@Override
 	int getType() {
 		return EventCategory.STATE;
 	}

@@ -43,7 +43,7 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 			((JNITimeAggregation2) timeAggregation).addVector();
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet())
 				((JNITimeAggregation2) timeAggregation).push_back(matrix
-						.getMatrix().get(i).get(key).doubleValue());
+						.getMatrix().get(i).get(key));
 		}
 
 	}
