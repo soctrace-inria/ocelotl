@@ -76,6 +76,22 @@ public class TimeSliceManager {
 		}
 		return slice;
 	}
+	
+	public TimeSlice getATimeSlice(final long timeStamp) {
+		TimeSlice slice = null;
+
+		long presumeTimeSlice = Math.max(0,
+				(timeStamp - timeRegion.getTimeStampStart()) / sliceDuration
+						- 1);
+		for (long i = presumeTimeSlice; i < timeSlices.size(); i++) {
+			final TimeSlice it = timeSlices.get((int) i);
+			if (it.startIsInsideMe(timeStamp)) {
+				slice = it;
+				break;
+			}
+		}
+		return slice;
+	}
 
 	public List<TimeSlice> getTimeSlices() {
 		return timeSlices;

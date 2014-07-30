@@ -35,7 +35,6 @@ public class ProportionConfig implements ISpaceConfig {
 	public ProportionConfig() {
 		super();
 	}
-
 	
 	public List<EventType> getTypes() {
 		return types;

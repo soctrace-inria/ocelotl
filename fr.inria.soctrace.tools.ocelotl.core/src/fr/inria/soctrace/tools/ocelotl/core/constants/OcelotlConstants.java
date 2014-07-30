@@ -29,14 +29,13 @@ public class OcelotlConstants {
 	 * PARAMETER: parameter has changed
 	 * EQ: 
 	 * NOTHING: nothing has changed
-	 *
 	 */
 	static public enum HasChanged {
 		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
 	}
 	
 	/**
-	 * Token used for the csv file format
+	 * Token used for the CSV file format
 	 */
 	static public String CSVDelimiter = ";";
 	
@@ -44,5 +43,13 @@ public class OcelotlConstants {
 	 * Number of field in the header of a cache file 
 	 */
 	static public int CACHE_HEADER_NORMAL_SIZE = 9;
+	
+	/**
+	 * Maximum size of the data cache in bytes.
+	 * A value of -1 means no size limit
+	 */
+	static public int MAX_CACHESIZE = -1;
+	
+	static public double MINIMAL_TIMESLICE_RATIO = 1.0;
 
 }

@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -129,9 +130,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 		initQueries();
 		initVectors();
 
-		String cacheFile = parameters.getDataCache().checkCache(parameters);
+		File cacheFile = parameters.getDataCache().checkCache(parameters);
 		// if there is a file and it is valid
-		if (!cacheFile.isEmpty()) {
+		if (cacheFile != null) {
 			// call computeMatrixFromFile()
 			loadFromCache(cacheFile);
 		} else {
@@ -199,8 +200,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 			// Iterate over matrix and write data
 			writer.print(matrixToCSV());
-		
+			
 			// Close the fd
+			writer.flush();
 			writer.close();
 
 		} catch (FileNotFoundException e) {
@@ -218,16 +220,16 @@ public abstract class MultiThreadTimeAggregationOperator {
 	/**
 	 * Load matrix values from a cache file
 	 * 
-	 * @param aFilepath
-	 *            path to the cache file
+	 * @param aCacheFile
+	 *            the cache file
 	 */
-	public void loadFromCache(String aFilepath) {
+	public void loadFromCache(File aCacheFile) {
 		try {
 			dm = new DeltaManagerOcelotl();
 			dm.start();
 
 			BufferedReader bufFileReader = new BufferedReader(new FileReader(
-					aFilepath));
+					aCacheFile.getPath()));
 
 			HashMap<String, EventProducer> eventProducers = new HashMap<String, EventProducer>();
 			for (EventProducer ep : parameters.getEventProducers()) {

@@ -76,6 +76,7 @@ import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
@@ -364,6 +365,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							qualityView.createDiagram();
+							
+							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 						}
 					});
 				

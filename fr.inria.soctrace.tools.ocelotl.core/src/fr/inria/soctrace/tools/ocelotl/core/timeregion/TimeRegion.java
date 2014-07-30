@@ -50,6 +50,21 @@ public class TimeRegion {
 			return false;
 		return true;
 	}
+	
+	/**
+	 * Test if a time region is contained within another
+	 * 
+	 * @param timeRegion
+	 *            the time region to test if its contained
+	 * @return false if the time region is not contained, true otherwise
+	 * 
+	 */
+	public boolean containsTimeRegion(final TimeRegion timeRegion) {
+		if (timeRegion.getTimeStampStart() < timeStampStart
+				|| timeRegion.getTimeStampEnd() > timeStampEnd)
+			return false;
+		return true;
+	}
 
 	public long getTimeDuration() {
 		return timeStampEnd - timeStampStart;
