@@ -53,6 +53,30 @@
             ts_default_number="20"
             unit="%TIME">
       </aggregation_operator>
+            <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.VariableDistribution"
+            event_category="VARIABLE"
+            generic="true"
+            operator="Variable Distribution"
+            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.VariableDistributionView"
+            spatial_compatibility="Parts, Proportion"
+            trace_formats="ALL"
+            ts_default_number="100"
+            unit="%UNKNOWN">
+      </aggregation_operator>
+            <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.VariableDistributionSpaceTime"
+            event_category="VARIABLE"
+            generic="true"
+            operator="Hierarchical Variable Distribution"
+            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalVariableDistributionView"
+            spatial_compatibility="Matrix"
+            trace_formats="ALL"
+            ts_default_number="20"
+            unit="%UNKNOWN">
+      </aggregation_operator>
    </extension>
 
 </plugin>

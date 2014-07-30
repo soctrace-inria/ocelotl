@@ -40,7 +40,7 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 public abstract class _2DMicroDescription extends
 		MultiThreadTimeAggregationOperator implements I2DMicroDescription {
 
-	protected List<HashMap<EventProducer, Long>> matrix;
+	protected List<HashMap<EventProducer, Double>> matrix;
 	
 	private static final Logger logger = LoggerFactory.getLogger(_2DMicroDescription.class);
 
@@ -92,7 +92,7 @@ public abstract class _2DMicroDescription extends
 	}
 
 	@Override
-	public List<HashMap<EventProducer, Long>> getMatrix() {
+	public List<HashMap<EventProducer, Double>> getMatrix() {
 		return matrix;
 	}
 
@@ -108,14 +108,14 @@ public abstract class _2DMicroDescription extends
 
 	@Override
 	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<EventProducer, Long>>();
+		matrix = new ArrayList<HashMap<EventProducer, Double>>();
 		final List<EventProducer> producers = getOcelotlParameters()
 				.getEventProducers();
-		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
-			matrix.add(new HashMap<EventProducer, Long>());
+		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
+			matrix.add(new HashMap<EventProducer, Double>());
 
 			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep, 0L);
+				matrix.get((int) i).put(ep, 0.0);
 		}
 	}
 
@@ -132,7 +132,7 @@ public abstract class _2DMicroDescription extends
 		logger.debug("");
 		logger.debug("Distribution Vectors");
 		int i = 0;
-		for (final HashMap<EventProducer, Long> it : matrix) {
+		for (final HashMap<EventProducer, Double> it : matrix) {
 			logger.debug("");
 			logger.debug("slice " + i++);
 			logger.debug("");
@@ -146,7 +146,7 @@ public abstract class _2DMicroDescription extends
 		StringBuffer stringBuf = new StringBuffer();
 		int slice = 0;
 		// For each slice
-		for (final HashMap<EventProducer, Long> it : matrix) {
+		for (final HashMap<EventProducer, Double> it : matrix) {
 			// for each event producer
 			for (final EventProducer ep : it.keySet()) {
 				if (it.get(ep) != 0)
@@ -163,7 +163,7 @@ public abstract class _2DMicroDescription extends
 	public void rebuildMatrix(String[] values, EventProducer ep,
 			int sliceMultiple) {
 		int slice = Integer.parseInt(values[0]);
-		long value = Long.parseLong(values[2]);
+		double value = Double.parseDouble(values[2]);
 
 		// If the number of time slice is a multiple of the cached time
 		// slice number
@@ -181,9 +181,9 @@ public abstract class _2DMicroDescription extends
 	
 	@Override
 	public void initMatrixToZero(Collection<EventProducer> eventProducers) {
-		for (int slice = 0; slice < timeSliceManager.getSlicesNumber(); slice++) {
+		for (int slice = 0; slice < parameters.getTimeSlicesNumber(); slice++) {
 			for (EventProducer ep : eventProducers) {
-				matrix.get(slice).put(ep, 0L);
+				matrix.get(slice).put(ep, 0.0);
 			}
 		}
 	}

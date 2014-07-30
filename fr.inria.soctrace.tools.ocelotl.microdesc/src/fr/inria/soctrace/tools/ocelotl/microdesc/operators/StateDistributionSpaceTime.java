@@ -29,14 +29,15 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
-import fr.inria.soctrace.tools.ocelotl.core.state.IState;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
-import fr.inria.soctrace.tools.ocelotl.microdesc.state.GenericState;
+import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericState;
 
 public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
@@ -61,19 +62,19 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		}
 
 		private void matrixUpdate(final IState state, final EventProducer ep,
-				final Map<Long, Long> distrib) {
+				final Map<Long, Double> distrib) {
 			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(state.getStateType())) {
-					logger.debug("Adding " + state.getStateType()
+				if (!matrix.get(0).get(ep).containsKey(state.getType())) {
+					logger.debug("Adding " + state.getType()
 							+ " state");
 					// addKey(state.getStateType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr)
 								.keySet())
-							matrixPushType(incr, epset, state.getStateType());
+							matrixPushType(incr, epset, state.getType());
 				}
 				for (final long it : distrib.keySet())
-					matrixWrite(it, ep, state.getStateType(), distrib);
+					matrixWrite(it, ep, state.getType(), distrib);
 			}
 		}
 
@@ -86,13 +87,15 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 				IState state;
 				for (final Event event : events) {
 					state = new GenericState(event, timeSliceManager);
-					final Map<Long, Long> distrib = state
+					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
 					matrixUpdate(state, event.getEventProducer(), distrib);
 				}
 			}
 		}
 	}
+
+	private TimeSliceStateManager timeSliceManager;
 
 	public StateDistributionSpaceTime() throws SoCTraceException {
 		super();
@@ -111,6 +114,8 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		it = ocelotlQueries.getStateIterator(eventProducers);
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
+		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)

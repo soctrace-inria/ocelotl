@@ -31,5 +31,5 @@ public interface I2DSpaceTimeMicroDescription extends ITimeAggregationOperator {
 	@Override
 	public SpaceTimeAggregation2Manager createManager() throws OcelotlException;
 
-	public List<HashMap<EventProducer, HashMap<String, Long>>> getMatrix();
+	public List<HashMap<EventProducer, HashMap<String, Double>>> getMatrix();
 }

@@ -19,7 +19,7 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 public abstract class _3DMatrixMicroDescription extends
 		MultiThreadTimeAggregationOperator {
 
-	protected List<HashMap<EventProducer, HashMap<String, Long>>> matrix;
+	protected List<HashMap<EventProducer, HashMap<String, Double>>> matrix;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(_3DMatrixMicroDescription.class);
@@ -54,7 +54,7 @@ public abstract class _3DMatrixMicroDescription extends
 				+ " Event Producers, " + eventsNumber + " Events");
 	}
 
-	public List<HashMap<EventProducer, HashMap<String, Long>>> getMatrix() {
+	public List<HashMap<EventProducer, HashMap<String, Double>>> getMatrix() {
 		return matrix;
 	}
 
@@ -68,19 +68,19 @@ public abstract class _3DMatrixMicroDescription extends
 
 	@Override
 	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Long>>>();
+		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
 		final List<EventProducer> producers = getOcelotlParameters()
 				.getEventProducers();
-		for (long i = 0; i < timeSliceManager.getSlicesNumber(); i++) {
-			matrix.add(new HashMap<EventProducer, HashMap<String, Long>>());
+		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
+			matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
 
 			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep, new HashMap<String, Long>());
+				matrix.get((int) i).put(ep, new HashMap<String, Double>());
 		}
 	}
 
 	public void matrixWrite(final long it, final EventProducer ep,
-			final String key, final Map<Long, Long> distrib) {
+			final String key, final Map<Long, Double> distrib) {
 		matrix.get((int) it)
 				.get(ep)
 				.put(key,
@@ -91,7 +91,7 @@ public abstract class _3DMatrixMicroDescription extends
 		logger.debug("");
 		logger.debug("Distribution Vectors");
 		int i = 0;
-		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
+		for (final HashMap<EventProducer, HashMap<String, Double>> it : matrix) {
 			logger.debug("");
 			logger.debug("slice " + i++);
 			logger.debug("");
@@ -105,7 +105,7 @@ public abstract class _3DMatrixMicroDescription extends
 		StringBuffer stringBuf = new StringBuffer();
 		int slice = 0;
 		// For each slice
-		for (final HashMap<EventProducer, HashMap<String, Long>> it : matrix) {
+		for (final HashMap<EventProducer, HashMap<String, Double>> it : matrix) {
 			// For each event producer
 			for (final EventProducer ep : it.keySet()) {
 				// For each event type
@@ -133,7 +133,7 @@ public abstract class _3DMatrixMicroDescription extends
 			return;
 
 		int slice = Integer.parseInt(values[0]);
-		long value = Long.parseLong(values[3]);
+		double value = Double.parseDouble(values[3]);
 
 		// If the number of time slice is a multiple of the cached time
 		// slice number
@@ -151,10 +151,10 @@ public abstract class _3DMatrixMicroDescription extends
 	
 	@Override
 	public void initMatrixToZero(Collection<EventProducer> eventProducers) {
-		for (int slice = 0; slice < timeSliceManager.getSlicesNumber(); slice++) {
+		for (int slice = 0; slice < parameters.getTimeSlicesNumber(); slice++) {
 			for (EventProducer ep : eventProducers) {
 				for (String evType : typeNames) {
-					matrix.get(slice).get(ep).put(evType, 0L);
+					matrix.get(slice).get(ep).put(evType, 0.0);
 				}
 			}
 		}

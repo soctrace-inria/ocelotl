@@ -47,8 +47,7 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 				for (final String key2 : matrix.getMatrix().get(i).get(key)
 						.keySet())
 					((JNITimeAggregation3) timeAggregation).push_back(matrix
-							.getMatrix().get(i).get(key).get(key2)
-							.doubleValue());
+							.getMatrix().get(i).get(key).get(key2));
 			}
 		}
 

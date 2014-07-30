@@ -29,16 +29,16 @@ import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class TimeSliceManager {
+public class TimeSliceStateManager {
 
-	private final List<TimeSlice> timeSlices = new ArrayList<TimeSlice>();
-	private final TimeRegion timeRegion;
-	private long slicesNumber;
+	protected final List<TimeSlice> timeSlices = new ArrayList<TimeSlice>();
+	protected final TimeRegion timeRegion;
+	protected long slicesNumber;
 
-	private long sliceDuration;
-	private static final Logger logger = LoggerFactory.getLogger(TimeSliceManager.class);
+	protected long sliceDuration;
+	private static final Logger logger = LoggerFactory.getLogger(TimeSliceStateManager.class);
 
-	public TimeSliceManager(final TimeRegion timeRegion, final long slicesNumber) {// TODO
+	public TimeSliceStateManager(final TimeRegion timeRegion, final long slicesNumber) {// TODO
 		// use
 		// region
 		super();
@@ -97,14 +97,14 @@ public class TimeSliceManager {
 		return timeSlices;
 	}
 
-	public Map<Long, Long> getTimeSlicesDistribution(
+	public Map<Long, Double> getStateDistribution(
 			final TimeRegion testedTimeRegion) {
-		final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
+		final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 		long startSlice = Math.max(
 				0,
 				(testedTimeRegion.getTimeStampStart() - timeRegion
 						.getTimeStampStart()) / sliceDuration - 1);
-		long temp = 0;
+		double temp = 0;
 		if (testedTimeRegion.getTimeStampStart()
 				- timeRegion.getTimeStampStart() >= 0)
 			for (long i = startSlice; i < timeSlices.size(); i++) {
@@ -119,7 +119,7 @@ public class TimeSliceManager {
 			if (temp == 0)
 				break;
 			else
-				timeSlicesDistribution.put(i, temp);
+				timeSlicesDistribution.put(i, (double) temp);
 		}
 		return timeSlicesDistribution;
 	}

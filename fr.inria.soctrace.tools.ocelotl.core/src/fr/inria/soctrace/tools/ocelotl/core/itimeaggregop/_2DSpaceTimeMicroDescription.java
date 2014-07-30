@@ -51,6 +51,6 @@ public abstract class _2DSpaceTimeMicroDescription extends
 
 	public void matrixPushType(final int incr, final EventProducer ep,
 			final String key) {
-		matrix.get(incr).get(ep).put(key, 0L);
+		matrix.get(incr).get(ep).put(key, 0.0);
 	}
 }

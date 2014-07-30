@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.state;
+package fr.inria.soctrace.tools.ocelotl.core.events;
 
 import java.util.Map;
 
@@ -26,10 +26,10 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 public interface IState {
 	public int getEventProducerID();
 
-	public String getStateType();
+	public String getType();
 
 	public TimeRegion getTimeRegion();
 
-	public Map<Long, Long> getTimeSlicesDistribution();
+	public Map<Long, Double> getTimeSlicesDistribution();
 
 }

@@ -51,6 +51,7 @@ public abstract class _3DMicroDescription extends _3DMatrixMicroDescription
 
 	public void matrixPushType(final int incr, final EventProducer ep,
 			final String key) {
-		matrix.get(incr).get(ep).put(key, 0L);
+		matrix.get(incr).get(ep).put(key, 0.0);
+		
 	}
 }

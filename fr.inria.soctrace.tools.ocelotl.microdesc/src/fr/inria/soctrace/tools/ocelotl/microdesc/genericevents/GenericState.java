@@ -17,18 +17,21 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
+package fr.inria.soctrace.tools.ocelotl.microdesc.genericevents;
 
-import java.util.HashMap;
-import java.util.List;
+import fr.inria.soctrace.lib.model.Event;
+import fr.inria.soctrace.tools.ocelotl.core.events.State;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 
-import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
+public class GenericState extends State {
 
-public interface I2DMicroDescription extends ITimeAggregationOperator {
+	public GenericState(final Event event,
+			final TimeSliceStateManager timeSliceManager) {
+		super(timeSliceManager);
+		timeRegion = new TimeRegion(event.getTimestamp(), event.getLongPar());
+		eventProducerID = event.getEventProducer().getId();
+		stateType = event.getType().getName();
+	}
 
-	@Override
-	public TimeAggregation2Manager createManager();
-
-	public List<HashMap<EventProducer, Double>> getMatrix();
 }

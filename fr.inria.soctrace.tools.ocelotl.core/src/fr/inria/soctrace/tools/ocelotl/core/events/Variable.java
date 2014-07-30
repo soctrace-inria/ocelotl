@@ -17,21 +17,23 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.state;
+package fr.inria.soctrace.tools.ocelotl.core.events;
 
 import java.util.Map;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 
-public abstract class State implements IState {
+public abstract class Variable implements IVariable{
 
-	protected String stateType = null;
+	protected String variableType = null;
 	protected TimeRegion timeRegion = null;
 	protected int eventProducerID = -1;
-	protected final TimeSliceManager timeSliceManager;
+	protected double value=0;
+	protected final TimeSliceVariableManager timeSliceManager;
 
-	public State(final TimeSliceManager timeSliceManager) {// TODO
+	public Variable(final TimeSliceVariableManager timeSliceManager) {// TODO
 		this.timeSliceManager = timeSliceManager;
 	}
 
@@ -41,8 +43,8 @@ public abstract class State implements IState {
 	}
 
 	@Override
-	public String getStateType() {
-		return stateType;
+	public String getType(){
+		return variableType;
 	}
 
 	@Override
@@ -51,8 +53,18 @@ public abstract class State implements IState {
 	}
 
 	@Override
-	public Map<Long, Long> getTimeSlicesDistribution() {
-		return timeSliceManager.getTimeSlicesDistribution(timeRegion);
+	public Map<Long, Double> getTimeSlicesDistribution() {
+		return timeSliceManager.getVariableDistribution(timeRegion, value);
 	}
+
+	public double getValue() {
+		return value;
+	}
+
+	public void setValue(double value) {
+		this.value = value;
+	}
+	
+	
 
 }
