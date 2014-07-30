@@ -36,7 +36,6 @@ public class EventDistributionView extends DistributionBaseView {
 					.size(); i++)
 				config.getTypes().add(
 						ocelotlView.getConfDataLoader().getTypes().get(i));
-		listViewerEventTypes.setInput(config.getTypes());
 	}
 	
 

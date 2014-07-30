@@ -38,9 +38,6 @@ public class PartMatrixView extends MatrixView {
 		if (!hierarchy.getRoot().getParts().isEmpty()) {
 			HierarchyPart hp=new HierarchyPart(hierarchy, root, colors, space);
 			hp.draw();
-
-			
-
 		}
 	}
 

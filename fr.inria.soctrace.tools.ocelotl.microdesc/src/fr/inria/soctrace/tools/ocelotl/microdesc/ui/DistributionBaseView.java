@@ -628,6 +628,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		producers.addAll(params.getEventProducers());
 		treeViewerEventProducer.setInput(params.getEventProducerHierarchy().getRoot());
 		setParameters();
+		listViewerEventTypes.setInput(config.getTypes());
 		updateTreeStatus();
 		return sashFormGlobal;
 
@@ -639,6 +640,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		this.ocelotlView = ocelotlView;
 		this.config = (DistributionConfig) config;
 		this.params = ocelotlView.getParams();
+		setParameters();
 	}
 
 	@Override

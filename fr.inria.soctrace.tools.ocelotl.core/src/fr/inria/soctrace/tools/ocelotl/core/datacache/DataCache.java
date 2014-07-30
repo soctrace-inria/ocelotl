@@ -21,10 +21,10 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 /**
  * Class handling the caching of the microscopic models.
  * 
- * It stores the cached data in a given directory in files with a CSV format.
- * The first line of the file is the header, containing several parameters
- * describing the characteristics of the cached microscopic model. The rest of
- * the files are the non-null data values (one per line).
+ * It stores the cached data in a given directory in files using CSV. The first
+ * line of the file is the header, containing several parameters describing the
+ * characteristics of the cached microscopic model. The rest of the file is
+ * composed of the non-null data values (one per line).
  */
 public class DataCache {
 
@@ -34,29 +34,42 @@ public class DataCache {
 	/**
 	 * List of the cache files in the current cache directory
 	 */
-	protected HashMap<CacheParameters, String> cachedData;
+	protected HashMap<CacheParameters, File> cachedData;
 
 	/**
 	 * Factor between the number of time slices in the current aggregation and
-	 * the number of time slices of th cache model
+	 * the number of time slices of the cache model
 	 */
 	protected int timeSliceFactor = 1;
 
 	/**
-	 * Path to the cache directory
+	 * Path to the current cache directory
 	 */
 	protected String cacheDirectory = "";
 
 	/**
-	 * Maximum size of the cache in MB (-1 no limit size)
+	 * Maximum size of the cache in MB (-1 == no limit size)
 	 */
-	protected int cacheMaxSize = -1;
+	protected int cacheMaxSize = OcelotlConstants.MAX_CACHESIZE;
 
-	public int getCacheMaxSize() {
+	/**
+	 * Size of the current data cache
+	 */
+	protected long currentCacheSize;
+
+	/**
+	 * Minimal ratio value that can happen
+	 */
+	protected double minimalRatio = OcelotlConstants.MINIMAL_TIMESLICE_RATIO;
+
+	public long getCacheMaxSize() {
 		return cacheMaxSize;
 	}
 
-	public void setCacheMaxSize(int cacheMaxSize) {
+	public void setCacheMaxSize(int cacheMaxSize) throws OcelotlException {
+		if (cacheMaxSize < -1) {
+			throw new OcelotlException(OcelotlException.INVALID_MAX_CACHE_SIZE);
+		}
 		this.cacheMaxSize = cacheMaxSize;
 	}
 
@@ -116,13 +129,15 @@ public class DataCache {
 
 	public DataCache() {
 		super();
-		cachedData = new HashMap<CacheParameters, String>();
+		cachedData = new HashMap<CacheParameters, File>();
 
 		// Default cache directory is the directory "ocelotlCache" in the
 		// running directory
 		setCacheDirectory(ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
 				+ "/ocelotlCache");
+
+		currentCacheSize = 0L;
 	}
 
 	/**
@@ -130,10 +145,10 @@ public class DataCache {
 	 * 
 	 * @param parameters
 	 *            parameters to be tested
-	 * @return the filepath of the cached data file if a correspondence was
-	 *         found, an empty String otherwise
+	 * @return the File of the cached data file if a correspondence was found,
+	 *         an empty String otherwise
 	 */
-	public String checkCache(OcelotlParameters parameters) {
+	public File checkCache(OcelotlParameters parameters) {
 
 		CacheParameters cParam = new CacheParameters(parameters);
 		for (CacheParameters op : cachedData.keySet()) {
@@ -141,44 +156,79 @@ public class DataCache {
 				return cachedData.get(op);
 		}
 
-		return "";
+		return null;
 	}
 
 	/**
 	 * Check if two traces are similar
 	 * 
-	 * @param op1
+	 * @param newParam
 	 *            new parameters to be tested
-	 * @param op2
-	 *            parameters of cached data
-	 * @return true if parameters are similar or compatible to the ones of the
-	 *         cached data
+	 * @param cacheParam
+	 *            parameters of a cached data
+	 * @return true if parameters are similar to or compatible with the ones of
+	 *         the cached data
 	 */
-	protected boolean similarParameters(CacheParameters op1, CacheParameters op2) {
+	protected boolean similarParameters(CacheParameters newParam,
+			CacheParameters cacheParam) {
 
 		// Is the trace the same?
-		if (!op1.traceName.equals(op2.traceName))
+		if (!newParam.traceName.equals(cacheParam.traceName))
 			return false;
 
-		// Are timestamps equals?
-		if (op1.startTimestamp != op2.startTimestamp
-				|| op1.endTimestamp != op2.endTimestamp)
+		// Are timestamps equals or are they included inside the cache
+		// timeregion
+		if (!checkCompatibleTimeStamp(newParam, cacheParam))
 			return false;
 
 		// Is the aggregation operator the same?
-		if ((!op1.timeAggOperator.equals(op2.timeAggOperator))
-				|| (!op1.spaceAggOperator.equals(op2.spaceAggOperator)))
+		if ((!newParam.timeAggOperator.equals(cacheParam.timeAggOperator))
+				|| (!newParam.spaceAggOperator
+						.equals(cacheParam.spaceAggOperator)))
 			return false;
 
 		// Is the number of slices of cached data divisible by the tested number
 		// of slices?
-		if (!(op2.nbTimeSlice % op1.nbTimeSlice == 0))
+		if (!(cacheParam.nbTimeSlice % newParam.nbTimeSlice == 0))
 			return false;
 
 		// Compute the time slice factor
-		timeSliceFactor = op2.nbTimeSlice / op1.nbTimeSlice;
+		timeSliceFactor = cacheParam.nbTimeSlice / newParam.nbTimeSlice;
 
 		return true;
+	}
+
+	protected boolean checkCompatibleTimeStamp(CacheParameters newParam,
+			CacheParameters cachedParam) {
+		TimeRegion newTimeRegion = new TimeRegion(newParam.startTimestamp,
+				newParam.endTimestamp);
+		TimeRegion cacheTimeRegion = new TimeRegion(newParam.startTimestamp,
+				newParam.endTimestamp);
+
+		// If timestamps are equal then OK
+		if (newTimeRegion.compareTimeRegion(cacheTimeRegion))
+			return true;
+
+		// If timestamps are included in the cache time stamps
+		if (newTimeRegion.containsTimeRegion(cacheTimeRegion)) {
+			// compute the number of included time slices
+			// time slice duration
+			long timeSliceDuration = (cachedParam.endTimestamp - cachedParam.startTimestamp)
+					/ cachedParam.nbTimeSlice;
+			int includedTimeslice = (int) ((newParam.endTimestamp - newParam.startTimestamp) / timeSliceDuration);
+
+			// Compute the ratio between the demanded time slice and the current
+			// time slice
+			double ratio = includedTimeslice / newParam.nbTimeSlice;
+
+			if (ratio < minimalRatio) {
+				return false;
+			} else {
+				return false;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -193,8 +243,9 @@ public class DataCache {
 	public void saveData(OcelotlParameters oParam, String aFilePath) {
 		// TODO check for cache size
 		CacheParameters params = new CacheParameters(oParam);
+		File aFile = new File(aFilePath);
 
-		cachedData.put(params, aFilePath);
+		cachedData.put(params, aFile);
 	}
 
 	/**
@@ -208,17 +259,16 @@ public class DataCache {
 	public void saveDataCacheTo(OcelotlParameters oParam, String destPath) {
 		// Get the current cache file
 		CacheParameters params = new CacheParameters(oParam);
-		String sourcePath = "";
+		File source = null;
 
 		// Look for the corresponding file
 		for (CacheParameters par : cachedData.keySet()) {
 			if (similarParameters(params, par)) {
-				sourcePath = cachedData.get(par);
+				source = cachedData.get(par);
 			}
 		}
 
-		if (!sourcePath.isEmpty()) {
-			File source = new File(sourcePath);
+		if (source != null) {
 			File dest = new File(destPath);
 
 			try {
@@ -237,14 +287,14 @@ public class DataCache {
 	 * Delete all the files in the cache
 	 */
 	public void deleteCache() {
-		for (String aFilePath : cachedData.values()) {
-			File cacheFile = new File(aFilePath);
-			if (!cacheFile.delete()) {
-				logger.debug("DataCache: Deletion of cache file " + aFilePath
+		for (File aCacheFile : cachedData.values()) {
+			if (!aCacheFile.delete()) {
+				logger.debug("DataCache: Deletion of cache file " + aCacheFile
 						+ " failed.");
 			}
 		}
 		cachedData.clear();
+		currentCacheSize = 0L;
 	}
 
 	/**
@@ -266,7 +316,7 @@ public class DataCache {
 					// If parsing was successful
 					if (param.traceID != -1) {
 						// Register the cache file
-						cachedData.put(param, traceCache.toString());
+						cachedData.put(param, traceCache);
 
 						logger.debug("Found " + param.traceName + " in "
 								+ traceCache.toString() + ", "
@@ -276,6 +326,7 @@ public class DataCache {
 								+ param.endTimestamp);
 					}
 				}
+				computeCacheSize();
 			}
 		} else {
 			System.err.println("The provided cache directory ("
@@ -372,6 +423,45 @@ public class DataCache {
 		}
 
 		return params.traceID;
+	}
+
+	/**
+	 * Chec
+	 */
+	public boolean checkCacheSize(long newFileSize) {
+		if (cacheMaxSize > -1) {
+			if (newFileSize > cacheMaxSize) {
+				return false;
+			}
+
+			while (currentCacheSize + newFileSize > cacheMaxSize) {
+				removeCacheFile();
+				computeCacheSize();
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Compute the current size of the cache in bytes
+	 */
+	public void computeCacheSize() {
+		currentCacheSize = 0;
+		for (File aCacheFile : cachedData.values()) {
+			currentCacheSize = currentCacheSize + aCacheFile.length();
+		}
+
+		logger.debug("Size of the current cache: " + currentCacheSize);
+	}
+
+	/**
+	 * Remove a cache file
+	 * 
+	 * TODO decide suppression policy (biggest cache, oldest cache file)
+	 */
+	public void removeCacheFile() {
+
 	}
 
 	/**

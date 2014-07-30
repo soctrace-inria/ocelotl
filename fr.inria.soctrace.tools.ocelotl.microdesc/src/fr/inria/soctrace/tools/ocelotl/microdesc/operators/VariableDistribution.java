@@ -29,17 +29,14 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
-import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericState;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
 public class VariableDistribution extends _3DMicroDescription {

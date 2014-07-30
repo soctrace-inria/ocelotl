@@ -29,9 +29,9 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTim
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 
 public class MatrixProportion extends SpaceSTAggregationOperator {
-	
-	HashMap <EventProducerNode, ArrayList<HashMap<String, Double>> > proportions;
-	static final String Void="void";
+
+	HashMap<EventProducerNode, ArrayList<HashMap<String, Double>>> proportions;
+	static final String Void = "void";
 
 	public MatrixProportion() {
 		super();
@@ -47,14 +47,14 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 
 	@Override
 	protected void initParts() {
-		proportions = new HashMap<EventProducerNode, ArrayList<HashMap<String,Double>>>();
+		proportions = new HashMap<EventProducerNode, ArrayList<HashMap<String, Double>>>();
 		computeProportions(hierarchy.getRoot());
 	}
-	
-	private List<String> getStates(){
+
+	private List<String> getStates() {
 		return ((SpaceTimeAggregation2Manager) lpaggregManager).getKeys();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void computeProportions(EventProducerNode node) {
 		proportions.put(node, new ArrayList<HashMap<String, Double>>());
@@ -95,27 +95,22 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 		}
 	}
 
-	public MajState getMajState(EventProducerNode epn, int start, int end){
-		double max=0.0;
-		MajState maj= new MajState(Void, max);
-		for (String state:getStates()){
-			double amp=0.0;
-			for (int i=start; i<end; i++)
-				amp+=proportions.get(epn).get(i).get(state);
-			amp/=(end-start);
-			if (amp>max){
-				maj= new MajState(state, amp);
-				max=amp;
+	public MajState getMajState(EventProducerNode epn, int start, int end) {
+		double max = 0.0;
+		MajState maj = new MajState(Void, max);
+		for (String state : getStates()) {
+			double amp = 0.0;
+			for (int i = start; i < end; i++)
+				amp += proportions.get(epn).get(i).get(state);
+			amp /= (end - start);
+			if (amp > max) {
+				maj = new MajState(state, amp);
+				max = amp;
 			}
-			
+
 		}
 		return maj;
-			
-		
-		
-		
-		
-	}
 
+	}
 
 }

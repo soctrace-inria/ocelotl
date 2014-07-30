@@ -43,7 +43,7 @@ public abstract class TypeDistributionView extends DistributionBaseView {
 						.getCategory() == getType())
 					config.getTypes().add(
 							ocelotlView.getConfDataLoader().getTypes().get(i));
-		listViewerEventTypes.setInput(config.getTypes());
+		
 	}
 
 	@Override

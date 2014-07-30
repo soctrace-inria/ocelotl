@@ -40,24 +40,23 @@ public class SimpleEventProducerHierarchy {
 		}
 
 		private void setParent() {
-			try {
-				if (!eventProducerNodes.containsKey(me.getParentId()))
+			if (!eventProducerNodes.containsKey(me.getParentId())) {
+				// If parent exists
+				if (eventProducers.containsKey(me.getParentId()) && me.getId() != me.getParentId()) {
 					eventProducerNodes.put(
 							me.getParentId(),
 							new SimpleEventProducerNode(eventProducers.get(me
 									.getParentId())));
-				parentNode = eventProducerNodes.get(me.getParentId());
-				parentNode.addChild(this);
-				orphans.remove(id);
-			} catch (NullPointerException e) {
-				parentNode = root;
-				root.addChild(this);
-				orphans.remove(id);
-				/*if (root == null) {
-					root = this;
+				} else { // It is a root
+					parentNode = root;
+					root.addChild(this);
 					orphans.remove(id);
-				}*/
+					return;
+				}
 			}
+			parentNode = eventProducerNodes.get(me.getParentId());
+			parentNode.addChild(this);
+			orphans.remove(id);
 		}
 
 		public void addChild(SimpleEventProducerNode child) {

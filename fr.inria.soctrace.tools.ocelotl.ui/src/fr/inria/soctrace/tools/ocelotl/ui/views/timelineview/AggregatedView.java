@@ -161,10 +161,14 @@ abstract public class AggregatedView implements IAggregatedView {
 		public void mouseReleased(final MouseEvent arg0) {
 			if (state == State.PRESSED_G || state == State.DRAG_G) {
 				state = State.RELEASED;
-				if(time == null)
+				if (time == null)
 					return;
-							
-				if (!ocelotlView.getTimeRegion().compareTimeRegion(time)&& selectTime.getTimeDuration()>0) {
+				
+				selectTime.setTimeStampStart(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampStart()).getTimeRegion().getTimeStampStart());
+				selectTime.setTimeStampEnd(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampEnd()).getTimeRegion().getTimeStampEnd());
+				
+				if (!ocelotlView.getTimeRegion().compareTimeRegion(time) && selectTime.getTimeDuration() > 0) {
+					ocelotlView.setTimeRegion(selectTime);
 					ocelotlView.getTimeAxisView().select(selectTime, true);
 					selectFigure.draw(selectTime, true);
 				} else {
@@ -172,14 +176,13 @@ abstract public class AggregatedView implements IAggregatedView {
 					if (selectFigure.getParent() != null)
 						root.remove(selectFigure);
 					root.repaint();
-					if(selectTime.getTimeDuration()==0){
+					if (selectTime.getTimeDuration() == 0) {
 						ocelotlView.setTimeRegion(resetTime);
 					}
-									}
+				}
 				selectTime = new TimeRegion(resetTime);
 			}
 		}
-
 	}
 
 	public static Color getActivecolorbg() {
@@ -284,7 +287,6 @@ abstract public class AggregatedView implements IAggregatedView {
 	@Override
 	public long getStart() {
 		return selectTime.getTimeStampStart();
-
 	}
 
 	public TimeRegion getTime() {
@@ -302,7 +304,6 @@ abstract public class AggregatedView implements IAggregatedView {
 			public void controlMoved(final ControlEvent arg0) {
 				canvas.redraw();
 				resizeDiagram();
-
 			}
 
 			@Override
