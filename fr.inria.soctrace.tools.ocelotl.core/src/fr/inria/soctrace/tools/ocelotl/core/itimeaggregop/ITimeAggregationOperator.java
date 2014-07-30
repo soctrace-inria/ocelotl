@@ -31,7 +31,7 @@ public interface ITimeAggregationOperator {
 
 	public OcelotlParameters getOcelotlParameters();
 
-	public TimeSliceStateManager getTimeSlicesManager();
+	//public TimeSliceStateManager getTimeSlicesManager();
 
 	public int getVectorSize();
 

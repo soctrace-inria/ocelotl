@@ -30,5 +30,5 @@ public interface I3DMicroDescription extends ITimeAggregationOperator {
 	@Override
 	public TimeAggregation3Manager createManager();
 
-	public List<HashMap<EventProducer, HashMap<String, Long>>> getMatrix();
+	public List<HashMap<EventProducer, HashMap<String, Double>>> getMatrix();
 }

@@ -32,12 +32,14 @@ import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 
 public class EventDistribution extends _3DMicroDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventDistribution.class);
+	private TimeSliceStateManager timeSliceManager;
 	
 	class OcelotlThread extends Thread {
 
@@ -45,6 +47,7 @@ public class EventDistribution extends _3DMicroDescription {
 		int threadNumber;
 		int thread;
 		int size;
+
 
 		public OcelotlThread(final int threadNumber, final int thread,
 				final int size) {
@@ -117,6 +120,8 @@ public class EventDistribution extends _3DMicroDescription {
 		it = ocelotlQueries.getEventIterator(eventProducers);
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
+		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)

@@ -17,18 +17,24 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
+package fr.inria.soctrace.tools.ocelotl.microdesc.ui;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.ArrayList;
 
-import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
+import org.eclipse.swt.widgets.Shell;
 
-public interface I2DMicroDescription extends ITimeAggregationOperator {
+import fr.inria.soctrace.lib.model.EventType;
+import fr.inria.soctrace.lib.model.utils.ModelConstants.EventCategory;
+
+public class VariableDistributionView extends TypeDistributionView {
+
+	public VariableDistributionView(final Shell shell) {
+		super(shell);
+	}
 
 	@Override
-	public TimeAggregation2Manager createManager();
+	int getType() {
+		return EventCategory.VARIABLE;
+	}
 
-	public List<HashMap<EventProducer, Double>> getMatrix();
 }

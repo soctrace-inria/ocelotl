@@ -7,16 +7,13 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class TimeSliceVariableManager extends TimeSliceStateManager{
 
-	private double value;
-
-	public TimeSliceVariableManager(TimeRegion timeRegion, long slicesNumber, double value) {
+	public TimeSliceVariableManager(TimeRegion timeRegion, long slicesNumber) {
 		super(timeRegion, slicesNumber);
-		this.value = value;
 	}
 
-	public Map<Long, Long> getTimeSlicesDistribution(
-			final TimeRegion testedTimeRegion) {
-		final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
+	public Map<Long, Double> getVariableDistribution(
+			final TimeRegion testedTimeRegion, double value) {
+		final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 		long startSlice = Math.max(
 				0,
 				(testedTimeRegion.getTimeStampStart() - timeRegion
@@ -36,7 +33,7 @@ public class TimeSliceVariableManager extends TimeSliceStateManager{
 			if (temp == 0)
 				break;
 			else
-				timeSlicesDistribution.put(i, (long) (((double) temp/ (double) sliceDuration) * value));
+				timeSlicesDistribution.put(i, (((double) temp/ (double) sliceDuration) * value));
 		}
 		return timeSlicesDistribution;
 	}

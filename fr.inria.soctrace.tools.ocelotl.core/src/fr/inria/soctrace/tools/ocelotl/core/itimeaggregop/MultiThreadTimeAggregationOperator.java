@@ -50,7 +50,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	private static final Logger logger = LoggerFactory
 			.getLogger(MultiThreadTimeAggregationOperator.class);
 	
-	protected TimeSliceStateManager timeSliceManager;
+	//protected TimeSliceStateManager timeSliceManager;
 	protected EventIterator it;
 	protected int count = 0;
 	protected int epit = 0;
@@ -111,9 +111,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 		return parameters;
 	}
 
-	public TimeSliceStateManager getTimeSlicesManager() {
-		return timeSliceManager;
-	}
+//	public TimeSliceStateManager getTimeSlicesManager() {
+//		return timeSliceManager;
+//	}
 
 	abstract public void initQueries();
 
@@ -124,8 +124,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 		this.parameters = parameters;
 		count = 0;
 		epit = 0;
-		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+//		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
+//				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initQueries();
 		initVectors();
 

@@ -29,22 +29,19 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
-import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericState;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
-public class VariableDistribution extends _3DMicroDescription {
+public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
-	private static final Logger logger = LoggerFactory.getLogger(VariableDistribution.class);
+	private static final Logger logger = LoggerFactory.getLogger(VariableDistributionSpaceTime.class);
 	
 	
 	class OcelotlThread extends Thread {
@@ -64,20 +61,20 @@ public class VariableDistribution extends _3DMicroDescription {
 			start();
 		}
 
-		private void matrixUpdate(final IVariable variable, final EventProducer ep,
+		private void matrixUpdate(final IVariable Variable, final EventProducer ep,
 				final Map<Long, Double> distrib) {
 			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(variable.getType())) {
-					logger.debug("Adding " + variable.getType()
-							+ " variable");
-					// addKey(state.getStateType());
+				if (!matrix.get(0).get(ep).containsKey(Variable.getType())) {
+					logger.debug("Adding " + Variable.getType()
+							+ " Variable");
+					// addKey(Variable.getVariableType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr)
 								.keySet())
-							matrixPushType(incr, epset, variable.getType());
+							matrixPushType(incr, epset, Variable.getType());
 				}
 				for (final long it : distrib.keySet())
-					matrixWrite(it, ep, variable.getType(), distrib);
+					matrixWrite(it, ep, Variable.getType(), distrib);
 			}
 		}
 
@@ -87,12 +84,12 @@ public class VariableDistribution extends _3DMicroDescription {
 				final List<Event> events = getEvents(size);
 				if (events.size() == 0)
 					break;
-				IVariable variable;
+				IVariable Variable;
 				for (final Event event : events) {
-					variable = new GenericVariable(event, timeSliceManager);
-					final Map<Long, Double> distrib = variable
+					Variable = new GenericVariable(event, timeSliceManager);
+					final Map<Long, Double> distrib = Variable
 							.getTimeSlicesDistribution();
-					matrixUpdate(variable, event.getEventProducer(), distrib);
+					matrixUpdate(Variable, event.getEventProducer(), distrib);
 				}
 			}
 		}
@@ -100,11 +97,11 @@ public class VariableDistribution extends _3DMicroDescription {
 
 	private TimeSliceVariableManager timeSliceManager;
 
-	public VariableDistribution() throws SoCTraceException {
+	public VariableDistributionSpaceTime() throws SoCTraceException {
 		super();
 	}
 
-	public VariableDistribution(final OcelotlParameters parameters)
+	public VariableDistributionSpaceTime(final OcelotlParameters parameters)
 			throws SoCTraceException, OcelotlException {
 		super(parameters);
 	}
@@ -143,5 +140,4 @@ public class VariableDistribution extends _3DMicroDescription {
 			e.printStackTrace();
 		}
 	}
-
 }

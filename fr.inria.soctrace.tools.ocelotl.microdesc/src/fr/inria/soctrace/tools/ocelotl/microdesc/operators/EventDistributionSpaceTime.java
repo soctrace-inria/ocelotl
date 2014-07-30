@@ -33,6 +33,7 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescr
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 
@@ -101,6 +102,8 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		}
 	}
 
+	private TimeSliceStateManager timeSliceManager;
+
 	public EventDistributionSpaceTime() throws SoCTraceException {
 		super();
 	}
@@ -118,6 +121,8 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		it = ocelotlQueries.getEventIterator(eventProducers);
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
+		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)

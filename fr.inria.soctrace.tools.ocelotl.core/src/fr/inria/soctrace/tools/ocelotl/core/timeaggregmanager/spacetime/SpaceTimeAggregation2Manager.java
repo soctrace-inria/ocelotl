@@ -60,7 +60,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	@Override
 	protected void fillNodesJNI() {
 		for (EventProducer ep : getEventProducers()) {
-			List<HashMap<String, Long>> values = new ArrayList<HashMap<String, Long>>();
+			List<HashMap<String, Double>> values = new ArrayList<HashMap<String, Double>>();
 			for (int i = 0; i < matrix.getVectorNumber(); i++)
 				values.add(matrix.getMatrix().get(i).get(ep));
 			hierarchy.setValues(ep, values);

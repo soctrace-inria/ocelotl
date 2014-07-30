@@ -17,23 +17,21 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.microdesc.state;
+package fr.inria.soctrace.tools.ocelotl.microdesc.genericevents;
 
 import fr.inria.soctrace.lib.model.Event;
-import fr.inria.soctrace.tools.ocelotl.core.state.State;
-import fr.inria.soctrace.tools.ocelotl.core.state.Variable;
+import fr.inria.soctrace.tools.ocelotl.core.events.State;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 
-public class GenericVariable extends Variable {
+public class GenericState extends State {
 
-	public GenericVariable(final Event event,
+	public GenericState(final Event event,
 			final TimeSliceStateManager timeSliceManager) {
 		super(timeSliceManager);
 		timeRegion = new TimeRegion(event.getTimestamp(), event.getLongPar());
 		eventProducerID = event.getEventProducer().getId();
-		variableType = event.getType().getName();
-		value = event.getDoublePar();
+		stateType = event.getType().getName();
 	}
 
 }

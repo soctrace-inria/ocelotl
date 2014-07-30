@@ -81,9 +81,9 @@ public class TimeSliceStateManager {
 		return timeSlices;
 	}
 
-	public Map<Long, Long> getTimeSlicesDistribution(
+	public Map<Long, Double> getStateDistribution(
 			final TimeRegion testedTimeRegion) {
-		final Map<Long, Long> timeSlicesDistribution = new HashMap<Long, Long>();
+		final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 		long startSlice = Math.max(
 				0,
 				(testedTimeRegion.getTimeStampStart() - timeRegion
@@ -103,7 +103,7 @@ public class TimeSliceStateManager {
 			if (temp == 0)
 				break;
 			else
-				timeSlicesDistribution.put(i, temp);
+				timeSlicesDistribution.put(i, (double) temp);
 		}
 		return timeSlicesDistribution;
 	}
