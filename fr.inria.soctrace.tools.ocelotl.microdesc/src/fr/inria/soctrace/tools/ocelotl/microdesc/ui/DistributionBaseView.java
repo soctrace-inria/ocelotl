@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.AbstractListViewer;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -152,6 +153,7 @@ public abstract class DistributionBaseView extends Dialog implements
             for (Object element : selection.toArray()) {
                 checkElementAndSubtree(element);
             }
+            updateSelectedEventProducer();
         }
     }
 	
@@ -204,7 +206,6 @@ public abstract class DistributionBaseView extends Dialog implements
 					e1.printStackTrace();
 				}
 			treeViewerEventProducer.setInput(producers);
-			// hasChanged = HasChanged.ALL;
 		}
 	}
 	
@@ -334,7 +335,9 @@ public abstract class DistributionBaseView extends Dialog implements
 	
 	protected CheckboxTreeViewer treeViewerEventProducer;
 
-	private final java.util.List<EventProducer> producers = new LinkedList<EventProducer>();
+	private java.util.List<EventProducer> producers = new LinkedList<EventProducer>();
+
+	private java.util.List<EventProducer> oldProducer;
 
 	public DistributionBaseView(final Shell parent) {
 		super(parent);
@@ -347,9 +350,12 @@ public abstract class DistributionBaseView extends Dialog implements
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		oldEventTypes = new ArrayList<EventType>(config.getTypes());
+		oldProducer = new LinkedList<EventProducer>(params.getEventProducers());
+
 		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		Composite all = (Composite) super.createDialogArea(parent);
-
+		
+		
 		final SashForm sashFormGlobal = new SashForm(all, SWT.VERTICAL);
 		sashFormGlobal.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 				true, 1, 1));
@@ -624,12 +630,22 @@ public abstract class DistributionBaseView extends Dialog implements
 		spinnerThread.setSelection(config.getThreadNumber());
 		sashForm.setWeights(new int[] { 1, 1, 1 });
 		sashFormGlobal.setWeights(new int[] { 1 });
-		producers.clear();
-		producers.addAll(params.getEventProducers());
+		
+		producers = new LinkedList<EventProducer>();
+		if(producers.isEmpty())
+		{
+			for(EventProducer ep: params.getEventProducers())
+				producers.add(ep); 
+		}
+
+		
 		treeViewerEventProducer.setInput(params.getEventProducerHierarchy().getRoot());
 		setParameters();
 		listViewerEventTypes.setInput(config.getTypes());
 		updateTreeStatus();
+		
+		System.out.println("Genu genu !!!!!!!!!!!!!! " + producers.size());
+		
 		return sashFormGlobal;
 
 	}
@@ -655,6 +671,7 @@ public abstract class DistributionBaseView extends Dialog implements
 	@Override
 	protected void cancelPressed() {
 		config.setTypes(oldEventTypes);
+		params.setEventProducers(oldProducer);
 		super.cancelPressed();
 	}
 
@@ -688,7 +705,8 @@ public abstract class DistributionBaseView extends Dialog implements
 	 */
 	protected void updateSelectedEventProducer() {
 		// Reset previously selected producers
-		producers.clear();
+
+		producers.clear();// =  new LinkedList<EventProducer>();
 
 		// Add checked producers
 		for (Object obj : treeViewerEventProducer.getCheckedElements()) {

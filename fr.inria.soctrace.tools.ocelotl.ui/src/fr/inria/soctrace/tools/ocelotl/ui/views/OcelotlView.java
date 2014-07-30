@@ -1293,7 +1293,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		if (ocelotlParameters.getEventProducers().isEmpty())
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
-
+		
 		ocelotlParameters.setMaxEventProducers(OcelotlDefaultParameterConstants.EventProducersPerQuery);
 		manager = new ConfigViewManager(this);
 		manager.init();
