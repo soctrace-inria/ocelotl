@@ -25,7 +25,7 @@ import fr.inria.soctrace.lib.model.EventType;
 
 public interface ITraceTypeConfig {
 
-	public void init(Object aConfDataLoader);
+	public void init();
 	public List<EventType> getTypes();
 
 }

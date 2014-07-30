@@ -24,7 +24,6 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
-import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 
 public class DistributionConfig implements ITraceTypeConfig {
 
@@ -65,32 +64,8 @@ public class DistributionConfig implements ITraceTypeConfig {
 	/**
 	 * Initialize the configuration with default settings
 	 * 
-	 * @param anObject
-	 * 		Must be of type ConfDataLoader. Typed as Object to avoid circular dependency
 	 */
-	public void init(Object anObject) {
-		if (! (anObject instanceof ConfDataLoader)) {
-			System.err
-					.println("Wrong class given in argument: expected an object of type ConfDataLoader");
-			return;
-		}
-
-		//ConfDataLoader aConfDataLoader = (ConfDataLoader) anObject;
-
-		/*if (getTypes().isEmpty())
-		{
-				for (int i = 0; i < aConfDataLoader.getTypes()
-						.size(); i++)
-					if (aConfDataLoader.getTypes().get(i)
-							.getCategory() == ocelotlParameters.getTraceTypeConfig().getTypes().getType())
-						config.getTypes().add(
-								aConfDataLoader.getTypes().get(i));
-				
-				
-		}*/
-		//	ocelotlParameters.getTraceTypeConfig().getTypes().addAll(confDataLoader.getTypes());
-		//getTypes().addAll(aConfDataLoader.getTypes());
-
+	public void init() {
 		setThreadNumber(DefaultSettingsConstant.threadNumber);
 		setEventsPerThread(DefaultSettingsConstant.eventsPerThread);
 	}
