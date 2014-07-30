@@ -48,7 +48,6 @@ public abstract class TypeDistributionView extends DistributionBaseView {
 
 	@Override
 	protected java.util.List<EventType> getEventTypes() {
-		System.out.println("test2");
 		java.util.List<EventType> types = new ArrayList<EventType>();
 		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
 			if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory() == getType())
