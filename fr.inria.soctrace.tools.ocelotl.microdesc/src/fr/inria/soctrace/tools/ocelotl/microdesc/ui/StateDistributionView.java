@@ -33,6 +33,7 @@ public class StateDistributionView extends TypeDistributionView {
 	}
 
 	int getType() {
+		System.out.println("test");
 		return EventCategory.STATE;
 	}
 
