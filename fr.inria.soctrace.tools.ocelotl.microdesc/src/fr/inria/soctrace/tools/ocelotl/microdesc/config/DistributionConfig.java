@@ -75,10 +75,21 @@ public class DistributionConfig implements ITraceTypeConfig {
 			return;
 		}
 
-		ConfDataLoader aConfDataLoader = (ConfDataLoader) anObject;
+		//ConfDataLoader aConfDataLoader = (ConfDataLoader) anObject;
 
-		if (getTypes().isEmpty())
-			getTypes().addAll(aConfDataLoader.getTypes());
+		/*if (getTypes().isEmpty())
+		{
+				for (int i = 0; i < aConfDataLoader.getTypes()
+						.size(); i++)
+					if (aConfDataLoader.getTypes().get(i)
+							.getCategory() == ocelotlParameters.getTraceTypeConfig().getTypes().getType())
+						config.getTypes().add(
+								aConfDataLoader.getTypes().get(i));
+				
+				
+		}*/
+		//	ocelotlParameters.getTraceTypeConfig().getTypes().addAll(confDataLoader.getTypes());
+		//getTypes().addAll(aConfDataLoader.getTypes());
 
 		setThreadNumber(DefaultSettingsConstant.threadNumber);
 		setEventsPerThread(DefaultSettingsConstant.eventsPerThread);

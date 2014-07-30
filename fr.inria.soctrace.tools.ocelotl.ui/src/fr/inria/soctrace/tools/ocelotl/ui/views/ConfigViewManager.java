@@ -28,15 +28,14 @@ import org.osgi.framework.Bundle;
 public class ConfigViewManager {
 
 	OcelotlView	ocelotlView;
+	IAggregationWindow window = null;
 
 	public ConfigViewManager(final OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
 	}
-
-	public void openConfigWindows() {
-		IAggregationWindow window = null;
-
+	
+	public void init(){
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getBundle());
 			window = (IAggregationWindow) mybundle.loadClass(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
@@ -45,6 +44,10 @@ public class ConfigViewManager {
 			e.printStackTrace();
 		}
 		window.init(ocelotlView, ocelotlView.getCore().getOcelotlParameters().getTraceTypeConfig());
+	}
+
+	public void openConfigWindows() {
+	
 		window.open();
 	}
 

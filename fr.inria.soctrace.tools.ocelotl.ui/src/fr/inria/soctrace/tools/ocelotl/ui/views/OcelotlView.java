@@ -76,7 +76,7 @@ import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
@@ -366,7 +366,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							qualityView.createDiagram();
 							
-							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
+							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 						}
 					});
 				
@@ -532,7 +532,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			hasChanged = HasChanged.ALL;
 			if (comboTime.getText().equals(""))
 				return;
-			final ConfigViewManager manager = new ConfigViewManager(view);
+			
 			manager.openConfigWindows();
 		}
 	}
@@ -572,7 +572,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		    String newCacheDir = dialog.open();
 		    if(newCacheDir != null)
 		    {
+		    	//Update the current datacache path
 		    	ocelotlParameters.getDataCache().setCacheDirectory(newCacheDir);
+		    	//Update the displayed path
 		    	datacacheDirectory.setText(ocelotlParameters.getDataCache().getCacheDirectory());
 		    }
 		}
@@ -681,6 +683,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Text text;
 
 	private Button	btnSaveDataCache;
+
+	private ConfigViewManager	manager;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -954,6 +958,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				}
 				
 				setDefaultDescriptionSettings();
+				
 			}
 		});
 		comboTime.setText("");
@@ -1290,9 +1295,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
 
 		ocelotlParameters.setMaxEventProducers(OcelotlDefaultParameterConstants.EventProducersPerQuery);
-		
-		if (ocelotlParameters.getTypes().isEmpty())
-			ocelotlParameters.getTypes().addAll(confDataLoader.getTypes());
+		manager = new ConfigViewManager(this);
+		manager.init();
 	}
 	
 	/**

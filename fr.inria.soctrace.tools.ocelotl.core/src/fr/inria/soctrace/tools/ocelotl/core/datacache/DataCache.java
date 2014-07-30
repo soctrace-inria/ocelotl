@@ -224,7 +224,7 @@ public class DataCache {
 			if (ratio < minimalRatio) {
 				return false;
 			} else {
-				return true;
+				return false;
 			}
 		}
 
