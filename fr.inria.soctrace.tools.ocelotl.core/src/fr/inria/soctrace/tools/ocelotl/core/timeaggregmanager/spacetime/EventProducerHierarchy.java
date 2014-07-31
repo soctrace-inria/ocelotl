@@ -226,7 +226,7 @@ public class EventProducerHierarchy {
 		}
 		if (!orphans.isEmpty()) {
 		//	System.err.println("Careful: hierarchy is incomplete and some elements will be destroyed!");
-			throw new OcelotlException(OcelotlException.HIERARCHY);
+			throw new OcelotlException(OcelotlException.INCOMPLETE_HIERARCHY);
 //			for (Integer orphan : orphans.keySet()) {
 //				if (orphans.containsKey(orphan))
 //					orphans.get(orphan).destroy();

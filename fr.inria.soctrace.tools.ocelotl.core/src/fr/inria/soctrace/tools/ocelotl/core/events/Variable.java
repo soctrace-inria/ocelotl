@@ -22,7 +22,6 @@ package fr.inria.soctrace.tools.ocelotl.core.events;
 import java.util.Map;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 
 public abstract class Variable implements IVariable{

@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.AbstractListViewer;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -179,6 +178,20 @@ public abstract class DistributionBaseView extends Dialog implements
 			updateSelectedEventProducer();
 		}
 	}
+	
+	public class UncheckSubtreeEventProducersAdapter extends SelectionAdapter {
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            TreeSelection selection = (TreeSelection) treeViewerEventProducer.getSelection();
+
+            for (Object element : selection.toArray()) {
+                uncheckElementAndSubtree(element);
+            }
+            
+            updateSelectedEventProducer();
+        }
+    }
 
 	
 	private class AddResultsEventProducersAdapter extends SelectionAdapter {
@@ -543,7 +556,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnUncheckSubtreeEventProducer.setFont(SWTResourceManager.getFont(
 				"Cantarell", 11, SWT.NORMAL));
 		btnUncheckSubtreeEventProducer.setImage(null);
-		btnUncheckSubtreeEventProducer.addSelectionListener(new UncheckEventProducerAdapter());
+		btnUncheckSubtreeEventProducer.addSelectionListener(new UncheckSubtreeEventProducersAdapter());
 		
 		Button btnAddEventProducer = new Button(buttonComposite,
 				SWT.NONE);
@@ -682,7 +695,6 @@ public abstract class DistributionBaseView extends Dialog implements
 		super.configureShell(newShell);
 		newShell.setText("Microscopic Description Settings");
 	}
-
 	
 	/**
 	 * Synchronize the event producer tree view with the model
@@ -771,6 +783,21 @@ public abstract class DistributionBaseView extends Dialog implements
 		for (Object child : new FilterTreeContentProvider()
 				.getChildren(element)) {
 			checkElementAndSubtree(child);
+		}
+	}
+	
+	/**
+	 * Check an element, all its parents and all its children.
+	 * 
+	 * @param element
+	 *            The element to check.
+	 */
+	private void uncheckElementAndSubtree(Object element) {
+		uncheckElement(element);
+
+		for (Object child : new FilterTreeContentProvider()
+				.getChildren(element)) {
+			uncheckElementAndSubtree(child);
 		}
 	}
 }

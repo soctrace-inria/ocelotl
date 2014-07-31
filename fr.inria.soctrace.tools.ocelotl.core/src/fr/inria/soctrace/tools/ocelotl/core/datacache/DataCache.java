@@ -202,13 +202,13 @@ public class DataCache {
 			CacheParameters cachedParam) {
 		TimeRegion newTimeRegion = new TimeRegion(newParam.startTimestamp,
 				newParam.endTimestamp);
-		TimeRegion cacheTimeRegion = new TimeRegion(newParam.startTimestamp,
-				newParam.endTimestamp);
+		TimeRegion cacheTimeRegion = new TimeRegion(cachedParam.startTimestamp,
+				cachedParam.endTimestamp);
 
 		// If timestamps are equal then OK
 		if (newTimeRegion.compareTimeRegion(cacheTimeRegion))
-			return true;
-
+			return true;	
+			
 		// If timestamps are included in the cache time stamps
 		if (newTimeRegion.containsTimeRegion(cacheTimeRegion)) {
 			// compute the number of included time slices

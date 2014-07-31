@@ -75,7 +75,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
-				throw new OcelotlException(OcelotlException.NOETS);
+				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
@@ -86,7 +86,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
-				throw new OcelotlException(OcelotlException.NOEPS);
+				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));
@@ -129,7 +129,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
-				throw new OcelotlException(OcelotlException.NOETS);
+				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
@@ -140,7 +140,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
-				throw new OcelotlException(OcelotlException.NOEPS);
+				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));
@@ -222,7 +222,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
-				throw new OcelotlException(OcelotlException.NOETS);
+				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
@@ -233,7 +233,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		// eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
-				throw new OcelotlException(OcelotlException.NOEPS);
+				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));
