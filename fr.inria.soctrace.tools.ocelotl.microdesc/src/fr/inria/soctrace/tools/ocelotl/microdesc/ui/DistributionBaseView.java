@@ -153,6 +153,7 @@ public abstract class DistributionBaseView extends Dialog implements
             for (Object element : selection.toArray()) {
                 checkElementAndSubtree(element);
             }
+            
             updateSelectedEventProducer();
         }
     }
@@ -349,13 +350,8 @@ public abstract class DistributionBaseView extends Dialog implements
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		oldEventTypes = new ArrayList<EventType>(config.getTypes());
-		oldProducer = new LinkedList<EventProducer>(params.getEventProducers());
-
-		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		Composite all = (Composite) super.createDialogArea(parent);
-		
-		
+			
 		final SashForm sashFormGlobal = new SashForm(all, SWT.VERTICAL);
 		sashFormGlobal.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 				true, 1, 1));
@@ -631,23 +627,27 @@ public abstract class DistributionBaseView extends Dialog implements
 		sashForm.setWeights(new int[] { 1, 1, 1 });
 		sashFormGlobal.setWeights(new int[] { 1 });
 		
-		producers = new LinkedList<EventProducer>();
-		if(producers.isEmpty())
-		{
-			for(EventProducer ep: params.getEventProducers())
-				producers.add(ep); 
-		}
-
+		initSettings();
 		
+		return sashFormGlobal;
+	}
+	
+	/**
+	 * Initialize settings values
+	 */
+	public void initSettings()
+	{
+		oldEventTypes = new ArrayList<EventType>(config.getTypes());
+		oldProducer = new LinkedList<EventProducer>(params.getEventProducers());
+		
+		producers = new LinkedList<EventProducer>();
+		for(EventProducer ep: params.getEventProducers())
+			producers.add(ep); 
+
 		treeViewerEventProducer.setInput(params.getEventProducerHierarchy().getRoot());
 		setParameters();
 		listViewerEventTypes.setInput(config.getTypes());
 		updateTreeStatus();
-		
-		System.out.println("Genu genu !!!!!!!!!!!!!! " + producers.size());
-		
-		return sashFormGlobal;
-
 	}
 
 	@Override
@@ -705,8 +705,7 @@ public abstract class DistributionBaseView extends Dialog implements
 	 */
 	protected void updateSelectedEventProducer() {
 		// Reset previously selected producers
-
-		producers.clear();// =  new LinkedList<EventProducer>();
+		producers.clear();
 
 		// Add checked producers
 		for (Object obj : treeViewerEventProducer.getCheckedElements()) {
