@@ -38,6 +38,7 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.query.EventTypeQuery;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
@@ -138,13 +139,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 		} else {
 			computeMatrix();
 
-			// save the newly computed matrix + parameters
+			if (eventsNumber == 0)
+				throw new OcelotlException(OcelotlException.NO_EVENTS);
+			
+			// Save the newly computed matrix + parameters
 			dm.start();
 			saveMatrix();
 			dm.end("Save the matrix to cache");
-
-			if (eventsNumber == 0)
-				throw new OcelotlException(OcelotlException.NOEVENTS);
 		}
 	}
 
@@ -171,6 +172,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 */
 	public void saveMatrix()
 	{
+		
+		//Check that no event type or event producer was filtered out which would result in an incomplete datacache
+		if(!noFiltering())
+			return;
+		
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/" + parameters.getTrace().getAlias() + "_" + parameters.getTrace().getId() + "_" + System.currentTimeMillis();
 		
 		// Write to file,  
@@ -222,27 +228,35 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * 
 	 * @param aCacheFile
 	 *            the cache file
+	 * @throws OcelotlException 
 	 */
-	public void loadFromCache(File aCacheFile) {
+	public void loadFromCache(File aCacheFile) throws OcelotlException {
 		try {
 			dm = new DeltaManagerOcelotl();
 			dm.start();
-
-			BufferedReader bufFileReader = new BufferedReader(new FileReader(
-					aCacheFile.getPath()));
 
 			HashMap<String, EventProducer> eventProducers = new HashMap<String, EventProducer>();
 			for (EventProducer ep : parameters.getEventProducers()) {
 				eventProducers.put(String.valueOf(ep.getId()), ep);
 			}
-
+			
+			// If no event producer is selected
+			if(eventProducers.isEmpty())
+				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
+		
 			typeNames.clear();
 			for (EventType evt : parameters.getTraceTypeConfig().getTypes()) {
 				typeNames.add(evt.getName());
 			}
+			// If no event type is selected
+			if(typeNames.isEmpty())
+				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
 
-			//Fill the matrix with zeroes
+			// Fill the matrix with zeroes
 			initMatrixToZero(eventProducers.values());
+			
+			BufferedReader bufFileReader = new BufferedReader(new FileReader(
+					aCacheFile.getPath()));
 			
 			String line;
 			// Get header
@@ -272,5 +286,22 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	boolean noFiltering()
+	{
+		if (parameters.getEventProducers().size() != parameters.getEventProducerHierarchy().getEventProducers().size())
+		{
+			logger.debug("At least one event producer is filtered: no cache will not saved.");
+			return false;
+		}
+		
+		if (parameters.getTraceTypeConfig().getTypes().size() != parameters.getAllEventTypes().size())
+		{
+			logger.debug("At least one event type is filtered: no cache will be saved.");
+			return false;
+		}
+			
+		return true;
 	}
 }

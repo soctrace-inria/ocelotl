@@ -20,10 +20,8 @@
 package fr.inria.soctrace.tools.ocelotl.microdesc.genericevents;
 
 import fr.inria.soctrace.lib.model.Event;
-import fr.inria.soctrace.tools.ocelotl.core.events.State;
 import fr.inria.soctrace.tools.ocelotl.core.events.Variable;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 
 public class GenericVariable extends Variable {

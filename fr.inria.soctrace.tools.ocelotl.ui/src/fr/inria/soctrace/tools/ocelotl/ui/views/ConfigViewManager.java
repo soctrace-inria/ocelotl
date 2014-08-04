@@ -47,7 +47,6 @@ public class ConfigViewManager {
 	}
 
 	public void openConfigWindows() {
-	
 		window.open();
 	}
 

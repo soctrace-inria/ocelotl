@@ -40,6 +40,7 @@ public class OcelotlParameters {
 
 	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
 	private List<EventType> eventTypes = new LinkedList<EventType>();
+	private List<EventType> allEventTypes;
     private SimpleEventProducerHierarchy eventProducerHierarchy;
 	private int timeSlicesNumber = 1;
 	private TimeRegion timeRegion;
@@ -234,6 +235,14 @@ public class OcelotlParameters {
 
 	public void setTimeSliceManager(TimeSliceStateManager timeSliceManager) {
 		this.timeSliceManager = timeSliceManager;
+	}
+
+	public List<EventType> getAllEventTypes() {
+		return allEventTypes;
+	}
+
+	public void setAllEventTypes(List<EventType> allEventTypes) {
+		this.allEventTypes = allEventTypes;
 	}
 
 

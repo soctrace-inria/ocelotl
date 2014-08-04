@@ -96,7 +96,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			if (confDataLoader.getCurrentTrace() == null) {
-				MessageDialog.openInformation(getSite().getShell(), "Error", OcelotlException.NOTRACE);
+				MessageDialog.openInformation(getSite().getShell(), "Error", OcelotlException.NO_TRACE);
 				return;
 			}
 
@@ -1289,11 +1289,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		hasChanged = HasChanged.ALL;
 
 		// Init operator specific configuration
-		ocelotlParameters.getTraceTypeConfig().init();
+		ocelotlParameters.getTraceTypeConfig().init(confDataLoader);
+		
+		ocelotlParameters.setAllEventTypes(confDataLoader.getTypes());
 
 		if (ocelotlParameters.getEventProducers().isEmpty())
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
-
+		
 		ocelotlParameters.setMaxEventProducers(OcelotlDefaultParameterConstants.EventProducersPerQuery);
 		manager = new ConfigViewManager(this);
 		manager.init();
@@ -1319,7 +1321,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	public void checkTrace() throws OcelotlException {
 		// If no trace is selected
 		if (confDataLoader.getCurrentTrace() == null)
-			throw new OcelotlException(OcelotlException.NOTRACE);
+			throw new OcelotlException(OcelotlException.NO_TRACE);
 	}
 
 	/**
@@ -1330,7 +1332,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	public void checkMicroscopicDescription() throws OcelotlException {
 		// If no microscopic distribution is selected
 		if (comboTime.getText().equals(""))
-			throw new OcelotlException(OcelotlException.NOMICROSCOPICDESCRIPTION);
+			throw new OcelotlException(OcelotlException.NO_MICROSCOPIC_DESCRIPTION);
 	}
 
 	/**
@@ -1341,7 +1343,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	public void checkVisualization() throws OcelotlException {
 		// If no visualization is selected
 		if (comboSpace.getText().equals(""))
-			throw new OcelotlException(OcelotlException.NOVISUALIZATION);
+			throw new OcelotlException(OcelotlException.NO_VISUALIZATION);
 	}
 
 	/**
@@ -1353,13 +1355,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	public void checkTimeStamp() throws OcelotlException {
 		// If the starting timestamp is greater than the ending one
 		if (confDataLoader.getCurrentTrace() == null || textTimestampStart.getText().isEmpty() || textTimestampEnd.getText().isEmpty())
-			throw new OcelotlException(OcelotlException.NOTIMESTAMP);
+			throw new OcelotlException(OcelotlException.NO_TIMESTAMP);
 
 		if (Long.parseLong(textTimestampStart.getText()) >= Long.parseLong(textTimestampEnd.getText())) {
 			// Reset to default values
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
 			textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
-			throw new OcelotlException(OcelotlException.INVALIDTIMERANGE);
+			throw new OcelotlException(OcelotlException.INVALID_TIMERANGE);
 		}
 		if (Long.parseLong(textTimestampEnd.getText()) > confDataLoader.getMaxTimestamp() || Long.parseLong(textTimestampEnd.getText()) < confDataLoader.getMinTimestamp()) {
 			textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
