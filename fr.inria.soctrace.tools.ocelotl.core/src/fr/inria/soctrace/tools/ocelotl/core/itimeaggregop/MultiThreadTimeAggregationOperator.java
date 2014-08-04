@@ -44,7 +44,6 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class MultiThreadTimeAggregationOperator {
@@ -266,7 +265,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 				return;
 			}
 				
-			
 			BufferedReader bufFileReader = new BufferedReader(new FileReader(
 					aCacheFile.getPath()));
 			
@@ -321,8 +319,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			//for( parameters.getDataCache().getTimeSliceMapping()
 			//if(parameters.getDataCache().getDirtyTimeSlices().contains(o))
 			//builtTimeSlices.getTimeSlices()) {
-			
-			
+				
 			// get cache timeslice
 			// int slice = Integer.parseInt(values[0]);
 			// 1. compute value proportional to the amount of the time slice

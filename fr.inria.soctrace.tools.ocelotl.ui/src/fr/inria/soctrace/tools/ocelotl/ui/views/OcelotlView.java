@@ -543,6 +543,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			}
 		}
 	}
+	
+	
+	private class EnableCacheListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			ocelotlParameters.getDataCache().setCacheActive(btnCacheEnabled.getSelection());
+		}
+	}
 
 	private class Settings2SelectionAdapter extends SelectionAdapter {
 
@@ -724,6 +732,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button						btnDeleteDataCache;
 	private Text						datacacheDirectory;
 	private Button						btnChangeCacheDirectory;
+	private Button 						btnCacheEnabled;
 	private int 						TS=0;
 	
 	/**
@@ -1143,6 +1152,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnDeleteDataCache.setText("Empty Cache");
 		btnDeleteDataCache.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
+		btnCacheEnabled.setText("Cache Enabled");
+		btnCacheEnabled.setSelection(true);
+		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
 		sashFormSettings.setWeights(new int[] {1});	
 		
