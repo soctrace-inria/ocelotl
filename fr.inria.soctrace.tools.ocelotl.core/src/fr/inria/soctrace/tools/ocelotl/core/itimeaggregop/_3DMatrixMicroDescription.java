@@ -47,10 +47,9 @@ public abstract class _3DMatrixMicroDescription extends
 					+ getOcelotlParameters().getMaxEventProducers())
 				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i
 						+ getOcelotlParameters().getMaxEventProducers())));
-
 		}
 
-		dm.end("TOTAL (QUERIES + COMPUTATION) : " + epsize
+		dm.end("TOTAL (QUERIES + COMPUTATION): " + epsize
 				+ " Event Producers, " + eventsNumber + " Events");
 	}
 
@@ -145,6 +144,24 @@ public abstract class _3DMatrixMicroDescription extends
 			if (matrix.get(slice).get(ep).get(evType) != null)
 				value = matrix.get(slice).get(ep).get(evType) + value;
 		}
+
+		matrix.get(slice).get(ep).put(evType, value);
+	}
+	
+	@Override
+	public void rebuildMatrixFromDirtyCache(String[] values, EventProducer ep, int slice,
+			double factor) {
+
+		String evType = values[2];
+		
+		// If the event type is filtered out
+		if (!typeNames.contains(evType))
+			return;
+
+		double value = Double.parseDouble(values[3]) * factor;
+		
+		if (matrix.get(slice).get(ep).get(evType) != null)
+			value = matrix.get(slice).get(ep).get(evType) + value;
 
 		matrix.get(slice).get(ep).put(evType, value);
 	}

@@ -38,12 +38,12 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.query.EventTypeQuery;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
@@ -57,7 +57,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected int count = 0;
 	protected int epit = 0;
 	protected DeltaManagerOcelotl dm;
-	public final static int EPCOUNT = 200;
 	protected int eventsNumber;
 	protected OcelotlParameters parameters;
 	protected OcelotlQueries ocelotlQueries;
@@ -99,6 +98,10 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 */
 	public abstract void rebuildMatrix(String[] values, EventProducer ep, int sliceMultiple);
 
+	
+	public abstract void rebuildMatrixFromDirtyCache(String[] values,
+			EventProducer ep, int currentSliceNumber, double factor);
+
 	public synchronized int getCount() {
 		count++;
 		return count;
@@ -133,7 +136,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 		File cacheFile = parameters.getDataCache().checkCache(parameters);
 		// if there is a file and it is valid
-		if (cacheFile != null) {
+		if (parameters.getDataCache().isCacheActive() && cacheFile != null) {
 			// call computeMatrixFromFile()
 			loadFromCache(cacheFile);
 		} else {
@@ -145,7 +148,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// Save the newly computed matrix + parameters
 			dm.start();
 			saveMatrix();
-			dm.end("Save the matrix to cache");
+			dm.end("DATACACHE - Save the matrix to cache");
 		}
 	}
 
@@ -170,16 +173,18 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * Save the matrix data to a cache file. Save only the values that are
 	 * different from 0
 	 */
-	public void saveMatrix()
-	{
-		
-		//Check that no event type or event producer was filtered out which would result in an incomplete datacache
-		if(!noFiltering())
+	public void saveMatrix() {
+		// Check that no event type or event producer was filtered out which
+		// would result in an incomplete datacache
+		if (!noFiltering() || !parameters.getDataCache().isCacheActive())
 			return;
-		
-		String filePath = parameters.getDataCache().getCacheDirectory() + "/" + parameters.getTrace().getAlias() + "_" + parameters.getTrace().getId() + "_" + System.currentTimeMillis();
-		
-		// Write to file,  
+
+		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
+				+ parameters.getTrace().getAlias() + "_"
+				+ parameters.getTrace().getId() + "_"
+				+ System.currentTimeMillis();
+
+		// Write to file,
 		try {
 			PrintWriter writer = new PrintWriter(filePath, "UTF-8");
 
@@ -206,7 +211,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 			// Iterate over matrix and write data
 			writer.print(matrixToCSV());
-			
+
 			// Close the fd
 			writer.flush();
 			writer.close();
@@ -219,7 +224,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		parameters.getDataCache().saveData(parameters, filePath);
 	}
 	
@@ -255,6 +260,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// Fill the matrix with zeroes
 			initMatrixToZero(eventProducers.values());
 			
+			if(parameters.getDataCache().isRebuildDirty())
+			{
+				rebuildDirtyMatrix(aCacheFile, eventProducers);
+				return;
+			}
+				
+			
 			BufferedReader bufFileReader = new BufferedReader(new FileReader(
 					aCacheFile.getPath()));
 			
@@ -266,7 +278,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			while ((line = bufFileReader.readLine()) != null) {
 				String[] values = line.split(OcelotlConstants.CSVDelimiter);
 
-				//TODO check that the values are correct (two values per line)
+				//TODO check that the values are correct (3/4 values per line)
 				
 				// If the event producer is not filtered out
 				if (eventProducers.containsKey(values[1])) {
@@ -287,21 +299,139 @@ public abstract class MultiThreadTimeAggregationOperator {
 			e.printStackTrace();
 		}
 	}
-	
-	boolean noFiltering()
-	{
-		if (parameters.getEventProducers().size() != parameters.getEventProducerHierarchy().getEventProducers().size())
-		{
-			logger.debug("At least one event producer is filtered: no cache will not saved.");
+
+	public void rebuildDirtyMatrix(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers) throws IOException {
+		// startSlice
+		// endSlice
+
+		//TimeSliceStateManager builtTimeSlices = new TimeSliceStateManager(
+		//		parameters.getTimeRegion(), parameters.getTimeSlicesNumber());
+
+		BufferedReader bufFileReader;
+
+		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
+
+		String line;
+		// Get header
+		line = bufFileReader.readLine();
+		
+		//for (TimeSlice aNewTimeSlice : parameters.getDataCache().getTimeSliceMapping().keySet()) {
+			
+			//for( parameters.getDataCache().getTimeSliceMapping()
+			//if(parameters.getDataCache().getDirtyTimeSlices().contains(o))
+			//builtTimeSlices.getTimeSlices()) {
+			
+			
+			// get cache timeslice
+			// int slice = Integer.parseInt(values[0]);
+			// 1. compute value proportional to the amount of the time slice
+			// included
+			// 2. query missing events using setTimeInterval in
+			// OcelotlQueries
+		//}
+
+		// Read data
+		while ((line = bufFileReader.readLine()) != null) {
+			String[] values = line.split(OcelotlConstants.CSVDelimiter);
+
+			// If the event producer is not filtered out
+			if (eventProducers.containsKey(values[1])) {
+				int slice = Integer.parseInt(values[0]);
+				for (TimeSlice cachedTimeSlice : parameters.getDataCache()
+						.getTimeSliceMapping().keySet()) {
+					// Look for the current time slice
+					if (cachedTimeSlice.getNumber() == slice) {
+						
+						// Is it dirty (does it belong to more than one new time
+						// slice?)
+						if (parameters.getDataCache().getTimeSliceMapping()
+								.get(cachedTimeSlice).size() > 1) {
+							double factor;
+							
+							for(TimeSlice aNewTimeSlice: parameters.getDataCache().getTimeSliceMapping()
+									.get(cachedTimeSlice))
+ {
+
+								// Compute the proportion of the dirty time
+								// slice in each slice
+								if (cachedTimeSlice.getTimeRegion()
+										.getTimeStampStart() > aNewTimeSlice
+										.getTimeRegion().getTimeStampStart()) {
+									factor = (double) (aNewTimeSlice.getTimeRegion()
+											.getTimeStampEnd() - cachedTimeSlice
+											.getTimeRegion()
+											.getTimeStampStart())
+											/ (double) cachedTimeSlice.getTimeRegion()
+													.getTimeDuration();
+								} else {
+									factor =  (double) (cachedTimeSlice.getTimeRegion()
+											.getTimeStampEnd() - aNewTimeSlice
+											.getTimeRegion()
+											.getTimeStampStart())
+											/ (double)  cachedTimeSlice.getTimeRegion()
+													.getTimeDuration();
+								}
+
+								//System.out.println("Timeslice " + cachedTimeSlice.getNumber() + " factor: " + factor);
+								
+								rebuildMatrixFromDirtyCache(values,
+										eventProducers.get(values[1]),
+										(int) aNewTimeSlice.getNumber(), factor);
+							}
+							
+							
+							// Strategy one
+								// Compute (or get precomputed) factor
+								// BuildMatrixFromDirtyCache(values, ep, currentTimeslice number, multiplication factor);
+							
+							
+							
+							// Strategy two
+								// Get the values from the db
+						}
+						else
+						{
+							rebuildMatrixFromDirtyCache(values,
+									eventProducers.get(values[1]),
+									(int) parameters.getDataCache().getTimeSliceMapping()
+									.get(cachedTimeSlice).get(0).getNumber(), 1.0);
+						}
+					}
+				}
+
+				// Fill the matrix
+			//	rebuildMatrix(values, eventProducers.get(values[1]), parameters
+			//			.getDataCache().getTimeSliceFactor());
+			}
+		}
+		bufFileReader.close();
+		dm.end("Load matrix from cache (dirty)");
+
+		// parameters.getDataCache().getDirtyTimeSlices())
+
+		// BuildSlice();
+
+	}
+
+	/**
+	 * Check if there are filters on event types or producers
+	 * 
+	 * @return true if nothing is filtered out, false otherwise
+	 */
+	public boolean noFiltering() {
+		if (parameters.getEventProducers().size() != parameters
+				.getEventProducerHierarchy().getEventProducers().size()) {
+			logger.debug("At least one event producer is filtered: no cache will be saved.");
 			return false;
 		}
-		
-		if (parameters.getTraceTypeConfig().getTypes().size() != parameters.getAllEventTypes().size())
-		{
+
+		if (parameters.getTraceTypeConfig().getTypes().size() != parameters
+				.getAllEventTypes().size()) {
 			logger.debug("At least one event type is filtered: no cache will be saved.");
 			return false;
 		}
-			
+
 		return true;
 	}
 }

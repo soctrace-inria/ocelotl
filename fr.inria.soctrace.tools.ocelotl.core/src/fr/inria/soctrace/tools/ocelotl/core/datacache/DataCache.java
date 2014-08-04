@@ -7,7 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.slf4j.Logger;
@@ -17,6 +19,8 @@ import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 
 /**
  * Class handling the caching of the microscopic models.
@@ -61,6 +65,92 @@ public class DataCache {
 	 * Minimal ratio value that can happen
 	 */
 	protected double minimalRatio = OcelotlConstants.MINIMAL_TIMESLICE_RATIO;
+	
+	/**
+	 * Maximal ratio value of dirty time slices in a cache
+	 */
+	protected double maxDirtyRatio = OcelotlConstants.MAXIMAL_DIRTY_RATIO;
+	
+	/**
+	 * Do we have to do some extra computation to rebuild the matrix from the
+	 * cache ?
+	 */
+	protected boolean rebuildDirty;
+	
+	/**
+	 * Set whether the cache is active or not
+	 */
+	protected boolean cacheActive = true;
+
+	/**
+	 * 
+	 */
+	private long cacheStartingSlice;
+
+	private long cacheEndingSlice;
+	
+	protected List<Long> dirtyTimeSlices;
+	
+	protected CacheParameters builtCacheParameters;
+	
+	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
+
+	public HashMap<TimeSlice, List<TimeSlice>> getTimeSliceMapping() {
+		return timeSliceMapping;
+	}
+
+	public void setTimeSliceMapping(
+			HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping) {
+		this.timeSliceMapping = timeSliceMapping;
+	}
+
+	public CacheParameters getBuiltCacheParameters() {
+		return builtCacheParameters;
+	}
+
+	public void setBuiltCacheParameters(CacheParameters builtCacheParameters) {
+		this.builtCacheParameters = builtCacheParameters;
+	}
+
+	public List<Long> getDirtyTimeSlices() {
+		return dirtyTimeSlices;
+	}
+
+	public void setDirtyTimeSlices(List<Long> dirtyTimeSlices) {
+		this.dirtyTimeSlices = dirtyTimeSlices;
+	}
+
+	public boolean isCacheActive() {
+		return cacheActive;
+	}
+
+	public void setCacheActive(boolean cacheActive) {
+		this.cacheActive = cacheActive;
+	}
+	
+	public boolean isRebuildDirty() {
+		return rebuildDirty;
+	}
+
+	public void setRebuildDirty(boolean rebuildDirty) {
+		this.rebuildDirty = rebuildDirty;
+	}
+	
+	public long getCacheStartingSlice() {
+		return cacheStartingSlice;
+	}
+
+	public void setCacheStartingSlice(long cacheStartingSlice) {
+		this.cacheStartingSlice = cacheStartingSlice;
+	}
+
+	public long getCacheEndingSlice() {
+		return cacheEndingSlice;
+	}
+
+	public void setCacheEndingSlice(long cacheEndingSlice) {
+		this.cacheEndingSlice = cacheEndingSlice;
+	}
 
 	public long getCacheMaxSize() {
 		return cacheMaxSize;
@@ -77,9 +167,14 @@ public class DataCache {
 		return cacheDirectory;
 	}
 
+	/**
+	 * Perform additional checks on the given path to test its validity
+	 * 
+	 * @param cacheDirectory
+	 */
 	public void setCacheDirectory(String cacheDirectory) {
-		if (!this.cacheDirectory.equals(cacheDirectory)) {
 
+		if (!this.cacheDirectory.equals(cacheDirectory)) {
 			// Check the existence of the cache directory
 			File dir = new File(cacheDirectory);
 			if (!dir.exists()) {
@@ -95,6 +190,7 @@ public class DataCache {
 						logger.error("The current cache directory is still: "
 								+ this.cacheDirectory);
 					} else {
+						cacheActive = false;
 						logger.error("The cache will be turned off.");
 					}
 					return;
@@ -107,6 +203,7 @@ public class DataCache {
 						+ cacheDirectory + ".");
 
 				if (this.cacheDirectory.isEmpty()) {
+					cacheActive = false;
 					logger.error("The cache will be turned off.");
 				} else {
 					logger.error("The current cache directory is still: "
@@ -115,6 +212,7 @@ public class DataCache {
 				return;
 			}
 
+			cacheActive = true;
 			// Everything's OK, set the cache directory
 			this.cacheDirectory = cacheDirectory;
 
@@ -130,14 +228,15 @@ public class DataCache {
 	public DataCache() {
 		super();
 		cachedData = new HashMap<CacheParameters, File>();
+		cacheActive = true;
 
 		// Default cache directory is the directory "ocelotlCache" in the
 		// running directory
 		setCacheDirectory(ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
 				+ "/ocelotlCache");
-
-		currentCacheSize = 0L;
+		
+		dirtyTimeSlices = new ArrayList<Long>();
 	}
 
 	/**
@@ -149,6 +248,7 @@ public class DataCache {
 	 *         an empty String otherwise
 	 */
 	public File checkCache(OcelotlParameters parameters) {
+		rebuildDirty = false;
 
 		CacheParameters cParam = new CacheParameters(parameters);
 		for (CacheParameters op : cachedData.keySet()) {
@@ -156,6 +256,7 @@ public class DataCache {
 				return cachedData.get(op);
 		}
 
+		logger.debug("No datacache was found");
 		return null;
 	}
 
@@ -173,64 +274,178 @@ public class DataCache {
 			CacheParameters cacheParam) {
 
 		// Is the trace the same?
-		if (!newParam.traceName.equals(cacheParam.traceName))
+		if (!newParam.getTraceName().equals(cacheParam.getTraceName()))
 			return false;
 
-		// Are timestamps equals or are they included inside the cache
+		// Is the aggregation operator the same?
+		if ((!newParam.getTimeAggOperator().equals(cacheParam.getTimeAggOperator()))
+				|| (!newParam.getSpaceAggOperator()
+						.equals(cacheParam.getSpaceAggOperator())))
+			return false;
+		
+		// Are timestamps equal or are they included inside the cache
 		// timeregion
 		if (!checkCompatibleTimeStamp(newParam, cacheParam))
 			return false;
 
-		// Is the aggregation operator the same?
-		if ((!newParam.timeAggOperator.equals(cacheParam.timeAggOperator))
-				|| (!newParam.spaceAggOperator
-						.equals(cacheParam.spaceAggOperator)))
-			return false;
-
-		// Is the number of slices of cached data divisible by the tested number
-		// of slices?
-		if (!(cacheParam.nbTimeSlice % newParam.nbTimeSlice == 0))
-			return false;
-
 		// Compute the time slice factor
-		timeSliceFactor = cacheParam.nbTimeSlice / newParam.nbTimeSlice;
+		timeSliceFactor = cacheParam.getNbTimeSlice() / newParam.getNbTimeSlice();
 
 		return true;
 	}
 
+	/**
+	 * Test if the new explored time region is compatible with the cached data
+	 * 
+	 * @param newParam
+	 *            parameters of the new view
+	 * @param cachedParam
+	 *            parameters of the cached data
+	 * @return true if they are compatible, false otherwise
+	 */
 	protected boolean checkCompatibleTimeStamp(CacheParameters newParam,
 			CacheParameters cachedParam) {
-		TimeRegion newTimeRegion = new TimeRegion(newParam.startTimestamp,
-				newParam.endTimestamp);
-		TimeRegion cacheTimeRegion = new TimeRegion(cachedParam.startTimestamp,
-				cachedParam.endTimestamp);
+		TimeRegion newTimeRegion = new TimeRegion(newParam.getStartTimestamp(),
+				newParam.getEndTimestamp());
+		TimeRegion cacheTimeRegion = new TimeRegion(cachedParam.getStartTimestamp(),
+				cachedParam.getEndTimestamp());
 
 		// If timestamps are equal then OK
-		if (newTimeRegion.compareTimeRegion(cacheTimeRegion))
-			return true;	
-			
+		if (newTimeRegion.compareTimeRegion(cacheTimeRegion)) {
+			// Is the number of slices of cached data divisible by the tested
+			// number of slices?
+			if (!(cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0))
+				return false;
+
+			return true;
+		}
+
 		// If timestamps are included in the cache time stamps
-		if (newTimeRegion.containsTimeRegion(cacheTimeRegion)) {
-			// compute the number of included time slices
-			// time slice duration
-			long timeSliceDuration = (cachedParam.endTimestamp - cachedParam.startTimestamp)
-					/ cachedParam.nbTimeSlice;
-			int includedTimeslice = (int) ((newParam.endTimestamp - newParam.startTimestamp) / timeSliceDuration);
+		if (cacheTimeRegion.containsTimeRegion(newTimeRegion)) {
+			// Compute the duration of a time slice in the cache
+			long timeSliceDuration = (cachedParam.getEndTimestamp() - cachedParam.getStartTimestamp())
+					/ cachedParam.getNbTimeSlice();
+			
+			// Compute the number of cached time slices included in the new time
+			// region
+			int includedTimeslice = (int) ((newParam.getEndTimestamp() - newParam.getStartTimestamp()) / timeSliceDuration);
 
 			// Compute the ratio between the demanded time slice and the current
 			// time slice
-			double ratio = includedTimeslice / newParam.nbTimeSlice;
+			double ratio = includedTimeslice / newParam.getNbTimeSlice();
 
-			if (ratio < minimalRatio) {
+			// If we have enough timeslices to build the zoomed view from the
+			// cache
+			if (ratio < minimalRatio)
 				return false;
-			} else {
-				return false;
-			}
+
+			TimeSliceStateManager cachedTsManager = new TimeSliceStateManager(
+					cacheTimeRegion, cachedParam.getNbTimeSlice());
+			TimeSliceStateManager newTsManager = new TimeSliceStateManager(
+					newTimeRegion, newParam.getNbTimeSlice());
+
+			return computeDirtyTimeSlice(newParam,
+					cachedParam, newTsManager, cachedTsManager);			
 		}
 
 		return false;
 	}
 
+	// hypothesis: are the timeslice align ?
+	// if not Sol: align the new param start ?
+	
+	//compute number of dirty time slices
+	/**
+	 * "Dirty" time slices are time slices of the cache that do not fit inside a
+	 * time slice of the new view
+	 * 
+	 * @param newParam
+	 * @param cachedParam
+	 * @param newTsManager
+	 * @param cachedTsManager
+	 * @return the ratio of dirty cache time slices over the total of used time
+	 *         slices in cache
+	 */
+	public boolean computeDirtyTimeSlice(CacheParameters newParam,
+			CacheParameters cachedParam, TimeSliceStateManager newTsManager,
+			TimeSliceStateManager cachedTsManager) {
+
+		double dirtyTimeslicesNumber = 0.0;
+		double usedCachedTimeSlices = 0.0;
+		boolean dirty = false;
+
+		List<TimeSlice> cachedTimeSlice = cachedTsManager.getTimeSlices();
+		List<TimeSlice> newTimeSlice = newTsManager.getTimeSlices();
+		dirtyTimeSlices.clear();
+		HashMap<TimeSlice, List<TimeSlice>> tmpTimeSliceMapping = new HashMap<TimeSlice, List<TimeSlice>>();
+		
+		for (TimeSlice aCachedTimeSlice : cachedTimeSlice) {
+			// If the time slice is inside the new time region
+			if (!(aCachedTimeSlice.getTimeRegion().getTimeStampEnd() < cachedParam.getStartTimestamp())
+					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > cachedParam.getEndTimestamp())) {
+				dirty = true;
+				usedCachedTimeSlices++;
+				for (TimeSlice aNewTimeSlice : newTimeSlice) {
+					// Is the cached time slice is at least partly inside a new
+					// time slice ?
+					if (aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
+							.getTimeRegion().getTimeStampStart())
+							|| aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
+									.getTimeRegion().getTimeStampEnd())) {
+
+						if (!tmpTimeSliceMapping.containsKey(aCachedTimeSlice)) {
+							tmpTimeSliceMapping.put(aCachedTimeSlice,
+									new ArrayList<TimeSlice>());
+						}
+						tmpTimeSliceMapping.get(aCachedTimeSlice).add(
+								aNewTimeSlice);
+					}
+
+					// If the cached time slice fits in one of the new time
+					// slices
+					if (aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
+							.getTimeRegion().getTimeStampStart())
+							&& aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
+									.getTimeRegion().getTimeStampEnd())) {
+						// Not dirty
+						dirty = false;
+						break;
+					}
+				}
+
+				if (dirty) {
+					dirtyTimeslicesNumber++;
+					dirtyTimeSlices.add(aCachedTimeSlice.getNumber());
+				} 
+			}
+		}
+		
+		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
+		
+		if (computedDirtyRatio > 0)
+			rebuildDirty = true;
+
+		if (computedDirtyRatio <= maxDirtyRatio) {
+			// Precompute stuff
+			setCacheStartingSlice(cachedTsManager
+					.getTimeSlice(cachedParam.getStartTimestamp()));
+			setCacheEndingSlice(cachedTsManager
+					.getTimeSlice(cachedParam.getEndTimestamp()));
+			builtCacheParameters = newParam;
+			if(timeSliceMapping != null)
+				timeSliceMapping.clear();
+			timeSliceMapping = tmpTimeSliceMapping;
+			
+			logger.debug("Complex rebuilding matrix will be used");
+			
+			return true;
+		}
+		
+		rebuildDirty = false;
+		return false;
+	}
+	
+	
 	/**
 	 * Add a newly saved microscopic model to the list of cache file
 	 * 
@@ -314,16 +529,16 @@ public class DataCache {
 					CacheParameters param = parseTraceCache(traceCache);
 
 					// If parsing was successful
-					if (param.traceID != -1) {
+					if (param.getTraceID() != -1) {
 						// Register the cache file
 						cachedData.put(param, traceCache);
 
-						logger.debug("Found " + param.traceName + " in "
+						logger.debug("Found " + param.getTraceName() + " in "
 								+ traceCache.toString() + ", "
-								+ param.timeAggOperator + ", "
-								+ param.spaceAggOperator + ", "
-								+ param.startTimestamp + ", "
-								+ param.endTimestamp);
+								+ param.getTimeAggOperator() + ", "
+								+ param.getSpaceAggOperator() + ", "
+								+ param.getStartTimestamp() + ", "
+								+ param.getEndTimestamp());
 					}
 				}
 				computeCacheSize();
@@ -366,19 +581,19 @@ public class DataCache {
 					// number ??
 
 					// Name
-					params.traceName = header[0];
+					params.setTraceName(header[0]);
 					// Database unique ID
-					params.traceID = Integer.parseInt(header[1]);
+					params.setTraceID(Integer.parseInt(header[1]));
 					// Time Aggregation Operator
-					params.timeAggOperator = header[2];
+					params.setTimeAggOperator(header[2]);
 					// Space Aggregation Operator
-					params.spaceAggOperator = header[3];
+					params.setSpaceAggOperator(header[3]);
 					// Start timestamp
-					params.startTimestamp = Long.parseLong(header[4]);
+					params.setStartTimestamp(Long.parseLong(header[4]));
 					// End timestamp
-					params.endTimestamp = Long.parseLong(header[5]);
+					params.setEndTimestamp(Long.parseLong(header[5]));
 					// Number of time Slices
-					params.nbTimeSlice = Integer.parseInt(header[6]);
+					params.setNbTimeSlice(Integer.parseInt(header[6]));
 				}
 
 				bufFileReader.close();
@@ -405,41 +620,40 @@ public class DataCache {
 		CacheParameters params = parseTraceCache(cacheFile);
 
 		// Invalid data file
-		if (params.traceID == -1) {
+		if (params.getTraceID() == -1) {
 			throw new OcelotlException(OcelotlException.INVALID_CACHEFILE);
 		} else {
-			oParam.setTimeSlicesNumber(params.nbTimeSlice);
-			TimeRegion timeRegion = new TimeRegion(params.startTimestamp,
-					params.endTimestamp);
+			oParam.setTimeSlicesNumber(params.getNbTimeSlice());
+			TimeRegion timeRegion = new TimeRegion(params.getStartTimestamp(),
+					params.getEndTimestamp());
 			oParam.setTimeRegion(timeRegion);
 
-			if (!params.timeAggOperator.equals("null")) {
-				oParam.setTimeAggOperator(params.timeAggOperator);
+			if (!params.getTimeAggOperator().equals("null")) {
+				oParam.setTimeAggOperator(params.getTimeAggOperator());
 			}
 
-			if (!params.spaceAggOperator.equals("null")) {
-				oParam.setSpaceAggOperator(params.spaceAggOperator);
+			if (!params.getSpaceAggOperator().equals("null")) {
+				oParam.setSpaceAggOperator(params.getSpaceAggOperator());
 			}
 		}
 
-		return params.traceID;
+		return params.getTraceID();
 	}
 
 	/**
-	 * Chec
+	 * Check that the new file fits in the cache size limit
 	 */
 	public boolean checkCacheSize(long newFileSize) {
 		if (cacheMaxSize > -1) {
 			if (newFileSize > cacheMaxSize) {
 				return false;
 			}
-
-			while (currentCacheSize + newFileSize > cacheMaxSize) {
+			while (currentCacheSize + newFileSize > cacheMaxSize
+					&& !cachedData.isEmpty()) {
 				removeCacheFile();
 				computeCacheSize();
 			}
 		}
-
 		return true;
 	}
 
@@ -456,61 +670,25 @@ public class DataCache {
 	}
 
 	/**
-	 * Remove a cache file
-	 * 
-	 * TODO decide suppression policy (biggest cache, oldest cache file)
+	 * Remove a cache file. The used policy is to suppress the oldest modified
+	 * file
 	 */
 	public void removeCacheFile() {
+		long oldestDate = Long.MAX_VALUE;
+		CacheParameters oldestParam = null;
 
-	}
-
-	/**
-	 * Describe the parameters used to check if a trace can be loaded from cache
-	 */
-	private class CacheParameters {
-		String traceName;
-		int traceID;
-		long startTimestamp;
-		long endTimestamp;
-		int nbTimeSlice;
-		String timeAggOperator;
-		String spaceAggOperator;
-
-		CacheParameters() {
-			traceName = "";
-			traceID = -1;
-			startTimestamp = 0L;
-			endTimestamp = 0L;
-			nbTimeSlice = 0;
-			timeAggOperator = "null";
-			spaceAggOperator = "null";
-		}
-
-		/**
-		 * Create a CacheParameter from an OcelotlParameter
-		 * 
-		 * @param oParam
-		 *            the Ocelotl parameters
-		 */
-		CacheParameters(OcelotlParameters oParam) {
-			traceName = oParam.getTrace().getAlias();
-			traceID = oParam.getTrace().getId();
-
-			startTimestamp = oParam.getTimeRegion().getTimeStampStart();
-			endTimestamp = oParam.getTimeRegion().getTimeStampEnd();
-			nbTimeSlice = oParam.getTimeSlicesNumber();
-			if (oParam.getTimeAggOperator() == null) {
-				timeAggOperator = "null";
-			} else {
-				timeAggOperator = oParam.getTimeAggOperator();
-			}
-
-			if (oParam.getSpaceAggOperator() == null) {
-				spaceAggOperator = "null";
-			} else {
-				spaceAggOperator = oParam.getSpaceAggOperator();
+		for (CacheParameters aCacheParam : cachedData.keySet()) {
+			if (oldestDate < cachedData.get(aCacheParam).lastModified()) {
+				oldestDate = cachedData.get(aCacheParam).lastModified();
+				oldestParam = aCacheParam;
 			}
 		}
-	}
 
+		if (!cachedData.get(oldestParam).delete()) {
+			logger.debug("DataCache: Deletion of cache file "
+					+ cachedData.get(oldestParam).getName() + " failed.");
+		}
+
+		cachedData.remove(oldestParam);
+	}
 }

@@ -63,6 +63,7 @@ import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.microdesc.config.DefaultSettingsConstant;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IAggregationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -325,8 +326,6 @@ public abstract class DistributionBaseView extends Dialog implements
 				config.getTypes().add((EventType) o);
 			listViewerEventTypes.setInput(config.getTypes());
 		}
-
-
 	}
 
 	protected OcelotlView ocelotlView;
@@ -594,8 +593,8 @@ public abstract class DistributionBaseView extends Dialog implements
 				false, 1, 1));
 		spinnerEventSize.setFont(SWTResourceManager.getFont("Cantarell", 11,
 				SWT.NORMAL));
-		spinnerEventSize.setMinimum(100);
-		spinnerEventSize.setMaximum(10000000);
+		spinnerEventSize.setMinimum(DefaultSettingsConstant.MIN_EVENTS_PER_THREAD);
+		spinnerEventSize.setMaximum(DefaultSettingsConstant.MAX_EVENTS_PER_THREAD);
 		spinnerEventSize.setSelection(config.getEventsPerThread());
 
 		final Group grpDivideDbQuery = new Group(sashForm, SWT.NONE);
@@ -614,8 +613,8 @@ public abstract class DistributionBaseView extends Dialog implements
 				11, SWT.NORMAL));
 		spinnerDivideDbQuery.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
 				true, false, 1, 1));
-		spinnerDivideDbQuery.setMinimum(0);
-		spinnerDivideDbQuery.setMaximum(1000000);
+		spinnerDivideDbQuery.setMinimum(DefaultSettingsConstant.MIN_EVENT_PRODUCERS_PER_QUERY);
+		spinnerDivideDbQuery.setMaximum(DefaultSettingsConstant.MAX_EVENT_PRODUCERS_PER_QUERY);
 		spinnerDivideDbQuery.setSelection(params.getMaxEventProducers());
 
 		final Group grpMultiThread = new Group(sashForm, SWT.NONE);
@@ -634,8 +633,8 @@ public abstract class DistributionBaseView extends Dialog implements
 				SWT.NORMAL));
 		spinnerThread.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
 				false, 1, 1));
-		spinnerThread.setMinimum(1);
-		spinnerThread.setMaximum(1000000);
+		spinnerThread.setMinimum(DefaultSettingsConstant.MIN_NUMBER_OF_THREAD);
+		spinnerThread.setMaximum(DefaultSettingsConstant.MAX_NUMBER_OF_THREAD);
 		spinnerThread.setSelection(config.getThreadNumber());
 		sashForm.setWeights(new int[] { 1, 1, 1 });
 		sashFormGlobal.setWeights(new int[] { 1 });

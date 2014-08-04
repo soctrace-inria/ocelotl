@@ -37,19 +37,27 @@ public class OcelotlConstants {
 	/**
 	 * Token used for the CSV file format
 	 */
-	static public String CSVDelimiter = ";";
+	static public final String CSVDelimiter = ";";
 	
 	/**
 	 * Number of field in the header of a cache file 
 	 */
-	static public int CACHE_HEADER_NORMAL_SIZE = 9;
+	static public final int CACHE_HEADER_NORMAL_SIZE = 9;
 	
 	/**
 	 * Maximum size of the data cache in bytes.
 	 * A value of -1 means no size limit
 	 */
-	static public int MAX_CACHESIZE = -1;
+	static public final int MAX_CACHESIZE = -1;
 	
-	static public double MINIMAL_TIMESLICE_RATIO = 1.0;
-
+	/**
+	 * Minimum ratio value for the datacache
+	 */
+	static public final double MINIMAL_TIMESLICE_RATIO = 1.0;
+	
+	/**
+	 * Maximal ratio value of dirty time slices in a cache
+	 */
+	static public final double MAXIMAL_DIRTY_RATIO = 0.7;
+	
 }

@@ -28,7 +28,7 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 public class DistributionConfig implements ITraceTypeConfig {
 
 	private List<EventType> types = new LinkedList<EventType>();
-	private int eventsPerThread = DefaultSettingsConstant.eventsPerThread;
+	private int eventsPerThread = DefaultSettingsConstant.EVENTS_PER_THREAD;
 	private int threadNumber = 8;
 
 	public DistributionConfig() {
@@ -67,7 +67,7 @@ public class DistributionConfig implements ITraceTypeConfig {
 	 */
 	public void init() {
 		setThreadNumber(DefaultSettingsConstant.threadNumber);
-		setEventsPerThread(DefaultSettingsConstant.eventsPerThread);
+		setEventsPerThread(DefaultSettingsConstant.EVENTS_PER_THREAD);
 	}
 
 }
