@@ -15,7 +15,7 @@ public class CacheParameters {
 		private String timeAggOperator;
 		private String spaceAggOperator;
 
-		CacheParameters() {
+		public CacheParameters() {
 			traceName = "";
 			traceID = -1;
 			startTimestamp = 0L;
