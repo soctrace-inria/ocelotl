@@ -422,6 +422,9 @@ public class DataCache {
 		
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
 		
+		if (computedDirtyRatio == 0)
+			return true;
+		
 		if (computedDirtyRatio > 0)
 			rebuildDirty = true;
 
@@ -436,6 +439,8 @@ public class DataCache {
 				timeSliceMapping.clear();
 			timeSliceMapping = tmpTimeSliceMapping;
 			
+			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber + " dirty Timeslices among " + usedCachedTimeSlices + " used cache time slices"
+					+ " (i.e. a ratio of " + computedDirtyRatio + ").");
 			logger.debug("Complex rebuilding matrix will be used");
 			
 			return true;

@@ -133,21 +133,28 @@ public abstract class MultiThreadTimeAggregationOperator {
 		initQueries();
 		initVectors();
 
-		File cacheFile = parameters.getDataCache().checkCache(parameters);
-		// if there is a file and it is valid
-		if (parameters.getDataCache().isCacheActive() && cacheFile != null) {
-			// call computeMatrixFromFile()
-			loadFromCache(cacheFile);
+		if (parameters.getDataCache().isCacheActive()) {
+			File cacheFile = parameters.getDataCache().checkCache(parameters);
+
+			// if there is a file and it is valid
+			if (cacheFile != null) {
+				loadFromCache(cacheFile);
+			} else {
+				computeMatrix();
+
+				if (eventsNumber == 0)
+					throw new OcelotlException(OcelotlException.NO_EVENTS);
+
+				// Save the newly computed matrix + parameters
+				dm.start();
+				saveMatrix();
+				dm.end("DATACACHE - Save the matrix to cache");
+			}
 		} else {
 			computeMatrix();
 
 			if (eventsNumber == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENTS);
-			
-			// Save the newly computed matrix + parameters
-			dm.start();
-			saveMatrix();
-			dm.end("DATACACHE - Save the matrix to cache");
 		}
 	}
 
