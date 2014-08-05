@@ -144,4 +144,9 @@ public class TestParameters {
 
 		return getTraceID();
 	}
+	
+	public String toString() {
+		String newString = traceName + "_" + traceID + "_" + startTimestamp + "_" + endTimestamp + "_" + nbTimeSlice + "_" + timeAggOperator + "_" + parameter;
+		return newString;
+	}
 }

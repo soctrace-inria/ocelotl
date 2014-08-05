@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Display;
-
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -25,11 +23,17 @@ public class TestBench {
 	String aConfFile;
 	OcelotlView theView;
 	List<TestParameters> testParams = new ArrayList<TestParameters>();
+	String testDirectory;
 	
 	public TestBench(String aFilePath, OcelotlView aView)
 	{
 		aConfFile = aFilePath;
 		theView = aView;
+		
+		String fileDir = aFilePath.substring(0, aFilePath.lastIndexOf("/") + 1);
+		testDirectory = fileDir + System.currentTimeMillis();
+		File dir = new File(testDirectory);
+		dir.mkdirs();
 	}
 	
 	public void parseFile()
@@ -93,7 +97,24 @@ public class TestBench {
 
 	public void launchTest() {
 		for (TestParameters aTest : testParams) {
-			theView.loadFromParam(aTest);
+			theView.loadFromParam(aTest, false);
+			String spaceLess = aTest.toString().replace(" ", "_");
+			theView.snapShotDiagram(testDirectory + "/" + spaceLess + ".png");
+
+			theView.loadFromParam(aTest, true);
+			theView.snapShotDiagram(testDirectory + "/" + spaceLess + "_noCache.png");
+		}
+
+		// Call the script to compare the image
+		try {
+			Process p = new ProcessBuilder("/home/youenn/projects/testBenchOcelotl/compare.sh", testDirectory).start();
+			p.waitFor();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

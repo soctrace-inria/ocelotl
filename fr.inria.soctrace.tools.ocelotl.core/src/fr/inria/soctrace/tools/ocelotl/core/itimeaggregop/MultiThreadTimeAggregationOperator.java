@@ -175,7 +175,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	public void saveMatrix() {
 		// Check that no event type or event producer was filtered out which
 		// would result in an incomplete datacache
-		if (!noFiltering() || !parameters.getDataCache().isCacheActive())
+		if (!parameters.getDataCache().isCacheActive() || !noFiltering())
 			return;
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"

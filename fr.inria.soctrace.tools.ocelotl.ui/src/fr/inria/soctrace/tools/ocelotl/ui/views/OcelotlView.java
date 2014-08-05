@@ -61,6 +61,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import ch.qos.logback.classic.Logger;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
@@ -95,11 +96,20 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	
 	Trace aTestTrace;
 	
-	public void loadFromParam(TestParameters someParams) {
+	public void snapShotDiagram(String fileName)
+	{
+		timeLineView.createSnapshotFor(fileName);
+		System.out.println("Creating image at " + fileName);
+	}
+	
+	public void loadFromParam(TestParameters someParams, boolean activeCache) {
 
 		final TestParameters testParams = someParams;
 		comboTime.removeAll();
 		comboSpace.removeAll();
+		
+		btnCacheEnabled.setSelection(activeCache);
+		btnCacheEnabled.notifyListeners(SWT.Selection, new Event());
 
 		final Job job = new Job("Loading trace from micro description") {
 
@@ -170,6 +180,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							textRun.setText(String.valueOf(ocelotlParameters.getParameter()));
 
+							hasChanged = HasChanged.ALL;
 							// And launch the display
 							btnRun.notifyListeners(SWT.Selection, new Event());
 						}
@@ -197,7 +208,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		try {
 			job.join();
-			System.out.println("test joins!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		} catch (InterruptedException e5) {
 			// TODO Auto-generated catch block
 			e5.printStackTrace();
@@ -448,7 +458,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			}
 			else
 			{
-				textRun.setText("1.0");
+				//textRun.setText("1.0");
 			}
 			setConfiguration();
 			final String title = "Computing Aggregated View";
@@ -514,7 +524,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			job.schedule();
 			try {
 				job.join();
-				System.out.println("run joins!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			} catch (InterruptedException e5) {
 				// TODO Auto-generated catch block
 				e5.printStackTrace();

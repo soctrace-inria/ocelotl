@@ -19,23 +19,35 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
+import org.eclipse.draw2d.SWTGraphics;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Display;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -319,6 +331,56 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseListener(mouse);
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
+	}
+	
+	public void createSnapshotFor(String fileName) {
+		byte[] imageBytes = createImage(root, SWT.IMAGE_PNG);
+
+		try {
+			FileOutputStream out = new FileOutputStream(fileName);
+			out.write(imageBytes);
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private byte[] createImage(Figure figure, int format) {
+
+		Device device = Display.getCurrent();
+		Rectangle r = figure.getBounds();
+
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+
+		Image image = null;
+		GC gc = null;
+		Graphics g = null;
+		try {
+			image = new Image(device, r.width, r.height);
+			gc = new GC(image);
+			g = new SWTGraphics(gc);
+			g.translate(r.x * -1, r.y * -1);
+
+			figure.paint(g);
+
+			ImageLoader imageLoader = new ImageLoader();
+			imageLoader.data = new ImageData[] { image.getImageData() };
+			imageLoader.save(result, format);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (g != null) {
+				g.dispose();
+			}
+			if (gc != null) {
+				gc.dispose();
+			}
+			if (image != null) {
+				image.dispose();
+			}
+		}
+		return result.toByteArray();
 	}
 
 }

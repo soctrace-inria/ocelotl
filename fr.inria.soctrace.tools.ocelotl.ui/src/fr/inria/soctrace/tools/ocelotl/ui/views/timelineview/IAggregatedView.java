@@ -35,5 +35,7 @@ public interface IAggregatedView {
 	public void init(TimeLineViewWrapper wrapper);
 
 	public void resizeDiagram();
+	
+	public void createSnapshotFor(String fileName);
 
 }
