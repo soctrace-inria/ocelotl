@@ -128,7 +128,7 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION : "
+		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
@@ -154,7 +154,7 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION : "
+		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 	

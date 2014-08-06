@@ -327,6 +327,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 	public void rebuildDirtyMatrix(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers) throws IOException {
 
+		DeltaManagerOcelotl aDM = new DeltaManagerOcelotl();
+		aDM.start();
+		
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
 		ArrayList<Integer> rebuiltTimeSlice = new ArrayList<Integer>();
@@ -394,7 +397,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			}
 		}
 		bufFileReader.close();
-		dm.end("Load matrix from cache (dirty)");
+		aDM.end("Load matrix from cache (dirty)");
 	}
 
 	/**
@@ -435,34 +438,18 @@ public abstract class MultiThreadTimeAggregationOperator {
 	
 	public void databaseRebuild(String[] values, TimeSlice cachedTimeSlice,
 			HashMap<String, EventProducer> eventProducers) {
-		long startTimeStamp;
-		long endTimeStamp;
 
-		for (TimeSlice aNewTimeSlice : parameters.getDataCache()
-				.getTimeSliceMapping().get(cachedTimeSlice)) {
-			
-			// Compute start and end timestamps
-			if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > aNewTimeSlice
-					.getTimeRegion().getTimeStampStart()) {
-				startTimeStamp = cachedTimeSlice.getTimeRegion()
-						.getTimeStampStart();
-				endTimeStamp = aNewTimeSlice.getTimeRegion().getTimeStampEnd();
-			} else {
-				startTimeStamp = aNewTimeSlice.getTimeRegion()
-						.getTimeStampStart();
-				endTimeStamp = cachedTimeSlice.getTimeRegion().getTimeStampEnd();
-			}
+		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+		time.add(new IntervalDesc(cachedTimeSlice.getTimeRegion()
+				.getTimeStampStart(), cachedTimeSlice.getTimeRegion()
+				.getTimeStampEnd()));
 
-			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
-			time.add(new IntervalDesc(startTimeStamp, endTimeStamp));
-			
-			try {
-				computeSubMatrix(new ArrayList<EventProducer>(eventProducers.values()), time);
-			} catch (SoCTraceException | InterruptedException
-					| OcelotlException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			computeSubMatrix(
+					new ArrayList<EventProducer>(eventProducers.values()), time);
+		} catch (SoCTraceException | InterruptedException | OcelotlException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
