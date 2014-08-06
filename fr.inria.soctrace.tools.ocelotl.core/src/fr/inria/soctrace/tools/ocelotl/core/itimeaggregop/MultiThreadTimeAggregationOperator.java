@@ -38,7 +38,9 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
@@ -52,7 +54,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			.getLogger(MultiThreadTimeAggregationOperator.class);
 	
 	//protected TimeSliceStateManager timeSliceManager;
-	protected EventIterator it;
+	protected EventIterator eventIterator;
 	protected int count = 0;
 	protected int epit = 0;
 	protected DeltaManagerOcelotl dm;
@@ -66,6 +68,10 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	abstract protected void computeSubMatrix(
 			final List<EventProducer> eventProducers) throws SoCTraceException,
+			InterruptedException, OcelotlException;
+	
+	abstract protected void computeSubMatrix(
+			final List<EventProducer> eventProducers, List<IntervalDesc> time) throws SoCTraceException,
 			InterruptedException, OcelotlException;
 	
 	/**
@@ -97,7 +103,20 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 */
 	public abstract void rebuildMatrix(String[] values, EventProducer ep, int sliceMultiple);
 
-	
+	/**
+	 * Fill the matrix with values from the cache multiplied by the factor
+	 * correponding to the proportional amount of the cached timeslice in the
+	 * built slice
+	 * 
+	 * @param values
+	 *            Array of Strings containing the values and the indexes of the
+	 *            matrix
+	 * @param ep
+	 * @param currentSliceNumber
+	 *            the number of the currently built time slice
+	 * @param factor
+	 *            the proportional factor
+	 */
 	public abstract void rebuildMatrixFromDirtyCache(String[] values,
 			EventProducer ep, int currentSliceNumber, double factor);
 
@@ -128,8 +147,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 		this.parameters = parameters;
 		count = 0;
 		epit = 0;
-//		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-//				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		// timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
+		// .getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initQueries();
 		initVectors();
 
@@ -164,11 +183,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	public List<Event> getEvents(final int size) {
 		final List<Event> events = new ArrayList<Event>();
-		synchronized (it) {
+		synchronized (eventIterator) {
 			for (int i = 0; i < size; i++) {
-				if (it.getNext() == null)
+				if (eventIterator.getNext() == null)
 					return events;
-				events.add(it.getEvent());
+				events.add(eventIterator.getEvent());
 				eventsNumber++;
 			}
 		}
@@ -307,33 +326,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	public void rebuildDirtyMatrix(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers) throws IOException {
-		// startSlice
-		// endSlice
-
-		//TimeSliceStateManager builtTimeSlices = new TimeSliceStateManager(
-		//		parameters.getTimeRegion(), parameters.getTimeSlicesNumber());
 
 		BufferedReader bufFileReader;
-
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
-
+		ArrayList<Integer> rebuiltTimeSlice = new ArrayList<Integer>();
+		
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
-		
-		//for (TimeSlice aNewTimeSlice : parameters.getDataCache().getTimeSliceMapping().keySet()) {
-			
-			//for( parameters.getDataCache().getTimeSliceMapping()
-			//if(parameters.getDataCache().getDirtyTimeSlices().contains(o))
-			//builtTimeSlices.getTimeSlices()) {
-				
-			// get cache timeslice
-			// int slice = Integer.parseInt(values[0]);
-			// 1. compute value proportional to the amount of the time slice
-			// included
-			// 2. query missing events using setTimeInterval in
-			// OcelotlQueries
-		//}
 
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
@@ -342,82 +342,130 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// If the event producer is not filtered out
 			if (eventProducers.containsKey(values[1])) {
 				int slice = Integer.parseInt(values[0]);
+
 				for (TimeSlice cachedTimeSlice : parameters.getDataCache()
 						.getTimeSliceMapping().keySet()) {
 					// Look for the current time slice
 					if (cachedTimeSlice.getNumber() == slice) {
-						
-						// Is it dirty (does it belong to more than one new time
+
+						// Is it dirty (does it cover to more than one new time
 						// slice?)
+						// Note it should not be more than 2 since it would mean
+						// that the cached timeslice is larger than a new time
+						// slice
 						if (parameters.getDataCache().getTimeSliceMapping()
 								.get(cachedTimeSlice).size() > 1) {
-							double factor;
-							
-							for(TimeSlice aNewTimeSlice: parameters.getDataCache().getTimeSliceMapping()
-									.get(cachedTimeSlice))
- {
 
-								// Compute the proportion of the dirty time
-								// slice in each slice
-								if (cachedTimeSlice.getTimeRegion()
-										.getTimeStampStart() > aNewTimeSlice
-										.getTimeRegion().getTimeStampStart()) {
-									factor = (double) (aNewTimeSlice.getTimeRegion()
-											.getTimeStampEnd() - cachedTimeSlice
-											.getTimeRegion()
-											.getTimeStampStart())
-											/ (double) cachedTimeSlice.getTimeRegion()
-													.getTimeDuration();
-								} else {
-									factor =  (double) (cachedTimeSlice.getTimeRegion()
-											.getTimeStampEnd() - aNewTimeSlice
-											.getTimeRegion()
-											.getTimeStampStart())
-											/ (double)  cachedTimeSlice.getTimeRegion()
-													.getTimeDuration();
-								}
-
-								//System.out.println("Timeslice " + cachedTimeSlice.getNumber() + " factor: " + factor);
-								
-								rebuildMatrixFromDirtyCache(values,
-										eventProducers.get(values[1]),
-										(int) aNewTimeSlice.getNumber(), factor);
-							}
-							
-							
-							// Strategy one
+							switch (parameters.getDataCache()
+									.getBuildingStrategy()) {
+								// Strategy one
 								// Compute (or get precomputed) factor
-								// BuildMatrixFromDirtyCache(values, ep, currentTimeslice number, multiplication factor);
-							
-							
-							
-							// Strategy two
+								case DATACACHE_PROPORTIONAL:
+									proportionalRebuild(values, cachedTimeSlice,
+									eventProducers);
+									break;
+									
+								// Strategy two
 								// Get the values from the db
-						}
-						else
-						{
-							rebuildMatrixFromDirtyCache(values,
+								case DATACACHE_DATABASE:
+								if (!rebuiltTimeSlice.contains(slice)) {
+									rebuiltTimeSlice.add(slice);
+									databaseRebuild(values, cachedTimeSlice,
+											eventProducers);
+								}
+									break;
+									
+								default:
+									logger.error("Undefined rebuilding datacache strategy");
+							}
+
+						} else {
+							// Not dirty
+							rebuildMatrixFromDirtyCache(
+									values,
 									eventProducers.get(values[1]),
-									(int) parameters.getDataCache().getTimeSliceMapping()
-									.get(cachedTimeSlice).get(0).getNumber(), 1.0);
+									(int) parameters.getDataCache()
+											.getTimeSliceMapping()
+											.get(cachedTimeSlice).get(0)
+											.getNumber(), 1.0);
 						}
 					}
 				}
-
-				// Fill the matrix
-			//	rebuildMatrix(values, eventProducers.get(values[1]), parameters
-			//			.getDataCache().getTimeSliceFactor());
 			}
 		}
 		bufFileReader.close();
 		dm.end("Load matrix from cache (dirty)");
-
-		// parameters.getDataCache().getDirtyTimeSlices())
-
-		// BuildSlice();
-
 	}
 
+	/**
+	 * Rebuild a timeslice from a dirty cached time slice
+	 * 
+	 * @param values
+	 * @param cachedTimeSlice
+	 * @param eventProducers
+	 */
+	public void proportionalRebuild(String[] values, TimeSlice cachedTimeSlice,
+			HashMap<String, EventProducer> eventProducers) {
+		double factor;
+
+		for (TimeSlice aNewTimeSlice : parameters.getDataCache()
+				.getTimeSliceMapping().get(cachedTimeSlice)) {
+
+			// Compute the proportion factor of the dirty time
+			// slice in each slice
+			if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > aNewTimeSlice
+					.getTimeRegion().getTimeStampStart()) {
+				factor = (double) (aNewTimeSlice.getTimeRegion()
+						.getTimeStampEnd() - cachedTimeSlice.getTimeRegion()
+						.getTimeStampStart())
+						/ (double) cachedTimeSlice.getTimeRegion()
+								.getTimeDuration();
+			} else {
+				factor = (double) (cachedTimeSlice.getTimeRegion()
+						.getTimeStampEnd() - aNewTimeSlice.getTimeRegion()
+						.getTimeStampStart())
+						/ (double) cachedTimeSlice.getTimeRegion()
+								.getTimeDuration();
+			}
+
+			rebuildMatrixFromDirtyCache(values, eventProducers.get(values[1]),
+					(int) aNewTimeSlice.getNumber(), factor);
+		}
+	}
+	
+	public void databaseRebuild(String[] values, TimeSlice cachedTimeSlice,
+			HashMap<String, EventProducer> eventProducers) {
+		long startTimeStamp;
+		long endTimeStamp;
+
+		for (TimeSlice aNewTimeSlice : parameters.getDataCache()
+				.getTimeSliceMapping().get(cachedTimeSlice)) {
+			
+			// Compute start and end timestamps
+			if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > aNewTimeSlice
+					.getTimeRegion().getTimeStampStart()) {
+				startTimeStamp = cachedTimeSlice.getTimeRegion()
+						.getTimeStampStart();
+				endTimeStamp = aNewTimeSlice.getTimeRegion().getTimeStampEnd();
+			} else {
+				startTimeStamp = aNewTimeSlice.getTimeRegion()
+						.getTimeStampStart();
+				endTimeStamp = cachedTimeSlice.getTimeRegion().getTimeStampEnd();
+			}
+
+			final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+			time.add(new IntervalDesc(startTimeStamp, endTimeStamp));
+			
+			try {
+				computeSubMatrix(new ArrayList<EventProducer>(eventProducers.values()), time);
+			} catch (SoCTraceException | InterruptedException
+					| OcelotlException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * Check if there are filters on event types or producers
 	 * 

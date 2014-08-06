@@ -18,4 +18,5 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.microdesc,
  fr.inria.soctrace.tools.ocelotl.microdesc.config,
  fr.inria.soctrace.tools.ocelotl.microdesc.operators,
  fr.inria.soctrace.tools.ocelotl.microdesc.ui
-Import-Package: org.eclipse.wb.swt
+Import-Package: fr.inria.soctrace.lib.search.utils,
+ org.eclipse.wb.swt

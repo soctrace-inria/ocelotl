@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -94,6 +95,16 @@ public class DataCache {
 	protected CacheParameters builtCacheParameters;
 	
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
+	
+	protected DatacacheStrategy buildingStrategy;
+
+	public DatacacheStrategy getBuildingStrategy() {
+		return buildingStrategy;
+	}
+
+	public void setBuildingStrategy(DatacacheStrategy buildingStrategy) {
+		this.buildingStrategy = buildingStrategy;
+	}
 
 	public HashMap<TimeSlice, List<TimeSlice>> getTimeSliceMapping() {
 		return timeSliceMapping;
@@ -237,6 +248,7 @@ public class DataCache {
 				+ "/ocelotlCache");
 		
 		dirtyTimeSlices = new ArrayList<Long>();
+		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
 	}
 
 	/**

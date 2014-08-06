@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
@@ -117,7 +118,7 @@ public class EventDistribution extends _3DMicroDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		it = ocelotlQueries.getEventIterator(eventProducers);
+		eventIterator = ocelotlQueries.getEventIterator(eventProducers);
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
@@ -136,7 +137,33 @@ public class EventDistribution extends _3DMicroDescription {
 		dm.end("VECTORS COMPUTATION : "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-
+	
+	@Override
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			List<IntervalDesc> time) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		dm = new DeltaManagerOcelotl();
+		dm.start();
+		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time);
+		dm = new DeltaManagerOcelotl();
+		dm.start();
+		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
+				.getTraceTypeConfig()).getThreadNumber(); t++)
+			threadlist.add(new OcelotlThread(
+					((DistributionConfig) getOcelotlParameters()
+							.getTraceTypeConfig()).getThreadNumber(), t,
+					((DistributionConfig) getOcelotlParameters()
+							.getTraceTypeConfig()).getEventsPerThread()));
+		for (final Thread thread : threadlist)
+			thread.join();
+		ocelotlQueries.closeIterator();
+		dm.end("VECTORS COMPUTATION : "
+				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+	
 	@Override
 	public void initQueries() {
 		try {
