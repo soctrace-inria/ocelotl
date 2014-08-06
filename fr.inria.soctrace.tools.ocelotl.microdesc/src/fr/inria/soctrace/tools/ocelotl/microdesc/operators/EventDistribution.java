@@ -134,7 +134,7 @@ public class EventDistribution extends _3DMicroDescription {
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION : "
+		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 	
@@ -160,7 +160,7 @@ public class EventDistribution extends _3DMicroDescription {
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION : "
+		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 	
