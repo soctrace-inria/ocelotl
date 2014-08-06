@@ -166,6 +166,26 @@ public abstract class _3DMatrixMicroDescription extends
 		matrix.get(slice).get(ep).put(evType, value);
 	}
 	
+
+	/*public void rebuildMatrixFromDataBase(Event anEvent, EventProducer ep, int slice) {
+
+		String evType = anEvent.getType().getName();
+		
+		// If the event type is filtered out
+		if (!typeNames.contains(evType))
+			return;
+
+		double value = Double.parseDouble(anEvent.getEventParams().get(0).getValue());
+		
+		computeSubMatrix(getOcelotlParameters().getEventProducers());
+		//matrixUpdate(anEvent, anEvent.getEventProducer());
+		
+		if (matrix.get(slice).get(ep).get(evType) != null)
+			value = matrix.get(slice).get(ep).get(evType) + value;
+
+		matrix.get(slice).get(ep).put(evType, value);
+	}*/
+	
 	@Override
 	public void initMatrixToZero(Collection<EventProducer> eventProducers) {
 		for (int slice = 0; slice < parameters.getTimeSlicesNumber(); slice++) {

@@ -111,7 +111,7 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		it = ocelotlQueries.getVariableIterator(eventProducers);
+		eventIterator = ocelotlQueries.getVariableIterator(eventProducers);
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
