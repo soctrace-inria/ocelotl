@@ -179,7 +179,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 							textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							textRun.setText(String.valueOf(ocelotlParameters.getParameter()));
-
+							ocelotlParameters.getDataCache().setBuildingStrategy(testParams.getDatacacheStrat());
+							
 							hasChanged = HasChanged.ALL;
 							// And launch the display
 							btnRun.notifyListeners(SWT.Selection, new Event());

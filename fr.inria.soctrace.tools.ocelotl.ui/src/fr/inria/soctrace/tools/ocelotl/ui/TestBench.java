@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 /**
@@ -76,6 +77,8 @@ public class TestBench {
 					params.setTraceName(traceName);
 					// Database unique ID
 					params.setTraceID(traceID);
+					// rebuilding strategy
+					params.setDatacacheStrat(DatacacheStrategy.valueOf(header[0]));
 					// Number of time Slices
 					params.setNbTimeSlice(Integer.parseInt(header[1]));
 					// Start timestamp

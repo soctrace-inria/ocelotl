@@ -68,9 +68,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 			OcelotlException {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
-		final TimeRegion region = new TimeRegion(intervals.get(0).t1,
-				intervals.get(0).t2);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+		final LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
 
 		// types
 		if (eventTypes != null) {
@@ -94,15 +93,43 @@ public class OcelotlTraceSearch extends TraceSearch {
 					ComparisonOperation.IN, vls.getValueString()));
 		}
 
-		if (region != null) {
-			if (traceDB.getMaxTimestamp() != region.getTimeStampEnd())
-				and.addCondition(new SimpleCondition("TIMESTAMP",
-						ComparisonOperation.LE, Long.toString(region
-								.getTimeStampEnd())));
-			if (traceDB.getMinTimestamp() != region.getTimeStampStart())
-				and.addCondition(new SimpleCondition("TIMESTAMP",
-						ComparisonOperation.GE, Long.toString(region
-								.getTimeStampStart())));
+		if(!intervals.isEmpty())
+		{
+			long min = traceDB.getMinTimestamp();
+			long max = traceDB.getMaxTimestamp();
+			
+			for(IntervalDesc anInterval: intervals)
+			{
+				TimeRegion aRegion = new TimeRegion(anInterval.t1,
+						anInterval.t2);
+				final LogicalCondition andTimeStamps = new LogicalCondition(LogicalOperation.AND);
+				
+				if (min != aRegion.getTimeStampStart())
+					andTimeStamps.addCondition(new SimpleCondition("TIMESTAMP",
+							ComparisonOperation.GE, Long.toString(aRegion
+									.getTimeStampStart())));
+				if (max != aRegion.getTimeStampEnd())
+					andTimeStamps.addCondition(new SimpleCondition("TIMESTAMP",
+							ComparisonOperation.LE, Long.toString(aRegion
+									.getTimeStampEnd())));
+				
+				if(intervals.size() == 1 && andTimeStamps.getNumberOfConditions() > 0)
+				{
+					if(andTimeStamps.getNumberOfConditions() == 1)
+					{
+						andTimeStamps.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, String.valueOf(1)));
+					}
+					and.addCondition(andTimeStamps);
+				}
+				else
+				{
+					or.addCondition(andTimeStamps);
+				}
+			}
+			if(or.getNumberOfConditions() > 1)
+			{
+				and.addCondition(or);
+			}
 		}
 
 		if (and.getNumberOfConditions() == 1)

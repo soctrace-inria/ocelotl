@@ -105,7 +105,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	/**
 	 * Fill the matrix with values from the cache multiplied by the factor
-	 * correponding to the proportional amount of the cached timeslice in the
+	 * corresponding to the proportional amount of the cached timeslice in the
 	 * built slice
 	 * 
 	 * @param values
@@ -333,7 +333,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
 		ArrayList<Integer> rebuiltTimeSlice = new ArrayList<Integer>();
-		
+		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
+	
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
@@ -345,11 +346,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// If the event producer is not filtered out
 			if (eventProducers.containsKey(values[1])) {
 				int slice = Integer.parseInt(values[0]);
-
-				for (TimeSlice cachedTimeSlice : parameters.getDataCache()
+				
+				TimeSlice cachedTimeSlice = parameters.getDataCache().getCacheTimeSliceIndex().get(slice);
+				//TODO optimize so that there is no need search each time for the right TS
+				/*for (TimeSlice cachedTimeSlice : parameters.getDataCache()
 						.getTimeSliceMapping().keySet()) {
 					// Look for the current time slice
-					if (cachedTimeSlice.getNumber() == slice) {
+					if (cachedTimeSlice.getNumber() == slice) {*/
 
 						// Is it dirty (does it cover to more than one new time
 						// slice?)
@@ -361,25 +364,25 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 							switch (parameters.getDataCache()
 									.getBuildingStrategy()) {
-								// Strategy one
-								// Compute (or get precomputed) factor
-								case DATACACHE_PROPORTIONAL:
-									proportionalRebuild(values, cachedTimeSlice,
-									eventProducers);
-									break;
+							// Strategy one
+							// Compute (or get precomputed) factor
+							case DATACACHE_PROPORTIONAL:
+								proportionalRebuild(values, cachedTimeSlice,
+										eventProducers);
+								break;
 									
-								// Strategy two
-								// Get the values from the db
-								case DATACACHE_DATABASE:
+							// Strategy two
+							// Get the values from the db
+							case DATACACHE_DATABASE:
 								if (!rebuiltTimeSlice.contains(slice)) {
 									rebuiltTimeSlice.add(slice);
-									databaseRebuild(values, cachedTimeSlice,
-											eventProducers);
+									times.add(databaseRebuild(values,
+											cachedTimeSlice, eventProducers));
 								}
-									break;
+								break;
 									
-								default:
-									logger.error("Undefined rebuilding datacache strategy");
+							default:
+								logger.error("Undefined rebuilding datacache strategy");
 							}
 
 						} else {
@@ -394,6 +397,22 @@ public abstract class MultiThreadTimeAggregationOperator {
 						}
 					}
 				}
+			//}
+		//}
+		if (parameters.getDataCache().getBuildingStrategy() == DatacacheStrategy.DATACACHE_DATABASE) {
+			try {
+				computeSubMatrix(
+						new ArrayList<EventProducer>(eventProducers.values()),
+						times);
+			} catch (SoCTraceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (OcelotlException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		bufFileReader.close();
@@ -436,21 +455,23 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 	}
 	
-	public void databaseRebuild(String[] values, TimeSlice cachedTimeSlice,
+	public IntervalDesc databaseRebuild(String[] values, TimeSlice cachedTimeSlice,
 			HashMap<String, EventProducer> eventProducers) {
 
-		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+		return new IntervalDesc(cachedTimeSlice.getTimeRegion()
+				.getTimeStampStart(), cachedTimeSlice.getTimeRegion()
+				.getTimeStampEnd());
+		/*final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
 		time.add(new IntervalDesc(cachedTimeSlice.getTimeRegion()
 				.getTimeStampStart(), cachedTimeSlice.getTimeRegion()
 				.getTimeStampEnd()));
-
 		try {
 			computeSubMatrix(
 					new ArrayList<EventProducer>(eventProducers.values()), time);
 		} catch (SoCTraceException | InterruptedException | OcelotlException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	/**

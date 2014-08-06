@@ -95,7 +95,17 @@ public class DataCache {
 	protected CacheParameters builtCacheParameters;
 	
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
+	protected HashMap<Long, TimeSlice> cacheTimeSliceIndex;
 	
+	public HashMap<Long, TimeSlice> getCacheTimeSliceIndex() {
+		return cacheTimeSliceIndex;
+	}
+
+	public void setCacheTimeSliceIndex(
+			HashMap<Long, TimeSlice> cacheTimeSliceIndex) {
+		this.cacheTimeSliceIndex = cacheTimeSliceIndex;
+	}
+
 	protected DatacacheStrategy buildingStrategy;
 
 	public DatacacheStrategy getBuildingStrategy() {
@@ -450,9 +460,15 @@ public class DataCache {
 			if(timeSliceMapping != null)
 				timeSliceMapping.clear();
 			timeSliceMapping = tmpTimeSliceMapping;
+			cacheTimeSliceIndex = new HashMap<Long, TimeSlice>();
+			
+			for (TimeSlice aCachedTimeSlice : cachedTimeSlice) {
+				cacheTimeSliceIndex.put(aCachedTimeSlice.getNumber(), aCachedTimeSlice);
+			}
+			
 			
 			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber + " dirty Timeslices among " + usedCachedTimeSlices + " used cache time slices"
-					+ " (i.e. a ratio of " + computedDirtyRatio + ").");
+					+ " (i.e. a ratio of " + computedDirtyRatio + "; " + cacheTimeSliceIndex.size() +" ).");
 			logger.debug("Complex rebuilding matrix will be used");
 			
 			return true;

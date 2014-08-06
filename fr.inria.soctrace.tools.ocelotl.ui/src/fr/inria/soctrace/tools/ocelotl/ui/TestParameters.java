@@ -1,5 +1,6 @@
 package fr.inria.soctrace.tools.ocelotl.ui;
 
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -13,6 +14,7 @@ public class TestParameters {
 	private String timeAggOperator;
 	private String spaceAggOperator;
 	private double parameter;
+	private DatacacheStrategy datacacheStrat;
 
 	public TestParameters() {
 		traceName = "";
@@ -23,6 +25,7 @@ public class TestParameters {
 		timeAggOperator = "null";
 		spaceAggOperator = "null";
 		parameter = 0.0;
+		setDatacacheStrat(DatacacheStrategy.DATACACHE_PROPORTIONAL);
 	}
 
 	/**
@@ -115,6 +118,14 @@ public class TestParameters {
 		this.parameter = parameter;
 	}
 	
+	public DatacacheStrategy getDatacacheStrat() {
+		return datacacheStrat;
+	}
+
+	public void setDatacacheStrat(DatacacheStrategy datacacheStrat) {
+		this.datacacheStrat = datacacheStrat;
+	}
+	
 	/**
 	 * Load a trace from a cache file
 	 * 
@@ -140,13 +151,16 @@ public class TestParameters {
 			if (!getSpaceAggOperator().equals("null")) {
 				oParam.setSpaceAggOperator(getSpaceAggOperator());
 			}
+			
+			oParam.getDataCache().setBuildingStrategy(getDatacacheStrat());
+			
 		}
 
 		return getTraceID();
 	}
 	
 	public String toString() {
-		String newString = traceName + "_" + traceID + "_" + startTimestamp + "_" + endTimestamp + "_" + nbTimeSlice + "_" + timeAggOperator + "_" + parameter;
+		String newString = traceName + "_" + traceID + "_" + startTimestamp + "_" + endTimestamp + "_" + nbTimeSlice + "_" + timeAggOperator + "_" + parameter + "_" + datacacheStrat;
 		return newString;
 	}
 }
