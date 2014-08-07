@@ -1,5 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.ui;
 
+import java.util.ArrayList;
+
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
@@ -13,8 +15,9 @@ public class TestParameters {
 	private int nbTimeSlice;
 	private String timeAggOperator;
 	private String spaceAggOperator;
-	private double parameter;
+	private ArrayList<Double> parameters;
 	private DatacacheStrategy datacacheStrat;
+	private String directory;
 
 	public TestParameters() {
 		traceName = "";
@@ -24,8 +27,9 @@ public class TestParameters {
 		nbTimeSlice = 0;
 		timeAggOperator = "null";
 		spaceAggOperator = "null";
-		parameter = 0.0;
+		setParameters(new ArrayList<Double>());
 		setDatacacheStrat(DatacacheStrategy.DATACACHE_PROPORTIONAL);
+		directory = "";
 	}
 
 	/**
@@ -53,7 +57,7 @@ public class TestParameters {
 			spaceAggOperator = oParam.getSpaceAggOperator();
 		}
 	}
-	
+
 	public String getTraceName() {
 		return traceName;
 	}
@@ -110,14 +114,14 @@ public class TestParameters {
 		this.spaceAggOperator = spaceAggOperator;
 	}
 
-	public double getParameter() {
-		return parameter;
+	public ArrayList<Double> getParameters() {
+		return parameters;
 	}
 
-	public void setParameter(double parameter) {
-		this.parameter = parameter;
+	public void setParameters(ArrayList<Double> parameters) {
+		this.parameters = parameters;
 	}
-	
+
 	public DatacacheStrategy getDatacacheStrat() {
 		return datacacheStrat;
 	}
@@ -126,24 +130,31 @@ public class TestParameters {
 		this.datacacheStrat = datacacheStrat;
 	}
 	
+	public String getDirectory() {
+		return directory;
+	}
+
+	public void setDirectory(String directory) {
+		this.directory = directory;
+	}
+	
 	/**
 	 * Load a trace from a cache file
 	 * 
 	 * @param cacheFilePath
 	 */
-	public int loadDataTest(OcelotlParameters oParam)
-			throws OcelotlException {
-		
+	public int loadDataTest(OcelotlParameters oParam) throws OcelotlException {
+
 		// Invalid data file
 		if (getTraceID() == -1) {
 			throw new OcelotlException(OcelotlException.INVALID_CACHEFILE);
 		} else {
 			oParam.setTimeSlicesNumber(getNbTimeSlice());
-			TimeRegion timeRegion = new TimeRegion(getStartTimestamp(),
-					getEndTimestamp());
+			TimeRegion timeRegion = new TimeRegion(getStartTimestamp(), getEndTimestamp());
 			oParam.setTimeRegion(timeRegion);
-			oParam.setParameter(getParameter());
-			
+
+			oParam.setParameter(getParameters().get(0));
+
 			if (!getTimeAggOperator().equals("null")) {
 				oParam.setTimeAggOperator(getTimeAggOperator());
 			}
@@ -151,16 +162,15 @@ public class TestParameters {
 			if (!getSpaceAggOperator().equals("null")) {
 				oParam.setSpaceAggOperator(getSpaceAggOperator());
 			}
-			
+
 			oParam.getDataCache().setBuildingStrategy(getDatacacheStrat());
-			
 		}
 
 		return getTraceID();
 	}
-	
+
 	public String toString() {
-		String newString = traceName + "_" + traceID + "_" + startTimestamp + "_" + endTimestamp + "_" + nbTimeSlice + "_" + timeAggOperator + "_" + parameter + "_" + datacacheStrat;
+		String newString = traceName + "_" + traceID + "_" + startTimestamp + "_" + endTimestamp + "_" + nbTimeSlice + "_" + timeAggOperator + "_" + datacacheStrat;
 		return newString;
 	}
 }

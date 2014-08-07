@@ -178,12 +178,30 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							spinnerTSNumber.setSelection(ocelotlParameters.getTimeSlicesNumber());
 							textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 							textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
-							textRun.setText(String.valueOf(ocelotlParameters.getParameter()));
 							ocelotlParameters.getDataCache().setBuildingStrategy(testParams.getDatacacheStrat());
 							
 							hasChanged = HasChanged.ALL;
-							// And launch the display
-							btnRun.notifyListeners(SWT.Selection, new Event());
+							
+							for(Double aParamValue: testParams.getParameters())
+							{
+								textRun.setText(String.valueOf(aParamValue));
+								// And launch the display
+								btnRun.notifyListeners(SWT.Selection, new Event());
+								
+								
+								String spaceLess = testParams.toString().replace(" ", "_");
+								spaceLess = spaceLess + "_" + aParamValue;
+								if(ocelotlParameters.getDataCache().isCacheActive())
+								{
+									snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + ".png");
+								}
+								else
+								{
+									snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + "_noCache.png");
+								}
+								hasChanged = HasChanged.PARAMETER;
+							}
+
 						}
 					});
 

@@ -34,11 +34,6 @@ public class TestBench {
 	{
 		aConfFile = aFilePath;
 		theView = aView;
-		
-		String fileDir = aFilePath.substring(0, aFilePath.lastIndexOf("/") + 1);
-		testDirectory = fileDir + System.currentTimeMillis();
-		File dir = new File(testDirectory);
-		dir.mkdirs();
 	}
 	
 	public void parseFile()
@@ -88,7 +83,12 @@ public class TestBench {
 					// Time Aggregation Operator
 					params.setTimeAggOperator(header[4]);
 					// Parameter value
-					params.setParameter(Double.parseDouble(header[5]));
+					params.getParameters().add(Double.parseDouble(header[5]));
+					
+					if (header.length > 6) {
+						for (int i = 6; i < header.length; i++)
+							params.getParameters().add(Double.parseDouble(header[i]));
+					}
 
 					testParams.add(params);
 				}
@@ -107,19 +107,21 @@ public class TestBench {
 
 	public void launchTest() {
 		statData = "";
+		String fileDir = aConfFile.substring(0, aConfFile.lastIndexOf("/") + 1);
+		testDirectory = fileDir + System.currentTimeMillis();
+		File dir = new File(testDirectory);
+		dir.mkdirs();
 		
 		for (TestParameters aTest : testParams) {
+			aTest.setDirectory(dir.getAbsolutePath());
 			noCacheTime = 0;
 			cacheTime = 0;
 			theView.loadFromParam(aTest, false);
-			String spaceLess = aTest.toString().replace(" ", "_");
 			statData = statData + aTest.toString().replace("_", ";") + "\n";
 			statData = statData + "Save matrix; Load matrix; Load matrix (dirty); dirt Timeslice; used TS; ratio; queries+computation; speedup\n";
-			theView.snapShotDiagram(testDirectory + "/" + spaceLess + ".png");
 			statData = statData + getStatData();
 			
 			theView.loadFromParam(aTest, true);
-			theView.snapShotDiagram(testDirectory + "/" + spaceLess + "_noCache.png");
 			statData = statData + getStatData();
 		}
 
@@ -201,7 +203,7 @@ public class TestBench {
 			} else {
 				stat = saveMatrixTime + ";" + loadMatrixTime + ";" + loadDirtyMatrixTime + ";" + dirtyTS + ";" + usedTS + ";" + ratio + ";" + computationTime + "\n";
 			}
-			
+
 			bufFileReader.close();
 			
 			PrintWriter writer = new PrintWriter(new File("/home/youenn/traces/eclipse_output.txt"));

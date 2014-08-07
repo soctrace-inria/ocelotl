@@ -82,30 +82,9 @@ public class DataCache {
 	 * Set whether the cache is active or not
 	 */
 	protected boolean cacheActive = true;
-
-	/**
-	 * 
-	 */
-	private long cacheStartingSlice;
-
-	private long cacheEndingSlice;
-	
-	protected List<Long> dirtyTimeSlices;
-	
-	protected CacheParameters builtCacheParameters;
 	
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
-	protected HashMap<Long, TimeSlice> cacheTimeSliceIndex;
 	
-	public HashMap<Long, TimeSlice> getCacheTimeSliceIndex() {
-		return cacheTimeSliceIndex;
-	}
-
-	public void setCacheTimeSliceIndex(
-			HashMap<Long, TimeSlice> cacheTimeSliceIndex) {
-		this.cacheTimeSliceIndex = cacheTimeSliceIndex;
-	}
-
 	protected DatacacheStrategy buildingStrategy;
 
 	public DatacacheStrategy getBuildingStrategy() {
@@ -125,22 +104,6 @@ public class DataCache {
 		this.timeSliceMapping = timeSliceMapping;
 	}
 
-	public CacheParameters getBuiltCacheParameters() {
-		return builtCacheParameters;
-	}
-
-	public void setBuiltCacheParameters(CacheParameters builtCacheParameters) {
-		this.builtCacheParameters = builtCacheParameters;
-	}
-
-	public List<Long> getDirtyTimeSlices() {
-		return dirtyTimeSlices;
-	}
-
-	public void setDirtyTimeSlices(List<Long> dirtyTimeSlices) {
-		this.dirtyTimeSlices = dirtyTimeSlices;
-	}
-
 	public boolean isCacheActive() {
 		return cacheActive;
 	}
@@ -157,22 +120,6 @@ public class DataCache {
 		this.rebuildDirty = rebuildDirty;
 	}
 	
-	public long getCacheStartingSlice() {
-		return cacheStartingSlice;
-	}
-
-	public void setCacheStartingSlice(long cacheStartingSlice) {
-		this.cacheStartingSlice = cacheStartingSlice;
-	}
-
-	public long getCacheEndingSlice() {
-		return cacheEndingSlice;
-	}
-
-	public void setCacheEndingSlice(long cacheEndingSlice) {
-		this.cacheEndingSlice = cacheEndingSlice;
-	}
-
 	public long getCacheMaxSize() {
 		return cacheMaxSize;
 	}
@@ -257,7 +204,6 @@ public class DataCache {
 				.getLocation().toString()
 				+ "/ocelotlCache");
 		
-		dirtyTimeSlices = new ArrayList<Long>();
 		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
 	}
 
@@ -376,10 +322,10 @@ public class DataCache {
 	// hypothesis: are the timeslice align ?
 	// if not Sol: align the new param start ?
 	
-	//compute number of dirty time slices
 	/**
 	 * "Dirty" time slices are time slices of the cache that do not fit inside a
-	 * time slice of the new view
+	 * time slice of the new view (i.e. they are used to build at least two new
+	 * time slices)
 	 * 
 	 * @param newParam
 	 * @param cachedParam
@@ -394,19 +340,21 @@ public class DataCache {
 
 		double dirtyTimeslicesNumber = 0.0;
 		double usedCachedTimeSlices = 0.0;
-		boolean dirty = false;
 
 		List<TimeSlice> cachedTimeSlice = cachedTsManager.getTimeSlices();
 		List<TimeSlice> newTimeSlice = newTsManager.getTimeSlices();
-		dirtyTimeSlices.clear();
+
 		HashMap<TimeSlice, List<TimeSlice>> tmpTimeSliceMapping = new HashMap<TimeSlice, List<TimeSlice>>();
-		
+
 		for (TimeSlice aCachedTimeSlice : cachedTimeSlice) {
 			// If the time slice is inside the new time region
-			if (!(aCachedTimeSlice.getTimeRegion().getTimeStampEnd() < cachedParam.getStartTimestamp())
-					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > cachedParam.getEndTimestamp())) {
-				dirty = true;
+			if (!(aCachedTimeSlice.getTimeRegion().getTimeStampEnd() < newParam
+					.getStartTimestamp())
+					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > newParam
+							.getEndTimestamp())) {
+				
 				usedCachedTimeSlices++;
+				
 				for (TimeSlice aNewTimeSlice : newTimeSlice) {
 					// Is the cached time slice is at least partly inside a new
 					// time slice ?
@@ -422,62 +370,43 @@ public class DataCache {
 						tmpTimeSliceMapping.get(aCachedTimeSlice).add(
 								aNewTimeSlice);
 					}
-
-					// If the cached time slice fits in one of the new time
-					// slices
-					if (aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
-							.getTimeRegion().getTimeStampStart())
-							&& aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
-									.getTimeRegion().getTimeStampEnd())) {
-						// Not dirty
-						dirty = false;
-						break;
-					}
 				}
 
-				if (dirty) {
+				// If a cached time slice is used in more than one new slice
+				// then it is dirty
+				if (tmpTimeSliceMapping.get(aCachedTimeSlice).size() > 1) {
 					dirtyTimeslicesNumber++;
-					dirtyTimeSlices.add(aCachedTimeSlice.getNumber());
-				} 
+				}
 			}
 		}
-		
+
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
-		
+
 		if (computedDirtyRatio == 0)
 			return true;
-		
+
 		if (computedDirtyRatio > 0)
 			rebuildDirty = true;
 
 		if (computedDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
-			setCacheStartingSlice(cachedTsManager
-					.getTimeSlice(cachedParam.getStartTimestamp()));
-			setCacheEndingSlice(cachedTsManager
-					.getTimeSlice(cachedParam.getEndTimestamp()));
-			builtCacheParameters = newParam;
-			if(timeSliceMapping != null)
+			if (timeSliceMapping != null)
 				timeSliceMapping.clear();
+
 			timeSliceMapping = tmpTimeSliceMapping;
-			cacheTimeSliceIndex = new HashMap<Long, TimeSlice>();
-			
-			for (TimeSlice aCachedTimeSlice : cachedTimeSlice) {
-				cacheTimeSliceIndex.put(aCachedTimeSlice.getNumber(), aCachedTimeSlice);
-			}
-			
-			
-			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber + " dirty Timeslices among " + usedCachedTimeSlices + " used cache time slices"
-					+ " (i.e. a ratio of " + computedDirtyRatio + ").");
+
+			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
+					+ " dirty Timeslices among " + usedCachedTimeSlices
+					+ " used cache time slices" + " (i.e. a ratio of "
+					+ computedDirtyRatio + ").");
 			logger.debug("Complex rebuilding matrix will be used");
-			
+
 			return true;
 		}
-		
+
 		rebuildDirty = false;
 		return false;
 	}
-	
 	
 	/**
 	 * Add a newly saved microscopic model to the list of cache file
