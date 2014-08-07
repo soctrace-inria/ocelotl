@@ -321,11 +321,10 @@ public class DataCache {
 
 	// hypothesis: are the timeslice align ?
 	// if not Sol: align the new param start ?
-	
-	//compute number of dirty time slices
 	/**
 	 * "Dirty" time slices are time slices of the cache that do not fit inside a
-	 * time slice of the new view
+	 * time slice of the new view (i.e. they are used to build at least two new
+	 * time slices)
 	 * 
 	 * @param newParam
 	 * @param cachedParam
@@ -340,19 +339,21 @@ public class DataCache {
 
 		double dirtyTimeslicesNumber = 0.0;
 		double usedCachedTimeSlices = 0.0;
-		boolean dirty = false;
 
 		List<TimeSlice> cachedTimeSlice = cachedTsManager.getTimeSlices();
 		List<TimeSlice> newTimeSlice = newTsManager.getTimeSlices();
 
 		HashMap<TimeSlice, List<TimeSlice>> tmpTimeSliceMapping = new HashMap<TimeSlice, List<TimeSlice>>();
-		
+
 		for (TimeSlice aCachedTimeSlice : cachedTimeSlice) {
 			// If the time slice is inside the new time region
-			if (!(aCachedTimeSlice.getTimeRegion().getTimeStampEnd() < cachedParam.getStartTimestamp())
-					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > cachedParam.getEndTimestamp())) {
-				dirty = true;
+			if (!(aCachedTimeSlice.getTimeRegion().getTimeStampEnd() < newParam
+					.getStartTimestamp())
+					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > newParam
+							.getEndTimestamp())) {
+				
 				usedCachedTimeSlices++;
+				
 				for (TimeSlice aNewTimeSlice : newTimeSlice) {
 					// Is the cached time slice is at least partly inside a new
 					// time slice ?
@@ -368,41 +369,40 @@ public class DataCache {
 						tmpTimeSliceMapping.get(aCachedTimeSlice).add(
 								aNewTimeSlice);
 					}
-
-					// If the cached time slice fits in one of the new time
-					// slices
-					if (aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
-							.getTimeRegion().getTimeStampStart())
-							&& aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
-									.getTimeRegion().getTimeStampEnd())) {
-						// Not dirty
-						dirty = false;
-						break;
-					}
 				}
 
-				if (dirty) {
+				// If a cached time slice is used in more than one new slice
+				// then it is dirty
+				if (tmpTimeSliceMapping.get(aCachedTimeSlice).size() > 1) {
 					dirtyTimeslicesNumber++;
-					} 
+				}
 			}
 		}
-		
+
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
-		
+
+		if (computedDirtyRatio == 0)
+			return true;
+
 		if (computedDirtyRatio > 0)
 			rebuildDirty = true;
 
 		if (computedDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
-			if(timeSliceMapping != null)
+			if (timeSliceMapping != null)
 				timeSliceMapping.clear();
+
 			timeSliceMapping = tmpTimeSliceMapping;
-			
+
+			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
+					+ " dirty Timeslices among " + usedCachedTimeSlices
+					+ " used cache time slices" + " (i.e. a ratio of "
+					+ computedDirtyRatio + ").");
 			logger.debug("Complex rebuilding matrix will be used");
-			
+
 			return true;
 		}
-		
+
 		rebuildDirty = false;
 		return false;
 	}

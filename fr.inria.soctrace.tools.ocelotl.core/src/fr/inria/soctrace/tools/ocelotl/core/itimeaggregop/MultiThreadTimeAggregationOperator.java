@@ -201,7 +201,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	public void saveMatrix() {
 		// Check that no event type or event producer was filtered out which
 		// would result in an incomplete datacache
-		if (!noFiltering() || !parameters.getDataCache().isCacheActive())
+		if (!parameters.getDataCache().isCacheActive() || !noFiltering())
 			return;
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
@@ -324,6 +324,15 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 	}
 
+	/**
+	 * Rebuild the matrix from a dirty cache using one of the available strategy
+	 * 
+	 * @param aCacheFile
+	 *            the cachefile
+	 * @param eventProducers
+	 *            List of the event producers not filtered out
+	 * @throws IOException
+	 */
 	public void rebuildDirtyMatrix(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers) throws IOException {
 
@@ -332,86 +341,35 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
-		ArrayList<Integer> rebuiltTimeSlice = new ArrayList<Integer>();
-		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
 
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
 
+		// Contains the time interval of the events to query
+		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
+
+		// Build an index in order to get quick access to a cached time slice
 		HashMap<Integer, TimeSlice> cacheTimeSliceIndex = new HashMap<Integer, TimeSlice>();
+		// Number of the last cache timeslice that is used
 		int maxSliceNumber = 0;
 
 		for (TimeSlice aCachedTimeSlice : parameters.getDataCache()
 				.getTimeSliceMapping().keySet()) {
 			cacheTimeSliceIndex.put((int) aCachedTimeSlice.getNumber(),
 					aCachedTimeSlice);
-			
-			if(maxSliceNumber < (int) aCachedTimeSlice.getNumber())
+
+			if (maxSliceNumber < (int) aCachedTimeSlice.getNumber())
 				maxSliceNumber = (int) aCachedTimeSlice.getNumber();
+
+			if (parameters.getDataCache().getTimeSliceMapping()
+					.get(aCachedTimeSlice).size() > 1)
+				times.add(databaseRebuild(aCachedTimeSlice));
 		}
 
-		// Read data
-		while ((line = bufFileReader.readLine()) != null) {
-			String[] values = line.split(OcelotlConstants.CSVDelimiter);
-
-			// If the event producer is not filtered out
-			if (eventProducers.containsKey(values[1])) {
-				int slice = Integer.parseInt(values[0]);
-
-				// Since slices are sorted in increasing order in the cache file
-				// once we get over the biggest slice number used to rebuild the
-				// matrix it is no longer necessary to parse the file
-				if(slice > maxSliceNumber)
-					break;
-
-				// Is the current time slice part of the used datacache slice?
-				if (!cacheTimeSliceIndex.keySet().contains(slice))
-					continue;
-
-				TimeSlice cachedTimeSlice = cacheTimeSliceIndex.get(slice);
-
-				// Is it dirty (does it cover to more than one new time
-				// slice?)
-				// Note it should not be more than 2 since it would mean
-				// that the cached timeslice is larger than a new time
-				// slice
-				if (parameters.getDataCache().getTimeSliceMapping()
-						.get(cachedTimeSlice).size() > 1) {
-
-					switch (parameters.getDataCache().getBuildingStrategy()) {
-					// Strategy one
-					// Compute (or get precomputed) factor
-					case DATACACHE_PROPORTIONAL:
-						proportionalRebuild(values, cachedTimeSlice,
-								eventProducers);
-						break;
-
-					// Strategy two
-					// Get the values from the db
-					case DATACACHE_DATABASE:
-						if (!rebuiltTimeSlice.contains(slice)) {
-							rebuiltTimeSlice.add(slice);
-							times.add(databaseRebuild(values, cachedTimeSlice,
-									eventProducers));
-						}
-						break;
-
-					default:
-						logger.error("DATACACHE - Undefined rebuilding datacache strategy");
-					}
-				} else {
-					// Not dirty
-					rebuildMatrixFromDirtyCache(values,
-							eventProducers.get(values[1]),
-							(int) parameters.getDataCache()
-									.getTimeSliceMapping().get(cachedTimeSlice)
-									.get(0).getNumber(), 1.0);
-				}
-			}
-		}
-		
-		// Run the single query at the end to rebuild the matrix 
+		// If strategy is DATACACHE_DATABASE
+		// Run a single database query with all the times found at the end to
+		// rebuild the matrix
 		if (parameters.getDataCache().getBuildingStrategy() == DatacacheStrategy.DATACACHE_DATABASE) {
 			try {
 				computeSubMatrix(
@@ -428,6 +386,63 @@ public abstract class MultiThreadTimeAggregationOperator {
 				e.printStackTrace();
 			}
 		}
+
+		// Read data
+		while ((line = bufFileReader.readLine()) != null) {
+			String[] values = line.split(OcelotlConstants.CSVDelimiter);
+
+			// If the event producer is not filtered out
+			if (eventProducers.containsKey(values[1])) {
+				int slice = Integer.parseInt(values[0]);
+
+				// Since slices are sorted in increasing order in the cache file
+				// once we get over the biggest slice number used to rebuild the
+				// matrix, it is no longer necessary to parse the file
+				if (slice > maxSliceNumber)
+					break;
+
+				// Is the current time slice part of the used datacache slice?
+				if (!cacheTimeSliceIndex.keySet().contains(slice))
+					continue;
+
+				TimeSlice cachedTimeSlice = cacheTimeSliceIndex.get(slice);
+
+				// Is it dirty (does it cover more than one new time
+				// slice?)
+				// Note: it should not be more than 2 since it would mean
+				// that the cached timeslice is larger than a new time
+				// slice
+				if (parameters.getDataCache().getTimeSliceMapping()
+						.get(cachedTimeSlice).size() > 1) {
+
+					switch (parameters.getDataCache().getBuildingStrategy()) {
+					// Strategy one
+					// Compute (or get precomputed) factor
+					case DATACACHE_PROPORTIONAL:
+						proportionalRebuild(values, cachedTimeSlice,
+								eventProducers);
+						break;
+
+					// Strategy two
+					// Get the values from the db
+					case DATACACHE_DATABASE:
+						// Do nothing
+						break;
+
+					default:
+						logger.error("DATACACHE - Undefined rebuilding datacache strategy");
+					}
+				} else {
+					// Not dirty
+					rebuildMatrixFromDirtyCache(values,
+							eventProducers.get(values[1]),
+							(int) parameters.getDataCache()
+									.getTimeSliceMapping().get(cachedTimeSlice)
+									.get(0).getNumber(), 1.0);
+				}
+			}
+		}
+
 		bufFileReader.close();
 		aDM.end("Load matrix from cache (dirty)");
 	}
@@ -468,8 +483,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 	}
 	
-	public IntervalDesc databaseRebuild(String[] values, TimeSlice cachedTimeSlice,
-			HashMap<String, EventProducer> eventProducers) {
+	/**
+	 * Create a time interval in which we get the event
+	 * 
+	 * @param cachedTimeSlice
+	 *            Time slice from which we get the interval boundaries
+	 * @return the created time interval
+	 */
+	public IntervalDesc databaseRebuild(TimeSlice cachedTimeSlice) {
 
 		return new IntervalDesc(cachedTimeSlice.getTimeRegion()
 				.getTimeStampStart(), cachedTimeSlice.getTimeRegion()
