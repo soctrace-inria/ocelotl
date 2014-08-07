@@ -339,6 +339,15 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// Get header
 		line = bufFileReader.readLine();
 
+		HashMap<Integer, TimeSlice> cacheTimeSliceIndex = new HashMap<Integer, TimeSlice>();
+
+		for (TimeSlice aCachedTimeSlice : parameters.getDataCache()
+				.getTimeSliceMapping().keySet()) {
+			cacheTimeSliceIndex.put((int) aCachedTimeSlice.getNumber(),
+					aCachedTimeSlice);
+		}
+	
+	
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
@@ -346,59 +355,51 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// If the event producer is not filtered out
 			if (eventProducers.containsKey(values[1])) {
 				int slice = Integer.parseInt(values[0]);
-				
-				TimeSlice cachedTimeSlice = parameters.getDataCache().getCacheTimeSliceIndex().get(slice);
-				//TODO optimize so that there is no need search each time for the right TS
-				/*for (TimeSlice cachedTimeSlice : parameters.getDataCache()
-						.getTimeSliceMapping().keySet()) {
-					// Look for the current time slice
-					if (cachedTimeSlice.getNumber() == slice) {*/
 
-						// Is it dirty (does it cover to more than one new time
-						// slice?)
-						// Note it should not be more than 2 since it would mean
-						// that the cached timeslice is larger than a new time
-						// slice
-						if (parameters.getDataCache().getTimeSliceMapping()
-								.get(cachedTimeSlice).size() > 1) {
+				if (!cacheTimeSliceIndex.keySet().contains(slice))
+					continue;
 
-							switch (parameters.getDataCache()
-									.getBuildingStrategy()) {
-							// Strategy one
-							// Compute (or get precomputed) factor
-							case DATACACHE_PROPORTIONAL:
-								proportionalRebuild(values, cachedTimeSlice,
-										eventProducers);
-								break;
-									
-							// Strategy two
-							// Get the values from the db
-							case DATACACHE_DATABASE:
-								if (!rebuiltTimeSlice.contains(slice)) {
-									rebuiltTimeSlice.add(slice);
-									times.add(databaseRebuild(values,
-											cachedTimeSlice, eventProducers));
-								}
-								break;
-									
-							default:
-								logger.error("Undefined rebuilding datacache strategy");
-							}
+				TimeSlice cachedTimeSlice = cacheTimeSliceIndex.get(slice);
 
-						} else {
-							// Not dirty
-							rebuildMatrixFromDirtyCache(
-									values,
-									eventProducers.get(values[1]),
-									(int) parameters.getDataCache()
-											.getTimeSliceMapping()
-											.get(cachedTimeSlice).get(0)
-											.getNumber(), 1.0);
+				// Is it dirty (does it cover to more than one new time
+				// slice?)
+				// Note it should not be more than 2 since it would mean
+				// that the cached timeslice is larger than a new time
+				// slice
+				if (parameters.getDataCache().getTimeSliceMapping()
+						.get(cachedTimeSlice).size() > 1) {
+
+					switch (parameters.getDataCache().getBuildingStrategy()) {
+					// Strategy one
+					// Compute (or get precomputed) factor
+					case DATACACHE_PROPORTIONAL:
+						proportionalRebuild(values, cachedTimeSlice,
+								eventProducers);
+						break;
+
+					// Strategy two
+					// Get the values from the db
+					case DATACACHE_DATABASE:
+						if (!rebuiltTimeSlice.contains(slice)) {
+							rebuiltTimeSlice.add(slice);
+							times.add(databaseRebuild(values, cachedTimeSlice,
+									eventProducers));
 						}
+						break;
+
+					default:
+						logger.error("Undefined rebuilding datacache strategy");
 					}
+				} else {
+					// Not dirty
+					rebuildMatrixFromDirtyCache(values,
+							eventProducers.get(values[1]),
+							(int) parameters.getDataCache()
+									.getTimeSliceMapping().get(cachedTimeSlice)
+									.get(0).getNumber(), 1.0);
 				}
-			//}
-		//}
+			}
+		}
 		if (parameters.getDataCache().getBuildingStrategy() == DatacacheStrategy.DATACACHE_DATABASE) {
 			try {
 				computeSubMatrix(

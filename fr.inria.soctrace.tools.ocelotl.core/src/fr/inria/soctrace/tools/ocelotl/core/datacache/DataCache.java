@@ -468,7 +468,7 @@ public class DataCache {
 			
 			
 			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber + " dirty Timeslices among " + usedCachedTimeSlices + " used cache time slices"
-					+ " (i.e. a ratio of " + computedDirtyRatio + "; " + cacheTimeSliceIndex.size() +" ).");
+					+ " (i.e. a ratio of " + computedDirtyRatio + ").");
 			logger.debug("Complex rebuilding matrix will be used");
 			
 			return true;
