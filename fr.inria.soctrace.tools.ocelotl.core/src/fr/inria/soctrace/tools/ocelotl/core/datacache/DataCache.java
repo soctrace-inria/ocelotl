@@ -82,17 +82,6 @@ public class DataCache {
 	 * Set whether the cache is active or not
 	 */
 	protected boolean cacheActive = true;
-
-	/**
-	 * 
-	 */
-	private long cacheStartingSlice;
-
-	private long cacheEndingSlice;
-	
-	protected List<Long> dirtyTimeSlices;
-	
-	protected CacheParameters builtCacheParameters;
 	
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
 	
@@ -115,22 +104,6 @@ public class DataCache {
 		this.timeSliceMapping = timeSliceMapping;
 	}
 
-	public CacheParameters getBuiltCacheParameters() {
-		return builtCacheParameters;
-	}
-
-	public void setBuiltCacheParameters(CacheParameters builtCacheParameters) {
-		this.builtCacheParameters = builtCacheParameters;
-	}
-
-	public List<Long> getDirtyTimeSlices() {
-		return dirtyTimeSlices;
-	}
-
-	public void setDirtyTimeSlices(List<Long> dirtyTimeSlices) {
-		this.dirtyTimeSlices = dirtyTimeSlices;
-	}
-
 	public boolean isCacheActive() {
 		return cacheActive;
 	}
@@ -147,22 +120,6 @@ public class DataCache {
 		this.rebuildDirty = rebuildDirty;
 	}
 	
-	public long getCacheStartingSlice() {
-		return cacheStartingSlice;
-	}
-
-	public void setCacheStartingSlice(long cacheStartingSlice) {
-		this.cacheStartingSlice = cacheStartingSlice;
-	}
-
-	public long getCacheEndingSlice() {
-		return cacheEndingSlice;
-	}
-
-	public void setCacheEndingSlice(long cacheEndingSlice) {
-		this.cacheEndingSlice = cacheEndingSlice;
-	}
-
 	public long getCacheMaxSize() {
 		return cacheMaxSize;
 	}
@@ -247,7 +204,6 @@ public class DataCache {
 				.getLocation().toString()
 				+ "/ocelotlCache");
 		
-		dirtyTimeSlices = new ArrayList<Long>();
 		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
 	}
 
@@ -388,7 +344,7 @@ public class DataCache {
 
 		List<TimeSlice> cachedTimeSlice = cachedTsManager.getTimeSlices();
 		List<TimeSlice> newTimeSlice = newTsManager.getTimeSlices();
-		dirtyTimeSlices.clear();
+
 		HashMap<TimeSlice, List<TimeSlice>> tmpTimeSliceMapping = new HashMap<TimeSlice, List<TimeSlice>>();
 		
 		for (TimeSlice aCachedTimeSlice : cachedTimeSlice) {
@@ -427,8 +383,7 @@ public class DataCache {
 
 				if (dirty) {
 					dirtyTimeslicesNumber++;
-					dirtyTimeSlices.add(aCachedTimeSlice.getNumber());
-				} 
+					} 
 			}
 		}
 		
@@ -439,11 +394,6 @@ public class DataCache {
 
 		if (computedDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
-			setCacheStartingSlice(cachedTsManager
-					.getTimeSlice(cachedParam.getStartTimestamp()));
-			setCacheEndingSlice(cachedTsManager
-					.getTimeSlice(cachedParam.getEndTimestamp()));
-			builtCacheParameters = newParam;
 			if(timeSliceMapping != null)
 				timeSliceMapping.clear();
 			timeSliceMapping = tmpTimeSliceMapping;
