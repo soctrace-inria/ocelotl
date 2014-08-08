@@ -362,8 +362,10 @@ public abstract class MultiThreadTimeAggregationOperator {
 			if (maxSliceNumber < (int) aCachedTimeSlice.getNumber())
 				maxSliceNumber = (int) aCachedTimeSlice.getNumber();
 
+			// If the time slice is dirty
 			if (parameters.getDataCache().getTimeSliceMapping()
 					.get(aCachedTimeSlice).size() > 1)
+				// Create an interval corresponding to the dirty time slice 
 				times.add(databaseRebuild(aCachedTimeSlice));
 		}
 
