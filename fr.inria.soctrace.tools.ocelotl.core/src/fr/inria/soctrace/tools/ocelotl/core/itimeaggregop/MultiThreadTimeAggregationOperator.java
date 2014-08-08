@@ -351,7 +351,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 		// Build an index in order to get quick access to a cached time slice
 		HashMap<Integer, TimeSlice> cacheTimeSliceIndex = new HashMap<Integer, TimeSlice>();
-		// Number of the last cache timeslice that is used
+		// Value of the biggest cache timeslice number that is used
 		int maxSliceNumber = 0;
 
 		for (TimeSlice aCachedTimeSlice : parameters.getDataCache()
@@ -364,7 +364,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 			// If the time slice is dirty
 			if (parameters.getDataCache().getTimeSliceMapping()
-					.get(aCachedTimeSlice).size() > 1)
+					.get(aCachedTimeSlice).size() > 1
+					|| aCachedTimeSlice.getTimeRegion().getTimeStampStart() < parameters
+							.getTimeRegion().getTimeStampStart()
+					|| aCachedTimeSlice.getTimeRegion().getTimeStampEnd() > parameters
+							.getTimeRegion().getTimeStampEnd())
 				// Create an interval corresponding to the dirty time slice 
 				times.add(databaseRebuild(aCachedTimeSlice));
 		}
@@ -409,13 +413,17 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 				TimeSlice cachedTimeSlice = cacheTimeSliceIndex.get(slice);
 
-				// Is it dirty (does it cover more than one new time
-				// slice?)
+				// Is it dirty (i.e. does it cover more than one new time
+				// slice)?
 				// Note: it should not be more than 2 since it would mean
 				// that the cached timeslice is larger than a new time
 				// slice
 				if (parameters.getDataCache().getTimeSliceMapping()
-						.get(cachedTimeSlice).size() > 1) {
+						.get(cachedTimeSlice).size() > 1
+						|| cachedTimeSlice.getTimeRegion().getTimeStampStart() < parameters
+								.getTimeRegion().getTimeStampStart()
+						|| cachedTimeSlice.getTimeRegion().getTimeStampEnd() > parameters
+								.getTimeRegion().getTimeStampEnd()) {
 
 					switch (parameters.getDataCache().getBuildingStrategy()) {
 					// Strategy one
@@ -493,10 +501,22 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * @return the created time interval
 	 */
 	public IntervalDesc databaseRebuild(TimeSlice cachedTimeSlice) {
+		long startInterval;
+		long endInterval;
 
-		return new IntervalDesc(cachedTimeSlice.getTimeRegion()
-				.getTimeStampStart(), cachedTimeSlice.getTimeRegion()
-				.getTimeStampEnd());
+		if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > parameters
+				.getTimeRegion().getTimeStampStart())
+			startInterval = cachedTimeSlice.getTimeRegion().getTimeStampStart();
+		else
+			startInterval = parameters.getTimeRegion().getTimeStampStart();
+
+		if (cachedTimeSlice.getTimeRegion().getTimeStampEnd() < parameters
+				.getTimeRegion().getTimeStampEnd())
+			endInterval = cachedTimeSlice.getTimeRegion().getTimeStampEnd();
+		else
+			endInterval = parameters.getTimeRegion().getTimeStampEnd();
+
+		return new IntervalDesc(startInterval, endInterval);
 	}
 	
 	/**

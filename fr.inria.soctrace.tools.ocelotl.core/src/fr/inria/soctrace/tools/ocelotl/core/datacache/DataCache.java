@@ -373,7 +373,11 @@ public class DataCache {
 
 				// If a cached time slice is used in more than one new slice
 				// then it is dirty
-				if (tmpTimeSliceMapping.get(aCachedTimeSlice).size() > 1) {
+				if (tmpTimeSliceMapping.get(aCachedTimeSlice).size() > 1
+						|| aCachedTimeSlice.getTimeRegion().getTimeStampStart() < newParam
+								.getStartTimestamp()
+						|| aCachedTimeSlice.getTimeRegion().getTimeStampEnd() > newParam
+								.getEndTimestamp()) {
 					dirtyTimeslicesNumber++;
 				}
 			}
