@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,8 +105,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 			// Display a warning if the selected file already exists
 			dialog.setOverwrite(true);
+			
+			Date date = new Date(System.currentTimeMillis() * 1000);
+			
 			// Set a default file name
-			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId());
+			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId() + "_" + date);
 
 			String saveCachefile = dialog.open();
 

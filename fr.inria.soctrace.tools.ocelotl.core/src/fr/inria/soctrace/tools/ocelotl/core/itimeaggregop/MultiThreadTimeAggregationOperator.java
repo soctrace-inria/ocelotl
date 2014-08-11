@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -203,11 +204,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// would result in an incomplete datacache
 		if (!parameters.getDataCache().isCacheActive() || !noFiltering())
 			return;
+		
+		Date convertedDate = new Date(System.currentTimeMillis() * 1000);
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
-				+ System.currentTimeMillis();
+				+ convertedDate;
 
 		// Write to file,
 		try {
