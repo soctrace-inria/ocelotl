@@ -19,7 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.queries;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
