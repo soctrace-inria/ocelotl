@@ -53,28 +53,37 @@ public class TimeSlice {
 		return value;
 	}
 
-	public double regionInsideMe(final TimeRegion testedTimeRegion) {
+	public double regionInsideMe(final TimeRegion testedTimeRegion) { 
+		// If the state starts within the time region
 		if (testedTimeRegion.getTimeStampStart() >= timeRegion
 				.getTimeStampStart()
 				&& testedTimeRegion.getTimeStampStart() <= timeRegion
 						.getTimeStampEnd()) {
+			// If it ends within the time region
 			if (testedTimeRegion.getTimeStampEnd() < timeRegion
 					.getTimeStampEnd())
+				// State duration
 				return testedTimeRegion.getTimeStampEnd()
 						- testedTimeRegion.getTimeStampStart();
 			else
+				// State duration up until the time region ends
 				return timeRegion.getTimeStampEnd()
 						- testedTimeRegion.getTimeStampStart();
+			// If state starts before the time region
 		} else if (testedTimeRegion.getTimeStampStart() < timeRegion
 				.getTimeStampStart())
+			// If it ends within the time region
 			if (testedTimeRegion.getTimeStampEnd() <= timeRegion
 					.getTimeStampEnd()
 					&& testedTimeRegion.getTimeStampEnd() >= timeRegion
 							.getTimeStampStart())
+				// State duration from the beginning of the state region
 				return testedTimeRegion.getTimeStampEnd()
 						- timeRegion.getTimeStampStart();
+			// if it ends after the time region
 			else if (testedTimeRegion.getTimeStampEnd() > timeRegion
 					.getTimeStampEnd())
+				// return time region duration
 				return timeRegion.getTimeStampEnd()
 						- timeRegion.getTimeStampStart();
 		return 0;

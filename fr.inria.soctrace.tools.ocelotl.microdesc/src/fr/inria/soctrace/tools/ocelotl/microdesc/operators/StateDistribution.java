@@ -86,8 +86,11 @@ public class StateDistribution extends _3DMicroDescription {
 				if (events.size() == 0)
 					break;
 				IState state;
+				// For each event
 				for (final Event event : events) {
+					// Convert to state
 					state = new GenericState(event, timeSliceManager);
+					// Get duration of the state for every time slice it is in
 					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
 					matrixUpdate(state, event.getEventProducer(), distrib);

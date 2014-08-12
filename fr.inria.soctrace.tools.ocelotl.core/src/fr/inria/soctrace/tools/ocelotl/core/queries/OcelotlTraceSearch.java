@@ -62,7 +62,21 @@ public class OcelotlTraceSearch extends TraceSearch {
 		}
 	}
 
-	// Build the query the get the events 
+	/**
+	 * Build the query to get all events
+	 * 
+	 * @param t
+	 *            The trace from which the events are taken
+	 * @param eventTypes
+	 *            The list of selected event types
+	 * @param intervals
+	 *            The list of selected time intervals
+	 * @param eventProducers
+	 *            The list of selected event producers
+	 * @return an event iterator
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
 	public EventIterator getEventIterator(final Trace t,
 			final List<EventType> eventTypes,
 			final List<IntervalDesc> intervals,
@@ -128,7 +142,12 @@ public class OcelotlTraceSearch extends TraceSearch {
 					and.addCondition(andTimeStamps);
 				}
 				else
-				{
+				{ 
+					if (andTimeStamps.getNumberOfConditions() == 1) {
+						andTimeStamps.addCondition(new SimpleCondition("'1'",
+								ComparisonOperation.EQ, String.valueOf(1)));
+					}
+					
 					// add a or condition between each interval
 					or.addCondition(andTimeStamps);
 				}
@@ -146,15 +165,14 @@ public class OcelotlTraceSearch extends TraceSearch {
 			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
-		// traceDB.close();
 		return query.getIterator();
 	}
 
-	public EventIterator getStateIterator(final Trace t,
+	public EventIterator getCategorySpecificIterator(final Trace t,
 			final List<EventType> eventTypes,
 			final List<IntervalDesc> intervals,
-			final List<EventProducer> eventProducers) throws SoCTraceException,
-			OcelotlException {
+			final List<EventProducer> eventProducers, int aCategory)
+			throws SoCTraceException, OcelotlException {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
@@ -183,17 +201,18 @@ public class OcelotlTraceSearch extends TraceSearch {
 		}
 
 		// intervals
-		SimpleCondition t1 = null;
-		SimpleCondition t2 = null;
-		SimpleCondition d1 = null;
-		SimpleCondition d2 = null;
-
 		if (!intervals.isEmpty()) {
 			long min = traceDB.getMinTimestamp();
 			long max = traceDB.getMaxTimestamp();
 
 			// For each timestamp intervals
 			for (IntervalDesc anInterval : intervals) {
+
+				SimpleCondition t1 = null;
+				SimpleCondition t2 = null;
+				SimpleCondition d1 = null;
+				SimpleCondition d2 = null;
+
 				TimeRegion aRegion = new TimeRegion(anInterval.t1,
 						anInterval.t2);
 				final LogicalCondition ort = new LogicalCondition(
@@ -207,7 +226,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 					t2 = new SimpleCondition("TIMESTAMP",
 							ComparisonOperation.LE, Long.toString(aRegion
 									.getTimeStampEnd()));
-				// If the state ends after the start date select it also  
+				// If the state ends after the start date select it also
 				if (min < aRegion.getTimeStampStart()) {
 					t1 = new SimpleCondition("TIMESTAMP",
 							ComparisonOperation.GE, Long.toString(aRegion
@@ -223,7 +242,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 						and.addCondition(t2);
 					else
 						or.addCondition(t2);
-				
+
 				else if (t2 == null && t1 != null) {
 					ort.addCondition(t1);
 					andd.addCondition(d1);
@@ -233,7 +252,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 						and.addCondition(ort);
 					else
 						or.addCondition(ort);
-					
+
 				} else if (t2 != null && t1 != null) {
 					andt.addCondition(t1);
 					andt.addCondition(t2);
@@ -247,19 +266,36 @@ public class OcelotlTraceSearch extends TraceSearch {
 						or.addCondition(ort);
 				}
 			}
-			if(or.getNumberOfConditions() > 1)
-			{
+			if (or.getNumberOfConditions() > 1) {
 				and.addCondition(or);
 			}
 		}
 		if (and.getNumberOfConditions() == 1)
 			and.addCondition(new SimpleCondition("CATEGORY",
-					ComparisonOperation.EQ, String.valueOf(EventCategory.STATE)));
+					ComparisonOperation.EQ, String.valueOf(aCategory)));
 		if (and.getNumberOfConditions() >= 2)
 			query.setElementWhere(and);
 		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
 		return query.getIterator();
+	}
+
+	public EventIterator getStateIterator(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers) throws SoCTraceException,
+			OcelotlException {
+		return getCategorySpecificIterator(t, eventTypes, intervals,
+				eventProducers, EventCategory.STATE);
+	}
+
+	public EventIterator getVariableIterator(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers) throws SoCTraceException,
+			OcelotlException {
+		return getCategorySpecificIterator(t, eventTypes, intervals,
+				eventProducers, EventCategory.VARIABLE);
 	}
 
 	protected void openTraceDBObject(final Trace t) throws SoCTraceException {
@@ -272,86 +308,4 @@ public class OcelotlTraceSearch extends TraceSearch {
 		traceDB = new TraceDBObject(t.getDbName(), DBMode.DB_OPEN);
 	}
 
-	public EventIterator getVariableIterator(
-			final Trace t,
-			final List<EventType> eventTypes,
-			final List<IntervalDesc> intervals,
-			final List<EventProducer> eventProducers) throws SoCTraceException,
-			OcelotlException {
-		openTraceDBObject(t);
-		final IteratorQueries query = new IteratorQueries(traceDB);
-		final TimeRegion region = new TimeRegion(intervals.get(0).t1,
-				intervals.get(0).t2);
-		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
-
-		// types
-		if (eventTypes != null) {
-			if (eventTypes.size() == 0)
-				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
-			final ValueListString vls = new ValueListString();
-			for (final EventType et : eventTypes)
-				vls.addValue(String.valueOf(et.getId()));
-			query.setTypeWhere(new SimpleCondition("EVENT_TYPE_ID",
-					ComparisonOperation.IN, vls.getValueString()));
-		}
-
-		// eventProducers
-		if (eventProducers != null) {
-			if (eventProducers.size() == 0)
-				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
-			final ValueListString vls = new ValueListString();
-			for (final EventProducer ep : eventProducers)
-				vls.addValue(String.valueOf(ep.getId()));
-			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID",
-					ComparisonOperation.IN, vls.getValueString()));
-		}
-
-		// intervals
-		final LogicalCondition ort = new LogicalCondition(LogicalOperation.OR);
-		final LogicalCondition andt = new LogicalCondition(LogicalOperation.AND);
-		final LogicalCondition andd = new LogicalCondition(LogicalOperation.AND);
-		SimpleCondition t1 = null;
-		SimpleCondition t2 = null;
-		SimpleCondition d1 = null;
-		SimpleCondition d2 = null;
-
-		if (region != null) {
-			if (traceDB.getMaxTimestamp() > region.getTimeStampEnd())
-				t2 = new SimpleCondition("TIMESTAMP", ComparisonOperation.LE,
-						Long.toString(region.getTimeStampEnd()));
-			if (traceDB.getMinTimestamp() < region.getTimeStampStart()) {
-				t1 = new SimpleCondition("TIMESTAMP", ComparisonOperation.GE,
-						Long.toString(region.getTimeStampStart()));
-				d1 = new SimpleCondition("TIMESTAMP", ComparisonOperation.LT,
-						Long.toString(region.getTimeStampStart()));
-				d2 = new SimpleCondition("LPAR", ComparisonOperation.GE,
-						Long.toString(region.getTimeStampStart()));
-			}
-			if (t1 == null && t2 != null)
-				and.addCondition(t2);
-			else if (t2 == null && t1 != null) {
-				ort.addCondition(t1);
-				andd.addCondition(d1);
-				andd.addCondition(d2);
-				ort.addCondition(andd);
-				and.addCondition(ort);
-			} else if (t2 != null && t1 != null) {
-				andt.addCondition(t1);
-				andt.addCondition(t2);
-				ort.addCondition(andt);
-				andd.addCondition(d1);
-				andd.addCondition(d2);
-				ort.addCondition(andd);
-				and.addCondition(ort);
-			}
-		}
-		if (and.getNumberOfConditions() == 1)
-			and.addCondition(new SimpleCondition("CATEGORY",
-					ComparisonOperation.EQ, String.valueOf(EventCategory.VARIABLE)));
-		if (and.getNumberOfConditions() >= 2)
-			query.setElementWhere(and);
-		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
-		query.setLoadParameters(false);
-		return query.getIterator();
-	}
 }

@@ -382,15 +382,19 @@ public class DataCache {
 				}
 			}
 		}
-
+		
+		// Proportion of dirty time slice in the part of the cache used to rebuild the matrix
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
 
+		// No dirty time slice
 		if (computedDirtyRatio == 0)
 			return true;
-
+		
+		// Set the flag for rebuild from dirty
 		if (computedDirtyRatio > 0)
 			rebuildDirty = true;
-
+		
+		// If the ratio is not over the max
 		if (computedDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
 			if (timeSliceMapping != null)

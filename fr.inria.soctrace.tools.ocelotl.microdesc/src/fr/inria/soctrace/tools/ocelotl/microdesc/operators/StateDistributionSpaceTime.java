@@ -65,10 +65,11 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		private void matrixUpdate(final IState state, final EventProducer ep,
 				final Map<Long, Double> distrib) {
 			synchronized (matrix) {
+				// If the event type is not in the matrix yet
 				if (!matrix.get(0).get(ep).containsKey(state.getType())) {
-					logger.debug("Adding " + state.getType()
-							+ " state");
-					// addKey(state.getStateType());
+					logger.debug("Adding " + state.getType() + " state");
+
+					// Add the type for each slice and ep and init to zero
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr)
 								.keySet())

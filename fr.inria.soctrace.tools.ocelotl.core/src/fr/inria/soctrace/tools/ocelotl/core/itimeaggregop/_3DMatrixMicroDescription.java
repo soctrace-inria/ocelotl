@@ -109,7 +109,7 @@ public abstract class _3DMatrixMicroDescription extends
 			for (final EventProducer ep : it.keySet()) {
 				// For each event type
 				for (String evtType : it.get(ep).keySet()) {
-					if (it.get(ep).get(evtType) != 0)
+					if (it.get(ep).get(evtType) != 0.0)
 						stringBuf.append(slice + OcelotlConstants.CSVDelimiter
 								+ ep.getId() + OcelotlConstants.CSVDelimiter
 								+ evtType + OcelotlConstants.CSVDelimiter
@@ -157,34 +157,16 @@ public abstract class _3DMatrixMicroDescription extends
 		// If the event type is filtered out
 		if (!typeNames.contains(evType))
 			return;
-
+		
+		// Compute a value proportional to the time ratio spent in the slice
 		double value = Double.parseDouble(values[3]) * factor;
 		
+		// Add the value to the one potentially already in the matrix
 		if (matrix.get(slice).get(ep).get(evType) != null)
 			value = matrix.get(slice).get(ep).get(evType) + value;
 
 		matrix.get(slice).get(ep).put(evType, value);
 	}
-	
-
-	/*public void rebuildMatrixFromDataBase(Event anEvent, EventProducer ep, int slice) {
-
-		String evType = anEvent.getType().getName();
-		
-		// If the event type is filtered out
-		if (!typeNames.contains(evType))
-			return;
-
-		double value = Double.parseDouble(anEvent.getEventParams().get(0).getValue());
-		
-		computeSubMatrix(getOcelotlParameters().getEventProducers());
-		//matrixUpdate(anEvent, anEvent.getEventProducer());
-		
-		if (matrix.get(slice).get(ep).get(evType) != null)
-			value = matrix.get(slice).get(ep).get(evType) + value;
-
-		matrix.get(slice).get(ep).put(evType, value);
-	}*/
 	
 	@Override
 	public void initMatrixToZero(Collection<EventProducer> eventProducers) {
