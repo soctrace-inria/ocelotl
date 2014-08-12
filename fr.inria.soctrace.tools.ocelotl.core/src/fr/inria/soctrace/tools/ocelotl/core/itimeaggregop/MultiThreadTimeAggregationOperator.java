@@ -152,10 +152,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 		initQueries();
 		initVectors();
 
+		// If the cache is enabled
 		if (parameters.getDataCache().isCacheActive()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
-			// if there is a file and it is valid
+			// If a valid cache file was found
 			if (cacheFile != null) {
 				loadFromCache(cacheFile);
 			} else {
@@ -174,6 +175,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 			if (eventsNumber == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENTS);
+
 		}
 	}
 
@@ -278,6 +280,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			for (EventType evt : parameters.getTraceTypeConfig().getTypes()) {
 				typeNames.add(evt.getName());
 			}
+			
 			// If no event type is selected
 			if(typeNames.isEmpty())
 				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
@@ -288,32 +291,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 			if(parameters.getDataCache().isRebuildDirty())
 			{
 				rebuildDirtyMatrix(aCacheFile, eventProducers);
-				return;
+				dm.end("Load matrix from cache (dirty)");
+			}
+			else
+			{
+				rebuildNormalMatrix(aCacheFile, eventProducers);
+				dm.end("Load matrix from cache");
 			}
 				
-			BufferedReader bufFileReader = new BufferedReader(new FileReader(
-					aCacheFile.getPath()));
-			
-			String line;
-			// Get header
-			line = bufFileReader.readLine();
-
-			// Read data
-			while ((line = bufFileReader.readLine()) != null) {
-				String[] values = line.split(OcelotlConstants.CSVDelimiter);
-
-				//TODO check that the values are correct (3/4 values per line)
-				
-				// If the event producer is not filtered out
-				if (eventProducers.containsKey(values[1])) {
-					// Fill the matrix
-					rebuildMatrix(values, eventProducers.get(values[1]),
-							parameters.getDataCache().getTimeSliceFactor());
-				}
-			}
-			bufFileReader.close();
-			dm.end("Load matrix from cache");
-
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -324,7 +309,32 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 	}
 
-		/**
+	public void rebuildNormalMatrix(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers) throws IOException  {
+		BufferedReader bufFileReader = new BufferedReader(new FileReader(
+				aCacheFile.getPath()));
+		
+		String line;
+		// Get header
+		line = bufFileReader.readLine();
+
+		// Read data
+		while ((line = bufFileReader.readLine()) != null) {
+			String[] values = line.split(OcelotlConstants.CSVDelimiter);
+
+			//TODO check that the values are correct (3/4 values per line)
+			
+			// If the event producer is not filtered out
+			if (eventProducers.containsKey(values[1])) {
+				// Fill the matrix
+				rebuildMatrix(values, eventProducers.get(values[1]),
+						parameters.getDataCache().getTimeSliceFactor());
+			}
+		}
+		bufFileReader.close();
+	}
+	
+	/**
 	 * Rebuild the matrix from a dirty cache using one of the available strategy
 	 * 
 	 * @param aCacheFile
@@ -335,16 +345,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 */
 	public void rebuildDirtyMatrix(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers) throws IOException {
-
-		DeltaManagerOcelotl aDM = new DeltaManagerOcelotl();
-		aDM.start();
-
-		BufferedReader bufFileReader;
-		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
-
-		String line;
-		// Get header
-		line = bufFileReader.readLine();
 
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
@@ -369,13 +369,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 							.getTimeRegion().getTimeStampStart()
 					|| aCachedTimeSlice.getTimeRegion().getTimeStampEnd() > parameters
 							.getTimeRegion().getTimeStampEnd())
-                // Create an interval corresponding to the dirty time slice 
+				// Create an interval corresponding to the dirty time slice
 				times.add(databaseRebuild(aCachedTimeSlice));
 		}
 
 		// If strategy is DATACACHE_DATABASE
-		// Run a single database query with all the times found at the end to
-		// rebuild the matrix
+		// Run a single database query with all the times of the dirty time
+		// slices to rebuild the matrix
 		if (parameters.getDataCache().getBuildingStrategy() == DatacacheStrategy.DATACACHE_DATABASE) {
 			try {
 				computeSubMatrix(
@@ -393,6 +393,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 			}
 		}
 
+		BufferedReader bufFileReader;
+		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
+
+		String line;
+		// Get header
+		line = bufFileReader.readLine();
+		
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
@@ -424,7 +431,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 								.getTimeRegion().getTimeStampStart()
 						|| cachedTimeSlice.getTimeRegion().getTimeStampEnd() > parameters
 								.getTimeRegion().getTimeStampEnd()) {
-
 					switch (parameters.getDataCache().getBuildingStrategy()) {
 					// Strategy one
 					// Compute (or get precomputed) factor
@@ -454,7 +460,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 
 		bufFileReader.close();
-		aDM.end("Load matrix from cache (dirty)");
 	}
 
 	/**
@@ -504,12 +509,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 		long startInterval;
 		long endInterval;
 
+		// If time slice begins within the time region
 		if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > parameters
 				.getTimeRegion().getTimeStampStart())
 			startInterval = cachedTimeSlice.getTimeRegion().getTimeStampStart();
 		else
 			startInterval = parameters.getTimeRegion().getTimeStampStart();
-
+		// If time slice ends within the time region
 		if (cachedTimeSlice.getTimeRegion().getTimeStampEnd() < parameters
 				.getTimeRegion().getTimeStampEnd())
 			endInterval = cachedTimeSlice.getTimeRegion().getTimeStampEnd();

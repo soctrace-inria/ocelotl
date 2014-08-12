@@ -61,7 +61,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import ch.qos.logback.classic.Logger;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
@@ -185,12 +184,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							for(Double aParamValue: testParams.getParameters())
 							{
 								textRun.setText(String.valueOf(aParamValue));
+				
 								// And launch the display
 								btnRun.notifyListeners(SWT.Selection, new Event());
-								
-								
+												
 								String spaceLess = testParams.toString().replace(" ", "_");
 								spaceLess = spaceLess + "_" + aParamValue;
+								
 								if(ocelotlParameters.getDataCache().isCacheActive())
 								{
 									snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + ".png");
@@ -199,12 +199,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								{
 									snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + "_noCache.png");
 								}
+								
 								hasChanged = HasChanged.PARAMETER;
 							}
-
 						}
 					});
-
 				} catch (final OcelotlException exception) {
 					Display.getDefault().syncExec(new Runnable() {
 						@Override

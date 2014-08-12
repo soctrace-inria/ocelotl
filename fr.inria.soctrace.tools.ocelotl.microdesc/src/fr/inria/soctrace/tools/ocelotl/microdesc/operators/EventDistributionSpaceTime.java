@@ -70,17 +70,19 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
 		private void matrixUpdate(final Event event, final EventProducer ep) {
 			synchronized (matrix) {
+				// If the event type is not in the matrix yet
 				if (!matrix.get(0).get(ep)
 						.containsKey(event.getType().getName())) {
 					logger.debug("Adding " + event.getType().getName()
 							+ " event");
-					// addKey(state.getStateType());
+					// Add the type for each slice and ep and init to zero
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr)
 								.keySet())
 							matrixPushType(incr, epset, event.getType()
 									.getName());
 				}
+				// Get the time slice number of the event
 				final long slice = timeSliceManager.getTimeSlice(event
 						.getTimestamp());
 				matrixWrite(slice, ep, event.getType().getName());
@@ -122,7 +124,7 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)

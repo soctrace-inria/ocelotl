@@ -109,7 +109,7 @@ public abstract class _3DMatrixMicroDescription extends
 			for (final EventProducer ep : it.keySet()) {
 				// For each event type
 				for (String evtType : it.get(ep).keySet()) {
-					if (it.get(ep).get(evtType) != 0)
+					if (it.get(ep).get(evtType) != 0.0)
 						stringBuf.append(slice + OcelotlConstants.CSVDelimiter
 								+ ep.getId() + OcelotlConstants.CSVDelimiter
 								+ evtType + OcelotlConstants.CSVDelimiter
@@ -137,6 +137,7 @@ public abstract class _3DMatrixMicroDescription extends
 		// If the number of time slice is a multiple of the cached time
 		// slice number
 		if (sliceMultiple > 1) {
+
 			// Compute the correct slice number
 			slice = slice / sliceMultiple;
 
@@ -158,7 +159,7 @@ public abstract class _3DMatrixMicroDescription extends
 		if (!typeNames.contains(evType))
 			return;
 
-		// Compute a value proportional to the value 
+		// Compute a value proportional to the time ratio spent in the slice
 		double value = Double.parseDouble(values[3]) * factor;
 		
 		// Add the value to the one potentially already in the matrix

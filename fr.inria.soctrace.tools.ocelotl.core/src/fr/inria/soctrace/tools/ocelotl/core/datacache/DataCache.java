@@ -351,9 +351,9 @@ public class DataCache {
 					.getStartTimestamp())
 					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > newParam
 							.getEndTimestamp())) {
-				
+
 				usedCachedTimeSlices++;
-                
+
 				for (TimeSlice aNewTimeSlice : newTimeSlice) {
 					// Is the cached time slice is at least partly inside a new
 					// time slice ?
@@ -379,29 +379,34 @@ public class DataCache {
 						|| aCachedTimeSlice.getTimeRegion().getTimeStampEnd() > newParam
 								.getEndTimestamp()) {
 					dirtyTimeslicesNumber++;
-					} 
+				}
 			}
 		}
 		
+		// Proportion of dirty time slice in the part of the cache used to rebuild the matrix
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
+		// No dirty time slice
 		if (computedDirtyRatio == 0)
 			return true;
 
+		// Set the flag for rebuild from dirty
 		if (computedDirtyRatio > 0)
 			rebuildDirty = true;
 
+		// If the ratio is not over the max 
 		if (computedDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
-			if(timeSliceMapping != null)
+			if (timeSliceMapping != null)
 				timeSliceMapping.clear();
-			timeSliceMapping = tmpTimeSliceMapping;
 			
+			timeSliceMapping = tmpTimeSliceMapping;
+
 			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
 					+ " dirty Timeslices among " + usedCachedTimeSlices
 					+ " used cache time slices" + " (i.e. a ratio of "
 					+ computedDirtyRatio + ").");
 			logger.debug("Complex rebuilding matrix will be used");
-			
+
 			return true;
 		}
 		

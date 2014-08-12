@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
@@ -106,37 +107,45 @@ public class TestBench {
 	}
 
 	public void launchTest() {
-		statData = "";
-		String fileDir = aConfFile.substring(0, aConfFile.lastIndexOf("/") + 1);
-		testDirectory = fileDir + System.currentTimeMillis();
-		File dir = new File(testDirectory);
-		dir.mkdirs();
 		
-		for (TestParameters aTest : testParams) {
-			aTest.setDirectory(dir.getAbsolutePath());
-			noCacheTime = 0;
-			cacheTime = 0;
-			theView.loadFromParam(aTest, false);
-			statData = statData + aTest.toString().replace("_", ";") + "\n";
-			statData = statData + "Save matrix; Load matrix; Load matrix (dirty); dirt Timeslice; used TS; ratio; queries+computation; speedup\n";
-			statData = statData + getStatData();
-			
-			theView.loadFromParam(aTest, true);
-			statData = statData + getStatData();
-		}
+		if (!testParams.isEmpty()) {
 
-		writeStat();
-		
-		// Call the script to compare the image
-		try {
-			Process p = new ProcessBuilder("/home/youenn/projects/testBenchOcelotl/compare.sh", testDirectory).start();
-			p.waitFor();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			statData = "";
+			String fileDir = aConfFile.substring(0, aConfFile.lastIndexOf("/") + 1);
+			Date aDate = new Date(System.currentTimeMillis());
+			String dirName = testParams.get(0).getTraceName() + "_" + aDate.toString();
+			dirName = dirName.replace(" ", "_");
+			testDirectory = fileDir + dirName;
+			File dir = new File(testDirectory);
+			dir.mkdirs();
+
+			for (TestParameters aTest : testParams) {
+				aTest.setDirectory(dir.getAbsolutePath());
+				noCacheTime = 0;
+				cacheTime = 0;
+				theView.loadFromParam(aTest, false);
+				statData = statData + aTest.toString().replace("_", ";") + "\n";
+				statData = statData + "Save matrix; Load matrix; Load matrix (dirty); dirt Timeslice; used TS; ratio; queries+computation; speedup\n";
+				statData = statData + getStatData();
+				writeStat();
+
+				theView.loadFromParam(aTest, true);
+				statData = statData + getStatData();
+				writeStat();
+			}
+
+			// Call the script to compare the image
+			try {
+				Process p = new ProcessBuilder("/home/youenn/projects/testBenchOcelotl/compare.sh", testDirectory).start();
+				p.waitFor();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 	}
 	
@@ -220,6 +229,7 @@ public class TestBench {
 		
 		return stat;
 	}
+	
 	
 	public void writeStat()
 	{
