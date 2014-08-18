@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
@@ -139,5 +140,13 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void computeSubMatrix(List<EventProducer> eventProducers,
+			List<IntervalDesc> time) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		// TODO Auto-generated method stub
+		
 	}
 }
