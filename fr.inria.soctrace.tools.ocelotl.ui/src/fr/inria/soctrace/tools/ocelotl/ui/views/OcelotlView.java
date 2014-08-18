@@ -1278,16 +1278,22 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		final Group groupDataCacheSettings = new Group(sashFormSettings, SWT.NONE);
 		groupDataCacheSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		groupDataCacheSettings.setText("Data Cache Settings");
-		groupDataCacheSettings.setLayout(new GridLayout(2, false));
+		groupDataCacheSettings.setLayout(new GridLayout(3, false));
 		
-		final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
-		lblDataCacheDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblDataCacheDirectory.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		lblDataCacheDirectory.setText("Data cache directory:");
+		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
+		btnCacheEnabled.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnCacheEnabled.setText("Cache Enabled");
+		btnCacheEnabled.setSelection(true);
+		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
+		new Label(groupDataCacheSettings, SWT.NONE);
+				
+				final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
+				lblDataCacheDirectory.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				lblDataCacheDirectory.setText("Data cache directory:");
 		
 				final GridData gd_dataCacheDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-				gd_dataCacheDir.widthHint = 75;
+				gd_dataCacheDir.widthHint = 100;
 				
 				datacacheDirectory = new Text(groupDataCacheSettings, SWT.BORDER);
 				datacacheDirectory.setLayoutData(gd_dataCacheDir);
@@ -1302,17 +1308,17 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnChangeCacheDirectory.addSelectionListener(new ModifyDatacacheDirectory());
 		
 				final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
-				lblDataCacheSize.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 				lblDataCacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 				lblDataCacheSize.setText("MB Data cache size (-1=unlimited):");
 		
 		dataCacheSize = new Text(groupDataCacheSettings, SWT.BORDER);
 		dataCacheSize.setText("-1");
 		dataCacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_text.widthHint = 100;
 		dataCacheSize.setLayoutData(gd_text);
 		dataCacheSize.addModifyListener(new DataCacheSizeListener());
+		new Label(groupDataCacheSettings, SWT.NONE);
 		
 		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
 		btnDeleteDataCache.setToolTipText("Empty Cache");
@@ -1321,16 +1327,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnDeleteDataCache.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
 		new Label(groupDataCacheSettings, SWT.NONE);
-		
-		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
-		btnCacheEnabled.setText("Cache Enabled");
-		btnCacheEnabled.setSelection(true);
-		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
 		
 		Button btnLoadBench = new Button(groupDataCacheSettings, SWT.NONE);
+		btnLoadBench.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnLoadBench.addSelectionListener(new BenchListener(this));
 		btnLoadBench.setText("Load Bench");
+		new Label(groupDataCacheSettings, SWT.NONE);
 		new Label(groupDataCacheSettings, SWT.NONE);
 		sashFormSettings.setWeights(new int[] {1});	
 		
@@ -1380,8 +1383,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		textRun.addModifyListener(new ParameterModifyListener());
 		scrolledComposite_1.setContent(group);
 		scrolledComposite_1.setMinSize(group.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashForm.setWeights(new int[] {193, 214, 38});
-		sashForm_1.setWeights(new int[] { 678, 222 });
+		sashForm.setWeights(new int[] {170, 240, 35});
+		sashForm_1.setWeights(new int[] {663, 237});
 		sashFormGlobal.setWeights(new int[] { 395 });
 
 		final IActionBars actionBars = getViewSite().getActionBars();
