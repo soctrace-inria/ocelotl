@@ -53,6 +53,12 @@ public class TimeSlice {
 		return value;
 	}
 
+	/**
+	 * Compute the duration of the time region that is within the time slice
+	 * 
+	 * @param testedTimeRegion
+	 * @return the length of the time region in the time slice
+	 */
 	public double regionInsideMe(final TimeRegion testedTimeRegion) { 
 		// If the state starts within the time region
 		if (testedTimeRegion.getTimeStampStart() >= timeRegion

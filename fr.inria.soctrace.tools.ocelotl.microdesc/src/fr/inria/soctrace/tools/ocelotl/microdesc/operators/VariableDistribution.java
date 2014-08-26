@@ -167,13 +167,4 @@ public class VariableDistribution extends _3DMicroDescription {
 			e.printStackTrace();
 		}
 	}
-
-	@Override
-	protected void computeSubMatrix(List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

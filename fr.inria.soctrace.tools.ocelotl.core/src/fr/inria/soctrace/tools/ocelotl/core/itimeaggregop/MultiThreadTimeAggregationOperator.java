@@ -72,8 +72,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 			InterruptedException, OcelotlException;
 	
 	abstract protected void computeSubMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException;
+			final List<EventProducer> eventProducers, List<IntervalDesc> time)
+			throws SoCTraceException, InterruptedException, OcelotlException;
+
+	protected void computeDirtyCacheMatrix(
+			final List<EventProducer> eventProducers, List<IntervalDesc> time)
+			throws SoCTraceException, InterruptedException, OcelotlException {
+		computeSubMatrix(eventProducers, time);
+	}
 	
 	/**
 	 * Convert the matrix values in one String formatted in CSV
@@ -289,6 +295,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// Fill the matrix with zeroes
 			initMatrixToZero(eventProducers.values());
 			
+			// Check how to rebuild the matrix
 			if (parameters.getDataCache().isRebuildDirty()) {
 				rebuildDirtyMatrix(aCacheFile, eventProducers);
 				dm.end("Load matrix from cache (dirty)");
@@ -347,9 +354,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
+		
+		// Contains the proportion factor for the dirty cached time slices
+		HashMap<TimeSlice, List<Double>> cachedSliceProportions = new HashMap<TimeSlice, List<Double>>();
 
 		// Build an index in order to get quick access to a cached time slice
 		HashMap<Integer, TimeSlice> cacheTimeSliceIndex = new HashMap<Integer, TimeSlice>();
+		
 		// Value of the biggest cache timeslice number that is used
 		int maxSliceNumber = 0;
 
@@ -367,9 +378,21 @@ public abstract class MultiThreadTimeAggregationOperator {
 					|| aCachedTimeSlice.getTimeRegion().getTimeStampStart() < parameters
 							.getTimeRegion().getTimeStampStart()
 					|| aCachedTimeSlice.getTimeRegion().getTimeStampEnd() > parameters
-							.getTimeRegion().getTimeStampEnd())
-				// Create an interval corresponding to the dirty time slice
-				times.add(databaseRebuild(aCachedTimeSlice));
+							.getTimeRegion().getTimeStampEnd()) {
+				switch (parameters.getDataCache().getBuildingStrategy()) {
+
+				case DATACACHE_PROPORTIONAL:
+					// Compute the proportion factors
+					cachedSliceProportions.put(aCachedTimeSlice,
+							computeProportions(aCachedTimeSlice));
+					break;
+
+				case DATACACHE_DATABASE:
+					// Create an interval corresponding to the dirty time slice
+					times.add(databaseRebuild(aCachedTimeSlice));
+					break;
+				}
+			}
 		}
 
 		// If strategy is DATACACHE_DATABASE
@@ -377,8 +400,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// slices to rebuild the matrix
 		if (parameters.getDataCache().getBuildingStrategy() == DatacacheStrategy.DATACACHE_DATABASE) {
 			try {
-				computeSubMatrix(
-						new ArrayList<EventProducer>(eventProducers.values()),
+				computeDirtyCacheMatrix(
+					new ArrayList<EventProducer>(eventProducers.values()),
 						times);
 			} catch (SoCTraceException e) {
 				// TODO Auto-generated catch block
@@ -436,7 +459,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 					// Compute (or get precomputed) factor
 					case DATACACHE_PROPORTIONAL:
 						proportionalRebuild(values, cachedTimeSlice,
-								eventProducers);
+								eventProducers,
+								cachedSliceProportions.get(cachedTimeSlice));
 						break;
 
 					// Strategy two
@@ -463,6 +487,43 @@ public abstract class MultiThreadTimeAggregationOperator {
 	}
 
 	/**
+	 * Compute the proportions for each new time slice the dirty cached time
+	 * slice is in
+	 * 
+	 * @param cachedTimeSlice
+	 *            the cached times slice
+	 * @return a List of proportions (size should not be higher than 2)
+	 */
+	public ArrayList<Double> computeProportions(TimeSlice cachedTimeSlice) {
+		ArrayList<Double> factors = new ArrayList<Double>();
+
+		// For each time slice the cached time slice is in
+		for (TimeSlice aNewTimeSlice : parameters.getDataCache()
+				.getTimeSliceMapping().get(cachedTimeSlice)) {
+
+			// Compute the proportion factor of the dirty time
+			// slice in each slice
+			// if the cached time slice starts in the current time slice
+			if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > aNewTimeSlice
+					.getTimeRegion().getTimeStampStart()) {
+				factors.add(((double) (aNewTimeSlice.getTimeRegion()
+						.getTimeStampEnd() - cachedTimeSlice.getTimeRegion()
+						.getTimeStampStart()))
+						/ ((double) cachedTimeSlice.getTimeRegion()
+								.getTimeDuration()));
+			} else {
+				factors.add(((double) (cachedTimeSlice.getTimeRegion()
+						.getTimeStampEnd() - aNewTimeSlice.getTimeRegion()
+						.getTimeStampStart()))
+						/ ((double) cachedTimeSlice.getTimeRegion()
+			.getTimeDuration()));
+			}
+		}
+
+		return factors;
+	}
+
+	/**
 	 * Rebuild a timeslice from a dirty cached time slice
 	 * 
 	 * @param values
@@ -470,31 +531,18 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * @param eventProducers
 	 */
 	public void proportionalRebuild(String[] values, TimeSlice cachedTimeSlice,
-			HashMap<String, EventProducer> eventProducers) {
-		double factor;
+			HashMap<String, EventProducer> eventProducers,
+			List<Double> proportionfactors) {
 
+		int index = 0;
 		for (TimeSlice aNewTimeSlice : parameters.getDataCache()
 				.getTimeSliceMapping().get(cachedTimeSlice)) {
 
-			// Compute the proportion factor of the dirty time
-			// slice in each slice
-			if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > aNewTimeSlice
-					.getTimeRegion().getTimeStampStart()) {
-				factor = (double) (aNewTimeSlice.getTimeRegion()
-						.getTimeStampEnd() - cachedTimeSlice.getTimeRegion()
-						.getTimeStampStart())
-						/ (double) cachedTimeSlice.getTimeRegion()
-								.getTimeDuration();
-			} else {
-				factor = (double) (cachedTimeSlice.getTimeRegion()
-						.getTimeStampEnd() - aNewTimeSlice.getTimeRegion()
-						.getTimeStampStart())
-						/ (double) cachedTimeSlice.getTimeRegion()
-								.getTimeDuration();
-			}
-
 			rebuildMatrixFromDirtyCache(values, eventProducers.get(values[1]),
-					(int) aNewTimeSlice.getNumber(), factor);
+					(int) aNewTimeSlice.getNumber(),
+					proportionfactors.get(index));
+
+			index++;
 		}
 	}
 	

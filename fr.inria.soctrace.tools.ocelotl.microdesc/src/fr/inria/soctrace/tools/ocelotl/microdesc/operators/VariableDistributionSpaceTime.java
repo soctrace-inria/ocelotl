@@ -167,12 +167,4 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 			e.printStackTrace();
 		}
 	}
-
-	@Override
-	protected void computeSubMatrix(List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
-		// TODO Auto-generated method stub
-		
-	}
 }
