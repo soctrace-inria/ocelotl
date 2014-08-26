@@ -19,7 +19,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * Let me zoom zoom zen in my bench bench bench
  * //trace
  * 
- * //cache activated ?; TimeSlice; Time stamps; Operator; parameter 
+ * //cache strategy; TimeSlice; Time stamps; Operator; parameter(s)
  */
 public class TestBench {
 
