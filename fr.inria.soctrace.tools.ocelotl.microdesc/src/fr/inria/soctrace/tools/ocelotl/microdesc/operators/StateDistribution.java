@@ -49,7 +49,7 @@ public class StateDistribution extends _3DMicroDescription {
 	
 	
 	class OcelotlThread extends Thread {
-
+		
 		List<EventProducer> eventProducers;
 		int threadNumber;
 		int thread;
@@ -180,13 +180,16 @@ public class StateDistribution extends _3DMicroDescription {
 	
 	
 	class CachedOcelotlThread extends OcelotlThread  {
+		
+		private HashMap<Long, List<TimeSlice>> timesliceIndex;
 
 		public CachedOcelotlThread(final int threadNumber, final int thread,
-				final int size) {
+				final int size, HashMap<Long, List<TimeSlice>> timesliceIndex) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			this.size = size;
+			this.timesliceIndex = timesliceIndex;
 			
 			start();
 		}
@@ -215,81 +218,66 @@ public class StateDistribution extends _3DMicroDescription {
 			final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 
 			// Find the number of the slice where the state event starts
-			long startSlice = Math.max(
-					0,
-					(testedTimeRegion.getTimeStampStart() - timeSliceManager.getTimeRegion()
-							.getTimeStampStart()) / timeSliceManager.getSliceDuration() - 1);
+			long startSlice = Math.max(0,
+					(testedTimeRegion.getTimeStampStart() - timeSliceManager
+							.getTimeRegion().getTimeStampStart())
+							/ timeSliceManager.getSliceDuration() - 1);
 			double temp = 0;
-			
+
 			// If the state starts within the actual time region
 			if (testedTimeRegion.getTimeStampStart()
 					- timeSliceManager.getTimeRegion().getTimeStampStart() >= 0)
-				for (long i = startSlice; i < timeSliceManager.getTimeSlices().size(); i++) {
-					final TimeSlice it = timeSliceManager.getTimeSlices().get((int) i);
+				for (long i = startSlice; i < timeSliceManager.getTimeSlices()
+						.size(); i++) {
+					final TimeSlice it = timeSliceManager.getTimeSlices().get(
+							(int) i);
 					// Make sure we got the right starting time slice?
 					if (it.startIsInsideMe(testedTimeRegion.getTimeStampStart())) {
 						startSlice = it.getNumber();
 						break;
 					}
 				}
-			
+
 			// For each slice of the new matrix
 			for (long i = startSlice; i < timeSliceManager.getSlicesNumber(); i++) {
 
-				// For each cached TimeSlice
-				for (TimeSlice aCachedTimeSlice : parameters.getDataCache()
-						.getTimeSliceMapping().keySet()) {
+				long timesliceStart = timeSliceManager.getTimeSlices()
+						.get((int) i).getTimeRegion().getTimeStampStart();
 
-					// If the cached time slice is dirty and the current time slice is inside
-					if ((parameters.getDataCache().getTimeSliceMapping()
-							.get(aCachedTimeSlice).size() > 1
-							|| aCachedTimeSlice.getTimeRegion()
-									.getTimeStampStart() < parameters
-									.getTimeRegion().getTimeStampStart() || aCachedTimeSlice
-							.getTimeRegion().getTimeStampEnd() > parameters
-							.getTimeRegion().getTimeStampEnd())){
-						
-						for (TimeSlice aTs: parameters.getDataCache().getTimeSliceMapping()
-									.get(aCachedTimeSlice))
-						{
-							if(aTs.getNumber() == i)
-							{
-						
-							
-									//.contains(timeSliceManager.getTimeSlices()
-									//		.get((int) i).getNumber())) {
+				if (timesliceStart > testedTimeRegion.getTimeStampEnd())
+					break;
 
-						// Compute the bounds of the time slice
-						long timeStampStart = Math.max(timeSliceManager
-								.getTimeSlices().get((int) i).getTimeRegion()
-								.getTimeStampStart(), aCachedTimeSlice
-								.getTimeRegion().getTimeStampStart());
-						long timeStampEnd = Math.min(timeSliceManager
-								.getTimeSlices().get((int) i).getTimeRegion()
-								.getTimeStampEnd(), aCachedTimeSlice
-								.getTimeRegion().getTimeStampEnd());
+				long timesliceEnd = timeSliceManager.getTimeSlices()
+						.get((int) i).getTimeRegion().getTimeStampEnd();
+
+				if (timesliceIndex.get(i) != null
+						&& !timesliceIndex.get(i).isEmpty()) {
+					for (TimeSlice aCachedTimeSlice : timesliceIndex.get(i)) {
+
+						long timeStampStart = Math.max(timesliceStart,
+								aCachedTimeSlice.getTimeRegion()
+										.getTimeStampStart());
+						long timeStampEnd = Math.min(timesliceEnd,
+								aCachedTimeSlice.getTimeRegion()
+										.getTimeStampEnd());
 
 						// Create the custom time slice
-						TimeRegion currentTimeregion = new TimeRegion(
-								timeStampStart, timeStampEnd);
 						TimeSlice currentTimeSlice = new TimeSlice(
-								currentTimeregion, -1);
+								new TimeRegion(timeStampStart, timeStampEnd),
+								-1);
 
 						// Get the duration of the state in the time slice i
 						temp = currentTimeSlice
 								.regionInsideMe(testedTimeRegion);
-						
+
 						// If the state has ended in the previous time slice
-						if (timeSlicesDistribution.get(i) != null && timeSlicesDistribution.get(i) != 0)
+						if (timeSlicesDistribution.get(i) != null)
 							temp = temp + timeSlicesDistribution.get(i);
 
-						timeSlicesDistribution.put(i, (double) temp);
+						timeSlicesDistribution.put(i, temp);
 					}
-						}
 				}
 			}
-			}
-			
 			return timeSlicesDistribution;
 		}
 	}
@@ -297,7 +285,7 @@ public class StateDistribution extends _3DMicroDescription {
 	
 	@Override
 	protected void computeDirtyCacheMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
+			List<IntervalDesc> time, HashMap<Long, List<TimeSlice>> timesliceIndex) throws SoCTraceException,
 			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
@@ -312,10 +300,11 @@ public class StateDistribution extends _3DMicroDescription {
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(),
+					timesliceIndex));
 		for (final Thread thread : threadlist)
 			thread.join();
-		
+
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");

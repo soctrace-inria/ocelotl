@@ -76,11 +76,12 @@ public abstract class MultiThreadTimeAggregationOperator {
 			throws SoCTraceException, InterruptedException, OcelotlException;
 
 	protected void computeDirtyCacheMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time)
+			final List<EventProducer> eventProducers, List<IntervalDesc> time,
+			HashMap<Long, List<TimeSlice>> timesliceIndex)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		computeSubMatrix(eventProducers, time);
 	}
-	
+
 	/**
 	 * Convert the matrix values in one String formatted in CSV
 	 * 
@@ -361,6 +362,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// Build an index in order to get quick access to a cached time slice
 		HashMap<Integer, TimeSlice> cacheTimeSliceIndex = new HashMap<Integer, TimeSlice>();
 		
+		// Build a reverse index from time slice to cached time slice
+		HashMap<Long, List<TimeSlice>> timesliceIndex = new HashMap<Long, List<TimeSlice>>();
+		
 		// Value of the biggest cache timeslice number that is used
 		int maxSliceNumber = 0;
 
@@ -390,6 +394,18 @@ public abstract class MultiThreadTimeAggregationOperator {
 				case DATACACHE_DATABASE:
 					// Create an interval corresponding to the dirty time slice
 					times.add(databaseRebuild(aCachedTimeSlice));
+
+					for (TimeSlice ts : parameters.getDataCache()
+							.getTimeSliceMapping().get(aCachedTimeSlice)) {
+
+						if (!timesliceIndex.containsKey(ts.getNumber())) {
+							timesliceIndex.put(ts.getNumber(),
+									new ArrayList<TimeSlice>());
+						}
+
+						timesliceIndex.get(ts.getNumber())
+								.add(aCachedTimeSlice);
+					}
 					break;
 				}
 			}
@@ -400,9 +416,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// slices to rebuild the matrix
 		if (parameters.getDataCache().getBuildingStrategy() == DatacacheStrategy.DATACACHE_DATABASE) {
 			try {
-				computeDirtyCacheMatrix(
-					new ArrayList<EventProducer>(eventProducers.values()),
-						times);
+				computeDirtyCacheMatrix(new ArrayList<EventProducer>(
+						eventProducers.values()), times, timesliceIndex);
 			} catch (SoCTraceException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -456,7 +471,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 					switch (parameters.getDataCache().getBuildingStrategy()) {
 					// Strategy one
-					// Compute (or get precomputed) factor
+					// Multiply the cached values by the proportion of the
+					// cached TS they are in
 					case DATACACHE_PROPORTIONAL:
 						proportionalRebuild(values, cachedTimeSlice,
 								eventProducers,
