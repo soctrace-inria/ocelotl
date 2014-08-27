@@ -161,7 +161,7 @@ public class IteratorQueries extends EventQuery {
 			logger.debug(query);
 
 			mystm = dbObj.getConnection().createStatement();
-
+		
 			final DeltaManager steps = new DeltaManagerOcelotl();
 			steps.start();
 			rs = mystm.executeQuery(query);

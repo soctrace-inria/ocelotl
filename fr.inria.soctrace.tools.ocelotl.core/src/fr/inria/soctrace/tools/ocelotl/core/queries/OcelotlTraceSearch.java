@@ -172,6 +172,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 			final List<EventProducer> eventProducers,
 			int aCategory) throws SoCTraceException,
 			OcelotlException {
+		
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
