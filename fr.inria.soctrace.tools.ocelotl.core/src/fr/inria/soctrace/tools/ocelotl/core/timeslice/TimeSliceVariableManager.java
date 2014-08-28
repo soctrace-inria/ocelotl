@@ -14,10 +14,10 @@ public class TimeSliceVariableManager extends TimeSliceStateManager{
 	public Map<Long, Double> getVariableDistribution(
 			final TimeRegion testedTimeRegion, double value) {
 		final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
-		long startSlice = Math.max(
-				0,
-				(testedTimeRegion.getTimeStampStart() - timeRegion
-						.getTimeStampStart()) / sliceDuration - 1);
+		long startSlice = Math.max(0L,
+				(long) ((testedTimeRegion.getTimeStampStart() - timeRegion
+						.getTimeStampStart()) / sliceDuration) - 1);
+
 		double temp = 0;
 		if (testedTimeRegion.getTimeStampStart()
 				- timeRegion.getTimeStampStart() >= 0)
@@ -33,7 +33,8 @@ public class TimeSliceVariableManager extends TimeSliceStateManager{
 			if (temp == 0)
 				break;
 			else
-				timeSlicesDistribution.put(i, (((double) temp/ (double) sliceDuration) * value));
+				timeSlicesDistribution.put(i,
+						(((double) temp / (double) sliceDuration) * value));
 		}
 		return timeSlicesDistribution;
 	}

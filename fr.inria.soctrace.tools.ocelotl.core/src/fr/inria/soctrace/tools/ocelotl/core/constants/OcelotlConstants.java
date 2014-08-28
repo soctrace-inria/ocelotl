@@ -58,7 +58,7 @@ public class OcelotlConstants {
 	/**
 	 * Maximal ratio value of dirty time slices in a cache
 	 */
-	static public double MAXIMAL_DIRTY_RATIO = 0.7;
+	static public double MAXIMAL_DIRTY_RATIO = 0.9;
 	
 	static public enum DatacacheStrategy {
 		DATACACHE_PROPORTIONAL, DATACACHE_DATABASE

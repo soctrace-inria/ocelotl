@@ -244,13 +244,19 @@ public class DataCache {
 		// Is the trace the same?
 		if (!newParam.getTraceName().equals(cacheParam.getTraceName()))
 			return false;
+		
+		// Is the trace unique ID similar?
+		if (newParam.getTraceID() != cacheParam.getTraceID())
+			return false;
 
 		// Is the aggregation operator the same?
-		if ((!newParam.getTimeAggOperator().equals(cacheParam.getTimeAggOperator()))
-				|| (!newParam.getSpaceAggOperator()
-						.equals(cacheParam.getSpaceAggOperator())))
+		if (!((newParam.getTimeAggOperator().equals(
+				cacheParam.getTimeAggOperator()) && (!newParam
+				.getTimeAggOperator().equals("null"))) || ((newParam
+				.getSpaceAggOperator().equals(cacheParam.getSpaceAggOperator()) && (!newParam
+				.getSpaceAggOperator().equals("null"))))))
 			return false;
-		
+
 		// Are timestamps equal or are they included inside the cache
 		// timeregion
 		if (!checkCompatibleTimeStamp(newParam, cacheParam))

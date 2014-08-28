@@ -218,11 +218,12 @@ public class StateDistribution extends _3DMicroDescription {
 			final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 
 			// Find the number of the slice where the state event starts
-			long startSlice = Math.max(0,
-					(testedTimeRegion.getTimeStampStart() - timeSliceManager
-							.getTimeRegion().getTimeStampStart())
-							/ timeSliceManager.getSliceDuration() - 1);
-			double temp = 0;
+			long startSlice = Math
+					.max(0L,
+							(long) ((testedTimeRegion.getTimeStampStart() - timeSliceManager
+									.getTimeRegion().getTimeStampStart()) / timeSliceManager
+									.getSliceDuration()) - 1);
+	double temp = 0;
 
 			// If the state starts within the actual time region
 			if (testedTimeRegion.getTimeStampStart()
@@ -284,9 +285,10 @@ public class StateDistribution extends _3DMicroDescription {
 
 	
 	@Override
-	protected void computeDirtyCacheMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time, HashMap<Long, List<TimeSlice>> timesliceIndex) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+	protected void computeDirtyCacheMatrix(
+			final List<EventProducer> eventProducers, List<IntervalDesc> time,
+			HashMap<Long, List<TimeSlice>> timesliceIndex)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);

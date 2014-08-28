@@ -35,22 +35,22 @@ public class TimeSliceStateManager {
 	protected final TimeRegion timeRegion;
 	protected long slicesNumber;
 
-	protected long sliceDuration;
+	protected double sliceDuration;
 	private static final Logger logger = LoggerFactory.getLogger(TimeSliceStateManager.class);
 
-	public TimeSliceStateManager(final TimeRegion timeRegion, final long slicesNumber) {// TODO
-		// use
-		// region
+	public TimeSliceStateManager(final TimeRegion timeRegion,
+			final long slicesNumber) {// TODO use region
 		super();
 		this.timeRegion = timeRegion;
 		this.slicesNumber = slicesNumber;
-		sliceDuration = timeRegion.getTimeDuration() / slicesNumber;
-		if (timeRegion.getTimeDuration() % slicesNumber != 0)
-			sliceDuration++;
+		// duration + 1 to make sure that no extra time slice is created to
+		// cover the last unit of time
+		sliceDuration = ((double) timeRegion.getTimeDuration() + 1.0)
+				/ (double) slicesNumber;
 		timeSlicesInit();
 	}
 
-	public long getSliceDuration() {
+	public double getSliceDuration() {
 		return sliceDuration;
 	}
 
@@ -62,11 +62,16 @@ public class TimeSliceStateManager {
 		return timeRegion;
 	}
 
+	/**
+	 * Get the number of a time slice the timestamp is in
+	 * 
+	 * @param timeStamp
+	 * @return the number of the time slice the time stamp is in
+	 * 
+	 */
 	public long getTimeSlice(final long timeStamp) {
-		// final Map<Long, Long> timeSlicesDistribution = new HashMap<Long,
-		// Long>();
-		long slice = Math.max(0, (timeStamp - timeRegion.getTimeStampStart())
-				/ sliceDuration - 1);
+		long slice = Math.max(0L, (long) Math.floor(((timeStamp - timeRegion
+				.getTimeStampStart()) / sliceDuration)) - 1);
 		for (long i = slice; i < timeSlices.size(); i++) {
 			final TimeSlice it = timeSlices.get((int) i);
 			if (it.startIsInsideMe(timeStamp)) {
@@ -80,8 +85,8 @@ public class TimeSliceStateManager {
 	public TimeSlice getATimeSlice(final long timeStamp) {
 		TimeSlice slice = null;
 
-		long presumeTimeSlice = Math.max(0,
-				(timeStamp - timeRegion.getTimeStampStart()) / sliceDuration
+		long presumeTimeSlice = Math.max(0L, (long)
+				((timeStamp - timeRegion.getTimeStampStart()) / sliceDuration)
 						- 1);
 		for (long i = presumeTimeSlice; i < timeSlices.size(); i++) {
 			final TimeSlice it = timeSlices.get((int) i);
@@ -102,11 +107,11 @@ public class TimeSliceStateManager {
 		final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 		// Find the number of the slice where the state event starts
 		long startSlice = Math.max(
-				0,
-				(testedTimeRegion.getTimeStampStart() - timeRegion
-						.getTimeStampStart()) / sliceDuration - 1);
-		double temp = 0;
+				0L,
+				(long) ((testedTimeRegion.getTimeStampStart() - timeRegion
+						.getTimeStampStart()) / sliceDuration) - 1);
 		
+		double temp = 0;
 		// If the state starts within the actual time region
 		if (testedTimeRegion.getTimeStampStart()
 				- timeRegion.getTimeStampStart() >= 0)
@@ -144,13 +149,14 @@ public class TimeSliceStateManager {
 
 	public void timeSlicesInit() {
 		int i = 0;
-		long currentTime = timeRegion.getTimeStampStart();
+		double currentTime = timeRegion.getTimeStampStart();
 		while (currentTime < timeRegion.getTimeStampEnd()) {
-			timeSlices.add(new TimeSlice(new TimeRegion(currentTime,
-					currentTime + sliceDuration), i));
+			timeSlices.add(new TimeSlice(new TimeRegion((long) currentTime,
+					(long) (currentTime + sliceDuration)), i));
 			currentTime += sliceDuration;
 			i++;
 		}
+
 		slicesNumber = i;
 	}
 
