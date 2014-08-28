@@ -224,10 +224,10 @@ public class StateDistribution extends _3DMicroDescription {
 			final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 
 			// Find the number of the slice where the state event starts
-			long startSlice = Math.max(0,
-					(testedTimeRegion.getTimeStampStart() - timeSliceManager
+			long startSlice = Math.max(0L,
+					(long) ((testedTimeRegion.getTimeStampStart() - timeSliceManager
 							.getTimeRegion().getTimeStampStart())
-							/ timeSliceManager.getSliceDuration() - 1);
+							/ timeSliceManager.getSliceDuration()) - 1);
 			
 			// If the state starts within the actual time region
 			if (testedTimeRegion.getTimeStampStart()

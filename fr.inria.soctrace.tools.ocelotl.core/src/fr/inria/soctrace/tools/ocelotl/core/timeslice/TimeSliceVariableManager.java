@@ -15,9 +15,9 @@ public class TimeSliceVariableManager extends TimeSliceStateManager{
 			final TimeRegion testedTimeRegion, double value) {
 		final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 		long startSlice = Math.max(
-				0,
-				(testedTimeRegion.getTimeStampStart() - timeRegion
-						.getTimeStampStart()) / sliceDuration - 1);
+				0,(long)
+				((testedTimeRegion.getTimeStampStart() - timeRegion
+						.getTimeStampStart()) / sliceDuration) - 1);
 		double temp = 0;
 		if (testedTimeRegion.getTimeStampStart()
 				- timeRegion.getTimeStampStart() >= 0)
