@@ -83,10 +83,20 @@ public class DataCache {
 	 */
 	protected boolean cacheActive = true;
 	
+	protected CacheParameters currentCacheParameters;
+	
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
 	
 	protected DatacacheStrategy buildingStrategy;
 
+	public CacheParameters getCurrentCacheParameters() {
+		return currentCacheParameters;
+	}
+
+	public void setCurrentCacheParameters(CacheParameters currentCacheParameters) {
+		this.currentCacheParameters = currentCacheParameters;
+	}
+	
 	public DatacacheStrategy getBuildingStrategy() {
 		return buildingStrategy;
 	}
@@ -221,7 +231,11 @@ public class DataCache {
 		CacheParameters cParam = new CacheParameters(parameters);
 		for (CacheParameters op : cachedData.keySet()) {
 			if (similarParameters(cParam, op))
+			{
+				currentCacheParameters = op;
 				return cachedData.get(op);
+			}
+				
 		}
 
 		logger.debug("No datacache was found");
@@ -244,11 +258,17 @@ public class DataCache {
 		// Is the trace the same?
 		if (!newParam.getTraceName().equals(cacheParam.getTraceName()))
 			return false;
+		
+		if (newParam.getTraceID() != cacheParam.getTraceID())
+			return false;
 
 		// Is the aggregation operator the same?
-		if ((!newParam.getTimeAggOperator().equals(cacheParam.getTimeAggOperator()))
-				|| (!newParam.getSpaceAggOperator()
-						.equals(cacheParam.getSpaceAggOperator())))
+		if (!((newParam.getTimeAggOperator().equals(
+				cacheParam.getTimeAggOperator()) && (!newParam
+				.getTimeAggOperator().equals("null")))
+				|| ((newParam.getSpaceAggOperator().equals(
+						cacheParam.getSpaceAggOperator()) && (!newParam
+						.getSpaceAggOperator().equals("null"))))))
 			return false;
 		
 		// Are timestamps equal or are they included inside the cache

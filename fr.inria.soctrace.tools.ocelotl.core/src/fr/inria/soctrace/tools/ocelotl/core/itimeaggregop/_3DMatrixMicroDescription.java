@@ -137,9 +137,9 @@ public abstract class _3DMatrixMicroDescription extends
 		// If the number of time slice is a multiple of the cached time
 		// slice number
 		if (sliceMultiple > 1) {
-
+			
 			// Compute the correct slice number
-			slice = slice / sliceMultiple;
+			slice = (int) Math.floor((double) slice / (double) sliceMultiple);
 
 			// And add the value to the one already in the matrix
 			if (matrix.get(slice).get(ep).get(evType) != null)

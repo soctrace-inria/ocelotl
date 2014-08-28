@@ -46,6 +46,7 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class MultiThreadTimeAggregationOperator {
@@ -173,7 +174,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 				// Save the newly computed matrix + parameters
 				dm.start();
-				//saveMatrix();
+				saveMatrix();
 				dm.end("DATACACHE - Save the matrix to cache");
 			}
 		} else {
@@ -316,6 +317,33 @@ public abstract class MultiThreadTimeAggregationOperator {
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
 		
+		/*if(parameters.getTimeSliceManager() != null)
+		{
+			long sliceDuration = parameters.getTimeSliceManager()
+					.getTimeRegion().getTimeDuration()
+					/ parameters.getDataCache().getCurrentCacheParameters()
+							.getNbTimeSlice();
+			if (parameters.getTimeSliceManager().getTimeRegion()
+					.getTimeDuration()
+					% parameters.getDataCache().getCurrentCacheParameters()
+							.getNbTimeSlice() != 0)
+				sliceDuration++;
+
+			sliceDuration = sliceDuration
+					* parameters.getDataCache().getCurrentCacheParameters()
+							.getNbTimeSlice();
+			sliceDuration = sliceDuration
+					/ parameters.getTimeSliceManager().getSlicesNumber();
+
+			System.out.println("!!!!!!!!!!!!!!!sliceDuration "
+					+ sliceDuration);
+
+			parameters.setTimeSliceManager(new TimeSliceStateManager(
+					parameters.getTimeSliceManager().getTimeRegion(),
+					parameters.getTimeSliceManager().getSlicesNumber(),
+					sliceDuration));
+		}*/
+		
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
@@ -359,7 +387,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 		
 		// Build a reverse index from time slice to cached time slice
 		HashMap<Long, List<TimeSlice>> timesliceIndex = new HashMap<Long, List<TimeSlice>>();
-
 		
 		// Value of the biggest cache timeslice number that is used
 		int maxSliceNumber = 0;

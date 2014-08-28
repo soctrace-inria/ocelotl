@@ -38,15 +38,22 @@ public class TimeSliceStateManager {
 	protected long sliceDuration;
 	private static final Logger logger = LoggerFactory.getLogger(TimeSliceStateManager.class);
 
-	public TimeSliceStateManager(final TimeRegion timeRegion, final long slicesNumber) {// TODO
-		// use
-		// region
+	public TimeSliceStateManager(final TimeRegion timeRegion,
+			final long slicesNumber) {// TODO use region
 		super();
 		this.timeRegion = timeRegion;
 		this.slicesNumber = slicesNumber;
 		sliceDuration = timeRegion.getTimeDuration() / slicesNumber;
 		if (timeRegion.getTimeDuration() % slicesNumber != 0)
 			sliceDuration++;
+		timeSlicesInit();
+	}
+
+	public TimeSliceStateManager(final TimeRegion timeRegion, final long slicesNumber, final long sliceDuration) {
+		super();
+		this.timeRegion = timeRegion;
+		this.slicesNumber = slicesNumber;
+		this.sliceDuration = sliceDuration;
 		timeSlicesInit();
 	}
 
@@ -65,7 +72,7 @@ public class TimeSliceStateManager {
 	public long getTimeSlice(final long timeStamp) {
 		// final Map<Long, Long> timeSlicesDistribution = new HashMap<Long,
 		// Long>();
-		long slice = Math.max(0, (timeStamp - timeRegion.getTimeStampStart())
+		long slice = Math.max(0L, (timeStamp - timeRegion.getTimeStampStart())
 				/ sliceDuration - 1);
 		for (long i = slice; i < timeSlices.size(); i++) {
 			final TimeSlice it = timeSlices.get((int) i);

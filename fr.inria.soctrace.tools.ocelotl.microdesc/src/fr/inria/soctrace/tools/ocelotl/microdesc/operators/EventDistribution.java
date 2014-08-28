@@ -123,6 +123,8 @@ public class EventDistribution extends _3DMicroDescription {
 		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		getOcelotlParameters().setTimeSliceManager(timeSliceManager);
+		
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
@@ -149,6 +151,8 @@ public class EventDistribution extends _3DMicroDescription {
 		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		getOcelotlParameters().setTimeSliceManager(timeSliceManager);
+		
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
