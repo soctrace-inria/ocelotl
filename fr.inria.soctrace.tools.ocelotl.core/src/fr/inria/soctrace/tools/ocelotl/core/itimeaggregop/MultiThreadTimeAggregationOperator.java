@@ -46,7 +46,6 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class MultiThreadTimeAggregationOperator {
@@ -316,33 +315,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 			HashMap<String, EventProducer> eventProducers) throws IOException  {
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
-		
-		/*if(parameters.getTimeSliceManager() != null)
-		{
-			long sliceDuration = parameters.getTimeSliceManager()
-					.getTimeRegion().getTimeDuration()
-					/ parameters.getDataCache().getCurrentCacheParameters()
-							.getNbTimeSlice();
-			if (parameters.getTimeSliceManager().getTimeRegion()
-					.getTimeDuration()
-					% parameters.getDataCache().getCurrentCacheParameters()
-							.getNbTimeSlice() != 0)
-				sliceDuration++;
-
-			sliceDuration = sliceDuration
-					* parameters.getDataCache().getCurrentCacheParameters()
-							.getNbTimeSlice();
-			sliceDuration = sliceDuration
-					/ parameters.getTimeSliceManager().getSlicesNumber();
-
-			System.out.println("!!!!!!!!!!!!!!!sliceDuration "
-					+ sliceDuration);
-
-			parameters.setTimeSliceManager(new TimeSliceStateManager(
-					parameters.getTimeSliceManager().getTimeRegion(),
-					parameters.getTimeSliceManager().getSlicesNumber(),
-					sliceDuration));
-		}*/
 		
 		String line;
 		// Get header

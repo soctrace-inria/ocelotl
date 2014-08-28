@@ -83,20 +83,10 @@ public class DataCache {
 	 */
 	protected boolean cacheActive = true;
 	
-	protected CacheParameters currentCacheParameters;
-	
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
 	
 	protected DatacacheStrategy buildingStrategy;
 
-	public CacheParameters getCurrentCacheParameters() {
-		return currentCacheParameters;
-	}
-
-	public void setCurrentCacheParameters(CacheParameters currentCacheParameters) {
-		this.currentCacheParameters = currentCacheParameters;
-	}
-	
 	public DatacacheStrategy getBuildingStrategy() {
 		return buildingStrategy;
 	}
@@ -231,11 +221,7 @@ public class DataCache {
 		CacheParameters cParam = new CacheParameters(parameters);
 		for (CacheParameters op : cachedData.keySet()) {
 			if (similarParameters(cParam, op))
-			{
-				currentCacheParameters = op;
 				return cachedData.get(op);
-			}
-				
 		}
 
 		logger.debug("No datacache was found");
