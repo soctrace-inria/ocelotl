@@ -34,5 +34,6 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
  fr.inria.soctrace.tools.ocelotl.core.timeslice,
- fr.inria.soctrace.tools.ocelotl.core.utils
+ fr.inria.soctrace.tools.ocelotl.core.utils,
+ fr.inria.soctrace.tools.ocelotl.ui.settings
 Import-Package: org.eclipse.core.resources

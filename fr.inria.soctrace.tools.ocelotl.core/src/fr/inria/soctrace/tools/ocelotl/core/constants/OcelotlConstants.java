@@ -51,6 +51,12 @@ public class OcelotlConstants {
 	static public int MAX_CACHESIZE = -1;
 	
 	/**
+	 * Is the cache activated by default
+	 */
+	static public boolean DEFAULT_CACHE_ACTIVATION = true;
+	
+	
+	/**
 	 * Minimum ratio value for the datacache
 	 */
 	static public double MINIMAL_TIMESLICE_RATIO = 1.0;

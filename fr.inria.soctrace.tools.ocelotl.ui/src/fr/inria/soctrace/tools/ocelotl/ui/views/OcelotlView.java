@@ -19,9 +19,16 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -61,6 +68,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
@@ -71,6 +79,7 @@ import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
@@ -78,15 +87,17 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
+import fr.inria.soctrace.tools.ocelotl.ui.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench;
 import fr.inria.soctrace.tools.ocelotl.ui.TestParameters;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
+import fr.inria.soctrace.tools.ocelotl.ui.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
 
 /**
- * Main view for LPAggreg Paje Tool
+ * Main view for Ocelolt
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
@@ -95,14 +106,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	
 	Trace aTestTrace;
 	
-	public void snapShotDiagram(String fileName)
-	{
-		timeLineView.createSnapshotFor(fileName);
-		System.out.println("Creating image at " + fileName);
-	}
-	
 	public void loadFromParam(TestParameters someParams, boolean activeCache) {
-
 		final TestParameters testParams = someParams;
 		comboTime.removeAll();
 		comboSpace.removeAll();
@@ -193,11 +197,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								
 								if(ocelotlParameters.getDataCache().isCacheActive())
 								{
-									snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + ".png");
+									snapshot.snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + ".png");
 								}
 								else
 								{
-									snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + "_noCache.png");
+									snapshot.snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + "_noCache.png");
 								}
 								
 								hasChanged = HasChanged.PARAMETER;
@@ -902,7 +906,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button						btnChangeCacheDirectory;
 	private Button 						btnCacheEnabled;
 	private int 						TS=0;
-	
+	private Snapshot 					snapshot;
 	/**
 	 * Followed topics
 	 */
@@ -923,8 +927,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
+
+		try {
+			ocelotlParameters.getDataCache().setSettings(ocelotlParameters.getOcelotlSettings());
+		} catch (final OcelotlException e) {
+			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
+		}
 		
-		//Register update to synchronize traces
+		snapshot = new Snapshot(ocelotlParameters.getOcelotlSettings().getSnapShotDirectory(), this);
+
+		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED);
@@ -1204,7 +1216,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnSettings2.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		sashFormTSandCurve.setWeights(new int[] { 1, 1, 1 });
 		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
-
 		
 		//Quality curves settings
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
@@ -1283,7 +1294,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
 		btnCacheEnabled.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnCacheEnabled.setText("Cache Enabled");
-		btnCacheEnabled.setSelection(true);
+		btnCacheEnabled.setSelection(ocelotlParameters.getOcelotlSettings().isCacheActivated());
 		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
 		new Label(groupDataCacheSettings, SWT.NONE);
@@ -1326,7 +1337,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnDeleteDataCache.setText("Empty Cache");
 		btnDeleteDataCache.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
-		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		Button btnTakeSnapshot = new Button(groupDataCacheSettings, SWT.NONE);
+		btnTakeSnapshot.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				snapshot.takeSnapShot();
+			}
+		});
+		
+		
+		btnTakeSnapshot.setText("Take Snapshot");
 		new Label(groupDataCacheSettings, SWT.NONE);
 		
 		Button btnLoadBench = new Button(groupDataCacheSettings, SWT.NONE);
@@ -1427,6 +1449,23 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 	public TimeRegion getTimeRegion() {
 		return new TimeRegion(Long.parseLong(textTimestampStart.getText()), Long.parseLong(textTimestampEnd.getText()));
+	}
+	
+
+	public IAggregatedView getTimeLineView() {
+		return timeLineView;
+	}
+
+	public void setTimeLineView(IAggregatedView timeLineView) {
+		this.timeLineView = timeLineView;
+	}
+
+	public QualityView getQualityView() {
+		return qualityView;
+	}
+
+	public void setQualityView(QualityView qualityView) {
+		this.qualityView = qualityView;
 	}
 
 	private void refreshTraces() {

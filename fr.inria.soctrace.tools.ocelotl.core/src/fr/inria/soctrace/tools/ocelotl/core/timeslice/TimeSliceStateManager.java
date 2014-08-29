@@ -48,14 +48,6 @@ public class TimeSliceStateManager {
 		timeSlicesInit();
 	}
 
-	public TimeSliceStateManager(final TimeRegion timeRegion, final long slicesNumber, final long sliceDuration) {
-		super();
-		this.timeRegion = timeRegion;
-		this.slicesNumber = slicesNumber;
-		this.sliceDuration = sliceDuration;
-		timeSlicesInit();
-	}
-
 	public double getSliceDuration() {
 		return sliceDuration;
 	}

@@ -103,7 +103,6 @@ public class TestBench {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	public void launchTest() {

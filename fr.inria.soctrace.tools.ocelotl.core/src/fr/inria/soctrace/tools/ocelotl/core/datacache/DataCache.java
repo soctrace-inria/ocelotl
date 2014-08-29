@@ -22,6 +22,7 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
+import fr.inria.soctrace.tools.ocelotl.ui.settings.OcelotlSettings;
 
 /**
  * Class handling the caching of the microscopic models.
@@ -181,6 +182,7 @@ public class DataCache {
 			}
 
 			cacheActive = true;
+			
 			// Everything's OK, set the cache directory
 			this.cacheDirectory = cacheDirectory;
 
@@ -205,6 +207,11 @@ public class DataCache {
 				+ "/ocelotlCache");
 		
 		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
+	}
+	
+	public void setSettings(OcelotlSettings settings) throws OcelotlException {
+		setCacheMaxSize(settings.getCacheSize());
+		setCacheDirectory(settings.getCacheDirectory());
 	}
 
 	/**

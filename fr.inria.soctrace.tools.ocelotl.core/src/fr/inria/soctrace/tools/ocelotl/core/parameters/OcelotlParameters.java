@@ -32,6 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
+import fr.inria.soctrace.tools.ocelotl.ui.settings.OcelotlSettings;
 
 public class OcelotlParameters {
 
@@ -52,8 +53,10 @@ public class OcelotlParameters {
 	private String timeAggOperator;
 	private String spaceAggOperator;
 	private boolean growingQualities = true;
+	private OcelotlSettings	ocelotlSettings = new OcelotlSettings();
+
 	private DataCache dataCache = new DataCache();
-	
+
 	private TimeSliceStateManager timeSliceManager;
 
 	private static boolean jniFlag = true;
@@ -81,7 +84,8 @@ public class OcelotlParameters {
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
 		this.iSpaceConfig = op.iSpaceConfig;
 		this.timeSliceManager = op.timeSliceManager;
-	}
+		this.ocelotlSettings = op.ocelotlSettings;
+		}
 	
 	
 	public List<EventProducer> getEventProducers() {
@@ -245,5 +249,13 @@ public class OcelotlParameters {
 		this.allEventTypes = allEventTypes;
 	}
 
+	public OcelotlSettings getOcelotlSettings() {
+		return ocelotlSettings;
+	}
 
+	public void setOcelotlSettings(OcelotlSettings ocelotlSettings) {
+		this.ocelotlSettings = ocelotlSettings;
+	}
+
+	
 }
