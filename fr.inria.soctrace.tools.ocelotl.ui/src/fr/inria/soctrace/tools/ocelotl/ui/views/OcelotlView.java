@@ -79,13 +79,14 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
+import fr.inria.soctrace.tools.ocelotl.ui.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
 
 /**
- * Main view for LPAggreg Paje Tool
+ * Main view for Ocelotl
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
@@ -226,6 +227,17 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				job.setUser(true);
 				job.schedule();
 			}
+		}
+	}
+	
+	private class TakeSnapshotAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			if(confDataLoader.getCurrentTrace() == null || ocelotlParameters.getTrace() == null)
+				return;
+				
+			snapshot.takeSnapShot();
 		}
 	}
 	
@@ -634,11 +646,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		@Override
 		public void modifyText(final ModifyEvent e) {
 			try {
-					textThreshold.setText("0.001");
+				if (Integer.valueOf(dataCacheSize.getText()) < 0) {
+					ocelotlParameters.getDataCache().setCacheMaxSize(-1);
+				} else {
+					// Set the cache size at the entered value converted from
+					// Megabytes to bytes
+					ocelotlParameters.getDataCache().setCacheMaxSize(Integer.valueOf(dataCacheSize.getText()) * 1000000);
+				}
 			} catch (final NumberFormatException err) {
-				dataCacheSize.setText(String.valueOf(ocelotlParameters.getDataCache().getCacheMaxSize()));
+				dataCacheSize.setSelection((int) ocelotlParameters.getDataCache().getCacheMaxSize());
+			} catch (OcelotlException e1) {
+				MessageDialog.openInformation(getSite().getShell(), "Error", e1.getMessage());
 			}
-			
 		}
 	}
 	
@@ -738,12 +757,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button						btnChangeCacheDirectory;
 	private Button 						btnCacheEnabled;
 	private int 						TS=0;
+	private Snapshot 					snapshot;
 	
 	/**
 	 * Followed topics
 	 */
 	protected FramesocBusTopicList topics = null;
-	private Text dataCacheSize;
+	private Spinner dataCacheSize;
 
 	private Button	btnSaveDataCache;
 
@@ -756,11 +776,20 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		} catch (final SoCTraceException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
+
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
-		
-		//Register update to synchronize traces
+
+		try {
+			ocelotlParameters.getDataCache().setSettings(ocelotlParameters.getOcelotlSettings());
+		} catch (final OcelotlException e) {
+			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
+		}
+
+		snapshot = new Snapshot(ocelotlParameters.getOcelotlSettings().getSnapShotDirectory(), this);
+
+		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED);
@@ -1142,8 +1171,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				lblDataCacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 				lblDataCacheSize.setText("MB Data cache size (-1=unlimited):");
 		
-		dataCacheSize = new Text(groupDataCacheSettings, SWT.BORDER);
-		dataCacheSize.setText("-1");
+		dataCacheSize = new Spinner(groupDataCacheSettings, SWT.BORDER);
+		dataCacheSize.setValues(0, -1, 99999999, 0, 1, 10);
+		if (ocelotlParameters.getOcelotlSettings().getCacheSize() > 0) {
+			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000);
+		} else {
+			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize());
+		}
 		dataCacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_text.widthHint = 100;
@@ -1160,8 +1194,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		
 		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
 		btnCacheEnabled.setText("Cache Enabled");
-		btnCacheEnabled.setSelection(true);
+		btnCacheEnabled.setSelection(ocelotlParameters.getOcelotlSettings().isCacheActivated());
 		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		Button btnTakeSnapshot = new Button(groupDataCacheSettings, SWT.NONE);
+		btnTakeSnapshot.addSelectionListener(new TakeSnapshotAdapter());
+		btnTakeSnapshot.setText("Take Snapshot");
 		new Label(groupDataCacheSettings, SWT.NONE);
 		sashFormSettings.setWeights(new int[] {1});	
 		
@@ -1252,7 +1291,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	public TimeAxisView getTimeAxisView() {
 		return timeAxisView;
 	}
+	
 
+	public IAggregatedView getTimeLineView() {
+		return timeLineView;
+	}
+	
+	public QualityView getQualityView() {
+		return qualityView;
+	}
+	
 	public TimeRegion getTimeRegion() {
 		return new TimeRegion(Long.parseLong(textTimestampStart.getText()), Long.parseLong(textTimestampEnd.getText()));
 	}

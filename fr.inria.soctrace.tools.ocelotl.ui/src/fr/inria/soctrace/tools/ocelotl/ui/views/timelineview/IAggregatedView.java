@@ -36,4 +36,5 @@ public interface IAggregatedView {
 
 	public void resizeDiagram();
 
+	public void createSnapshotFor(String fileName);
 }

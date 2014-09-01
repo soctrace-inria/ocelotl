@@ -19,6 +19,9 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseEvent;
@@ -33,6 +37,7 @@ import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
+import org.eclipse.draw2d.SWTGraphics;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
@@ -40,8 +45,14 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.slf4j.Logger;
@@ -122,6 +133,10 @@ public class QualityView {
 	public QualityView(final OcelotlView lpaggregView) {
 		super();
 		ocelotlView = lpaggregView;
+	}
+	
+	public Figure getRoot() {
+		return root;
 	}
 
 	public void createDiagram() {
@@ -388,5 +403,5 @@ public class QualityView {
 			qualityWidth *= 2;
 		}
 	}
-
+	
 }
