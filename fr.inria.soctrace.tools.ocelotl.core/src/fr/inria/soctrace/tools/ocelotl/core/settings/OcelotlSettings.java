@@ -1,10 +1,12 @@
-package fr.inria.soctrace.tools.ocelotl.ui.settings;
+package fr.inria.soctrace.tools.ocelotl.core.settings;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.slf4j.Logger;
@@ -21,12 +23,17 @@ public class OcelotlSettings {
 	private String cacheDirectory;
 	private int cacheSize;
 	private String snapShotDirectory;
+	private String defaultConfigFile;
 
 	public OcelotlSettings() {
 		cacheActivated = OcelotlConstants.DEFAULT_CACHE_ACTIVATION;
+
+		// Default cache directory is the directory "ocelotlCache" in the
+		// running directory
 		cacheDirectory = ResourcesPlugin.getWorkspace().getRoot().getLocation()
 				.toString()
 				+ "/ocelotlCache";
+
 		cacheSize = OcelotlConstants.MAX_CACHESIZE;
 		snapShotDirectory = ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
@@ -39,7 +46,7 @@ public class OcelotlSettings {
 	 * Load a previously saved configuration file
 	 */
 	private void loadConfigurationFile() {
-		String defaultConfigFile = ResourcesPlugin.getWorkspace().getRoot()
+		defaultConfigFile = ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
 				+ "/ocelotl.conf";
 		File confFile = new File(defaultConfigFile);
@@ -54,14 +61,21 @@ public class OcelotlSettings {
 				String line;
 				// Get header
 				line = bufFileReader.readLine();
-				
+
 				if (line != null) {
 					String[] header = line.split(OcelotlConstants.CSVDelimiter);
 
-					setCacheActivated(Boolean.valueOf(header[0]));
-					setCacheDirectory(header[1]);
-					setCacheSize(Integer.parseInt(header[2]));
-					setSnapShotDirectory(header[3]);
+					if (header.length == OcelotlConstants.CONFIGURATION_NORMAL_SIZE) {
+						setCacheActivated(Boolean.valueOf(header[0]));
+						setCacheDirectory(header[1]);
+						// Convert from megabytes to bytes
+						setCacheSize(Integer.parseInt(header[2]) * 1000000);
+						setSnapShotDirectory(header[3]);
+					} else {
+						logger.debug("Invalid configuration file: Default values will be used");
+					}
+				} else {
+					logger.debug("Invalid configuration file: Default values will be used");
 				}
 
 				bufFileReader.close();
@@ -75,12 +89,45 @@ public class OcelotlSettings {
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				logger.debug("No configuration file was found: Default values will be used");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
-			logger.debug("No configuration file was found: Default values will be used");
+			logger.debug("The configuration file was not found or could not be read: Default values will be used");
+		}
+	}
+
+	/**
+	 * Save the current settings in the configuration file
+	 */
+	public void saveSettings() {
+		StringBuffer output = new StringBuffer();
+
+		output.append(cacheActivated);
+		output.append(";");
+		output.append(cacheDirectory);
+		output.append(";");
+		output.append(cacheSize / 1000000);
+		output.append(";");
+		output.append(snapShotDirectory);
+
+		String newSettings = output.toString();
+
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(defaultConfigFile, "UTF-8");
+
+			writer.print(newSettings);
+
+			// Close the fd
+			writer.flush();
+			writer.close();
+
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -89,7 +136,10 @@ public class OcelotlSettings {
 	}
 
 	public void setSnapShotDirectory(String snapShotDir) {
-		this.snapShotDirectory = snapShotDir;
+		if (!snapShotDirectory.equals(snapShotDir)) {
+			this.snapShotDirectory = snapShotDir;
+			saveSettings();
+		}
 	}
 
 	public int getCacheSize() {
@@ -97,7 +147,10 @@ public class OcelotlSettings {
 	}
 
 	public void setCacheSize(int cacheSize) {
-		this.cacheSize = cacheSize;
+		if (this.cacheSize != cacheSize) {
+			this.cacheSize = cacheSize;
+			saveSettings();
+		}
 	}
 
 	public String getCacheDirectory() {
@@ -105,7 +158,10 @@ public class OcelotlSettings {
 	}
 
 	public void setCacheDirectory(String cacheDir) {
-		this.cacheDirectory = cacheDir;
+		if (!this.cacheDirectory.equals(cacheDir)) {
+			this.cacheDirectory = cacheDir;
+			saveSettings();
+		}
 	}
 
 	public boolean isCacheActivated() {
@@ -113,7 +169,10 @@ public class OcelotlSettings {
 	}
 
 	public void setCacheActivated(boolean cacheActivated) {
-		this.cacheActivated = cacheActivated;
+		if (this.cacheActivated != cacheActivated) {
+			this.cacheActivated = cacheActivated;
+			saveSettings();
+		}
 	}
 
 }

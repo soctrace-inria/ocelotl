@@ -32,6 +32,7 @@ public class Snapshot {
 
 	public void setSnapshotDirectory(String snapshotDirectory) {
 		this.snapshotDirectory = snapshotDirectory;
+		theView.getParams().getOcelotlSettings().setSnapShotDirectory(this.snapshotDirectory);
 	}
 
 	public void takeSnapShot() {

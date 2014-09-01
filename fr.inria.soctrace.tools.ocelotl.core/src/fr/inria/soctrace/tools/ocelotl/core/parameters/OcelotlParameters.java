@@ -30,9 +30,9 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
+import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
-import fr.inria.soctrace.tools.ocelotl.ui.settings.OcelotlSettings;
 
 public class OcelotlParameters {
 

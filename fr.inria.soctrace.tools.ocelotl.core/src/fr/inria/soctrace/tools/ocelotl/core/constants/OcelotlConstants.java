@@ -55,7 +55,6 @@ public class OcelotlConstants {
 	 */
 	static public boolean DEFAULT_CACHE_ACTIVATION = true;
 	
-	
 	/**
 	 * Minimum ratio value for the datacache
 	 */
@@ -66,8 +65,16 @@ public class OcelotlConstants {
 	 */
 	static public double MAXIMAL_DIRTY_RATIO = 1.0;
 	
+	/**
+	 * Possible datacache rebuilding strategies
+	 */
 	static public enum DatacacheStrategy {
 		DATACACHE_PROPORTIONAL, DATACACHE_DATABASE
 	}
+	
+	/**
+	 * Size of the configuration file
+	 */
+	static final public int CONFIGURATION_NORMAL_SIZE = 4;
 
 }

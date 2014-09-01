@@ -19,10 +19,10 @@ import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
-import fr.inria.soctrace.tools.ocelotl.ui.settings.OcelotlSettings;
 
 /**
  * Class handling the caching of the microscopic models.
@@ -36,7 +36,9 @@ public class DataCache {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(DataCache.class);
-
+	
+	OcelotlSettings settings;
+	
 	/**
 	 * List of the cache files in the current cache directory
 	 */
@@ -111,6 +113,7 @@ public class DataCache {
 
 	public void setCacheActive(boolean cacheActive) {
 		this.cacheActive = cacheActive;
+		settings.setCacheActivated(this.cacheActive);
 	}
 	
 	public boolean isRebuildDirty() {
@@ -130,6 +133,7 @@ public class DataCache {
 			throw new OcelotlException(OcelotlException.INVALID_MAX_CACHE_SIZE);
 		}
 		this.cacheMaxSize = cacheMaxSize;
+		settings.setCacheSize(this.cacheMaxSize);
 	}
 
 	public String getCacheDirectory() {
@@ -185,6 +189,9 @@ public class DataCache {
 			
 			// Everything's OK, set the cache directory
 			this.cacheDirectory = cacheDirectory;
+			
+			// Update settings
+			settings.setCacheDirectory(this.cacheDirectory);
 
 			// Search the directory for existing cache files
 			readCachedData();
@@ -198,18 +205,19 @@ public class DataCache {
 	public DataCache() {
 		super();
 		cachedData = new HashMap<CacheParameters, File>();
-		cacheActive = true;
-
-		// Default cache directory is the directory "ocelotlCache" in the
-		// running directory
-		setCacheDirectory(ResourcesPlugin.getWorkspace().getRoot()
-				.getLocation().toString()
-				+ "/ocelotlCache");
 		
 		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
 	}
 	
+	/**
+	 * Set cache parameters from the configuration file
+	 * 
+	 * @param settings
+	 *            Configuration from file
+	 * @throws OcelotlException
+	 */
 	public void setSettings(OcelotlSettings settings) throws OcelotlException {
+		this.settings = settings;
 		setCacheMaxSize(settings.getCacheSize());
 		setCacheDirectory(settings.getCacheDirectory());
 	}

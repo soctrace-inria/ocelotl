@@ -19,16 +19,9 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -68,7 +61,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
@@ -79,7 +71,6 @@ import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
@@ -91,7 +82,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench;
 import fr.inria.soctrace.tools.ocelotl.ui.TestParameters;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
-import fr.inria.soctrace.tools.ocelotl.ui.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
@@ -389,6 +379,15 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				job.setUser(true);
 				job.schedule();
 			}
+		}
+	}
+	
+	private class TakeSnapshotAdapter extends SelectionAdapter {
+		
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+
+			snapshot.takeSnapShot();
 		}
 	}
 	
@@ -798,15 +797,19 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	}
 
 	private class DataCacheSizeListener implements ModifyListener {
-	
+
 		@Override
 		public void modifyText(final ModifyEvent e) {
 			try {
-					textThreshold.setText("0.001");
+				// Set the cache size at the entered value converted from
+				// Megabytes to bytes
+				ocelotlParameters.getDataCache().setCacheMaxSize(Integer.valueOf(dataCacheSize.getText()) * 1000000);
 			} catch (final NumberFormatException err) {
 				dataCacheSize.setText(String.valueOf(ocelotlParameters.getDataCache().getCacheMaxSize()));
+			} catch (OcelotlException e1) {
+				MessageDialog.openInformation(getSite().getShell(), "Error", e1.getMessage());
 			}
-			
+
 		}
 	}
 	
@@ -1323,7 +1326,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				lblDataCacheSize.setText("MB Data cache size (-1=unlimited):");
 		
 		dataCacheSize = new Text(groupDataCacheSettings, SWT.BORDER);
-		dataCacheSize.setText("-1");
+		if (ocelotlParameters.getOcelotlSettings().getCacheSize() > 0) {
+			dataCacheSize.setText(String.valueOf(ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000));
+		} else {
+			dataCacheSize.setText(String.valueOf(ocelotlParameters.getOcelotlSettings().getCacheSize()));
+		}
+
 		dataCacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_text.widthHint = 100;
@@ -1339,14 +1347,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
 		
 		Button btnTakeSnapshot = new Button(groupDataCacheSettings, SWT.NONE);
-		btnTakeSnapshot.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				
-				snapshot.takeSnapShot();
-			}
-		});
-		
+		btnTakeSnapshot.addSelectionListener(new TakeSnapshotAdapter());
 		
 		btnTakeSnapshot.setText("Take Snapshot");
 		new Label(groupDataCacheSettings, SWT.NONE);
