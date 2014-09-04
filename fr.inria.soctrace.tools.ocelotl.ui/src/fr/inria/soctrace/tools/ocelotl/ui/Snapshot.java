@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.lpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.lib.utils.Configuration;
+import fr.inria.soctrace.lib.utils.Configuration.SoCTraceProperty;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class Snapshot {
@@ -51,6 +53,10 @@ public class Snapshot {
 	 */
 	public void snapShotDiagram(String dirPath) {
 		theView.getTimeLineView().createSnapshotFor(dirPath + "/diagram.png");
+	}
+	
+	public void snapShotDiagramWithName(String dirPath) {
+		theView.getTimeLineView().createSnapshotFor(dirPath);
 	}
 
 	/**
@@ -106,10 +112,15 @@ public class Snapshot {
 				break;
 			}
 		}
-
+		
+		String dbDir = Configuration.getInstance().get(SoCTraceProperty.sqlite_db_directory);
+		dbDir = dbDir + theView.getParams().getTrace().getDbName();
+		
 		StringBuffer output = new StringBuffer();
 		output.append("Trace name: ");
 		output.append(theView.getParams().getTrace().getAlias());
+		output.append("\nTrace path: ");
+		output.append(dbDir);
 		output.append("\nNumber of slices: ");
 		output.append(theView.getParams().getTimeSlicesNumber());
 		output.append("\nStart timestamp: ");
@@ -163,8 +174,14 @@ public class Snapshot {
 	public void createSymLink(String aDirPath) {
 		// TODO create symbolic link
 		Process p;
+	
+		String dbDir = Configuration.getInstance().get(SoCTraceProperty.sqlite_db_directory);
+		dbDir = dbDir + theView.getParams().getTrace().getDbName();
+		
+		String commandDirPath = aDirPath.replace(" ", "\\" + " ");
+		
 		try {
-			p = Runtime.getRuntime().exec("ln -s " + aDirPath + "/A\\ Link\\ to\\ the\\ trace");
+			p = Runtime.getRuntime().exec("ln -s " + dbDir + " " + commandDirPath + "/A\\ Link\\ to\\ the\\ trace");
 			p.waitFor();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

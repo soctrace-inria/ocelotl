@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -266,10 +265,9 @@ public class DataCache {
 		// Is the aggregation operator the same?
 		if (!((newParam.getTimeAggOperator().equals(
 				cacheParam.getTimeAggOperator()) && (!newParam
-				.getTimeAggOperator().equals("null")))
-				|| ((newParam.getSpaceAggOperator().equals(
-						cacheParam.getSpaceAggOperator()) && (!newParam
-						.getSpaceAggOperator().equals("null"))))))
+				.getTimeAggOperator().equals("null"))) || ((newParam
+				.getSpaceAggOperator().equals(cacheParam.getSpaceAggOperator()) && (!newParam
+				.getSpaceAggOperator().equals("null"))))))
 			return false;
 		
 		// Are timestamps equal or are they included inside the cache

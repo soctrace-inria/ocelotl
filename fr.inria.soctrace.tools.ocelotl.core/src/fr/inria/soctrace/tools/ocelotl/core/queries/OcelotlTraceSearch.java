@@ -29,7 +29,6 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.ComparisonOperation;
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.LogicalOperation;
-import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.OrderBy;
 import fr.inria.soctrace.lib.query.conditions.LogicalCondition;
 import fr.inria.soctrace.lib.query.conditions.SimpleCondition;
 import fr.inria.soctrace.lib.search.TraceSearch;
@@ -67,9 +66,9 @@ public class OcelotlTraceSearch extends TraceSearch {
 	 * @param t
 	 *            The trace from which the events are taken
 	 * @param eventTypes
-	 *            The list of selected event types 
+	 *            The list of selected event types
 	 * @param intervals
-	 *            The list of selected time intervals 
+	 *            The list of selected time intervals
 	 * @param eventProducers
 	 *            The list of selected event producers
 	 * @return an event iterator
@@ -109,18 +108,17 @@ public class OcelotlTraceSearch extends TraceSearch {
 		}
 
 		// If we filter based on the timestamps
-		if(!intervals.isEmpty())
-		{
+		if (!intervals.isEmpty()) {
 			long min = traceDB.getMinTimestamp();
 			long max = traceDB.getMaxTimestamp();
-			
+
 			// For each timestamps intervals
-			for(IntervalDesc anInterval: intervals)
-			{
+			for (IntervalDesc anInterval : intervals) {
 				TimeRegion aRegion = new TimeRegion(anInterval.t1,
 						anInterval.t2);
-				final LogicalCondition andTimeStamps = new LogicalCondition(LogicalOperation.AND);
-				
+				final LogicalCondition andTimeStamps = new LogicalCondition(
+						LogicalOperation.AND);
+
 				// Optimize by checking if one of the timestamps is a boundary
 				// of the trace
 				if (min != aRegion.getTimeStampStart())
@@ -131,48 +129,45 @@ public class OcelotlTraceSearch extends TraceSearch {
 					andTimeStamps.addCondition(new SimpleCondition("TIMESTAMP",
 							ComparisonOperation.LE, Long.toString(aRegion
 									.getTimeStampEnd())));
-				
-				if(intervals.size() == 1 && andTimeStamps.getNumberOfConditions() > 0)
-				{
-					if(andTimeStamps.getNumberOfConditions() == 1)
-					{
-						andTimeStamps.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, String.valueOf(1)));
+
+				if (intervals.size() == 1
+						&& andTimeStamps.getNumberOfConditions() > 0) {
+					if (andTimeStamps.getNumberOfConditions() == 1) {
+						andTimeStamps.addCondition(new SimpleCondition("'1'",
+								ComparisonOperation.EQ, String.valueOf(1)));
 					}
 					and.addCondition(andTimeStamps);
-				}
-				else
-				{
-					if(andTimeStamps.getNumberOfConditions() == 1)
-					{
-						andTimeStamps.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, String.valueOf(1)));
+				} else {
+					if (andTimeStamps.getNumberOfConditions() == 1) {
+						andTimeStamps.addCondition(new SimpleCondition("'1'",
+								ComparisonOperation.EQ, String.valueOf(1)));
 					}
 					// add a or condition between each interval
 					or.addCondition(andTimeStamps);
 				}
 			}
-			
-			if(or.getNumberOfConditions() > 1)
-			{
+
+			if (or.getNumberOfConditions() > 1) {
 				and.addCondition(or);
 			}
 		}
 
 		if (and.getNumberOfConditions() == 1)
-		and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, String.valueOf(1)));
+			and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ,
+					String.valueOf(1)));
 		if (and.getNumberOfConditions() >= 2)
 			query.setElementWhere(and);
-		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+		//query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
 		return query.getIterator();
 	}
-	
+
 	public EventIterator getCategorySpecificIterator(final Trace t,
 			final List<EventType> eventTypes,
 			final List<IntervalDesc> intervals,
-			final List<EventProducer> eventProducers,
-			int aCategory) throws SoCTraceException,
-			OcelotlException {
-		
+			final List<EventProducer> eventProducers, int aCategory)
+			throws SoCTraceException, OcelotlException {
+
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
 		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
@@ -207,12 +202,12 @@ public class OcelotlTraceSearch extends TraceSearch {
 
 			// For each timestamp intervals
 			for (IntervalDesc anInterval : intervals) {
-				
+
 				SimpleCondition t1 = null;
 				SimpleCondition t2 = null;
 				SimpleCondition d1 = null;
 				SimpleCondition d2 = null;
-				
+
 				TimeRegion aRegion = new TimeRegion(anInterval.t1,
 						anInterval.t2);
 				final LogicalCondition ort = new LogicalCondition(
@@ -226,7 +221,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 					t2 = new SimpleCondition("TIMESTAMP",
 							ComparisonOperation.LE, Long.toString(aRegion
 									.getTimeStampEnd()));
-				// If the state ends after the start date select it also  
+				// If the state ends after the start date select it also
 				if (min < aRegion.getTimeStampStart()) {
 					t1 = new SimpleCondition("TIMESTAMP",
 							ComparisonOperation.GE, Long.toString(aRegion
@@ -242,7 +237,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 						and.addCondition(t2);
 					else
 						or.addCondition(t2);
-				
+
 				else if (t2 == null && t1 != null) {
 					ort.addCondition(t1);
 					andd.addCondition(d1);
@@ -252,7 +247,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 						and.addCondition(ort);
 					else
 						or.addCondition(ort);
-					
+
 				} else if (t2 != null && t1 != null) {
 					andt.addCondition(t1);
 					andt.addCondition(t2);
@@ -266,8 +261,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 						or.addCondition(ort);
 				}
 			}
-			if(or.getNumberOfConditions() > 1)
-			{
+			if (or.getNumberOfConditions() > 1) {
 				and.addCondition(or);
 			}
 		}
@@ -276,7 +270,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 					ComparisonOperation.EQ, String.valueOf(aCategory)));
 		if (and.getNumberOfConditions() >= 2)
 			query.setElementWhere(and);
-		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+	//	query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
 		return query.getIterator();
 	}
@@ -308,5 +302,5 @@ public class OcelotlTraceSearch extends TraceSearch {
 
 		traceDB = new TraceDBObject(t.getDbName(), DBMode.DB_OPEN);
 	}
-	
+
 }

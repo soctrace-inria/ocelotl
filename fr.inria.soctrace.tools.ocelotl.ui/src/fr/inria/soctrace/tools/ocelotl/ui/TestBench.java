@@ -31,12 +31,11 @@ public class TestBench {
 	int noCacheTime;
 	int cacheTime;
 	
-	public TestBench(String aFilePath, OcelotlView aView)
-	{
+	public TestBench(String aFilePath, OcelotlView aView) {
 		aConfFile = aFilePath;
 		theView = aView;
 	}
-	
+
 	public void parseFile()
 	{
 		File aFile = new File(aConfFile);

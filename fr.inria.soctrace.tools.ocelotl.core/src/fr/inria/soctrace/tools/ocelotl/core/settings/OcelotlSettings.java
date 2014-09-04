@@ -63,14 +63,18 @@ public class OcelotlSettings {
 				line = bufFileReader.readLine();
 
 				if (line != null) {
-					String[] header = line.split(OcelotlConstants.CSVDelimiter);
-
-					if (header.length == OcelotlConstants.CONFIGURATION_NORMAL_SIZE) {
-						setCacheActivated(Boolean.valueOf(header[0]));
-						setCacheDirectory(header[1]);
-						// Convert from megabytes to bytes
-						setCacheSize(Integer.parseInt(header[2]) * 1000000);
-						setSnapShotDirectory(header[3]);
+					String[] config = line.split(OcelotlConstants.CSVDelimiter);
+					// If the configuration has the right number of objects
+					if (config.length == OcelotlConstants.CONFIGURATION_NORMAL_SIZE) {
+						setCacheActivated(Boolean.valueOf(config[0]));
+						setCacheDirectory(config[1]);
+						if (Integer.parseInt(config[2]) >= 0) {
+							// Convert from megabytes to bytes
+							setCacheSize(Integer.parseInt(config[2]) * 1000000);
+						} else {
+							setCacheSize(-1);
+						}
+						setSnapShotDirectory(config[3]);
 					} else {
 						logger.debug("Invalid configuration file: Default values will be used");
 					}
@@ -109,7 +113,11 @@ public class OcelotlSettings {
 		output.append(";");
 		output.append(cacheDirectory);
 		output.append(";");
-		output.append(cacheSize / 1000000);
+		if (cacheSize >= 0) {
+			output.append(cacheSize / 1000000);
+		} else {
+			output.append(-1);
+		}	
 		output.append(";");
 		output.append(snapShotDirectory);
 

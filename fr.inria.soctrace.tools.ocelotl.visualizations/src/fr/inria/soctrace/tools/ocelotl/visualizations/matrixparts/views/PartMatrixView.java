@@ -36,7 +36,7 @@ public class PartMatrixView extends MatrixView {
 	@Override
 	protected void computeDiagram() {
 		if (!hierarchy.getRoot().getParts().isEmpty()) {
-			HierarchyPart hp=new HierarchyPart(hierarchy, root, colors, space);
+			HierarchyPart hp = new HierarchyPart(hierarchy, root, colors, space);
 			hp.draw();
 		}
 	}

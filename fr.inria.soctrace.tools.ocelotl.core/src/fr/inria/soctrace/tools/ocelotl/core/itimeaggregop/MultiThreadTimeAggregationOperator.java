@@ -69,17 +69,18 @@ public abstract class MultiThreadTimeAggregationOperator {
 	abstract protected void computeSubMatrix(
 			final List<EventProducer> eventProducers) throws SoCTraceException,
 			InterruptedException, OcelotlException;
-	
+
 	abstract protected void computeSubMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException;
-	
+			final List<EventProducer> eventProducers, List<IntervalDesc> time)
+			throws SoCTraceException, InterruptedException, OcelotlException;
+
 	protected void computeDirtyCacheMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time, HashMap<Long, List<TimeSlice>> timesliceIndex)
+			final List<EventProducer> eventProducers, List<IntervalDesc> time,
+			HashMap<Long, List<TimeSlice>> timesliceIndex)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		computeSubMatrix(eventProducers, time);
 	}
-	
+
 	/**
 	 * Convert the matrix values in one String formatted in CSV
 	 * 
@@ -295,7 +296,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 			if (parameters.getDataCache().isRebuildDirty()) {
 				rebuildDirtyMatrix(aCacheFile, eventProducers);
-				dm.end("Load matrix from cache (dirty)");
+				dm.end("Load matrix from cache (dirty)");// :  " + parameters.getDataCache().getBuildingStrategy());
 			} else {
 				rebuildNormalMatrix(aCacheFile, eventProducers);
 				dm.end("Load matrix from cache");
@@ -389,7 +390,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 				case DATACACHE_DATABASE:
 					// Create an interval corresponding to the dirty time slice
 					times.add(databaseRebuild(aCachedTimeSlice));
-					
+
+					// Add to timeslice index
 					for (TimeSlice ts : parameters.getDataCache()
 							.getTimeSliceMapping().get(aCachedTimeSlice)) {
 
@@ -397,11 +399,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 							timesliceIndex.put(ts.getNumber(),
 									new ArrayList<TimeSlice>());
 						}
-						
+
 						timesliceIndex.get(ts.getNumber())
 								.add(aCachedTimeSlice);
 					}
-					
+
 					break;
 				}
 			}

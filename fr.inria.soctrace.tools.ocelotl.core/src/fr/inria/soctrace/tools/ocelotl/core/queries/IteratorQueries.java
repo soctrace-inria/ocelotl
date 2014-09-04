@@ -165,7 +165,7 @@ public class IteratorQueries extends EventQuery {
 			final DeltaManager steps = new DeltaManagerOcelotl();
 			steps.start();
 			rs = mystm.executeQuery(query);
-			steps.start();
+			steps.end("Execute Query");
 
 		} catch (final SQLException e) {
 			throw new SoCTraceException(e);

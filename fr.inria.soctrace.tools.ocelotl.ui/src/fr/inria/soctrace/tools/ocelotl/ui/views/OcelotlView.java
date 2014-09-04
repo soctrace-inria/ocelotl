@@ -181,19 +181,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				
 								// And launch the display
 								btnRun.notifyListeners(SWT.Selection, new Event());
-												
+								
 								String spaceLess = testParams.toString().replace(" ", "_");
 								spaceLess = spaceLess + "_" + aParamValue;
 								
-								if(ocelotlParameters.getDataCache().isCacheActive())
-								{
-									snapshot.snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + ".png");
+								if (ocelotlParameters.getDataCache().isCacheActive()) {
+									snapshot.snapShotDiagramWithName(testParams.getDirectory() + "/" + spaceLess + ".png");
+								} else {
+									snapshot.snapShotDiagramWithName(testParams.getDirectory() + "/" + spaceLess + "_noCache.png");
 								}
-								else
-								{
-									snapshot.snapShotDiagram(testParams.getDirectory() + "/" + spaceLess + "_noCache.png");
-								}
-								
+
 								hasChanged = HasChanged.PARAMETER;
 							}
 						}
@@ -456,7 +453,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
 				return;
 			}
-					
+
 			// Mutex zone
 			synchronized (lock) {
 				// If a job is already running
@@ -473,13 +470,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				running = true;
 			}
 			
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
-			{
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER) {
 				hasChanged = HasChanged.PARAMETER;
-			}
-			else
-			{
-				//textRun.setText("1.0");
+			} else {
+				// textRun.setText("1.0");
 			}
 			setConfiguration();
 			final String title = "Computing Aggregated View";
@@ -488,7 +482,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-                    try {
+					try {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
 								ocelotlCore.initTimeOperator();
@@ -526,13 +520,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						@Override
 						public void run() {
 							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
-							
 							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							qualityView.createDiagram();
-							}
+						}
 					});
 				
 					synchronized (lock) {
@@ -543,6 +536,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			};
 			job.setUser(true);	
 			job.schedule();
+			
 			try {
 				job.join();
 			} catch (InterruptedException e5) {

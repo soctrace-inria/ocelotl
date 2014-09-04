@@ -107,6 +107,7 @@ public class HierarchyProportion {
 		initY();
 		print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot().getParts()
 				.size());
+		root.getUpdateManager().performUpdate();
 	}
 
 	private List<Part> computeParts(EventProducerNode epn, int start, int end) {

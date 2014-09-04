@@ -223,9 +223,27 @@ public class OcelotlQueries {
 	 */
 	public EventIterator getVariableIterator(List<EventProducer> eventProducers)
 			throws SoCTraceException, OcelotlException {
+		final List<IntervalDesc> time = setTimeInterval();
+		return getVariableIterator(eventProducers, time);
+	}
+
+	/**
+	 * 
+	 * @param eventProducers
+	 *            list of event producers from which to select all the events. A
+	 *            null value means all event producers.
+	 * @param time
+	 *            List of time intervals from which the events are selected
+	 * @return an EventIterator on all events produced by the event producers in
+	 *         eventProducers and in the time range defined in time
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
+	public EventIterator getVariableIterator(
+			List<EventProducer> eventProducers, List<IntervalDesc> time)
+			throws SoCTraceException, OcelotlException {
 		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
 				.initialize();
-		final List<IntervalDesc> time = setTimeInterval();
 
 		// If we do not filter event producers
 		if (eventProducers == null
@@ -240,6 +258,5 @@ public class OcelotlQueries {
 					eventProducers);
 		}
 	}
-
 }
 
