@@ -218,6 +218,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
+				+ parameters.getTimeAggOperator() + "_"
 				+ convertedDate;
 
 		// Write to file,

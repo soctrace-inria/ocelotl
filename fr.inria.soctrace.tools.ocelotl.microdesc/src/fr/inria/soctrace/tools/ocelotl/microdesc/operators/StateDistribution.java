@@ -223,7 +223,7 @@ public class StateDistribution extends _3DMicroDescription {
 							(long) ((testedTimeRegion.getTimeStampStart() - timeSliceManager
 									.getTimeRegion().getTimeStampStart()) / timeSliceManager
 									.getSliceDuration()) - 1);
-	double temp = 0;
+			double temp = 0;
 
 			// If the state starts within the actual time region
 			if (testedTimeRegion.getTimeStampStart()
