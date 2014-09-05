@@ -116,24 +116,6 @@ abstract public class AggregatedView implements IAggregatedView {
 					p2 = p3;
 				else if (p3 < p1)
 					p1 = p3;
-				double sliceSize = (double)resetTime.getTimeDuration()/(double)ocelotlView.getTimeSliceNumber();
-				int i=0;
-				for (i=0; i<ocelotlView.getTimeSliceNumber(); i++){
-					if ((p1>=((sliceSize*i)+resetTime.getTimeStampStart()))&&(p1<((sliceSize*(i+1))+resetTime.getTimeStampStart()))){
-					p1=(long) ((sliceSize*i)+resetTime.getTimeStampStart());
-					break;
-					}
-				}
-				if (i==ocelotlView.getTimeSliceNumber()){
-					p3=resetTime.getTimeStampEnd();
-				}else{
-					for (; i<ocelotlView.getTimeSliceNumber(); i++){
-						if ((p2>=((sliceSize*i)+resetTime.getTimeStampStart()))&&(p2<((sliceSize*(i+1))+resetTime.getTimeStampStart()))){
-						p3=(long) ((sliceSize*i+1)+resetTime.getTimeStampStart());
-						break;
-						}
-					}
-				}
 				selectTime = new TimeRegion(p1, p2);
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
@@ -197,18 +179,30 @@ abstract public class AggregatedView implements IAggregatedView {
 				//selectTime.setTimeStampStart(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampStart()).getTimeRegion().getTimeStampStart());
 				//selectTime.setTimeStampEnd(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampEnd()).getTimeRegion().getTimeStampEnd());
 				
-				if (!ocelotlView.getTimeRegion().compareTimeRegion(time) && selectTime.getTimeDuration() > 0) {
+				if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
 					//ocelotlView.setTimeRegion(selectTime);
+					double sliceSize = (double)resetTime.getTimeDuration()/(double)ocelotlView.getTimeSliceNumber();
+					int i=0;
+					for (i=0; i<ocelotlView.getTimeSliceNumber(); i++){
+						if ((selectTime.getTimeStampStart()>=((sliceSize*i)+resetTime.getTimeStampStart()))&&(selectTime.getTimeStampStart()<((sliceSize*(i+1))+resetTime.getTimeStampStart()))){
+						selectTime.setTimeStampStart((long) ((sliceSize*i)+resetTime.getTimeStampStart()));
+						break;
+						}
+					}
+					for (i=0; i<ocelotlView.getTimeSliceNumber(); i++){
+						if ((selectTime.getTimeStampEnd()>=((sliceSize*i)+resetTime.getTimeStampStart()))&&(selectTime.getTimeStampEnd()<((sliceSize*(i+1))+resetTime.getTimeStampStart()))){
+							selectTime.setTimeStampEnd((long) ((sliceSize*(i+1))+resetTime.getTimeStampStart()));
+						break;
+						}
+					}
 					ocelotlView.getTimeAxisView().select(selectTime, true);
+					ocelotlView.setTimeRegion(selectTime);
 					selectFigure.draw(selectTime, true);
 				} else {
 					ocelotlView.getTimeAxisView().resizeDiagram();
 					if (selectFigure.getParent() != null)
 						root.remove(selectFigure);
 					root.repaint();
-					if (selectTime.getTimeDuration() == 0) {
-						ocelotlView.setTimeRegion(resetTime);
-					}
 				}
 				selectTime = new TimeRegion(resetTime);
 			}
