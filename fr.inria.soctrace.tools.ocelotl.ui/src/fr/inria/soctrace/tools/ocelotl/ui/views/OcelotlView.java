@@ -1340,6 +1340,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		return qualityView;
 	}
 	
+	
+	
+	public int getTimeSliceNumber() {
+		return spinnerTSNumber.getSelection();
+	}
+
+	public void setComboTime(Combo comboTime) {
+		this.comboTime = comboTime;
+	}
+
 	public TimeRegion getTimeRegion() {
 		return new TimeRegion(Long.parseLong(textTimestampStart.getText()), Long.parseLong(textTimestampEnd.getText()));
 	}
