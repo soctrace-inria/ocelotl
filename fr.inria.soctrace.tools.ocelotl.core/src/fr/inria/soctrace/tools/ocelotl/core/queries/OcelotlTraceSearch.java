@@ -93,7 +93,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
-			query.setTypeWhere(new SimpleCondition("EVENT_TYPE_ID",
+			and.addCondition(new SimpleCondition("EVENT_TYPE_ID",
 					ComparisonOperation.IN, vls.getValueString()));
 		}
 
@@ -162,7 +162,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 		and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, String.valueOf(1)));
 		if (and.getNumberOfConditions() >= 2)
 			query.setElementWhere(and);
-		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+		//query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
 		return query.getIterator();
 	}
@@ -184,7 +184,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
-			query.setTypeWhere(new SimpleCondition("EVENT_TYPE_ID",
+			and.addCondition(new SimpleCondition("EVENT_TYPE_ID",
 					ComparisonOperation.IN, vls.getValueString()));
 		}
 
@@ -274,7 +274,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 					ComparisonOperation.EQ, String.valueOf(aCategory)));
 		if (and.getNumberOfConditions() >= 2)
 			query.setElementWhere(and);
-		query.setOrderBy("TIMESTAMP", OrderBy.ASC);
+		//query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
 		return query.getIterator();
 	}
