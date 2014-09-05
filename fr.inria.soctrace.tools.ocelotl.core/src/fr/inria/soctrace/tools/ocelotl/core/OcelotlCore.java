@@ -64,8 +64,12 @@ public class OcelotlCore {
 
 	public void initTimeOperator(IProgressMonitor monitor) throws OcelotlException {
 		setTimeOperator(monitor);
+		if(monitor.isCanceled())
+			return;
 		try {
 			lpaggregManager = timeOperator.createManager(monitor);
+			if(monitor.isCanceled())
+				return;
 		} catch (UnsatisfiedLinkError e) {
 			throw new OcelotlException(OcelotlException.JNI);
 		}

@@ -44,6 +44,9 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 	protected void fillVectors(IProgressMonitor monitor) {
 		for (int i = 0; i < matrix.getMatrix().size(); i++) {
 			((JNITimeAggregation3) timeAggregation).addMatrix();
+			if (monitor.isCanceled()) {
+				return;
+			}
 			for (final EventProducer key : matrix.getMatrix().get(i).keySet()) {
 				((JNITimeAggregation3) timeAggregation).addVector();
 				for (final String key2 : matrix.getMatrix().get(i).get(key)

@@ -160,7 +160,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// .getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initQueries();
 		initVectors();
-		
+		if(monitor.isCanceled())
+			return;
 		// If the cache is enabled
 		if (parameters.getDataCache().isCacheActive()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
@@ -173,6 +174,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 				monitor.setTaskName("Loading data from database");
 				computeMatrix(monitor);
 
+				if(monitor.isCanceled())
+					return;
+				
 				if (eventsNumber == 0)
 					throw new OcelotlException(OcelotlException.NO_EVENTS);
 
@@ -195,14 +199,23 @@ public abstract class MultiThreadTimeAggregationOperator {
 		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
 	}
 
-	public List<Event> getEvents(final int size) {
+	public List<Event> getEvents(final int size, IProgressMonitor monitor) {
 		final List<Event> events = new ArrayList<Event>();
+		int eventCount = 0;
+		if (monitor.isCanceled())
+			return null;
 		synchronized (eventIterator) {
 			for (int i = 0; i < size; i++) {
 				if (eventIterator.getNext() == null)
 					return events;
 				events.add(eventIterator.getEvent());
 				eventsNumber++;
+				eventCount++;
+				if (eventCount % 30 == 0) {
+					if (monitor.isCanceled()) {
+						return null;
+					}
+				}
 			}
 		}
 		return events;
@@ -300,7 +313,10 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 			// Fill the matrix with zeroes
 			initMatrixToZero(eventProducers.values());
-			
+
+			if (monitor.isCanceled()) 
+				return;	
+				
 			// Check how to rebuild the matrix
 			if (parameters.getDataCache().isRebuildDirty()) {
 				monitor.setTaskName("Rebuilding with strategy " + parameters.getDataCache().getBuildingStrategy());
@@ -310,7 +326,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 				monitor.setTaskName("Rebuilding with cache data");
 				rebuildNormalMatrix(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache");
-
 			}
 
 		} catch (FileNotFoundException e) {
@@ -329,6 +344,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 				aCacheFile.getPath()));
 
 		monitor.subTask("Filling matrix with cache data");
+		long lineCount = 0;
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
@@ -345,6 +361,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 				rebuildMatrix(values, eventProducers.get(values[1]), parameters
 						.getDataCache().getTimeSliceFactor());
 			}
+			lineCount++;
+
+			if (lineCount % 50 == 0)
+				if (monitor.isCanceled()) {
+					bufFileReader.close();
+					return;
+				}
 		}
 		bufFileReader.close();
 	}
@@ -419,6 +442,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 			}
 		}
 
+		if (monitor.isCanceled()) 
+			return;
+
 		// If strategy is DATACACHE_DATABASE
 		// Run a single database query with all the times of the dirty time
 		// slices to rebuild the matrix
@@ -426,7 +452,10 @@ public abstract class MultiThreadTimeAggregationOperator {
 			try {
 				monitor.subTask("Fetching dirty data from database");
 				computeDirtyCacheMatrix(new ArrayList<EventProducer>(
-						eventProducers.values()), times, timesliceIndex, monitor);
+						eventProducers.values()), times, timesliceIndex,
+						monitor);
+				if (monitor.isCanceled())
+					return;
 			} catch (SoCTraceException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -438,10 +467,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 				e.printStackTrace();
 			}
 		}
-		
+
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
 
+		long lineCount = 0;
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
@@ -451,6 +481,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
 
+			lineCount++;
 			// If the event producer is not filtered out
 			if (eventProducers.containsKey(values[1])) {
 				int slice = Integer.parseInt(values[0]);
@@ -507,6 +538,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 									.get(0).getNumber(), 1.0);
 				}
 			}
+			if (lineCount % 50 == 0)
+				if (monitor.isCanceled()) {
+					bufFileReader.close();
+					return;
+				}
 		}
 
 		bufFileReader.close();

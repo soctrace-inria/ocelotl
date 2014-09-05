@@ -55,17 +55,19 @@ public class StateDistribution extends _3DMicroDescription {
 		int threadNumber;
 		int thread;
 		int size;
+		IProgressMonitor monitor;
 		
 		public OcelotlThread() {
 			super();
 		}
 
 		public OcelotlThread(final int threadNumber, final int thread,
-				final int size) {
+				final int size, IProgressMonitor monitor) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			this.size = size;
+			this.monitor =  monitor;
 
 			start();
 		}
@@ -90,7 +92,7 @@ public class StateDistribution extends _3DMicroDescription {
 		@Override
 		public void run() {
 			while (true) {
-				final List<Event> events = getEvents(size);
+				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
 				IState state;
@@ -126,6 +128,10 @@ public class StateDistribution extends _3DMicroDescription {
 		dm.start();
 		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers);
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -136,7 +142,7 @@ public class StateDistribution extends _3DMicroDescription {
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
@@ -152,6 +158,10 @@ public class StateDistribution extends _3DMicroDescription {
 		dm.start();
 		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -162,7 +172,7 @@ public class StateDistribution extends _3DMicroDescription {
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
@@ -180,18 +190,19 @@ public class StateDistribution extends _3DMicroDescription {
 		}
 	}
 	
-	
 	class CachedOcelotlThread extends OcelotlThread  {
 		
 		private HashMap<Long, List<TimeSlice>> timesliceIndex;
+		private IProgressMonitor monitor;
 
 		public CachedOcelotlThread(final int threadNumber, final int thread,
-				final int size, HashMap<Long, List<TimeSlice>> timesliceIndex) {
+				final int size, HashMap<Long, List<TimeSlice>> timesliceIndex, IProgressMonitor monitor) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			this.size = size;
 			this.timesliceIndex = timesliceIndex;
+			this.monitor = monitor;
 			
 			start();
 		}
@@ -199,10 +210,11 @@ public class StateDistribution extends _3DMicroDescription {
 		@Override
 		public void run() {
 			while (true) {
-				final List<Event> events = getEvents(size);
+				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
 				IState state;
+				long eventCount = 0;
 				// For each event
 				for (final Event event : events) {
 					// Convert to state
@@ -210,6 +222,12 @@ public class StateDistribution extends _3DMicroDescription {
 					// Get duration of the state for every time slice it is in
 					final Map<Long, Double> distrib = computeDistribution(state);
 					matrixUpdate(state, event.getEventProducer(), distrib);
+					eventCount++;
+					if (eventCount % 20 == 0) {
+						if (monitor.isCanceled()) {
+							return;
+						}
+					}
 				}
 			}
 		}
@@ -294,13 +312,20 @@ public class StateDistribution extends _3DMicroDescription {
 			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		if(monitor.isCanceled())
+			return;
 		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
-
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
+		
+		monitor.subTask("Fill the matrix");
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<CachedOcelotlThread> threadlist = new ArrayList<CachedOcelotlThread>();
-		monitor.subTask("Fill the matrix");
+
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new CachedOcelotlThread(
@@ -308,11 +333,13 @@ public class StateDistribution extends _3DMicroDescription {
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getEventsPerThread(),
-					timesliceIndex));
+					timesliceIndex, monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 
 		ocelotlQueries.closeIterator();
+		if(monitor.isCanceled())
+			return;
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}

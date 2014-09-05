@@ -178,7 +178,6 @@ public class QualityView {
 		rectangleText.setLayoutManager(layout);
 		rectangleText.setBackgroundColor(root.getBackgroundColor());
 		rectangleText.setForegroundColor(root.getBackgroundColor());
-
 	}
 
 	public void drawParam() {

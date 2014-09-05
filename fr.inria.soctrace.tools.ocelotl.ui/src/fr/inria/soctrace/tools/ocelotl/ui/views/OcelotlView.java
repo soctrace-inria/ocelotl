@@ -328,6 +328,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			} else {
 				textRun.setText("1.0");
 			}
+			oldParameters = new OcelotlParameters(ocelotlParameters);
 			setConfiguration();
 			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
@@ -338,21 +339,51 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					try {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
+								if (monitor.isCanceled()) {
+									restoreConfiguration();
+									synchronized (lock) {
+										running = false;
+									}
+									return Status.CANCEL_STATUS;
+								}
+									
+							
 								monitor.setTaskName("Init Time Operator");
 								ocelotlCore.initTimeOperator(monitor);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
+								if (monitor.isCanceled()) {
+									restoreConfiguration();
+									synchronized (lock) {
+										running = false;
+									}
+									return Status.CANCEL_STATUS;
+								}
 								monitor.setTaskName("Compute Qualities");
 								ocelotlCore.computeQualities(monitor);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
+								if (monitor.isCanceled()) {
+									restoreConfiguration();
+									synchronized (lock) {
+										running = false;
+									}
+									return Status.CANCEL_STATUS;
+								}
 								monitor.setTaskName("Compute Dichotomy");
 								ocelotlCore.computeDichotomy(monitor);
 							}
 						}
 
 						hasChanged = HasChanged.PARAMETER;
-
+						
+						if (monitor.isCanceled()) {
+							restoreConfiguration();
+							synchronized (lock) {
+								running = false;
+							}
+							return Status.CANCEL_STATUS;
+						}
 						monitor.setTaskName("Compute Parts");
 						// if (hasChanged == HasChanged.ALL || hasChanged ==
 						// HasChanged.NORMALIZE || hasChanged ==
@@ -763,6 +794,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button 						btnCacheEnabled;
 	private int 						TS=0;
 	private Snapshot 					snapshot;
+	private OcelotlParameters			oldParameters;
 	
 	/**
 	 * Followed topics
@@ -1345,6 +1377,19 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		} catch (final NumberFormatException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
+	}
+	
+	public void restoreConfiguration() {
+		ocelotlParameters.setTrace(oldParameters.getTrace());
+		ocelotlParameters.setNormalize(oldParameters.isNormalize());
+		ocelotlParameters.setTimeSlicesNumber(oldParameters.getTimeSlicesNumber());
+		ocelotlParameters.setTimeAggOperator(oldParameters.getTimeAggOperator());
+
+		ocelotlParameters.setThreshold(oldParameters.getThreshold());
+		ocelotlParameters.setParameter(oldParameters.getParameter());
+		ocelotlParameters.setTimeRegion(oldParameters.getTimeRegion());
+		hasChanged = HasChanged.ALL;
+
 	}
 
 	@Override
