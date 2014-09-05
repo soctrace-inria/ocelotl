@@ -1294,7 +1294,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		textRun.addModifyListener(new ParameterModifyListener());
 		scrolledComposite_1.setContent(group);
 		scrolledComposite_1.setMinSize(group.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashForm.setWeights(new int[] {193, 214, 38});
+		sashForm.setWeights(new int[] {190, 221, 34});
 		sashForm_1.setWeights(new int[] {635, 265});
 		sashFormGlobal.setWeights(new int[] { 395 });
 
