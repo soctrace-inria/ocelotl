@@ -62,13 +62,13 @@ public class ConfDataLoader {
 	private long					minTimestamp;
 	private long					maxTimestamp;
 	private List<AnalysisResult>	results;
-	public final static String 					STATE="STATE";
-	public final static String 					PUNCTUAL_EVENT="EVENT";
-	public final static String 					LINK="LINK";
-	public final static String 					VARIABLE="VARIABLE";
-	public final static String 					ALL="ALL";
-	
-	private static final Logger logger = LoggerFactory.getLogger(ConfDataLoader.class);
+	public final static String		STATE			= "STATE";
+	public final static String		PUNCTUAL_EVENT	= "EVENT";
+	public final static String		LINK			= "LINK";
+	public final static String		VARIABLE		= "VARIABLE";
+	public final static String		ALL				= "ALL";
+
+	private static final Logger		logger			= LoggerFactory.getLogger(ConfDataLoader.class);
 
 	/** The constructor. */
 	public ConfDataLoader() {
@@ -106,9 +106,9 @@ public class ConfDataLoader {
 		final List<ISearchable> search = data.getElements();
 		final List<Integer> id = new ArrayList<Integer>();
 		final List<EventProducer> prodFromResult = new ArrayList<EventProducer>();
-		for (final ISearchable s: search)
+		for (final ISearchable s : search)
 			id.add(s.getId());
-		for (final EventProducer ep: producers)
+		for (final EventProducer ep : producers)
 			if (id.contains(ep.getId()))
 				prodFromResult.add(ep);
 		return prodFromResult;
@@ -155,8 +155,8 @@ public class ConfDataLoader {
 		final TraceQuery tQuery = new TraceQuery(sysDB);
 		traces = tQuery.getList();
 		sysDB.close();
-		
-		//Sort alphabetically
+
+		// Sort alphabetically
 		Collections.sort(traces, new Comparator<Trace>() {
 			@Override
 			public int compare(final Trace arg0, final Trace arg1) {
@@ -165,13 +165,16 @@ public class ConfDataLoader {
 		});
 		return traces;
 	}
-	
+
 	/**
 	 * Check if the loaded trace has events of a specific category
-	 * @param must be one of the constant defining a category in {@link EventCategory}
-	 * (i.e. STATE, LINK, VARIABLE, PUNCTUAL_EVENT)
-	 * @return true if the trace contains at least one event type 
-	 * belonging to the category  
+	 * 
+	 * @param aCategory
+	 *            must be one of the constant defining a category in
+	 *            {@link EventCategory} (i.e. STATE, LINK, VARIABLE,
+	 *            PUNCTUAL_EVENT)
+	 * @return true if the trace contains at least one event type belonging to
+	 *         the category
 	 */
 	public boolean hasEventOfCategory(int aCategory) {
 		for (EventType anEventType : getTypes()) {

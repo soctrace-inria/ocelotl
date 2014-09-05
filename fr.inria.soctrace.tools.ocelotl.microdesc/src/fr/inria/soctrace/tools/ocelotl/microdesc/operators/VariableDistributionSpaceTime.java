@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +43,9 @@ import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
 public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
-	private static final Logger logger = LoggerFactory.getLogger(VariableDistributionSpaceTime.class);
-	
-	
+	private static final Logger logger = LoggerFactory
+			.getLogger(VariableDistributionSpaceTime.class);
+
 	class OcelotlThread extends Thread {
 
 		List<EventProducer> eventProducers;
@@ -62,12 +63,11 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 			start();
 		}
 
-		private void matrixUpdate(final IVariable Variable, final EventProducer ep,
-				final Map<Long, Double> distrib) {
+		private void matrixUpdate(final IVariable Variable,
+				final EventProducer ep, final Map<Long, Double> distrib) {
 			synchronized (matrix) {
 				if (!matrix.get(0).get(ep).containsKey(Variable.getType())) {
-					logger.debug("Adding " + Variable.getType()
-							+ " Variable");
+					logger.debug("Adding " + Variable.getType() + " Variable");
 					// addKey(Variable.getVariableType());
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr)
@@ -102,21 +102,24 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 		super();
 	}
 
-	public VariableDistributionSpaceTime(final OcelotlParameters parameters)
-			throws SoCTraceException, OcelotlException {
-		super(parameters);
+	public VariableDistributionSpaceTime(final OcelotlParameters parameters,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		super(parameters, monitor);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query variables");
 		eventIterator = ocelotlQueries.getVariableIterator(eventProducers);
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
-		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
@@ -131,18 +134,18 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 		dm.end("VECTORS COMPUTATION : "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
+
 	@Override
 	protected void computeSubMatrix(List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		eventIterator = ocelotlQueries.getVariableIterator(eventProducers, time);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
+		monitor.subTask("Query variables");
+		eventIterator = ocelotlQueries
+				.getVariableIterator(eventProducers, time);
 		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
-		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)

@@ -22,6 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,19 +113,19 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		super();
 	}
 
-	public EventDistributionSpaceTime(final OcelotlParameters parameters)
+	public EventDistributionSpaceTime(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
-		super(parameters);
+		super(parameters, monitor);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query events");
 		eventIterator = ocelotlQueries.getEventIterator(eventProducers);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -141,16 +142,15 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
+
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query events");
 		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();

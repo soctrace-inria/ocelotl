@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,19 +104,19 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		super();
 	}
 
-	public StateDistributionSpaceTime(final OcelotlParameters parameters)
-			throws SoCTraceException, OcelotlException {
-		super(parameters);
+	public StateDistributionSpaceTime(final OcelotlParameters parameters,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		super(parameters, monitor);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -135,13 +136,11 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();

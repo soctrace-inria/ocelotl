@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,21 +103,21 @@ public class VariableDistribution extends _3DMicroDescription {
 		super();
 	}
 
-	public VariableDistribution(final OcelotlParameters parameters)
-			throws SoCTraceException, OcelotlException {
-		super(parameters);
+	public VariableDistribution(final OcelotlParameters parameters,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		super(parameters, monitor);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		eventIterator = ocelotlQueries.getVariableIterator(eventProducers);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
 		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
-		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
@@ -131,11 +132,11 @@ public class VariableDistribution extends _3DMicroDescription {
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
+
 	@Override
 	protected void computeSubMatrix(List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		eventIterator = ocelotlQueries.getVariableIterator(eventProducers, time);

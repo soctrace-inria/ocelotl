@@ -14,6 +14,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -539,6 +540,51 @@ public class DataCache {
 	}
 
 	/**
+	 * Check that every cache file have a corresponding trace in the database,
+	 * and if not then delete the cache file
+	 * 
+	 * @param traces
+	 *            list of the traces in the database
+	 */
+	public void removeDeletedTraces(List<Trace> traces) {
+		List<CacheParameters> deletedCache = new ArrayList<CacheParameters>();
+
+		for (CacheParameters aCache : cachedData.keySet()) {
+			boolean deleted = true;
+
+			// Check if the corresponding trace still exists
+			for (Trace aTrace : traces) {
+				if (aCache.getTraceID() == aTrace.getId()) {
+					deleted = false;
+					break;
+				}
+			}
+
+			// If not delete the cache file
+			if (deleted) {
+				logger.debug("DataCache: The trace "
+						+ aCache.getTraceName()
+						+ " (ID = "
+						+ aCache.getTraceID()
+						+ ") is no longer in the database: the corresponding cache file will be deleted.");
+				if (!cachedData.get(aCache).delete()) {
+					logger.debug("DataCache: Deletion of cache file "
+							+ cachedData.get(aCache).getName() + " failed.");
+				}
+				deletedCache.add(aCache);
+			}
+		}
+
+		// Remove the deleted cache
+		for (CacheParameters aCache : deletedCache) {
+			cachedData.remove(aCache);
+		}
+
+		// Recompute the current cache size
+		computeCacheSize();
+	}
+
+	/**
 	 * Try parsing the parameters from the given file
 	 * 
 	 * @param aCachefile
@@ -655,7 +701,7 @@ public class DataCache {
 			currentCacheSize = currentCacheSize + aCacheFile.length();
 		}
 
-		logger.debug("Size of the current cache: " + currentCacheSize);
+		logger.debug("Size of the current cache is: " + currentCacheSize + " bytes.");
 	}
 
 	/**

@@ -22,6 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public void computeDichotomy() {
+	public void computeDichotomy(IProgressMonitor monitor) {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(),
@@ -59,7 +60,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public void computeParts() {
+	public void computeParts(IProgressMonitor monitor) {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeParts(ocelotlParameters.getParameter());
@@ -81,7 +82,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public void computeQualities() {
+	public void computeQualities(IProgressMonitor monitor) {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeQualities(ocelotlParameters.isNormalize());
@@ -150,7 +151,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public abstract void reset() throws OcelotlException;
+	public abstract void reset(IProgressMonitor monitor) throws OcelotlException;
 
 	@Override
 	public EventProducerHierarchy getHierarchy() {

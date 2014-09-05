@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import fr.inria.lpaggreg.spacetime.JNISpaceTimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -35,10 +37,10 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	_2DSpaceTimeMicroDescription matrix;
 
 	public SpaceTimeAggregation2Manager(
-			_2DSpaceTimeMicroDescription _2dSpaceTimeMicroDescription) throws OcelotlException {
+			_2DSpaceTimeMicroDescription _2dSpaceTimeMicroDescription, IProgressMonitor monitor) throws OcelotlException {
 		super(_2dSpaceTimeMicroDescription.getOcelotlParameters());
 		matrix = _2dSpaceTimeMicroDescription;
-		reset();
+		reset(monitor);
 	}
 
 	@Override
@@ -99,7 +101,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	}
 
 	@Override
-	public void reset() throws OcelotlException {
+	public void reset(IProgressMonitor monitor) throws OcelotlException {
 		setHierarchy();
 		if (OcelotlParameters.isJniFlag())
 			timeAggregation = new JNISpaceTimeAggregation2();

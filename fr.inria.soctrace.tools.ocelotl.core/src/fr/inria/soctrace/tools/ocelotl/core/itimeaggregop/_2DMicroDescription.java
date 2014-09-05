@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,11 +49,11 @@ public abstract class _2DMicroDescription extends
 		super();
 	}
 
-	public _2DMicroDescription(final OcelotlParameters parameters)
+	public _2DMicroDescription(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
 		super();
 		try {
-			setOcelotlParameters(parameters);
+			setOcelotlParameters(parameters, monitor);
 		} catch (final InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -60,7 +61,7 @@ public abstract class _2DMicroDescription extends
 	}
 
 	@Override
-	public void computeMatrix() throws SoCTraceException, OcelotlException,
+	public void computeMatrix(IProgressMonitor monitor) throws SoCTraceException, OcelotlException,
 			InterruptedException {
 		eventsNumber = 0;
 		final DeltaManager dmt = new DeltaManagerOcelotl();
@@ -68,7 +69,7 @@ public abstract class _2DMicroDescription extends
 		final int epsize = getOcelotlParameters().getEventProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0
 				|| epsize < getOcelotlParameters().getMaxEventProducers())
-			computeSubMatrix(getOcelotlParameters().getEventProducers());
+			computeSubMatrix(getOcelotlParameters().getEventProducers(), monitor);
 		else {
 			final List<EventProducer> producers = getOcelotlParameters()
 					.getEventProducers().size() == 0 ? ocelotlQueries
@@ -77,7 +78,7 @@ public abstract class _2DMicroDescription extends
 			for (int i = 0; i < epsize; i = i
 					+ getOcelotlParameters().getMaxEventProducers())
 				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i
-						+ getOcelotlParameters().getMaxEventProducers())));
+						+ getOcelotlParameters().getMaxEventProducers())), monitor);
 
 		}
 
@@ -86,8 +87,8 @@ public abstract class _2DMicroDescription extends
 	}
 
 	@Override
-	public TimeAggregation2Manager createManager() {
-		return new TimeAggregation2Manager(this);
+	public TimeAggregation2Manager createManager(IProgressMonitor monitor) {
+		return new TimeAggregation2Manager(this, monitor);
 
 	}
 

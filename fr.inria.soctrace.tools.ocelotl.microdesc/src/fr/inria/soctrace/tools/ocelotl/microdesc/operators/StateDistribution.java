@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,22 +113,23 @@ public class StateDistribution extends _3DMicroDescription {
 		super();
 	}
 
-	public StateDistribution(final OcelotlParameters parameters)
+	public StateDistribution(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
-		super(parameters);
+		super(parameters, monitor);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(
@@ -144,16 +146,16 @@ public class StateDistribution extends _3DMicroDescription {
 	
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(
@@ -287,15 +289,18 @@ public class StateDistribution extends _3DMicroDescription {
 	@Override
 	protected void computeDirtyCacheMatrix(
 			final List<EventProducer> eventProducers, List<IntervalDesc> time,
-			HashMap<Long, List<TimeSlice>> timesliceIndex)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+			HashMap<Long, List<TimeSlice>> timesliceIndex,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
 
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<CachedOcelotlThread> threadlist = new ArrayList<CachedOcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new CachedOcelotlThread(

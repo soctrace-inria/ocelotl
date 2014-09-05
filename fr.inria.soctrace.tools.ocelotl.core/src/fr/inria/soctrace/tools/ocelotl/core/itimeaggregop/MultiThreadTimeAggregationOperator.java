@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,22 +65,22 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected OcelotlQueries ocelotlQueries;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
 	
-	abstract protected void computeMatrix() throws SoCTraceException,
+	abstract protected void computeMatrix(IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException;
 
 	abstract protected void computeSubMatrix(
-			final List<EventProducer> eventProducers) throws SoCTraceException,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException;
 	
 	abstract protected void computeSubMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time)
+			final List<EventProducer> eventProducers, List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException;
 
 	protected void computeDirtyCacheMatrix(
 			final List<EventProducer> eventProducers, List<IntervalDesc> time,
-			HashMap<Long, List<TimeSlice>> timesliceIndex)
+			HashMap<Long, List<TimeSlice>> timesliceIndex, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
-		computeSubMatrix(eventProducers, time);
+		computeSubMatrix(eventProducers, time, monitor);
 	}
 
 	/**
@@ -150,7 +151,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	abstract protected void initVectors() throws SoCTraceException;
 
-	public void setOcelotlParameters(final OcelotlParameters parameters)
+	public void setOcelotlParameters(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		this.parameters = parameters;
 		count = 0;
@@ -166,20 +167,24 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 			// If a valid cache file was found
 			if (cacheFile != null) {
-				loadFromCache(cacheFile);
+				monitor.setTaskName("Loading data from cache");
+				loadFromCache(cacheFile, monitor);
 			} else {
-				computeMatrix();
+				monitor.setTaskName("Loading data from database");
+				computeMatrix(monitor);
 
 				if (eventsNumber == 0)
 					throw new OcelotlException(OcelotlException.NO_EVENTS);
 
 				// Save the newly computed matrix + parameters
 				dm.start();
+				monitor.subTask("Saving matrix in the cache.");
 				saveMatrix();
 				dm.end("DATACACHE - Save the matrix to cache");
 			}
 		} else {
-			computeMatrix();
+			monitor.setTaskName("Loading data from database");
+			computeMatrix(monitor);
 
 			if (eventsNumber == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENTS);
@@ -252,7 +257,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// Close the fd
 			writer.flush();
 			writer.close();
-
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -272,7 +276,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 *            the cache file
 	 * @throws OcelotlException 
 	 */
-	public void loadFromCache(File aCacheFile) throws OcelotlException {
+	public void loadFromCache(File aCacheFile, IProgressMonitor monitor) throws OcelotlException {
 		try {
 			dm = new DeltaManagerOcelotl();
 			dm.start();
@@ -299,10 +303,12 @@ public abstract class MultiThreadTimeAggregationOperator {
 			
 			// Check how to rebuild the matrix
 			if (parameters.getDataCache().isRebuildDirty()) {
-				rebuildDirtyMatrix(aCacheFile, eventProducers);
+				monitor.setTaskName("Rebuilding with strategy " + parameters.getDataCache().getBuildingStrategy());
+				rebuildDirtyMatrix(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache (dirty)");
 			} else {
-				rebuildNormalMatrix(aCacheFile, eventProducers);
+				monitor.setTaskName("Rebuilding with cache data");
+				rebuildNormalMatrix(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache");
 
 			}
@@ -318,10 +324,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 	}
 
 	public void rebuildNormalMatrix(File aCacheFile,
-			HashMap<String, EventProducer> eventProducers) throws IOException {
+			HashMap<String, EventProducer> eventProducers, IProgressMonitor monitor) throws IOException {
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
 
+		monitor.subTask("Filling matrix with cache data");
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
@@ -352,7 +359,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * @throws IOException
 	 */
 	public void rebuildDirtyMatrix(File aCacheFile,
-			HashMap<String, EventProducer> eventProducers) throws IOException {
+			HashMap<String, EventProducer> eventProducers, IProgressMonitor monitor) throws IOException {
 
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
@@ -417,8 +424,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// slices to rebuild the matrix
 		if (parameters.getDataCache().getBuildingStrategy() == DatacacheStrategy.DATACACHE_DATABASE) {
 			try {
+				monitor.subTask("Fetching dirty data from database");
 				computeDirtyCacheMatrix(new ArrayList<EventProducer>(
-						eventProducers.values()), times, timesliceIndex);
+						eventProducers.values()), times, timesliceIndex, monitor);
 			} catch (SoCTraceException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -438,6 +446,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// Get header
 		line = bufFileReader.readLine();
 
+		monitor.subTask("Filling the matrix with cache data");
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);

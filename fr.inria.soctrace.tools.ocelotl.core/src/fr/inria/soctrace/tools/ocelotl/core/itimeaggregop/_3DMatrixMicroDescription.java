@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public abstract class _3DMatrixMicroDescription extends
 	}
 
 	@Override
-	public void computeMatrix() throws SoCTraceException, OcelotlException,
+	public void computeMatrix(IProgressMonitor monitor) throws SoCTraceException, OcelotlException,
 			InterruptedException {
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManagerOcelotl();
@@ -37,7 +38,7 @@ public abstract class _3DMatrixMicroDescription extends
 		final int epsize = getOcelotlParameters().getEventProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0
 				|| epsize < getOcelotlParameters().getMaxEventProducers())
-			computeSubMatrix(getOcelotlParameters().getEventProducers());
+			computeSubMatrix(getOcelotlParameters().getEventProducers(), monitor);
 		else {
 			final List<EventProducer> producers = getOcelotlParameters()
 					.getEventProducers().size() == 0 ? ocelotlQueries
@@ -46,7 +47,7 @@ public abstract class _3DMatrixMicroDescription extends
 			for (int i = 0; i < epsize; i = i
 					+ getOcelotlParameters().getMaxEventProducers())
 				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i
-						+ getOcelotlParameters().getMaxEventProducers())));
+						+ getOcelotlParameters().getMaxEventProducers())), monitor);
 		}
 
 		dm.end("TOTAL (QUERIES + COMPUTATION): " + epsize

@@ -306,7 +306,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
 				return;
 			}
-					
+
 			// Mutex zone
 			synchronized (lock) {
 				// If a job is already running
@@ -322,13 +322,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				// else we are starting a job
 				running = true;
 			}
-			
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
-			{
+
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER) {
 				hasChanged = HasChanged.PARAMETER;
-			}
-			else
-			{
+			} else {
 				textRun.setText("1.0");
 			}
 			setConfiguration();
@@ -338,23 +335,31 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
-                    try {
+					try {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
-								ocelotlCore.initTimeOperator();
+								monitor.setTaskName("Init Time Operator");
+								ocelotlCore.initTimeOperator(monitor);
 							}
-							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE)
-								ocelotlCore.computeQualities();
-
-							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD)
-								ocelotlCore.computeDichotomy();
+							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
+								monitor.setTaskName("Compute Qualities");
+								ocelotlCore.computeQualities(monitor);
+							}
+							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
+								monitor.setTaskName("Compute Dichotomy");
+								ocelotlCore.computeDichotomy(monitor);
+							}
 						}
 
 						hasChanged = HasChanged.PARAMETER;
-						
-						//if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.PARAMETER)
-						ocelotlCore.computeParts();
-					
+
+						monitor.setTaskName("Compute Parts");
+						// if (hasChanged == HasChanged.ALL || hasChanged ==
+						// HasChanged.NORMALIZE || hasChanged ==
+						// HasChanged.PARAMETER)
+						// new ComputePartWrapper(monitor, ocelotlCore);
+						ocelotlCore.computeParts(monitor);
+
 					} catch (final OcelotlException e) {
 						monitor.done();
 						Display.getDefault().syncExec(new Runnable() {
@@ -380,18 +385,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							qualityView.createDiagram();
-							
+
 							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 						}
 					});
-				
+
 					synchronized (lock) {
 						running = false;
 					}
-					return Status.OK_STATUS;	
+					return Status.OK_STATUS;
 				}
 			};
-			job.setUser(true);	
+			job.setUser(true);
 			job.schedule();
 
 		}
@@ -1319,7 +1324,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			traceMap.put(index, t);
 			index++;
 		}
-		;
+
+		ocelotlParameters.getDataCache().removeDeletedTraces(confDataLoader.getTraces());	
 	}
 
 	public void setComboAggregationOperator(final Combo comboAggregationOperator) {
@@ -1368,6 +1374,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		// Init operator specific configuration
 		ocelotlParameters.getTraceTypeConfig().init();
 		
+		// Set a list of all the events
 		ocelotlParameters.setAllEventTypes(confDataLoader.getTypes());
 
 		if (ocelotlParameters.getEventProducers().isEmpty())
