@@ -335,7 +335,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
-					monitor.beginTask(title, IProgressMonitor.UNKNOWN);
+					monitor.beginTask(title, 4);
 					try {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
@@ -347,9 +347,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									return Status.CANCEL_STATUS;
 								}
 									
-							
 								monitor.setTaskName("Init Time Operator");
 								ocelotlCore.initTimeOperator(monitor);
+								monitor.worked(1);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
 								if (monitor.isCanceled()) {
@@ -361,6 +361,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								}
 								monitor.setTaskName("Compute Qualities");
 								ocelotlCore.computeQualities(monitor);
+								monitor.worked(1);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
 								if (monitor.isCanceled()) {
@@ -372,6 +373,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								}
 								monitor.setTaskName("Compute Dichotomy");
 								ocelotlCore.computeDichotomy(monitor);
+								monitor.worked(1);
 							}
 						}
 
@@ -390,6 +392,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						// HasChanged.PARAMETER)
 						// new ComputePartWrapper(monitor, ocelotlCore);
 						ocelotlCore.computeParts(monitor);
+						monitor.worked(1);
 
 					} catch (final OcelotlException e) {
 						monitor.done();
@@ -467,6 +470,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			hasChanged = HasChanged.ALL;
 			ocelotlParameters.getEventProducers().clear();
 			ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
+			// Set a list of all the events
+			ocelotlParameters.setAllEventTypes(confDataLoader.getTypes(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getEventCategory()));
 			spinnerTSNumber.setSelection(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getTs());
 			
 			// Get the available visualizations
@@ -1386,6 +1391,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());
 			ocelotlParameters.setTimeRegion(new TimeRegion(Long.valueOf(textTimestampStart.getText()), Long.valueOf(textTimestampEnd.getText())));
+			// Set a list of all the events
 		} catch (final NumberFormatException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
@@ -1430,9 +1436,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		// Init operator specific configuration
 		ocelotlParameters.getTraceTypeConfig().init();
-		
-		// Set a list of all the events
-		ocelotlParameters.setAllEventTypes(confDataLoader.getTypes());
 
 		if (ocelotlParameters.getEventProducers().isEmpty())
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());

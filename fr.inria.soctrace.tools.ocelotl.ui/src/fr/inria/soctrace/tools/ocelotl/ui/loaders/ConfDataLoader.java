@@ -46,6 +46,7 @@ import fr.inria.soctrace.lib.search.utils.Printer;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorResource;
 
 /**
  * Convenience class to load Trace data related to LPAggreg configuration.
@@ -208,6 +209,39 @@ public class ConfDataLoader {
 		if (!category.isEmpty())
 			category.add(ALL);
 		return category;
+	}
+
+	public List<EventType> getTypes(List<String> eventCategory) {
+		List<EventType> nlist = new ArrayList<EventType>();
+		for (String c :eventCategory){
+			if (c==ALL){
+				return getTypes();
+			}
+		}
+		for (EventType et:getTypes()){
+			for (String c :eventCategory){
+				if (c.equals(STATE) && et.getCategory()==EventCategory.STATE){
+					nlist.add(et);
+					break;
+				}
+				if (c.equals(PUNCTUAL_EVENT) && et.getCategory()==EventCategory.PUNCTUAL_EVENT){
+					nlist.add(et);
+					break;
+				}
+				if (c.equals(VARIABLE) && et.getCategory()==EventCategory.VARIABLE){
+					nlist.add(et);
+					break;
+				}
+				if (c.equals(LINK) && et.getCategory()==EventCategory.LINK){
+					nlist.add(et);
+					break;
+				}
+				
+			}
+			
+		}
+		return nlist;
+	
 	}
 
 }
