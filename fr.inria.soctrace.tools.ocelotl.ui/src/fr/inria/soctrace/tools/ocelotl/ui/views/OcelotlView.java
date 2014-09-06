@@ -1386,6 +1386,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setNormalize(btnNormalize.getSelection());
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
+		ocelotlParameters.setSpaceAggOperator(comboSpace.getText());
 		try {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());
@@ -1401,7 +1402,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setNormalize(oldParameters.isNormalize());
 		ocelotlParameters.setTimeSlicesNumber(oldParameters.getTimeSlicesNumber());
 		ocelotlParameters.setTimeAggOperator(oldParameters.getTimeAggOperator());
-
 		ocelotlParameters.setThreshold(oldParameters.getThreshold());
 		ocelotlParameters.setParameter(oldParameters.getParameter());
 		ocelotlParameters.setTimeRegion(oldParameters.getTimeRegion());
