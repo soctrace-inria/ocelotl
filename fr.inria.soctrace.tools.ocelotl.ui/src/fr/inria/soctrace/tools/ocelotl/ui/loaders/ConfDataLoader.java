@@ -226,22 +226,23 @@ public class ConfDataLoader {
 
 	public List<EventType> getTypes(List<String> eventCategory) {
 
+		List<EventType> nlist = new ArrayList<EventType>();
 		for (String c :eventCategory){
-			if (c==ALL){
-				return getTypes();
+			if (c.equals(ALL)){
+				nlist.addAll(getTypes());
+				return nlist;
 			}
 		}
-		List<EventType> nlist = new ArrayList<EventType>();
-			for (String c :eventCategory){
-				if (c.equals(PUNCTUAL_EVENT))
-					nlist.addAll(typesByCat.get(EventCategory.PUNCTUAL_EVENT));
-				if (c.equals(STATE))
-					nlist.addAll(typesByCat.get(EventCategory.STATE));
-				if (c.equals(LINK))
-					nlist.addAll(typesByCat.get(EventCategory.LINK));
-				if (c.equals(VARIABLE))
-					nlist.addAll(typesByCat.get(EventCategory.VARIABLE));
-			}
+		for (String c :eventCategory){
+			if (c.equals(PUNCTUAL_EVENT))
+				nlist.addAll(typesByCat.get(EventCategory.PUNCTUAL_EVENT));
+			if (c.equals(STATE))
+				nlist.addAll(typesByCat.get(EventCategory.STATE));
+			if (c.equals(LINK))
+				nlist.addAll(typesByCat.get(EventCategory.LINK));
+			if (c.equals(VARIABLE))
+				nlist.addAll(typesByCat.get(EventCategory.VARIABLE));
+		}
 		return nlist;
 	}
 	
