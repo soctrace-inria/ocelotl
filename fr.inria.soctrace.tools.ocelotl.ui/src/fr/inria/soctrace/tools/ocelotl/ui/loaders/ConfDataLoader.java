@@ -60,6 +60,7 @@ public class ConfDataLoader {
 	private List<Trace>				traces;
 	private List<EventProducer>		producers;
 	private List<EventType>			types;
+	private List<List<EventType> >	typesByCat;
 	private long					minTimestamp;
 	private long					maxTimestamp;
 	private List<AnalysisResult>	results;
@@ -68,7 +69,8 @@ public class ConfDataLoader {
 	public final static String		LINK			= "LINK";
 	public final static String		VARIABLE		= "VARIABLE";
 	public final static String		ALL				= "ALL";
-
+	public final static int[] category = {EventCategory.PUNCTUAL_EVENT, EventCategory.STATE, EventCategory.LINK, EventCategory.VARIABLE};
+	
 	private static final Logger		logger			= LoggerFactory.getLogger(ConfDataLoader.class);
 
 	/** The constructor. */
@@ -143,6 +145,7 @@ public class ConfDataLoader {
 		producers = pQuery.getList();
 		final EventTypeQuery tQuery = new EventTypeQuery(traceDB);
 		types = tQuery.getList();
+		setSubTypes();
 		minTimestamp = Math.max(0, traceDB.getMinTimestamp());
 		maxTimestamp = Math.max(0, traceDB.getMaxTimestamp());
 		final AnalysisResultQuery aQuery = new AnalysisResultQuery(traceDB);
@@ -210,38 +213,51 @@ public class ConfDataLoader {
 			category.add(ALL);
 		return category;
 	}
+	
+	private void setSubTypes(){
+		typesByCat=new ArrayList<List<EventType>>();
+		for (int i=0; i<category.length; i++){
+			typesByCat.add(new ArrayList<EventType>());
+		}
+		for (EventType et: types){
+			typesByCat.get(et.getCategory()).add(et);
+		}
+	}
 
 	public List<EventType> getTypes(List<String> eventCategory) {
-		List<EventType> nlist = new ArrayList<EventType>();
+
 		for (String c :eventCategory){
 			if (c==ALL){
 				return getTypes();
 			}
 		}
-		for (EventType et:getTypes()){
+		List<EventType> nlist = new ArrayList<EventType>();
 			for (String c :eventCategory){
-				if (c.equals(STATE) && et.getCategory()==EventCategory.STATE){
-					nlist.add(et);
-					break;
-				}
-				if (c.equals(PUNCTUAL_EVENT) && et.getCategory()==EventCategory.PUNCTUAL_EVENT){
-					nlist.add(et);
-					break;
-				}
-				if (c.equals(VARIABLE) && et.getCategory()==EventCategory.VARIABLE){
-					nlist.add(et);
-					break;
-				}
-				if (c.equals(LINK) && et.getCategory()==EventCategory.LINK){
-					nlist.add(et);
-					break;
-				}
-				
+				if (c.equals(PUNCTUAL_EVENT))
+					nlist.addAll(typesByCat.get(EventCategory.PUNCTUAL_EVENT));
+				if (c.equals(STATE))
+					nlist.addAll(typesByCat.get(EventCategory.STATE));
+				if (c.equals(LINK))
+					nlist.addAll(typesByCat.get(EventCategory.LINK));
+				if (c.equals(VARIABLE))
+					nlist.addAll(typesByCat.get(EventCategory.VARIABLE));
 			}
-			
-		}
 		return nlist;
+	}
 	
+	public List<EventType> getTypes (int cat){
+		return typesByCat.get(cat);
+	}
+	
+	public List<EventType> getTypes (String cat){
+		ArrayList<String> str = new ArrayList<String>();
+		return getTypes(str);
 	}
 
+	public List<List<EventType>> getTypesByCat() {
+		return typesByCat;
+	}
+
+	
+	
 }

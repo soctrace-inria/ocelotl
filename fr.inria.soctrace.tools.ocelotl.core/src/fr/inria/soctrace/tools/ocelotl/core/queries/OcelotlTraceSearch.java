@@ -29,7 +29,6 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.query.ValueListString;
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.ComparisonOperation;
 import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.LogicalOperation;
-import fr.inria.soctrace.lib.query.conditions.ConditionsConstants.OrderBy;
 import fr.inria.soctrace.lib.query.conditions.LogicalCondition;
 import fr.inria.soctrace.lib.query.conditions.SimpleCondition;
 import fr.inria.soctrace.lib.search.TraceSearch;
@@ -37,10 +36,20 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public class OcelotlTraceSearch extends TraceSearch {
+	
+	OcelotlParameters parameters;
+	
+	
+
+	public OcelotlTraceSearch(OcelotlParameters parameters) {
+		super();
+		this.parameters = parameters;
+	}
 
 	@SuppressWarnings("unused")
 	private LogicalCondition buildIntervalCondition(final IntervalDesc interval) {
@@ -83,29 +92,35 @@ public class OcelotlTraceSearch extends TraceSearch {
 			OcelotlException {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
-		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+		//final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 		final LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
+		ConditionManager conditionManager = new ConditionManager();
+		
 
 		// If we filter the event types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
+			if (eventTypes.size()!=parameters.getAllEventTypes().size()){
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
-			and.addCondition(new SimpleCondition("EVENT_TYPE_ID",
+			conditionManager.addCondition(new SimpleCondition("EVENT_TYPE_ID",
 					ComparisonOperation.IN, vls.getValueString()));
+			}
 		}
 
 		// If we filter the eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
+			if (eventProducers.size()!=parameters.getAllEventProducers().size()){
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));
-			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID",
+			conditionManager.addCondition(new SimpleCondition("EVENT_PRODUCER_ID",
 					ComparisonOperation.IN, vls.getValueString()));
+			}
 		}
 
 		// If we filter based on the timestamps
@@ -138,7 +153,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 					{
 						andTimeStamps.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, String.valueOf(1)));
 					}
-					and.addCondition(andTimeStamps);
+					conditionManager.addCondition(andTimeStamps);
 				}
 				else
 				{ 
@@ -154,14 +169,10 @@ public class OcelotlTraceSearch extends TraceSearch {
 			
 			if(or.getNumberOfConditions() > 1)
 			{
-				and.addCondition(or);
+				conditionManager.addCondition(or);
 			}
 		}
-
-		if (and.getNumberOfConditions() == 1)
-		and.addCondition(new SimpleCondition("'1'", ComparisonOperation.EQ, String.valueOf(1)));
-		if (and.getNumberOfConditions() >= 2)
-			query.setElementWhere(and);
+		conditionManager.setWhere(query);
 		//query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
 		return query.getIterator();
@@ -174,29 +185,40 @@ public class OcelotlTraceSearch extends TraceSearch {
 			throws SoCTraceException, OcelotlException {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
-		final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
+		ConditionManager conditionManager = new ConditionManager();
+		//final LogicalCondition and = new LogicalCondition(LogicalOperation.AND);
 		final LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
 
 		// types
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
+			if (eventTypes.size()!=parameters.getAllEventTypes().size()){
+					if (eventTypes.containsAll(parameters.getCatEventTypes().get(aCategory))){
+						conditionManager.addCondition(new SimpleCondition("CATEGORY",
+					ComparisonOperation.EQ, String.valueOf(aCategory)));
+					}
+			else{
 			final ValueListString vls = new ValueListString();
 			for (final EventType et : eventTypes)
 				vls.addValue(String.valueOf(et.getId()));
-			and.addCondition(new SimpleCondition("EVENT_TYPE_ID",
+			conditionManager.addCondition(new SimpleCondition("EVENT_TYPE_ID",
 					ComparisonOperation.IN, vls.getValueString()));
+			}
+			}
 		}
 
 		// eventProducers
 		if (eventProducers != null) {
 			if (eventProducers.size() == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
+			if (eventProducers.size()!=parameters.getAllEventProducers().size()){
 			final ValueListString vls = new ValueListString();
 			for (final EventProducer ep : eventProducers)
 				vls.addValue(String.valueOf(ep.getId()));
-			and.addCondition(new SimpleCondition("EVENT_PRODUCER_ID",
+			conditionManager.addCondition(new SimpleCondition("EVENT_PRODUCER_ID",
 					ComparisonOperation.IN, vls.getValueString()));
+			}
 		}
 
 		// intervals
@@ -238,7 +260,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 				}
 				if (t1 == null && t2 != null)
 					if (intervals.size() == 1)
-						and.addCondition(t2);
+						conditionManager.addCondition(t2);
 					else
 						or.addCondition(t2);
 
@@ -248,7 +270,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 					andd.addCondition(d2);
 					ort.addCondition(andd);
 					if (intervals.size() == 1)
-						and.addCondition(ort);
+						conditionManager.addCondition(ort);
 					else
 						or.addCondition(ort);
 
@@ -260,20 +282,16 @@ public class OcelotlTraceSearch extends TraceSearch {
 					andd.addCondition(d2);
 					ort.addCondition(andd);
 					if (intervals.size() == 1)
-						and.addCondition(ort);
+						conditionManager.addCondition(ort);
 					else
 						or.addCondition(ort);
 				}
 			}
 			if (or.getNumberOfConditions() > 1) {
-				and.addCondition(or);
+				conditionManager.addCondition(or);
 			}
 		}
-		if (and.getNumberOfConditions() == 1)
-			and.addCondition(new SimpleCondition("CATEGORY",
-					ComparisonOperation.EQ, String.valueOf(aCategory)));
-		if (and.getNumberOfConditions() >= 2)
-			query.setElementWhere(and);
+		conditionManager.setWhere(query);
 		//query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
 		return query.getIterator();

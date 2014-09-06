@@ -24,33 +24,24 @@ import java.util.ArrayList;
 import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.lib.model.EventType;
+import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 
-public abstract class TypeDistributionView extends DistributionBaseView {
+public class TypeDistributionView extends DistributionBaseView {
 
 	public TypeDistributionView(final Shell shell) {
 		super(shell);
 	}
-	
-	abstract int getType();
 
 	@Override
 	public void setParameters() {
 		if (config.getTypes().isEmpty())
-			for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes()
-					.size(); i++)
-				if (ocelotlView.getConfDataLoader().getTypes().get(i)
-						.getCategory() == getType())
-					config.getTypes().add(
-							ocelotlView.getConfDataLoader().getTypes().get(i));
-		
+			config.getTypes().addAll(ocelotlView.getParams().getOperatorEventTypes());	
 	}
 
 	@Override
 	protected java.util.List<EventType> getEventTypes() {
 		java.util.List<EventType> types = new ArrayList<EventType>();
-		for (int i = 0; i < ocelotlView.getConfDataLoader().getTypes().size(); i++)
-			if (ocelotlView.getConfDataLoader().getTypes().get(i).getCategory() == getType())
-				types.add(ocelotlView.getConfDataLoader().getTypes().get(i));
+		types.addAll(ocelotlView.getParams().getOperatorEventTypes());	
 		return types;
 	}
 }

@@ -42,6 +42,9 @@ public class OcelotlParameters {
 	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
 	private List<EventType> eventTypes = new LinkedList<EventType>();
 	private List<EventType> allEventTypes;
+	private List<EventType> operatorEventTypes;
+	private List<EventProducer> allEventProducers;
+	private List<List<EventType>> catEventTypes;
     private SimpleEventProducerHierarchy eventProducerHierarchy;
 	private int timeSlicesNumber = 1;
 	private TimeRegion timeRegion;
@@ -255,5 +258,43 @@ public class OcelotlParameters {
 	public void setOcelotlSettings(OcelotlSettings ocelotlSettings) {
 		this.ocelotlSettings = ocelotlSettings;
 	}
+
+	public List<EventType> getEventTypes() {
+		return eventTypes;
+	}
+
+	public void setEventTypes(List<EventType> eventTypes) {
+		this.eventTypes = eventTypes;
+	}
+
+	public List<EventType> getOperatorEventTypes() {
+		return operatorEventTypes;
+	}
+
+	public void setOperatorEventTypes(List<EventType> operatorEventTypes) {
+		this.operatorEventTypes = operatorEventTypes;
+	}
+
+	public List<List<EventType>> getCatEventTypes() {
+		return catEventTypes;
+	}
+	
+	public List<EventType> getEventTypes(int category) {
+		return catEventTypes.get(category);
+	}
+
+	public void setCatEventTypes(List<List<EventType>> catEventTypes) {
+		this.catEventTypes = catEventTypes;
+	}
+
+	public List<EventProducer> getAllEventProducers() {
+		return allEventProducers;
+	}
+
+	public void setAllEventProducers(List<EventProducer> list) {
+		this.allEventProducers = list;
+	}
+	
+	
 
 }

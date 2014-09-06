@@ -471,7 +471,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlParameters.getEventProducers().clear();
 			ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
 			// Set a list of all the events
-			ocelotlParameters.setAllEventTypes(confDataLoader.getTypes(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getEventCategory()));
 			spinnerTSNumber.setSelection(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getTs());
 			
 			// Get the available visualizations
@@ -1434,9 +1433,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	public void setDefaultDescriptionSettings() {
 		hasChanged = HasChanged.ALL;
 
+		ocelotlParameters.setAllEventTypes(confDataLoader.getTypes());
+		ocelotlParameters.setCatEventTypes(confDataLoader.getTypesByCat());
+		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getEventCategory()));
 		// Init operator specific configuration
 		ocelotlParameters.getTraceTypeConfig().init();
-
+		ocelotlParameters.setAllEventProducers(confDataLoader.getProducers());
 		if (ocelotlParameters.getEventProducers().isEmpty())
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
 		

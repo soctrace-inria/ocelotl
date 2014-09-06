@@ -649,7 +649,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 
 		if (parameters.getTraceTypeConfig().getTypes().size() != parameters
-				.getAllEventTypes().size()) {
+				.getOperatorEventTypes().size()) {
 			logger.debug("At least one event type is filtered: no cache will be saved.");
 			return false;
 		}
