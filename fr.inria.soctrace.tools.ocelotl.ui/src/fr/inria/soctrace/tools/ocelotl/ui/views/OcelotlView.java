@@ -589,6 +589,12 @@ private class TakeSnapshotAdapter extends SelectionAdapter {
 			job.setUser(true);	
 			job.schedule();
 
+			try {
+				job.join();
+			} catch (InterruptedException e5) {
+				// TODO Auto-generated catch block
+				e5.printStackTrace();
+			}
 		}
 	}
 

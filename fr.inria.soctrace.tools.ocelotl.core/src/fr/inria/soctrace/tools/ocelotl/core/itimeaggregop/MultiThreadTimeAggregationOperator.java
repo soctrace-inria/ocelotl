@@ -197,7 +197,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 				// Save the newly computed matrix + parameters
 				dm.start();
 				monitor.subTask("Saving matrix in the cache.");
-				saveMatrix();
+				//saveMatrix();
 				dm.end("DATACACHE - Save the matrix to cache");
 			}
 		} else {
