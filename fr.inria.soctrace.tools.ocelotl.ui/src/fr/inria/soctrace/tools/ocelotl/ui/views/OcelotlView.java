@@ -482,7 +482,7 @@ private class TakeSnapshotAdapter extends SelectionAdapter {
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER) {
 				hasChanged = HasChanged.PARAMETER;
 			} else {
-				textRun.setText("1.0");
+			//	textRun.setText("1.0");
 			}
 			oldParameters = new OcelotlParameters(ocelotlParameters);
 			setConfiguration();
