@@ -41,6 +41,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -48,6 +49,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -89,13 +91,26 @@ abstract public class AggregatedView implements IAggregatedView {
 	}
 
 	static public enum State {
-		PRESSED_D, DRAG_D, PRESSED_G, DRAG_G, RELEASED;
+		PRESSED_D, DRAG_D, PRESSED_G, DRAG_G, DRAG_G_START, RELEASED, MOVE_START, MOVE_END, EXITED;
 	}
 
 	class TimeMouseListener implements MouseListener, MouseMotionListener {
 
+		private static final long	Threshold	= 5;
 		State	state	= State.RELEASED;
+		State 	previous = State.RELEASED;
 		Point	currentPoint;
+		Display display = Display.getCurrent();
+		Shell shell = display.getActiveShell();
+		long fixed;
+		
+		
+		public TimeMouseListener() {
+			super();
+			display = Display.getCurrent();
+			shell = display.getActiveShell();
+
+		}
 
 		@Override
 		public void mouseDoubleClicked(final MouseEvent arg0) {
@@ -105,18 +120,19 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseDragged(final MouseEvent arg0) {
-			if ((state == State.PRESSED_G || state == State.DRAG_G) && arg0.getLocation().getDistance(currentPoint) > 10) {
-				state = State.DRAG_G;
-				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
-				p3 = Math.max(p3, resetTime.getTimeStampStart());
-				p3 = Math.min(p3, resetTime.getTimeStampEnd());
-				long p1 = selectTime.getTimeStampStart();
-				long p2 = selectTime.getTimeStampEnd();
-				if (p3 > p1)
-					p2 = p3;
-				else if (p3 < p1)
-					p1 = p3;
-				selectTime = new TimeRegion(p1, p2);
+			if ((state == State.PRESSED_G || state == State.DRAG_G || state == State.DRAG_G_START) && arg0.getLocation().getDistance(currentPoint) > 10) {
+				long moved = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
+				if (state != State.DRAG_G_START){
+					state = State.DRAG_G;
+				}
+				moved = Math.max(moved, resetTime.getTimeStampStart());
+				moved = Math.min(moved, resetTime.getTimeStampEnd());
+				fixed = Math.max(fixed, resetTime.getTimeStampStart());
+				fixed = Math.min(fixed, resetTime.getTimeStampEnd());
+				if (fixed<moved){
+					selectTime = new TimeRegion(fixed, moved);
+				}else
+					selectTime=new TimeRegion(moved, fixed);	
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
 				selectFigure.draw(selectTime, false);
@@ -132,14 +148,11 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseEntered(final MouseEvent arg0) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void mouseExited(final MouseEvent arg0) {
-			// TODO Auto-generated method stub
-
+			mouseReleased(arg0);
 		}
 
 		@Override
@@ -150,28 +163,61 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseMoved(final MouseEvent arg0) {
+			if (selectFigure!=null && root.getChildren().contains(selectFigure)){
+			if (Math.abs(selectFigure.getBounds().x-arg0.x)<Threshold){
+				state = State.MOVE_START;
+				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+			}
+			else if(Math.abs(selectFigure.getBounds().x+selectFigure.getBounds().width-arg0.x)<Threshold){
+				state = State.MOVE_END;
+				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+			}
+			else{
+				state=State.RELEASED;
+				shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+			}
+			}
+					
 
 		}
 
 		@Override
 		public void mousePressed(final MouseEvent arg0) {
 			if (arg0.button == 1 && resetTime != null) {
-				state = State.PRESSED_G;
+				currentPoint = arg0.getLocation();
 				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
+				if (state == State.MOVE_START){
+					p3=selectTime.getTimeStampStart();
+					fixed = selectTime.getTimeStampEnd();
+					state = State.DRAG_G_START;
+				}else if(state == State.MOVE_END){
+					p3=selectTime.getTimeStampEnd();
+					fixed = selectTime.getTimeStampStart();
+					state = State.DRAG_G;
+				}else{
+				state = State.PRESSED_G;
 				p3 = Math.max(p3, resetTime.getTimeStampStart());
 				p3 = Math.min(p3, resetTime.getTimeStampEnd());
+				selectTime=new TimeRegion(resetTime);
 				selectTime.setTimeStampStart(p3);
 				selectTime.setTimeStampEnd(p3);
-				currentPoint = arg0.getLocation();
+				fixed = p3;
+				}
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
 				selectFigure.draw(selectTime, false);
+				
 			}
 		}
 
 		@Override
 		public void mouseReleased(final MouseEvent arg0) {
-			if (state == State.PRESSED_G || state == State.DRAG_G) {
+			
+			
+			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+			if (state == State.DRAG_G || state == State.DRAG_G_START) {
+				mouseDragged(arg0);
+			}
 				state = State.RELEASED;
 				if (time == null)
 					return;
@@ -184,13 +230,13 @@ abstract public class AggregatedView implements IAggregatedView {
 					double sliceSize = (double)resetTime.getTimeDuration()/(double)ocelotlView.getTimeSliceNumber();
 					int i=0;
 					for (i=0; i<ocelotlView.getTimeSliceNumber(); i++){
-						if ((selectTime.getTimeStampStart()>=((sliceSize*i)+resetTime.getTimeStampStart()))&&(selectTime.getTimeStampStart()<((sliceSize*(i+1))+resetTime.getTimeStampStart()))){
+						if ((selectTime.getTimeStampStart()>=((long) ((sliceSize*i)+resetTime.getTimeStampStart())))&&(selectTime.getTimeStampStart()<((long) ((sliceSize*(i+1))+resetTime.getTimeStampStart())))){
 						selectTime.setTimeStampStart((long) ((sliceSize*i)+resetTime.getTimeStampStart()));
 						break;
 						}
 					}
 					for (i=0; i<ocelotlView.getTimeSliceNumber(); i++){
-						if ((selectTime.getTimeStampEnd()>=((sliceSize*i)+resetTime.getTimeStampStart()))&&(selectTime.getTimeStampEnd()<((sliceSize*(i+1))+resetTime.getTimeStampStart()))){
+						if ((selectTime.getTimeStampEnd()>((long) ((sliceSize*i)+resetTime.getTimeStampStart())))&&(selectTime.getTimeStampEnd()<=((long) ((sliceSize*(i+1))+resetTime.getTimeStampStart())))){
 							selectTime.setTimeStampEnd((long) ((sliceSize*(i+1))+resetTime.getTimeStampStart()));
 						break;
 						}
@@ -204,9 +250,10 @@ abstract public class AggregatedView implements IAggregatedView {
 						root.remove(selectFigure);
 					root.repaint();
 				}
-				selectTime = new TimeRegion(resetTime);
+				//selectTime = new TimeRegion(resetTime);
 			}
-		}
+		
+
 	}
 
 	public static Color getActivecolorbg() {
