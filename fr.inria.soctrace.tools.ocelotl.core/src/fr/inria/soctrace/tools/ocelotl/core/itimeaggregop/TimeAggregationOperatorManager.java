@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
@@ -70,9 +71,9 @@ public class TimeAggregationOperatorManager {
 		}
 	}
 
-	public void activateSelectedOperator() throws OcelotlException {
+	public void activateSelectedOperator(IProgressMonitor monitor) throws OcelotlException {
 		try {
-			selectedOperator.setOcelotlParameters(parameters);
+			selectedOperator.setOcelotlParameters(parameters, monitor);
 		} catch (SoCTraceException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

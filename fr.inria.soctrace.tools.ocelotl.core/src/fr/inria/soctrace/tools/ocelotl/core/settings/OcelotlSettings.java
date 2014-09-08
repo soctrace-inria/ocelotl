@@ -23,9 +23,13 @@ public class OcelotlSettings {
 	private String cacheDirectory;
 	private int cacheSize;
 	private String snapShotDirectory;
+	
+	// Default directory where the config file is
 	private String defaultConfigFile;
 
 	public OcelotlSettings() {
+		
+		// Init with default configuration
 		cacheActivated = OcelotlConstants.DEFAULT_CACHE_ACTIVATION;
 
 		// Default cache directory is the directory "ocelotlCache" in the
@@ -39,6 +43,8 @@ public class OcelotlSettings {
 				.getLocation().toString()
 				+ "/ocelotlSnapshot";
 
+		// Check if a configuration file exists and if so, load the saved
+		// configuration
 		loadConfigurationFile();
 	}
 
@@ -51,23 +57,24 @@ public class OcelotlSettings {
 				+ "/ocelotl.conf";
 		File confFile = new File(defaultConfigFile);
 
-		// If the conf file is there
+		// If the conf file exists and can be read
 		if (confFile.exists() && confFile.canRead()) {
-			// Parse & load
+			// Then parse & load
 			BufferedReader bufFileReader;
 
 			try {
 				bufFileReader = new BufferedReader(new FileReader(confFile));
 				String line;
-				// Get header
+				// Get the first line
 				line = bufFileReader.readLine();
 
 				if (line != null) {
 					String[] config = line.split(OcelotlConstants.CSVDelimiter);
-					// If the configuration has the right number of objects
+
+					// If the configuration has the right number of objects 
 					if (config.length == OcelotlConstants.CONFIGURATION_NORMAL_SIZE) {
 						setCacheActivated(Boolean.valueOf(config[0]));
-						setCacheDirectory(config[1]);
+						setCacheDirectory(config[1]);			
 						if (Integer.parseInt(config[2]) >= 0) {
 							// Convert from megabytes to bytes
 							setCacheSize(Integer.parseInt(config[2]) * 1000000);
@@ -117,7 +124,7 @@ public class OcelotlSettings {
 			output.append(cacheSize / 1000000);
 		} else {
 			output.append(-1);
-		}	
+		}		
 		output.append(";");
 		output.append(snapShotDirectory);
 
@@ -126,7 +133,6 @@ public class OcelotlSettings {
 		PrintWriter writer;
 		try {
 			writer = new PrintWriter(defaultConfigFile, "UTF-8");
-
 			writer.print(newSettings);
 
 			// Close the fd

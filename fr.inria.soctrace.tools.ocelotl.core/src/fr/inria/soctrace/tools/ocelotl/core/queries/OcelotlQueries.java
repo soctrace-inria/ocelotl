@@ -24,10 +24,7 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.query.EventProducerQuery;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
-import fr.inria.soctrace.lib.storage.DBObject.DBMode;
-import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
@@ -60,26 +57,7 @@ public class OcelotlQueries {
 	 * @throws SoCTraceException
 	 */
 	public List<EventProducer> getAllEventProducers() throws SoCTraceException {
-		final TraceDBObject traceDB = new TraceDBObject(ocelotlParameters
-				.getTrace().getDbName(), DBMode.DB_OPEN);
-		final EventProducerQuery eventProducerQuery = new EventProducerQuery(
-				traceDB);
-		final List<EventProducer> eplist = eventProducerQuery.getList();
-		traceDB.close();
-		return eplist;
-	}
-
-	/**
-	 * Query all the events of type State for all producers
-	 * 
-	 * @return an EventIterator on all events of the category State produced by
-	 *         the event producers in eventProducers
-	 * @throws SoCTraceException
-	 * @throws OcelotlException
-	 */
-	public EventIterator getStateIterator() throws SoCTraceException,
-			OcelotlException {
-		return getStateIterator(getAllEventProducers());
+		return ocelotlParameters.getAllEventProducers();
 	}
 
 	/**
@@ -101,39 +79,17 @@ public class OcelotlQueries {
 		final List<IntervalDesc> time = setTimeInterval();
 		return getStateIterator(eventProducers, time);
 	}
-	
+
 	public EventIterator getStateIterator(List<EventProducer> eventProducers,
 			List<IntervalDesc> time) throws SoCTraceException, OcelotlException {
 
-		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
-				.initialize();
-
-		// If we do not filter event producers
-		if (eventProducers == null
-				|| eventProducers.size() == getAllEventProducers().size()) {
-			return traceSearch.getStateIterator(ocelotlParameters.getTrace(),
-					ocelotlParameters.getTraceTypeConfig().getTypes(), time,
-					null);
-		} else {
-			return traceSearch.getStateIterator(ocelotlParameters.getTrace(),
-					ocelotlParameters.getTraceTypeConfig().getTypes(), time,
-					eventProducers);
-		}
+		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
+				ocelotlParameters).initialize();
+		return traceSearch.getStateIterator(ocelotlParameters.getTrace(),
+				ocelotlParameters.getTraceTypeConfig().getTypes(), time,
+				eventProducers);
 	}
 
-
-	/**
-	 * Query all the events of type State for all producers
-	 * 
-	 * @return an EventIterator on all events without filtering
-	 * @throws SoCTraceException
-	 * @throws OcelotlException
-	 */
-	public EventIterator getEventIterator() throws SoCTraceException,
-			OcelotlException {
-		return getEventIterator(getAllEventProducers());
-	}
-	
 	/**
 	 * Query all the events for the given list of producers
 	 * 
@@ -152,11 +108,11 @@ public class OcelotlQueries {
 		final List<IntervalDesc> time = setTimeInterval();
 		return getEventIterator(eventProducers, time);
 	}
-	
+
 	/**
 	 * 
 	 * @param eventProducers
-	 * 	list of event producers from which to select all the events. A
+	 *            list of event producers from which to select all the events. A
 	 *            null value means all event producers.
 	 * @param time
 	 * @return an EventIterator on all events produced by the event producers in
@@ -166,20 +122,12 @@ public class OcelotlQueries {
 	 */
 	public EventIterator getEventIterator(List<EventProducer> eventProducers,
 			List<IntervalDesc> time) throws SoCTraceException, OcelotlException {
-		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
-				.initialize();
+		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
+				ocelotlParameters).initialize();
 
-		// If we do not filter event producers
-		if (eventProducers == null
-				|| eventProducers.size() == getAllEventProducers().size()) {
-			return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
-					ocelotlParameters.getTraceTypeConfig().getTypes(), time,
-					null);
-		} else {
-			return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
-					ocelotlParameters.getTraceTypeConfig().getTypes(), time,
-					eventProducers);
-		}
+		return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
+				ocelotlParameters.getTraceTypeConfig().getTypes(), time,
+				eventProducers);
 	}
 
 	/**
@@ -194,19 +142,6 @@ public class OcelotlQueries {
 				.getTimeStampEnd()));
 
 		return time;
-	}
-	
-	/**
-	 * Query all the events of type Variable for all producers
-	 * 
-	 * @return an EventIterator on all events of the category State produced by
-	 *         the event producers in eventProducers
-	 * @throws SoCTraceException
-	 * @throws OcelotlException
-	 */
-	public EventIterator getVariableIterator() throws SoCTraceException,
-			OcelotlException {
-		return getVariableIterator(getAllEventProducers());
 	}
 
 	/**
@@ -242,21 +177,10 @@ public class OcelotlQueries {
 	public EventIterator getVariableIterator(
 			List<EventProducer> eventProducers, List<IntervalDesc> time)
 			throws SoCTraceException, OcelotlException {
-		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch()
-				.initialize();
+		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
+				ocelotlParameters).initialize();
 
-		// If we do not filter event producers
-		if (eventProducers == null
-				|| eventProducers.size() == getAllEventProducers().size()) {
-			return traceSearch.getVariableIterator(
-					ocelotlParameters.getTrace(), ocelotlParameters
-							.getTraceTypeConfig().getTypes(), time, null);
-		} else {
-			return traceSearch.getVariableIterator(
-					ocelotlParameters.getTrace(), ocelotlParameters
-							.getTraceTypeConfig().getTypes(), time,
-					eventProducers);
-		}
+		return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
+				ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
 	}
 }
-

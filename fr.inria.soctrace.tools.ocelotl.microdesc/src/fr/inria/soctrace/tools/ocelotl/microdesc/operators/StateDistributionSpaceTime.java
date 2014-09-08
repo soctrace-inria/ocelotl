@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,13 +52,15 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		int threadNumber;
 		int thread;
 		int size;
+		IProgressMonitor monitor;
 
 		public OcelotlThread(final int threadNumber, final int thread,
-				final int size) {
+				final int size, IProgressMonitor monitor) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			this.size = size;
+			this.monitor = monitor;
 
 			start();
 		}
@@ -65,10 +68,11 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		private void matrixUpdate(final IState state, final EventProducer ep,
 				final Map<Long, Double> distrib) {
 			synchronized (matrix) {
+				// If the event type is not in the matrix yet
 				if (!matrix.get(0).get(ep).containsKey(state.getType())) {
-					logger.debug("Adding " + state.getType()
-							+ " state");
-					// addKey(state.getStateType());
+					logger.debug("Adding " + state.getType() + " state");
+
+					// Add the type for each slice and ep and init to zero
 					for (int incr = 0; incr < matrix.size(); incr++)
 						for (final EventProducer epset : matrix.get(incr)
 								.keySet())
@@ -82,7 +86,7 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		@Override
 		public void run() {
 			while (true) {
-				final List<Event> events = getEvents(size);
+				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
 				IState state;
@@ -102,19 +106,24 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		super();
 	}
 
-	public StateDistributionSpaceTime(final OcelotlParameters parameters)
-			throws SoCTraceException, OcelotlException {
-		super(parameters);
+	public StateDistributionSpaceTime(final OcelotlParameters parameters,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		super(parameters, monitor);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
+		
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -124,23 +133,26 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
+		
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -150,7 +162,7 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();

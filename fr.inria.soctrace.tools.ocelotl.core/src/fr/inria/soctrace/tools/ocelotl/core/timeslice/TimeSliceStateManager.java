@@ -43,8 +43,10 @@ public class TimeSliceStateManager {
 		super();
 		this.timeRegion = timeRegion;
 		this.slicesNumber = slicesNumber;
-		// duration + 1 so that we are sure we do not create an extra time slice to xover the last unit of time
-		sliceDuration = ((double) timeRegion.getTimeDuration() + 1.0) /  (double) slicesNumber;
+		// duration + 1 to make sure that no extra time slice is created to
+		// cover the last unit of time
+		sliceDuration = ((double) timeRegion.getTimeDuration() + 1.0)
+				/ (double) slicesNumber;
 		timeSlicesInit();
 	}
 
@@ -79,7 +81,7 @@ public class TimeSliceStateManager {
 		}
 		return slice;
 	}
-
+	
 	public TimeSlice getATimeSlice(final long timeStamp) {
 		TimeSlice slice = null;
 
@@ -103,7 +105,6 @@ public class TimeSliceStateManager {
 	public Map<Long, Double> getStateDistribution(
 			final TimeRegion testedTimeRegion) {
 		final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
-
 		// Find the number of the slice where the state event starts
 		long startSlice = Math.max(
 				0L,
@@ -153,7 +154,6 @@ public class TimeSliceStateManager {
 			timeSlices.add(new TimeSlice(new TimeRegion((long) currentTime,
 					(long) (currentTime + sliceDuration)), i));
 			currentTime += sliceDuration;
-
 			i++;
 		}
 

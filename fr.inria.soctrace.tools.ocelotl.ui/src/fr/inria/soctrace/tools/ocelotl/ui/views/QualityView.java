@@ -19,9 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -29,7 +26,6 @@ import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseEvent;
@@ -37,7 +33,6 @@ import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.SWTGraphics;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
@@ -45,14 +40,8 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.slf4j.Logger;
@@ -135,6 +124,10 @@ public class QualityView {
 		ocelotlView = lpaggregView;
 	}
 
+public Figure getRoot() {
+		return root;
+	}
+
 	public void createDiagram() {
 		root.removeAll();
 		if (ocelotlView.getCore().getLpaggregManager() != null) {
@@ -174,7 +167,6 @@ public class QualityView {
 		rectangleText.setLayoutManager(layout);
 		rectangleText.setBackgroundColor(root.getBackgroundColor());
 		rectangleText.setForegroundColor(root.getBackgroundColor());
-
 	}
 
 	public void drawParam() {
@@ -400,54 +392,4 @@ public class QualityView {
 		}
 	}
 
-	public void createSnapshotFor(String fileName) {
-		byte[] imageBytes = createImage(root, SWT.IMAGE_PNG);
-
-		try {
-			FileOutputStream out = new FileOutputStream(fileName);
-			out.write(imageBytes);
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private byte[] createImage(Figure figure, int format) {
-
-		Device device = Display.getCurrent();
-		Rectangle r = figure.getBounds();
-
-		ByteArrayOutputStream result = new ByteArrayOutputStream();
-
-		Image image = null;
-		GC gc = null;
-		Graphics g = null;
-		try {
-			image = new Image(device, r.width, r.height);
-			gc = new GC(image);
-			g = new SWTGraphics(gc);
-			g.translate(r.x * -1, r.y * -1);
-
-			figure.paint(g);
-
-			ImageLoader imageLoader = new ImageLoader();
-			imageLoader.data = new ImageData[] { image.getImageData() };
-			imageLoader.save(result, format);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (g != null) {
-				g.dispose();
-			}
-			if (gc != null) {
-				gc.dispose();
-			}
-			if (image != null) {
-				image.dispose();
-			}
-		}
-		return result.toByteArray();
-	}
-	
 }

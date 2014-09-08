@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,22 +50,24 @@ public class StateDistribution extends _3DMicroDescription {
 	
 	
 	class OcelotlThread extends Thread {
-
+		
 		List<EventProducer> eventProducers;
 		int threadNumber;
 		int thread;
 		int size;
-
+		IProgressMonitor monitor;
+		
 		public OcelotlThread() {
 			super();
 		}
 
 		public OcelotlThread(final int threadNumber, final int thread,
-				final int size) {
+				final int size, IProgressMonitor monitor) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			this.size = size;
+			this.monitor =  monitor;
 
 			start();
 		}
@@ -89,10 +92,14 @@ public class StateDistribution extends _3DMicroDescription {
 		@Override
 		public void run() {
 			while (true) {
-				final List<Event> events = getEvents(size);
+				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
+				if (monitor.isCanceled()) {
+					return;
+				}
 				IState state;
+				long eventCount = 0;
 				// For each event
 				for (final Event event : events) {
 					// Convert to state
@@ -101,6 +108,12 @@ public class StateDistribution extends _3DMicroDescription {
 					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
 					matrixUpdate(state, event.getEventProducer(), distrib);
+					eventCount++;
+					if (eventCount % 10 == 0) {
+						if (monitor.isCanceled()) {
+							return;
+						}
+					}
 				}
 			}
 		}
@@ -112,31 +125,34 @@ public class StateDistribution extends _3DMicroDescription {
 		super();
 	}
 
-	public StateDistribution(final OcelotlParameters parameters)
+	public StateDistribution(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
-		super(parameters);
+		super(parameters, monitor);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
-		getOcelotlParameters().setTimeSliceManager(timeSliceManager);
-		
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
@@ -146,30 +162,32 @@ public class StateDistribution extends _3DMicroDescription {
 	
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
-		getOcelotlParameters().setTimeSliceManager(timeSliceManager);
-		
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
-				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices " + eventsNumber);
+				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	@Override
@@ -182,18 +200,19 @@ public class StateDistribution extends _3DMicroDescription {
 		}
 	}
 	
-	
 	class CachedOcelotlThread extends OcelotlThread  {
-
-		private HashMap<Long, List<TimeSlice>> timesliceIndex;
 		
+		private HashMap<Long, List<TimeSlice>> timesliceIndex;
+		private IProgressMonitor monitor;
+
 		public CachedOcelotlThread(final int threadNumber, final int thread,
-				final int size, HashMap<Long, List<TimeSlice>> timesliceIndex) {
+				final int size, HashMap<Long, List<TimeSlice>> timesliceIndex, IProgressMonitor monitor) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			this.size = size;
 			this.timesliceIndex = timesliceIndex;
+			this.monitor = monitor;
 			
 			start();
 		}
@@ -201,10 +220,14 @@ public class StateDistribution extends _3DMicroDescription {
 		@Override
 		public void run() {
 			while (true) {
-				final List<Event> events = getEvents(size);
+				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
+				if (monitor.isCanceled()) {
+					return;
+				}
 				IState state;
+				long eventCount = 0;
 				// For each event
 				for (final Event event : events) {
 					// Convert to state
@@ -212,23 +235,29 @@ public class StateDistribution extends _3DMicroDescription {
 					// Get duration of the state for every time slice it is in
 					final Map<Long, Double> distrib = computeDistribution(state);
 					matrixUpdate(state, event.getEventProducer(), distrib);
+					eventCount++;
+					if (eventCount % 20 == 0) {
+						if (monitor.isCanceled()) {
+							return;
+						}
+					}
 				}
 			}
 		}
 		
 
 		public Map<Long, Double> computeDistribution(IState state) {
-			
 			TimeRegion testedTimeRegion = state.getTimeRegion();
-			
 			final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
 
 			// Find the number of the slice where the state event starts
-			long startSlice = Math.max(0L,
-					(long) ((testedTimeRegion.getTimeStampStart() - timeSliceManager
-							.getTimeRegion().getTimeStampStart())
-							/ timeSliceManager.getSliceDuration()) - 1);
-			
+			long startSlice = Math
+					.max(0L,
+							(long) ((testedTimeRegion.getTimeStampStart() - timeSliceManager
+									.getTimeRegion().getTimeStampStart()) / timeSliceManager
+									.getSliceDuration()) - 1);
+			double temp = 0;
+
 			// If the state starts within the actual time region
 			if (testedTimeRegion.getTimeStampStart()
 					- timeSliceManager.getTimeRegion().getTimeStampStart() >= 0)
@@ -243,7 +272,7 @@ public class StateDistribution extends _3DMicroDescription {
 					}
 				}
 
-			double temp = 0;
+			// For each slice of the new matrix
 			for (long i = startSlice; i < timeSliceManager.getSlicesNumber(); i++) {
 
 				long timesliceStart = timeSliceManager.getTimeSlices()
@@ -271,13 +300,11 @@ public class StateDistribution extends _3DMicroDescription {
 								new TimeRegion(timeStampStart, timeStampEnd),
 								-1);
 
-						// Get the duration of the state in the time
-						// slice i
+						// Get the duration of the state in the time slice i
 						temp = currentTimeSlice
 								.regionInsideMe(testedTimeRegion);
 
-						// If the state has ended in the previous time
-						// slice
+						// If the state has ended in the previous time slice
 						if (timeSlicesDistribution.get(i) != null)
 							temp = temp + timeSlicesDistribution.get(i);
 
@@ -285,26 +312,32 @@ public class StateDistribution extends _3DMicroDescription {
 					}
 				}
 			}
-
 			return timeSlicesDistribution;
 		}
 	}
-
 	
 	@Override
 	protected void computeDirtyCacheMatrix(
 			final List<EventProducer> eventProducers, List<IntervalDesc> time,
-			HashMap<Long, List<TimeSlice>> timesliceIndex)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+			HashMap<Long, List<TimeSlice>> timesliceIndex,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		if(monitor.isCanceled())
+			return;
+		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
-
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
+		
+		monitor.subTask("Fill the matrix");
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
-		getOcelotlParameters().setTimeSliceManager(timeSliceManager);
-		
 		final List<CachedOcelotlThread> threadlist = new ArrayList<CachedOcelotlThread>();
+
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new CachedOcelotlThread(
@@ -312,13 +345,16 @@ public class StateDistribution extends _3DMicroDescription {
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getEventsPerThread(),
-					timesliceIndex));
+					timesliceIndex, monitor));
+
 		for (final Thread thread : threadlist)
 			thread.join();
-		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION: "
-				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices "
-				+ eventsNumber);
-	}
 
+		ocelotlQueries.closeIterator();
+		if(monitor.isCanceled())
+			return;
+		dm.end("VECTORS COMPUTATION: "
+				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+	
 }

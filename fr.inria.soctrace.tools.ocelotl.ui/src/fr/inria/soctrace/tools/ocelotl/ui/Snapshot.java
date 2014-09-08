@@ -1,13 +1,26 @@
 package fr.inria.soctrace.tools.ocelotl.ui;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.SWTGraphics;
+import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +33,7 @@ public class Snapshot {
 
 	private static final Logger	logger	= LoggerFactory.getLogger(Snapshot.class);
 
+	// Directory where all the snapshots are saved
 	private String				snapshotDirectory;
 	private OcelotlView			theView;
 
@@ -37,14 +51,22 @@ public class Snapshot {
 		theView.getParams().getOcelotlSettings().setSnapShotDirectory(this.snapshotDirectory);
 	}
 
+	/**
+	 * Call all the methods that create a snapshot of the current state of Ocelotl
+	 */
 	public void takeSnapShot() {
 		// Create directory
 		String currentDirPath = createDirectory();
 
+		// Save the currently displayed diagram as an image
 		snapShotDiagram(currentDirPath);
+		// Save the currently displayed quality curves as an image
 		snapShotQualityCurve(currentDirPath);
+		// Save the the current parameters in a text file
 		saveConfig(currentDirPath);
-		//createSymLink(currentDirPath);
+		
+		// Create a symbolic link to the trace file
+		// createSymLink(currentDirPath);
 	}
 
 	/**
@@ -54,21 +76,22 @@ public class Snapshot {
 	public void snapShotDiagram(String dirPath) {
 		theView.getTimeLineView().createSnapshotFor(dirPath + "/diagram.png");
 	}
-	
+
 	public void snapShotDiagramWithName(String dirPath) {
 		theView.getTimeLineView().createSnapshotFor(dirPath);
-	}
-
+		}
+	
 	/**
 	 * Create a png image of the quality curve
 	 * @param dirPath
 	 */
 	public void snapShotQualityCurve(String dirPath) {
-		theView.getQualityView().createSnapshotFor(dirPath + "/curves.png");
+		createSnapshotFor(theView.getQualityView().getRoot(), dirPath + "/curves.png");
 	}
 
 	/**
-	 * Save the actual configuration
+	 * Save the actual configuration (trace name, number of slice , start and
+	 * end timestamps, used operators, parameter, gain and loss)
 	 */
 	public String saveConfig(String aDirPath) {
 		String config = getParameters();
@@ -102,6 +125,7 @@ public class Snapshot {
 		double gain = 0;
 		double loss = 0;
 
+		// Look for the gain and loss value
 		for (int i = 0; i < parameters.size() - 1; i++) {
 			if (theView.getParams().getParameter() < parameters.get(i)) {
 				if (i > 0)
@@ -112,8 +136,8 @@ public class Snapshot {
 				break;
 			}
 		}
-		
-		String dbDir = Configuration.getInstance().get(SoCTraceProperty.sqlite_db_directory);
+
+        String dbDir = Configuration.getInstance().get(SoCTraceProperty.sqlite_db_directory);
 		dbDir = dbDir + theView.getParams().getTrace().getDbName();
 		
 		StringBuffer output = new StringBuffer();
@@ -147,10 +171,12 @@ public class Snapshot {
 	public String createDirectory() {
 		String dirName = "";
 		File dir = new File(snapshotDirectory);
+		
+		// Check if the general directory exists
 		if (!dir.exists()) {
 			logger.debug("Snapshot directory (" + snapshotDirectory + ") does not exist and will be created now.");
 
-			// Create the directory
+			// Create the general snaphot directory
 			if (!dir.mkdirs()) {
 				logger.error("Failed to create cache directory: " + snapshotDirectory + ".");
 			}
@@ -159,6 +185,7 @@ public class Snapshot {
 		Date aDate = new Date(System.currentTimeMillis());
 		dirName = snapshotDirectory + "/" + theView.getParams().getTrace().getAlias() + "_" + aDate.toString();
 
+		// Create the specific snaphot directory
 		dir = new File(dirName);
 		if (!dir.mkdirs()) {
 			logger.error("Failed to create cache directory: " + dirName + ".");
@@ -168,10 +195,10 @@ public class Snapshot {
 	}
 	
 	/**
-	 * Create a symbolic link to the trace
+	 * Create a symbolic link to the trace file
 	 * @param aDirPath
 	 */
-	public void createSymLink(String aDirPath) {
+		public void createSymLink(String aDirPath) {
 		// TODO create symbolic link
 		Process p;
 	
@@ -190,6 +217,73 @@ public class Snapshot {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Create an image from the Figure given in argument
+	 * 
+	 * @param figure
+	 *            Figure from which the image is created
+	 * @param fileName
+	 *            Path where to save the image
+	 */
+	public void createSnapshotFor(Figure figure, String fileName) {
+		byte[] imageBytes = createImage(figure, SWT.IMAGE_PNG);
+
+		try {
+			FileOutputStream out = new FileOutputStream(fileName);
+			out.write(imageBytes);
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Generate the image
+	 * 
+	 * @param figure
+	 *            Figure from which the image is created
+	 * @param format
+	 *            format of the generated image
+	 * @return an array of bytes corresponding to an image
+	 */
+	private byte[] createImage(Figure figure, int format) {
+
+		Device device = Display.getCurrent();
+		Rectangle r = figure.getBounds();
+
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+
+		Image image = null;
+		GC gc = null;
+		Graphics g = null;
+		try {
+			image = new Image(device, r.width, r.height);
+			gc = new GC(image);
+			g = new SWTGraphics(gc);
+			g.translate(r.x * -1, r.y * -1);
+
+			figure.paint(g);
+
+			ImageLoader imageLoader = new ImageLoader();
+			imageLoader.data = new ImageData[] { image.getImageData() };
+			imageLoader.save(result, format);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (g != null) {
+				g.dispose();
+			}
+			if (gc != null) {
+				gc.dispose();
+			}
+			if (image != null) {
+				image.dispose();
+			}
+		}
+		return result.toByteArray();
 	}
 
 }

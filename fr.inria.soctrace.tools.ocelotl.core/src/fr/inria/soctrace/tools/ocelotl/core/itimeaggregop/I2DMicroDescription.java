@@ -22,13 +22,15 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
 
 public interface I2DMicroDescription extends ITimeAggregationOperator {
 
 	@Override
-	public TimeAggregation2Manager createManager();
+	public TimeAggregation2Manager createManager(IProgressMonitor monitor);
 
 	public List<HashMap<EventProducer, Double>> getMatrix();
 }

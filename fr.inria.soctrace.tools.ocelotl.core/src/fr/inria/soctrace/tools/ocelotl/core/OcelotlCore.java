@@ -19,6 +19,8 @@
 
 package fr.inria.soctrace.tools.ocelotl.core;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
@@ -60,26 +62,30 @@ public class OcelotlCore {
 		init(ocelotlParameters);
 	}
 
-	public void initTimeOperator() throws OcelotlException {
-		setTimeOperator();
+	public void initTimeOperator(IProgressMonitor monitor) throws OcelotlException {
+		setTimeOperator(monitor);
+		if(monitor.isCanceled())
+			return;
 		try {
-			lpaggregManager = timeOperator.createManager();
+			lpaggregManager = timeOperator.createManager(monitor);
+			if(monitor.isCanceled())
+				return;
 		} catch (UnsatisfiedLinkError e) {
 			throw new OcelotlException(OcelotlException.JNI);
 		}
 	}
 
-	public void computeQualities() {
-		lpaggregManager.computeQualities();
+	public void computeQualities(IProgressMonitor monitor) {
+		lpaggregManager.computeQualities(monitor);
 	}
 
-	public void computeDichotomy() throws OcelotlException {
-		lpaggregManager.computeDichotomy();
+	public void computeDichotomy(IProgressMonitor monitor) throws OcelotlException {
+		lpaggregManager.computeDichotomy(monitor);
 		lpaggregManager.printParameters();
 	}
 
-	public void computeParts() {
-		lpaggregManager.computeParts();
+	public void computeParts(IProgressMonitor monitor) {
+		lpaggregManager.computeParts(monitor);
 		// lpaggregManager.printParts();
 		setSpaceOperator();
 		lpaggregManager.print(this);
@@ -133,8 +139,8 @@ public class OcelotlCore {
 		spaceOperator = spaceOperators.getSelectedOperator();
 	}
 
-	public void setTimeOperator() throws OcelotlException {
-		timeOperators.activateSelectedOperator();
+	public void setTimeOperator(IProgressMonitor monitor) throws OcelotlException {
+		timeOperators.activateSelectedOperator(monitor);
 		timeOperator = timeOperators.getSelectedOperator();
 	}
 

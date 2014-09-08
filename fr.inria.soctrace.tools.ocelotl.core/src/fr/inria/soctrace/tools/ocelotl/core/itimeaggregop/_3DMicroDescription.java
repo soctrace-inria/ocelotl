@@ -19,6 +19,8 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -32,11 +34,11 @@ public abstract class _3DMicroDescription extends _3DMatrixMicroDescription
 		super();
 	}
 
-	public _3DMicroDescription(final OcelotlParameters parameters)
+	public _3DMicroDescription(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
 		super();
 		try {
-			setOcelotlParameters(parameters);
+			setOcelotlParameters(parameters, monitor);
 		} catch (final InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,8 +46,8 @@ public abstract class _3DMicroDescription extends _3DMatrixMicroDescription
 	}
 
 	@Override
-	public TimeAggregation3Manager createManager() {
-		return new TimeAggregation3Manager(this);
+	public TimeAggregation3Manager createManager(IProgressMonitor monitor) {
+		return new TimeAggregation3Manager(this, monitor);
 
 	}
 

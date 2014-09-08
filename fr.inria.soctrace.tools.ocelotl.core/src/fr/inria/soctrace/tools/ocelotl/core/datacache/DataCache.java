@@ -14,6 +14,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -35,8 +36,8 @@ public class DataCache {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(DataCache.class);
-	
-	OcelotlSettings settings;
+
+	private OcelotlSettings settings;
 	
 	/**
 	 * List of the cache files in the current cache directory
@@ -185,7 +186,6 @@ public class DataCache {
 			}
 
 			cacheActive = true;
-			
 			// Everything's OK, set the cache directory
 			this.cacheDirectory = cacheDirectory;
 			
@@ -207,7 +207,7 @@ public class DataCache {
 		
 		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
 	}
-	
+
 	/**
 	 * Set cache parameters from the configuration file
 	 * 
@@ -220,7 +220,7 @@ public class DataCache {
 		setCacheMaxSize(settings.getCacheSize());
 		setCacheDirectory(settings.getCacheDirectory());
 	}
-
+	
 	/**
 	 * Check parameter against the cached data parameters
 	 * 
@@ -259,6 +259,7 @@ public class DataCache {
 		if (!newParam.getTraceName().equals(cacheParam.getTraceName()))
 			return false;
 		
+		// Is the trace unique ID similar?
 		if (newParam.getTraceID() != cacheParam.getTraceID())
 			return false;
 
@@ -269,7 +270,7 @@ public class DataCache {
 				.getSpaceAggOperator().equals(cacheParam.getSpaceAggOperator()) && (!newParam
 				.getSpaceAggOperator().equals("null"))))))
 			return false;
-		
+
 		// Are timestamps equal or are they included inside the cache
 		// timeregion
 		if (!checkCompatibleTimeStamp(newParam, cacheParam))
@@ -339,7 +340,7 @@ public class DataCache {
 	}
 
 	// hypothesis: are the timeslice align ?
-	// if not Sol: align the new param start ?	
+	// if not Sol: align the new param start ?
 	/**
 	 * "Dirty" time slices are time slices of the cache that do not fit inside a
 	 * time slice of the new view (i.e. they are used to build at least two new
@@ -370,9 +371,9 @@ public class DataCache {
 					.getStartTimestamp())
 					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > newParam
 							.getEndTimestamp())) {
-
+				
 				usedCachedTimeSlices++;
-
+				
 				for (TimeSlice aNewTimeSlice : newTimeSlice) {
 					// Is the cached time slice is at least partly inside a new
 					// time slice ?
@@ -404,20 +405,21 @@ public class DataCache {
 		
 		// Proportion of dirty time slice in the part of the cache used to rebuild the matrix
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
+
 		// No dirty time slice
 		if (computedDirtyRatio == 0)
 			return true;
-
+		
 		// Set the flag for rebuild from dirty
 		if (computedDirtyRatio > 0)
 			rebuildDirty = true;
-
-		// If the ratio is not over the max 
+		
+		// If the ratio is not over the max
 		if (computedDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
 			if (timeSliceMapping != null)
 				timeSliceMapping.clear();
-			
+
 			timeSliceMapping = tmpTimeSliceMapping;
 
 			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
@@ -428,12 +430,12 @@ public class DataCache {
 
 			return true;
 		}
-		
+
 		rebuildDirty = false;
 		return false;
 	}
 	
-
+	
 	/**
 	 * Add a newly saved microscopic model to the list of cache file
 	 * 
@@ -535,6 +537,51 @@ public class DataCache {
 			System.err.println("The provided cache directory ("
 					+ cacheDirectory + ")does not exist");
 		}
+	}
+
+	/**
+	 * Check that every cache file have a corresponding trace in the database,
+	 * and if not then delete the cache file
+	 * 
+	 * @param traces
+	 *            list of the traces in the database
+	 */
+	public void removeDeletedTraces(List<Trace> traces) {
+		List<CacheParameters> deletedCache = new ArrayList<CacheParameters>();
+
+		for (CacheParameters aCache : cachedData.keySet()) {
+			boolean deleted = true;
+
+			// Check if the corresponding trace still exists
+			for (Trace aTrace : traces) {
+				if (aCache.getTraceID() == aTrace.getId()) {
+					deleted = false;
+					break;
+				}
+			}
+
+			// If not delete the cache file
+			if (deleted) {
+				logger.debug("DataCache: The trace "
+						+ aCache.getTraceName()
+						+ " (ID = "
+						+ aCache.getTraceID()
+						+ ") is no longer in the database: the corresponding cache file will be deleted.");
+				if (!cachedData.get(aCache).delete()) {
+					logger.debug("DataCache: Deletion of cache file "
+							+ cachedData.get(aCache).getName() + " failed.");
+				}
+				deletedCache.add(aCache);
+			}
+		}
+
+		// Remove the deleted cache
+		for (CacheParameters aCache : deletedCache) {
+			cachedData.remove(aCache);
+		}
+
+		// Recompute the current cache size
+		computeCacheSize();
 	}
 
 	/**
@@ -654,7 +701,7 @@ public class DataCache {
 			currentCacheSize = currentCacheSize + aCacheFile.length();
 		}
 
-		logger.debug("Size of the current cache: " + currentCacheSize);
+		logger.debug("Size of the current cache is: " + currentCacheSize + " bytes.");
 	}
 
 	/**

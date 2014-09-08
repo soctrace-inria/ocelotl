@@ -2,9 +2,9 @@ package fr.inria.soctrace.tools.ocelotl.microdesc.ui;
 
 import org.eclipse.swt.widgets.Shell;
 
-public class HierarchicalVariableDistributionView extends VariableDistributionView {
+public class HierarchicalDistributionView extends TypeDistributionView{
 
-	public HierarchicalVariableDistributionView(Shell parent) {
+	public HierarchicalDistributionView(Shell parent) {
 		super(parent);
 	}
 
@@ -40,4 +40,5 @@ public class HierarchicalVariableDistributionView extends VariableDistributionVi
 			uncheckElement(child);
 		}
 	}
+
 }

@@ -20,9 +20,11 @@ public class OcelotlException extends Exception {
 	public static final String NO_TIMESTAMP = "Error: At least one of the starting or ending timestamps is missing.";
 	public static final String INCOMPLETE_HIERARCHY = "Error: The event producer hierarchy is incomplete.";
 	public static final String INVALID_CACHEFILE = "Error: The selected file is not a valid cache file.";
-	public static final String INVALID_CACHED_TRACE = "Error: The corresponding trace was not found in the databse.";
+	public static final String INVALID_CACHED_TRACE = "Error: The corresponding trace was not found in the database.";
 	public static final String INVALID_CACHED_OPERATOR = "Error: The corresponding aggregation operator was not found.";
 	public static final String INVALID_MAX_CACHE_SIZE = "Error: The given cache size value is not correct.";
+	public static final String USER_CANCEL_INTERRUPTION = "User interrupted the current operation.";
+	
 	
 	public OcelotlException() {
 		super();

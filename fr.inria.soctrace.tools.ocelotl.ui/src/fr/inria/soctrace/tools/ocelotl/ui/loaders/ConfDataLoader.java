@@ -46,6 +46,7 @@ import fr.inria.soctrace.lib.search.utils.Printer;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorResource;
 
 /**
  * Convenience class to load Trace data related to LPAggreg configuration.
@@ -59,16 +60,18 @@ public class ConfDataLoader {
 	private List<Trace>				traces;
 	private List<EventProducer>		producers;
 	private List<EventType>			types;
+	private List<List<EventType> >	typesByCat;
 	private long					minTimestamp;
 	private long					maxTimestamp;
 	private List<AnalysisResult>	results;
-	public final static String 					STATE="STATE";
-	public final static String 					PUNCTUAL_EVENT="EVENT";
-	public final static String 					LINK="LINK";
-	public final static String 					VARIABLE="VARIABLE";
-	public final static String 					ALL="ALL";
+	public final static String		STATE			= "STATE";
+	public final static String		PUNCTUAL_EVENT	= "EVENT";
+	public final static String		LINK			= "LINK";
+	public final static String		VARIABLE		= "VARIABLE";
+	public final static String		ALL				= "ALL";
+	public final static int[] category = {EventCategory.PUNCTUAL_EVENT, EventCategory.STATE, EventCategory.LINK, EventCategory.VARIABLE};
 	
-	private static final Logger logger = LoggerFactory.getLogger(ConfDataLoader.class);
+	private static final Logger		logger			= LoggerFactory.getLogger(ConfDataLoader.class);
 
 	/** The constructor. */
 	public ConfDataLoader() {
@@ -106,9 +109,9 @@ public class ConfDataLoader {
 		final List<ISearchable> search = data.getElements();
 		final List<Integer> id = new ArrayList<Integer>();
 		final List<EventProducer> prodFromResult = new ArrayList<EventProducer>();
-		for (final ISearchable s: search)
+		for (final ISearchable s : search)
 			id.add(s.getId());
-		for (final EventProducer ep: producers)
+		for (final EventProducer ep : producers)
 			if (id.contains(ep.getId()))
 				prodFromResult.add(ep);
 		return prodFromResult;
@@ -142,6 +145,7 @@ public class ConfDataLoader {
 		producers = pQuery.getList();
 		final EventTypeQuery tQuery = new EventTypeQuery(traceDB);
 		types = tQuery.getList();
+		setSubTypes();
 		minTimestamp = Math.max(0, traceDB.getMinTimestamp());
 		maxTimestamp = Math.max(0, traceDB.getMaxTimestamp());
 		final AnalysisResultQuery aQuery = new AnalysisResultQuery(traceDB);
@@ -155,8 +159,8 @@ public class ConfDataLoader {
 		final TraceQuery tQuery = new TraceQuery(sysDB);
 		traces = tQuery.getList();
 		sysDB.close();
-		
-		//Sort alphabetically
+
+		// Sort alphabetically
 		Collections.sort(traces, new Comparator<Trace>() {
 			@Override
 			public int compare(final Trace arg0, final Trace arg1) {
@@ -165,13 +169,16 @@ public class ConfDataLoader {
 		});
 		return traces;
 	}
-	
+
 	/**
 	 * Check if the loaded trace has events of a specific category
-	 * @param must be one of the constant defining a category in {@link EventCategory}
-	 * (i.e. STATE, LINK, VARIABLE, PUNCTUAL_EVENT)
-	 * @return true if the trace contains at least one event type 
-	 * belonging to the category  
+	 * 
+	 * @param aCategory
+	 *            must be one of the constant defining a category in
+	 *            {@link EventCategory} (i.e. STATE, LINK, VARIABLE,
+	 *            PUNCTUAL_EVENT)
+	 * @return true if the trace contains at least one event type belonging to
+	 *         the category
 	 */
 	public boolean hasEventOfCategory(int aCategory) {
 		for (EventType anEventType : getTypes()) {
@@ -206,5 +213,52 @@ public class ConfDataLoader {
 			category.add(ALL);
 		return category;
 	}
+	
+	private void setSubTypes(){
+		typesByCat=new ArrayList<List<EventType>>();
+		for (int i=0; i<category.length; i++){
+			typesByCat.add(new ArrayList<EventType>());
+		}
+		for (EventType et: types){
+			typesByCat.get(et.getCategory()).add(et);
+		}
+	}
 
+	public List<EventType> getTypes(List<String> eventCategory) {
+
+		List<EventType> nlist = new ArrayList<EventType>();
+		for (String c :eventCategory){
+			if (c.equals(ALL)){
+				nlist.addAll(getTypes());
+				return nlist;
+			}
+		}
+		for (String c :eventCategory){
+			if (c.equals(PUNCTUAL_EVENT))
+				nlist.addAll(typesByCat.get(EventCategory.PUNCTUAL_EVENT));
+			if (c.equals(STATE))
+				nlist.addAll(typesByCat.get(EventCategory.STATE));
+			if (c.equals(LINK))
+				nlist.addAll(typesByCat.get(EventCategory.LINK));
+			if (c.equals(VARIABLE))
+				nlist.addAll(typesByCat.get(EventCategory.VARIABLE));
+		}
+		return nlist;
+	}
+	
+	public List<EventType> getTypes (int cat){
+		return typesByCat.get(cat);
+	}
+	
+	public List<EventType> getTypes (String cat){
+		ArrayList<String> str = new ArrayList<String>();
+		return getTypes(str);
+	}
+
+	public List<List<EventType>> getTypesByCat() {
+		return typesByCat;
+	}
+
+	
+	
 }

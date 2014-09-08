@@ -28,9 +28,11 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,22 +65,22 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected OcelotlQueries ocelotlQueries;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
 	
-	abstract protected void computeMatrix() throws SoCTraceException,
+	abstract protected void computeMatrix(IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException;
 
 	abstract protected void computeSubMatrix(
-			final List<EventProducer> eventProducers) throws SoCTraceException,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException;
-
+	
 	abstract protected void computeSubMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time)
+			final List<EventProducer> eventProducers, List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException;
 
 	protected void computeDirtyCacheMatrix(
 			final List<EventProducer> eventProducers, List<IntervalDesc> time,
-			HashMap<Long, List<TimeSlice>> timesliceIndex)
+			HashMap<Long, List<TimeSlice>> timesliceIndex, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
-		computeSubMatrix(eventProducers, time);
+		computeSubMatrix(eventProducers, time, monitor);
 	}
 
 	/**
@@ -98,7 +100,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 */
 	public abstract void initMatrixToZero(
 			Collection<EventProducer> eventProducers);
-	
+
 	/**
 	 * Fill the matrix with values from the cache file
 	 * 
@@ -149,7 +151,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	abstract protected void initVectors() throws SoCTraceException;
 
-	public void setOcelotlParameters(final OcelotlParameters parameters)
+	public void setOcelotlParameters(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		this.parameters = parameters;
 		count = 0;
@@ -158,27 +160,35 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// .getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initQueries();
 		initVectors();
-
+		if(monitor.isCanceled())
+			return;
 		// If the cache is enabled
 		if (parameters.getDataCache().isCacheActive()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
 			// If a valid cache file was found
 			if (cacheFile != null) {
-				loadFromCache(cacheFile);
+				monitor.setTaskName("Loading data from cache");
+				loadFromCache(cacheFile, monitor);
 			} else {
-				computeMatrix();
+				monitor.setTaskName("Loading data from database");
+				computeMatrix(monitor);
 
+				if(monitor.isCanceled())
+					return;
+				
 				if (eventsNumber == 0)
 					throw new OcelotlException(OcelotlException.NO_EVENTS);
 
 				// Save the newly computed matrix + parameters
 				dm.start();
-				//saveMatrix();
+				monitor.subTask("Saving matrix in the cache.");
+				saveMatrix();
 				dm.end("DATACACHE - Save the matrix to cache");
 			}
 		} else {
-			computeMatrix();
+			monitor.setTaskName("Loading data from database");
+			computeMatrix(monitor);
 
 			if (eventsNumber == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENTS);
@@ -189,11 +199,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
 	}
 
-	public List<Event> getEvents(final int size) {
+	public List<Event> getEvents(final int size, IProgressMonitor monitor) {
 		final List<Event> events = new ArrayList<Event>();
+		if (monitor.isCanceled())
+			return events;
 		synchronized (eventIterator) {
 			for (int i = 0; i < size; i++) {
-				if (eventIterator.getNext() == null)
+				if (eventIterator.getNext(monitor) == null)
 					return events;
 				events.add(eventIterator.getEvent());
 				eventsNumber++;
@@ -211,11 +223,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// would result in an incomplete datacache
 		if (!parameters.getDataCache().isCacheActive() || !noFiltering())
 			return;
+		
+		Date convertedDate = new Date(System.currentTimeMillis() * 1000);
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
-				+ System.currentTimeMillis();
+				+ parameters.getTimeAggOperator() + "_"
+				+ convertedDate;
 
 		// Write to file,
 		try {
@@ -248,7 +263,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// Close the fd
 			writer.flush();
 			writer.close();
-
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -268,7 +282,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 *            the cache file
 	 * @throws OcelotlException 
 	 */
-	public void loadFromCache(File aCacheFile) throws OcelotlException {
+	public void loadFromCache(File aCacheFile, IProgressMonitor monitor) throws OcelotlException {
 		try {
 			dm = new DeltaManagerOcelotl();
 			dm.start();
@@ -286,7 +300,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 			for (EventType evt : parameters.getTraceTypeConfig().getTypes()) {
 				typeNames.add(evt.getName());
 			}
-			
 			// If no event type is selected
 			if(typeNames.isEmpty())
 				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
@@ -294,14 +307,20 @@ public abstract class MultiThreadTimeAggregationOperator {
 			// Fill the matrix with zeroes
 			initMatrixToZero(eventProducers.values());
 
+			if (monitor.isCanceled()) 
+				return;	
+				
+			// Check how to rebuild the matrix
 			if (parameters.getDataCache().isRebuildDirty()) {
-				rebuildDirtyMatrix(aCacheFile, eventProducers);
-				dm.end("Load matrix from cache (dirty)");// :  " + parameters.getDataCache().getBuildingStrategy());
+				monitor.setTaskName("Rebuilding with strategy " + parameters.getDataCache().getBuildingStrategy());
+				rebuildDirtyMatrix(aCacheFile, eventProducers, monitor);
+				dm.end("Load matrix from cache (dirty)");
 			} else {
-				rebuildNormalMatrix(aCacheFile, eventProducers);
+				monitor.setTaskName("Rebuilding with cache data");
+				rebuildNormalMatrix(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache");
 			}
-				
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -313,10 +332,12 @@ public abstract class MultiThreadTimeAggregationOperator {
 	}
 
 	public void rebuildNormalMatrix(File aCacheFile,
-			HashMap<String, EventProducer> eventProducers) throws IOException  {
+			HashMap<String, EventProducer> eventProducers, IProgressMonitor monitor) throws IOException {
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
-		
+
+		monitor.subTask("Filling matrix with cache data");
+		long lineCount = 0;
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
@@ -325,18 +346,25 @@ public abstract class MultiThreadTimeAggregationOperator {
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
 
-			//TODO check that the values are correct (3/4 values per line)
-			
+			// TODO check that the values are correct (3/4 values per line)
+
 			// If the event producer is not filtered out
 			if (eventProducers.containsKey(values[1])) {
 				// Fill the matrix
-				rebuildMatrix(values, eventProducers.get(values[1]),
-						parameters.getDataCache().getTimeSliceFactor());
+				rebuildMatrix(values, eventProducers.get(values[1]), parameters
+						.getDataCache().getTimeSliceFactor());
 			}
+			lineCount++;
+
+			if (lineCount % 50 == 0)
+				if (monitor.isCanceled()) {
+					bufFileReader.close();
+					return;
+				}
 		}
 		bufFileReader.close();
 	}
-	
+
 	/**
 	 * Rebuild the matrix from a dirty cache using one of the available strategy
 	 * 
@@ -347,7 +375,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * @throws IOException
 	 */
 	public void rebuildDirtyMatrix(File aCacheFile,
-			HashMap<String, EventProducer> eventProducers) throws IOException {
+			HashMap<String, EventProducer> eventProducers, IProgressMonitor monitor) throws IOException {
 
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
@@ -391,7 +419,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 					// Create an interval corresponding to the dirty time slice
 					times.add(databaseRebuild(aCachedTimeSlice));
 
-					// Add to timeslice index
 					for (TimeSlice ts : parameters.getDataCache()
 							.getTimeSliceMapping().get(aCachedTimeSlice)) {
 
@@ -403,19 +430,25 @@ public abstract class MultiThreadTimeAggregationOperator {
 						timesliceIndex.get(ts.getNumber())
 								.add(aCachedTimeSlice);
 					}
-
 					break;
 				}
 			}
-				
 		}
 
+		if (monitor.isCanceled()) 
+			return;
+
+		// If strategy is DATACACHE_DATABASE
 		// Run a single database query with all the times of the dirty time
 		// slices to rebuild the matrix
 		if (parameters.getDataCache().getBuildingStrategy() == DatacacheStrategy.DATACACHE_DATABASE) {
 			try {
+				monitor.subTask("Fetching dirty data from database");
 				computeDirtyCacheMatrix(new ArrayList<EventProducer>(
-						eventProducers.values()), times, timesliceIndex);
+						eventProducers.values()), times, timesliceIndex,
+						monitor);
+				if (monitor.isCanceled())
+					return;
 			} catch (SoCTraceException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -431,14 +464,17 @@ public abstract class MultiThreadTimeAggregationOperator {
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
 
+		long lineCount = 0;
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
-		
+
+		monitor.subTask("Filling the matrix with cache data");
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
 
+			lineCount++;
 			// If the event producer is not filtered out
 			if (eventProducers.containsKey(values[1])) {
 				int slice = Integer.parseInt(values[0]);
@@ -466,6 +502,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 								.getTimeRegion().getTimeStampStart()
 						|| cachedTimeSlice.getTimeRegion().getTimeStampEnd() > parameters
 								.getTimeRegion().getTimeStampEnd()) {
+
 					switch (parameters.getDataCache().getBuildingStrategy()) {
 					// Strategy one
 					// Multiply the cached values by the proportion of the
@@ -494,6 +531,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 									.get(0).getNumber(), 1.0);
 				}
 			}
+			if (lineCount % 50 == 0)
+				if (monitor.isCanceled()) {
+					bufFileReader.close();
+					return;
+				}
 		}
 
 		bufFileReader.close();
@@ -569,13 +611,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 	public IntervalDesc databaseRebuild(TimeSlice cachedTimeSlice) {
 		long startInterval;
 		long endInterval;
-
+		
 		// If time slice begins within the time region
 		if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > parameters
 				.getTimeRegion().getTimeStampStart())
 			startInterval = cachedTimeSlice.getTimeRegion().getTimeStampStart();
 		else
 			startInterval = parameters.getTimeRegion().getTimeStampStart();
+		
 		// If time slice ends within the time region
 		if (cachedTimeSlice.getTimeRegion().getTimeStampEnd() < parameters
 				.getTimeRegion().getTimeStampEnd())
@@ -599,7 +642,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 
 		if (parameters.getTraceTypeConfig().getTypes().size() != parameters
-				.getAllEventTypes().size()) {
+				.getOperatorEventTypes().size()) {
 			logger.debug("At least one event type is filtered: no cache will be saved.");
 			return false;
 		}

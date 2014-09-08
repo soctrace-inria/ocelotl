@@ -22,6 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,15 +49,17 @@ public class EventDistribution extends _3DMicroDescription {
 		int threadNumber;
 		int thread;
 		int size;
+		IProgressMonitor monitor;
 
 
 		public OcelotlThread(final int threadNumber, final int thread,
-				final int size) {
+				final int size, IProgressMonitor monitor) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			this.size = size;
-
+			this.monitor = monitor;
+			
 			start();
 		}
 
@@ -92,13 +95,23 @@ public class EventDistribution extends _3DMicroDescription {
 		@Override
 		public void run() {
 			while (true) {
-				final List<Event> events = getEvents(size);
+				long eventCount = 0;
+				final List<Event> events = getEvents(size, monitor);
+				if (monitor.isCanceled()) {
+					return;
+				}
 				if (events.size() == 0)
 					break;
 				for (final Event event : events) {
 					// final Map<Long, Long> distrib =
 					// state.getTimeSlicesDistribution();
 					matrixUpdate(event, event.getEventProducer());
+					eventCount++;
+					if (eventCount % 30 == 0) {
+						if (monitor.isCanceled()) {
+							return;
+						}
+					}
 				}
 			}
 		}
@@ -108,62 +121,77 @@ public class EventDistribution extends _3DMicroDescription {
 		super();
 	}
 
-	public EventDistribution(final OcelotlParameters parameters)
+	public EventDistribution(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
-		super(parameters);
+		super(parameters, monitor);
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers)
+	protected void computeSubMatrix(final List<EventProducer> eventProducers, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query events");
 		eventIterator = ocelotlQueries.getEventIterator(eventProducers);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
+	
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 		.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		getOcelotlParameters().setTimeSliceManager(timeSliceManager);
 		
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
+		
+		if(monitor.isCanceled())
+			return;
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 	
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException,
+			List<IntervalDesc> time, IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query events");
 		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time);
-		dm = new DeltaManagerOcelotl();
-		dm.start();
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		getOcelotlParameters().setTimeSliceManager(timeSliceManager);
 		
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
 				.getTraceTypeConfig()).getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getThreadNumber(), t,
 					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread()));
+							.getTraceTypeConfig()).getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
+		if(monitor.isCanceled())
+			return;
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}

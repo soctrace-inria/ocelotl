@@ -22,6 +22,8 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregation2Manager;
@@ -29,7 +31,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTim
 public interface I2DSpaceTimeMicroDescription extends ITimeAggregationOperator {
 
 	@Override
-	public SpaceTimeAggregation2Manager createManager() throws OcelotlException;
+	public SpaceTimeAggregation2Manager createManager(IProgressMonitor monitor) throws OcelotlException;
 
 	public List<HashMap<EventProducer, HashMap<String, Double>>> getMatrix();
 }
