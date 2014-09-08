@@ -32,6 +32,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.management.monitor.Monitor;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,10 +68,10 @@ public class IteratorQueries extends EventQuery {
 			return current;
 		}
 
-		public Event getNext() {
+		public Event getNext(IProgressMonitor monitor) {
 			try {
 				current = rebuildNextEvent();
-				if (current != null)
+				if (current != null && !monitor.isCanceled())
 					return current;
 			} catch (SQLException | SoCTraceException e) {
 				// TODO Auto-generated catch block

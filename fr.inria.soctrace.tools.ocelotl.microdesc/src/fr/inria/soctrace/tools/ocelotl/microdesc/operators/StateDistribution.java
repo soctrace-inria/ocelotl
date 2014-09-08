@@ -95,7 +95,11 @@ public class StateDistribution extends _3DMicroDescription {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
+				if (monitor.isCanceled()) {
+					return;
+				}
 				IState state;
+				long eventCount = 0;
 				// For each event
 				for (final Event event : events) {
 					// Convert to state
@@ -104,6 +108,12 @@ public class StateDistribution extends _3DMicroDescription {
 					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
 					matrixUpdate(state, event.getEventProducer(), distrib);
+					eventCount++;
+					if (eventCount % 10 == 0) {
+						if (monitor.isCanceled()) {
+							return;
+						}
+					}
 				}
 			}
 		}
@@ -213,6 +223,9 @@ public class StateDistribution extends _3DMicroDescription {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
+				if (monitor.isCanceled()) {
+					return;
+				}
 				IState state;
 				long eventCount = 0;
 				// For each event
@@ -302,7 +315,6 @@ public class StateDistribution extends _3DMicroDescription {
 			return timeSlicesDistribution;
 		}
 	}
-
 	
 	@Override
 	protected void computeDirtyCacheMatrix(
@@ -334,6 +346,7 @@ public class StateDistribution extends _3DMicroDescription {
 					((DistributionConfig) getOcelotlParameters()
 							.getTraceTypeConfig()).getEventsPerThread(),
 					timesliceIndex, monitor));
+
 		for (final Thread thread : threadlist)
 			thread.join();
 
@@ -343,5 +356,5 @@ public class StateDistribution extends _3DMicroDescription {
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-
+	
 }

@@ -201,21 +201,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	public List<Event> getEvents(final int size, IProgressMonitor monitor) {
 		final List<Event> events = new ArrayList<Event>();
-		int eventCount = 0;
 		if (monitor.isCanceled())
-			return null;
+			return events;
 		synchronized (eventIterator) {
 			for (int i = 0; i < size; i++) {
-				if (eventIterator.getNext() == null)
+				if (eventIterator.getNext(monitor) == null)
 					return events;
 				events.add(eventIterator.getEvent());
 				eventsNumber++;
-				eventCount++;
-				if (eventCount % 30 == 0) {
-					if (monitor.isCanceled()) {
-						return null;
-					}
-				}
 			}
 		}
 		return events;

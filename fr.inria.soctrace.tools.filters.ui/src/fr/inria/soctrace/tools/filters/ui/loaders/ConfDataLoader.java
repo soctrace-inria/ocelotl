@@ -37,7 +37,6 @@ import fr.inria.soctrace.lib.search.utils.Printer;
 import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
-import fr.inria.soctrace.tools.filters.ui.FilterTool;
 
 /**
  * Convenience class to load Trace data related to Filter tool configuration.

@@ -129,6 +129,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 
 			FileDialog dialog = new FileDialog(getSite().getShell(), SWT.OPEN);
+			dialog.setFilterPath(ocelotlParameters.getDataCache().getCacheDirectory());
 			loadCachefile = dialog.open();
 
 			if (loadCachefile != null) {
@@ -630,10 +631,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			hasChanged = HasChanged.ALL;
 			if (comboTime.getText().equals(""))
 				return;
 			
+			hasChanged = HasChanged.ALL;
 			manager.openConfigWindows();
 		}
 	}
@@ -999,6 +1000,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		Button btnTakeSnapshot = new Button(groupTime, SWT.NONE);
 		btnTakeSnapshot.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/snapshot-icon.png"));
 		btnTakeSnapshot.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnTakeSnapshot.setToolTipText("Take a snapshot of the current view.");
 		btnTakeSnapshot.addSelectionListener(new TakeSnapshotAdapter());
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
@@ -1406,7 +1408,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setParameter(oldParameters.getParameter());
 		ocelotlParameters.setTimeRegion(oldParameters.getTimeRegion());
 		hasChanged = HasChanged.ALL;
-
 	}
 
 	@Override
