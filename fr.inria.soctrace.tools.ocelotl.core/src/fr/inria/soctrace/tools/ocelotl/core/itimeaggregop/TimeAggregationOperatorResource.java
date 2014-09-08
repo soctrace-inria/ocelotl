@@ -22,8 +22,6 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.inria.soctrace.lib.model.EventType;
-
 public class TimeAggregationOperatorResource {
 
 	private static final String Split = ", ";

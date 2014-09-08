@@ -35,7 +35,6 @@ import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
@@ -88,12 +87,17 @@ public class VariableDistribution extends _3DMicroDescription {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
+				if (monitor.isCanceled())
+					return;
+				
 				IVariable variable;
 				for (final Event event : events) {
 					variable = new GenericVariable(event, timeSliceManager);
 					final Map<Long, Double> distrib = variable
 							.getTimeSlicesDistribution();
 					matrixUpdate(variable, event.getEventProducer(), distrib);
+					if (monitor.isCanceled())
+						return;
 				}
 			}
 		}
@@ -109,34 +113,6 @@ public class VariableDistribution extends _3DMicroDescription {
 			IProgressMonitor monitor) throws SoCTraceException,
 			OcelotlException {
 		super(parameters, monitor);
-	}
-
-	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers,
-			IProgressMonitor monitor) throws SoCTraceException,
-			InterruptedException, OcelotlException {
-		dm = new DeltaManagerOcelotl();
-		dm.start();
-		eventIterator = ocelotlQueries.getVariableIterator(eventProducers);
-		if (monitor.isCanceled()) {
-			ocelotlQueries.closeIterator();
-			return;
-		}
-		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
-		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
-				.getTraceTypeConfig()).getThreadNumber(); t++)
-			threadlist.add(new OcelotlThread(
-					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getThreadNumber(), t,
-					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread(), monitor));
-		for (final Thread thread : threadlist)
-			thread.join();
-		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION: "
-				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 
 	@Override
@@ -166,14 +142,5 @@ public class VariableDistribution extends _3DMicroDescription {
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-
-	@Override
-	public void initQueries() {
-		try {
-			ocelotlQueries = new OcelotlQueries(parameters);
-		} catch (final SoCTraceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	
 }

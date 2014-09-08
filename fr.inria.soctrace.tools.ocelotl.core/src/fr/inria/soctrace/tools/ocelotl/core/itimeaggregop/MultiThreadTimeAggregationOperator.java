@@ -51,11 +51,11 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class MultiThreadTimeAggregationOperator {
-	
+
 	private static final Logger logger = LoggerFactory
 			.getLogger(MultiThreadTimeAggregationOperator.class);
-	
-	//protected TimeSliceStateManager timeSliceManager;
+
+	// protected TimeSliceStateManager timeSliceManager;
 	protected EventIterator eventIterator;
 	protected int count = 0;
 	protected int epit = 0;
@@ -64,22 +64,32 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected OcelotlParameters parameters;
 	protected OcelotlQueries ocelotlQueries;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
-	
-	abstract protected void computeMatrix(IProgressMonitor monitor) throws SoCTraceException,
-			InterruptedException, OcelotlException;
+
+	abstract protected void computeMatrix(IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException;
+
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		// Default time interval
+		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+		time.add(new IntervalDesc(parameters.getTimeRegion()
+				.getTimeStampStart(), parameters.getTimeRegion()
+				.getTimeStampEnd()));
+
+		computeSubMatrix(eventProducers, time, monitor);
+	}
 
 	abstract protected void computeSubMatrix(
-			final List<EventProducer> eventProducers, IProgressMonitor monitor) throws SoCTraceException,
+			final List<EventProducer> eventProducers, List<IntervalDesc> time,
+			IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException;
-	
-	abstract protected void computeSubMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time, IProgressMonitor monitor)
-			throws SoCTraceException, InterruptedException, OcelotlException;
 
 	protected void computeDirtyCacheMatrix(
 			final List<EventProducer> eventProducers, List<IntervalDesc> time,
-			HashMap<Long, List<TimeSlice>> timesliceIndex, IProgressMonitor monitor)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+			HashMap<Long, List<TimeSlice>> timesliceIndex,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		computeSubMatrix(eventProducers, time, monitor);
 	}
 
@@ -89,7 +99,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * @return the String containing the matrix values
 	 */
 	public abstract String matrixToCSV();
-	
+
 	/**
 	 * Initialize the matrix with zero values. Since a lot of values in the
 	 * matrix are zeroes, this trick reduces the size of the cached data and
@@ -105,12 +115,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * Fill the matrix with values from the cache file
 	 * 
 	 * @param values
-	 *            Array of Strings containing the values and the indexes of the matrix
+	 *            Array of Strings containing the values and the indexes of the
+	 *            matrix
 	 * @param sliceMultiple
 	 *            used to compute the current slice number if the number of time
 	 *            slices is a divisor of the number of slices of the cached data
 	 */
-	public abstract void rebuildMatrix(String[] values, EventProducer ep, int sliceMultiple);
+	public abstract void rebuildMatrix(String[] values, EventProducer ep,
+			int sliceMultiple);
 
 	/**
 	 * Fill the matrix with values from the cache multiplied by the factor
@@ -143,16 +155,17 @@ public abstract class MultiThreadTimeAggregationOperator {
 		return parameters;
 	}
 
-//	public TimeSliceStateManager getTimeSlicesManager() {
-//		return timeSliceManager;
-//	}
+	// public TimeSliceStateManager getTimeSlicesManager() {
+	// return timeSliceManager;
+	// }
 
 	abstract public void initQueries();
 
 	abstract protected void initVectors() throws SoCTraceException;
 
-	public void setOcelotlParameters(final OcelotlParameters parameters, IProgressMonitor monitor)
-			throws SoCTraceException, InterruptedException, OcelotlException {
+	public void setOcelotlParameters(final OcelotlParameters parameters,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
 		this.parameters = parameters;
 		count = 0;
 		epit = 0;
@@ -160,8 +173,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// .getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		initQueries();
 		initVectors();
-		if(monitor.isCanceled())
+		if (monitor.isCanceled())
 			return;
+
 		// If the cache is enabled
 		if (parameters.getDataCache().isCacheActive()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
@@ -174,9 +188,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 				monitor.setTaskName("Loading data from database");
 				computeMatrix(monitor);
 
-				if(monitor.isCanceled())
+				if (monitor.isCanceled())
 					return;
-				
+
 				if (eventsNumber == 0)
 					throw new OcelotlException(OcelotlException.NO_EVENTS);
 
@@ -223,14 +237,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 		// would result in an incomplete datacache
 		if (!parameters.getDataCache().isCacheActive() || !noFiltering())
 			return;
-		
+
 		Date convertedDate = new Date(System.currentTimeMillis() * 1000);
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
-				+ parameters.getTimeAggOperator() + "_"
-				+ convertedDate;
+				+ parameters.getTimeAggOperator() + "_" + convertedDate;
 
 		// Write to file,
 		try {
@@ -274,15 +287,16 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 		parameters.getDataCache().saveData(parameters, filePath);
 	}
-	
+
 	/**
 	 * Load matrix values from a cache file
 	 * 
 	 * @param aCacheFile
 	 *            the cache file
-	 * @throws OcelotlException 
+	 * @throws OcelotlException
 	 */
-	public void loadFromCache(File aCacheFile, IProgressMonitor monitor) throws OcelotlException {
+	public void loadFromCache(File aCacheFile, IProgressMonitor monitor)
+			throws OcelotlException {
 		try {
 			dm = new DeltaManagerOcelotl();
 			dm.start();
@@ -291,28 +305,29 @@ public abstract class MultiThreadTimeAggregationOperator {
 			for (EventProducer ep : parameters.getEventProducers()) {
 				eventProducers.put(String.valueOf(ep.getId()), ep);
 			}
-			
+
 			// If no event producer is selected
-			if(eventProducers.isEmpty())
+			if (eventProducers.isEmpty())
 				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
-		
+
 			typeNames.clear();
 			for (EventType evt : parameters.getTraceTypeConfig().getTypes()) {
 				typeNames.add(evt.getName());
 			}
 			// If no event type is selected
-			if(typeNames.isEmpty())
+			if (typeNames.isEmpty())
 				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
 
 			// Fill the matrix with zeroes
 			initMatrixToZero(eventProducers.values());
 
-			if (monitor.isCanceled()) 
-				return;	
-				
+			if (monitor.isCanceled())
+				return;
+
 			// Check how to rebuild the matrix
 			if (parameters.getDataCache().isRebuildDirty()) {
-				monitor.setTaskName("Rebuilding with strategy " + parameters.getDataCache().getBuildingStrategy());
+				monitor.setTaskName("Rebuilding with strategy "
+						+ parameters.getDataCache().getBuildingStrategy());
 				rebuildDirtyMatrix(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache (dirty)");
 			} else {
@@ -324,20 +339,20 @@ public abstract class MultiThreadTimeAggregationOperator {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	public void rebuildNormalMatrix(File aCacheFile,
-			HashMap<String, EventProducer> eventProducers, IProgressMonitor monitor) throws IOException {
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException {
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
 
 		monitor.subTask("Filling matrix with cache data");
-		long lineCount = 0;
+
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
@@ -354,13 +369,12 @@ public abstract class MultiThreadTimeAggregationOperator {
 				rebuildMatrix(values, eventProducers.get(values[1]), parameters
 						.getDataCache().getTimeSliceFactor());
 			}
-			lineCount++;
 
-			if (lineCount % 50 == 0)
-				if (monitor.isCanceled()) {
-					bufFileReader.close();
-					return;
-				}
+			if (monitor.isCanceled()) {
+				bufFileReader.close();
+				return;
+			}
+
 		}
 		bufFileReader.close();
 	}
@@ -375,20 +389,21 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 * @throws IOException
 	 */
 	public void rebuildDirtyMatrix(File aCacheFile,
-			HashMap<String, EventProducer> eventProducers, IProgressMonitor monitor) throws IOException {
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException {
 
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
-		
+
 		// Contains the proportion factor for the dirty cached time slices
 		HashMap<TimeSlice, List<Double>> cachedSliceProportions = new HashMap<TimeSlice, List<Double>>();
 
 		// Build an index in order to get quick access to a cached time slice
 		HashMap<Integer, TimeSlice> cacheTimeSliceIndex = new HashMap<Integer, TimeSlice>();
-		
+
 		// Build a reverse index from time slice to cached time slice
 		HashMap<Long, List<TimeSlice>> timesliceIndex = new HashMap<Long, List<TimeSlice>>();
-		
+
 		// Value of the biggest cache timeslice number that is used
 		int maxSliceNumber = 0;
 
@@ -435,7 +450,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			}
 		}
 
-		if (monitor.isCanceled()) 
+		if (monitor.isCanceled())
 			return;
 
 		// If strategy is DATACACHE_DATABASE
@@ -464,7 +479,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
 
-		long lineCount = 0;
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
@@ -474,7 +488,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
 
-			lineCount++;
 			// If the event producer is not filtered out
 			if (eventProducers.containsKey(values[1])) {
 				int slice = Integer.parseInt(values[0]);
@@ -531,11 +544,11 @@ public abstract class MultiThreadTimeAggregationOperator {
 									.get(0).getNumber(), 1.0);
 				}
 			}
-			if (lineCount % 50 == 0)
-				if (monitor.isCanceled()) {
-					bufFileReader.close();
-					return;
-				}
+			
+			if (monitor.isCanceled()) {
+				bufFileReader.close();
+				return;
+			}
 		}
 
 		bufFileReader.close();
@@ -571,7 +584,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 						.getTimeStampEnd() - aNewTimeSlice.getTimeRegion()
 						.getTimeStampStart()))
 						/ ((double) cachedTimeSlice.getTimeRegion()
-			.getTimeDuration()));
+								.getTimeDuration()));
 			}
 		}
 
@@ -600,7 +613,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			index++;
 		}
 	}
-	
+
 	/**
 	 * Create a time interval in which we get the event
 	 * 
@@ -611,14 +624,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 	public IntervalDesc databaseRebuild(TimeSlice cachedTimeSlice) {
 		long startInterval;
 		long endInterval;
-		
+
 		// If time slice begins within the time region
 		if (cachedTimeSlice.getTimeRegion().getTimeStampStart() > parameters
 				.getTimeRegion().getTimeStampStart())
 			startInterval = cachedTimeSlice.getTimeRegion().getTimeStampStart();
 		else
 			startInterval = parameters.getTimeRegion().getTimeStampStart();
-		
+
 		// If time slice ends within the time region
 		if (cachedTimeSlice.getTimeRegion().getTimeStampEnd() < parameters
 				.getTimeRegion().getTimeStampEnd())
@@ -628,7 +641,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 		return new IntervalDesc(startInterval, endInterval);
 	}
-	
+
 	/**
 	 * Check if there are filters on event types or producers
 	 * 

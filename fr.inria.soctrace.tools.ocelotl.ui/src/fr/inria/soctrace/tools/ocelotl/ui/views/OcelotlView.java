@@ -515,7 +515,8 @@ private class TakeSnapshotAdapter extends SelectionAdapter {
 									}
 									return Status.CANCEL_STATUS;
 								}
-								monitor.setTaskName("Compute Qualities");
+								monitor.setTaskName("Init Time Operator");
+								monitor.subTask("");
 								ocelotlCore.computeQualities(monitor);
 								monitor.worked(1);
 							}
