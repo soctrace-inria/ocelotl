@@ -15,6 +15,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class _3DMatrixMicroDescription extends
@@ -76,6 +77,16 @@ public abstract class _3DMatrixMicroDescription extends
 
 			for (final EventProducer ep : producers)
 				matrix.get((int) i).put(ep, new HashMap<String, Double>());
+		}
+	}
+	
+	@Override
+	public void initQueries() {
+		try {
+			ocelotlQueries = new OcelotlQueries(parameters);
+		} catch (final SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -179,5 +190,5 @@ public abstract class _3DMatrixMicroDescription extends
 			}
 		}
 	}
-	
+
 }

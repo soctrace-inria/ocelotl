@@ -29,7 +29,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregati
 
 public abstract class _3DMicroDescription extends _3DMatrixMicroDescription
 		implements I3DMicroDescription {
-
+	
 	public _3DMicroDescription() {
 		super();
 	}
@@ -55,4 +55,5 @@ public abstract class _3DMicroDescription extends _3DMatrixMicroDescription
 			final String key) {
 		matrix.get(incr).get(ep).put(key, 0.0);
 	}
+	
 }

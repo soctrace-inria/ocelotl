@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 
 public class TypeDistributionView extends DistributionBaseView {
 
