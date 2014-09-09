@@ -822,17 +822,15 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button 						btnCacheEnabled;
 	private Snapshot 					snapshot;
 	private OcelotlParameters			oldParameters;
-	private Button						btnRadioButton, btnRadioButton_1, btnRadioButton_2, btnRadioButton_3;
-	
-	
+	private Button								btnRadioButton, btnRadioButton_1, btnRadioButton_2, btnRadioButton_3;
+	private HashMap<DatacachePolicy, Button>	cachepolicy		= new HashMap<DatacachePolicy, Button>();
+
 	/**
 	 * Followed topics
 	 */
 	protected FramesocBusTopicList topics = null;
 	private Spinner dataCacheSize;
-
 	private Button	btnSaveDataCache;
-
 	private ConfigViewManager	manager;
 
 	/** @throws SoCTraceException */
@@ -842,7 +840,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		} catch (final SoCTraceException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
-
+		
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
@@ -907,7 +905,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					return;
 				final TraceIntervalDescriptor des = new TraceIntervalDescriptor();
 				des.setTrace(ocelotlParameters.getTrace());
-
 				des.setStartTimestamp(getTimeRegion().getTimeStampStart());
 				des.setEndTimestamp(getTimeRegion().getTimeStampEnd());
 				FramesocBus.getInstance().send(FramesocBusTopic.TOPIC_UI_TABLE_DISPLAY_TIME_INTERVAL, des);
@@ -1289,6 +1286,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnRadioButton_3.setText("Auto");
 		new Label(groupDataCacheSettings, SWT.NONE);
 		
+		cachepolicy.put(DatacachePolicy.CACHEPOLICY_SLOW, btnRadioButton);
+		cachepolicy.put(DatacachePolicy.CACHEPOLICY_FAST, btnRadioButton_1);
+		cachepolicy.put(DatacachePolicy.CACHEPOLICY_ASK, btnRadioButton_2);
+		cachepolicy.put(DatacachePolicy.CACHEPOLICY_AUTO, btnRadioButton_3);
+		
+		cachepolicy.get(ocelotlParameters.getOcelotlSettings().getCachePolicy()).setSelection(true);
+		
 		if (ocelotlParameters.getOcelotlSettings().getCacheSize() > 0) {
 			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000);
 		} else {
@@ -1459,25 +1463,40 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		hasChanged = HasChanged.ALL;
 	}
 	
-	public void setCachePolicy()
-	{
-		switch(ocelotlParameters.getOcelotlSettings().getCachePolicy())
-		{
-			case CACHEPOLICY_FAST: 
+	/**
+	 * Set the cache strategy depending on the selected policy
+	 * TODO Take the operator into account
+	 */
+	public void setCachePolicy() {
+		switch (ocelotlParameters.getOcelotlSettings().getCachePolicy()) {
+		case CACHEPOLICY_FAST:
+			ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
+			break;
+
+		case CACHEPOLICY_SLOW:
+			ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_DATABASE);
+			break;
+
+		case CACHEPOLICY_ASK:
+			String[] dialogButtonLabels = { "Precise", "Fast", "Automatic" };
+			MessageDialog choosePolicy = new MessageDialog(getSite().getShell(), "Choose a cache policy", null, "Please choose one of the following methods for cache rebuilding:", MessageDialog.NONE, dialogButtonLabels, 0);
+			int choice = choosePolicy.open();
+			
+			if (choice == 0) {
+				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_DATABASE);
+				break;
+			} else if (choice == 1) {
 				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
 				break;
-				
-			case CACHEPOLICY_FAST: 
-				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
-				break;
-				
-			case CACHEPOLICY_FAST: 
-				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
-				break;
-				
-			case CACHEPOLICY_FAST: 
-				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
-				break;
+			}
+
+		case CACHEPOLICY_AUTO:
+			// TODO implement auto (decision taken when computing ratio)
+			ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
+			break;
+
+		default:
+			break;
 		}
 	}
 

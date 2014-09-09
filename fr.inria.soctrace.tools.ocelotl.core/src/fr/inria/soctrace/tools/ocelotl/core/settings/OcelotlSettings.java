@@ -47,7 +47,6 @@ public class OcelotlSettings {
 				.getLocation().toString()
 				+ "/ocelotlSnapshot";
 		
-		
 		cachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 
 		// Check if a configuration file exists and if so, load the saved
@@ -89,7 +88,7 @@ public class OcelotlSettings {
 							setCacheSize(-1);
 						}
 						setSnapShotDirectory(config[3]);
-						//setCachePolicy(Integer.valueOf(config[4]));
+						setCachePolicy(DatacachePolicy.valueOf(config[4]));
 						
 					} else {
 						logger.debug("Invalid configuration file: Default values will be used");
@@ -206,7 +205,10 @@ public class OcelotlSettings {
 	}
 
 	public void setCachePolicy(DatacachePolicy cachePolicy) {
-		this.cachePolicy = cachePolicy;
+		if (this.cachePolicy != cachePolicy) {
+			this.cachePolicy = cachePolicy;
+			saveSettings();
+		}
 	}
 
 }

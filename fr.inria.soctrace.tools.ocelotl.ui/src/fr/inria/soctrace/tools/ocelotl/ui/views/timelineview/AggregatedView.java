@@ -114,7 +114,6 @@ abstract public class AggregatedView implements IAggregatedView {
 		@Override
 		public void mouseDoubleClicked(final MouseEvent arg0) {
 			// TODO Auto-generated method stub
-
 		}
 
 		@Override
@@ -151,8 +150,10 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseExited(final MouseEvent arg0) {
-			state = State.EXITED;
-			mouseReleased(arg0);
+			if (state != State.RELEASED && state != State.MOVE_START && state != State.MOVE_END && state != State.EXITED) {
+				state = State.EXITED;
+				mouseReleased(arg0);
+			}
 		}
 
 		@Override
@@ -218,11 +219,7 @@ abstract public class AggregatedView implements IAggregatedView {
 			if (time == null)
 				return;
 
-			selectTime.setTimeStampStart(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampStart()).getTimeRegion().getTimeStampStart());
-			selectTime.setTimeStampEnd(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampEnd()).getTimeRegion().getTimeStampEnd());
-
 			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-				// ocelotlView.setTimeRegion(selectTime);
 				double sliceSize = (double) resetTime.getTimeDuration() / (double) ocelotlView.getTimeSliceNumber();
 				int i = 0;
 				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++) {
@@ -246,9 +243,7 @@ abstract public class AggregatedView implements IAggregatedView {
 					root.remove(selectFigure);
 				root.repaint();
 			}
-			// selectTime = new TimeRegion(resetTime);
 		}
-
 	}
 
 	public static Color getActivecolorbg() {
