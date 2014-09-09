@@ -72,9 +72,11 @@ import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
@@ -703,6 +705,25 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 	
+	private class cachePolicyListener extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			if (btnRadioButton.getSelection()) {
+				ocelotlParameters.getOcelotlSettings().setCachePolicy(DatacachePolicy.CACHEPOLICY_SLOW);
+			}
+			if (btnRadioButton_1.getSelection()) {
+				ocelotlParameters.getOcelotlSettings().setCachePolicy(DatacachePolicy.CACHEPOLICY_FAST);
+			}
+			if (btnRadioButton_2.getSelection()) {
+				ocelotlParameters.getOcelotlSettings().setCachePolicy(DatacachePolicy.CACHEPOLICY_ASK);
+			}
+			if (btnRadioButton_3.getSelection()) {
+				ocelotlParameters.getOcelotlSettings().setCachePolicy(DatacachePolicy.CACHEPOLICY_AUTO);
+			}
+		}
+	}
+	
 	private class TraceAdapter extends SelectionAdapter {
 		private Trace	trace;
 
@@ -798,9 +819,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Text						datacacheDirectory;
 	private Button						btnChangeCacheDirectory;
 	private Button 						btnCacheEnabled;
-	private int 						TS=0;
 	private Snapshot 					snapshot;
 	private OcelotlParameters			oldParameters;
+	private Button						btnRadioButton, btnRadioButton_1, btnRadioButton_2, btnRadioButton_3;
+	
 	
 	/**
 	 * Followed topics
@@ -1180,7 +1202,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
 		sashFormAdvancedParameters.setWeights(new int[] { 1 });
 		
-
 		// Datacache settings
 		final TabItem tbtmOcelotlSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtmOcelotlSettings.setText("Settings");
@@ -1243,6 +1264,30 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
 		new Label(groupDataCacheSettings, SWT.NONE);
 		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		Label lblCachePolicy = new Label(groupDataCacheSettings, SWT.NONE);
+		lblCachePolicy.setText("Cache policy");
+		new Label(groupDataCacheSettings, SWT.NONE);
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		btnRadioButton = new Button(groupDataCacheSettings, SWT.RADIO);
+		btnRadioButton.addSelectionListener(new cachePolicyListener());
+		btnRadioButton.setText("Precise (slow)");
+		
+		btnRadioButton_1 = new Button(groupDataCacheSettings, SWT.RADIO);
+		btnRadioButton_1.addSelectionListener(new cachePolicyListener());
+		btnRadioButton_1.setText("Fast");
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		btnRadioButton_2 = new Button(groupDataCacheSettings, SWT.RADIO);
+		btnRadioButton_2.addSelectionListener(new cachePolicyListener());
+		btnRadioButton_2.setText("Ask me");
+		
+		btnRadioButton_3 = new Button(groupDataCacheSettings, SWT.RADIO);
+		btnRadioButton_3.addSelectionListener(new cachePolicyListener());
+		btnRadioButton_3.setText("Auto");
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
 		if (ocelotlParameters.getOcelotlSettings().getCacheSize() > 0) {
 			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000);
 		} else {
@@ -1390,6 +1435,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
 		ocelotlParameters.setSpaceAggOperator(comboSpace.getText());
+		setCachePolicy();
+		
 		try {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());
@@ -1409,6 +1456,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setParameter(oldParameters.getParameter());
 		ocelotlParameters.setTimeRegion(oldParameters.getTimeRegion());
 		hasChanged = HasChanged.ALL;
+	}
+	
+	public void setCachePolicy()
+	{
+		
 	}
 
 	@Override

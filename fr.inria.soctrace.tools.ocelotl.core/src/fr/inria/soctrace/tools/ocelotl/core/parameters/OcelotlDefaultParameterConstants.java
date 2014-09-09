@@ -1,4 +1,6 @@
-package fr.inria.soctrace.tools.ocelotl.ui.views;
+package fr.inria.soctrace.tools.ocelotl.core.parameters;
+
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 /*
  * Class for the constants defining the default parameters in Ocelotl
  */
@@ -46,7 +48,6 @@ public class OcelotlDefaultParameterConstants {
 	 */
 	public static final int maxTimeslice = 10000;
 	
-	
 	/**
 	 * Gain/Loss ratio
 	 */
@@ -56,4 +57,16 @@ public class OcelotlDefaultParameterConstants {
 	 * Number of event producer per query (0 = all)
 	 */
 	public static final int EventProducersPerQuery = 0;
+	
+	/**
+	 * Is the cache activated by default
+	 */
+	public static boolean DEFAULT_CACHE_ACTIVATION = true;
+
+	/**
+	 * Is the cache activated by default
+	 */
+	public static DatacachePolicy DEFAULT_CACHE_POLICY = DatacachePolicy.CACHEPOLICY_FAST;
+
+
 }

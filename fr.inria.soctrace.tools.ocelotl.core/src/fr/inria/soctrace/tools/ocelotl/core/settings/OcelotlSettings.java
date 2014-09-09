@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
 
 public class OcelotlSettings {
 
@@ -23,6 +25,7 @@ public class OcelotlSettings {
 	private String cacheDirectory;
 	private int cacheSize;
 	private String snapShotDirectory;
+	private DatacachePolicy cachePolicy;
 	
 	// Default directory where the config file is
 	private String defaultConfigFile;
@@ -30,7 +33,8 @@ public class OcelotlSettings {
 	public OcelotlSettings() {
 		
 		// Init with default configuration
-		cacheActivated = OcelotlConstants.DEFAULT_CACHE_ACTIVATION;
+		cacheActivated = OcelotlDefaultParameterConstants.Normalize;
+			//	OcelotlConstants.DEFAULT_CACHE_ACTIVATION;
 
 		// Default cache directory is the directory "ocelotlCache" in the
 		// running directory
@@ -42,6 +46,9 @@ public class OcelotlSettings {
 		snapShotDirectory = ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
 				+ "/ocelotlSnapshot";
+		
+		
+		cachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -82,6 +89,8 @@ public class OcelotlSettings {
 							setCacheSize(-1);
 						}
 						setSnapShotDirectory(config[3]);
+						//setCachePolicy(Integer.valueOf(config[4]));
+						
 					} else {
 						logger.debug("Invalid configuration file: Default values will be used");
 					}
@@ -96,7 +105,8 @@ public class OcelotlSettings {
 				logger.debug("Cache directory: " + cacheDirectory);
 				logger.debug("Cache size: " + cacheSize);
 				logger.debug("Snapshot directory: " + snapShotDirectory);
-
+				logger.debug("Cache Policy: " + cachePolicy);
+				
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -127,6 +137,8 @@ public class OcelotlSettings {
 		}		
 		output.append(";");
 		output.append(snapShotDirectory);
+		output.append(";");
+		output.append(cachePolicy);
 
 		String newSettings = output.toString();
 
@@ -187,6 +199,14 @@ public class OcelotlSettings {
 			this.cacheActivated = cacheActivated;
 			saveSettings();
 		}
+	}
+
+	public DatacachePolicy getCachePolicy() {
+		return cachePolicy;
+	}
+
+	public void setCachePolicy(DatacachePolicy cachePolicy) {
+		this.cachePolicy = cachePolicy;
 	}
 
 }
