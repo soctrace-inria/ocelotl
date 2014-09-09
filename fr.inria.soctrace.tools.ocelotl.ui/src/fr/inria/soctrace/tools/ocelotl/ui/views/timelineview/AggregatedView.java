@@ -152,6 +152,7 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseExited(final MouseEvent arg0) {
+			state=State.EXITED;
 			mouseReleased(arg0);
 		}
 
