@@ -121,8 +121,8 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		monitor.subTask("Query variables");
-		eventIterator = ocelotlQueries
-				.getVariableIterator(eventProducers, time);
+		eventIterator = ocelotlQueries.getVariableIterator(eventProducers,
+				time, monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;

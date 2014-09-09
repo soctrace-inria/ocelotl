@@ -121,7 +121,8 @@ public class VariableDistribution extends _3DMicroDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		eventIterator = ocelotlQueries.getVariableIterator(eventProducers, time);
+		eventIterator = ocelotlQueries.getVariableIterator(eventProducers,
+				time, monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;

@@ -122,7 +122,8 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
+		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
+				monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;

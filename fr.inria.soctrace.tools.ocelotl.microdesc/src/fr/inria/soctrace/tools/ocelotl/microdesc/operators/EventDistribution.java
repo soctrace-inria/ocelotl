@@ -128,7 +128,8 @@ public class EventDistribution extends _3DMicroDescription {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		monitor.subTask("Query events");
-		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time);
+		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time,
+				monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;

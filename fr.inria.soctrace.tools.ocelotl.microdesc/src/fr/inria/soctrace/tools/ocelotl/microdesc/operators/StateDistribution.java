@@ -132,7 +132,8 @@ public class StateDistribution extends _3DMicroDescription {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		monitor.subTask("Query states");
-		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
+		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
+				monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;
@@ -282,7 +283,8 @@ public class StateDistribution extends _3DMicroDescription {
 		if(monitor.isCanceled())
 			return;
 		monitor.subTask("Query states");
-		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
+		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
+				monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;

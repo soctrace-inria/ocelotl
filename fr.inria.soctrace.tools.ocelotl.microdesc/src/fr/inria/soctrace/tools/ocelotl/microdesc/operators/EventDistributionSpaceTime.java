@@ -131,7 +131,8 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		monitor.subTask("Query events");
-		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time);
+		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time,
+				monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;
