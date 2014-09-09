@@ -97,14 +97,13 @@ abstract public class AggregatedView implements IAggregatedView {
 	class TimeMouseListener implements MouseListener, MouseMotionListener {
 
 		private static final long	Threshold	= 5;
-		State	state	= State.RELEASED;
-		State 	previous = State.RELEASED;
-		Point	currentPoint;
-		Display display = Display.getCurrent();
-		Shell shell = display.getActiveShell();
-		long fixed;
-		
-		
+		State						state		= State.RELEASED;
+		State						previous	= State.RELEASED;
+		Point						currentPoint;
+		Display						display		= Display.getCurrent();
+		Shell						shell		= display.getActiveShell();
+		long						fixed;
+
 		public TimeMouseListener() {
 			super();
 			display = Display.getCurrent();
@@ -122,17 +121,17 @@ abstract public class AggregatedView implements IAggregatedView {
 		public void mouseDragged(final MouseEvent arg0) {
 			if ((state == State.PRESSED_G || state == State.DRAG_G || state == State.DRAG_G_START) && arg0.getLocation().getDistance(currentPoint) > 10) {
 				long moved = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
-				if (state != State.DRAG_G_START){
+				if (state != State.DRAG_G_START) {
 					state = State.DRAG_G;
 				}
 				moved = Math.max(moved, resetTime.getTimeStampStart());
 				moved = Math.min(moved, resetTime.getTimeStampEnd());
 				fixed = Math.max(fixed, resetTime.getTimeStampStart());
 				fixed = Math.min(fixed, resetTime.getTimeStampEnd());
-				if (fixed<moved){
+				if (fixed < moved) {
 					selectTime = new TimeRegion(fixed, moved);
-				}else
-					selectTime=new TimeRegion(moved, fixed);	
+				} else
+					selectTime = new TimeRegion(moved, fixed);
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
 				selectFigure.draw(selectTime, false);
@@ -152,7 +151,7 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseExited(final MouseEvent arg0) {
-			state=State.EXITED;
+			state = State.EXITED;
 			mouseReleased(arg0);
 		}
 
@@ -164,21 +163,18 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseMoved(final MouseEvent arg0) {
-			if (selectFigure!=null && root.getChildren().contains(selectFigure)){
-			if (Math.abs(selectFigure.getBounds().x-arg0.x)<Threshold){
-				state = State.MOVE_START;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+			if (selectFigure != null && root.getChildren().contains(selectFigure)) {
+				if (Math.abs(selectFigure.getBounds().x - arg0.x) < Threshold) {
+					state = State.MOVE_START;
+					shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+				} else if (Math.abs(selectFigure.getBounds().x + selectFigure.getBounds().width - arg0.x) < Threshold) {
+					state = State.MOVE_END;
+					shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+				} else {
+					state = State.RELEASED;
+					shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+				}
 			}
-			else if(Math.abs(selectFigure.getBounds().x+selectFigure.getBounds().width-arg0.x)<Threshold){
-				state = State.MOVE_END;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
-			}
-			else{
-				state=State.RELEASED;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
-			}
-			}
-					
 
 		}
 
@@ -187,73 +183,71 @@ abstract public class AggregatedView implements IAggregatedView {
 			if (arg0.button == 1 && resetTime != null) {
 				currentPoint = arg0.getLocation();
 				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
-				if (state == State.MOVE_START){
-					p3=selectTime.getTimeStampStart();
+				if (state == State.MOVE_START) {
+					p3 = selectTime.getTimeStampStart();
 					fixed = selectTime.getTimeStampEnd();
 					state = State.DRAG_G_START;
-				}else if(state == State.MOVE_END){
-					p3=selectTime.getTimeStampEnd();
+				} else if (state == State.MOVE_END) {
+					p3 = selectTime.getTimeStampEnd();
 					fixed = selectTime.getTimeStampStart();
 					state = State.DRAG_G;
-				}else{
-				state = State.PRESSED_G;
-				p3 = Math.max(p3, resetTime.getTimeStampStart());
-				p3 = Math.min(p3, resetTime.getTimeStampEnd());
-				selectTime=new TimeRegion(resetTime);
-				selectTime.setTimeStampStart(p3);
-				selectTime.setTimeStampEnd(p3);
-				fixed = p3;
+				} else {
+					state = State.PRESSED_G;
+					p3 = Math.max(p3, resetTime.getTimeStampStart());
+					p3 = Math.min(p3, resetTime.getTimeStampEnd());
+					selectTime = new TimeRegion(resetTime);
+					selectTime.setTimeStampStart(p3);
+					selectTime.setTimeStampEnd(p3);
+					fixed = p3;
 				}
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
 				selectFigure.draw(selectTime, false);
-				
+
 			}
 		}
 
 		@Override
 		public void mouseReleased(final MouseEvent arg0) {
-			
-			
+
 			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 			if (state == State.DRAG_G || state == State.DRAG_G_START) {
 				mouseDragged(arg0);
 			}
-				state = State.RELEASED;
-				if (time == null)
-					return;
-				
-				selectTime.setTimeStampStart(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampStart()).getTimeRegion().getTimeStampStart());
-				selectTime.setTimeStampEnd(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampEnd()).getTimeRegion().getTimeStampEnd());
-				
-				if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-					//ocelotlView.setTimeRegion(selectTime);
-					double sliceSize = (double)resetTime.getTimeDuration()/(double)ocelotlView.getTimeSliceNumber();
-					int i=0;
-					for (i=0; i<ocelotlView.getTimeSliceNumber(); i++){
-						if ((selectTime.getTimeStampStart()>=((long) ((sliceSize*i)+resetTime.getTimeStampStart())))&&(selectTime.getTimeStampStart()<((long) ((sliceSize*(i+1))+resetTime.getTimeStampStart())))){
-						selectTime.setTimeStampStart((long) ((sliceSize*i)+resetTime.getTimeStampStart()));
+			state = State.RELEASED;
+			if (time == null)
+				return;
+
+			selectTime.setTimeStampStart(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampStart()).getTimeRegion().getTimeStampStart());
+			selectTime.setTimeStampEnd(ocelotlView.getParams().getTimeSliceManager().getATimeSlice(selectTime.getTimeStampEnd()).getTimeRegion().getTimeStampEnd());
+
+			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
+				// ocelotlView.setTimeRegion(selectTime);
+				double sliceSize = (double) resetTime.getTimeDuration() / (double) ocelotlView.getTimeSliceNumber();
+				int i = 0;
+				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++) {
+					if ((selectTime.getTimeStampStart() >= ((long) ((sliceSize * i) + resetTime.getTimeStampStart()))) && (selectTime.getTimeStampStart() < ((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart())))) {
+						selectTime.setTimeStampStart((long) ((sliceSize * i) + resetTime.getTimeStampStart()));
 						break;
-						}
 					}
-					for (i=0; i<ocelotlView.getTimeSliceNumber(); i++){
-						if ((selectTime.getTimeStampEnd()>((long) ((sliceSize*i)+resetTime.getTimeStampStart())))&&(selectTime.getTimeStampEnd()<=((long) ((sliceSize*(i+1))+resetTime.getTimeStampStart())))){
-							selectTime.setTimeStampEnd((long) ((sliceSize*(i+1))+resetTime.getTimeStampStart()));
-						break;
-						}
-					}
-					ocelotlView.getTimeAxisView().select(selectTime, true);
-					ocelotlView.setTimeRegion(selectTime);
-					selectFigure.draw(selectTime, true);
-				} else {
-					ocelotlView.getTimeAxisView().resizeDiagram();
-					if (selectFigure.getParent() != null)
-						root.remove(selectFigure);
-					root.repaint();
 				}
-				//selectTime = new TimeRegion(resetTime);
+				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++) {
+					if ((selectTime.getTimeStampEnd() > ((long) ((sliceSize * i) + resetTime.getTimeStampStart()))) && (selectTime.getTimeStampEnd() <= ((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart())))) {
+						selectTime.setTimeStampEnd((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart()));
+						break;
+					}
+				}
+				ocelotlView.getTimeAxisView().select(selectTime, true);
+				ocelotlView.setTimeRegion(selectTime);
+				selectFigure.draw(selectTime, true);
+			} else {
+				ocelotlView.getTimeAxisView().resizeDiagram();
+				if (selectFigure.getParent() != null)
+					root.remove(selectFigure);
+				root.repaint();
 			}
-		
+			// selectTime = new TimeRegion(resetTime);
+		}
 
 	}
 
@@ -442,5 +436,5 @@ abstract public class AggregatedView implements IAggregatedView {
 		}
 		return result.toByteArray();
 	}
-	
+
 }

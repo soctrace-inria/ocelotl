@@ -73,6 +73,7 @@ import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
@@ -1460,7 +1461,24 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	
 	public void setCachePolicy()
 	{
-		
+		switch(ocelotlParameters.getOcelotlSettings().getCachePolicy())
+		{
+			case CACHEPOLICY_FAST: 
+				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
+				break;
+				
+			case CACHEPOLICY_FAST: 
+				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
+				break;
+				
+			case CACHEPOLICY_FAST: 
+				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
+				break;
+				
+			case CACHEPOLICY_FAST: 
+				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
+				break;
+		}
 	}
 
 	@Override
