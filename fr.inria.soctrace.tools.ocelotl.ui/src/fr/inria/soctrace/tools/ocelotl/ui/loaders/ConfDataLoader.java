@@ -145,8 +145,8 @@ public class ConfDataLoader {
 		final EventTypeQuery tQuery = new EventTypeQuery(traceDB);
 		types = tQuery.getList();
 		setSubTypes();
-		minTimestamp = Math.max(0, traceDB.getMinTimestamp());
-		maxTimestamp = Math.max(0, traceDB.getMaxTimestamp());
+		minTimestamp = currentTrace.getMinTimestamp();
+		maxTimestamp = currentTrace.getMaxTimestamp();
 
 		final AnalysisResultQuery aQuery = new AnalysisResultQuery(traceDB);
 		results = aQuery.getList();

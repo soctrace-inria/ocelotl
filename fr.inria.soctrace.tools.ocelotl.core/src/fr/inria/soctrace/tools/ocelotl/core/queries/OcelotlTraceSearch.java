@@ -128,8 +128,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 
 		// If we filter based on the timestamps
 		if (!intervals.isEmpty()) {
-			long min = traceDB.getMinTimestamp();
-			long max = traceDB.getMaxTimestamp();
+			long min = parameters.getTrace().getMinTimestamp();
+			long max = parameters.getTrace().getMaxTimestamp();
 
 			// For each timestamps intervals
 			for (IntervalDesc anInterval : intervals) {
@@ -227,8 +227,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 
 		// intervals
 		if (!intervals.isEmpty()) {
-			long min = traceDB.getMinTimestamp();
-			long max = traceDB.getMaxTimestamp();
+			long min = parameters.getTrace().getMinTimestamp();
+			long max = parameters.getTrace().getMaxTimestamp();
 
 			// For each timestamp intervals
 			for (IntervalDesc anInterval : intervals) {
