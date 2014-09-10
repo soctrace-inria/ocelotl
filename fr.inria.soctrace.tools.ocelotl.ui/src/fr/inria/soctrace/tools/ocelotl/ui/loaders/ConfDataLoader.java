@@ -147,6 +147,7 @@ public class ConfDataLoader {
 		setSubTypes();
 		minTimestamp = Math.max(0, traceDB.getMinTimestamp());
 		maxTimestamp = Math.max(0, traceDB.getMaxTimestamp());
+
 		final AnalysisResultQuery aQuery = new AnalysisResultQuery(traceDB);
 		results = aQuery.getList();
 		traceDB.close();

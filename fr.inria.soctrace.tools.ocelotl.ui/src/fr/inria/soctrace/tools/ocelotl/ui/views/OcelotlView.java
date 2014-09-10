@@ -40,6 +40,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -350,7 +352,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									}
 									return Status.CANCEL_STATUS;
 								}
-									
 								monitor.setTaskName("Init Time Operator");
 								ocelotlCore.initTimeOperator(monitor);
 								monitor.worked(1);
@@ -363,9 +364,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									}
 									return Status.CANCEL_STATUS;
 								}
-								monitor.setTaskName("Init Time Operator");
+								monitor.setTaskName("Compute Qualities");
 								monitor.subTask("");
-								ocelotlCore.computeQualities(monitor);
+								ocelotlCore.computeQualities();
 								monitor.worked(1);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
@@ -377,7 +378,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									return Status.CANCEL_STATUS;
 								}
 								monitor.setTaskName("Compute Dichotomy");
-								ocelotlCore.computeDichotomy(monitor);
+								ocelotlCore.computeDichotomy();
 								monitor.worked(1);
 							}
 						}
@@ -395,8 +396,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						// if (hasChanged == HasChanged.ALL || hasChanged ==
 						// HasChanged.NORMALIZE || hasChanged ==
 						// HasChanged.PARAMETER)
-						// new ComputePartWrapper(monitor, ocelotlCore);
-						ocelotlCore.computeParts(monitor);
+
+						ocelotlCore.computeParts();
 						monitor.worked(1);
 
 					} catch (final OcelotlException e) {
@@ -705,6 +706,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			}
 		}
 	}
+
+	private class CacheTimeSliceListener implements ModifyListener {
+
+		@Override
+		public void modifyText(final ModifyEvent e) {
+			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(cacheTimeSliceValue.getText()));
+		}
+	}
 	
 	private class cachePolicyListener extends SelectionAdapter {
 
@@ -820,10 +829,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Text						datacacheDirectory;
 	private Button						btnChangeCacheDirectory;
 	private Button 						btnCacheEnabled;
-	private Snapshot 					snapshot;
-	private OcelotlParameters			oldParameters;
+	private Snapshot							snapshot;
+	private OcelotlParameters					oldParameters;
 	private Button								btnRadioButton, btnRadioButton_1, btnRadioButton_2, btnRadioButton_3;
 	private HashMap<DatacachePolicy, Button>	cachepolicy		= new HashMap<DatacachePolicy, Button>();
+	private Spinner								cacheTimeSliceValue;
+	private Font								cantarell8;
 
 	/**
 	 * Followed topics
@@ -958,6 +969,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		final SashForm sashForm_4 = new SashForm(sashFormView, SWT.BORDER | SWT.VERTICAL);
 		compositeMatrixView = new Composite(sashForm_4, SWT.BORDER);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		cantarell8 = new Font(compositeMatrixView.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
 		timeLineViewWrapper.init(compositeMatrixView);
@@ -977,50 +989,49 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		groupTime.setSize(422, 110);
 		groupTime.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		groupTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupTime.setFont(cantarell8);
 		groupTime.setLayout(new GridLayout(11, false));
 
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
-		lblStartTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblStartTimestamp.setFont(cantarell8);
 		lblStartTimestamp.setText("Start");
 
 		textTimestampStart = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textTimestampStart = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
 		gd_textTimestampStart.widthHint = 150;
 		textTimestampStart.setLayoutData(gd_textTimestampStart);
-		textTimestampStart.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		textTimestampStart.setFont(cantarell8);
 
 		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
 		lblEndTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		lblEndTimestamp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblEndTimestamp.setFont(cantarell8);
 		lblEndTimestamp.setText("End");
 
 		textTimestampEnd = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textTimestampEnd = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
 		gd_textTimestampEnd.widthHint = 150;
 		textTimestampEnd.setLayoutData(gd_textTimestampEnd);
-		textTimestampEnd.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		textTimestampEnd.setFont(cantarell8);
 
 		btnReset = new Button(groupTime, SWT.NONE);
 		btnReset.setToolTipText("Reset Timestamps");
 		btnReset.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/undo_edit.gif"));
-		btnReset.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
 
 		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
-		lblTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblTSNumber.setFont(cantarell8);
 		lblTSNumber.setText("Timeslice Number");
 
 		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
 		final GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_spinnerTSNumber.widthHint = 100;
 		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
-		spinnerTSNumber.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		spinnerTSNumber.setFont(cantarell8);
 		spinnerTSNumber.setMaximum(OcelotlDefaultParameterConstants.maxTimeslice);
 		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
 		
 		Button btnTakeSnapshot = new Button(groupTime, SWT.NONE);
 		btnTakeSnapshot.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/snapshot-icon.png"));
-		btnTakeSnapshot.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnTakeSnapshot.setFont(cantarell8);
 		btnTakeSnapshot.setToolTipText("Take a snapshot of the current view.");
 		btnTakeSnapshot.addSelectionListener(new TakeSnapshotAdapter());
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
@@ -1044,10 +1055,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		final SashForm sashFormTSandCurve = new SashForm(tabFolder, SWT.VERTICAL);
 		tbtmTimeAggregationParameters.setControl(sashFormTSandCurve);
-		sashFormTSandCurve.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		sashFormTSandCurve.setFont(cantarell8);
 
 		final Group groupTraces = new Group(sashFormTSandCurve, SWT.NONE);
-		groupTraces.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupTraces.setFont(cantarell8);
 		groupTraces.setText("Trace");
 		groupTraces.setLayout(new GridLayout(1, false));
 
@@ -1061,7 +1072,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		final GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_comboTraces.widthHint = 179;
 		comboTraces.setLayoutData(gd_comboTraces);
-		comboTraces.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		comboTraces.setFont(cantarell8);
 		
 		Button btnLoadDataCache = new Button(composite_1, SWT.NONE);
 		btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
@@ -1079,12 +1090,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 		
 		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
-		groupAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupAggregationOperator.setFont(cantarell8);
 		groupAggregationOperator.setText("Microscopic Description");
 		groupAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
-		compositeAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		compositeAggregationOperator.setFont(cantarell8);
 		compositeAggregationOperator.setLayout(new GridLayout(3, false));
 		final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_compositeAggregationOperator.minimumHeight = 20;
@@ -1095,14 +1106,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		gd_comboAggregationOperator.widthHint = 170;
 		comboTime.setLayoutData(gd_comboAggregationOperator);
-		comboTime.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		comboTime.setFont(cantarell8);
 		comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
 		comboTime.setText("");
 		
 				btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
 				btnSettings.setToolTipText("Settings");
 				btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-				btnSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				btnSettings.setFont(cantarell8);
 				btnSettings.addSelectionListener(new SettingsSelectionAdapter());
 		
 		btnSaveDataCache = new Button(compositeAggregationOperator, SWT.NONE);
@@ -1113,7 +1124,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		final Group grpSpaceAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
 		grpSpaceAggregationOperator.setText("Visualization");
-		grpSpaceAggregationOperator.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		grpSpaceAggregationOperator.setFont(cantarell8);
 		grpSpaceAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite composite = new Composite(grpSpaceAggregationOperator, SWT.NONE);
@@ -1121,11 +1132,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		gd_composite.minimumHeight = 20;
 		gd_composite.widthHint = 85;
 		composite.setLayoutData(gd_composite);
-		composite.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		composite.setFont(cantarell8);
 		composite.setLayout(new GridLayout(2, false));
 
 		comboSpace = new Combo(composite, SWT.READ_ONLY);
-		comboSpace.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		comboSpace.setFont(cantarell8);
 		final GridData gd_combo = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
 		gd_combo.widthHint = 170;
 		comboSpace.setLayoutData(gd_combo);
@@ -1135,7 +1146,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnSettings2 = new Button(composite, SWT.NONE);
 		btnSettings2.setToolTipText("Settings");
 		btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-		btnSettings2.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnSettings2.setFont(cantarell8);
 		sashFormTSandCurve.setWeights(new int[] { 1, 1, 1 });
 		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
 
@@ -1145,18 +1156,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		tbtmAdvancedParameters.setText("Quality curves");
 
 		final SashForm sashFormAdvancedParameters = new SashForm(tabFolder, SWT.VERTICAL);
-		sashFormAdvancedParameters.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		sashFormAdvancedParameters.setFont(cantarell8);
 		tbtmAdvancedParameters.setControl(sashFormAdvancedParameters);
 
 		final Group groupQualityCurveSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
-		groupQualityCurveSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupQualityCurveSettings.setFont(cantarell8);
 		groupQualityCurveSettings.setText("Quality Curve Settings");
 		groupQualityCurveSettings.setLayout(new GridLayout(4, false));
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
-		btnNormalize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnNormalize.setFont(cantarell8);
 		btnNormalize.setSelection(true);
 		btnNormalize.setText("Normalize Qualities");
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
@@ -1165,7 +1176,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
-		btnGrowingQualities.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnGrowingQualities.setFont(cantarell8);
 		btnGrowingQualities.setText("Complexity gain (green)\nInformation gain (red)");
 		btnGrowingQualities.setSelection(true);
 		btnGrowingQualities.addSelectionListener(new GrowingQualityRadioSelectionAdapter());
@@ -1177,20 +1188,20 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)");
 		btnDecreasingQualities.setSelection(false);
-		btnDecreasingQualities.setFont(org.eclipse.wb.swt.SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnDecreasingQualities.setFont(cantarell8);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		final Label lblThreshold = new Label(groupQualityCurveSettings, SWT.NONE);
-		lblThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblThreshold.setFont(cantarell8);
 		lblThreshold.setText("X Axis Maximal Precision");
 
 		textThreshold = new Text(groupQualityCurveSettings, SWT.BORDER);
 		GridData gd_textThreshold = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_textThreshold.widthHint = 100;
 		textThreshold.setLayoutData(gd_textThreshold);
-		textThreshold.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		textThreshold.setFont(cantarell8);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
@@ -1205,24 +1216,30 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		tbtmOcelotlSettings.setText("Settings");
 		
 		final SashForm sashFormSettings = new SashForm(tabFolder, SWT.VERTICAL);
-		sashFormSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		sashFormSettings.setFont(cantarell8);
 		tbtmOcelotlSettings.setControl(sashFormSettings);
 
 		final Group groupDataCacheSettings = new Group(sashFormSettings, SWT.NONE);
-		groupDataCacheSettings.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		groupDataCacheSettings.setFont(cantarell8);
 		groupDataCacheSettings.setText("Data Cache Settings");
 		groupDataCacheSettings.setLayout(new GridLayout(3, false));
 		
 		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
-		btnCacheEnabled.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		btnCacheEnabled.setFont(cantarell8);
 		btnCacheEnabled.setText("Cache Enabled");
 		btnCacheEnabled.setSelection(ocelotlParameters.getOcelotlSettings().isCacheActivated());
 		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
-		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
+		btnDeleteDataCache.setToolTipText("Empty Cache");
+		btnDeleteDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/delete_obj.gif"));
+		btnDeleteDataCache.setText("Empty Cache");
+		btnDeleteDataCache.setFont(cantarell8);
+		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
 		new Label(groupDataCacheSettings, SWT.NONE);
 				
 				final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
-				lblDataCacheDirectory.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				lblDataCacheDirectory.setFont(cantarell8);
 				lblDataCacheDirectory.setText("Data cache directory:");
 				
 						final GridData gd_dataCacheDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
@@ -1230,7 +1247,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						
 						datacacheDirectory = new Text(groupDataCacheSettings, SWT.BORDER);
 						datacacheDirectory.setLayoutData(gd_dataCacheDir);
-						datacacheDirectory.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+						datacacheDirectory.setFont(cantarell8);
 						datacacheDirectory.setEditable(false);
 						datacacheDirectory.setText(ocelotlParameters.getDataCache().getCacheDirectory());
 				
@@ -1238,52 +1255,63 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				btnChangeCacheDirectory.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 				btnChangeCacheDirectory.setToolTipText("Change Cache Directory");
 				btnChangeCacheDirectory.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/fldr_obj.gif"));
-				btnChangeCacheDirectory.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				btnChangeCacheDirectory.setFont(cantarell8);
 				btnChangeCacheDirectory.addSelectionListener(new ModifyDatacacheDirectory());
 		
 				final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
-				lblDataCacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+				lblDataCacheSize.setFont(cantarell8);
 				lblDataCacheSize.setText("MB Data cache size (-1=unlimited):");
 		
 		dataCacheSize = new Spinner(groupDataCacheSettings, SWT.BORDER);
 		dataCacheSize.setValues(0, -1, 99999999, 0, 1, 10);
-		dataCacheSize.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		dataCacheSize.setFont(cantarell8);
 		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_text.widthHint = 100;
 		dataCacheSize.setLayoutData(gd_text);
 		dataCacheSize.addModifyListener(new DataCacheSizeListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
 		
-		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
-		btnDeleteDataCache.setToolTipText("Empty Cache");
-		btnDeleteDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/delete_obj.gif"));
-		btnDeleteDataCache.setText("Empty Cache");
-		btnDeleteDataCache.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
-		new Label(groupDataCacheSettings, SWT.NONE);
+		Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
+		lblCacheTimeSlices.setText("Cache time slices:");
+		lblCacheTimeSlices.setFont(cantarell8);
+		lblCacheTimeSlices.setToolTipText("Number of time slices used when generating cache");
+
+		cacheTimeSliceValue = new Spinner(groupDataCacheSettings, SWT.BORDER);
+		cacheTimeSliceValue.setValues(0, 0, 99999999, 0, 1, 10);
+		cacheTimeSliceValue.setFont(cantarell8);
+		GridData gd_cacheTimeSliceValue = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_cacheTimeSliceValue.widthHint = 100;
+		cacheTimeSliceValue.setLayoutData(gd_cacheTimeSliceValue);
+		cacheTimeSliceValue.setSelection(ocelotlParameters.getOcelotlSettings().getCacheTimeSliceNumber());
+		cacheTimeSliceValue.addModifyListener(new CacheTimeSliceListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
 		
 		Label lblCachePolicy = new Label(groupDataCacheSettings, SWT.NONE);
 		lblCachePolicy.setText("Cache policy");
+		lblCachePolicy.setFont(cantarell8);
 		new Label(groupDataCacheSettings, SWT.NONE);
 		new Label(groupDataCacheSettings, SWT.NONE);
 		
 		btnRadioButton = new Button(groupDataCacheSettings, SWT.RADIO);
 		btnRadioButton.addSelectionListener(new cachePolicyListener());
 		btnRadioButton.setText("Precise (slow)");
+		btnRadioButton.setFont(cantarell8);
 		
 		btnRadioButton_1 = new Button(groupDataCacheSettings, SWT.RADIO);
 		btnRadioButton_1.addSelectionListener(new cachePolicyListener());
 		btnRadioButton_1.setText("Fast");
+		btnRadioButton_1.setFont(cantarell8);
 		new Label(groupDataCacheSettings, SWT.NONE);
 		
 		btnRadioButton_2 = new Button(groupDataCacheSettings, SWT.RADIO);
 		btnRadioButton_2.addSelectionListener(new cachePolicyListener());
 		btnRadioButton_2.setText("Ask me");
+		btnRadioButton_2.setFont(cantarell8);
 		
 		btnRadioButton_3 = new Button(groupDataCacheSettings, SWT.RADIO);
 		btnRadioButton_3.addSelectionListener(new cachePolicyListener());
 		btnRadioButton_3.setText("Auto");
+		btnRadioButton_3.setFont(cantarell8);
 		new Label(groupDataCacheSettings, SWT.NONE);
 		
 		cachepolicy.put(DatacachePolicy.CACHEPOLICY_SLOW, btnRadioButton);
@@ -1317,23 +1345,23 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		final Label lblParameter = new Label(group, SWT.NONE);
 		lblParameter.setText("Parameter");
-		lblParameter.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		lblParameter.setFont(cantarell8);
 
 		textRun = new Text(group, SWT.BORDER);
 		GridData gd_textRun = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_textRun.widthHint = 100;
 		textRun.setLayoutData(gd_textRun);
-		textRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		textRun.setFont(cantarell8);
 
 		buttonDown = new Button(group, SWT.NONE);
 		buttonDown.setToolTipText("Increase Parameter");
 		buttonDown.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/elcl16/backward_nav.gif"));
-		buttonDown.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonDown.setFont(cantarell8);
 
 		buttonUp = new Button(group, SWT.NONE);
 		buttonUp.setToolTipText("Decrease Parameter");
 		buttonUp.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/elcl16/forward_nav.gif"));
-		buttonUp.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+		buttonUp.setFont(cantarell8);
 		btnRun = new Button(group, SWT.NONE);
 		btnRun.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/ocelotl16.png"));
@@ -1426,7 +1454,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			index++;
 		}
 
-		ocelotlParameters.getDataCache().removeDeletedTraces(confDataLoader.getTraces());	
+		ocelotlParameters.getDataCache().buildDictionary(confDataLoader.getTraces());	
 	}
 
 	public void setComboAggregationOperator(final Combo comboAggregationOperator) {
@@ -1434,14 +1462,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	}
 
 	public void setConfiguration() {
-
 		ocelotlParameters.setTrace(confDataLoader.getCurrentTrace());
 		ocelotlParameters.setNormalize(btnNormalize.getSelection());
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
 		ocelotlParameters.setSpaceAggOperator(comboSpace.getText());
 		setCachePolicy();
-		
 		try {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());
@@ -1451,7 +1477,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
 	}
-	
+
 	public void restoreConfiguration() {
 		ocelotlParameters.setTrace(oldParameters.getTrace());
 		ocelotlParameters.setNormalize(oldParameters.isNormalize());
@@ -1468,6 +1494,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	 * TODO Take the operator into account
 	 */
 	public void setCachePolicy() {
+		if (hasChanged != HasChanged.ALL)
+			return;
+
 		switch (ocelotlParameters.getOcelotlSettings().getCachePolicy()) {
 		case CACHEPOLICY_FAST:
 			ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_PROPORTIONAL);
@@ -1481,7 +1510,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			String[] dialogButtonLabels = { "Precise", "Fast", "Automatic" };
 			MessageDialog choosePolicy = new MessageDialog(getSite().getShell(), "Choose a cache policy", null, "Please choose one of the following methods for cache rebuilding:", MessageDialog.NONE, dialogButtonLabels, 0);
 			int choice = choosePolicy.open();
-			
+
 			if (choice == 0) {
 				ocelotlParameters.getDataCache().setBuildingStrategy(DatacacheStrategy.DATACACHE_DATABASE);
 				break;

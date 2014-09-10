@@ -49,7 +49,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public void computeDichotomy(IProgressMonitor monitor) {
+	public void computeDichotomy() {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(),
@@ -60,7 +60,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public void computeParts(IProgressMonitor monitor) {
+	public void computeParts() {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeParts(ocelotlParameters.getParameter());
@@ -82,7 +82,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public void computeQualities(IProgressMonitor monitor) {
+	public void computeQualities() {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeQualities(ocelotlParameters.isNormalize());

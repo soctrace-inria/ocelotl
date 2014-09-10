@@ -40,6 +40,7 @@ public class DistributionConfig implements ITraceTypeConfig {
 		return types;
 	}
 
+	@Override
 	public void setTypes(final List<EventType> types) {
 		this.types = types;
 	}
@@ -63,7 +64,6 @@ public class DistributionConfig implements ITraceTypeConfig {
 	@Override
 	/**
 	 * Initialize the configuration with default settings
-	 * 
 	 */
 	public void init() {
 		setThreadNumber(DefaultSettingsConstant.threadNumber);

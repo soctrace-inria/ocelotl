@@ -77,5 +77,5 @@ public class OcelotlConstants {
 	/**
 	 * Size of the configuration file
 	 */
-	static final public int CONFIGURATION_NORMAL_SIZE = 5;
+	static final public int CONFIGURATION_NORMAL_SIZE = 6;
 }

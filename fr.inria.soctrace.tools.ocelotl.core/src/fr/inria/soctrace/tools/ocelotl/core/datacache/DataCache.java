@@ -6,7 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,11 +41,16 @@ public class DataCache {
 			.getLogger(DataCache.class);
 
 	private OcelotlSettings settings;
-	
+
 	/**
 	 * List of the cache files in the current cache directory
 	 */
 	protected HashMap<CacheParameters, File> cachedData;
+
+	/**
+	 * Dictionary of cache files associated to to trace
+	 */
+	protected HashMap<Trace, List<CacheParameters>> cacheIndex;
 
 	/**
 	 * Factor between the number of time slices in the current aggregation and
@@ -69,26 +77,28 @@ public class DataCache {
 	 * Minimal ratio value that can happen
 	 */
 	protected double minimalRatio = OcelotlConstants.MINIMAL_TIMESLICE_RATIO;
-	
+
 	/**
 	 * Maximal ratio value of dirty time slices in a cache
 	 */
 	protected double maxDirtyRatio = OcelotlConstants.MAXIMAL_DIRTY_RATIO;
-	
+
 	/**
 	 * Do we have to do some extra computation to rebuild the matrix from the
 	 * cache ?
 	 */
 	protected boolean rebuildDirty;
-	
+
 	/**
 	 * Set whether the cache is active or not
 	 */
 	protected boolean cacheActive = true;
-	
+
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
-	
+
 	protected DatacacheStrategy buildingStrategy;
+
+	protected boolean validDirectory;
 
 	public DatacacheStrategy getBuildingStrategy() {
 		return buildingStrategy;
@@ -115,7 +125,7 @@ public class DataCache {
 		this.cacheActive = cacheActive;
 		settings.setCacheActivated(this.cacheActive);
 	}
-	
+
 	public boolean isRebuildDirty() {
 		return rebuildDirty;
 	}
@@ -123,7 +133,7 @@ public class DataCache {
 	public void setRebuildDirty(boolean rebuildDirty) {
 		this.rebuildDirty = rebuildDirty;
 	}
-	
+
 	public long getCacheMaxSize() {
 		return cacheMaxSize;
 	}
@@ -163,7 +173,7 @@ public class DataCache {
 						logger.error("The current cache directory is still: "
 								+ this.cacheDirectory);
 					} else {
-						cacheActive = false;
+						validDirectory = false;
 						logger.error("The cache will be turned off.");
 					}
 					return;
@@ -176,7 +186,7 @@ public class DataCache {
 						+ cacheDirectory + ".");
 
 				if (this.cacheDirectory.isEmpty()) {
-					cacheActive = false;
+					validDirectory = false;
 					logger.error("The cache will be turned off.");
 				} else {
 					logger.error("The current cache directory is still: "
@@ -185,10 +195,11 @@ public class DataCache {
 				return;
 			}
 
-			cacheActive = true;
+			validDirectory = true;
+
 			// Everything's OK, set the cache directory
 			this.cacheDirectory = cacheDirectory;
-			
+
 			// Update settings
 			settings.setCacheDirectory(this.cacheDirectory);
 
@@ -201,10 +212,19 @@ public class DataCache {
 		return timeSliceFactor;
 	}
 
+	public boolean isValidDirectory() {
+		return validDirectory;
+	}
+
+	public void setValidDirectory(boolean validDirectory) {
+		this.validDirectory = validDirectory;
+	}
+
 	public DataCache() {
 		super();
 		cachedData = new HashMap<CacheParameters, File>();
-		
+		cacheIndex = new HashMap<Trace, List<CacheParameters>>();
+
 		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
 	}
 
@@ -220,7 +240,7 @@ public class DataCache {
 		setCacheMaxSize(settings.getCacheSize());
 		setCacheDirectory(settings.getCacheDirectory());
 	}
-	
+
 	/**
 	 * Check parameter against the cached data parameters
 	 * 
@@ -233,7 +253,14 @@ public class DataCache {
 		rebuildDirty = false;
 
 		CacheParameters cParam = new CacheParameters(parameters);
-		for (CacheParameters op : cachedData.keySet()) {
+
+		// Look for the correct trace
+		if (!cacheIndex.containsKey(parameters.getTrace())) {
+			logger.debug("No datacache was found");
+			return null;
+		}
+		
+		for (CacheParameters op : cacheIndex.get(parameters.getTrace())) {
 			if (similarParameters(cParam, op))
 				return cachedData.get(op);
 		}
@@ -255,14 +282,6 @@ public class DataCache {
 	protected boolean similarParameters(CacheParameters newParam,
 			CacheParameters cacheParam) {
 
-		// Is the trace the same?
-		if (!newParam.getTraceName().equals(cacheParam.getTraceName()))
-			return false;
-		
-		// Is the trace unique ID similar?
-		if (newParam.getTraceID() != cacheParam.getTraceID())
-			return false;
-
 		// Is the aggregation operator the same?
 		if (!((newParam.getTimeAggOperator().equals(
 				cacheParam.getTimeAggOperator()) && (!newParam
@@ -277,7 +296,8 @@ public class DataCache {
 			return false;
 
 		// Compute the time slice factor
-		timeSliceFactor = cacheParam.getNbTimeSlice() / newParam.getNbTimeSlice();
+		timeSliceFactor = cacheParam.getNbTimeSlice()
+				/ newParam.getNbTimeSlice();
 
 		return true;
 	}
@@ -295,8 +315,8 @@ public class DataCache {
 			CacheParameters cachedParam) {
 		TimeRegion newTimeRegion = new TimeRegion(newParam.getStartTimestamp(),
 				newParam.getEndTimestamp());
-		TimeRegion cacheTimeRegion = new TimeRegion(cachedParam.getStartTimestamp(),
-				cachedParam.getEndTimestamp());
+		TimeRegion cacheTimeRegion = new TimeRegion(
+				cachedParam.getStartTimestamp(), cachedParam.getEndTimestamp());
 
 		// If timestamps are equal then OK
 		if (newTimeRegion.compareTimeRegion(cacheTimeRegion)) {
@@ -311,12 +331,13 @@ public class DataCache {
 		// If timestamps are included in the cache time stamps
 		if (cacheTimeRegion.containsTimeRegion(newTimeRegion)) {
 			// Compute the duration of a time slice in the cache
-			long timeSliceDuration = (cachedParam.getEndTimestamp() - cachedParam.getStartTimestamp())
-					/ cachedParam.getNbTimeSlice();
-			
+			long timeSliceDuration = (cachedParam.getEndTimestamp() - cachedParam
+					.getStartTimestamp()) / cachedParam.getNbTimeSlice();
+
 			// Compute the number of cached time slices included in the new time
 			// region
-			int includedTimeslice = (int) ((newParam.getEndTimestamp() - newParam.getStartTimestamp()) / timeSliceDuration);
+			int includedTimeslice = (int) ((newParam.getEndTimestamp() - newParam
+					.getStartTimestamp()) / timeSliceDuration);
 
 			// Compute the ratio between the demanded time slice and the current
 			// time slice
@@ -332,8 +353,8 @@ public class DataCache {
 			TimeSliceStateManager newTsManager = new TimeSliceStateManager(
 					newTimeRegion, newParam.getNbTimeSlice());
 
-			return computeDirtyTimeSlice(newParam,
-					cachedParam, newTsManager, cachedTsManager);			
+			return computeDirtyTimeSlice(newParam, cachedParam, newTsManager,
+					cachedTsManager);
 		}
 
 		return false;
@@ -371,9 +392,9 @@ public class DataCache {
 					.getStartTimestamp())
 					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > newParam
 							.getEndTimestamp())) {
-				
+
 				usedCachedTimeSlices++;
-				
+
 				for (TimeSlice aNewTimeSlice : newTimeSlice) {
 					// Is the cached time slice is at least partly inside a new
 					// time slice ?
@@ -402,18 +423,19 @@ public class DataCache {
 				}
 			}
 		}
-		
-		// Proportion of dirty time slice in the part of the cache used to rebuild the matrix
+
+		// Proportion of dirty time slice in the part of the cache used to
+		// rebuild the matrix
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
 
 		// No dirty time slice
 		if (computedDirtyRatio == 0)
 			return true;
-		
+
 		// Set the flag for rebuild from dirty
 		if (computedDirtyRatio > 0)
 			rebuildDirty = true;
-		
+
 		// If the ratio is not over the max
 		if (computedDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
@@ -434,8 +456,7 @@ public class DataCache {
 		rebuildDirty = false;
 		return false;
 	}
-	
-	
+
 	/**
 	 * Add a newly saved microscopic model to the list of cache file
 	 * 
@@ -451,6 +472,13 @@ public class DataCache {
 		File aFile = new File(aFilePath);
 
 		cachedData.put(params, aFile);
+		
+		// Update dictionary
+		if (!cacheIndex.containsKey(oParam.getTrace())) {
+			cacheIndex
+					.put(oParam.getTrace(), new ArrayList<CacheParameters>());
+		}
+		cacheIndex.get(oParam.getTrace()).add(params);
 	}
 
 	/**
@@ -537,6 +565,30 @@ public class DataCache {
 			System.err.println("The provided cache directory ("
 					+ cacheDirectory + ")does not exist");
 		}
+	}
+	
+	/**
+	 * Build the cache index
+	 * 
+	 * @param traces
+	 *            List of all the traces in database
+	 */
+	public void buildDictionary(List<Trace> traces) {
+		cacheIndex = new HashMap<Trace, List<CacheParameters>>();
+
+		for (CacheParameters aCache : cachedData.keySet()) {
+			// Check if the corresponding trace still exists
+			for (Trace aTrace : traces) {
+				if (aCache.getTraceID() == aTrace.getId()) {
+					if (!cacheIndex.containsKey(aTrace)) {
+						cacheIndex
+								.put(aTrace, new ArrayList<CacheParameters>());
+					}
+					cacheIndex.get(aTrace).add(aCache);
+				}
+			}
+		}
+		removeDeletedTraces(traces);
 	}
 
 	/**
@@ -701,24 +753,39 @@ public class DataCache {
 			currentCacheSize = currentCacheSize + aCacheFile.length();
 		}
 
-		logger.debug("Size of the current cache is: " + currentCacheSize + " bytes.");
+		logger.debug("Size of the current cache is: " + currentCacheSize
+				+ " bytes.");
 	}
 
 	/**
-	 * Remove a cache file. The used policy is to suppress the oldest modified
-	 * file
+	 * Remove a cache file. The used policy is to suppress the file which has
+	 * the oldest accessed time
 	 */
 	public void removeCacheFile() {
-		long oldestDate = Long.MAX_VALUE;
+		// Init with current time
+		FileTime oldestDate = FileTime.from(System.currentTimeMillis(), null);
 		CacheParameters oldestParam = null;
 
 		for (CacheParameters aCacheParam : cachedData.keySet()) {
-			if (oldestDate < cachedData.get(aCacheParam).lastModified()) {
-				oldestDate = cachedData.get(aCacheParam).lastModified();
-				oldestParam = aCacheParam;
+			try {
+				// Get the last access to the file
+				Path path = cachedData.get(aCacheParam).toPath();
+				BasicFileAttributes attrs;
+				attrs = Files.readAttributes(path, BasicFileAttributes.class);
+				FileTime currentTime = attrs.lastAccessTime();
+
+				// If the access is older than the current oldest
+				if (currentTime.compareTo(oldestDate) < 0) {
+					oldestDate = currentTime;
+					oldestParam = aCacheParam;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
+		// Delete oldest accessed cache
 		if (!cachedData.get(oldestParam).delete()) {
 			logger.debug("DataCache: Deletion of cache file "
 					+ cachedData.get(oldestParam).getName() + " failed.");

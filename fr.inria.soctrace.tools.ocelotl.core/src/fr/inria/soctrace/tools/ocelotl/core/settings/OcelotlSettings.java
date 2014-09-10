@@ -26,6 +26,7 @@ public class OcelotlSettings {
 	private int cacheSize;
 	private String snapShotDirectory;
 	private DatacachePolicy cachePolicy;
+	private int cacheTimeSliceNumber;
 	
 	// Default directory where the config file is
 	private String defaultConfigFile;
@@ -33,8 +34,7 @@ public class OcelotlSettings {
 	public OcelotlSettings() {
 		
 		// Init with default configuration
-		cacheActivated = OcelotlDefaultParameterConstants.Normalize;
-			//	OcelotlConstants.DEFAULT_CACHE_ACTIVATION;
+		cacheActivated = OcelotlDefaultParameterConstants.DEFAULT_CACHE_ACTIVATION;
 
 		// Default cache directory is the directory "ocelotlCache" in the
 		// running directory
@@ -43,11 +43,14 @@ public class OcelotlSettings {
 				+ "/ocelotlCache";
 
 		cacheSize = OcelotlConstants.MAX_CACHESIZE;
+		
 		snapShotDirectory = ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
 				+ "/ocelotlSnapshot";
 		
 		cachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
+		
+		cacheTimeSliceNumber = OcelotlDefaultParameterConstants.DEFAULT_CACHE_TS_NUMBER;
 
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -89,7 +92,7 @@ public class OcelotlSettings {
 						}
 						setSnapShotDirectory(config[3]);
 						setCachePolicy(DatacachePolicy.valueOf(config[4]));
-						
+						setCacheTimeSliceNumber(Integer.valueOf(config[5]));
 					} else {
 						logger.debug("Invalid configuration file: Default values will be used");
 					}
@@ -105,6 +108,8 @@ public class OcelotlSettings {
 				logger.debug("Cache size: " + cacheSize);
 				logger.debug("Snapshot directory: " + snapShotDirectory);
 				logger.debug("Cache Policy: " + cachePolicy);
+				logger.debug("Cache Time slices: " + cacheTimeSliceNumber);
+				
 				
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -129,6 +134,7 @@ public class OcelotlSettings {
 		output.append(";");
 		output.append(cacheDirectory);
 		output.append(";");
+		// Convert from MB to bytes
 		if (cacheSize >= 0) {
 			output.append(cacheSize / 1000000);
 		} else {
@@ -138,7 +144,9 @@ public class OcelotlSettings {
 		output.append(snapShotDirectory);
 		output.append(";");
 		output.append(cachePolicy);
-
+		output.append(";");
+		output.append(cacheTimeSliceNumber);
+		
 		String newSettings = output.toString();
 
 		PrintWriter writer;
@@ -207,6 +215,17 @@ public class OcelotlSettings {
 	public void setCachePolicy(DatacachePolicy cachePolicy) {
 		if (this.cachePolicy != cachePolicy) {
 			this.cachePolicy = cachePolicy;
+			saveSettings();
+		}
+	}
+
+	public int getCacheTimeSliceNumber() {
+		return cacheTimeSliceNumber;
+	}
+
+	public void setCacheTimeSliceNumber(int cacheTimeSliceNumber) {
+		if (this.cacheTimeSliceNumber != cacheTimeSliceNumber) {
+			this.cacheTimeSliceNumber = cacheTimeSliceNumber;
 			saveSettings();
 		}
 	}

@@ -75,17 +75,17 @@ public class OcelotlCore {
 		}
 	}
 
-	public void computeQualities(IProgressMonitor monitor) {
-		lpaggregManager.computeQualities(monitor);
+	public void computeQualities() {
+		lpaggregManager.computeQualities();
 	}
 
-	public void computeDichotomy(IProgressMonitor monitor) throws OcelotlException {
-		lpaggregManager.computeDichotomy(monitor);
+	public void computeDichotomy() throws OcelotlException {
+		lpaggregManager.computeDichotomy();
 		lpaggregManager.printParameters();
 	}
 
-	public void computeParts(IProgressMonitor monitor) {
-		lpaggregManager.computeParts(monitor);
+	public void computeParts() {
+		lpaggregManager.computeParts();
 		// lpaggregManager.printParts();
 		setSpaceOperator();
 		lpaggregManager.print(this);
