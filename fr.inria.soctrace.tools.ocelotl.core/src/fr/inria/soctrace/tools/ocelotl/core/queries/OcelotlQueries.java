@@ -22,6 +22,8 @@ package fr.inria.soctrace.tools.ocelotl.core.queries;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
@@ -73,21 +75,22 @@ public class OcelotlQueries {
 	 * @throws OcelotlException
 	 */
 	public EventIterator getStateIterator(
-			final List<EventProducer> eventProducers) throws SoCTraceException,
-			OcelotlException {
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
 
 		final List<IntervalDesc> time = setTimeInterval();
-		return getStateIterator(eventProducers, time);
+		return getStateIterator(eventProducers, time, monitor);
 	}
 
 	public EventIterator getStateIterator(List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
 
 		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
 				ocelotlParameters).initialize();
 		return traceSearch.getStateIterator(ocelotlParameters.getTrace(),
 				ocelotlParameters.getTraceTypeConfig().getTypes(), time,
-				eventProducers);
+				eventProducers, monitor);
 	}
 
 	/**
@@ -102,11 +105,11 @@ public class OcelotlQueries {
 	 * @throws OcelotlException
 	 */
 	public EventIterator getEventIterator(
-			final List<EventProducer> eventProducers) throws SoCTraceException,
-			OcelotlException {
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
 
 		final List<IntervalDesc> time = setTimeInterval();
-		return getEventIterator(eventProducers, time);
+		return getEventIterator(eventProducers, time, monitor);
 	}
 
 	/**
@@ -121,13 +124,14 @@ public class OcelotlQueries {
 	 * @throws OcelotlException
 	 */
 	public EventIterator getEventIterator(List<EventProducer> eventProducers,
-			List<IntervalDesc> time) throws SoCTraceException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
 		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
 				ocelotlParameters).initialize();
 
 		return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
 				ocelotlParameters.getTraceTypeConfig().getTypes(), time,
-				eventProducers);
+				eventProducers, monitor);
 	}
 
 	/**
@@ -156,10 +160,11 @@ public class OcelotlQueries {
 	 * @throws SoCTraceException
 	 * @throws OcelotlException
 	 */
-	public EventIterator getVariableIterator(List<EventProducer> eventProducers)
+	public EventIterator getVariableIterator(
+			List<EventProducer> eventProducers, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
 		final List<IntervalDesc> time = setTimeInterval();
-		return getVariableIterator(eventProducers, time);
+		return getVariableIterator(eventProducers, time, monitor);
 	}
 
 	/**
@@ -175,12 +180,14 @@ public class OcelotlQueries {
 	 * @throws OcelotlException
 	 */
 	public EventIterator getVariableIterator(
-			List<EventProducer> eventProducers, List<IntervalDesc> time)
-			throws SoCTraceException, OcelotlException {
+			List<EventProducer> eventProducers, List<IntervalDesc> time,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
 		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
 				ocelotlParameters).initialize();
 
 		return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
-				ocelotlParameters.getTraceTypeConfig().getTypes(), time, null);
+				ocelotlParameters.getTraceTypeConfig().getTypes(), time, null,
+				monitor);
 	}
 }

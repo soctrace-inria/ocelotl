@@ -55,8 +55,9 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
  * 
  */
 public class IteratorQueries extends EventQuery {
-	
-	private static final Logger logger = LoggerFactory.getLogger(IteratorQueries.class);
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(IteratorQueries.class);
 
 	public class EventIterator {
 
@@ -102,7 +103,7 @@ public class IteratorQueries extends EventQuery {
 		clear();
 	}
 
-	public EventIterator getIterator() throws SoCTraceException {
+	public EventIterator getIterator(IProgressMonitor monitor) throws SoCTraceException {
 
 		try {
 			final DeltaManager dm = new DeltaManagerOcelotl();
@@ -162,11 +163,15 @@ public class IteratorQueries extends EventQuery {
 			logger.debug(query);
 
 			mystm = dbObj.getConnection().createStatement();
-		
+			MonitorThread monThread = new MonitorThread(monitor);
+
 			final DeltaManager steps = new DeltaManagerOcelotl();
 			steps.start();
 			rs = mystm.executeQuery(query);
 			steps.end("Execute Query");
+
+			if (monThread.isAlive())
+				monThread.interrupt();
 
 		} catch (final SQLException e) {
 			throw new SoCTraceException(e);
@@ -201,6 +206,37 @@ public class IteratorQueries extends EventQuery {
 		if (rs.next())
 			return rebuildEvent(rs);
 		return null;
+	}
+
+	/**
+	 * Thread watching the monitor and trying to interrupt the query if the user
+	 * cancels the query
+	 */
+	class MonitorThread extends Thread {
+		private IProgressMonitor monitor;
+
+		public MonitorThread(IProgressMonitor aMonitor) {
+			super();
+			monitor = aMonitor;
+			start();
+		}
+
+		@Override
+		public void run() {
+			boolean notEnded = true;
+
+			while (notEnded) {
+				try {
+					if (monitor.isCanceled()) {
+						mystm.cancel();
+					}
+
+					sleep(200);
+				} catch (InterruptedException | SQLException e) {
+					return;
+				}
+			}
+		}
 	}
 
 }

@@ -21,6 +21,8 @@ package fr.inria.soctrace.tools.ocelotl.core.queries;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
@@ -86,8 +88,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 	public EventIterator getEventIterator(final Trace t,
 			final List<EventType> eventTypes,
 			final List<IntervalDesc> intervals,
-			final List<EventProducer> eventProducers) throws SoCTraceException,
-			OcelotlException {
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
 		// final LogicalCondition and = new
@@ -126,8 +128,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 
 		// If we filter based on the timestamps
 		if (!intervals.isEmpty()) {
-			long min = traceDB.getMinTimestamp();
-			long max = traceDB.getMaxTimestamp();
+			long min = parameters.getTrace().getMinTimestamp();
+			long max = parameters.getTrace().getMaxTimestamp();
 
 			// For each timestamps intervals
 			for (IntervalDesc anInterval : intervals) {
@@ -170,16 +172,16 @@ public class OcelotlTraceSearch extends TraceSearch {
 			}
 		}
 		conditionManager.setWhere(query);
-		// query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
-		return query.getIterator();
+		return query.getIterator(monitor);
 	}
 
 	public EventIterator getCategorySpecificIterator(final Trace t,
 			final List<EventType> eventTypes,
 			final List<IntervalDesc> intervals,
-			final List<EventProducer> eventProducers, int aCategory)
-			throws SoCTraceException, OcelotlException {
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
 		ConditionManager conditionManager = new ConditionManager();
@@ -225,8 +227,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 
 		// intervals
 		if (!intervals.isEmpty()) {
-			long min = traceDB.getMinTimestamp();
-			long max = traceDB.getMaxTimestamp();
+			long min = parameters.getTrace().getMinTimestamp();
+			long max = parameters.getTrace().getMaxTimestamp();
 
 			// For each timestamp intervals
 			for (IntervalDesc anInterval : intervals) {
@@ -294,27 +296,26 @@ public class OcelotlTraceSearch extends TraceSearch {
 			}
 		}
 		conditionManager.setWhere(query);
-		// query.setOrderBy("TIMESTAMP", OrderBy.ASC);
 		query.setLoadParameters(false);
-		return query.getIterator();
+		return query.getIterator(monitor);
 	}
 
 	public EventIterator getStateIterator(final Trace t,
 			final List<EventType> eventTypes,
 			final List<IntervalDesc> intervals,
-			final List<EventProducer> eventProducers) throws SoCTraceException,
-			OcelotlException {
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
 		return getCategorySpecificIterator(t, eventTypes, intervals,
-				eventProducers, EventCategory.STATE);
+				eventProducers, EventCategory.STATE, monitor);
 	}
 
 	public EventIterator getVariableIterator(final Trace t,
 			final List<EventType> eventTypes,
 			final List<IntervalDesc> intervals,
-			final List<EventProducer> eventProducers) throws SoCTraceException,
-			OcelotlException {
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
 		return getCategorySpecificIterator(t, eventTypes, intervals,
-				eventProducers, EventCategory.VARIABLE);
+				eventProducers, EventCategory.VARIABLE, monitor);
 	}
 
 	protected void openTraceDBObject(final Trace t) throws SoCTraceException {

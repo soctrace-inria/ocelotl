@@ -28,6 +28,7 @@ import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
@@ -46,17 +47,20 @@ public class OcelotlParameters {
 	private List<EventProducer> allEventProducers;
 	private List<List<EventType>> catEventTypes;
     private SimpleEventProducerHierarchy eventProducerHierarchy;
-	private int timeSlicesNumber = 1;
+	private int timeSlicesNumber = OcelotlDefaultParameterConstants.TimeSliceNumber;
 	private TimeRegion timeRegion;
-	private double parameter = 0;
-	private boolean normalize = false;
-	private double threshold = 0.001;
+	private double parameter = OcelotlDefaultParameterConstants.RunParameter;
+	private boolean normalize = OcelotlDefaultParameterConstants.Normalize;
+	private double threshold = OcelotlDefaultParameterConstants.Threshold;
 	private Trace trace = null;
-	private int maxEventProducers = 0;
+	private int maxEventProducers = OcelotlDefaultParameterConstants.EventProducersPerQuery;
+	private int eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
+	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
 	private String timeAggOperator;
 	private String spaceAggOperator;
-	private boolean growingQualities = true;
+	private boolean growingQualities = OcelotlDefaultParameterConstants.GrowingQualities;
 	private DataCache dataCache = new DataCache();
+	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 	private OcelotlSettings	ocelotlSettings = new OcelotlSettings();
 	
 	private TimeSliceStateManager timeSliceManager;
@@ -294,7 +298,29 @@ public class OcelotlParameters {
 	public void setAllEventProducers(List<EventProducer> list) {
 		this.allEventProducers = list;
 	}
-	
-	
+
+	public DatacachePolicy getDataCachePolicy() {
+		return dataCachePolicy;
+	}
+
+	public void setDataCachePolicy(DatacachePolicy dataCachePolicy) {
+		this.dataCachePolicy = dataCachePolicy;
+	}
+
+	public int getThreadNumber() {
+		return threadNumber;
+	}
+
+	public void setThreadNumber(int threadNumber) {
+		this.threadNumber = threadNumber;
+	}
+
+	public int getEventsPerThread() {
+		return eventsPerThread;
+	}
+
+	public void setEventsPerThread(int eventsPerThread) {
+		this.eventsPerThread = eventsPerThread;
+	}
 
 }

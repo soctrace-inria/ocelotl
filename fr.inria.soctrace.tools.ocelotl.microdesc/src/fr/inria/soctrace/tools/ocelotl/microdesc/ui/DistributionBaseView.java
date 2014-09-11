@@ -48,10 +48,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
@@ -63,7 +61,6 @@ import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.microdesc.config.DefaultSettingsConstant;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IAggregationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -339,12 +336,6 @@ public abstract class DistributionBaseView extends Dialog implements
 	protected OcelotlParameters params;
 
 	private java.util.List<EventType> oldEventTypes;
-
-	private Spinner spinnerEventSize;
-
-	private Spinner spinnerDivideDbQuery;
-
-	private Spinner spinnerThread;
 	
 	protected CheckboxTreeViewer treeViewerEventProducer;
 
@@ -570,73 +561,6 @@ public abstract class DistributionBaseView extends Dialog implements
 		layout.numColumns = 4;
         buttonComposite.setLayout(layout);
 
-		
-		// Advanced Settings tab
-		TabItem tbtmNewItem_1 = new TabItem(tabFolder, SWT.NONE);
-		tbtmNewItem_1.setText("Advanced Settings");
-
-		SashForm sashForm = new SashForm(tabFolder, SWT.VERTICAL);
-		tbtmNewItem_1.setControl(sashForm);
-		final Group grpCacheManagement = new Group(sashForm, SWT.NONE);
-		grpCacheManagement.setFont(org.eclipse.wb.swt.SWTResourceManager
-				.getFont("Cantarell", 11, SWT.NORMAL));
-		grpCacheManagement.setText("Iterator Management");
-		grpCacheManagement.setLayout(new GridLayout(2, false));
-
-		final Label lblPageSize = new Label(grpCacheManagement, SWT.NONE);
-		lblPageSize.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
-		lblPageSize.setText("Event Number Retrieved by Threads");
-
-		spinnerEventSize = new Spinner(grpCacheManagement, SWT.BORDER);
-		spinnerEventSize.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-				false, 1, 1));
-		spinnerEventSize.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
-		spinnerEventSize.setMinimum(DefaultSettingsConstant.MIN_EVENTS_PER_THREAD);
-		spinnerEventSize.setMaximum(DefaultSettingsConstant.MAX_EVENTS_PER_THREAD);
-		spinnerEventSize.setSelection(config.getEventsPerThread());
-
-		final Group grpDivideDbQuery = new Group(sashForm, SWT.NONE);
-		grpDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
-		grpDivideDbQuery.setText("Query Management");
-		grpDivideDbQuery.setLayout(new GridLayout(2, false));
-
-		final Label lblDivideDbQueries = new Label(grpDivideDbQuery, SWT.NONE);
-		lblDivideDbQueries.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
-		lblDivideDbQueries.setText("Event Producers per Query (0=All)");
-
-		spinnerDivideDbQuery = new Spinner(grpDivideDbQuery, SWT.BORDER);
-		spinnerDivideDbQuery.setFont(SWTResourceManager.getFont("Cantarell",
-				11, SWT.NORMAL));
-		spinnerDivideDbQuery.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-				true, false, 1, 1));
-		spinnerDivideDbQuery.setMinimum(DefaultSettingsConstant.MIN_EVENT_PRODUCERS_PER_QUERY);
-		spinnerDivideDbQuery.setMaximum(DefaultSettingsConstant.MAX_EVENT_PRODUCERS_PER_QUERY);
-		spinnerDivideDbQuery.setSelection(params.getMaxEventProducers());
-
-		final Group grpMultiThread = new Group(sashForm, SWT.NONE);
-		grpMultiThread.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
-		grpMultiThread.setText("Multi Threading");
-		grpMultiThread.setLayout(new GridLayout(2, false));
-
-		final Label lblThread = new Label(grpMultiThread, SWT.NONE);
-		lblThread.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
-		lblThread.setText("Working Threads");
-
-		spinnerThread = new Spinner(grpMultiThread, SWT.BORDER);
-		spinnerThread.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
-		spinnerThread.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-				false, 1, 1));
-		spinnerThread.setMinimum(DefaultSettingsConstant.MIN_NUMBER_OF_THREAD);
-		spinnerThread.setMaximum(DefaultSettingsConstant.MAX_NUMBER_OF_THREAD);
-		spinnerThread.setSelection(config.getThreadNumber());
-		sashForm.setWeights(new int[] { 1, 1, 1 });
 		sashFormGlobal.setWeights(new int[] { 1 });
 		
 		initSettings();
@@ -673,10 +597,7 @@ public abstract class DistributionBaseView extends Dialog implements
 
 	@Override
 	protected void okPressed() {
-		config.setEventsPerThread(spinnerEventSize.getSelection());
-		config.setThreadNumber(spinnerThread.getSelection());
 		params.setEventProducers(producers);
-		params.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
 		super.okPressed();
 	}
 

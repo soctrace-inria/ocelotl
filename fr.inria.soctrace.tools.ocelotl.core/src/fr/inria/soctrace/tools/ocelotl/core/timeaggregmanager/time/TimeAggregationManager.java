@@ -51,7 +51,7 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	}
 
 	@Override
-	public void computeDichotomy(IProgressMonitor monitor) {
+	public void computeDichotomy() {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeBestQualities(ocelotlParameters.getThreshold(),
@@ -63,7 +63,7 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	}
 
 	@Override
-	public void computeParts(IProgressMonitor monitor) {
+	public void computeParts() {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		parts = timeAggregation.getParts(ocelotlParameters.getParameter());
@@ -71,7 +71,7 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	}
 
 	@Override
-	public void computeQualities(IProgressMonitor monitor) {
+	public void computeQualities() {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
 		timeAggregation.computeQualities(ocelotlParameters.isNormalize());

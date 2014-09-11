@@ -37,7 +37,6 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescr
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
-import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericState;
 
 public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
@@ -122,7 +121,8 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time);
+		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
+				monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;
@@ -130,13 +130,10 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
-				.getTraceTypeConfig()).getThreadNumber(); t++)
-			threadlist.add(new OcelotlThread(
-					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getThreadNumber(), t,
-					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread(), monitor));
+		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
+			threadlist.add(new OcelotlThread(getOcelotlParameters()
+					.getThreadNumber(), t, getOcelotlParameters()
+					.getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();

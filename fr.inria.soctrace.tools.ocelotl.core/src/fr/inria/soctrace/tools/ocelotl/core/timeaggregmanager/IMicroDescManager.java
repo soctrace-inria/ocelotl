@@ -30,11 +30,11 @@ import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 
 public interface IMicroDescManager {
 
-	public void computeDichotomy(IProgressMonitor monitor) throws OcelotlException;
+	public void computeDichotomy() throws OcelotlException;
 
-	public void computeParts(IProgressMonitor monitor);
+	public void computeParts();
 
-	public void computeQualities(IProgressMonitor monitor);
+	public void computeQualities();
 
 	public List<EventProducer> getEventProducers();
 

@@ -44,8 +44,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.wb.swt.SWTResourceManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import fr.inria.lpaggreg.quality.DLPQuality;
 
@@ -117,7 +115,6 @@ public class QualityView {
 	private final static float	ParamLineWidth		= 1.8F;
 
 	private final static float	QualityLineWidth	= 2.0F;
-	private static final Logger	logger				= LoggerFactory.getLogger(QualityView.class);
 
 	public QualityView(final OcelotlView lpaggregView) {
 		super();

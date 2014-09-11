@@ -235,7 +235,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 	public void saveMatrix() {
 		// Check that no event type or event producer was filtered out which
 		// would result in an incomplete datacache
-		if (!parameters.getDataCache().isCacheActive() || !noFiltering())
+		if (!parameters.getDataCache().isCacheActive() || !noFiltering()
+				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
 		Date convertedDate = new Date(System.currentTimeMillis() * 1000);
@@ -661,5 +662,70 @@ public abstract class MultiThreadTimeAggregationOperator {
 		}
 
 		return true;
+	}
+
+    /**
+	 * Generate a cache matrix with the number of TimeSlice provided in settings
+	 * 
+	 * @return true if a cache was generated, false otherwise
+	 */
+	public boolean generateCache(IProgressMonitor monitor) {
+
+		// Check that the timestamps are ocvering all the traces
+		if (parameters.getTrace().getMinTimestamp() != parameters
+				.getTimeRegion().getTimeStampStart())
+			return false;
+
+		if (parameters.getTrace().getMaxTimestamp() != parameters
+				.getTimeRegion().getTimeStampEnd())
+			return false;
+
+		if (parameters.getDataCache().isCacheActive()) {
+			try {
+				monitor.subTask("Generating Cache with "
+						+ parameters.getOcelotlSettings()
+								.getCacheTimeSliceNumber() + " time slices");
+				// Set the number of timeSliceNumber
+				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
+				parameters.setTimeSlicesNumber(parameters.getOcelotlSettings()
+						.getCacheTimeSliceNumber());
+
+				// Make sure we got all event types
+				List<EventType> oldEventTypes = new ArrayList<EventType>();
+				for (EventType aType : parameters.getTraceTypeConfig()
+						.getTypes())
+					oldEventTypes.add(aType);
+
+				parameters.getTraceTypeConfig().setTypes(
+						parameters.getOperatorEventTypes());
+				
+				initQueries();
+				initVectors();
+
+				computeSubMatrix(parameters.getEventProducers(), monitor);
+				saveMatrix();
+				parameters.setTimeSlicesNumber(savedTimeSliceNumber);
+				parameters.getTraceTypeConfig().setTypes(oldEventTypes);
+
+				File aCacheFile = parameters.getDataCache().checkCache(
+						parameters);
+				
+				initQueries();
+				initVectors();
+				monitor.subTask("Loading from the newly generated cache");
+				loadFromCache(aCacheFile, monitor);
+				return true;
+			} catch (SoCTraceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (OcelotlException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return false;
 	}
 }
