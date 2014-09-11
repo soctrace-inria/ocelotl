@@ -35,7 +35,6 @@ import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
-import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 
 public class EventDistribution extends _3DMicroDescription {
 
@@ -123,8 +122,8 @@ public class EventDistribution extends _3DMicroDescription {
 
 	@Override
 	protected void computeSubMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time, IProgressMonitor monitor) throws SoCTraceException,
-			InterruptedException, OcelotlException {
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		monitor.subTask("Query events");
@@ -134,23 +133,20 @@ public class EventDistribution extends _3DMicroDescription {
 			ocelotlQueries.closeIterator();
 			return;
 		}
-		
+
 		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Fill the matrix");
-		for (int t = 0; t < ((DistributionConfig) getOcelotlParameters()
-				.getTraceTypeConfig()).getThreadNumber(); t++)
-			threadlist.add(new OcelotlThread(
-					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getThreadNumber(), t,
-					((DistributionConfig) getOcelotlParameters()
-							.getTraceTypeConfig()).getEventsPerThread(), monitor));
+		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
+			threadlist.add(new OcelotlThread(getOcelotlParameters()
+					.getThreadNumber(), t, getOcelotlParameters()
+					.getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
+
 }

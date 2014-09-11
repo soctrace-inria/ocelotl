@@ -27,12 +27,14 @@ public class OcelotlSettings {
 	private String snapShotDirectory;
 	private DatacachePolicy cachePolicy;
 	private int cacheTimeSliceNumber;
+	private int eventsPerThread;
+	private int maxEventProducersPerQuery;
+	private int numberOfThread;
 	
 	// Default directory where the config file is
 	private String defaultConfigFile;
 
 	public OcelotlSettings() {
-		
 		// Init with default configuration
 		cacheActivated = OcelotlDefaultParameterConstants.DEFAULT_CACHE_ACTIVATION;
 
@@ -43,14 +45,15 @@ public class OcelotlSettings {
 				+ "/ocelotlCache";
 
 		cacheSize = OcelotlConstants.MAX_CACHESIZE;
-		
 		snapShotDirectory = ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
 				+ "/ocelotlSnapshot";
 		
 		cachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
-		
 		cacheTimeSliceNumber = OcelotlDefaultParameterConstants.DEFAULT_CACHE_TS_NUMBER;
+		eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
+		maxEventProducersPerQuery = OcelotlDefaultParameterConstants.EventProducersPerQuery;
+		numberOfThread = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
 
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -93,6 +96,9 @@ public class OcelotlSettings {
 						setSnapShotDirectory(config[3]);
 						setCachePolicy(DatacachePolicy.valueOf(config[4]));
 						setCacheTimeSliceNumber(Integer.valueOf(config[5]));
+						setEventsPerThread(Integer.valueOf(config[6]));
+						setMaxEventProducersPerQuery(Integer.valueOf(config[7]));
+						setNumberOfThread(Integer.valueOf(config[8]));
 					} else {
 						logger.debug("Invalid configuration file: Default values will be used");
 					}
@@ -146,6 +152,12 @@ public class OcelotlSettings {
 		output.append(cachePolicy);
 		output.append(";");
 		output.append(cacheTimeSliceNumber);
+		output.append(";");
+		output.append(eventsPerThread);
+		output.append(";");
+		output.append(maxEventProducersPerQuery);
+		output.append(";");
+		output.append(numberOfThread);
 		
 		String newSettings = output.toString();
 
@@ -226,6 +238,39 @@ public class OcelotlSettings {
 	public void setCacheTimeSliceNumber(int cacheTimeSliceNumber) {
 		if (this.cacheTimeSliceNumber != cacheTimeSliceNumber) {
 			this.cacheTimeSliceNumber = cacheTimeSliceNumber;
+			saveSettings();
+		}
+	}
+
+	public int getEventsPerThread() {
+		return eventsPerThread;
+	}
+
+	public void setEventsPerThread(int eventsPerThread) {
+		if (this.eventsPerThread != eventsPerThread) {
+			this.eventsPerThread = eventsPerThread;
+			saveSettings();
+		}
+	}
+
+	public int getMaxEventProducersPerQuery() {
+		return maxEventProducersPerQuery;
+	}
+
+	public void setMaxEventProducersPerQuery(int maxEventProducers) {
+		if (this.maxEventProducersPerQuery != maxEventProducers) {
+			this.maxEventProducersPerQuery = maxEventProducers;
+			saveSettings();
+		}
+	}
+
+	public int getNumberOfThread() {
+		return numberOfThread;
+	}
+
+	public void setNumberOfThread(int numberOfThread) {
+		if (this.numberOfThread != numberOfThread) {
+			this.numberOfThread = numberOfThread;
 			saveSettings();
 		}
 	}

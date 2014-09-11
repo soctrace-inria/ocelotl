@@ -117,7 +117,6 @@ public class QualityView {
 	private final static float	ParamLineWidth		= 1.8F;
 
 	private final static float	QualityLineWidth	= 2.0F;
-	private static final Logger	logger				= LoggerFactory.getLogger(QualityView.class);
 
 	public QualityView(final OcelotlView lpaggregView) {
 		super();

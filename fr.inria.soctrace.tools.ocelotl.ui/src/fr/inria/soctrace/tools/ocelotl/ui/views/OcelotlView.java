@@ -352,7 +352,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									}
 									return Status.CANCEL_STATUS;
 								}
-								monitor.setTaskName("Init Time Operator");
+								monitor.setTaskName("Initializing Time Operator");
 								ocelotlCore.initTimeOperator(monitor);
 								monitor.worked(1);
 							}
@@ -384,7 +384,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						}
 
 						hasChanged = HasChanged.PARAMETER;
-						
 						if (monitor.isCanceled()) {
 							restoreConfiguration();
 							synchronized (lock) {
@@ -715,6 +714,30 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 	
+	private class ThreadNumberListener implements ModifyListener {
+
+		@Override
+		public void modifyText(final ModifyEvent e) {
+			ocelotlParameters.getOcelotlSettings().setNumberOfThread(Integer.valueOf(spinnerThread.getText()));
+		}
+	}
+	
+	private class MaxEventProducerListener implements ModifyListener {
+
+		@Override
+		public void modifyText(final ModifyEvent e) {
+			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(spinnerDivideDbQuery.getText()));
+		}
+	}
+	
+	private class EventPerThreadListener implements ModifyListener {
+
+		@Override
+		public void modifyText(final ModifyEvent e) {
+			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(spinnerEventSize.getText()));
+		}
+	}
+	
 	private class cachePolicyListener extends SelectionAdapter {
 
 		@Override
@@ -843,6 +866,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Spinner dataCacheSize;
 	private Button	btnSaveDataCache;
 	private ConfigViewManager	manager;
+
+	private Spinner	spinnerEventSize;
+
+	private Spinner	spinnerDivideDbQuery;
+
+	private Spinner	spinnerThread;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1213,7 +1242,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		
 		// Datacache settings
 		final TabItem tbtmOcelotlSettings = new TabItem(tabFolder, SWT.NONE);
-		tbtmOcelotlSettings.setText("Settings");
+		tbtmOcelotlSettings.setText("Cache");
 		
 		final SashForm sashFormSettings = new SashForm(tabFolder, SWT.VERTICAL);
 		sashFormSettings.setFont(cantarell8);
@@ -1329,6 +1358,67 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		sashFormSettings.setWeights(new int[] {1});	
 		
 		
+		//Thread settings
+		final TabItem tbtmAdvancedSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtmAdvancedSettings.setText("Advanced");
+	
+		SashForm advancedSettingsSashForm = new SashForm(tabFolder, SWT.VERTICAL);
+		tbtmAdvancedSettings.setControl(advancedSettingsSashForm);
+		final Group grpCacheManagement = new Group(advancedSettingsSashForm, SWT.NONE);
+		grpCacheManagement.setFont(cantarell8);
+		grpCacheManagement.setText("Iterator Management");
+		grpCacheManagement.setLayout(new GridLayout(2, false));
+
+		final Label lblPageSize = new Label(grpCacheManagement, SWT.NONE);
+		lblPageSize.setFont(cantarell8);
+		lblPageSize.setText("Event Number Retrieved by Threads");
+
+		spinnerEventSize = new Spinner(grpCacheManagement, SWT.BORDER);
+		spinnerEventSize.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 1, 1));
+		spinnerEventSize.setFont(cantarell8);
+		spinnerEventSize.setMinimum(OcelotlDefaultParameterConstants.MIN_EVENTS_PER_THREAD);
+		spinnerEventSize.setMaximum(OcelotlDefaultParameterConstants.MAX_EVENTS_PER_THREAD);
+		spinnerEventSize.setSelection(ocelotlParameters.getOcelotlSettings().getEventsPerThread());
+		spinnerEventSize.addModifyListener(new EventPerThreadListener());
+
+		final Group grpDivideDbQuery = new Group(advancedSettingsSashForm, SWT.NONE);
+		grpDivideDbQuery.setFont(cantarell8);
+		grpDivideDbQuery.setText("Query Management");
+		grpDivideDbQuery.setLayout(new GridLayout(2, false));
+
+		final Label lblDivideDbQueries = new Label(grpDivideDbQuery, SWT.NONE);
+		lblDivideDbQueries.setFont(cantarell8);
+		lblDivideDbQueries.setText("Event Producers per Query (0=All)");
+
+		spinnerDivideDbQuery = new Spinner(grpDivideDbQuery, SWT.BORDER);
+		spinnerDivideDbQuery.setFont(cantarell8);
+		spinnerDivideDbQuery.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+				true, false, 1, 1));
+		spinnerDivideDbQuery.setMinimum(OcelotlDefaultParameterConstants.MIN_EVENT_PRODUCERS_PER_QUERY);
+		spinnerDivideDbQuery.setMaximum(OcelotlDefaultParameterConstants.MAX_EVENT_PRODUCERS_PER_QUERY);
+		spinnerDivideDbQuery.setSelection(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
+		spinnerDivideDbQuery.addModifyListener(new MaxEventProducerListener());
+		
+		final Group grpMultiThread = new Group(advancedSettingsSashForm, SWT.NONE);
+		grpMultiThread.setFont(cantarell8);
+		grpMultiThread.setText("Multi Threading");
+		grpMultiThread.setLayout(new GridLayout(2, false));
+
+		final Label lblThread = new Label(grpMultiThread, SWT.NONE);
+		lblThread.setFont(cantarell8);
+		lblThread.setText("Working Threads");
+
+		spinnerThread = new Spinner(grpMultiThread, SWT.BORDER);
+		spinnerThread.setFont(cantarell8);
+		spinnerThread.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 1, 1));
+		spinnerThread.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_THREAD);
+		spinnerThread.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_THREAD);
+		spinnerThread.setSelection(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
+		spinnerThread.addModifyListener(new ThreadNumberListener());
+		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1 });
+			
 		// Quality curves display
 		final Composite compositeQualityView = new Composite(sashForm, SWT.BORDER);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -1467,6 +1557,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
 		ocelotlParameters.setSpaceAggOperator(comboSpace.getText());
+		
+		ocelotlParameters.setEventsPerThread(spinnerEventSize.getSelection());
+		ocelotlParameters.setThreadNumber(spinnerThread.getSelection());
+		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());
+		
 		setCachePolicy();
 		try {
 			ocelotlParameters.setThreshold(Double.valueOf(textThreshold.getText()).floatValue());
@@ -1557,12 +1652,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setCatEventTypes(confDataLoader.getTypesByCat());
 		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getEventCategory()));
 		// Init operator specific configuration
-		ocelotlParameters.getTraceTypeConfig().init();
 		ocelotlParameters.setAllEventProducers(confDataLoader.getProducers());
 		if (ocelotlParameters.getEventProducers().isEmpty())
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
 		
-		ocelotlParameters.setMaxEventProducers(OcelotlDefaultParameterConstants.EventProducersPerQuery);
+		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		manager = new ConfigViewManager(this);
 		manager.init();
 	}

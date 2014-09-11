@@ -61,16 +61,34 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Is the cache activated by default
 	 */
-	public static boolean DEFAULT_CACHE_ACTIVATION = true;
+	public static final boolean DEFAULT_CACHE_ACTIVATION = true;
 
 	/**
 	 * Default cache policy
 	 */
-	public static DatacachePolicy DEFAULT_CACHE_POLICY = DatacachePolicy.CACHEPOLICY_FAST;
+	public static final DatacachePolicy DEFAULT_CACHE_POLICY = DatacachePolicy.CACHEPOLICY_FAST;
 
 	/**
 	 * Default number of time slices used when generating a cache
 	 */
-	public static int DEFAULT_CACHE_TS_NUMBER = 10000;
+	public static final int DEFAULT_CACHE_TS_NUMBER = 10000;
 
+	/**
+	 * Number of threads for computation
+	 */
+	public static final int NUMBER_OF_THREADS = 8;
+	
+	/**
+	 * Number of events loaded by thread
+	 */
+	public static final int EVENTS_PER_THREAD = 10000;
+	public static final int MIN_EVENTS_PER_THREAD = 100;
+	public static final int MAX_EVENTS_PER_THREAD = 10000000;
+	
+	public static final int MIN_NUMBER_OF_THREAD = 1;
+	public static final int MAX_NUMBER_OF_THREAD = 1000000;
+	
+	public static final int MIN_EVENT_PRODUCERS_PER_QUERY = 0;
+	public static final int MAX_EVENT_PRODUCERS_PER_QUERY = 1000000;
+	
 }

@@ -54,6 +54,8 @@ public class OcelotlParameters {
 	private double threshold = OcelotlDefaultParameterConstants.Threshold;
 	private Trace trace = null;
 	private int maxEventProducers = OcelotlDefaultParameterConstants.EventProducersPerQuery;
+	private int eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
+	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
 	private String timeAggOperator;
 	private String spaceAggOperator;
 	private boolean growingQualities = OcelotlDefaultParameterConstants.GrowingQualities;
@@ -303,6 +305,22 @@ public class OcelotlParameters {
 
 	public void setDataCachePolicy(DatacachePolicy dataCachePolicy) {
 		this.dataCachePolicy = dataCachePolicy;
+	}
+
+	public int getThreadNumber() {
+		return threadNumber;
+	}
+
+	public void setThreadNumber(int threadNumber) {
+		this.threadNumber = threadNumber;
+	}
+
+	public int getEventsPerThread() {
+		return eventsPerThread;
+	}
+
+	public void setEventsPerThread(int eventsPerThread) {
+		this.eventsPerThread = eventsPerThread;
 	}
 
 }
