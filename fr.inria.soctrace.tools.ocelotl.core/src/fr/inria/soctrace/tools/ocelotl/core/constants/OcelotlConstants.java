@@ -68,7 +68,7 @@ public class OcelotlConstants {
 	}
 	
 	/**
-	 * Possible datacache policy (hot to chose strategy
+	 * Possible datacache policies (used to choose strategy)
 	 */
 	static public enum DatacachePolicy {
 		CACHEPOLICY_FAST, CACHEPOLICY_SLOW, CACHEPOLICY_AUTO, CACHEPOLICY_ASK
