@@ -283,11 +283,9 @@ public class DataCache {
 			CacheParameters cacheParam) {
 
 		// Is the aggregation operator the same?
-		if (!((newParam.getTimeAggOperator().equals(
+		if (!(newParam.getTimeAggOperator().equals(
 				cacheParam.getTimeAggOperator()) && (!newParam
-				.getTimeAggOperator().equals("null"))) || ((newParam
-				.getSpaceAggOperator().equals(cacheParam.getSpaceAggOperator()) && (!newParam
-				.getSpaceAggOperator().equals("null"))))))
+				.getTimeAggOperator().equals("null"))))
 			return false;
 
 		// Are timestamps equal or are they included inside the cache
