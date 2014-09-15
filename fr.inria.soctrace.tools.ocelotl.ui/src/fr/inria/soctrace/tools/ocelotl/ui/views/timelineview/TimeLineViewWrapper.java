@@ -84,14 +84,12 @@ public class TimeLineViewWrapper {
 		for (final MouseListener m : mouseListeners)
 			root.removeMouseListener(m);
 		mouseListeners.clear();
-
 	}
 
 	public void cleanMouseMotionListeners() {
 		for (final MouseMotionListener m : mouseMotionListeners)
 			root.removeMouseMotionListener(m);
 		mouseMotionListeners.clear();
-
 	}
 
 	public Canvas getCanvas() {

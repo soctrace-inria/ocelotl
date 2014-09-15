@@ -40,6 +40,13 @@ public class TimeRegion {
 		setTimeStampEnd(time.getTimeStampEnd());
 	}
 
+	/**
+	 * Check if two time regions represent the time period
+	 * 
+	 * @param timeRegion
+	 *            The TimeRegion to compare with
+	 * @return true if the time regions are identical
+	 */
 	public boolean compareTimeRegion(final TimeRegion timeRegion) {
 		return getTimeStampStart() == timeRegion.getTimeStampStart()
 				&& getTimeStampEnd() == timeRegion.getTimeStampEnd();

@@ -241,7 +241,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
-		Date convertedDate = new Date(System.currentTimeMillis() * 1000);
+		Date convertedDate = new Date(System.currentTimeMillis());
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"

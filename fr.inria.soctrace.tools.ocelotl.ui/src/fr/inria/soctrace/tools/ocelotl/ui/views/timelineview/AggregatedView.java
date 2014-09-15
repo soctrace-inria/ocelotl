@@ -134,6 +134,7 @@ abstract public class AggregatedView implements IAggregatedView {
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
 				selectFigure.draw(selectTime, false);
+				ocelotlView.getOverView().updateSelection(selectTime);
 				if (ocelotlView.getTimeRegion().compareTimeRegion(time)) {
 					ocelotlView.getTimeAxisView().unselect();
 					if (selectFigure.getParent() != null)
@@ -204,7 +205,7 @@ abstract public class AggregatedView implements IAggregatedView {
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
 				selectFigure.draw(selectTime, false);
-
+				ocelotlView.getOverView().updateSelection(selectTime);
 			}
 		}
 
@@ -237,12 +238,15 @@ abstract public class AggregatedView implements IAggregatedView {
 				ocelotlView.getTimeAxisView().select(selectTime, true);
 				ocelotlView.setTimeRegion(selectTime);
 				selectFigure.draw(selectTime, true);
+				ocelotlView.getOverView().updateSelection(selectTime);
 			} else {
 				ocelotlView.getTimeAxisView().resizeDiagram();
+				ocelotlView.getOverView().deleteSelection();
 				if (selectFigure.getParent() != null)
 					root.remove(selectFigure);
 				root.repaint();
 			}
+			
 		}
 	}
 
@@ -312,6 +316,10 @@ abstract public class AggregatedView implements IAggregatedView {
 		return canvas;
 	}
 
+	public void setCanvas(Canvas canvas) {
+		this.canvas = canvas;
+	}
+
 	@Override
 	public long getEnd() {
 		return selectTime.getTimeStampEnd();
@@ -331,6 +339,10 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public Figure getRoot() {
 		return root;
+	}
+	
+	public void setRoot(Figure root) {
+		this.root = root;
 	}
 
 	public SelectFigure getSelectFigure() {
@@ -382,6 +394,8 @@ abstract public class AggregatedView implements IAggregatedView {
 		selectFigure = new SelectFigure();
 	}
 
+	
+	// TODO take resolution in to account (given as a parameter)
 	public void createSnapshotFor(String fileName) {
 		byte[] imageBytes = createImage(root, SWT.IMAGE_PNG);
 

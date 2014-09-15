@@ -38,7 +38,6 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 
 	public TimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
-
 	}
 
 	@Override
@@ -70,6 +69,7 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 			computeDiagram();
 		}
 	}
+
 
 	public List<Integer> getParts() {
 		return parts;
