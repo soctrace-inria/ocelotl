@@ -426,11 +426,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							qualityView.createDiagram();
 							tabFolder.setSelection(1);
-							double tempParam = ocelotlParameters.getParameter();
-							ocelotlParameters.setParameter(0.0);
-							ocelotlCore.computeParts();
 							overView.updateDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
-							ocelotlParameters.setParameter(tempParam);
 							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 						}
 					});
@@ -594,7 +590,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						break;
 					}
 				}
-
 			}
 		}
 	}
@@ -608,6 +603,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			{
 				timeLineView.resizeDiagram();
 				timeAxisView.resizeDiagram();
+				overView.resizeDiagram();
 				overView.deleteSelection();
 			}
 		}
