@@ -53,7 +53,7 @@ public class MultiState {
 	private Proportion distribution;
 	private IFigure root;
 	private IconManager iconManager;
-	//Minimum value to consider a color too ligth
+	//Minimum value to consider a color too light
 	private static final int Light = 225;
 
 	public MultiState(final int index, final Proportion distribution,
@@ -75,9 +75,7 @@ public class MultiState {
 				&& color.getRed() > Light)
 			return true;
 		return false;
-
 	}
-
 	
 	//Draw the proportion visualization of the aggregates
 	public void init() {

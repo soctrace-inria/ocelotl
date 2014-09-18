@@ -95,13 +95,28 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 		}
 	}
 
+	/**
+	 * Compute the state that has the biggest proportion in the given time
+	 * region
+	 * 
+	 * @param epn
+	 *            The considered event producer node
+	 * @param start
+	 *            the index of the starting slice
+	 * @param end
+	 *            the index of the ending slice
+	 * @return the state with the biggest proportion
+	 */
 	public MajState getMajState(EventProducerNode epn, int start, int end) {
 		double max = 0.0;
 		MajState maj = new MajState(Void, max);
 		for (String state : getStates()) {
 			double amp = 0.0;
+			// Compute the total presence of the state
 			for (int i = start; i < end; i++)
 				amp += proportions.get(epn).get(i).get(state);
+
+			// Divide by duration
 			amp /= (end - start);
 			if (amp > max) {
 				maj = new MajState(state, amp);

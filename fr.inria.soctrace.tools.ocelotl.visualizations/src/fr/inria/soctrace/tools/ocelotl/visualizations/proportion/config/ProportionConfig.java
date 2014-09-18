@@ -52,11 +52,9 @@ public class ProportionConfig implements ISpaceConfig {
 		this.types = types;
 	}
 
-
 	public StateColorManager getColors() {
 		return colors;
 	}
-
 
 	public void initColors() {
 		this.colors = new StateColorManager();

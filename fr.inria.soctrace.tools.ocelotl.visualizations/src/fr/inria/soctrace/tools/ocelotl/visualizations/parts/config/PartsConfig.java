@@ -23,27 +23,28 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 
 public class PartsConfig implements ISpaceConfig {
 
-	private boolean numbers=false;
-	private boolean aggregated=true;
-	
+	private boolean numbers = false;
+	private boolean aggregated = true;
+
 	public boolean isAggregated() {
 		return aggregated;
 	}
+
 	public void setAggregated(boolean aggregated) {
 		this.aggregated = aggregated;
 	}
+
 	public boolean isNumbers() {
 		return numbers;
 	}
+
 	public void setNumbers(boolean numbers) {
 		this.numbers = numbers;
 	}
+
 	public PartsConfig() {
 		super();
-		this.numbers=false;
-		this.aggregated=true;
+		this.numbers = false;
+		this.aggregated = true;
 	}
-	
-	
-
 }
