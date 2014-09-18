@@ -59,22 +59,23 @@ public class Overview {
 	}
 	
 	public void createDiagram(IMicroDescManager iMicroDescManager, TimeRegion time) {
-		
 		globalTimeRegion = new TimeRegion(time);
-		
+
 		// Save the current parameter
 		double tempParam = ocelotlView.getParams().getParameter();
-		// Set the parameter to  zero in order to have a fully desaggregated view
-		ocelotlView.getParams().setParameter(0.0);
-		// Compute the desaggregated view 
+
+		// Set the parameter to the computed initial parameter
+		ocelotlView.getParams().setParameter(ocelotlView.computeInitialParameter());
+
+		// Compute the desaggregated view
 		ocelotlView.getOcelotlCore().computeParts();
-		
+
 		timeLineView.createDiagram(iMicroDescManager, time);
-		
+
 		// Restore the parameter
 		ocelotlView.getParams().setParameter(tempParam);
 	}
-	
+
 	/**
 	 * 
 	 */

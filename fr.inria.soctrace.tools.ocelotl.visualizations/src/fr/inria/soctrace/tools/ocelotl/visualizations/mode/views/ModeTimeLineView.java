@@ -15,7 +15,7 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 public class ModeTimeLineView extends TimeLineView {
 
 	private Proportion distribution;
-	
+
 	public ModeTimeLineView(OcelotlView ocelotlView) {
 		super(ocelotlView);
 	}
@@ -40,9 +40,9 @@ public class ModeTimeLineView extends TimeLineView {
 							/ parts.size() - space + Border, Border)));
 			j = j + aggParts.get(i);
 			part.getUpdateManager().performUpdate();
-			MajState mState = getMajState(i);//distribution.getPart(i).getStartPart(), distribution.getPart(i).getEndPart());
+			MajState mState = getMajState(i);
 			part.draw(mState);
-		}	
+		}
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class ModeTimeLineView extends TimeLineView {
 	 *            the index of the current part
 	 * @return the dominant state or event
 	 */
-	public MajState getMajState(int index) { 
+	public MajState getMajState(int index) {
 		double max = 0.0;
 		double tempMax;
 		MajState maj = new MajState("void", max);
@@ -68,5 +68,5 @@ public class ModeTimeLineView extends TimeLineView {
 		}
 		return maj;
 	}
-	
+
 }

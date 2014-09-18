@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +65,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
@@ -382,6 +384,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								ocelotlCore.computeDichotomy();
 								monitor.worked(1);
 							}
+							
+							// Compute the parameter value
+							ocelotlParameters.setParameter(computeInitialParameter());
 						}
 
 						hasChanged = HasChanged.PARAMETER;
@@ -424,6 +429,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							timeLineView.deleteDiagram();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
+							textRun.setText(String.valueOf(getParams().getParameter()));
 							qualityView.createDiagram();
 							tabFolder.setSelection(1);
 							overView.updateDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
@@ -1685,6 +1691,41 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		manager = new ConfigViewManager(this);
 		manager.init();
+	}
+	
+	/**
+	 * Search for the parameter that has the largest gap between two consecutive
+	 * gain or loss values
+	 * 
+	 * @return the corresponding parameter 
+	 */
+	public double computeInitialParameter() {
+		double diffG = 0.0, diffL = 0.0;
+		double maxDiff = 0.0;
+		int indexMaxQual = -1;
+		int i;
+
+		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) getOcelotlCore().getLpaggregManager().getQualities();
+		for (i = 1; i < qual.size(); i++) {
+			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
+			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
+			if (diffG > maxDiff) {
+				maxDiff = diffG;
+				indexMaxQual = i;
+			}
+			if (diffL > maxDiff) {
+				maxDiff = diffG;
+				indexMaxQual = i;
+			}
+		}
+
+		if (indexMaxQual > -1 && indexMaxQual < getOcelotlCore().getLpaggregManager().getParameters().size())
+			// Set the parameter to zero in order to have a fully desaggregated
+			// view
+			return getOcelotlCore().getLpaggregManager().getParameters().get(indexMaxQual);
+
+		// No index found or invalid value, return 1.0 as default
+		return 1.0;
 	}
 	
 	/**

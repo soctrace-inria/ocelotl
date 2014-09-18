@@ -752,7 +752,7 @@ public class DataCache {
 		}
 
 		logger.debug("Size of the current cache is: " + currentCacheSize
-				+ " bytes.");
+				+ " bytes (" + currentCacheSize / 1000000 + " MB).");
 	}
 
 	/**
