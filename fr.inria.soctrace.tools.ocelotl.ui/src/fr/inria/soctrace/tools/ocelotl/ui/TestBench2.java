@@ -18,41 +18,25 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 /**
  * Let me zoom zoom zen in my bench bench bench
  * 
- * bench file format:
- * //trace;traceID
- * //cache strategy; TimeSlice; Time stamps; Operator; parameter(s)
+ * bench file format: //trace;traceID //cache strategy; TimeSlice; Time stamps;
+ * Operator; parameter(s)
  */
-public class TestBench {
+public class TestBench2 extends TestBench {
 
-	public final int TraceNamePos = 0;
-	public final int TraceIDPos = 1;
-	public final int CacheActivatedPos = 2;
-	public final int CacheStrategyPos = 3;
-	public final int NumberOfTimeSlicePos = 4;
-	public final int StartTimestampPos = 5;
-	public final int EndTimeStampPos = 6;
-	public final int TimeAggregatorPos = 7;
-	public final int NumberOfRepetetionPos = 8;
-	public final int ParameterPos = 9;
-	public final int testbenchHeaderSize = 10;
-	
-	String aConfFile;
-	OcelotlView theView;
-	List<TestParameters> testParams = new ArrayList<TestParameters>();
-	String testDirectory;
-	String statData;
-	int noCacheTime;
-	int cacheTime;
-	
-	public TestBench(String aFilePath, OcelotlView aView) {
-		aConfFile = aFilePath;
-		theView = aView;
+	List<TestParameters>	testParams	= new ArrayList<TestParameters>();
+	String					testDirectory;
+	String					statData;
+	int						noCacheTime;
+	int						cacheTime;
+
+	public TestBench2(String aFilePath, OcelotlView aView) {
+		super(aFilePath, aView);
 	}
 
-	public void parseFile()
-	{
+	@Override
+	public void parseFile() {
 		File aFile = new File(aConfFile);
-		
+
 		if (aFile.canRead() && aFile.isFile()) {
 			BufferedReader bufFileReader;
 
@@ -62,52 +46,57 @@ public class TestBench {
 				String line;
 				int traceID = -1;
 				String traceName = "";
-				
+
 				// Get header
 				line = bufFileReader.readLine();
-				if (line != null) {
+			/*	if (line != null) {
 					String[] header = line.split(OcelotlConstants.CSVDelimiter);
 
 					// Name
 					traceName = header[0];
 					// Database unique ID
 					traceID = Integer.parseInt(header[1]);
-				}
-				
+				}*/
+
 				while ((line = bufFileReader.readLine()) != null) {
-					if (line.isEmpty())
+					if (line.isEmpty() || line.length() < testbenchHeaderSize)
 						continue;
 
 					String[] header = line.split(OcelotlConstants.CSVDelimiter);
 					TestParameters params = new TestParameters();
 
 					// Name
-					params.setTraceName(traceName);
+					params.setTraceName(header[TraceNamePos]);
 					// Database unique ID
-					params.setTraceID(traceID);
+					params.setTraceID(Integer.parseInt(header[TraceIDPos]));
+					// Cache activation
+					params.setActivateCache(Boolean.parseBoolean(header[CacheActivatedPos]));
 					// rebuilding strategy
-					params.setDatacacheStrat(DatacacheStrategy.valueOf(header[0]));
+					params.setDatacacheStrat(DatacacheStrategy.valueOf(header[CacheStrategyPos]));
 					// Number of time Slices
-					params.setNbTimeSlice(Integer.parseInt(header[1]));
+					params.setNbTimeSlice(Integer.parseInt(header[NumberOfTimeSlicePos]));
 					// Start timestamp
-					params.setStartTimestamp(Long.parseLong(header[2]));
+					params.setStartTimestamp(Long.parseLong(header[StartTimestampPos]));
 					// End timestamp
-					params.setEndTimestamp(Long.parseLong(header[3]));
+					params.setEndTimestamp(Long.parseLong(header[EndTimeStampPos]));
 					// Time Aggregation Operator
-					params.setTimeAggOperator(header[4]);
+					params.setTimeAggOperator(header[TimeAggregatorPos]);
+					// Number of repetitions
+					params.setNumberOfRepetition(Integer.parseInt(header[NumberOfRepetetionPos]));
+
 					// Parameter value
-					params.getParameters().add(Double.parseDouble(header[5]));
-					
-					if (header.length > 6) {
-						for (int i = 6; i < header.length; i++)
+					params.getParameters().add(Double.parseDouble(header[ParameterPos]));
+
+					if (header.length > testbenchHeaderSize) {
+						for (int i = testbenchHeaderSize; i < header.length; i++)
 							params.getParameters().add(Double.parseDouble(header[i]));
 					}
 
 					testParams.add(params);
 				}
-
+				
 				bufFileReader.close();
-
+				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -117,10 +106,10 @@ public class TestBench {
 		}
 	}
 
+	@Override
 	public void launchTest() {
-		
-		if (!testParams.isEmpty()) {
 
+		if (!testParams.isEmpty()) {
 			statData = "";
 			String fileDir = aConfFile.substring(0, aConfFile.lastIndexOf("/") + 1);
 			Date aDate = new Date(System.currentTimeMillis());
@@ -132,17 +121,15 @@ public class TestBench {
 
 			for (TestParameters aTest : testParams) {
 				aTest.setDirectory(dir.getAbsolutePath());
-				noCacheTime = 0;
-				cacheTime = 0;
-				theView.loadFromParam(aTest, false);
 				statData = statData + aTest.toString().replace("_", ";") + "\n";
-				statData = statData + "Save matrix; Load matrix; Load matrix (dirty); dirt Timeslice; used TS; ratio; queries+computation; speedup\n";
-				statData = statData + getStatData();
+				statData = statData + "Microscopic Model; Compute Qualities; compute Dicho; Compute parts + display\n";
+				for (int i = 0; i < aTest.getNumberOfRepetition(); i++) {
+					theView.loadFromParam(aTest, aTest.isActivateCache());
+					statData = statData + getStatData();
+				}
 				writeStat();
-
-				theView.loadFromParam(aTest, true);
-				statData = statData + getStatData();
-				writeStat();
+				
+				statData = statData + "\n";
 			}
 
 			// Call the script to compare the image
@@ -156,12 +143,11 @@ public class TestBench {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
 		}
 	}
-	
-	public String getStatData()
-	{
+
+	@Override
+	public String getStatData() {
 		String stat = "";
 		BufferedReader bufFileReader;
 		String line;
@@ -172,64 +158,70 @@ public class TestBench {
 		double usedTS = 0;
 		double ratio = 0.0;
 		int computationTime = 0;
-		
+
 		int microscopicModel = 0;
 		int computeQualities = 0;
 		int computeDicho = 0;
 		int computePartAndDisplay = 0;
-		
+
 		try {
 			bufFileReader = new BufferedReader(new FileReader("/home/youenn/traces/eclipse_output.txt"));
-			
+
 			while ((line = bufFileReader.readLine()) != null) {
 				if (line.isEmpty())
 					continue;
 
-				if(line.contains("[DATACACHE - Save the matrix to cache]"))
-				{
-					String saveMatrix = line.substring(line.indexOf("Delta: ")+ 7, line.indexOf(" ms"));
+				if (line.contains("[DATACACHE - Save the matrix to cache]")) {
+					String saveMatrix = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
 					saveMatrixTime = Integer.valueOf(saveMatrix);
 				}
-				if(line.contains("[Load matrix from cache]"))
-				{
-					String loadMatrix = line.substring(line.indexOf("Delta: ")+ 7, line.indexOf(" ms"));
+				if (line.contains("[Load matrix from cache]")) {
+					String loadMatrix = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
 					loadMatrixTime = Integer.valueOf(loadMatrix);
 					cacheTime = loadMatrixTime;
 				}
-				if(line.contains("[Load matrix from cache (dirty)]"))
-				{
-					String loadMatrix = line.substring(line.indexOf("Delta: ")+ 7, line.indexOf(" ms"));
+				if (line.contains("[Load matrix from cache (dirty)]")) {
+					String loadMatrix = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
 					loadDirtyMatrixTime = Integer.valueOf(loadMatrix);
 					cacheTime = loadDirtyMatrixTime;
 				}
-				if(line.contains("[DATACACHE] Found "))
-				{
-					String dirtyTimeslicesNumber = line.substring(line.indexOf("Found ")+ 6, line.indexOf(" dirty Timeslices"));
-					String usedCachedTimeSlices = line.substring(line.indexOf("among ")+ 6, line.indexOf(" used cache"));
-					String computedDirtyRatio = line.substring(line.indexOf("ratio of")+ 8, line.indexOf(")."));
-					
+				if (line.contains("[DATACACHE] Found ")) {
+					String dirtyTimeslicesNumber = line.substring(line.indexOf("Found ") + 6, line.indexOf(" dirty Timeslices"));
+					String usedCachedTimeSlices = line.substring(line.indexOf("among ") + 6, line.indexOf(" used cache"));
+					String computedDirtyRatio = line.substring(line.indexOf("ratio of") + 8, line.indexOf(")."));
+
 					dirtyTS = Double.valueOf(dirtyTimeslicesNumber);
 					usedTS = Double.valueOf(usedCachedTimeSlices);
 					ratio = Double.valueOf(computedDirtyRatio);
 				}
-				
-				if(line.contains("[TOTAL (QUERIES + COMPUTATION)"))
-				{
-					String computation = line.substring(line.indexOf("Delta: ")+ 7, line.indexOf(" ms"));
+				if (line.contains("[TOTAL (QUERIES + COMPUTATION)")) {
+					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
 					computationTime = Integer.valueOf(computation);
 					noCacheTime = computationTime;
 				}
+				if (line.contains("[Microscopic Rebuilding]")) {
+					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
+					microscopicModel = Integer.valueOf(computation);
+				}
+				if (line.contains("[Compute qualities]")) {
+					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
+					computeQualities = Integer.valueOf(computation);
+				}
+				if (line.contains("[Compute Dichotomy]")) {
+					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
+					computeDicho = Integer.valueOf(computation);
+				}
+				if (line.contains("[Compute parts and display]")) {
+					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
+					computePartAndDisplay = Integer.valueOf(computation);
+				}
 			}
-			
-			if (noCacheTime > 0 && cacheTime > 0) {
-				stat = saveMatrixTime + ";" + loadMatrixTime + ";" + loadDirtyMatrixTime + ";" + dirtyTS + ";" + usedTS + ";" + ratio + ";" + computationTime + ";" + ((double) (noCacheTime)) / ((double) cacheTime) + "\n";
 
-			} else {
-				stat = saveMatrixTime + ";" + loadMatrixTime + ";" + loadDirtyMatrixTime + ";" + dirtyTS + ";" + usedTS + ";" + ratio + ";" + computationTime + "\n";
-			}
+			stat = microscopicModel + ";" + computeQualities + ";" + computeDicho + ";" +  computePartAndDisplay+ "\n";
+			//saveMatrixTime + ";" + loadMatrixTime + ";" + loadDirtyMatrixTime + ";" + dirtyTS + ";" + usedTS + ";" + ratio + ";" + computationTime + "\n";
 
 			bufFileReader.close();
-			
+
 			PrintWriter writer = new PrintWriter(new File("/home/youenn/traces/eclipse_output.txt"));
 			writer.print("");
 			writer.close();
@@ -241,13 +233,12 @@ public class TestBench {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return stat;
 	}
-	
-	
-	public void writeStat()
-	{
+
+	@Override
+	public void writeStat() {
 		PrintWriter writer;
 		try {
 			writer = new PrintWriter(testDirectory + "/result.csv", "UTF-8");
@@ -257,7 +248,7 @@ public class TestBench {
 			// Close the fd
 			writer.flush();
 			writer.close();
-			
+
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

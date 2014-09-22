@@ -18,6 +18,8 @@ public class TestParameters {
 	private ArrayList<Double> parameters;
 	private DatacacheStrategy datacacheStrat;
 	private String directory;
+	private int numberOfRepetition;
+	private boolean activateCache;
 
 	public TestParameters() {
 		traceName = "";
@@ -30,6 +32,8 @@ public class TestParameters {
 		setParameters(new ArrayList<Double>());
 		setDatacacheStrat(DatacacheStrategy.DATACACHE_PROPORTIONAL);
 		directory = "";
+		setNumberOfRepetition(1);
+		setActivateCache(false);
 	}
 
 	/**
@@ -138,6 +142,22 @@ public class TestParameters {
 		this.directory = directory;
 	}
 	
+	public int getNumberOfRepetition() {
+		return numberOfRepetition;
+	}
+
+	public void setNumberOfRepetition(int numberOfRepetition) {
+		this.numberOfRepetition = numberOfRepetition;
+	}
+
+	public boolean isActivateCache() {
+		return activateCache;
+	}
+
+	public void setActivateCache(boolean activateCache) {
+		this.activateCache = activateCache;
+	}
+
 	/**
 	 * Load a trace from a cache file
 	 * 

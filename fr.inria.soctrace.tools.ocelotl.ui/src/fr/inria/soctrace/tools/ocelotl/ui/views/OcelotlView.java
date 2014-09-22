@@ -19,6 +19,10 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +77,7 @@ import fr.inria.soctrace.framesoc.ui.perspective.FramesocPartManager;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
@@ -85,6 +90,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench2;
 import fr.inria.soctrace.tools.ocelotl.ui.TestParameters;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
@@ -229,29 +235,46 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 
-   private class BenchListener extends SelectionAdapter {
+	private class BenchListener extends SelectionAdapter {
 
-           private final OcelotlView       view;
+		private final OcelotlView	view;
 
-           public BenchListener(final OcelotlView view) {
-                   this.view = view;
-           }
-           
-           @Override
-           public void widgetSelected(SelectionEvent e) {
-                   FileDialog dialog = new FileDialog(getSite().getShell(), SWT.OPEN);
-                   String loadCachefile = dialog.open();
+		public BenchListener(final OcelotlView view) {
+			this.view = view;
+		}
 
-                   if (loadCachefile != null) {
-                           TestBench aTest = new TestBench(loadCachefile, view);
-                           aTest.parseFile();
-                           aTest.launchTest();
-                   }
-           }
-   }
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			FileDialog dialog = new FileDialog(getSite().getShell(), SWT.OPEN);
+			String loadCachefile = dialog.open();
 
-	
-	
+			if (loadCachefile != null) {
+				BufferedReader bufFileReader;
+				try {
+					bufFileReader = new BufferedReader(new FileReader(loadCachefile));
+					String line;
+					TestBench aTest;
+
+					// Get header
+					line = bufFileReader.readLine();
+					if (line.equals("v2")) {
+						aTest = new TestBench2(loadCachefile, view);
+					} else {
+						aTest = new TestBench(loadCachefile, view);
+					}
+					aTest.parseFile();
+					aTest.launchTest();
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+
+			}
+		}
+	}
 	
 	private class SaveDataListener extends SelectionAdapter {
 
@@ -456,7 +479,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		private Object	lock	= new Object();
 		// Global flag signaling that a job is already running
 		private boolean	running	= false;
-
+		DeltaManager aDm = new DeltaManager();
+		
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			// Check that inputs are valid
@@ -467,7 +491,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
 				return;
 			}
-
+			
 			// Mutex zone
 			synchronized (lock) {
 				// If a job is already running
@@ -483,7 +507,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				// else we are starting a job
 				running = true;
 			}
-
+			
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER) {
 				hasChanged = HasChanged.PARAMETER;
 			} else {
@@ -496,6 +520,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
+			
 					monitor.beginTask(title, 4);
 					try {
 						if (hasChanged != HasChanged.PARAMETER) {
@@ -508,7 +533,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									return Status.CANCEL_STATUS;
 								}
 								monitor.setTaskName("Initializing Time Operator");
+								aDm.start();
 								ocelotlCore.initTimeOperator(monitor);
+								aDm.end("Microscopic Rebuilding");
 								monitor.worked(1);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
@@ -521,7 +548,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								}
 								monitor.setTaskName("Compute Qualities");
 								monitor.subTask("");
+								aDm.start();
 								ocelotlCore.computeQualities();
+								aDm.end("Compute qualities");
 								monitor.worked(1);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
@@ -533,7 +562,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									return Status.CANCEL_STATUS;
 								}
 								monitor.setTaskName("Compute Dichotomy");
+								aDm.start();
 								ocelotlCore.computeDichotomy();
+								aDm.end("Compute Dichotomy");
 								monitor.worked(1);
 							}
 						}
@@ -550,7 +581,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						// if (hasChanged == HasChanged.ALL || hasChanged ==
 						// HasChanged.NORMALIZE || hasChanged ==
 						// HasChanged.PARAMETER)
-						
+						aDm.start();
 						ocelotlCore.computeParts();
 						monitor.worked(1);
 
@@ -581,6 +612,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							qualityView.createDiagram();
 
 							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
+							aDm.end("Compute parts and display");
 						}
 					});
 
