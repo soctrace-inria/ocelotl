@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import fr.inria.lpaggreg.time.JNITimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I2DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 
 public class TimeAggregation2Manager extends TimeAggregationManager {
 
@@ -38,7 +40,6 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 		reset(monitor);
 	}
 
-
 	@Override
 	public void fillVectors(IProgressMonitor monitor) {
 		for (int i = 0; i < matrix.getVectorNumber(); i++) {
@@ -47,7 +48,6 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 				((JNITimeAggregation2) timeAggregation).push_back(matrix
 						.getMatrix().get(i).get(key));
 		}
-
 	}
 
 	@Override
@@ -63,6 +63,21 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 	public void reset(IProgressMonitor monitor) {
 		timeAggregation = new JNITimeAggregation2();
 		fillVectors(monitor);
+	}
+	
+	@Override
+	public IMicroDescManager copy() {
+		TimeAggregation2Manager aNewManager = null;
+
+		aNewManager = new TimeAggregation2Manager(matrix,  new NullProgressMonitor());
+		//aNewManager.matrix = new _2DMicroDescription();//initVectors();
+		/*for (int i = 0; i < matrix.getMatrix().size(); i++) {
+			for (EventProducer ep : ocelotlParameters.getEventProducers()) {
+				aNewManager.matrix.getMatrix().get(i).get(ep)
+						.put(this.matrix.getMatrix().get(i));
+			}
+		}*/
+		return aNewManager;
 	}
 
 }

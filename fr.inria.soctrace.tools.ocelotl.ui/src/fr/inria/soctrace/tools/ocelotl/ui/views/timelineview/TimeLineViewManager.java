@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
+import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class TimeLineViewManager {
@@ -47,5 +48,19 @@ public class TimeLineViewManager {
 		return timeLineView;
 
 	}
+	
+	public IAggregatedView create(String aVisualization) {
+		IAggregatedView timeLineView = null;
+		try {
+			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource(aVisualization).getBundle());
+			timeLineView = (IAggregatedView) mybundle.loadClass(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource(aVisualization).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return timeLineView;
+
+	}
+
 
 }

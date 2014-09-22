@@ -19,10 +19,12 @@
 
 package fr.inria.soctrace.tools.ocelotl.visualizations.proportion;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
@@ -99,6 +101,23 @@ public class Proportion extends SpaceTAggregationOperator {
 	private void normalize() {
 		for (final Part part : parts)
 			((PartMap) part.getData()).normalizeElements(timeSliceDuration, part.getPartSize());
+	}
+
+	@Override
+	public ISpaceAggregationOperator copy() {
+		Proportion newProp = new Proportion();
+		newProp.states = states;
+		newProp.ocelotlCore = ocelotlCore;
+		newProp.timeSliceNumber = timeSliceNumber;
+		newProp.timeSliceDuration = timeSliceDuration;
+		newProp.lpaggregManager = lpaggregManager;
+
+		newProp.parts = new ArrayList<Part>();
+		int i;
+		for (i = 0; i < parts.size(); i++)
+			newProp.parts.add(parts.get(i));
+
+		return newProp;
 	}
 
 }

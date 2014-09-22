@@ -1,5 +1,6 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.LightweightSystem;
@@ -14,7 +15,10 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.osgi.framework.Bundle;
 
+import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
@@ -28,6 +32,7 @@ public class Overview {
 	private AggregatedView timeLineView;
 	private TimeRegion globalTimeRegion;
 	private IMicroDescManager md;
+	private ISpaceAggregationOperator spaceOperator;
 	private boolean redrawOverview;
 	// Show the currently displayed zone
 	private SelectFigure displayedZone;
@@ -66,9 +71,8 @@ public class Overview {
 
 		// Set the parameter to the computed initial parameter
 		ocelotlView.getParams().setParameter(ocelotlView.computeInitialParameter());
-
-		// Compute the desaggregated view
-		ocelotlView.getOcelotlCore().computeParts();
+		
+		timeLineView.setDistribution(spaceOperator);
 
 		timeLineView.createDiagram(iMicroDescManager, time);
 
@@ -80,21 +84,30 @@ public class Overview {
 	 * 
 	 */
 	public void resizeDiagram() {
-		canvas.redraw();
-		createDiagram(md, globalTimeRegion);
-		root.repaint();
+		if (md != null && globalTimeRegion != null) {
+			canvas.redraw();
+			createDiagram(md, globalTimeRegion);
+			root.repaint();
+		}
 	}
 
 	public void updateDiagram(IMicroDescManager iMicroDescManager, TimeRegion time) {
 		// Update the selected region with the displayed region
-
 		if (!redrawOverview && newTimeRegionLonger(time)) {
 			redrawOverview = true;
 			globalTimeRegion = new TimeRegion(time);
 		}
-			
+
 		if (redrawOverview) {
-			md = iMicroDescManager;
+			// Perform a deep copy of the microdescription model
+			md = iMicroDescManager.copy();
+
+			// Compute the view according to the new parameter value
+			iMicroDescManager.computeParts();
+			
+			this.spaceOperator.setOcelotlCore(ocelotlView.getOcelotlCore());
+
+			//spaceOperator = ocelotlView.getOcelotlCore().getSpaceOperator().copy();
 			createDiagram(iMicroDescManager, time);
 			redrawOverview = false;
 		}
@@ -166,6 +179,31 @@ public class Overview {
 		this.selectedZone = selectedZone;
 	}
 
+	public ISpaceAggregationOperator getSpaceOperator() {
+		return spaceOperator;
+	}
+
+	public void setSpaceOperator(ISpaceAggregationOperator spaceOperator) {
+		this.spaceOperator = spaceOperator;
+	}
+
+	
+	public void setSelectedOperator(String spaceOperator) {
+		final Bundle mybundle = Platform.getBundle(ocelotlView.getOcelotlCore().getSpaceOperators().getOperatorList().get(
+				spaceOperator).getBundle());
+		try {
+			this.spaceOperator = (ISpaceAggregationOperator) mybundle.loadClass(
+					ocelotlView.getOcelotlCore().getSpaceOperators().getOperatorList().get(spaceOperator).getOperatorClass())
+					.newInstance();
+
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	//	this.spaceOperator.setOcelotlCore(ocelotlView.getOcelotlCore());
+	}
+	
 	private class SelectFigure extends RectangleFigure {
 
 		Color foreground;
@@ -208,5 +246,7 @@ public class Overview {
 			root.repaint();
 		}
 	}
+	
+	
 	
 }

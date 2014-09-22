@@ -50,4 +50,6 @@ public interface IMicroDescManager {
 
 	public void print(OcelotlCore core);
 
+	public IMicroDescManager copy();
+	
 }

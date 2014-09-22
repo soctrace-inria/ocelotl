@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import fr.inria.lpaggreg.time.JNITimeAggregation3;
 import fr.inria.soctrace.lib.model.EventProducer;
@@ -39,7 +40,6 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		reset(monitor);
 	}
 
-
 	@Override
 	protected void fillVectors(IProgressMonitor monitor) {
 		for (int i = 0; i < matrix.getMatrix().size(); i++) {
@@ -55,7 +55,6 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 							.getMatrix().get(i).get(key).get(key2));
 			}
 		}
-
 	}
 
 	@Override
@@ -78,4 +77,14 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		fillVectors(monitor);
 	}
 
+	
+	public TimeAggregation3Manager copy()
+	{
+		TimeAggregation3Manager aNewManager = new TimeAggregation3Manager(this.matrix,  new NullProgressMonitor());
+		aNewManager.matrix = (I3DMicroDescription) matrix.copy();
+		aNewManager.timeAggregation = timeAggregation.copy();
+		aNewManager.qualities = timeAggregation.getQualityList();
+				
+		return aNewManager;
+	}
 }

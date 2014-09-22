@@ -349,6 +349,7 @@ public class QualityView {
 				canvas.redraw();
 				root.repaint();
 				resizeDiagram();
+				ocelotlView.getOverView().resizeDiagram();
 			}
 
 			@Override
@@ -356,6 +357,7 @@ public class QualityView {
 				canvas.redraw();
 				root.repaint();
 				resizeDiagram();
+				ocelotlView.getOverView().resizeDiagram();
 			}
 		});
 

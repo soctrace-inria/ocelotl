@@ -404,7 +404,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 						ocelotlCore.computeParts();
 						monitor.worked(1);
-
 					} catch (final OcelotlException e) {
 						monitor.done();
 						Display.getDefault().syncExec(new Runnable() {
@@ -516,7 +515,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
-			overView.setTimeLineView((AggregatedView)timeLineViewManager.create());
+			overView.setTimeLineView((AggregatedView)timeLineViewManager.create("Simple Mode"));
+			overView.setSelectedOperator(comboSpace.getText());
 		}
 	}
 	
@@ -605,11 +605,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
-			if(timeLineView != null)
-			{
+			if (timeLineView != null) {
 				timeLineView.resizeDiagram();
 				timeAxisView.resizeDiagram();
-				overView.resizeDiagram();
 				overView.deleteSelection();
 			}
 		}

@@ -39,7 +39,7 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class SpaceAggregationOperatorManager {
 
-	HashMap<String, SpaceAggregationOperatorResource> operatorList;
+	protected HashMap<String, SpaceAggregationOperatorResource> operatorList;
 	ISpaceAggregationOperator selectedOperator;
 	String selectedOperatorName;
 	ISpaceConfig selectedConfig;
@@ -128,6 +128,10 @@ public class SpaceAggregationOperatorManager {
 	public SpaceAggregationOperatorResource getSelectedOperatorResource() {
 		return operatorList.get(selectedOperatorName);
 	}
+	
+	public SpaceAggregationOperatorResource getSelectedOperatorResource(String anOperatorName) {
+		return operatorList.get(anOperatorName);
+	}
 
 	// private void init() throws SoCTraceException {
 	// List = new HashMap<String, ISpaceAggregationOperator>();
@@ -177,4 +181,8 @@ public class SpaceAggregationOperatorManager {
 
 	}
 
+	public HashMap<String, SpaceAggregationOperatorResource> getOperatorList() {
+		return operatorList;
+	}
+	
 }

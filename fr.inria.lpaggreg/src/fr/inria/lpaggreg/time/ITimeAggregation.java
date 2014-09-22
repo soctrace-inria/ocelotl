@@ -17,4 +17,6 @@ public interface ITimeAggregation {
 	public List<DLPQuality> getQualityList();
 
 	public int getSize();
+	
+	public ITimeAggregation copy();
 }

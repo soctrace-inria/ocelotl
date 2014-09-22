@@ -34,6 +34,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -45,7 +46,6 @@ import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericState;
 public class StateDistribution extends _3DMicroDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(StateDistribution.class);
-	
 	
 	class OcelotlThread extends Thread {
 		
@@ -304,6 +304,35 @@ public class StateDistribution extends _3DMicroDescription {
 			return;
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+
+	@Override
+	public ITimeAggregationOperator copy() {
+		StateDistribution aNewDist = null;
+		try {
+			aNewDist = new StateDistribution();
+			aNewDist.parameters = new OcelotlParameters(this.parameters);
+			aNewDist.matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
+			int i;
+
+			for (i = 0; i < matrix.size(); i++) {
+				aNewDist.matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
+				for (EventProducer ep : parameters.getAllEventProducers())
+					aNewDist.matrix.get((int) i).put(ep, new HashMap<String, Double>());
+			}
+
+			for (i = 0; i < matrix.size(); i++) {
+				for (EventProducer anEP : parameters.getAllEventProducers()) {
+					for (String state : matrix.get(i).get(anEP).keySet())
+						aNewDist.matrix.get(i).get(anEP)
+								.put(state, matrix.get(i).get(anEP).get(state));
+				}
+			}
+		} catch (SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return aNewDist;
 	}
 	
 }

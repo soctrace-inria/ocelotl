@@ -26,5 +26,7 @@ public interface ISpaceAggregationOperator {
 	public OcelotlCore getOcelotlCore();
 
 	public void setOcelotlCore(OcelotlCore ocelotlCore);
+	
+	public ISpaceAggregationOperator copy();
 
 }

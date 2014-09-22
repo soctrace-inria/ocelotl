@@ -44,5 +44,7 @@ public interface ITimeAggregationOperator {
 
 	public void setOcelotlParameters(OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException;
-
+	
+	public ITimeAggregationOperator copy();
+	
 }

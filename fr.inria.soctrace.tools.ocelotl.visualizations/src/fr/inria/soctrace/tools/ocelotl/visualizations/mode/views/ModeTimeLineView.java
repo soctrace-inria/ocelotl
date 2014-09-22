@@ -7,22 +7,32 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
 import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 
+
 public class ModeTimeLineView extends TimeLineView {
 
-	private Proportion distribution;
+	//private Proportion distribution = null;
+	private int space = 1;
 
 	public ModeTimeLineView(OcelotlView ocelotlView) {
 		super(ocelotlView);
 	}
+	
+	public ModeTimeLineView(OcelotlView ocelotlView, Proportion distribution) {
+		super(ocelotlView);
+		this.distribution = distribution;
+	}
 
 	@Override
 	protected void computeDiagram() {
-		distribution = (Proportion) ocelotlView.getCore().getSpaceOperator();
+		//distribution = 	(Proportion) ocelotlView.getOverView().getSpaceOperator();//getOcelotlCore().getSpaceOperator();//getOverView().getSpaceOperator();
+		//distribution = (SpaceTAggregationOperator) ocelotlView.getOcelotlCore().getSpaceOperator();//getOverView().getSpaceOperator();
+
 		int i;
 		final List<Integer> aggParts = new ArrayList<Integer>();
 		for (i = 0; i <= parts.get(parts.size() - 1); i++)
@@ -55,10 +65,11 @@ public class ModeTimeLineView extends TimeLineView {
 	 */
 	public MajState getMajState(int index) {
 		double max = 0.0;
-		double tempMax;
+		double tempMax = 0.0;
 		MajState maj = new MajState("void", max);
-		tempMax = 0.0;
-		for (String state : distribution.getStates()) {
+
+		List<String> states = ((TimeAggregation3Manager) ocelotlView.getOcelotlCore().getLpaggregManager()).getKeys();
+		for (String state : states) {
 			tempMax = ((PartMap) distribution.getPart(index).getData())
 					.getElements().get(state);
 			if (tempMax > max) {
