@@ -320,10 +320,8 @@ public class DataCache {
 		if (newTimeRegion.compareTimeRegion(cacheTimeRegion)) {
 			// Is the number of slices of cached data divisible by the tested
 			// number of slices?
-			if (!(cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0))
-				return false;
-
-			return true;
+			if ((cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0))
+				return true;
 		}
 
 		// If timestamps are included in the cache time stamps
