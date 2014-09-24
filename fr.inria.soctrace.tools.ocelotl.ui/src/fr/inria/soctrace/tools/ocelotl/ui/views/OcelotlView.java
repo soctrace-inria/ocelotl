@@ -516,7 +516,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
 			overView.setTimeLineView((AggregatedView)timeLineViewManager.create("Simple Mode"));
-			overView.setSelectedOperator(comboSpace.getText());
+			overView.setSelectedOperator("Simple Mode");
 		}
 	}
 	

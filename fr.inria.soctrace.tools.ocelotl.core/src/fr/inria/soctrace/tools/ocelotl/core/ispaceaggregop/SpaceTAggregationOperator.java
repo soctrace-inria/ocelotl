@@ -65,13 +65,18 @@ abstract public class SpaceTAggregationOperator implements
 		return timeSliceNumber;
 	}
 
+	// Initialize the number of parts for the current aggregation parameter
 	protected void initParts() {
 		int oldPart = 0;
+		// First part
 		parts.add(new Part(0, 1, null));
 		for (int i = 0; i < lpaggregManager.getParts().size(); i++)
+			// If we are still in the same part
 			if (lpaggregManager.getParts().get(i) == oldPart)
+				// Extend the current part
 				parts.get(parts.size() - 1).setEndPart(i + 1);
 			else {
+				// Start a new part
 				oldPart = lpaggregManager.getParts().get(i);
 				parts.add(new Part(i, i + 1, null));
 			}
@@ -90,6 +95,5 @@ abstract public class SpaceTAggregationOperator implements
 		initParts();
 		computeParts();
 	}
-
 
 }

@@ -57,15 +57,20 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 
 	@SuppressWarnings("unchecked")
 	private void computeProportions(EventProducerNode node) {
+		// Init for the current producer node
 		proportions.put(node, new ArrayList<HashMap<String, Double>>());
+		// Init for each part of the node
 		for (int i = 0; i < node.getParts().size(); i++) {
 			proportions.get(node).add(new HashMap<String, Double>());
+			// And for each state of the part
 			for (String state : getStates())
 				proportions.get(node).get(i).put(state, 0.0);
 		}
+		// If node is a leaf
 		if (node.getChildrenNodes().isEmpty()) {
 			for (int i = 0; i < node.getParts().size(); i++) {
 				for (String state : getStates())
+					// Add value (= value / time slice duration)
 					proportions
 							.get(node)
 							.get(i)
@@ -76,6 +81,7 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 													.doubleValue()));
 			}
 		} else {
+			// Compute for each children node
 			for (EventProducerNode child : node.getChildrenNodes()) {
 				computeProportions(child);
 				for (int i = 0; i < node.getParts().size(); i++) {
@@ -122,7 +128,6 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 				maj = new MajState(state, amp);
 				max = amp;
 			}
-
 		}
 		return maj;
 

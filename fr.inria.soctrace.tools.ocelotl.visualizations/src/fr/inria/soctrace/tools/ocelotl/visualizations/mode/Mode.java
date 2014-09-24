@@ -1,57 +1,72 @@
 package fr.inria.soctrace.tools.ocelotl.visualizations.mode;
 
+import java.util.HashMap;
 import java.util.List;
 
-import fr.inria.soctrace.lib.model.EventProducer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
 
-public class Mode extends Proportion {
+public class Mode implements ISpaceAggregationOperator {
 
-	private List<String>		states;
-	
+	protected OcelotlCore ocelotlCore;
+	protected HashMap<Integer, MajState> majStates;
+	protected IMicroDescManager lpaggregManager;
+	protected List<Part> parts;
+
+	private static final Logger logger = LoggerFactory.getLogger(Mode.class);
+
 	@Override
-	protected void computeParts() {
-		initParts();
-		initStates();
-		aggregateStates();
+	public OcelotlCore getOcelotlCore() {
+		return ocelotlCore;
+	}
+
+	@Override
+	public void setOcelotlCore(OcelotlCore ocelotlCore) {
+		this.ocelotlCore = ocelotlCore;
+		lpaggregManager = (IMicroDescManager) ocelotlCore.getLpaggregManager();
+		computeParts();
+	}
+
+	public Mode(OcelotlCore ocelotlCore) {
+		super();
+		setOcelotlCore(ocelotlCore);
 	}
 	
-	@Override
-	protected void initParts() {
-		int oldPart = 0;
-		parts.add(new Part(0, 1, new PartMap()));
-		for (int i = 0; i < lpaggregManager.getParts().size(); i++)
-			if (lpaggregManager.getParts().get(i) == oldPart)
-				parts.get(parts.size() - 1).setEndPart(i + 1);
-			else {
-				oldPart = lpaggregManager.getParts().get(i);
-				parts.add(new Part(i, i + 1, new PartMap()));
-			}
+	public Mode() {
+		super();
+	}
+	
+	/**
+	 * Check whether the operator is temporal or spatio-temporal and then
+	 * compute the majstates with appropriate class
+	 */
+	public void computeParts() {
+		if (SpaceTimeAggregationManager.class.isAssignableFrom(ocelotlCore
+				.getLpaggregManager().getClass())) {
+			majStates = new SpaceTimeMode(ocelotlCore, lpaggregManager).getMajStates();
+		} else if (TimeAggregationManager.class.isAssignableFrom(ocelotlCore
+				.getLpaggregManager().getClass())) {
+			majStates = new TimeMode(ocelotlCore, ocelotlCore.getLpaggregManager()).getMajStates();
+		} else {
+			logger.error("Non supported class type: "
+					+ ocelotlCore.getLpaggregManager().getClass().getName());
+		}
 	}
 
-	private void initStates() {
-		states = ((TimeAggregation3Manager) lpaggregManager).getKeys();
-		for (final Part part : parts)
-			for (final String state : states)
-				((PartMap) part.getData()).putElement(state, 0.0);
+	public HashMap<Integer, MajState> getMajStates() {
+		return majStates;
 	}
 
-	private void aggregateStates() {
-		for (final Part part : parts)
-			for (int i = part.getStartPart(); i < part.getEndPart(); i++)
-				for (final EventProducer ep : ((TimeAggregation3Manager) lpaggregManager)
-						.getEventProducers())
-					for (final String state : states)
-						((PartMap) part.getData()).addElement(state,
-								((TimeAggregation3Manager) lpaggregManager)
-										.getTimeSliceMatrix().getMatrix()
-										.get(i).get(ep).get(state));
+	public void setMajStates(HashMap<Integer, MajState> majStates) {
+		this.majStates = majStates;
 	}
 
-	public List<String> getStates() {
-		return ((TimeAggregation3Manager) lpaggregManager).getKeys();
-	}
 }

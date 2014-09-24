@@ -118,7 +118,6 @@ public class HierarchyProportion {
 		for (int i = start + 1; i < end; i++) {
 			if (epn.getParts().get(i) == oldPart) {
 				parts.get(parts.size() - 1).incrSize();
-
 			} else {
 				oldPart = epn.getParts().get(i);
 				parts.add(new Part(i, i + 1, null));
@@ -126,7 +125,6 @@ public class HierarchyProportion {
 						new VisualAggregatedData(false,
 								epn.getParts().get(i) != -1, epn.getParts()
 										.get(i), true));
-
 			}
 		}
 		return parts;

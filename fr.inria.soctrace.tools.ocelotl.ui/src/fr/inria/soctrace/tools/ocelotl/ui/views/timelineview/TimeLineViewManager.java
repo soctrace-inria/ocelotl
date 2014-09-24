@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class TimeLineViewManager {

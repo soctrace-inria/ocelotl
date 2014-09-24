@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Bundle;
 
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -72,7 +71,7 @@ public class Overview {
 		// Set the parameter to the computed initial parameter
 		ocelotlView.getParams().setParameter(ocelotlView.computeInitialParameter());
 		
-		timeLineView.setDistribution(spaceOperator);
+		timeLineView.setSpaceOperator(spaceOperator);
 
 		timeLineView.createDiagram(iMicroDescManager, time);
 
@@ -91,6 +90,11 @@ public class Overview {
 		}
 	}
 
+	/**
+	 * Update the overview (the selection, and the drawing)
+	 * @param iMicroDescManager
+	 * @param time
+	 */
 	public void updateDiagram(IMicroDescManager iMicroDescManager, TimeRegion time) {
 		// Update the selected region with the displayed region
 		if (!redrawOverview && newTimeRegionLonger(time)) {

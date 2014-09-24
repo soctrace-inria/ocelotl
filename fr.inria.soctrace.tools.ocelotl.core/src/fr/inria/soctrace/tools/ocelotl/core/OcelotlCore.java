@@ -138,7 +138,7 @@ public class OcelotlCore {
 		spaceOperators.activateSelectedOperator();
 		spaceOperator = spaceOperators.getSelectedOperator();
 	}
-
+	
 	public void setTimeOperator(IProgressMonitor monitor) throws OcelotlException {
 		timeOperators.activateSelectedOperator(monitor);
 		timeOperator = timeOperators.getSelectedOperator();

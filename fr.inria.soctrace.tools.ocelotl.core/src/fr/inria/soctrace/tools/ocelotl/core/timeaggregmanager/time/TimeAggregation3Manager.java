@@ -77,14 +77,14 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		fillVectors(monitor);
 	}
 
-	
-	public TimeAggregation3Manager copy()
-	{
-		TimeAggregation3Manager aNewManager = new TimeAggregation3Manager(this.matrix,  new NullProgressMonitor());
+	public TimeAggregation3Manager copy() {
+		TimeAggregation3Manager aNewManager = new TimeAggregation3Manager(
+				this.matrix, new NullProgressMonitor());
 		aNewManager.matrix = (I3DMicroDescription) matrix.copy();
 		aNewManager.timeAggregation = timeAggregation.copy();
 		aNewManager.qualities = timeAggregation.getQualityList();
-				
+		aNewManager.parts = this.getParts();
+
 		return aNewManager;
 	}
 }

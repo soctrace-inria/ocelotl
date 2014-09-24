@@ -21,7 +21,6 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregationManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -79,14 +78,6 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 	public void resizeDiagram() {
 		createDiagram(parts, time);
 		root.repaint();
-	}
-
-	public SpaceTAggregationOperator getDistribution() {
-		return distribution;
-	}
-
-	public void setDistribution(SpaceTAggregationOperator distribution) {
-		this.distribution = distribution;
 	}
 
 }

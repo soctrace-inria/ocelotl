@@ -103,7 +103,7 @@ public class Proportion extends SpaceTAggregationOperator {
 			((PartMap) part.getData()).normalizeElements(timeSliceDuration, part.getPartSize());
 	}
 
-	@Override
+	/*@Override
 	public ISpaceAggregationOperator copy() {
 		Proportion newProp = new Proportion();
 		newProp.states = states;
@@ -118,6 +118,6 @@ public class Proportion extends SpaceTAggregationOperator {
 			newProp.parts.add(parts.get(i));
 
 		return newProp;
-	}
+	}*/
 
 }

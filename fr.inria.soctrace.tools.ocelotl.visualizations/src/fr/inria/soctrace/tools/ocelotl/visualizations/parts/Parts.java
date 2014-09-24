@@ -19,11 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.visualizations.parts;
 
-import java.util.ArrayList;
-
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
 
 public class Parts extends SpaceTAggregationOperator {
@@ -41,7 +37,7 @@ public class Parts extends SpaceTAggregationOperator {
 		initParts();
 	}
 
-	@Override
+	/*@Override
 	public ISpaceAggregationOperator copy() {
 		Parts newParts = new Parts();
 		newParts.ocelotlCore = ocelotlCore;
@@ -55,7 +51,6 @@ public class Parts extends SpaceTAggregationOperator {
 			newParts.parts.add(parts.get(i));
 
 		return newParts;
-	}
+	}*/
 
-	
 }
