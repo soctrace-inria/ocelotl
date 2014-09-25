@@ -37,20 +37,4 @@ public class Parts extends SpaceTAggregationOperator {
 		initParts();
 	}
 
-	/*@Override
-	public ISpaceAggregationOperator copy() {
-		Parts newParts = new Parts();
-		newParts.ocelotlCore = ocelotlCore;
-		newParts.timeSliceNumber = timeSliceNumber;
-		newParts.timeSliceDuration = timeSliceDuration;
-		newParts.lpaggregManager = lpaggregManager;
-
-		newParts.parts = new ArrayList<Part>();
-		int i;
-		for (i = 0; i < parts.size(); i++)
-			newParts.parts.add(parts.get(i));
-
-		return newParts;
-	}*/
-
 }

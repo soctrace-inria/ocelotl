@@ -14,8 +14,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.Mode;
-import fr.inria.soctrace.tools.ocelotl.visualizations.mode.SpaceTimeMode;
-import fr.inria.soctrace.tools.ocelotl.visualizations.mode.TimeMode;
 
 public class ModeTimeLineView extends TimeLineView {
 
@@ -52,10 +50,19 @@ public class ModeTimeLineView extends TimeLineView {
 	@Override
 	public void createDiagram(final IMicroDescManager manager, final TimeRegion time) {
 		if (SpaceTimeAggregationManager.class.isAssignableFrom(manager.getClass())) {
-			createDiagram(((SpaceTimeAggregationManager) manager).getHierarchy().getRoot().getParts(), time);
+			List<Integer> newParts = computePseudoParts(((SpaceTimeAggregationManager) manager).getHierarchy().getRoot().getParts());
+			createDiagram(newParts, time);
 		} else if (TimeAggregationManager.class.isAssignableFrom(manager.getClass())) {
 			createDiagram(((TimeAggregationManager) manager).getParts(), time);
 		}
 	}
 	
+	List<Integer> computePseudoParts(List<Integer> parts) {
+		List<Integer> pseudoParts = new ArrayList<Integer>();
+		for (int i = 0; i < parts.size(); i++) {
+			pseudoParts.add(i);
+		}
+		return pseudoParts;
+	}
+
 }

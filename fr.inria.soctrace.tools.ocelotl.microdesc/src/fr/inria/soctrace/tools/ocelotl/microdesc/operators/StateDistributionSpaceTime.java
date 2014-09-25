@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
@@ -139,6 +141,36 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+
+	@Override
+	public ITimeAggregationOperator copy() {
+
+		StateDistributionSpaceTime aNewDist = null;
+			try {
+				aNewDist = new StateDistributionSpaceTime();
+				aNewDist.parameters = new OcelotlParameters(this.parameters);
+				aNewDist.matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
+				int i;
+
+				for (i = 0; i < matrix.size(); i++) {
+					aNewDist.matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
+					for (EventProducer ep : parameters.getAllEventProducers())
+						aNewDist.matrix.get((int) i).put(ep, new HashMap<String, Double>());
+				}
+
+				for (i = 0; i < matrix.size(); i++) {
+					for (EventProducer anEP : parameters.getAllEventProducers()) {
+						for (String state : matrix.get(i).get(anEP).keySet())
+							aNewDist.matrix.get(i).get(anEP)
+									.put(state, matrix.get(i).get(anEP).get(state));
+					}
+				}
+			} catch (SoCTraceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return aNewDist;
 	}
 	
 }

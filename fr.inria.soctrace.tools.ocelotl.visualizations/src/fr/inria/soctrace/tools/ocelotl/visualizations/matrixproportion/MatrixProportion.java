@@ -81,7 +81,7 @@ public class MatrixProportion extends SpaceSTAggregationOperator {
 													.doubleValue()));
 			}
 		} else {
-			// Compute for each children node
+			// Compute proportions recursively for each children node
 			for (EventProducerNode child : node.getChildrenNodes()) {
 				computeProportions(child);
 				for (int i = 0; i < node.getParts().size(); i++) {

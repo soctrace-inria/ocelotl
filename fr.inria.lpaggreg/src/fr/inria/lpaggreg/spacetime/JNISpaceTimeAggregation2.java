@@ -19,10 +19,12 @@
 
 package fr.inria.lpaggreg.spacetime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.lpaggreg.jni.DLPAggregWrapper;
+import fr.inria.lpaggreg.quality.DLPQuality;
 
 
 public class JNISpaceTimeAggregation2 extends JNISpaceTimeAggregation implements
@@ -55,6 +57,23 @@ public class JNISpaceTimeAggregation2 extends JNISpaceTimeAggregation implements
 			}
 		}
 
+	}
+	
+	@Override
+	public ISpaceTimeAggregation copy() {
+		JNISpaceTimeAggregation2 aNewJNI = new JNISpaceTimeAggregation2();
+		aNewJNI.jniWrapper = jniWrapper;
+		
+		int i;
+		aNewJNI.parameters = new ArrayList<Double>();
+		for (i = 0; i < parameters.size(); i++)
+			aNewJNI.parameters.add(parameters.get(i));
+
+		aNewJNI.qualities = new ArrayList<DLPQuality>();
+		for (i = 0; i < qualities.size(); i++)
+			aNewJNI.qualities.add(qualities.get(i));
+
+		return aNewJNI;
 	}
 
 }

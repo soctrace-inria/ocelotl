@@ -109,16 +109,30 @@ public class HierarchyProportion {
 				.size());
 	}
 
+	/**
+	 * Compute the temporal parts for a given EventProducerNode
+	 * 
+	 * @param epn
+	 *            the EventProducerNode
+	 * @param start
+	 *            the starting time slice
+	 * @param end
+	 *            the ending time slice
+	 * @return a list of temporal Parts
+	 */
 	private List<Part> computeParts(EventProducerNode epn, int start, int end) {
 		List<Part> parts = new ArrayList<Part>();
 		int oldPart = epn.getParts().get(start);
+		// Init part
 		parts.add(new Part(start, start + 1, new VisualAggregatedData(false,
 				epn.getParts().get(start) != -1, epn.getParts().get(start),
 				true)));
 		for (int i = start + 1; i < end; i++) {
+			// If we are still in the same part, increase its size
 			if (epn.getParts().get(i) == oldPart) {
 				parts.get(parts.size() - 1).incrSize();
 			} else {
+				// Create a new part
 				oldPart = epn.getParts().get(i);
 				parts.add(new Part(i, i + 1, null));
 				parts.get(parts.size() - 1).setData(
@@ -143,55 +157,76 @@ public class HierarchyProportion {
 	 */
 	private void print(int id, int start, int end) {
 		EventProducerNode epn = hierarchy.getEventProducerNodes().get(id);
+		// Compute the parts for the current epn
 		List<Part> parts = computeParts(epn, start, end);
 		for (Part p : parts) {
+			// If p is an aggregation
 			if (((VisualAggregatedData) p.getData()).isAggregated())
 				drawStandardAggregate(p.getStartPart(), epn.getIndex(),
 						p.getEndPart(), epn.getWeight(),
 						((VisualAggregatedData) p.getData()).getValue(), epn);
 			else {
+				// Check for each child that we have enough vertical space to
+				// display them
 				boolean aggy = false;
 				for (EventProducerNode ep : epn.getChildrenNodes()) {
+					// if the space needed to print an element is smaller than 1
+					// pixel
 					if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
+						// Aggregate
 						aggy = true;
 						break;
 					}
 				}
+				// If enough space
 				if (aggy == false)
+					// recursively call print() on the children node
 					printChildren(id, p.getStartPart(), p.getEndPart());
 				else {
 					List<Part> aggParts = computeCommonCuts(epn,
 							p.getStartPart(), p.getEndPart());
 					for (Part pagg : aggParts) {
-						if (((VisualAggregatedData) pagg.getData())
-								.isNoCutInside())
-							drawCleanVisualAggregate(pagg.getStartPart(),
-									epn.getIndex(), pagg.getEndPart(),
-									epn.getWeight(),
-									((VisualAggregatedData) p.getData())
-											.getValue(), epn);
-						else
-							drawNotCleanVisualAggregate(pagg.getStartPart(),
-									epn.getIndex(), pagg.getEndPart(),
-									epn.getWeight(),
-									((VisualAggregatedData) p.getData())
-											.getValue(), epn);
+						// Does the aggregated data contain some temporal cut
+						boolean hasNoCut = ((VisualAggregatedData) pagg
+								.getData()).isNoCutInside();
+						drawVisualAggregate(
+								pagg.getStartPart(),
+								epn.getIndex(),
+								pagg.getEndPart(),
+								epn.getWeight(),
+								((VisualAggregatedData) p.getData()).getValue(),
+								epn, hasNoCut);
 					}
 				}
 			}
 		}
-
 	}
 
+	/**
+	 * Compute the common cut between the event producer node and its children
+	 * 
+	 * @param epn
+	 *            the event producer node
+	 * @param start
+	 *            the starting time slice
+	 * @param end
+	 *            the ending time slice
+	 * @return a list of parts
+	 */
 	private List<Part> computeCommonCuts(EventProducerNode epn, int start,
 			int end) {
 		HashMap<EventProducerNode, List<Part>> hm = new HashMap<EventProducerNode, List<Part>>();
+		// Contains the parts which are common to all the children
 		List<Part> commonParts = new ArrayList<Part>();
+		// All parts (results)
 		List<Part> parts = new ArrayList<Part>();
+		// For each child
 		for (EventProducerNode child : epn.getChildrenNodes()) {
 			if (child.isAggregated() == Aggregation.FULL)
+				// Get parts
 				hm.put(child, computeParts(child, start, end));
 			else
+				// Get common cuts
 				hm.put(child, computeCommonCuts(child, start, end));
 		}
 		List<Part> testPart = hm.get(epn.getChildrenNodes().get(0));
@@ -201,6 +236,7 @@ public class HierarchyProportion {
 			for (EventProducerNode child : epn.getChildrenNodes()) {
 				commonCut = false;
 				for (Part p2 : hm.get(child)) {
+					// If p and p2 has the same starting and ending dates
 					if (p.compare(p2)) {
 						commonCut = true;
 						if (((VisualAggregatedData) p2.getData())
@@ -208,40 +244,67 @@ public class HierarchyProportion {
 								&& !((VisualAggregatedData) p2.getData())
 										.isNoCutInside())
 							cleanCut = false;
+						// Get to the next child
 						break;
 					}
 				}
+				// There was at least one child with no common cut
 				if (commonCut == false)
 					break;
 			}
+			// If the part is common to all the children
 			if (commonCut) {
+				// Add it to common parts
 				commonParts.add(new Part(p.getStartPart(), p.getEndPart(),
 						new VisualAggregatedData(true, false, -1, cleanCut)));
 			}
 		}
+		// If no common cut were found
 		if (commonParts.isEmpty()) {
+			// Just add one big part
 			parts.add(new Part(start, end, new VisualAggregatedData(true,
 					false, -1, false)));
 			return parts;
 		}
+		// If the common parts do not start at the starting slice
 		if (commonParts.get(0).getStartPart() != start)
 			parts.add(new Part(start, commonParts.get(0).getStartPart(),
 					new VisualAggregatedData(true, false, -1, false)));
+
+		// For each common part
 		for (Part ptemp : commonParts) {
+			// If parts is not empty and the last part does not end with
+			// the beginning of the current common part
 			if (parts.size() > 0
 					&& parts.get(parts.size() - 1).getEndPart() != ptemp
 							.getStartPart())
+				// Add a new part in the gap between the last part and the
+				// current common part
 				parts.add(new Part(parts.get(parts.size() - 1).getEndPart(),
 						ptemp.getStartPart(), new VisualAggregatedData(true,
 								false, -1, false)));
+			// Add the common part
 			parts.add(ptemp);
 		}
+		// if the last part does not go until the end time slice
 		if (parts.get(parts.size() - 1).getEndPart() != end)
+			// Add a part to fill the gap
 			parts.add(new Part(parts.get(parts.size() - 1).getEndPart(), end,
 					new VisualAggregatedData(true, false, -1, false)));
 		return parts;
 	}
 
+	/**
+	 * Recursively print all the children of the event producer with the given
+	 * id
+	 * 
+	 * @param id
+	 *            id of the event producer
+	 * @param start
+	 *            starting slice
+	 * @param end
+	 *            ending slice
+	 */
 	private void printChildren(int id, int start, int end) {
 		for (EventProducerNode ep : hierarchy.getEventProducerNodes().get(id)
 				.getChildrenNodes())
@@ -261,6 +324,7 @@ public class HierarchyProportion {
 
 		rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
 				+ state.getState() + ", " + state.getAmplitude100() + "%) "));
+		
 		int xa = (int) ((logicX * logicWidth + Border));
 		int ya = (int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb = xendlist.get(logicX2);
@@ -268,32 +332,53 @@ public class HierarchyProportion {
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 	}
 
-	private void drawNotCleanVisualAggregate(int logicX, int logicY,
-			int logicX2, int sizeY, int number, EventProducerNode epn) {
+	/**
+	 * Draw an aggregation when the resolution is too small to print all the
+	 * cuts. If the aggregated area contains temporal cut (clean parameter),
+	 * then it is drawn with a cross else it is drawn with a single diagnoal
+	 * line
+	 * 
+	 * @param logicX
+	 * @param logicY
+	 * @param logicX2
+	 * @param sizeY
+	 * @param number
+	 * ?? (not used: to delete ?) 
+	 * @param epn
+	 *            the event producer
+	 * @param clean
+	 *            Does the aggregated area contains temporal cut ?
+	 */
+	private void drawVisualAggregate(int logicX, int logicY, int logicX2,
+			int sizeY, int number, EventProducerNode epn, boolean clean) {
 		final RectangleFigure rectangle = new RectangleFigure();
 		MajState state = proportion.getMajState(epn, logicX, logicX2);
 		rectangle.setBackgroundColor(FramesocColorManager.getInstance()
 				.getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setForegroundColor(FramesocColorManager.getInstance()
 				.getEventTypeColor(state.getState()).getSwtColor());
+		// Set the alpha transparency according to the proportion
 		rectangle.setAlpha(state.getAmplitude255M());
 		rectangle.setLineWidth(1);
 		rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
 				+ state.getState() + ", " + state.getAmplitude100() + "%) "));
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
+		
 		Label lab = new Label("?");
 		lab.setTextAlignment(PositionConstants.CENTER);
 		lab.setLabelAlignment(SWT.CENTER);
 		lab.setForegroundColor(ColorConstants.black);
 		rectangle
 				.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
-		// rectangle.add(lab, BorderLayout.CENTER);
+
 		int xa = (int) ((logicX * logicWidth + Border));
 		int ya = (int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb = xendlist.get(logicX2);
 		int yb = yendlist.get(logicY + sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
+				
+		// Draw a line to show that this is an aggregation due to a lack of space
 		final PolylineConnection line = new PolylineConnection();
 		Color color = ColorConstants.black;
 		boolean light = isColorLight(rectangle.getBackgroundColor(),
@@ -303,19 +388,23 @@ public class HierarchyProportion {
 		}
 		line.setBackgroundColor(color);
 		line.setForegroundColor(color);
-		line.setEndpoints(new Point(xa, ya), new Point(xb, yb));
-		line.setAntialias(SWT.ON);
+		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
 		line.setLineWidth(1);
-		// line.setAlpha(state.getAmplitude255());
+		line.setAntialias(SWT.ON);
 		root.add(line);
-		final PolylineConnection line2 = new PolylineConnection();
-		line2.setBackgroundColor(color);
-		line2.setForegroundColor(color);
-		line2.setEndpoints(new Point(xa, yb), new Point(xb, ya));
-		line2.setAntialias(SWT.ON);
-		line2.setLineWidth(1);
-		root.add(line2);
-		// line2.setAlpha(state.getAmplitude255());
+
+		// Draw another line if the aggregation contains more temporal cut inside
+		if (!clean) {
+			final PolylineConnection line2 = new PolylineConnection();
+			line2.setBackgroundColor(color);
+			line2.setForegroundColor(color);
+			line2.setEndpoints(new Point(xa, ya), new Point(xb, yb));
+			line2.setAntialias(SWT.ON);
+			line2.setLineWidth(1);
+			root.add(line2);
+		}
+
+		// If the color is too light then draw a border
 		if (light) {
 			drawRectangleBorder(xa, xb, ya, yb);
 		}
@@ -351,52 +440,6 @@ public class HierarchyProportion {
 	private boolean isColorLight(Color color, int alpha) {
 		return (alpha < AlphaThreshold || ((color.getBlue() < ColorThreshold)
 				&& (color.getRed() < ColorThreshold) && (color.getGreen() < ColorThreshold)));
-	}
-
-	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2,
-			int sizeY, int number, EventProducerNode epn) {
-		final RectangleFigure rectangle = new RectangleFigure();
-		MajState state = proportion.getMajState(epn, logicX, logicX2);
-		rectangle.setBackgroundColor(FramesocColorManager.getInstance()
-				.getEventTypeColor(state.getState()).getSwtColor());
-		rectangle.setForegroundColor(FramesocColorManager.getInstance()
-				.getEventTypeColor(state.getState()).getSwtColor());
-		rectangle.setAlpha(state.getAmplitude255M());
-		rectangle.setLineWidth(1);
-
-		rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
-				+ state.getState() + ", " + state.getAmplitude100() + "%) "));
-
-		rectangle.setLayoutManager(new BorderLayout());
-		rectangle.setPreferredSize(1000, 1000);
-		Label lab = new Label("?");
-		lab.setTextAlignment(PositionConstants.CENTER);
-		lab.setLabelAlignment(SWT.CENTER);
-		lab.setForegroundColor(ColorConstants.black);
-		rectangle
-				.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
-		// rectangle.add(lab, BorderLayout.CENTER);
-		int xa = (int) ((logicX * logicWidth + Border));
-		int ya = (int) (rootHeight - height + logicY * logicHeight - Border);
-		int xb = xendlist.get(logicX2);
-		int yb = yendlist.get(logicY + sizeY);
-		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
-		final PolylineConnection line = new PolylineConnection();
-		Color color = ColorConstants.black;
-		boolean light = isColorLight(rectangle.getBackgroundColor(),
-				rectangle.getAlpha());
-		if (!light) {
-			color = ColorConstants.white;
-		}
-		line.setBackgroundColor(color);
-		line.setForegroundColor(color);
-		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
-		line.setLineWidth(1);
-		line.setAntialias(SWT.ON);
-		root.add(line);
-		if (light) {
-			drawRectangleBorder(xa, xb, ya, yb);
-		}
 	}
 
 	private void setIndex(final int index) {
