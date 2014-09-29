@@ -32,6 +32,7 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
@@ -159,7 +160,7 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
 			// If a valid cache file was found
-			if (cacheFile != null && !parameters.getDataCache().isRebuildDirty()) {
+			if (cacheFile != null && !parameters.getDataCache().isRebuildDirty() && parameters.getDataCache().getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE) {
 				monitor.setTaskName("Loading data from cache");
 				loadFromCache(cacheFile, monitor);
 			} else {
