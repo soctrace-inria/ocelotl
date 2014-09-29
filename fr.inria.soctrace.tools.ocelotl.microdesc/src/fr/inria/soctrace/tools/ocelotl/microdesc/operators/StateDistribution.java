@@ -326,7 +326,7 @@ public class StateDistribution extends _3DMicroDescription {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
 			// If a valid cache file was found
-			if (cacheFile != null && !parameters.getDataCache().isRebuildDirty() && parameters.getDataCache().getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE) {
+			if (cacheFile != null && (!parameters.getDataCache().isRebuildDirty() || parameters.getDataCache().getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE)) {
 				monitor.setTaskName("Loading data from cache");
 				loadFromCache(cacheFile, monitor);
 			} else {

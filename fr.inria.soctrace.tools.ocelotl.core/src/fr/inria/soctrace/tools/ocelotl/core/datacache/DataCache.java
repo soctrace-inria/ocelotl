@@ -255,7 +255,6 @@ public class DataCache {
 		int ratio=0;
 
 		CacheParameters cParam = new CacheParameters(parameters);
-		System.out.println(cParam.getNbTimeSlice());
 		// Look for the correct trace
 		if (!cacheIndex.containsKey(parameters.getTrace())) {
 			logger.debug("No datacache was found");
@@ -263,7 +262,6 @@ public class DataCache {
 		}
 		
 		for (CacheParameters op : cacheIndex.get(parameters.getTrace())) {
-			System.out.println(op.getTraceName()+op.getNbTimeSlice());
 			if (similarParameters(cParam, op)){
 				if (cache==null){
 					cache=op;
@@ -282,8 +280,6 @@ public class DataCache {
 		}
 		else{
 			similarParameters(cParam, cache);
-			System.out.println("Sel trace"+cache.getTraceName()
-					+cache.getNbTimeSlice()+rebuildDirty);
 			return cachedData.get(cache);
 		}
 			
@@ -301,7 +297,6 @@ public class DataCache {
 	 */
 	protected boolean similarParameters(CacheParameters newParam,
 			CacheParameters cacheParam) {
-		System.out.println(newParam.getNbTimeSlice());
 		// Is the aggregation operator the same?
 		if (!(newParam.getTimeAggOperator().equals(
 				cacheParam.getTimeAggOperator()) && (!newParam
