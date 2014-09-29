@@ -685,9 +685,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 		if (parameters.getDataCache().isCacheActive()) {
 			try {
-				monitor.subTask("Generating Cache with "
-						+ parameters.getOcelotlSettings()
-								.getCacheTimeSliceNumber() + " time slices");
+
 				// Set the number of timeSliceNumber
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
 				if (parameters.getOcelotlSettings().getCacheTimeSliceNumber()%savedTimeSliceNumber==0){
@@ -696,6 +694,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 				}else{
 					parameters.setTimeSlicesNumber(savedTimeSliceNumber);
 				}
+				monitor.subTask("Generating Cache with "
+						+ parameters.getTimeSlicesNumber() + " time slices");
 
 				// Make sure we got all event types
 				List<EventType> oldEventTypes = new ArrayList<EventType>();
