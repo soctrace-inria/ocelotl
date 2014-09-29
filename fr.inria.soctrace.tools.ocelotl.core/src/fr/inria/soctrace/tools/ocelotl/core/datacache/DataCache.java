@@ -66,7 +66,7 @@ public class DataCache {
 	/**
 	 * Maximum size of the cache in MB (-1 == no limit size)
 	 */
-	protected int cacheMaxSize = OcelotlConstants.MAX_CACHESIZE;
+	protected long cacheMaxSize = OcelotlConstants.MAX_CACHESIZE;
 
 	/**
 	 * Size of the current data cache
@@ -138,11 +138,11 @@ public class DataCache {
 		return cacheMaxSize;
 	}
 
-	public void setCacheMaxSize(int cacheMaxSize) throws OcelotlException {
-		if (cacheMaxSize < -1) {
+	public void setCacheMaxSize(long l) throws OcelotlException {
+		if (l < -1) {
 			throw new OcelotlException(OcelotlException.INVALID_MAX_CACHE_SIZE);
 		}
-		this.cacheMaxSize = cacheMaxSize;
+		this.cacheMaxSize = l;
 		settings.setCacheSize(this.cacheMaxSize);
 	}
 

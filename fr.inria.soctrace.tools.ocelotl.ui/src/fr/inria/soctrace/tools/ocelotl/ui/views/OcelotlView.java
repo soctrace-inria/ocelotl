@@ -696,7 +696,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				} else {
 					// Set the cache size at the entered value converted from
 					// Megabytes to bytes
-					ocelotlParameters.getDataCache().setCacheMaxSize(Integer.valueOf(dataCacheSize.getText()) * 1000000);
+					ocelotlParameters.getDataCache().setCacheMaxSize(Long.valueOf(dataCacheSize.getText()) * 1000000);
 				}
 			} catch (final NumberFormatException err) {
 				dataCacheSize.setSelection((int) ocelotlParameters.getDataCache().getCacheMaxSize());
@@ -1351,9 +1351,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		cachepolicy.get(ocelotlParameters.getOcelotlSettings().getCachePolicy()).setSelection(true);
 		
 		if (ocelotlParameters.getOcelotlSettings().getCacheSize() > 0) {
-			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000);
+			dataCacheSize.setSelection((int) (ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000));
 		} else {
-			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize());
+			dataCacheSize.setSelection((int) ocelotlParameters.getOcelotlSettings().getCacheSize());
 		}
 		sashFormSettings.setWeights(new int[] {1});	
 		
