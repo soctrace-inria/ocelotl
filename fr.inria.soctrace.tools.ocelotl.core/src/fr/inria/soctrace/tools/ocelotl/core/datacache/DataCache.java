@@ -251,9 +251,11 @@ public class DataCache {
 	 */
 	public File checkCache(OcelotlParameters parameters) {
 		rebuildDirty = false;
+		CacheParameters cache=null;
+		int ratio=0;
 
 		CacheParameters cParam = new CacheParameters(parameters);
-
+		System.out.println(cParam.getNbTimeSlice());
 		// Look for the correct trace
 		if (!cacheIndex.containsKey(parameters.getTrace())) {
 			logger.debug("No datacache was found");
@@ -261,12 +263,30 @@ public class DataCache {
 		}
 		
 		for (CacheParameters op : cacheIndex.get(parameters.getTrace())) {
-			if (similarParameters(cParam, op))
-				return cachedData.get(op);
+			System.out.println(op.getTraceName()+op.getNbTimeSlice());
+			if (similarParameters(cParam, op)){
+				if (cache==null){
+					cache=op;
+					ratio=(op.getNbTimeSlice()%parameters.getTimeSlicesNumber());
+				}
+				else{
+					if ((op.getNbTimeSlice()%parameters.getTimeSlicesNumber())<ratio){
+						cache=op;
+					}
+				}
+			}
 		}
-
-		logger.debug("No datacache was found");
-		return null;
+		if (cache==null){
+			logger.debug("No datacache was found");
+			return null;
+		}
+		else{
+			similarParameters(cParam, cache);
+			System.out.println("Sel trace"+cache.getTraceName()
+					+cache.getNbTimeSlice()+rebuildDirty);
+			return cachedData.get(cache);
+		}
+			
 	}
 
 	/**
@@ -281,7 +301,7 @@ public class DataCache {
 	 */
 	protected boolean similarParameters(CacheParameters newParam,
 			CacheParameters cacheParam) {
-
+		System.out.println(newParam.getNbTimeSlice());
 		// Is the aggregation operator the same?
 		if (!(newParam.getTimeAggOperator().equals(
 				cacheParam.getTimeAggOperator()) && (!newParam
@@ -311,6 +331,7 @@ public class DataCache {
 	 */
 	protected boolean checkCompatibleTimeStamp(CacheParameters newParam,
 			CacheParameters cachedParam) {
+		rebuildDirty=false;
 		TimeRegion newTimeRegion = new TimeRegion(newParam.getStartTimestamp(),
 				newParam.getEndTimestamp());
 		TimeRegion cacheTimeRegion = new TimeRegion(
@@ -320,8 +341,12 @@ public class DataCache {
 		if (newTimeRegion.compareTimeRegion(cacheTimeRegion)) {
 			// Is the number of slices of cached data divisible by the tested
 			// number of slices?
-			if ((cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0))
+			if ((cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0)){
+				timeSliceMapping=null;
+				logger.debug("[DATACACHE] Found full compatibility");
+				rebuildDirty = false;
 				return true;
+			}
 		}
 
 		// If timestamps are included in the cache time stamps
@@ -373,7 +398,6 @@ public class DataCache {
 	public boolean computeDirtyTimeSlice(CacheParameters newParam,
 			CacheParameters cachedParam, TimeSliceStateManager newTsManager,
 			TimeSliceStateManager cachedTsManager) {
-
 		double dirtyTimeslicesNumber = 0.0;
 		double usedCachedTimeSlices = 0.0;
 
@@ -425,8 +449,15 @@ public class DataCache {
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
 
 		// No dirty time slice
-		if (computedDirtyRatio == 0)
+		if (computedDirtyRatio == 0){
+			timeSliceMapping=null;
+			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
+					+ " dirty Timeslices among " + usedCachedTimeSlices
+					+ " used cache time slices" + " (i.e. a ratio of "
+					+ computedDirtyRatio + ").");
+			rebuildDirty = false;
 			return true;
+		}
 
 		// Set the flag for rebuild from dirty
 		if (computedDirtyRatio > 0)
@@ -444,8 +475,6 @@ public class DataCache {
 					+ " dirty Timeslices among " + usedCachedTimeSlices
 					+ " used cache time slices" + " (i.e. a ratio of "
 					+ computedDirtyRatio + ").");
-			logger.debug("Complex rebuilding matrix will be used");
-
 			return true;
 		}
 
