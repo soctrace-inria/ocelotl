@@ -241,7 +241,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
-		Date convertedDate = new Date(System.currentTimeMillis() * 1000);
+		Date convertedDate = new Date(System.currentTimeMillis());
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"
@@ -690,8 +690,12 @@ public abstract class MultiThreadTimeAggregationOperator {
 								.getCacheTimeSliceNumber() + " time slices");
 				// Set the number of timeSliceNumber
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
-				parameters.setTimeSlicesNumber(parameters.getOcelotlSettings()
+				if (parameters.getOcelotlSettings().getCacheTimeSliceNumber()%savedTimeSliceNumber==0){
+					parameters.setTimeSlicesNumber(parameters.getOcelotlSettings()
 						.getCacheTimeSliceNumber());
+				}else{
+					parameters.setTimeSlicesNumber(savedTimeSliceNumber);
+				}
 
 				// Make sure we got all event types
 				List<EventType> oldEventTypes = new ArrayList<EventType>();
