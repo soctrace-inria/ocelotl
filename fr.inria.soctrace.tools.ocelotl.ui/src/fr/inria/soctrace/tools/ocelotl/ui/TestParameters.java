@@ -13,6 +13,7 @@ public class TestParameters {
 	private long startTimestamp;
 	private long endTimestamp;
 	private int nbTimeSlice;
+	private int nbEventProd;
 	private String timeAggOperator;
 	private String spaceAggOperator;
 	private ArrayList<Double> parameters;
@@ -27,6 +28,7 @@ public class TestParameters {
 		startTimestamp = 0L;
 		endTimestamp = 0L;
 		nbTimeSlice = 0;
+		nbEventProd = 0;
 		timeAggOperator = "null";
 		spaceAggOperator = "null";
 		setParameters(new ArrayList<Double>());
@@ -192,5 +194,13 @@ public class TestParameters {
 	public String toString() {
 		String newString = traceName + "_" + traceID + "_" + startTimestamp + "_" + endTimestamp + "_" + nbTimeSlice + "_" + timeAggOperator + "_" + datacacheStrat;
 		return newString;
+	}
+
+	public int getNbEventProd() {
+		return nbEventProd;
+	}
+
+	public void setNbEventProd(int nbEventProd) {
+		this.nbEventProd = nbEventProd;
 	}
 }

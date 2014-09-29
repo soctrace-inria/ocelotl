@@ -119,16 +119,27 @@ public class TestBench2 extends TestBench {
 			File dir = new File(testDirectory);
 			dir.mkdirs();
 
+			int j;
 			for (TestParameters aTest : testParams) {
 				aTest.setDirectory(dir.getAbsolutePath());
-				statData = statData + aTest.toString().replace("_", ";") + "\n";
-				statData = statData + "Microscopic Model; Compute Qualities; compute Dicho; Compute parts + display\n";
-				for (int i = 0; i < aTest.getNumberOfRepetition(); i++) {
-					theView.loadFromParam(aTest, aTest.isActivateCache());
-					statData = statData + getStatData();
-				}
-				writeStat();
 				
+				statData = statData + aTest.toString().replace("_", ";") + "\n";
+				statData = statData + "Number of Producer; number of TIme Slice; Microscopic Model; Compute Qualities;Compute Dichotomies; Compute best cuts + display\n";
+				//for (int i = 20; i <= 40; i++) {
+				for (int i = 660; i <= 1000; i = i +20) {
+					aTest.setNbTimeSlice(i);
+					for(j = 16; j <= 583; j = j + 20)
+					{
+					aTest.setNbEventProd(j);
+					//for (int j = 0; j < aTest.getNumberOfRepetition(); j++) {
+						theView.loadFromParam(aTest, aTest.isActivateCache());
+						statData = statData + getStatData(aTest);
+						writeStat();
+					//}
+					}
+					
+				}
+
 				statData = statData + "\n";
 			}
 
@@ -146,8 +157,7 @@ public class TestBench2 extends TestBench {
 		}
 	}
 
-	@Override
-	public String getStatData() {
+	public String getStatData(TestParameters aTest) {
 		String stat = "";
 		BufferedReader bufFileReader;
 		String line;
@@ -217,7 +227,7 @@ public class TestBench2 extends TestBench {
 				}
 			}
 
-			stat = microscopicModel + ";" + computeQualities + ";" + computeDicho + ";" +  computePartAndDisplay+ "\n";
+			stat = aTest.getNbTimeSlice() + ";" + aTest.getNbEventProd() + ";" + microscopicModel + ";" + computeQualities + ";" + computeDicho + ";" +  computePartAndDisplay+ "\n";
 			//saveMatrixTime + ";" + loadMatrixTime + ";" + loadDirtyMatrixTime + ";" + dirtyTS + ";" + usedTS + ";" + ratio + ";" + computationTime + "\n";
 
 			bufFileReader.close();

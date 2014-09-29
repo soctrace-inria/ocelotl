@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,6 +76,7 @@ import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocPartManager;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocViews;
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
@@ -184,6 +186,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 							textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							ocelotlParameters.getDataCache().setBuildingStrategy(testParams.getDatacacheStrat());
+							
+							ArrayList<EventProducer> evProd = new ArrayList<EventProducer>();
+							int i;
+							for (i = 0; i < testParams.getNbEventProd(); i++) {
+								evProd.add(ocelotlParameters.getAllEventProducers().get(i));
+							}
+							ocelotlParameters.setEventProducers(evProd);
 							
 							hasChanged = HasChanged.ALL;
 							
