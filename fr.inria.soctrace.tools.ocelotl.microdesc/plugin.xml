@@ -38,8 +38,8 @@
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
             spatial_compatibility="Matrix"
             trace_formats="ALL"
-            ts_default_number="20"
-            unit="%TIME">
+            ts_default_number="30"
+            unit="events">
       </aggregation_operator>
       <aggregation_operator
             class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionSpaceTime"
@@ -50,7 +50,7 @@
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
             spatial_compatibility="Matrix, SMode"
             trace_formats="ALL"
-            ts_default_number="20"
+            ts_default_number="30"
             unit="%TIME">
       </aggregation_operator>
             <aggregation_operator
@@ -74,7 +74,7 @@
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
             spatial_compatibility="Matrix"
             trace_formats="ALL"
-            ts_default_number="20"
+            ts_default_number="30"
             unit="%UNKNOWN">
       </aggregation_operator>
    </extension>
