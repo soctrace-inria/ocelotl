@@ -311,7 +311,7 @@ public class StateDistribution extends _3DMicroDescription {
 	
 	
 	protected boolean isCacheLoadable(File cacheFile, DataCache datacache){
-		return (cacheFile != null && (datacache.isRebuildDirty() || datacache.getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE));
+		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache.getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE));
 	}
 	
 }
