@@ -33,6 +33,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
+import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
@@ -141,53 +142,9 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 		dm.end("VECTORS COMPUTATION : "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
-	public void setOcelotlParameters(final OcelotlParameters parameters,
-			IProgressMonitor monitor) throws SoCTraceException,
-			InterruptedException, OcelotlException {
-		this.parameters = parameters;
-		count = 0;
-		epit = 0;
-		// timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-		// .getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
-		initQueries();
-		initVectors();
-		if (monitor.isCanceled())
-			return;
-
-		// If the cache is enabled
-		if (parameters.getDataCache().isCacheActive()) {
-			File cacheFile = parameters.getDataCache().checkCache(parameters);
-
-			// If a valid cache file was found
-			if (cacheFile != null && (!parameters.getDataCache().isRebuildDirty() || parameters.getDataCache().getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE)) {
-				monitor.setTaskName("Loading data from cache");
-				loadFromCache(cacheFile, monitor);
-			} else {
-				if (!generateCache(monitor)) {
-					monitor.setTaskName("Loading data from database");
-					computeMatrix(monitor);
-
-					if (monitor.isCanceled())
-						return;
-
-					if (eventsNumber == 0)
-						throw new OcelotlException(OcelotlException.NO_EVENTS);
-
-					// Save the newly computed matrix + parameters
-					dm.start();
-					monitor.subTask("Saving matrix in the cache.");
-					saveMatrix();
-					dm.end("DATACACHE - Save the matrix to cache");
-				}
-			}
-		} else {
-			monitor.setTaskName("Loading data from database");
-			computeMatrix(monitor);
-
-			if (eventsNumber == 0)
-				throw new OcelotlException(OcelotlException.NO_EVENTS);
-		}
+		
+	protected boolean isCacheLoadable(File cacheFile, DataCache datacache){
+		return (cacheFile != null && (datacache.isRebuildDirty() || datacache.getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE));
 	}
 
 }

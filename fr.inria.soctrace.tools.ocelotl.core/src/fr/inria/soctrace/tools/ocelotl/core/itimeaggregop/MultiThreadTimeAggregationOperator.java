@@ -43,6 +43,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
+import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
@@ -162,6 +163,10 @@ public abstract class MultiThreadTimeAggregationOperator {
 	abstract public void initQueries();
 
 	abstract protected void initVectors() throws SoCTraceException;
+	
+	protected boolean isCacheLoadable(File cacheFile, DataCache datacache){
+		return (cacheFile!=null);
+	}
 
 	public void setOcelotlParameters(final OcelotlParameters parameters,
 			IProgressMonitor monitor) throws SoCTraceException,
@@ -181,7 +186,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
 			// If a valid cache file was found
-			if (cacheFile != null) {
+			if (isCacheLoadable(cacheFile, parameters.getDataCache())) {
 				monitor.setTaskName("Loading data from cache");
 				loadFromCache(cacheFile, monitor);
 			} else {
