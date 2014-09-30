@@ -186,6 +186,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 				loadFromCache(cacheFile, monitor);
 			} else {
 				if (!generateCache(monitor)) {
+					if (monitor.isCanceled())
+						return;
 					monitor.setTaskName("Loading data from database");
 					computeMatrix(monitor);
 
@@ -200,6 +202,16 @@ public abstract class MultiThreadTimeAggregationOperator {
 					monitor.subTask("Saving matrix in the cache.");
 					saveMatrix();
 					dm.end("DATACACHE - Save the matrix to cache");
+				}else{
+					if (monitor.isCanceled())
+						return;
+				File aCacheFile = parameters.getDataCache().checkCache(
+						parameters);
+				
+				initQueries();
+				initVectors();
+				monitor.subTask("Loading from the newly generated cache");
+				loadFromCache(aCacheFile, monitor);
 				}
 			}
 		} else {
@@ -713,18 +725,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 				initQueries();
 				initVectors();
 
-				computeSubMatrix(parameters.getEventProducers(), monitor);
+				computeMatrix(monitor);
+				if (monitor.isCanceled())
+					return false;
 				saveMatrix();
 				parameters.setTimeSlicesNumber(savedTimeSliceNumber);
 				parameters.getTraceTypeConfig().setTypes(oldEventTypes);
 
-				File aCacheFile = parameters.getDataCache().checkCache(
-						parameters);
-				
-				initQueries();
-				initVectors();
-				monitor.subTask("Loading from the newly generated cache");
-				loadFromCache(aCacheFile, monitor);
+
 				return true;
 			} catch (SoCTraceException e) {
 				// TODO Auto-generated catch block

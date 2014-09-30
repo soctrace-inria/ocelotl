@@ -334,7 +334,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			} else {
 				textRun.setText("1.0");
 			}
-			oldParameters = new OcelotlParameters(ocelotlParameters);
+			//oldParameters = new OcelotlParameters(ocelotlParameters);
 			setConfiguration();
 			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
@@ -610,7 +610,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			ocelotlParameters.getDataCache().setCacheActive(btnCacheEnabled.getSelection());
+			boolean cacheActivation = ocelotlParameters.getDataCache().isCacheActive();
+				btnDeleteDataCache.setEnabled(cacheActivation);
+				datacacheDirectory.setEnabled(cacheActivation);
+				btnChangeCacheDirectory.setEnabled(cacheActivation);
+				btnRadioButton.setEnabled(cacheActivation);
+				btnRadioButton_1.setEnabled(cacheActivation);
+				btnRadioButton_2.setEnabled(cacheActivation);
+				btnRadioButton_3.setEnabled(cacheActivation);
+				cacheTimeSliceValue.setEnabled(cacheActivation);
+				dataCacheSize.setEnabled(cacheActivation);		
 		}
+		
 	}
 
 	private class Settings2SelectionAdapter extends SelectionAdapter {
@@ -726,7 +737,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(spinnerDivideDbQuery.getText()));
+			ocelotlParameters.getOcelotlSettings().setMaxEventProducersPerQuery(Integer.valueOf(spinnerDivideDbQuery.getText()));
 		}
 	}
 	
@@ -734,7 +745,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(spinnerEventSize.getText()));
+			ocelotlParameters.getOcelotlSettings().setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
 		}
 	}
 	
@@ -1574,14 +1585,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	}
 
 	public void restoreConfiguration() {
-		ocelotlParameters.setTrace(oldParameters.getTrace());
-		ocelotlParameters.setNormalize(oldParameters.isNormalize());
-		ocelotlParameters.setTimeSlicesNumber(oldParameters.getTimeSlicesNumber());
-		ocelotlParameters.setTimeAggOperator(oldParameters.getTimeAggOperator());
-		ocelotlParameters.setThreshold(oldParameters.getThreshold());
-		ocelotlParameters.setParameter(oldParameters.getParameter());
-		ocelotlParameters.setTimeRegion(oldParameters.getTimeRegion());
-		hasChanged = HasChanged.ALL;
+//		ocelotlParameters.setTrace(oldParameters.getTrace());
+//		ocelotlParameters.setNormalize(oldParameters.isNormalize());
+//		ocelotlParameters.setTimeSlicesNumber(oldParameters.getTimeSlicesNumber());
+//		ocelotlParameters.setTimeAggOperator(oldParameters.getTimeAggOperator());
+//		ocelotlParameters.setThreshold(oldParameters.getThreshold());
+//		ocelotlParameters.setParameter(oldParameters.getParameter());
+//		ocelotlParameters.setTimeRegion(oldParameters.getTimeRegion());
+//		hasChanged = HasChanged.ALL;
 	}
 	
 	/**
