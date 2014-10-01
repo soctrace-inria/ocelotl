@@ -1131,7 +1131,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		
 		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
 		groupAggregationOperator.setFont(cantarell8);
-		groupAggregationOperator.setText("Microscopic Description");
+		groupAggregationOperator.setText("Analysis Type");
 		groupAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
