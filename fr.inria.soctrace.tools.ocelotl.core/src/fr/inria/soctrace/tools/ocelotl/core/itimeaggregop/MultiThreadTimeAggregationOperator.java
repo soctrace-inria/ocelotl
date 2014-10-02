@@ -710,8 +710,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 						.getCacheTimeSliceNumber());
 				}else if (parameters.getOcelotlSettings().getCacheTimeSliceNumber()>savedTimeSliceNumber){
 					parameters.setTimeSlicesNumber(parameters.getOcelotlSettings()
-							.getCacheTimeSliceNumber()-parameters.getOcelotlSettings()
-							.getCacheTimeSliceNumber()%savedTimeSliceNumber);
+							.getCacheTimeSliceNumber()-(parameters.getOcelotlSettings()
+							.getCacheTimeSliceNumber()%savedTimeSliceNumber));
 				}else{
 					parameters.setTimeSlicesNumber(savedTimeSliceNumber);
 				}
