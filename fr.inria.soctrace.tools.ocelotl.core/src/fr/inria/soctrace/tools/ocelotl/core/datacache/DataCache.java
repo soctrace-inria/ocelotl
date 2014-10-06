@@ -242,17 +242,18 @@ public class DataCache {
 	}
 
 	/**
-	 * Check parameter against the cached data parameters
+	 * Check parameter against the cached data parameters, and return the most
+	 * appropriate data cache
 	 * 
 	 * @param parameters
 	 *            parameters to be tested
 	 * @return the File of the cached data file if a correspondence was found,
-	 *         an empty String otherwise
+	 *         null otherwise
 	 */
 	public File checkCache(OcelotlParameters parameters) {
 		rebuildDirty = false;
-		CacheParameters cache=null;
-		int ratio=0;
+		CacheParameters cache = null;
+		int ratio = 0;
 
 		CacheParameters cParam = new CacheParameters(parameters);
 		// Look for the correct trace
@@ -262,23 +263,27 @@ public class DataCache {
 		}
 		
 		for (CacheParameters op : cacheIndex.get(parameters.getTrace())) {
-			if (similarParameters(cParam, op)){
-				if (cache==null){
-					cache=op;
-					ratio=(op.getNbTimeSlice()%parameters.getTimeSlicesNumber());
-				}
-				else{
-					if ((op.getNbTimeSlice()%parameters.getTimeSlicesNumber())<ratio){
-						cache=op;
+			if (similarParameters(cParam, op)) {
+				// If first iteration
+				if (cache == null) {
+					// Init
+					cache = op;
+					// TODO change that
+					ratio = (op.getNbTimeSlice() % parameters
+							.getTimeSlicesNumber());
+				} else {
+					// If the ratio
+					if ((op.getNbTimeSlice() % parameters.getTimeSlicesNumber()) < ratio) {
+						cache = op;
 					}
 				}
 			}
 		}
-		if (cache==null){
+		
+		if (cache == null) {
 			logger.debug("No datacache was found");
 			return null;
-		}
-		else{
+		} else {
 			similarParameters(cParam, cache);
 			return cachedData.get(cache);
 		}
@@ -326,7 +331,7 @@ public class DataCache {
 	 */
 	protected boolean checkCompatibleTimeStamp(CacheParameters newParam,
 			CacheParameters cachedParam) {
-		rebuildDirty=false;
+		rebuildDirty = false;
 		TimeRegion newTimeRegion = new TimeRegion(newParam.getStartTimestamp(),
 				newParam.getEndTimestamp());
 		TimeRegion cacheTimeRegion = new TimeRegion(
@@ -337,9 +342,8 @@ public class DataCache {
 			// Is the number of slices of cached data divisible by the tested
 			// number of slices?
 			if ((cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0)){
-				timeSliceMapping=null;
+				timeSliceMapping = null;
 				logger.debug("[DATACACHE] Found full compatibility");
-				rebuildDirty = false;
 				return true;
 			}
 		}
@@ -376,8 +380,6 @@ public class DataCache {
 		return false;
 	}
 
-	// hypothesis: are the timeslice align ?
-	// if not Sol: align the new param start ?
 	/**
 	 * "Dirty" time slices are time slices of the cache that do not fit inside a
 	 * time slice of the new view (i.e. they are used to build at least two new
@@ -439,13 +441,13 @@ public class DataCache {
 			}
 		}
 
-		// Proportion of dirty time slice in the part of the cache used to
+		// Proportion of dirty time slices in the part of the cache used to
 		// rebuild the matrix
 		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
 
 		// No dirty time slice
-		if (computedDirtyRatio == 0){
-			timeSliceMapping=null;
+		if (computedDirtyRatio == 0) {
+			timeSliceMapping = null;
 			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
 					+ " dirty Timeslices among " + usedCachedTimeSlices
 					+ " used cache time slices" + " (i.e. a ratio of "

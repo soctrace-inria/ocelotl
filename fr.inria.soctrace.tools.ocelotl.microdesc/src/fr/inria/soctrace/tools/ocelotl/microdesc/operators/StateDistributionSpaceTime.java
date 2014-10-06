@@ -144,10 +144,10 @@ public class StateDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 	
-	protected boolean isCacheLoadable(File cacheFile, DataCache datacache){
-		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache.getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE));
+	@Override
+	protected boolean isCacheLoadable(File cacheFile, DataCache datacache) {
+		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache
+				.getBuildingStrategy() != DatacacheStrategy.DATACACHE_DATABASE));
 	}
-	
-	
 	
 }

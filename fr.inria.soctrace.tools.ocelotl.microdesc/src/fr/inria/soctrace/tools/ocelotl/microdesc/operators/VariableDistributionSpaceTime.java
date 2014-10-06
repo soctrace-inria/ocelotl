@@ -142,9 +142,11 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 		dm.end("VECTORS COMPUTATION : "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-		
-	protected boolean isCacheLoadable(File cacheFile, DataCache datacache){
-		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache.getBuildingStrategy()!=DatacacheStrategy.DATACACHE_DATABASE));
+	
+	@Override	
+	protected boolean isCacheLoadable(File cacheFile, DataCache datacache) {
+		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache
+				.getBuildingStrategy() != DatacacheStrategy.DATACACHE_DATABASE));
 	}
 
 }
