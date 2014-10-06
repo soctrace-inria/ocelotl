@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,8 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
+import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
@@ -131,6 +134,7 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()
@@ -141,7 +145,7 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 		dm.end("VECTORS COMPUTATION : "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
+
 	@Override
 	public ITimeAggregationOperator copy() {
 		VariableDistributionSpaceTime aNewDist = null;
@@ -169,6 +173,13 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 			e.printStackTrace();
 		}
 		return aNewDist;
+	}
+
+
+	@Override	
+	protected boolean isCacheLoadable(File cacheFile, DataCache datacache) {
+		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache
+				.getBuildingStrategy() != DatacacheStrategy.DATACACHE_DATABASE));
 	}
 
 }

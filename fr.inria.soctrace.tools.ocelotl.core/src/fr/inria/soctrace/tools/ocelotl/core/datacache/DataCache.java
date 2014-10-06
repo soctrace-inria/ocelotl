@@ -66,7 +66,7 @@ public class DataCache {
 	/**
 	 * Maximum size of the cache in MB (-1 == no limit size)
 	 */
-	protected int cacheMaxSize = OcelotlConstants.MAX_CACHESIZE;
+	protected long cacheMaxSize = OcelotlConstants.MAX_CACHESIZE;
 
 	/**
 	 * Size of the current data cache
@@ -99,6 +99,8 @@ public class DataCache {
 	protected DatacacheStrategy buildingStrategy;
 
 	protected boolean validDirectory;
+	
+	protected double currentDirtyRatio;
 
 	public DatacacheStrategy getBuildingStrategy() {
 		return buildingStrategy;
@@ -138,11 +140,11 @@ public class DataCache {
 		return cacheMaxSize;
 	}
 
-	public void setCacheMaxSize(int cacheMaxSize) throws OcelotlException {
-		if (cacheMaxSize < -1) {
+	public void setCacheMaxSize(long l) throws OcelotlException {
+		if (l < -1) {
 			throw new OcelotlException(OcelotlException.INVALID_MAX_CACHE_SIZE);
 		}
-		this.cacheMaxSize = cacheMaxSize;
+		this.cacheMaxSize = l;
 		settings.setCacheSize(this.cacheMaxSize);
 	}
 
@@ -242,18 +244,21 @@ public class DataCache {
 	}
 
 	/**
-	 * Check parameter against the cached data parameters
+	 * Check parameter against the cached data parameters, and return the most
+	 * appropriate data cache
 	 * 
 	 * @param parameters
 	 *            parameters to be tested
 	 * @return the File of the cached data file if a correspondence was found,
-	 *         an empty String otherwise
+	 *         null otherwise
 	 */
 	public File checkCache(OcelotlParameters parameters) {
 		rebuildDirty = false;
+		CacheParameters cache = null;
+		currentDirtyRatio = Double.MAX_VALUE;
+		double bestRatio = Double.MAX_VALUE;
 
 		CacheParameters cParam = new CacheParameters(parameters);
-
 		// Look for the correct trace
 		if (!cacheIndex.containsKey(parameters.getTrace())) {
 			logger.debug("No datacache was found");
@@ -261,12 +266,38 @@ public class DataCache {
 		}
 		
 		for (CacheParameters op : cacheIndex.get(parameters.getTrace())) {
-			if (similarParameters(cParam, op))
-				return cachedData.get(op);
+			if (similarParameters(cParam, op)) {
+				// If first iteration
+				if (cache == null) {
+					// Init
+					cache = op;
+					bestRatio = currentDirtyRatio;
+				} else {
+					// If the dirty ratio of the cache is better than the
+					// current best
+					if (bestRatio < currentDirtyRatio) {
+						// Set it as the best candidate
+						cache = op;
+						bestRatio = currentDirtyRatio;
+					}
+				}
+				// If perfect cache
+				if (currentDirtyRatio == 0) {
+					cache = op;
+					// There is no better solution so stop looking
+					break;
+				}
+			}
 		}
-
-		logger.debug("No datacache was found");
-		return null;
+		
+		if (cache == null) {
+			logger.debug("No datacache was found");
+			return null;
+		} else {
+			similarParameters(cParam, cache);
+			return cachedData.get(cache);
+		}
+			
 	}
 
 	/**
@@ -281,11 +312,12 @@ public class DataCache {
 	 */
 	protected boolean similarParameters(CacheParameters newParam,
 			CacheParameters cacheParam) {
-
+		
+		// TODO implement inter-operator compatibility
 		// Is the aggregation operator the same?
-		if (!((newParam.getTimeAggOperator().equals(
+		if (!(newParam.getTimeAggOperator().equals(
 				cacheParam.getTimeAggOperator()) && (!newParam
-				.getTimeAggOperator().equals("null")))))
+				.getTimeAggOperator().equals("null"))))
 			return false;
 
 		// Are timestamps equal or are they included inside the cache
@@ -311,19 +343,25 @@ public class DataCache {
 	 */
 	protected boolean checkCompatibleTimeStamp(CacheParameters newParam,
 			CacheParameters cachedParam) {
+
 		TimeRegion newTimeRegion = new TimeRegion(newParam.getStartTimestamp(),
 				newParam.getEndTimestamp());
 		TimeRegion cacheTimeRegion = new TimeRegion(
 				cachedParam.getStartTimestamp(), cachedParam.getEndTimestamp());
+		
+		currentDirtyRatio = Double.MAX_VALUE;
+		rebuildDirty = false;
 
 		// If timestamps are equal then OK
 		if (newTimeRegion.compareTimeRegion(cacheTimeRegion)) {
 			// Is the number of slices of cached data divisible by the tested
 			// number of slices?
-			if (!(cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0))
-				return false;
-
-			return true;
+			if ((cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0)){
+				timeSliceMapping = null;
+				logger.debug("[DATACACHE] Found full compatibility");
+				currentDirtyRatio = 0;
+				return true;
+			}
 		}
 
 		// If timestamps are included in the cache time stamps
@@ -358,8 +396,6 @@ public class DataCache {
 		return false;
 	}
 
-	// hypothesis: are the timeslice align ?
-	// if not Sol: align the new param start ?
 	/**
 	 * "Dirty" time slices are time slices of the cache that do not fit inside a
 	 * time slice of the new view (i.e. they are used to build at least two new
@@ -375,7 +411,6 @@ public class DataCache {
 	public boolean computeDirtyTimeSlice(CacheParameters newParam,
 			CacheParameters cachedParam, TimeSliceStateManager newTsManager,
 			TimeSliceStateManager cachedTsManager) {
-
 		double dirtyTimeslicesNumber = 0.0;
 		double usedCachedTimeSlices = 0.0;
 
@@ -422,20 +457,27 @@ public class DataCache {
 			}
 		}
 
-		// Proportion of dirty time slice in the part of the cache used to
+		// Proportion of dirty time slices in the part of the cache used to
 		// rebuild the matrix
-		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
+		currentDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
 
 		// No dirty time slice
-		if (computedDirtyRatio == 0)
+		if (currentDirtyRatio == 0) {
+			timeSliceMapping = null;
+			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
+					+ " dirty Timeslices among " + usedCachedTimeSlices
+					+ " used cache time slices" + " (i.e. a ratio of "
+					+ currentDirtyRatio + ").");
+			rebuildDirty = false;
 			return true;
+		}
 
 		// Set the flag for rebuild from dirty
-		if (computedDirtyRatio > 0)
+		if (currentDirtyRatio > 0)
 			rebuildDirty = true;
 
 		// If the ratio is not over the max
-		if (computedDirtyRatio <= maxDirtyRatio) {
+		if (currentDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
 			if (timeSliceMapping != null)
 				timeSliceMapping.clear();
@@ -445,9 +487,7 @@ public class DataCache {
 			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
 					+ " dirty Timeslices among " + usedCachedTimeSlices
 					+ " used cache time slices" + " (i.e. a ratio of "
-					+ computedDirtyRatio + ").");
-			logger.debug("Complex rebuilding matrix will be used");
-
+					+ currentDirtyRatio + ").");
 			return true;
 		}
 
@@ -752,8 +792,7 @@ public class DataCache {
 		}
 
 		logger.debug("Size of the current cache is: " + currentCacheSize
-				+ " bytes (" + currentCacheSize / 1000000 + " MB).");
-	}
+				+ " bytes (" + currentCacheSize / 1000000 + " MB).");	 }
 
 	/**
 	 * Remove a cache file. The used policy is to suppress the file which has

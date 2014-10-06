@@ -43,6 +43,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
+import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
@@ -163,14 +164,27 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 	abstract protected void initVectors() throws SoCTraceException;
 
+	/**
+	 * Check whether the current cache can be loaded
+	 * 
+	 * @param cacheFile
+	 *            The candidate cache file
+	 * @param datacache
+	 *            The current datacache
+	 * @return true if the loading of the current cachefile is possible, false
+	 *         otherwise
+	 */
+	protected boolean isCacheLoadable(File cacheFile, DataCache datacache) {
+		return cacheFile != null;
+	}
+
 	public void setOcelotlParameters(final OcelotlParameters parameters,
 			IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException {
 		this.parameters = parameters;
 		count = 0;
 		epit = 0;
-		// timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-		// .getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+
 		initQueries();
 		initVectors();
 		if (monitor.isCanceled())
@@ -180,12 +194,15 @@ public abstract class MultiThreadTimeAggregationOperator {
 		if (parameters.getDataCache().isCacheActive()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
-			// If a valid cache file was found
-			if (cacheFile != null) {
+			// Is loading the current cache possible 
+			if (isCacheLoadable(cacheFile, parameters.getDataCache())) {
 				monitor.setTaskName("Loading data from cache");
 				loadFromCache(cacheFile, monitor);
 			} else {
 				if (!generateCache(monitor)) {
+					if (monitor.isCanceled())
+						return;
+					
 					monitor.setTaskName("Loading data from database");
 					computeMatrix(monitor);
 
@@ -200,6 +217,19 @@ public abstract class MultiThreadTimeAggregationOperator {
 					monitor.subTask("Saving matrix in the cache.");
 					saveMatrix();
 					dm.end("DATACACHE - Save the matrix to cache");
+				} else {
+					// If a cache was generated successfully, load it
+					if (monitor.isCanceled())
+						return;
+					
+					File aCacheFile = parameters.getDataCache().checkCache(
+							parameters);
+
+					initQueries();
+					initVectors();
+					
+					monitor.subTask("Loading from the newly generated cache");
+					loadFromCache(aCacheFile, monitor);
 				}
 			}
 		} else {
@@ -674,7 +704,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 */
 	public boolean generateCache(IProgressMonitor monitor) {
 
-		// Check that the timestamps are ocvering all the traces
+		// Check that the timestamps are covering the whole trace time region
 		if (parameters.getTrace().getMinTimestamp() != parameters
 				.getTimeRegion().getTimeStampStart())
 			return false;
@@ -685,13 +715,34 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 		if (parameters.getDataCache().isCacheActive()) {
 			try {
-				monitor.subTask("Generating Cache with "
-						+ parameters.getOcelotlSettings()
-								.getCacheTimeSliceNumber() + " time slices");
-				// Set the number of timeSliceNumber
+				// Set the number of time slices for the generated cache
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
-				parameters.setTimeSlicesNumber(parameters.getOcelotlSettings()
-						.getCacheTimeSliceNumber());
+				
+				// If the number of generated time slices is divisible by the
+				// current number of time slices
+				if (parameters.getOcelotlSettings().getCacheTimeSliceNumber()
+						% savedTimeSliceNumber == 0) {
+					// Use the setting number
+					parameters.setTimeSlicesNumber(parameters
+							.getOcelotlSettings().getCacheTimeSliceNumber());
+				} else if (parameters.getOcelotlSettings()
+						.getCacheTimeSliceNumber() > savedTimeSliceNumber) {
+					// If it is not divisible but still greater than the current
+					// number of time slices
+					// Then set the number of generated time by subtracting the
+					// remnant from the number given in the settings
+					parameters
+							.setTimeSlicesNumber(parameters
+									.getOcelotlSettings()
+									.getCacheTimeSliceNumber()
+									- (parameters.getOcelotlSettings()
+											.getCacheTimeSliceNumber() % savedTimeSliceNumber));
+				} else {
+					// Else simply put the number of current time slice
+					parameters.setTimeSlicesNumber(savedTimeSliceNumber);
+				}
+				monitor.subTask("Generating Cache with "
+						+ parameters.getTimeSlicesNumber() + " time slices");
 
 				// Make sure we got all event types
 				List<EventType> oldEventTypes = new ArrayList<EventType>();
@@ -701,22 +752,18 @@ public abstract class MultiThreadTimeAggregationOperator {
 
 				parameters.getTraceTypeConfig().setTypes(
 						parameters.getOperatorEventTypes());
-				
+
 				initQueries();
 				initVectors();
 
-				computeSubMatrix(parameters.getEventProducers(), monitor);
+				computeMatrix(monitor);
+				if (monitor.isCanceled())
+					return false;
+				
 				saveMatrix();
 				parameters.setTimeSlicesNumber(savedTimeSliceNumber);
 				parameters.getTraceTypeConfig().setTypes(oldEventTypes);
 
-				File aCacheFile = parameters.getDataCache().checkCache(
-						parameters);
-				
-				initQueries();
-				initVectors();
-				monitor.subTask("Loading from the newly generated cache");
-				loadFromCache(aCacheFile, monitor);
 				return true;
 			} catch (SoCTraceException e) {
 				// TODO Auto-generated catch block

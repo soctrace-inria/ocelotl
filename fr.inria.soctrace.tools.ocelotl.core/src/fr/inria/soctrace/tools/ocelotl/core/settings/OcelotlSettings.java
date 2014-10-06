@@ -23,7 +23,7 @@ public class OcelotlSettings {
 
 	private boolean cacheActivated;
 	private String cacheDirectory;
-	private int cacheSize;
+	private long cacheSize;
 	private String snapShotDirectory;
 	private DatacachePolicy cachePolicy;
 	private int cacheTimeSliceNumber;
@@ -89,7 +89,7 @@ public class OcelotlSettings {
 						setCacheDirectory(config[1]);			
 						if (Integer.parseInt(config[2]) >= 0) {
 							// Convert from megabytes to bytes
-							setCacheSize(Integer.parseInt(config[2]) * 1000000);
+							setCacheSize(Long.parseLong(config[2]) * 1000000);
 						} else {
 							setCacheSize(-1);
 						}
@@ -187,13 +187,13 @@ public class OcelotlSettings {
 		}
 	}
 
-	public int getCacheSize() {
+	public long getCacheSize() {
 		return cacheSize;
 	}
 
-	public void setCacheSize(int cacheSize) {
-		if (this.cacheSize != cacheSize) {
-			this.cacheSize = cacheSize;
+	public void setCacheSize(long cacheMaxSize) {
+		if (this.cacheSize != cacheMaxSize) {
+			this.cacheSize = cacheMaxSize;
 			saveSettings();
 		}
 	}

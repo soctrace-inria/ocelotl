@@ -29,12 +29,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import fr.inria.lpaggreg.spacetime.JNISpaceTimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._2DSpaceTimeMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 
 public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
@@ -138,7 +136,5 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 		}
 		return aNewManager;
 	}
-	
-	
 
 }

@@ -51,7 +51,6 @@ public class EventDistribution extends _3DMicroDescription {
 		int size;
 		IProgressMonitor monitor;
 
-
 		public OcelotlThread(final int threadNumber, final int thread,
 				final int size, IProgressMonitor monitor) {
 			super();

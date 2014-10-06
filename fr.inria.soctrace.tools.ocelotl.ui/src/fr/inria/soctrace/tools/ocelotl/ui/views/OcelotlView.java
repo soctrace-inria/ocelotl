@@ -115,7 +115,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			// Display a warning if the selected file already exists
 			dialog.setOverwrite(true);
 			
-			Date date = new Date(System.currentTimeMillis() * 1000);
+			Date date = new Date(System.currentTimeMillis());
 			
 			// Set a default file name
 			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId() + "_" + date);
@@ -337,7 +337,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			} else {
 				textRun.setText("1.0");
 			}
-			oldParameters = new OcelotlParameters(ocelotlParameters);
 			setConfiguration();
 			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
@@ -349,7 +348,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
 								if (monitor.isCanceled()) {
-									restoreConfiguration();
 									synchronized (lock) {
 										running = false;
 									}
@@ -361,7 +359,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
 								if (monitor.isCanceled()) {
-									restoreConfiguration();
 									synchronized (lock) {
 										running = false;
 									}
@@ -374,7 +371,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
 								if (monitor.isCanceled()) {
-									restoreConfiguration();
 									synchronized (lock) {
 										running = false;
 									}
@@ -391,7 +387,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 						hasChanged = HasChanged.PARAMETER;
 						if (monitor.isCanceled()) {
-							restoreConfiguration();
 							synchronized (lock) {
 								running = false;
 							}
@@ -613,12 +608,22 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 	
-	
 	private class EnableCacheListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			ocelotlParameters.getDataCache().setCacheActive(btnCacheEnabled.getSelection());
+			boolean cacheActivation = ocelotlParameters.getDataCache().isCacheActive();
+				btnDeleteDataCache.setEnabled(cacheActivation);
+				datacacheDirectory.setEnabled(cacheActivation);
+				btnChangeCacheDirectory.setEnabled(cacheActivation);
+				btnRadioButton.setEnabled(cacheActivation);
+				btnRadioButton_1.setEnabled(cacheActivation);
+				btnRadioButton_2.setEnabled(cacheActivation);
+				btnRadioButton_3.setEnabled(cacheActivation);
+				cacheTimeSliceValue.setEnabled(cacheActivation);
+				dataCacheSize.setEnabled(cacheActivation);		
 		}
+		
 	}
 
 	private class Settings2SelectionAdapter extends SelectionAdapter {
@@ -704,7 +709,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				} else {
 					// Set the cache size at the entered value converted from
 					// Megabytes to bytes
-					ocelotlParameters.getDataCache().setCacheMaxSize(Integer.valueOf(dataCacheSize.getText()) * 1000000);
+					ocelotlParameters.getDataCache().setCacheMaxSize(Long.valueOf(dataCacheSize.getText()) * 1000000);
 				}
 			} catch (final NumberFormatException err) {
 				dataCacheSize.setSelection((int) ocelotlParameters.getDataCache().getCacheMaxSize());
@@ -734,7 +739,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(spinnerDivideDbQuery.getText()));
+			ocelotlParameters.getOcelotlSettings().setMaxEventProducersPerQuery(Integer.valueOf(spinnerDivideDbQuery.getText()));
 		}
 	}
 	
@@ -742,7 +747,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(spinnerEventSize.getText()));
+			ocelotlParameters.getOcelotlSettings().setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
 		}
 	}
 	
@@ -802,10 +807,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								}
 								
 								comboTime.setText("");
-								// btnRemoveEventProducer.notifyListeners(SWT.Selection,
-								// new Event());
-								// btnAddAllEventProducer.notifyListeners(SWT.Selection,
-								// new Event());
 							}
 						});
 					} catch (final Exception e) {
@@ -861,7 +862,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button								btnChangeCacheDirectory;
 	private Button								btnCacheEnabled;
 	private Snapshot							snapshot;
-	private OcelotlParameters					oldParameters;
 	private Button								btnRadioButton, btnRadioButton_1, btnRadioButton_2, btnRadioButton_3;
 	private HashMap<DatacachePolicy, Button>	cachepolicy		= new HashMap<DatacachePolicy, Button>();
 	private Spinner								cacheTimeSliceValue;
@@ -1130,7 +1130,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		
 		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
 		groupAggregationOperator.setFont(cantarell8);
-		groupAggregationOperator.setText("Microscopic Description");
+		groupAggregationOperator.setText("Analysis Type");
 		groupAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
@@ -1313,9 +1313,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		cachepolicy.get(ocelotlParameters.getOcelotlSettings().getCachePolicy()).setSelection(true);
 		
 		if (ocelotlParameters.getOcelotlSettings().getCacheSize() > 0) {
-			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000);
+			dataCacheSize.setSelection((int) (ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000));
 		} else {
-			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize());
+			dataCacheSize.setSelection((int) ocelotlParameters.getOcelotlSettings().getCacheSize());
 		}
 		sashFormSettings.setWeights(new int[] {1});	
 		
@@ -1536,9 +1536,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	public QualityView getQualityView() {
 		return qualityView;
 	}
-	
-	
-	
+
 	public int getTimeSliceNumber() {
 		return spinnerTSNumber.getSelection();
 	}
@@ -1603,17 +1601,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 
-	public void restoreConfiguration() {
-		ocelotlParameters.setTrace(oldParameters.getTrace());
-		ocelotlParameters.setNormalize(oldParameters.isNormalize());
-		ocelotlParameters.setTimeSlicesNumber(oldParameters.getTimeSlicesNumber());
-		ocelotlParameters.setTimeAggOperator(oldParameters.getTimeAggOperator());
-		ocelotlParameters.setThreshold(oldParameters.getThreshold());
-		ocelotlParameters.setParameter(oldParameters.getParameter());
-		ocelotlParameters.setTimeRegion(oldParameters.getTimeRegion());
-		hasChanged = HasChanged.ALL;
-	}
-	
 	/**
 	 * Set the cache strategy depending on the selected policy
 	 * TODO Take the operator into account
@@ -1692,41 +1679,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	}
 	
 	/**
-	 * Search for the parameter that has the largest gap between two consecutive
-	 * gain or loss values
-	 * 
-	 * @return the corresponding parameter 
-	 */
-	public double computeInitialParameter() {
-		double diffG = 0.0, diffL = 0.0;
-		double maxDiff = 0.0;
-		int indexMaxQual = -1;
-		int i;
-
-		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) getOcelotlCore().getLpaggregManager().getQualities();
-		for (i = 1; i < qual.size(); i++) {
-			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
-			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
-			if (diffG > maxDiff) {
-				maxDiff = diffG;
-				indexMaxQual = i;
-			}
-			if (diffL > maxDiff) {
-				maxDiff = diffG;
-				indexMaxQual = i;
-			}
-		}
-
-		if (indexMaxQual > -1 && indexMaxQual < getOcelotlCore().getLpaggregManager().getParameters().size())
-			// Set the parameter to zero in order to have a fully desaggregated
-			// view
-			return getOcelotlCore().getLpaggregManager().getParameters().get(indexMaxQual);
-
-		// No index found or invalid value, return 1.0 as default
-		return 1.0;
-	}
-	
-	/**
 	 * Check that inputs are valid
 	 * 
 	 * @throws OcelotlException if one input is not valid
@@ -1797,6 +1749,39 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 			throw new OcelotlException(OcelotlException.INVALID_START_TIMESTAMP);
 		}
+	}
+
+	/**
+	 * Search for the parameter that has the largest gap (sum of the differences
+	 * in gain and loss values) between two consecutive gain and loss values
+	 * 
+	 * @return the corresponding parameter value, or 1.0 as default
+	 */
+	public double computeInitialParameter() {
+		double diffG = 0.0, diffL = 0.0;
+		double sumDiff = 0.0;
+		double maxDiff = 0.0;
+		int indexMaxQual = -1;
+		int i;
+		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) ocelotlCore.getLpaggregManager().getQualities();
+		for (i = 1; i < qual.size(); i++) {
+			// Compute the difference for the gain and the loss
+			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
+			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
+
+			// Compute sum of both
+			sumDiff = diffG + diffL;
+
+			if (sumDiff > maxDiff) {
+				maxDiff = sumDiff;
+				indexMaxQual = i;
+			}
+		}
+		if (indexMaxQual > -1 && indexMaxQual < ocelotlCore.getLpaggregManager().getParameters().size())
+			return ocelotlCore.getLpaggregManager().getParameters().get(indexMaxQual);
+
+		// No index found or the value is invalid, return 1.0 as default
+		return 1.0;
 	}
 	
 }
