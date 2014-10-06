@@ -79,7 +79,6 @@ public abstract class _2DMicroDescription extends
 					+ getOcelotlParameters().getMaxEventProducers())
 				computeSubMatrix(producers.subList(i, Math.min(epsize - 1, i
 						+ getOcelotlParameters().getMaxEventProducers())), monitor);
-
 		}
 
 		dmt.end("TOTAL (QUERIES + COMPUTATION) : " + epsize

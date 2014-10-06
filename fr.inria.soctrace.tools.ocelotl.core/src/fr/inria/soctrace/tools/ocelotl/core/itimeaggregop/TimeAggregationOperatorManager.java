@@ -40,7 +40,8 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class TimeAggregationOperatorManager {
 
-	HashMap<String, TimeAggregationOperatorResource> List;
+	HashMap<String, TimeAggregationOperatorResource> operatorList;
+
 	ITimeAggregationOperator selectedOperator;
 	String selectedOperatorName;
 	ITraceTypeConfig selectedConfig;
@@ -80,20 +81,20 @@ public class TimeAggregationOperatorManager {
 		}
 	}
 
-	public List<String> getOperators(final String traceType, final List<String> category) {
-		logger.debug("Comparing Time Operator trace format with "
-				+ traceType);
+	public List<String> getOperators(final String traceType,
+			final List<String> category) {
+		logger.debug("Comparing Time Operator trace format with " + traceType);
 		final List<String> op = new ArrayList<String>();
-		for (final TimeAggregationOperatorResource r : List.values()) {
+		for (final TimeAggregationOperatorResource r : operatorList.values()) {
 			StringBuffer buff = new StringBuffer();
 			buff.append(r.getTraceFormats());
 			logger.debug(buff.toString());
-			if (r.isGeneric()||r.getTraceFormats().contains(traceType)){
-				for (String cat: category){
-				if(r.getEventCategory().contains(cat)){
-					op.add(r.getName());
-					break;
-				}
+			if (r.isGeneric() || r.getTraceFormats().contains(traceType)) {
+				for (String cat : category) {
+					if (r.getEventCategory().contains(cat)) {
+						op.add(r.getName());
+						break;
+					}
 				}
 			}
 		}
@@ -117,11 +118,11 @@ public class TimeAggregationOperatorManager {
 	}
 
 	public TimeAggregationOperatorResource getSelectedOperatorResource() {
-		return List.get(selectedOperatorName);
+		return operatorList.get(selectedOperatorName);
 	}
 
 	private void init() throws SoCTraceException {
-		List = new HashMap<String, TimeAggregationOperatorResource>();
+		operatorList = new HashMap<String, TimeAggregationOperatorResource>();
 
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
@@ -143,18 +144,17 @@ public class TimeAggregationOperatorManager {
 			resource.setBundle(e.getContributor().getName());
 			resource.setUnit(e.getAttribute(OP_UNIT));
 			resource.setTs(e.getAttribute(OP_TS));
-			List.put(resource.getName(), resource);
+			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
 					+ resource.getTraceFormats());
 		}
 	}
 
 	public void setSelectedOperator(final String name) {
-		final Bundle mybundle = Platform.getBundle(List.get(name).getBundle());
+		final Bundle mybundle = Platform.getBundle(operatorList.get(name).getBundle());
 		try {
-
 			selectedOperator = (ITimeAggregationOperator) mybundle.loadClass(
-					List.get(name).getOperatorClass()).newInstance();
+					operatorList.get(name).getOperatorClass()).newInstance();
 			selectedOperatorName = name;
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException e1) {
@@ -163,14 +163,22 @@ public class TimeAggregationOperatorManager {
 		}
 		try {
 			selectedConfig = (ITraceTypeConfig) mybundle.loadClass(
-					List.get(name).getParamConfig()).newInstance();
+					operatorList.get(name).getParamConfig()).newInstance();
 			parameters.setTraceTypeConfig(selectedConfig);
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+	}
+	
+	public HashMap<String, TimeAggregationOperatorResource> getOperatorList() {
+		return operatorList;
+	}
+
+	public void setOperatorList(
+			HashMap<String, TimeAggregationOperatorResource> operatorList) {
+		this.operatorList = operatorList;
 	}
 
 }

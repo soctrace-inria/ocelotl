@@ -177,7 +177,6 @@ public class TimeAggregationOperatorResource {
 
 	public void setTraceFormats(final String traceFormats) {
 		decompose(this.traceFormats, traceFormats);
-
 	}
 	
 	private List<String> decompose(List<String> list, String string){

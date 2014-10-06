@@ -123,6 +123,7 @@ public class VariableDistribution extends _3DMicroDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query variables");
 		eventIterator = ocelotlQueries.getVariableIterator(eventProducers,
 				time, monitor);
 		if (monitor.isCanceled()) {
@@ -132,6 +133,7 @@ public class VariableDistribution extends _3DMicroDescription {
 		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()

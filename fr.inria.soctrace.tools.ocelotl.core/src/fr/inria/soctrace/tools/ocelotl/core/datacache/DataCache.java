@@ -99,6 +99,8 @@ public class DataCache {
 	protected DatacacheStrategy buildingStrategy;
 
 	protected boolean validDirectory;
+	
+	protected double currentDirtyRatio;
 
 	public DatacacheStrategy getBuildingStrategy() {
 		return buildingStrategy;
@@ -253,7 +255,8 @@ public class DataCache {
 	public File checkCache(OcelotlParameters parameters) {
 		rebuildDirty = false;
 		CacheParameters cache = null;
-		int ratio = 0;
+		currentDirtyRatio = Double.MAX_VALUE;
+		double bestRatio = Double.MAX_VALUE;
 
 		CacheParameters cParam = new CacheParameters(parameters);
 		// Look for the correct trace
@@ -268,14 +271,21 @@ public class DataCache {
 				if (cache == null) {
 					// Init
 					cache = op;
-					// TODO change that
-					ratio = (op.getNbTimeSlice() % parameters
-							.getTimeSlicesNumber());
+					bestRatio = currentDirtyRatio;
 				} else {
-					// If the ratio
-					if ((op.getNbTimeSlice() % parameters.getTimeSlicesNumber()) < ratio) {
+					// If the dirty ratio of the cache is better than the
+					// current best
+					if (bestRatio < currentDirtyRatio) {
+						// Set it as the best candidate
 						cache = op;
+						bestRatio = currentDirtyRatio;
 					}
+				}
+				// If perfect cache
+				if (currentDirtyRatio == 0) {
+					cache = op;
+					// There is no better solution so stop looking
+					break;
 				}
 			}
 		}
@@ -302,6 +312,8 @@ public class DataCache {
 	 */
 	protected boolean similarParameters(CacheParameters newParam,
 			CacheParameters cacheParam) {
+		
+		// TODO implement inter-operator compatibility
 		// Is the aggregation operator the same?
 		if (!(newParam.getTimeAggOperator().equals(
 				cacheParam.getTimeAggOperator()) && (!newParam
@@ -331,11 +343,14 @@ public class DataCache {
 	 */
 	protected boolean checkCompatibleTimeStamp(CacheParameters newParam,
 			CacheParameters cachedParam) {
-		rebuildDirty = false;
+
 		TimeRegion newTimeRegion = new TimeRegion(newParam.getStartTimestamp(),
 				newParam.getEndTimestamp());
 		TimeRegion cacheTimeRegion = new TimeRegion(
 				cachedParam.getStartTimestamp(), cachedParam.getEndTimestamp());
+		
+		currentDirtyRatio = Double.MAX_VALUE;
+		rebuildDirty = false;
 
 		// If timestamps are equal then OK
 		if (newTimeRegion.compareTimeRegion(cacheTimeRegion)) {
@@ -344,6 +359,7 @@ public class DataCache {
 			if ((cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0)){
 				timeSliceMapping = null;
 				logger.debug("[DATACACHE] Found full compatibility");
+				currentDirtyRatio = 0;
 				return true;
 			}
 		}
@@ -443,25 +459,25 @@ public class DataCache {
 
 		// Proportion of dirty time slices in the part of the cache used to
 		// rebuild the matrix
-		double computedDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
+		currentDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
 
 		// No dirty time slice
-		if (computedDirtyRatio == 0) {
+		if (currentDirtyRatio == 0) {
 			timeSliceMapping = null;
 			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
 					+ " dirty Timeslices among " + usedCachedTimeSlices
 					+ " used cache time slices" + " (i.e. a ratio of "
-					+ computedDirtyRatio + ").");
+					+ currentDirtyRatio + ").");
 			rebuildDirty = false;
 			return true;
 		}
 
 		// Set the flag for rebuild from dirty
-		if (computedDirtyRatio > 0)
+		if (currentDirtyRatio > 0)
 			rebuildDirty = true;
 
 		// If the ratio is not over the max
-		if (computedDirtyRatio <= maxDirtyRatio) {
+		if (currentDirtyRatio <= maxDirtyRatio) {
 			// Precompute stuff
 			if (timeSliceMapping != null)
 				timeSliceMapping.clear();
@@ -471,7 +487,7 @@ public class DataCache {
 			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
 					+ " dirty Timeslices among " + usedCachedTimeSlices
 					+ " used cache time slices" + " (i.e. a ratio of "
-					+ computedDirtyRatio + ").");
+					+ currentDirtyRatio + ").");
 			return true;
 		}
 
