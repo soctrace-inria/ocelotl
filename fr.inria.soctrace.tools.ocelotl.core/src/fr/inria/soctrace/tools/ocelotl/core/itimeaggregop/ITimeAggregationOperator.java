@@ -38,8 +38,6 @@ public interface ITimeAggregationOperator {
 
 	public int getVectorNumber();
 
-	public void initVectors() throws SoCTraceException;
-
 	public void print();
 
 	public void setOcelotlParameters(OcelotlParameters parameters, IProgressMonitor monitor)

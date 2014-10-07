@@ -45,13 +45,15 @@ import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.IMicroscopicModel;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
-public abstract class MultiThreadTimeAggregationOperator {
+public abstract class MultiThreadTimeAggregationOperator implements IMicroscopicModel {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MultiThreadTimeAggregationOperator.class);
@@ -65,8 +67,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected OcelotlParameters parameters;
 	protected OcelotlQueries ocelotlQueries;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
+	protected MicroscopicModel microModel;
 
-	abstract protected void computeMatrix(IProgressMonitor monitor)
+	public abstract void computeMatrix(IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException;
 
 	protected void computeSubMatrix(final List<EventProducer> eventProducers,
@@ -81,7 +84,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 		computeSubMatrix(eventProducers, time, monitor);
 	}
 
-	abstract protected void computeSubMatrix(
+	abstract public void computeSubMatrix(
 			final List<EventProducer> eventProducers, List<IntervalDesc> time,
 			IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException;
@@ -141,6 +144,9 @@ public abstract class MultiThreadTimeAggregationOperator {
 	 */
 	public abstract void rebuildMatrixFromDirtyCache(String[] values,
 			EventProducer ep, int currentSliceNumber, double factor);
+	
+	public abstract void buildMicroscopicModel(IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException;
 
 	public synchronized int getCount() {
 		count++;
@@ -150,6 +156,14 @@ public abstract class MultiThreadTimeAggregationOperator {
 	public synchronized int getEP() {
 		epit++;
 		return epit - 1;
+	}
+	
+	public int getEventsNumber() {
+		return eventsNumber;
+	}
+
+	public void setEventsNumber(int eventsNumber) {
+		this.eventsNumber = eventsNumber;
 	}
 
 	public OcelotlParameters getOcelotlParameters() {
@@ -161,8 +175,6 @@ public abstract class MultiThreadTimeAggregationOperator {
 	// }
 
 	abstract public void initQueries();
-
-	abstract protected void initVectors() throws SoCTraceException;
 
 	/**
 	 * Check whether the current cache can be loaded
@@ -184,61 +196,13 @@ public abstract class MultiThreadTimeAggregationOperator {
 		this.parameters = parameters;
 		count = 0;
 		epit = 0;
+		eventsNumber = 0;
 
 		initQueries();
-		initVectors();
 		if (monitor.isCanceled())
 			return;
 
-		// If the cache is enabled
-		if (parameters.getDataCache().isCacheActive()) {
-			File cacheFile = parameters.getDataCache().checkCache(parameters);
-
-			// Is loading the current cache possible 
-			if (isCacheLoadable(cacheFile, parameters.getDataCache())) {
-				monitor.setTaskName("Loading data from cache");
-				loadFromCache(cacheFile, monitor);
-			} else {
-				if (!generateCache(monitor)) {
-					if (monitor.isCanceled())
-						return;
-					
-					monitor.setTaskName("Loading data from database");
-					computeMatrix(monitor);
-
-					if (monitor.isCanceled())
-						return;
-
-					if (eventsNumber == 0)
-						throw new OcelotlException(OcelotlException.NO_EVENTS);
-
-					// Save the newly computed matrix + parameters
-					dm.start();
-					monitor.subTask("Saving matrix in the cache.");
-					saveMatrix();
-					dm.end("DATACACHE - Save the matrix to cache");
-				} else {
-					// If a cache was generated successfully, load it
-					if (monitor.isCanceled())
-						return;
-					
-					File aCacheFile = parameters.getDataCache().checkCache(
-							parameters);
-
-					initQueries();
-					initVectors();
-					
-					monitor.subTask("Loading from the newly generated cache");
-					loadFromCache(aCacheFile, monitor);
-				}
-			}
-		} else {
-			monitor.setTaskName("Loading data from database");
-			computeMatrix(monitor);
-
-			if (eventsNumber == 0)
-				throw new OcelotlException(OcelotlException.NO_EVENTS);
-		}
+		buildMicroscopicModel(monitor);	
 	}
 
 	public void total(final int rows) {
@@ -754,7 +718,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 						parameters.getOperatorEventTypes());
 
 				initQueries();
-				initVectors();
+
 
 				computeMatrix(monitor);
 				if (monitor.isCanceled())

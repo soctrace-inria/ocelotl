@@ -48,12 +48,11 @@ public abstract class _3DMicroDescription extends _3DMatrixMicroDescription
 	@Override
 	public TimeAggregation3Manager createManager(IProgressMonitor monitor) {
 		return new TimeAggregation3Manager(this, monitor);
-
 	}
 
 	public void matrixPushType(final int incr, final EventProducer ep,
 			final String key) {
-		matrix.get(incr).get(ep).put(key, 0.0);
+		microModel.getMatrix().get(incr).get(ep).put(key, 0.0);
 	}
-	
+
 }

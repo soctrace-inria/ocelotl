@@ -68,13 +68,13 @@ public class VariableDistribution extends _3DMicroDescription {
 
 		private void matrixUpdate(final IVariable variable, final EventProducer ep,
 				final Map<Long, Double> distrib) {
-			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(variable.getType())) {
+			synchronized (microModel.getMatrix()) {
+				if (!microModel.getMatrix().get(0).get(ep).containsKey(variable.getType())) {
 					logger.debug("Adding " + variable.getType()
 							+ " variable");
 					// addKey(state.getStateType());
-					for (int incr = 0; incr < matrix.size(); incr++)
-						for (final EventProducer epset : matrix.get(incr)
+					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
+						for (final EventProducer epset : microModel.getMatrix().get(incr)
 								.keySet())
 							matrixPushType(incr, epset, variable.getType());
 				}
@@ -118,7 +118,7 @@ public class VariableDistribution extends _3DMicroDescription {
 	}
 
 	@Override
-	protected void computeSubMatrix(List<EventProducer> eventProducers,
+	public void computeSubMatrix(List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();

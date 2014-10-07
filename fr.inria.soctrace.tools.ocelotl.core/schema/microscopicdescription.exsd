@@ -121,6 +121,14 @@
                </documentation>
             </annotation>
          </attribute>
+
+         <attribute name="value_type" type="string">
+            <annotation>
+               <documentation>
+               </documentation>
+            </annotation>
+         </attribute>
+         
          <attribute name="unit" use="required">
             <annotation>
                <documentation>

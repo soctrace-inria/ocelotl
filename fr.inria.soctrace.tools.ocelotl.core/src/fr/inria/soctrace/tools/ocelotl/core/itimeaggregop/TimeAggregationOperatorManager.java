@@ -58,7 +58,8 @@ public class TimeAggregationOperatorManager {
 	private static final String OP_EVENT_CATEGORY = "event_category"; //$NON-NLS-1$
 	private static final String OP_UNIT = "unit"; //$NON-NLS-1$
 	private static final String OP_TS = "ts_default_number"; //$NON-NLS-1$
-
+	private static final String OP_VALUE_TYPE = "value_type"; //$NON-NLS-1$
+	
 	private static final Logger logger = LoggerFactory.getLogger(TimeAggregationOperatorManager.class);
 	
 	public TimeAggregationOperatorManager(final OcelotlParameters parameters) {
@@ -144,6 +145,7 @@ public class TimeAggregationOperatorManager {
 			resource.setBundle(e.getContributor().getName());
 			resource.setUnit(e.getAttribute(OP_UNIT));
 			resource.setTs(e.getAttribute(OP_TS));
+			resource.setValueType(e.getAttribute(OP_VALUE_TYPE));
 			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
 					+ resource.getTraceFormats());

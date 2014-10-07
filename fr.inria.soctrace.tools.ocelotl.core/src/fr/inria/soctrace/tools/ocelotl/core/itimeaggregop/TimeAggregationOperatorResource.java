@@ -38,6 +38,7 @@ public class TimeAggregationOperatorResource {
 	String paramConfig;
 	String unit;
 	int ts;
+	String valueType;
 	String bundle;
 
 	public TimeAggregationOperatorResource() {
@@ -48,7 +49,8 @@ public class TimeAggregationOperatorResource {
 			final String name, final boolean generic,
 			final List<String> traceFormats,
 			final List<String> spaceCompatibility, final String paramWinClass,
-			final String paramConfig, final List<String> eventCategory, final String ts, final String unit, final String bundle) {
+			final String paramConfig, final List<String> eventCategory,
+			final String ts, final String unit, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
@@ -59,15 +61,15 @@ public class TimeAggregationOperatorResource {
 		this.paramConfig = paramConfig;
 		this.eventCategory = eventCategory;
 		setTs(ts);
-		this.unit=unit;
+		this.unit = unit;
 		this.bundle = bundle;
 	}
 
 	public TimeAggregationOperatorResource(final String operatorClass,
 			final String name, final boolean generic,
 			final String traceFormats, final String spaceCompatibility,
-			final String paramWinClass, final String paramConfig, final String ts, final String unit,
-			final String bundle) {
+			final String paramWinClass, final String paramConfig,
+			final String ts, final String unit, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
@@ -130,6 +132,10 @@ public class TimeAggregationOperatorResource {
 	public boolean isGeneric() {
 		return generic;
 	}
+	
+	public String getValueType() {
+		return valueType;
+	}
 
 	public void setBundle(final String bundle) {
 		this.bundle = bundle;
@@ -177,6 +183,10 @@ public class TimeAggregationOperatorResource {
 
 	public void setTraceFormats(final String traceFormats) {
 		decompose(this.traceFormats, traceFormats);
+	}
+	
+	public void setValueType(String attribute) {
+		valueType = attribute;
 	}
 	
 	private List<String> decompose(List<String> list, String string){

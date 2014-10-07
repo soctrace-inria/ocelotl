@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,13 +76,13 @@ public class StateDistribution extends _3DMicroDescription {
 
 		protected void matrixUpdate(final IState state, final EventProducer ep,
 				final Map<Long, Double> distrib) {
-			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(state.getType())) {
+			synchronized (microModel.getMatrix()) {
+				if (!microModel.getMatrix().get(0).get(ep).containsKey(state.getType())) {
 					logger.debug("Adding " + state.getType()
 							+ " state");
-					// addKey(state.getStateType());
-					for (int incr = 0; incr < matrix.size(); incr++)
-						for (final EventProducer epset : matrix.get(incr)
+	
+					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
+						for (final EventProducer epset : microModel.getMatrix().get(incr)
 								.keySet())
 							matrixPushType(incr, epset, state.getType());
 				}
@@ -128,7 +129,7 @@ public class StateDistribution extends _3DMicroDescription {
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+	public void computeSubMatrix(final List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
@@ -314,5 +315,13 @@ public class StateDistribution extends _3DMicroDescription {
 		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache
 				.getBuildingStrategy() != DatacacheStrategy.DATACACHE_DATABASE));
 	}
-	
+
+	@Override
+	public void rebuildDirty(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException, SoCTraceException,
+			InterruptedException, OcelotlException {
+		microModel.buildNormalMatrix(monitor);
+	}
+
 }

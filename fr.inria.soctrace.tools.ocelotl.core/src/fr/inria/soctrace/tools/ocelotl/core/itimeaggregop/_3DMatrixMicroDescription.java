@@ -1,6 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +16,15 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class _3DMatrixMicroDescription extends
 		MultiThreadTimeAggregationOperator {
 
-	protected List<HashMap<EventProducer, HashMap<String, Double>>> matrix;
+//	protected List<HashMap<EventProducer, HashMap<String, Double>>> matrix;
+	protected Microscopic3DModel microModel;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(_3DMatrixMicroDescription.class);
@@ -56,30 +59,17 @@ public abstract class _3DMatrixMicroDescription extends
 	}
 
 	public List<HashMap<EventProducer, HashMap<String, Double>>> getMatrix() {
-		return matrix;
+		return microModel.getMatrix();
 	}
 
 	public int getVectorSize() {
-		return matrix.get(0).size();
+		return microModel.getMatrix().get(0).size();
 	}
 
 	public int getVectorNumber() {
-		return matrix.size();
+		return microModel.getMatrix().size();
 	}
 
-	@Override
-	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
-		final List<EventProducer> producers = getOcelotlParameters()
-				.getEventProducers();
-		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
-			matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
-
-			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep, new HashMap<String, Double>());
-		}
-	}
-	
 	@Override
 	public void initQueries() {
 		try {
@@ -89,20 +79,27 @@ public abstract class _3DMatrixMicroDescription extends
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void buildMicroscopicModel(IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		microModel = new Microscopic3DModel(this);
+		microModel.buildMicroscopicModel(parameters, monitor);
+	}
 
 	public void matrixWrite(final long it, final EventProducer ep,
 			final String key, final Map<Long, Double> distrib) {
-		matrix.get((int) it)
+		microModel.getMatrix().get((int) it)
 				.get(ep)
 				.put(key,
-						matrix.get((int) it).get(ep).get(key) + distrib.get(it));
+						microModel.getMatrix().get((int) it).get(ep).get(key) + distrib.get(it));
 	}
 
 	public void print() {
 		logger.debug("");
 		logger.debug("Distribution Vectors");
 		int i = 0;
-		for (final HashMap<EventProducer, HashMap<String, Double>> it : matrix) {
+		for (final HashMap<EventProducer, HashMap<String, Double>> it : microModel.getMatrix()) {
 			logger.debug("");
 			logger.debug("slice " + i++);
 			logger.debug("");
@@ -116,7 +113,7 @@ public abstract class _3DMatrixMicroDescription extends
 		StringBuffer stringBuf = new StringBuffer();
 		int slice = 0;
 		// For each slice
-		for (final HashMap<EventProducer, HashMap<String, Double>> it : matrix) {
+		for (final HashMap<EventProducer, HashMap<String, Double>> it : microModel.getMatrix()) {
 			// For each event producer
 			for (final EventProducer ep : it.keySet()) {
 				// For each event type
@@ -153,11 +150,11 @@ public abstract class _3DMatrixMicroDescription extends
 			slice = slice / sliceMultiple;
 
 			// And add the value to the one already in the matrix
-			if (matrix.get(slice).get(ep).get(evType) != null)
-				value = matrix.get(slice).get(ep).get(evType) + value;
+			if (microModel.getMatrix().get(slice).get(ep).get(evType) != null)
+				value = microModel.getMatrix().get(slice).get(ep).get(evType) + value;
 		}
 
-		matrix.get(slice).get(ep).put(evType, value);
+		microModel.getMatrix().get(slice).get(ep).put(evType, value);
 	}
 	
 	@Override
@@ -174,10 +171,10 @@ public abstract class _3DMatrixMicroDescription extends
 		double value = Double.parseDouble(values[3]) * factor;
 		
 		// Add the value to the one potentially already in the matrix
-		if (matrix.get(slice).get(ep).get(evType) != null)
-			value = matrix.get(slice).get(ep).get(evType) + value;
+		if (microModel.getMatrix().get(slice).get(ep).get(evType) != null)
+			value = microModel.getMatrix().get(slice).get(ep).get(evType) + value;
 
-		matrix.get(slice).get(ep).put(evType, value);
+		microModel.getMatrix().get(slice).get(ep).put(evType, value);
 	}
 	
 	@Override
@@ -185,10 +182,29 @@ public abstract class _3DMatrixMicroDescription extends
 		for (int slice = 0; slice < parameters.getTimeSlicesNumber(); slice++) {
 			for (EventProducer ep : eventProducers) {
 				for (String evType : typeNames) {
-					matrix.get(slice).get(ep).put(evType, 0.0);
+					microModel.getMatrix().get(slice).get(ep).put(evType, 0.0);
 				}
 			}
 		}
+	}
+	
+	public void rebuildClean(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException {
+		microModel.rebuildClean(aCacheFile, eventProducers, monitor);
+	}
+
+	public void rebuildApproximate(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException {
+		microModel.rebuildApproximate(aCacheFile, eventProducers, monitor);
+	}
+
+	public void rebuildDirty(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException, SoCTraceException,
+			InterruptedException, OcelotlException {
+		microModel.rebuildClean(aCacheFile, eventProducers, monitor);
 	}
 
 }

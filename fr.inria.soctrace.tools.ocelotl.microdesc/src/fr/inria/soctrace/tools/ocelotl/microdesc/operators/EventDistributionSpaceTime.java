@@ -61,25 +61,25 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 
 		private void matrixWrite(final long slice, final EventProducer ep,
 				String type) {
-			synchronized (matrix) {
-				matrix.get((int) slice)
+			synchronized (microModel.getMatrix()) {
+				microModel.getMatrix().get((int) slice)
 						.get(ep)
 						.put(type,
-								matrix.get((int) slice).get(ep).get(type) + 1);
+								microModel.getMatrix().get((int) slice).get(ep).get(type) + 1);
 			}
 		}
 
 		private void matrixUpdate(final Event event, final EventProducer ep) {
-			synchronized (matrix) {
+			synchronized (microModel.getMatrix()) {
 				// If the event type is not in the matrix yet
-				if (!matrix.get(0).get(ep)
+				if (!microModel.getMatrix().get(0).get(ep)
 						.containsKey(event.getType().getName())) {
 					logger.debug("Adding " + event.getType().getName()
 							+ " event");
 					
 					// Add the type for each slice and ep and init to zero
-					for (int incr = 0; incr < matrix.size(); incr++)
-						for (final EventProducer epset : matrix.get(incr)
+					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
+						for (final EventProducer epset : microModel.getMatrix().get(incr)
 								.keySet())
 							matrixPushType(incr, epset, event.getType()
 									.getName());
@@ -124,7 +124,7 @@ public class EventDistributionSpaceTime extends _2DSpaceTimeMicroDescription {
 	}
 
 	@Override
-	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+	public void computeSubMatrix(final List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();

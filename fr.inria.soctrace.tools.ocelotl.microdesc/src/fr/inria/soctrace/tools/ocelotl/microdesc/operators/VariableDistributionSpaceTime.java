@@ -68,12 +68,12 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 
 		private void matrixUpdate(final IVariable Variable,
 				final EventProducer ep, final Map<Long, Double> distrib) {
-			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(Variable.getType())) {
+			synchronized (microModel.getMatrix()) {
+				if (!microModel.getMatrix().get(0).get(ep).containsKey(Variable.getType())) {
 					logger.debug("Adding " + Variable.getType() + " Variable");
 					// addKey(Variable.getVariableType());
-					for (int incr = 0; incr < matrix.size(); incr++)
-						for (final EventProducer epset : matrix.get(incr)
+					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
+						for (final EventProducer epset : microModel.getMatrix().get(incr)
 								.keySet())
 							matrixPushType(incr, epset, Variable.getType());
 				}
@@ -117,7 +117,7 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 	}
 
 	@Override
-	protected void computeSubMatrix(List<EventProducer> eventProducers,
+	public void computeSubMatrix(List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
@@ -140,7 +140,7 @@ public class VariableDistributionSpaceTime extends _2DSpaceTimeMicroDescription 
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION : "
+		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 	

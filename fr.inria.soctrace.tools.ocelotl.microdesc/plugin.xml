@@ -15,6 +15,7 @@
             spatial_compatibility="Parts, Proportion"
             trace_formats="ALL"
             ts_default_number="100"
+            value_type="events"
             unit="events">
       </aggregation_operator>
       <aggregation_operator
@@ -27,6 +28,7 @@
             spatial_compatibility="Parts, Proportion"
             trace_formats="ALL"
             ts_default_number="100"
+            value_type="state"
             unit="%TIME">
       </aggregation_operator>
       <aggregation_operator
@@ -39,6 +41,7 @@
             spatial_compatibility="Matrix"
             trace_formats="ALL"
             ts_default_number="30"
+            value_type="events"
             unit="events">
       </aggregation_operator>
       <aggregation_operator
@@ -51,6 +54,7 @@
             spatial_compatibility="Matrix, SMode"
             trace_formats="ALL"
             ts_default_number="30"
+            value_type="state"
             unit="%TIME">
       </aggregation_operator>
             <aggregation_operator
@@ -63,6 +67,7 @@
             spatial_compatibility="Parts, Proportion"
             trace_formats="ALL"
             ts_default_number="100"
+            value_type="variable"
             unit="%UNKNOWN">
       </aggregation_operator>
             <aggregation_operator
@@ -75,6 +80,7 @@
             spatial_compatibility="Matrix"
             trace_formats="ALL"
             ts_default_number="30"
+            value_type="variable"
             unit="%UNKNOWN">
       </aggregation_operator>
    </extension>

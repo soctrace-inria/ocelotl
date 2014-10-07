@@ -19,8 +19,8 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic2DModel;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
@@ -41,7 +41,8 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 public abstract class _2DMicroDescription extends
 		MultiThreadTimeAggregationOperator implements I2DMicroDescription {
 
-	protected List<HashMap<EventProducer, Double>> matrix;
+	//protected List<HashMap<EventProducer, Double>> matrix;
+	protected Microscopic2DModel microModel;
 	
 	private static final Logger logger = LoggerFactory.getLogger(_2DMicroDescription.class);
 
@@ -58,6 +59,13 @@ public abstract class _2DMicroDescription extends
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void buildMicroscopicModel(IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		microModel = new Microscopic2DModel(this);
+		microModel.buildMicroscopicModel(parameters, monitor);
 	}
 
 	@Override
@@ -93,37 +101,24 @@ public abstract class _2DMicroDescription extends
 
 	@Override
 	public List<HashMap<EventProducer, Double>> getMatrix() {
-		return matrix;
+		return microModel.getMatrix();
 	}
 
 	@Override
 	public int getVectorSize() {
-		return matrix.get(0).size();
+		return microModel.getMatrix().get(0).size();
 	}
 
 	@Override
 	public int getVectorNumber() {
-		return matrix.size();
-	}
-
-	@Override
-	public void initVectors() throws SoCTraceException {
-		matrix = new ArrayList<HashMap<EventProducer, Double>>();
-		final List<EventProducer> producers = getOcelotlParameters()
-				.getEventProducers();
-		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
-			matrix.add(new HashMap<EventProducer, Double>());
-
-			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep, 0.0);
-		}
+		return microModel.getMatrix().size();
 	}
 
 	public void matrixWrite(final long it, final EventProducer ep,
 			final Map<Long, Long> distrib) {
-		synchronized (matrix) {
-			matrix.get((int) it).put(ep,
-					matrix.get((int) it).get(ep) + distrib.get(it));
+		synchronized (microModel.getMatrix()) {
+			microModel.getMatrix().get((int) it).put(ep,
+					microModel.getMatrix().get((int) it).get(ep) + distrib.get(it));
 		}
 	}
 
@@ -132,7 +127,7 @@ public abstract class _2DMicroDescription extends
 		logger.debug("");
 		logger.debug("Distribution Vectors");
 		int i = 0;
-		for (final HashMap<EventProducer, Double> it : matrix) {
+		for (final HashMap<EventProducer, Double> it : microModel.getMatrix()) {
 			logger.debug("");
 			logger.debug("slice " + i++);
 			logger.debug("");
@@ -141,51 +136,23 @@ public abstract class _2DMicroDescription extends
 		}
 	}
 
-	@Override
-	public String matrixToCSV() {
-		StringBuffer stringBuf = new StringBuffer();
-		int slice = 0;
-		// For each slice
-		for (final HashMap<EventProducer, Double> it : matrix) {
-			// for each event producer
-			for (final EventProducer ep : it.keySet()) {
-				if (it.get(ep) != 0)
-					stringBuf.append(slice + OcelotlConstants.CSVDelimiter
-							+ ep.getId() + OcelotlConstants.CSVDelimiter
-							+ it.get(ep) + "\n");
-			}
-			slice++;
-		}
-		return stringBuf.toString();
+	public void rebuildClean(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException {
+		microModel.rebuildClean(aCacheFile, eventProducers, monitor);
+	}
+
+	public void rebuildApproximate(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException {
+		microModel.rebuildApproximate(aCacheFile, eventProducers, monitor);
+	}
+
+	public void rebuildDirty(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException, SoCTraceException,
+			InterruptedException, OcelotlException {
+		microModel.rebuildClean(aCacheFile, eventProducers, monitor);
 	}
 	
-	@Override
-	public void rebuildMatrix(String[] values, EventProducer ep,
-			int sliceMultiple) {
-		int slice = Integer.parseInt(values[0]);
-		double value = Double.parseDouble(values[2]);
-
-		// If the number of time slice is a multiple of the cached time
-		// slice number
-		if (sliceMultiple > 1) {
-			// Compute the correct slice number
-			slice = slice / sliceMultiple;
-
-			// And add the value to the one already in the matrix
-			if (matrix.get(slice).get(ep) != null)
-				value = matrix.get(slice).get(ep) + value;
-		}
-		
-		matrix.get(slice).put(ep, value);
-	}
-	
-	@Override
-	public void initMatrixToZero(Collection<EventProducer> eventProducers) {
-		for (int slice = 0; slice < parameters.getTimeSlicesNumber(); slice++) {
-			for (EventProducer ep : eventProducers) {
-				matrix.get(slice).put(ep, 0.0);
-			}
-		}
-	}
-
 }
