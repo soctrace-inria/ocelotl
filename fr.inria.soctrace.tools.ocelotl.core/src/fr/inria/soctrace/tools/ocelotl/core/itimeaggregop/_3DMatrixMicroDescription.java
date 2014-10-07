@@ -2,7 +2,6 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
-import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
@@ -108,85 +106,6 @@ public abstract class _3DMatrixMicroDescription extends
 		}
 	}
 
-	@Override
-	public String matrixToCSV() {
-		StringBuffer stringBuf = new StringBuffer();
-		int slice = 0;
-		// For each slice
-		for (final HashMap<EventProducer, HashMap<String, Double>> it : microModel.getMatrix()) {
-			// For each event producer
-			for (final EventProducer ep : it.keySet()) {
-				// For each event type
-				for (String evtType : it.get(ep).keySet()) {
-					if (it.get(ep).get(evtType) != 0.0)
-						stringBuf.append(slice + OcelotlConstants.CSVDelimiter
-								+ ep.getId() + OcelotlConstants.CSVDelimiter
-								+ evtType + OcelotlConstants.CSVDelimiter
-								+ it.get(ep).get(evtType) + "\n");
-				}
-			}
-			slice++;
-		}
-		return stringBuf.toString();
-	}
-
-	@Override
-	public void rebuildMatrix(String[] values, EventProducer ep,
-			int sliceMultiple) {
-
-		String evType = values[2];
-		
-		// If the event type is filtered out
-		if (!typeNames.contains(evType))
-			return;
-
-		int slice = Integer.parseInt(values[0]);
-		double value = Double.parseDouble(values[3]);
-
-		// If the number of time slice is a multiple of the cached time
-		// slice number
-		if (sliceMultiple > 1) {
-			// Compute the correct slice number
-			slice = slice / sliceMultiple;
-
-			// And add the value to the one already in the matrix
-			if (microModel.getMatrix().get(slice).get(ep).get(evType) != null)
-				value = microModel.getMatrix().get(slice).get(ep).get(evType) + value;
-		}
-
-		microModel.getMatrix().get(slice).get(ep).put(evType, value);
-	}
-	
-	@Override
-	public void rebuildMatrixFromDirtyCache(String[] values, EventProducer ep, int slice,
-			double factor) {
-
-		String evType = values[2];
-		
-		// If the event type is filtered out
-		if (!typeNames.contains(evType))
-			return;
-		
-		// Compute a value proportional to the time ratio spent in the slice
-		double value = Double.parseDouble(values[3]) * factor;
-		
-		// Add the value to the one potentially already in the matrix
-		if (microModel.getMatrix().get(slice).get(ep).get(evType) != null)
-			value = microModel.getMatrix().get(slice).get(ep).get(evType) + value;
-
-		microModel.getMatrix().get(slice).get(ep).put(evType, value);
-	}
-	
-	@Override
-	public void initMatrixToZero(Collection<EventProducer> eventProducers) {
-		for (int slice = 0; slice < parameters.getTimeSlicesNumber(); slice++) {
-			for (EventProducer ep : eventProducers) {
-				for (String evType : typeNames) {
-					microModel.getMatrix().get(slice).get(ep).put(evType, 0.0);
-				}
-			}
-		}
-	}
 	
 	public void rebuildClean(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,

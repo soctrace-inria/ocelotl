@@ -34,8 +34,6 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
-import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
-import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
@@ -310,12 +308,6 @@ public class StateDistribution extends _3DMicroDescription {
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
 	
-	@Override
-	protected boolean isCacheLoadable(File cacheFile, DataCache datacache) {
-		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache
-				.getBuildingStrategy() != DatacacheStrategy.DATACACHE_DATABASE));
-	}
-
 	@Override
 	public void rebuildDirty(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,

@@ -39,13 +39,28 @@ public abstract class MicroscopicModel {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MicroscopicModel.class);
-	
+
 	protected EventIterator eventIterator;
 
-	public abstract String matrixToCSV();
-	
 	public abstract void initVectors() throws SoCTraceException;
-	
+
+	/**
+	 * Convert the matrix values in one String formatted in CSV
+	 * 
+	 * @return the String containing the matrix values
+	 */
+	public abstract String matrixToCSV();
+
+	/**
+	 * Initialize the matrix with zero values. Since a lot of values in the
+	 * matrix are zeroes, this trick reduces the size of the cached data and
+	 * improves the performances of loading data from cache.
+	 * 
+	 * @param eventProducers
+	 *            List of event of the currently selected event producers
+	 */
+	public abstract void initToZero(Collection<EventProducer> eventProducers);
+
 	public MicroscopicModel(MultiThreadTimeAggregationOperator anOperator) {
 		aggregOperator = anOperator;
 		parameters = aggregOperator.getOcelotlParameters();
@@ -60,9 +75,19 @@ public abstract class MicroscopicModel {
 		aggregOperator.computeSubMatrix(eventProducers, time, monitor);
 	}
 
+	/**
+	 * Fill the matrix with values from the cache file
+	 * 
+	 * @param values
+	 *            Array of Strings containing the values and the indexes of the
+	 *            matrix
+	 * @param sliceMultiple
+	 *            used to compute the current slice number if the number of time
+	 *            slices is a divisor of the number of slices of the cached data
+	 */
 	public abstract void rebuildMatrix(String[] values, EventProducer ep,
 			int sliceMultiple);
-	
+
 	public DataCache getDataCache() {
 		return dataCache;
 	}
@@ -70,20 +95,32 @@ public abstract class MicroscopicModel {
 	public void setDataCache(DataCache dataCache) {
 		this.dataCache = dataCache;
 	}
-	
-	public abstract void initToZero(Collection<EventProducer> eventProducers);
 
+	/**
+	 * Fill the matrix with values from the cache multiplied by the factor
+	 * corresponding to the proportional amount of the cached timeslice in the
+	 * built slice
+	 * 
+	 * @param values
+	 *            Array of Strings containing the values and the indexes of the
+	 *            matrix
+	 * @param ep
+	 * @param currentSliceNumber
+	 *            the number of the currently built time slice
+	 * @param factor
+	 *            the proportional factor
+	 */
 	public abstract void rebuildMatrixFromDirtyCache(String[] values,
 			EventProducer ep, int currentSliceNumber, double factor);
-	
-		/**
+
+	/**
 	 * Load matrix values from a cache file
 	 * 
 	 * @param aCacheFile
 	 *            the cache file
 	 * @throws OcelotlException
-		 * @throws InterruptedException 
-		 * @throws SoCTraceException 
+	 * @throws InterruptedException
+	 * @throws SoCTraceException
 	 */
 	public void loadFromCache(File aCacheFile, IProgressMonitor monitor)
 			throws OcelotlException, SoCTraceException, InterruptedException {
@@ -149,7 +186,7 @@ public abstract class MicroscopicModel {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Rebuild the matrix from a dirty cache using one of the available strategy
 	 * 
@@ -164,7 +201,7 @@ public abstract class MicroscopicModel {
 			IProgressMonitor monitor) throws IOException {
 		monitor.setTaskName("Rebuilding the matrix with the precise strategy");
 		monitor.subTask("Initializing");
-		
+
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
 
@@ -216,7 +253,7 @@ public abstract class MicroscopicModel {
 		// slices to rebuild the matrix
 		try {
 			monitor.subTask("Fetching incomplete data from database");
-			
+
 			computeDirtyCacheMatrix(
 					new ArrayList<EventProducer>(eventProducers.values()),
 					times, timesliceIndex, monitor);
@@ -289,7 +326,7 @@ public abstract class MicroscopicModel {
 
 		bufFileReader.close();
 	}
-	
+
 	/**
 	 * Rebuild the matrix from a dirty cache using one of the available strategy
 	 * 
@@ -302,7 +339,7 @@ public abstract class MicroscopicModel {
 	public void rebuildApproximate(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException {
-		
+
 		monitor.setTaskName("Rebuilding the matrix with the fast strategy");
 		monitor.subTask("Initializing");
 
@@ -341,7 +378,7 @@ public abstract class MicroscopicModel {
 			return;
 
 		monitor.subTask("Filling the matrix with cache data");
-		
+
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
 
@@ -405,7 +442,7 @@ public abstract class MicroscopicModel {
 
 		bufFileReader.close();
 	}
-	
+
 	public void rebuildClean(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException {
@@ -473,7 +510,7 @@ public abstract class MicroscopicModel {
 								.getTimeDuration()));
 			}
 		}
-		
+
 		return factors;
 	}
 
@@ -504,7 +541,6 @@ public abstract class MicroscopicModel {
 
 		return new IntervalDesc(startInterval, endInterval);
 	}
-	
 
 	/**
 	 * Rebuild a timeslice from a dirty cached time slice
@@ -528,7 +564,7 @@ public abstract class MicroscopicModel {
 			index++;
 		}
 	}
-	
+
 	/**
 	 * Save the matrix data to a cache file. Save only the values that are
 	 * different from 0
@@ -590,7 +626,6 @@ public abstract class MicroscopicModel {
 		parameters.getDataCache().saveData(parameters, filePath);
 	}
 
-	
 	/**
 	 * Check if there are filters on event types or producers
 	 * 
@@ -611,7 +646,7 @@ public abstract class MicroscopicModel {
 
 		return true;
 	}
-	
+
 	/**
 	 * Generate a cache matrix with the number of TimeSlice provided in settings
 	 * 
@@ -632,7 +667,7 @@ public abstract class MicroscopicModel {
 			try {
 				// Set the number of time slices for the generated cache
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
-				
+
 				// If the number of generated time slices is divisible by the
 				// current number of time slices
 				if (parameters.getOcelotlSettings().getCacheTimeSliceNumber()
@@ -656,7 +691,7 @@ public abstract class MicroscopicModel {
 					// Else simply put the number of current time slices
 					parameters.setTimeSlicesNumber(savedTimeSliceNumber);
 				}
-				
+
 				monitor.subTask("Generating cache with "
 						+ parameters.getTimeSlicesNumber() + " time slices");
 
@@ -672,9 +707,9 @@ public abstract class MicroscopicModel {
 				buildNormalMatrix(monitor);
 				if (monitor.isCanceled())
 					return false;
-				
+
 				saveMatrix();
-				
+
 				// Restoring parameters
 				parameters.setTimeSlicesNumber(savedTimeSliceNumber);
 				parameters.getTraceTypeConfig().setTypes(oldEventTypes);
@@ -693,10 +728,10 @@ public abstract class MicroscopicModel {
 		}
 		return false;
 	}
-	
+
 	public void buildNormalMatrix(IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
-		
+
 		monitor.setTaskName("Fetching data from database");
 		aggregOperator.initQueries();
 		aggregOperator.computeMatrix(monitor);
@@ -709,7 +744,7 @@ public abstract class MicroscopicModel {
 			InterruptedException, OcelotlException {
 
 		initVectors();
-		
+
 		// If the cache is enabled
 		if (parameters.getDataCache().isCacheActive()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
@@ -742,7 +777,7 @@ public abstract class MicroscopicModel {
 
 					File aCacheFile = parameters.getDataCache().checkCache(
 							parameters);
-					
+
 					initVectors();
 
 					monitor.subTask("Loading from the newly generated cache");
@@ -753,5 +788,5 @@ public abstract class MicroscopicModel {
 			buildNormalMatrix(monitor);
 		}
 	}
-	
+
 }

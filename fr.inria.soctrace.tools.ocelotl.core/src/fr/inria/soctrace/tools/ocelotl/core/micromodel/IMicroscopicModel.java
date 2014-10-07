@@ -12,8 +12,6 @@ import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 
 public interface IMicroscopicModel {
 
-	void saveMatrix();
-
 	void rebuildClean(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException;
