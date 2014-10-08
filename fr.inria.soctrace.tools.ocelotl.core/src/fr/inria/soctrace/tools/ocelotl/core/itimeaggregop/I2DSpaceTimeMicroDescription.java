@@ -26,12 +26,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregation2Manager;
 
 public interface I2DSpaceTimeMicroDescription extends ITimeAggregationOperator {
 
 	@Override
-	public SpaceTimeAggregation2Manager createManager(MultiThreadTimeAggregationOperator microMod, IProgressMonitor monitor) throws OcelotlException;
+	public SpaceTimeAggregation2Manager createManager(MicroscopicModel microMod, IProgressMonitor monitor) throws OcelotlException;
 
 	public List<HashMap<EventProducer, HashMap<String, Double>>> getMatrix();
 }

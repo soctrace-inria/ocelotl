@@ -25,12 +25,13 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation2Manager;
 
 public interface I2DMicroDescription extends ITimeAggregationOperator {
 
 	@Override
-	public TimeAggregation2Manager createManager(MultiThreadTimeAggregationOperator microMod, IProgressMonitor monitor);
+	public TimeAggregation2Manager createManager(MicroscopicModel microMod, IProgressMonitor monitor);
 
 	public List<HashMap<EventProducer, Double>> getMatrix();
 }

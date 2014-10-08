@@ -25,10 +25,9 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperatorManager;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.MultiThreadTimeAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.IAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
-import fr.inria.soctrace.tools.ocelotl.core.micromodel.IMicroscopicModel;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
 import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModelTypeManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
@@ -51,9 +50,9 @@ public class OcelotlCore {
 	IMicroDescManager lpaggregManager;
 	PartManager partManager;
 	MicroscopicModelTypeManager microModelTypeManager;
-	MultiThreadTimeAggregationOperator microModel;
+	MicroscopicModel microModel;
 	TimeAggregationOperatorManager timeOperators;
-	ITimeAggregationOperator timeOperator;
+	IAggregationOperator timeOperator;
 	SpaceAggregationOperatorManager spaceOperators;
 	ISpaceAggregationOperator spaceOperator;
 
@@ -128,7 +127,7 @@ public class OcelotlCore {
 		return spaceOperators;
 	}
 
-	public ITimeAggregationOperator getTimeOperator() {
+	public IAggregationOperator getTimeOperator() {
 		return timeOperator;
 	}
 
@@ -163,7 +162,7 @@ public class OcelotlCore {
 	}
 
 	public void setMicroModel(IProgressMonitor monitor) throws OcelotlException {
-		//microModelTypeManager.setSelectedMicroModel(monitor);
+		microModelTypeManager.activateSelectedMicroModel(ocelotlParameters);
 		microModel = microModelTypeManager.getSelectedMicroModel();
 	}
 	

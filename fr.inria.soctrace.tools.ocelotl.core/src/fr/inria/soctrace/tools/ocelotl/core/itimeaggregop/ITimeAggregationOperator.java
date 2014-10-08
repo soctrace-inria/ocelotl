@@ -23,12 +23,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 
 public interface ITimeAggregationOperator {
 
-	public IMicroDescManager createManager(MultiThreadTimeAggregationOperator microMod, IProgressMonitor monitor) throws OcelotlException;
+	public IMicroDescManager createManager(MicroscopicModel microMod, IProgressMonitor monitor) throws OcelotlException;
 
 	public OcelotlParameters getOcelotlParameters();
 

@@ -24,4 +24,10 @@ public interface IMicroscopicModel {
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException, SoCTraceException,
 			InterruptedException, OcelotlException;
+	
+	public int getVectorSize();
+
+	public int getVectorNumber();
+
+	public void print();
 }

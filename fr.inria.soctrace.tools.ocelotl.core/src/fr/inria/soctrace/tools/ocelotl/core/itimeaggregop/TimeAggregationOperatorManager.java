@@ -42,7 +42,7 @@ public class TimeAggregationOperatorManager {
 
 	HashMap<String, TimeAggregationOperatorResource> operatorList;
 
-	ITimeAggregationOperator selectedOperator;
+	IAggregationOperator selectedOperator;
 	String selectedOperatorName;
 	ITraceTypeConfig selectedConfig;
 	OcelotlParameters parameters;
@@ -76,12 +76,12 @@ public class TimeAggregationOperatorManager {
 
 	public void activateSelectedOperator(IProgressMonitor monitor)
 			throws OcelotlException {
-		try {
-			selectedOperator.setOcelotlParameters(parameters, monitor);
+		/*try {
+			//selectedOperator.setOcelotlParameters(parameters, monitor);
 		} catch (SoCTraceException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public List<String> getOperators(final String traceType,
@@ -117,7 +117,7 @@ public class TimeAggregationOperatorManager {
 		return selectedConfig;
 	}
 
-	public ITimeAggregationOperator getSelectedOperator() {
+	public IAggregationOperator getSelectedOperator() {
 		return selectedOperator;
 	}
 
@@ -158,7 +158,7 @@ public class TimeAggregationOperatorManager {
 		final Bundle mybundle = Platform.getBundle(operatorList.get(name)
 				.getBundle());
 		try {
-			selectedOperator = (ITimeAggregationOperator) mybundle.loadClass(
+			selectedOperator = (IAggregationOperator) mybundle.loadClass(
 					operatorList.get(name).getOperatorClass()).newInstance();
 			selectedOperatorName = name;
 		} catch (InstantiationException | IllegalAccessException

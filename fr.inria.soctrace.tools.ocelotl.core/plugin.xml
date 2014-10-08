@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="microscopicdescription" name="Microscopic Description" schema="schema/microscopicdescription.exsd"/>
    <extension-point id="visualization" name="Visualization" schema="schema/visualization.exsd"/>
    <extension-point id="microscopicmodel" name="MicroscopicModel" schema="schema/microscopicmodel.exsd"/>
-   <extension-point id="timeaggregator" name="TimeAggregator" schema="schema/timeaggregator.exsd"/>
+   <extension-point id="timeaggregator" name="TimeAggregator" schema="schema/aggregationoperator.exsd"/>
 
 </plugin>

@@ -28,19 +28,19 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import fr.inria.lpaggreg.spacetime.JNISpaceTimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.MultiThreadTimeAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMatrixMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 
 public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
-	_3DMatrixMicroDescription matrix;
+	Microscopic3DModel matrix;
 
 	public SpaceTimeAggregation2Manager(
-			MultiThreadTimeAggregationOperator matrix, IProgressMonitor monitor) throws OcelotlException {
+			MicroscopicModel matrix, IProgressMonitor monitor) throws OcelotlException {
 		super(matrix.getOcelotlParameters());
-		this.matrix = (_3DMatrixMicroDescription) matrix;
+		this.matrix = (Microscopic3DModel) matrix;
 		reset(monitor);
 	}
 

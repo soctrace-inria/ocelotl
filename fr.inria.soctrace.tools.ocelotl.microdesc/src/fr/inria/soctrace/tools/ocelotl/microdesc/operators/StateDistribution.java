@@ -36,13 +36,12 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMatrixMicroDescription;
-import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericState;
 
-public class StateDistribution extends _3DMatrixMicroDescription {
+public class StateDistribution extends Microscopic3DModel {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(StateDistribution.class);
@@ -73,15 +72,15 @@ public class StateDistribution extends _3DMatrixMicroDescription {
 
 		protected void matrixUpdate(final IState state, final EventProducer ep,
 				final Map<Long, Double> distrib) {
-			synchronized (microModel.getMatrix()) {
+			synchronized (getMatrix()) {
 				// If the event type is not in the matrix yet
-				if (!microModel.getMatrix().get(0).get(ep)
+				if (!getMatrix().get(0).get(ep)
 						.containsKey(state.getType())) {
 					logger.debug("Adding " + state.getType() + " state");
 
 					// Add the type for each slice and ep and init to zero
-					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
-						for (final EventProducer epset : microModel.getMatrix()
+					for (int incr = 0; incr < getMatrix().size(); incr++)
+						for (final EventProducer epset : getMatrix()
 								.get(incr).keySet())
 							matrixPushType(incr, epset, state.getType());
 				}
@@ -89,6 +88,7 @@ public class StateDistribution extends _3DMatrixMicroDescription {
 					matrixWrite(it, ep, state.getType(), distrib);
 			}
 		}
+		
 
 		@Override
 		public void run() {
@@ -120,11 +120,11 @@ public class StateDistribution extends _3DMatrixMicroDescription {
 		super();
 	}
 	
-	public StateDistribution(final OcelotlParameters parameters,
+	/*public StateDistribution(final OcelotlParameters parameters,
 			IProgressMonitor monitor) throws SoCTraceException,
 			OcelotlException {
 		super(parameters, monitor);
-	}
+	}*/
 
 	@Override
 	public void computeSubMatrix(final List<EventProducer> eventProducers,
@@ -159,7 +159,7 @@ public class StateDistribution extends _3DMatrixMicroDescription {
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException, SoCTraceException,
 			InterruptedException, OcelotlException {
-		microModel.buildNormalMatrix(monitor);
+		buildNormalMatrix(monitor);
 	}
 
 }

@@ -31,12 +31,11 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMatrixMicroDescription;
-import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
-public class EventDistribution extends _3DMatrixMicroDescription {
+public class EventDistribution extends Microscopic3DModel {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventDistribution.class);
 	private TimeSliceStateManager timeSliceManager;
@@ -62,25 +61,25 @@ public class EventDistribution extends _3DMatrixMicroDescription {
 
 		private void matrixWrite(final long slice, final EventProducer ep,
 				String type) {
-			synchronized (microModel.getMatrix()) {
-				microModel.getMatrix().get((int) slice)
+			synchronized (getMatrix()) {
+				getMatrix().get((int) slice)
 						.get(ep)
 						.put(type,
-								microModel.getMatrix().get((int) slice).get(ep).get(type) + 1);
+								getMatrix().get((int) slice).get(ep).get(type) + 1);
 			}
 		}
 
 		private void matrixUpdate(final Event event, final EventProducer ep) {
-			synchronized (microModel.getMatrix()) {
+			synchronized (getMatrix()) {
 				// If the event type is not in the matrix yet
-				if (!microModel.getMatrix().get(0).get(ep)
+				if (!getMatrix().get(0).get(ep)
 						.containsKey(event.getType().getName())) {
 					logger.debug("Adding " + event.getType().getName()
 							+ " event");
 					
 					// Add the type for each slice and ep and init to zero
-					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
-						for (final EventProducer epset : microModel.getMatrix().get(incr)
+					for (int incr = 0; incr < getMatrix().size(); incr++)
+						for (final EventProducer epset : getMatrix().get(incr)
 								.keySet())
 							matrixPushType(incr, epset, event.getType()
 									.getName());
@@ -118,10 +117,10 @@ public class EventDistribution extends _3DMatrixMicroDescription {
 		super();
 	}
 	
-	public EventDistribution(final OcelotlParameters parameters, IProgressMonitor monitor)
+	/*public EventDistribution(final OcelotlParameters parameters, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
 		super(parameters, monitor);
-	}
+	}*/
 
 	@Override
 	public void computeSubMatrix(final List<EventProducer> eventProducers,

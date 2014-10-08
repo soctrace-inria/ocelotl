@@ -14,15 +14,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.MultiThreadTimeAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class MicroscopicModelTypeManager {
 	
 	protected HashMap<String, MicroscopicModelTypeResource> typeList;
 	protected String selectedType;
-	protected MultiThreadTimeAggregationOperator selectedMicroModel;
+	protected MicroscopicModel selectedMicroModel;
 
 	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.microscopicmodel"; //$NON-NLS-1$
 	private static final String OP_NAME = "name"; //$NON-NLS-1$
@@ -39,6 +39,11 @@ public class MicroscopicModelTypeManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void activateSelectedMicroModel(OcelotlParameters params)
+			throws OcelotlException {
+		selectedMicroModel.setOcelotlParameters(params);
 	}
 
 	public List<String> getTypes(final String traceType,
@@ -96,7 +101,7 @@ public class MicroscopicModelTypeManager {
 		selectedType = name;
 	}
 
-	public MultiThreadTimeAggregationOperator getSelectedMicroModel() {
+	public MicroscopicModel getSelectedMicroModel() {
 		return selectedMicroModel;
 	}
 
@@ -105,7 +110,7 @@ public class MicroscopicModelTypeManager {
 				.getBundle());
 	
 		try {
-			selectedMicroModel = (MultiThreadTimeAggregationOperator) mybundle.loadClass(
+			selectedMicroModel = (MicroscopicModel) mybundle.loadClass(
 					typeList.get(name).getMicroModelClass()).newInstance();
 			selectedType = name;
 		} catch (InstantiationException | IllegalAccessException

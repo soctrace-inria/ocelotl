@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
@@ -24,23 +25,34 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.MultiThreadTimeAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
-public abstract class MicroscopicModel {
+public abstract class MicroscopicModel implements IMicroscopicModel {
 	protected DataCache dataCache;
 	protected DeltaManagerOcelotl dm;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
 	protected OcelotlParameters parameters;
-	protected MultiThreadTimeAggregationOperator aggregOperator;
+
+	protected EventIterator eventIterator;
+	protected int count = 0;
+	protected int epit = 0;
+	protected int eventsNumber;
+	protected OcelotlQueries ocelotlQueries;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MicroscopicModel.class);
 
-	protected EventIterator eventIterator;
+	public MicroscopicModel() {
+	}
+
+	public MicroscopicModel(OcelotlParameters param) {
+		parameters = param;
+		dataCache = parameters.getDataCache();
+	}
 
 	public abstract void initVectors() throws SoCTraceException;
 
@@ -60,20 +72,6 @@ public abstract class MicroscopicModel {
 	 *            List of event of the currently selected event producers
 	 */
 	public abstract void initToZero(Collection<EventProducer> eventProducers);
-
-	public MicroscopicModel(MultiThreadTimeAggregationOperator anOperator) {
-		aggregOperator = anOperator;
-		parameters = aggregOperator.getOcelotlParameters();
-		dataCache = parameters.getDataCache();
-	}
-
-	protected void computeDirtyCacheMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time,
-			HashMap<Long, List<TimeSlice>> timesliceIndex,
-			IProgressMonitor monitor) throws SoCTraceException,
-			InterruptedException, OcelotlException {
-		aggregOperator.computeSubMatrix(eventProducers, time, monitor);
-	}
 
 	/**
 	 * Fill the matrix with values from the cache file
@@ -154,16 +152,13 @@ public abstract class MicroscopicModel {
 
 			// Check how to rebuild the matrix
 			if (parameters.getDataCache().isRebuildDirty()) {
-
 				switch (parameters.getDataCache().getBuildingStrategy()) {
 				case DATACACHE_DATABASE:
-					aggregOperator.rebuildApproximate(aCacheFile,
-							eventProducers, monitor);
+					rebuildDirty(aCacheFile, eventProducers, monitor);
 					break;
 
 				case DATACACHE_PROPORTIONAL:
-					aggregOperator.rebuildDirty(aCacheFile, eventProducers,
-							monitor);
+					rebuildApproximate(aCacheFile, eventProducers, monitor);
 					break;
 
 				default:
@@ -173,8 +168,7 @@ public abstract class MicroscopicModel {
 				dm.end("Load matrix from cache (dirty)");
 			} else {
 				monitor.setTaskName("Rebuilding with cache data");
-				aggregOperator
-						.rebuildClean(aCacheFile, eventProducers, monitor);
+				rebuildClean(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache");
 			}
 
@@ -195,10 +189,14 @@ public abstract class MicroscopicModel {
 	 * @param eventProducers
 	 *            List of the event producers not filtered out
 	 * @throws IOException
+	 * @throws OcelotlException
+	 * @throws InterruptedException
+	 * @throws SoCTraceException
 	 */
 	public void rebuildDirty(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
-			IProgressMonitor monitor) throws IOException {
+			IProgressMonitor monitor) throws IOException, SoCTraceException,
+			InterruptedException, OcelotlException {
 		monitor.setTaskName("Rebuilding the matrix with the precise strategy");
 		monitor.subTask("Initializing");
 
@@ -251,24 +249,14 @@ public abstract class MicroscopicModel {
 
 		// Run a single database query with all the times of the dirty time
 		// slices to rebuild the matrix
-		try {
-			monitor.subTask("Fetching incomplete data from database");
 
-			computeDirtyCacheMatrix(
-					new ArrayList<EventProducer>(eventProducers.values()),
-					times, timesliceIndex, monitor);
-			if (monitor.isCanceled())
-				return;
-		} catch (SoCTraceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OcelotlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		monitor.subTask("Fetching incomplete data from database");
+
+		computeDirtyCacheMatrix(
+				new ArrayList<EventProducer>(eventProducers.values()), times,
+				timesliceIndex, monitor);
+		if (monitor.isCanceled())
+			return;
 
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
@@ -691,7 +679,7 @@ public abstract class MicroscopicModel {
 					// Else simply put the number of current time slices
 					parameters.setTimeSlicesNumber(savedTimeSliceNumber);
 				}
-				
+
 				logger.debug("Generating cache with "
 						+ parameters.getTimeSlicesNumber() + " time slices");
 
@@ -737,9 +725,10 @@ public abstract class MicroscopicModel {
 
 		monitor.setTaskName("Fetching data from database");
 		initVectors();
-		aggregOperator.initQueries();
-		aggregOperator.computeMatrix(monitor);
-		if (aggregOperator.getEventsNumber() == 0)
+		initQueries();
+		computeMatrix(monitor);
+
+		if (getEventsNumber() == 0)
 			throw new OcelotlException(OcelotlException.NO_EVENTS);
 	}
 
@@ -791,6 +780,97 @@ public abstract class MicroscopicModel {
 		} else {
 			buildNormalMatrix(monitor);
 		}
+	}
+
+	public void total(final int rows) {
+		dm.end("VECTOR COMPUTATION " + rows + " rows computed");
+	}
+
+	public List<Event> getEvents(final int size, IProgressMonitor monitor) {
+		final List<Event> events = new ArrayList<Event>();
+		if (monitor.isCanceled())
+			return events;
+		synchronized (eventIterator) {
+			for (int i = 0; i < size; i++) {
+				if (eventIterator.getNext(monitor) == null)
+					return events;
+				events.add(eventIterator.getEvent());
+				eventsNumber++;
+			}
+		}
+		return events;
+	}
+
+	public abstract void computeMatrix(IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException;
+
+	protected void computeSubMatrix(final List<EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		// Default time interval
+		final List<IntervalDesc> time = new ArrayList<IntervalDesc>();
+		time.add(new IntervalDesc(parameters.getTimeRegion()
+				.getTimeStampStart(), parameters.getTimeRegion()
+				.getTimeStampEnd()));
+
+		computeSubMatrix(eventProducers, time, monitor);
+	}
+
+	abstract public void computeSubMatrix(
+			final List<EventProducer> eventProducers, List<IntervalDesc> time,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException;
+
+	protected void computeDirtyCacheMatrix(
+			final List<EventProducer> eventProducers, List<IntervalDesc> time,
+			HashMap<Long, List<TimeSlice>> timesliceIndex,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		computeSubMatrix(eventProducers, time, monitor);
+	}
+
+	public synchronized int getCount() {
+		count++;
+		return count;
+	}
+
+	public synchronized int getEP() {
+		epit++;
+		return epit - 1;
+	}
+
+	public int getEventsNumber() {
+		return eventsNumber;
+	}
+
+	public void setEventsNumber(int eventsNumber) {
+		this.eventsNumber = eventsNumber;
+	}
+
+	public OcelotlParameters getOcelotlParameters() {
+		return parameters;
+	}
+
+	public void setOcelotlParameters(OcelotlParameters params) {
+		parameters = params;
+		dataCache = params.getDataCache();
+	}
+
+	abstract public void initQueries();
+
+	public void setOcelotlParameters(final OcelotlParameters parameters,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		this.parameters = parameters;
+		count = 0;
+		epit = 0;
+		eventsNumber = 0;
+
+		initQueries();
+		if (monitor.isCanceled())
+			return;
+
+		buildMicroscopicModel(parameters, monitor);
 	}
 
 }

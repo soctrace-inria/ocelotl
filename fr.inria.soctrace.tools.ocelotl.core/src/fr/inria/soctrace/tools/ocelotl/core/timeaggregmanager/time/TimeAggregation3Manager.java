@@ -26,18 +26,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.lpaggreg.time.JNITimeAggregation3;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.MultiThreadTimeAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMatrixMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
 
 public class TimeAggregation3Manager extends TimeAggregationManager {
 
-	_3DMatrixMicroDescription matrix;
+	Microscopic3DModel matrix;
 	List<List<List<Double>>> values;
 
-	public TimeAggregation3Manager(final MultiThreadTimeAggregationOperator timeSliceMatrix, IProgressMonitor monitor) {
+	public TimeAggregation3Manager(final MicroscopicModel timeSliceMatrix, IProgressMonitor monitor) {
 		super(timeSliceMatrix.getOcelotlParameters());
-		this.matrix = (_3DMatrixMicroDescription) timeSliceMatrix;
+		this.matrix = (Microscopic3DModel) timeSliceMatrix;
 		reset(monitor);
 	}
 
@@ -70,7 +69,7 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 				.get(getEventProducers().get(0)).keySet());
 	}
 
-	public _3DMatrixMicroDescription getTimeSliceMatrix() {
+	public Microscopic3DModel getTimeSliceMatrix() {
 		return matrix;
 	}
 

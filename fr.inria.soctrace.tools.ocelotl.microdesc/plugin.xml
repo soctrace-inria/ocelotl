@@ -2,60 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         id="idGenericTime"
-         name="GenericTimeAggregationOperators"
-         point="fr.inria.soctrace.tools.ocelotl.core.microscopicdescription">
-      <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistribution"
-            event_category="ALL"
-            generic="true"
-            operator="Event Distribution - Temporal Aggregation"
-            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.TypeDistributionView"
-            spatial_compatibility="Parts, Proportion"
-            trace_formats="ALL"
-            ts_default_number="100"
-            unit="events">
-      </aggregation_operator>
-      <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistribution"
-            event_category="STATE"
-            generic="true"
-            operator="State Duration - Temporal Aggregation"
-            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.TypeDistributionView"
-            spatial_compatibility="Parts, Proportion"
-            trace_formats="ALL"
-            ts_default_number="100"
-            unit="%TIME">
-      </aggregation_operator>
-      <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistributionSpaceTime"
-            event_category="ALL"
-            generic="true"
-            operator="Event Distribution - Spatiotemporal Aggregation"
-            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
-            spatial_compatibility="Matrix"
-            trace_formats="ALL"
-            ts_default_number="30"
-            unit="events">
-      </aggregation_operator>
-       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.VariableDistribution"
-            event_category="VARIABLE"
-            generic="true"
-            operator="Variable Mean - Temporal Aggregation"
-            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.TypeDistributionView"
-            spatial_compatibility="Parts, Proportion"
-            trace_formats="ALL"
-            ts_default_number="100"
-            unit="%UNKNOWN">
-      </aggregation_operator>
-   </extension>
-   
-   <extension
          id="idGenericMicroModel"
          name="MicroModel"
          point="fr.inria.soctrace.tools.ocelotl.core.microscopicmodel">
