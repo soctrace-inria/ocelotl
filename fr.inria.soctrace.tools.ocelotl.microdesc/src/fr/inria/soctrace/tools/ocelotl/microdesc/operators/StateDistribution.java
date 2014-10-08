@@ -120,12 +120,6 @@ public class StateDistribution extends Microscopic3DModel {
 		super();
 	}
 	
-	/*public StateDistribution(final OcelotlParameters parameters,
-			IProgressMonitor monitor) throws SoCTraceException,
-			OcelotlException {
-		super(parameters, monitor);
-	}*/
-
 	@Override
 	public void computeSubMatrix(final List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)

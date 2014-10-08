@@ -478,6 +478,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	
 			// Get the available aggregation operators
 			comboTime.removeAll();
+			comboSpace.removeAll();
 			
 			for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 				comboTime.add(op);
@@ -487,7 +488,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		}
 	}
-	
 	
 	private class ComboTimeSelectionAdapter extends SelectionAdapter {
 

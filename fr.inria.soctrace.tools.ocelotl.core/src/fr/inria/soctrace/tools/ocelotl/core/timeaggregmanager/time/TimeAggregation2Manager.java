@@ -26,15 +26,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.lpaggreg.time.JNITimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I2DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic2DModel;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
 
 public class TimeAggregation2Manager extends TimeAggregationManager {
 
-	I2DMicroDescription matrix;
+	Microscopic2DModel matrix;
 
-	public TimeAggregation2Manager(final I2DMicroDescription matrix, IProgressMonitor monitor) {
+	public TimeAggregation2Manager(final MicroscopicModel matrix, IProgressMonitor monitor) {
 		super(matrix.getOcelotlParameters());
-		this.matrix = matrix;
+		this.matrix = (Microscopic2DModel) matrix;
 		reset(monitor);
 	}
 
@@ -55,7 +56,7 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 		return new ArrayList<EventProducer>(matrix.getMatrix().get(0).keySet());
 	}
 
-	public I2DMicroDescription getTimeSliceMatrix() {
+	public Microscopic2DModel getTimeSliceMatrix() {
 		return matrix;
 	}
 

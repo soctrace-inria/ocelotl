@@ -21,14 +21,14 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModel;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregation2Manager;
+import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
 
-public class _2DSpaceTimeMicroDescription  implements IAggregationOperator  {
+public class TemporalAggregation implements IAggregationOperator {
 
 	@Override
-	public SpaceTimeAggregation2Manager createManager(MicroscopicModel microMod, IProgressMonitor monitor) throws OcelotlException {
-		return new SpaceTimeAggregation2Manager(microMod, monitor);
+	public TimeAggregation3Manager createManager(MicroscopicModel microMod, IProgressMonitor monitor) {
+		return new TimeAggregation3Manager(microMod, monitor);
 	}
+
 }

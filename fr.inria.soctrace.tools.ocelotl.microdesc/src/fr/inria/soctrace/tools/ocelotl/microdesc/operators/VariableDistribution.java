@@ -35,13 +35,12 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMatrixMicroDescription;
-import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
-public class VariableDistribution extends _3DMatrixMicroDescription {
+public class VariableDistribution extends Microscopic3DModel {
 
 	private static final Logger logger = LoggerFactory.getLogger(VariableDistribution.class);
 	
@@ -67,13 +66,13 @@ public class VariableDistribution extends _3DMatrixMicroDescription {
 
 		private void matrixUpdate(final IVariable variable, final EventProducer ep,
 				final Map<Long, Double> distrib) {
-			synchronized (microModel.getMatrix()) {
-				if (!microModel.getMatrix().get(0).get(ep).containsKey(variable.getType())) {
+			synchronized (getMatrix()) {
+				if (!getMatrix().get(0).get(ep).containsKey(variable.getType())) {
 					logger.debug("Adding " + variable.getType()
 							+ " variable");
 
-					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
-						for (final EventProducer epset : microModel.getMatrix().get(incr)
+					for (int incr = 0; incr < getMatrix().size(); incr++)
+						for (final EventProducer epset : getMatrix().get(incr)
 								.keySet())
 							matrixPushType(incr, epset, variable.getType());
 				}
@@ -110,12 +109,6 @@ public class VariableDistribution extends _3DMatrixMicroDescription {
 		super();
 	}
 	
-	public VariableDistribution(final OcelotlParameters parameters,
-			IProgressMonitor monitor) throws SoCTraceException,
-			OcelotlException {
-		super(parameters, monitor);
-	}
-
 	@Override
 	public void computeSubMatrix(List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)
@@ -149,7 +142,7 @@ public class VariableDistribution extends _3DMatrixMicroDescription {
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException {
-		microModel.buildNormalMatrix(monitor);
+		buildNormalMatrix(monitor);
 	}
 
 }

@@ -116,11 +116,6 @@ public class EventDistribution extends Microscopic3DModel {
 	public EventDistribution() throws SoCTraceException, OcelotlException {
 		super();
 	}
-	
-	/*public EventDistribution(final OcelotlParameters parameters, IProgressMonitor monitor)
-			throws SoCTraceException, OcelotlException {
-		super(parameters, monitor);
-	}*/
 
 	@Override
 	public void computeSubMatrix(final List<EventProducer> eventProducers,
