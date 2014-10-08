@@ -594,7 +594,7 @@ public abstract class MicroscopicModel {
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getTrace().getId()
 					+ OcelotlConstants.CSVDelimiter
-					+ parameters.getTimeAggOperator()
+					+ parameters.getMicroModelType()
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getSpaceAggOperator()
 					+ OcelotlConstants.CSVDelimiter

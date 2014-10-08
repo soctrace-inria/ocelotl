@@ -41,7 +41,6 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 public abstract class _2DMicroDescription extends
 		MultiThreadTimeAggregationOperator implements I2DMicroDescription {
 
-	//protected List<HashMap<EventProducer, Double>> matrix;
 	protected Microscopic2DModel microModel;
 	
 	private static final Logger logger = LoggerFactory.getLogger(_2DMicroDescription.class);
@@ -96,7 +95,6 @@ public abstract class _2DMicroDescription extends
 	@Override
 	public TimeAggregation2Manager createManager(IProgressMonitor monitor) {
 		return new TimeAggregation2Manager(this, monitor);
-
 	}
 
 	@Override

@@ -21,7 +21,6 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
@@ -48,11 +47,5 @@ public abstract class _2DSpaceTimeMicroDescription extends
 	@Override
 	public SpaceTimeAggregation2Manager createManager(IProgressMonitor monitor) throws OcelotlException {
 		return new SpaceTimeAggregation2Manager(this, monitor);
-
-	}
-
-	public void matrixPushType(final int incr, final EventProducer ep,
-			final String key) {
-		microModel.getMatrix().get(incr).get(ep).put(key, 0.0);
 	}
 }

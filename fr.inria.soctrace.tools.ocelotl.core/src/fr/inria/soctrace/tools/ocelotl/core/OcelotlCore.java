@@ -27,6 +27,7 @@ import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOper
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModelTypeManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.PartManager;
@@ -47,6 +48,7 @@ public class OcelotlCore {
 	OcelotlParameters ocelotlParameters;
 	IMicroDescManager lpaggregManager;
 	PartManager partManager;
+	MicroscopicModelTypeManager microModelTypeManager;
 	TimeAggregationOperatorManager timeOperators;
 	ITimeAggregationOperator timeOperator;
 	SpaceAggregationOperatorManager spaceOperators;
@@ -122,12 +124,17 @@ public class OcelotlCore {
 	public TimeAggregationOperatorManager getTimeOperators() {
 		return timeOperators;
 	}
+	
+	public MicroscopicModelTypeManager getMicromodelTypes() {
+		return microModelTypeManager;
+	}
 
 	public void init(final OcelotlParameters ocelotlParameters)
 			throws SoCTraceException {
 		setOcelotlParameters(ocelotlParameters);
 		timeOperators = new TimeAggregationOperatorManager(ocelotlParameters);
 		spaceOperators = new SpaceAggregationOperatorManager(this);
+		microModelTypeManager = new MicroscopicModelTypeManager();
 	}
 
 	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {

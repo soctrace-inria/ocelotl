@@ -24,12 +24,12 @@ import java.util.Map;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 
-public abstract class Variable implements IVariable{
+public abstract class Variable implements IVariable {
 
 	protected String variableType = null;
 	protected TimeRegion timeRegion = null;
 	protected int eventProducerID = -1;
-	protected double value=0;
+	protected double value = 0;
 	protected final TimeSliceVariableManager timeSliceManager;
 
 	public Variable(final TimeSliceVariableManager timeSliceManager) {// TODO
@@ -42,7 +42,7 @@ public abstract class Variable implements IVariable{
 	}
 
 	@Override
-	public String getType(){
+	public String getType() {
 		return variableType;
 	}
 
@@ -63,7 +63,5 @@ public abstract class Variable implements IVariable{
 	public void setValue(double value) {
 		this.value = value;
 	}
-	
-	
 
 }

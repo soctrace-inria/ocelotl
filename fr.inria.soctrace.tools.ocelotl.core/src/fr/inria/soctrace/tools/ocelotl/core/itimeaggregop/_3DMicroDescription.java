@@ -21,7 +21,6 @@ package fr.inria.soctrace.tools.ocelotl.core.itimeaggregop;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
@@ -48,11 +47,6 @@ public abstract class _3DMicroDescription extends _3DMatrixMicroDescription
 	@Override
 	public TimeAggregation3Manager createManager(IProgressMonitor monitor) {
 		return new TimeAggregation3Manager(this, monitor);
-	}
-
-	public void matrixPushType(final int incr, final EventProducer ep,
-			final String key) {
-		microModel.getMatrix().get(incr).get(ep).put(key, 0.0);
 	}
 
 }

@@ -21,7 +21,6 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 public abstract class _3DMatrixMicroDescription extends
 		MultiThreadTimeAggregationOperator {
 
-//	protected List<HashMap<EventProducer, HashMap<String, Double>>> matrix;
 	protected Microscopic3DModel microModel;
 
 	private static final Logger logger = LoggerFactory
@@ -124,6 +123,11 @@ public abstract class _3DMatrixMicroDescription extends
 			IProgressMonitor monitor) throws IOException, SoCTraceException,
 			InterruptedException, OcelotlException {
 		microModel.rebuildClean(aCacheFile, eventProducers, monitor);
+	}
+	
+	public void matrixPushType(final int incr, final EventProducer ep,
+			final String key) {
+		microModel.getMatrix().get(incr).get(ep).put(key, 0.0);
 	}
 
 }

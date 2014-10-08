@@ -313,11 +313,9 @@ public class DataCache {
 	protected boolean similarParameters(CacheParameters newParam,
 			CacheParameters cacheParam) {
 		
-		// TODO implement inter-operator compatibility
-		// Is the aggregation operator the same?
-		if (!(newParam.getTimeAggOperator().equals(
-				cacheParam.getTimeAggOperator()) && (!newParam
-				.getTimeAggOperator().equals("null"))))
+		if (!(newParam.getMicroModelType().equals(
+				cacheParam.getMicroModelType()) && (!newParam
+				.getMicroModelType().equals("null"))))
 			return false;
 
 		// Are timestamps equal or are they included inside the cache

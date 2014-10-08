@@ -59,9 +59,10 @@ public class TimeAggregationOperatorManager {
 	private static final String OP_UNIT = "unit"; //$NON-NLS-1$
 	private static final String OP_TS = "ts_default_number"; //$NON-NLS-1$
 	private static final String OP_VALUE_TYPE = "value_type"; //$NON-NLS-1$
-	
-	private static final Logger logger = LoggerFactory.getLogger(TimeAggregationOperatorManager.class);
-	
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(TimeAggregationOperatorManager.class);
+
 	public TimeAggregationOperatorManager(final OcelotlParameters parameters) {
 		super();
 		this.parameters = parameters;
@@ -73,7 +74,8 @@ public class TimeAggregationOperatorManager {
 		}
 	}
 
-	public void activateSelectedOperator(IProgressMonitor monitor) throws OcelotlException {
+	public void activateSelectedOperator(IProgressMonitor monitor)
+			throws OcelotlException {
 		try {
 			selectedOperator.setOcelotlParameters(parameters, monitor);
 		} catch (SoCTraceException | InterruptedException e) {
@@ -99,6 +101,7 @@ public class TimeAggregationOperatorManager {
 				}
 			}
 		}
+		// Sort in alphabetical order
 		Collections.sort(op, new Comparator<String>() {
 
 			@Override
@@ -128,8 +131,7 @@ public class TimeAggregationOperatorManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length
-				+ " Time aggregation operators detected:");
+		logger.debug(config.length + " Time aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final TimeAggregationOperatorResource resource = new TimeAggregationOperatorResource();
@@ -153,7 +155,8 @@ public class TimeAggregationOperatorManager {
 	}
 
 	public void setSelectedOperator(final String name) {
-		final Bundle mybundle = Platform.getBundle(operatorList.get(name).getBundle());
+		final Bundle mybundle = Platform.getBundle(operatorList.get(name)
+				.getBundle());
 		try {
 			selectedOperator = (ITimeAggregationOperator) mybundle.loadClass(
 					operatorList.get(name).getOperatorClass()).newInstance();
@@ -173,7 +176,7 @@ public class TimeAggregationOperatorManager {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public HashMap<String, TimeAggregationOperatorResource> getOperatorList() {
 		return operatorList;
 	}

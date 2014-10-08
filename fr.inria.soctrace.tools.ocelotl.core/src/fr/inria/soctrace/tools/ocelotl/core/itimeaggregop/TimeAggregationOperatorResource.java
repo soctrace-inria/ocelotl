@@ -102,10 +102,10 @@ public class TimeAggregationOperatorResource {
 	}
 
 	public void setTs(String ts) {
-		try{
-		this.ts = Integer.parseInt(ts);
-		}catch (NumberFormatException e){
-			this.ts=0;
+		try {
+			this.ts = Integer.parseInt(ts);
+		} catch (NumberFormatException e) {
+			this.ts = 0;
 		}
 	}
 
@@ -132,7 +132,7 @@ public class TimeAggregationOperatorResource {
 	public boolean isGeneric() {
 		return generic;
 	}
-	
+
 	public String getValueType() {
 		return valueType;
 	}
@@ -168,7 +168,7 @@ public class TimeAggregationOperatorResource {
 	public void setSpaceCompatibility(final String spaceCompatibility) {
 		decompose(this.spaceCompatibility, spaceCompatibility);
 	}
-	
+
 	public void setEventCategory(final List<String> eventCategory) {
 		this.eventCategory = eventCategory;
 	}
@@ -184,12 +184,12 @@ public class TimeAggregationOperatorResource {
 	public void setTraceFormats(final String traceFormats) {
 		decompose(this.traceFormats, traceFormats);
 	}
-	
+
 	public void setValueType(String attribute) {
 		valueType = attribute;
 	}
-	
-	private List<String> decompose(List<String> list, String string){
+
+	private List<String> decompose(List<String> list, String string) {
 		final String[] tmp = string.split(Split);
 		list.clear();
 		for (final String s : tmp)
