@@ -47,7 +47,7 @@ public class TimeAggregationOperatorManager {
 	ITraceTypeConfig selectedConfig;
 	OcelotlParameters parameters;
 
-	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.microscopicdescription"; //$NON-NLS-1$
+	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.timeaggregator"; //$NON-NLS-1$
 	private static final String OP_NAME = "operator"; //$NON-NLS-1$
 	private static final String OP_CLASS = "class"; //$NON-NLS-1$
 	private static final String OP_TRACE_FORMATS = "trace_formats"; //$NON-NLS-1$

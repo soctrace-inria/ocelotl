@@ -581,7 +581,7 @@ public abstract class MicroscopicModel {
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
-				+ parameters.getTimeAggOperator() + "_" + convertedDate;
+				+ parameters.getMicroModelType() + "_" + convertedDate;
 
 		// Write to file,
 		try {
@@ -691,6 +691,9 @@ public abstract class MicroscopicModel {
 					// Else simply put the number of current time slices
 					parameters.setTimeSlicesNumber(savedTimeSliceNumber);
 				}
+				
+				logger.debug("Generating cache with "
+						+ parameters.getTimeSlicesNumber() + " time slices");
 
 				monitor.subTask("Generating cache with "
 						+ parameters.getTimeSlicesNumber() + " time slices");
@@ -733,6 +736,7 @@ public abstract class MicroscopicModel {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 
 		monitor.setTaskName("Fetching data from database");
+		initVectors();
 		aggregOperator.initQueries();
 		aggregOperator.computeMatrix(monitor);
 		if (aggregOperator.getEventsNumber() == 0)

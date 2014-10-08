@@ -36,27 +36,26 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMatrixMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericState;
 
-public class StateDistribution extends _3DMicroDescription {
+public class StateDistribution extends _3DMatrixMicroDescription {
 
-	private static final Logger logger = LoggerFactory.getLogger(StateDistribution.class);
-	
-	
+	private static final Logger logger = LoggerFactory
+			.getLogger(StateDistribution.class);
+	private TimeSliceStateManager timeSliceManager;
+
 	class OcelotlThread extends Thread {
-		
+
 		List<EventProducer> eventProducers;
 		int threadNumber;
 		int thread;
 		int size;
 		IProgressMonitor monitor;
-		
+
 		public OcelotlThread() {
 			super();
 		}
@@ -67,7 +66,7 @@ public class StateDistribution extends _3DMicroDescription {
 			this.threadNumber = threadNumber;
 			this.thread = thread;
 			this.size = size;
-			this.monitor =  monitor;
+			this.monitor = monitor;
 
 			start();
 		}
@@ -75,13 +74,15 @@ public class StateDistribution extends _3DMicroDescription {
 		protected void matrixUpdate(final IState state, final EventProducer ep,
 				final Map<Long, Double> distrib) {
 			synchronized (microModel.getMatrix()) {
-				if (!microModel.getMatrix().get(0).get(ep).containsKey(state.getType())) {
-					logger.debug("Adding " + state.getType()
-							+ " state");
-	
+				// If the event type is not in the matrix yet
+				if (!microModel.getMatrix().get(0).get(ep)
+						.containsKey(state.getType())) {
+					logger.debug("Adding " + state.getType() + " state");
+
+					// Add the type for each slice and ep and init to zero
 					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
-						for (final EventProducer epset : microModel.getMatrix().get(incr)
-								.keySet())
+						for (final EventProducer epset : microModel.getMatrix()
+								.get(incr).keySet())
 							matrixPushType(incr, epset, state.getType());
 				}
 				for (final long it : distrib.keySet())
@@ -95,7 +96,7 @@ public class StateDistribution extends _3DMicroDescription {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
-				if (monitor.isCanceled()) 
+				if (monitor.isCanceled())
 					return;
 
 				IState state;
@@ -115,14 +116,13 @@ public class StateDistribution extends _3DMicroDescription {
 		}
 	}
 
-	private TimeSliceStateManager timeSliceManager;
-
-	public StateDistribution() throws SoCTraceException {
+	public StateDistribution() {
 		super();
 	}
-
-	public StateDistribution(final OcelotlParameters parameters, IProgressMonitor monitor)
-			throws SoCTraceException, OcelotlException {
+	
+	public StateDistribution(final OcelotlParameters parameters,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
 		super(parameters, monitor);
 	}
 
@@ -153,161 +153,7 @@ public class StateDistribution extends _3DMicroDescription {
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
-	
-	class CachedOcelotlThread extends OcelotlThread  {
-		
-		private HashMap<Long, List<TimeSlice>> timesliceIndex;
-		private IProgressMonitor monitor;
 
-		public CachedOcelotlThread(final int threadNumber, final int thread,
-				final int size, HashMap<Long, List<TimeSlice>> timesliceIndex, IProgressMonitor monitor) {
-			super();
-			this.threadNumber = threadNumber;
-			this.thread = thread;
-			this.size = size;
-			this.timesliceIndex = timesliceIndex;
-			this.monitor = monitor;
-			
-			start();
-		}
-
-		@Override
-		public void run() {
-			while (true) {
-				final List<Event> events = getEvents(size, monitor);
-				if (events.size() == 0)
-					break;
-				if (monitor.isCanceled()) {
-					return;
-				}
-				IState state;
-				long eventCount = 0;
-				// For each event
-				for (final Event event : events) {
-					// Convert to state
-					state = new GenericState(event, timeSliceManager);
-					// Get duration of the state for every time slice it is in
-					final Map<Long, Double> distrib = computeDistribution(state);
-					matrixUpdate(state, event.getEventProducer(), distrib);
-					eventCount++;
-					if (eventCount % 20 == 0) {
-						if (monitor.isCanceled()) {
-							return;
-						}
-					}
-				}
-			}
-		}
-		
-
-		public Map<Long, Double> computeDistribution(IState state) {
-			TimeRegion testedTimeRegion = state.getTimeRegion();
-			final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();
-
-			// Find the number of the slice where the state event starts
-			long startSlice = Math
-					.max(0L,
-							(long) ((testedTimeRegion.getTimeStampStart() - timeSliceManager
-									.getTimeRegion().getTimeStampStart()) / timeSliceManager
-									.getSliceDuration()) - 1);
-			double temp = 0;
-
-			// If the state starts within the actual time region
-			if (testedTimeRegion.getTimeStampStart()
-					- timeSliceManager.getTimeRegion().getTimeStampStart() >= 0)
-				for (long i = startSlice; i < timeSliceManager.getTimeSlices()
-						.size(); i++) {
-					final TimeSlice it = timeSliceManager.getTimeSlices().get(
-							(int) i);
-					// Make sure we got the right starting time slice?
-					if (it.startIsInsideMe(testedTimeRegion.getTimeStampStart())) {
-						startSlice = it.getNumber();
-						break;
-					}
-				}
-
-			// For each slice of the new matrix
-			for (long i = startSlice; i < timeSliceManager.getSlicesNumber(); i++) {
-
-				long timesliceStart = timeSliceManager.getTimeSlices()
-						.get((int) i).getTimeRegion().getTimeStampStart();
-
-				if (timesliceStart > testedTimeRegion.getTimeStampEnd())
-					break;
-
-				long timesliceEnd = timeSliceManager.getTimeSlices()
-						.get((int) i).getTimeRegion().getTimeStampEnd();
-
-				if (timesliceIndex.get(i) != null
-						&& !timesliceIndex.get(i).isEmpty()) {
-					for (TimeSlice aCachedTimeSlice : timesliceIndex.get(i)) {
-
-						long timeStampStart = Math.max(timesliceStart,
-								aCachedTimeSlice.getTimeRegion()
-										.getTimeStampStart());
-						long timeStampEnd = Math.min(timesliceEnd,
-								aCachedTimeSlice.getTimeRegion()
-										.getTimeStampEnd());
-
-						// Create the custom time slice
-						TimeSlice currentTimeSlice = new TimeSlice(
-								new TimeRegion(timeStampStart, timeStampEnd),
-								-1);
-
-						// Get the duration of the state in the time slice i
-						temp = currentTimeSlice
-								.regionInsideMe(testedTimeRegion);
-
-						// If the state has ended in the previous time slice
-						if (timeSlicesDistribution.get(i) != null)
-							temp = temp + timeSlicesDistribution.get(i);
-
-						timeSlicesDistribution.put(i, temp);
-					}
-				}
-			}
-			return timeSlicesDistribution;
-		}
-	}
-	
-	@Override
-	protected void computeDirtyCacheMatrix(
-			final List<EventProducer> eventProducers, List<IntervalDesc> time,
-			HashMap<Long, List<TimeSlice>> timesliceIndex,
-			IProgressMonitor monitor) throws SoCTraceException,
-			InterruptedException, OcelotlException {
-		dm = new DeltaManagerOcelotl();
-		dm.start();
-		if(monitor.isCanceled())
-			return;
-		monitor.subTask("Query states");
-		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
-				monitor);
-		if (monitor.isCanceled()) {
-			ocelotlQueries.closeIterator();
-			return;
-		}
-		
-		monitor.subTask("Fill the matrix");
-		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
-		final List<CachedOcelotlThread> threadlist = new ArrayList<CachedOcelotlThread>();
-
-		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
-			threadlist.add(new CachedOcelotlThread(getOcelotlParameters()
-					.getThreadNumber(), t, getOcelotlParameters()
-					.getEventsPerThread(), timesliceIndex, monitor));
-
-		for (final Thread thread : threadlist)
-			thread.join();
-
-		ocelotlQueries.closeIterator();
-		if (monitor.isCanceled())
-			return;
-		dm.end("VECTORS COMPUTATION: "
-				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
-	}
-	
 	@Override
 	public void rebuildDirty(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,

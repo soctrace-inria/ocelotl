@@ -27,15 +27,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import fr.inria.lpaggreg.time.JNITimeAggregation3;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.I3DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.MultiThreadTimeAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMatrixMicroDescription;
 
 public class TimeAggregation3Manager extends TimeAggregationManager {
 
-	I3DMicroDescription matrix;
+	_3DMatrixMicroDescription matrix;
 	List<List<List<Double>>> values;
 
-	public TimeAggregation3Manager(final I3DMicroDescription timeSliceMatrix, IProgressMonitor monitor) {
+	public TimeAggregation3Manager(final MultiThreadTimeAggregationOperator timeSliceMatrix, IProgressMonitor monitor) {
 		super(timeSliceMatrix.getOcelotlParameters());
-		this.matrix = timeSliceMatrix;
+		this.matrix = (_3DMatrixMicroDescription) timeSliceMatrix;
 		reset(monitor);
 	}
 
@@ -68,7 +70,7 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 				.get(getEventProducers().get(0)).keySet());
 	}
 
-	public I3DMicroDescription getTimeSliceMatrix() {
+	public _3DMatrixMicroDescription getTimeSliceMatrix() {
 		return matrix;
 	}
 

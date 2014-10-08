@@ -15,6 +15,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
@@ -28,6 +29,18 @@ public abstract class _3DMatrixMicroDescription extends
 
 	public _3DMatrixMicroDescription() {
 		super();
+	}
+	
+	public _3DMatrixMicroDescription(final OcelotlParameters parameters,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		super();
+		try {
+			setOcelotlParameters(parameters, monitor);
+		} catch (final InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -105,7 +118,6 @@ public abstract class _3DMatrixMicroDescription extends
 		}
 	}
 
-	
 	public void rebuildClean(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException {

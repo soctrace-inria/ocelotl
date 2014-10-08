@@ -4,5 +4,6 @@
    <extension-point id="microscopicdescription" name="Microscopic Description" schema="schema/microscopicdescription.exsd"/>
    <extension-point id="visualization" name="Visualization" schema="schema/visualization.exsd"/>
    <extension-point id="microscopicmodel" name="MicroscopicModel" schema="schema/microscopicmodel.exsd"/>
+   <extension-point id="timeaggregator" name="TimeAggregator" schema="schema/timeaggregator.exsd"/>
 
 </plugin>

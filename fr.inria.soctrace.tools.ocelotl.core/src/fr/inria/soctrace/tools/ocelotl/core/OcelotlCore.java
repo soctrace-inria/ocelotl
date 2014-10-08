@@ -26,7 +26,9 @@ import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.MultiThreadTimeAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
+import fr.inria.soctrace.tools.ocelotl.core.micromodel.IMicroscopicModel;
 import fr.inria.soctrace.tools.ocelotl.core.micromodel.MicroscopicModelTypeManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
@@ -49,6 +51,7 @@ public class OcelotlCore {
 	IMicroDescManager lpaggregManager;
 	PartManager partManager;
 	MicroscopicModelTypeManager microModelTypeManager;
+	MultiThreadTimeAggregationOperator microModel;
 	TimeAggregationOperatorManager timeOperators;
 	ITimeAggregationOperator timeOperator;
 	SpaceAggregationOperatorManager spaceOperators;
@@ -65,15 +68,23 @@ public class OcelotlCore {
 	}
 
 	public void initTimeOperator(IProgressMonitor monitor) throws OcelotlException {
+		setMicroModel(monitor);
 		setTimeOperator(monitor);
 		if(monitor.isCanceled())
 			return;
 		try {
-			lpaggregManager = timeOperator.createManager(monitor);
+			microModel.setOcelotlParameters(ocelotlParameters, monitor);
+			lpaggregManager = timeOperator.createManager(microModel, monitor);
 			if(monitor.isCanceled())
 				return;
 		} catch (UnsatisfiedLinkError e) {
 			throw new OcelotlException(OcelotlException.JNI);
+		} catch (SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -150,5 +161,12 @@ public class OcelotlCore {
 		timeOperators.activateSelectedOperator(monitor);
 		timeOperator = timeOperators.getSelectedOperator();
 	}
+
+	public void setMicroModel(IProgressMonitor monitor) throws OcelotlException {
+		//microModelTypeManager.setSelectedMicroModel(monitor);
+		microModel = microModelTypeManager.getSelectedMicroModel();
+	}
+	
+	
 
 }

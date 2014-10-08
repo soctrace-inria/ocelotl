@@ -28,11 +28,9 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
 
 public interface ITimeAggregationOperator {
 
-	public IMicroDescManager createManager(IProgressMonitor monitor) throws OcelotlException;
+	public IMicroDescManager createManager(MultiThreadTimeAggregationOperator microMod, IProgressMonitor monitor) throws OcelotlException;
 
 	public OcelotlParameters getOcelotlParameters();
-
-	//public TimeSliceStateManager getTimeSlicesManager();
 
 	public int getVectorSize();
 

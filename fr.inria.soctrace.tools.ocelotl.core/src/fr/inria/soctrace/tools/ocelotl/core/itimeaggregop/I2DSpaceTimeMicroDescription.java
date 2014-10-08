@@ -31,7 +31,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTim
 public interface I2DSpaceTimeMicroDescription extends ITimeAggregationOperator {
 
 	@Override
-	public SpaceTimeAggregation2Manager createManager(IProgressMonitor monitor) throws OcelotlException;
+	public SpaceTimeAggregation2Manager createManager(MultiThreadTimeAggregationOperator microMod, IProgressMonitor monitor) throws OcelotlException;
 
 	public List<HashMap<EventProducer, HashMap<String, Double>>> getMatrix();
 }

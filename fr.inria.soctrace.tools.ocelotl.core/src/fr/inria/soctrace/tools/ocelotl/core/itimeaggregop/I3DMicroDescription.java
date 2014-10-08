@@ -30,7 +30,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregati
 public interface I3DMicroDescription extends ITimeAggregationOperator {
 
 	@Override
-	public TimeAggregation3Manager createManager(IProgressMonitor monitor);
+	public TimeAggregation3Manager createManager(MultiThreadTimeAggregationOperator micromod, IProgressMonitor monitor);
 
 	public List<HashMap<EventProducer, HashMap<String, Double>>> getMatrix();
 }

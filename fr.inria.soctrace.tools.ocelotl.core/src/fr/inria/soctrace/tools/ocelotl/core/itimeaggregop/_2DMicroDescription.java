@@ -44,8 +44,8 @@ public abstract class _2DMicroDescription extends
 	protected Microscopic2DModel microModel;
 	
 	private static final Logger logger = LoggerFactory.getLogger(_2DMicroDescription.class);
-
-	public _2DMicroDescription() throws SoCTraceException {
+	
+	public _2DMicroDescription() {
 		super();
 	}
 
@@ -97,7 +97,6 @@ public abstract class _2DMicroDescription extends
 		return new TimeAggregation2Manager(this, monitor);
 	}
 
-	@Override
 	public List<HashMap<EventProducer, Double>> getMatrix() {
 		return microModel.getMatrix();
 	}

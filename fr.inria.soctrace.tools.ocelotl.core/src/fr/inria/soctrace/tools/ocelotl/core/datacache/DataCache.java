@@ -589,7 +589,7 @@ public class DataCache {
 
 						logger.debug("Found " + param.getTraceName() + " in "
 								+ traceCache.toString() + ", "
-								+ param.getTimeAggOperator() + ", "
+								+ param.getMicroModelType() + ", "
 								+ param.getSpaceAggOperator() + ", "
 								+ param.getStartTimestamp() + ", "
 								+ param.getEndTimestamp());
@@ -708,7 +708,7 @@ public class DataCache {
 					// Database unique ID
 					params.setTraceID(Integer.parseInt(header[1]));
 					// Time Aggregation Operator
-					params.setTimeAggOperator(header[2]);
+					params.setMicroModelType(header[2]);
 					// Space Aggregation Operator
 					params.setSpaceAggOperator(header[3]);
 					// Start timestamp

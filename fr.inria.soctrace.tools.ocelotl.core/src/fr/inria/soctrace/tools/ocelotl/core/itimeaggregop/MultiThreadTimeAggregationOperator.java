@@ -39,7 +39,6 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class MultiThreadTimeAggregationOperator implements IMicroscopicModel {
 
-	// protected TimeSliceStateManager timeSliceManager;
 	protected EventIterator eventIterator;
 	protected int count = 0;
 	protected int epit = 0;

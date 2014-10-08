@@ -35,13 +35,13 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMatrixMicroDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
-public class VariableDistribution extends _3DMicroDescription {
+public class VariableDistribution extends _3DMatrixMicroDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(VariableDistribution.class);
 	
@@ -71,7 +71,7 @@ public class VariableDistribution extends _3DMicroDescription {
 				if (!microModel.getMatrix().get(0).get(ep).containsKey(variable.getType())) {
 					logger.debug("Adding " + variable.getType()
 							+ " variable");
-					// addKey(state.getStateType());
+
 					for (int incr = 0; incr < microModel.getMatrix().size(); incr++)
 						for (final EventProducer epset : microModel.getMatrix().get(incr)
 								.keySet())
@@ -106,10 +106,10 @@ public class VariableDistribution extends _3DMicroDescription {
 
 	private TimeSliceVariableManager timeSliceManager;
 
-	public VariableDistribution() throws SoCTraceException {
+	public VariableDistribution() {
 		super();
 	}
-
+	
 	public VariableDistribution(final OcelotlParameters parameters,
 			IProgressMonitor monitor) throws SoCTraceException,
 			OcelotlException {

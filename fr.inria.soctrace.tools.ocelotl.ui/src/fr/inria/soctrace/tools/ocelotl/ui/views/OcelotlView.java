@@ -467,6 +467,28 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 	
+	private class ComboTypeSelectionAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (confDataLoader.getCurrentTrace() == null)
+				return;
+			hasChanged = HasChanged.ALL;
+			ocelotlParameters.getEventProducers().clear();
+	
+			// Get the available aggregation operators
+			comboTime.removeAll();
+			
+			for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
+				comboTime.add(op);
+			}
+			
+			comboTime.setText("");
+
+		}
+	}
+	
+	
 	private class ComboTimeSelectionAdapter extends SelectionAdapter {
 
 		@Override
@@ -475,8 +497,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				return;
 			hasChanged = HasChanged.ALL;
 			ocelotlParameters.getEventProducers().clear();
+			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
 			ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
-			// Set a list of all the events
+			// Set the number of time slice
 			spinnerTSNumber.setSelection(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getTs());
 			
 			// Get the available visualizations
@@ -804,13 +827,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									comboType.add(type);
 								}
 								comboType.setText("");
-								
-								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
-									comboTime.add(op);
-								}
-								
-								comboTime.setText("");
-
 							}
 						});
 					} catch (final Exception e) {
@@ -1145,7 +1161,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		gd_comboType.widthHint = 170;
 		comboType.setLayoutData(gd_comboType);
 		comboType.setFont(cantarell8);
-		comboType.addSelectionListener(new ComboTimeSelectionAdapter());
+		comboType.addSelectionListener(new ComboTypeSelectionAdapter());
 		comboType.setText("");
 		
 		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
