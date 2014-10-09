@@ -2,8 +2,8 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
- * overview by using aggregation techniques
+ * Ocelotl is a FrameSoC plug in which enables to visualize a trace 
+ * overview by using a time aggregation technique
  *
  * (C) Copyright 2013 INRIA
  *
@@ -17,7 +17,7 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views;
+package fr.inria.soctrace.tools.ocelotl.visualizations.mode.views;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,20 +33,27 @@ import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.Aggregation;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.VisualAggregatedData;
-import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManager;
+import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView;
+import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
+import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MatrixProportion;
 
-public class HierarchyPart {
+public class HierarchyProportion {
 
 	private int index;
 	private static final int Border = PartMatrixView.Border;
+	private static final int ColorThreshold = 175;
+	private static final int AlphaThreshold = 190;
 	private int space = 3;
+	private int rectangleBorder = 1;
 	private EventProducerHierarchy hierarchy;
 	private IFigure root;
 	private double rootHeight;
@@ -54,34 +61,50 @@ public class HierarchyPart {
 	private double width;
 	private double logicWidth;
 	private double logicHeight;
-	private int minLogicWeight = 3;
-	private PartColorManager colors;
+	private int minLogicWeight = 1;
 	private List<Integer> xendlist;
+	private List<Integer> yendlist;
+	private MatrixProportion proportion;
 
-	public HierarchyPart(EventProducerHierarchy hierarchy, final IFigure root,
-			PartColorManager colors, int space) {
+	public HierarchyProportion(MatrixProportion proportion,
+			EventProducerHierarchy hierarchy, final IFigure root, int space) {
 		super();
 		setIndex(index);
 		this.root = root;
 		this.hierarchy = hierarchy;
-		this.colors = colors;
 		xendlist = new ArrayList<Integer>();
+		yendlist = new ArrayList<Integer>();
 		this.space = space;
+		this.proportion = proportion;
 	}
 
+	/**
+	 * Compute the list of X values according to the number of time slices
+	 * (parts)
+	 */
 	private void initX() {
 		xendlist.clear();
 		for (int i = 0; i <= hierarchy.getRoot().getParts().size(); i++)
 			xendlist.add((int) (i * logicWidth + Border - space));
 	}
 
+	/**
+	 * Compute the list of Y values according to the weight of the root node
+	 */
+	private void initY() {
+		yendlist.clear();
+		for (int i = 0; i <= hierarchy.getRoot().getWeight(); i++)
+			yendlist.add((int) (rootHeight - height + i * logicHeight - space - Border));
+	}
+
 	public void draw() {
 		rootHeight = root.getSize().height;
-		height = rootHeight - Border;
+		height = rootHeight - (2 * Border);
 		width = root.getSize().width - (2 * Border);
 		logicWidth = width / (hierarchy.getRoot().getParts().size());
 		logicHeight = height / hierarchy.getRoot().getWeight();
 		initX();
+		initY();
 		print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot().getParts()
 				.size());
 	}
@@ -109,6 +132,17 @@ public class HierarchyPart {
 		return parts;
 	}
 
+	/**
+	 * Print the matrix of data for a given eventproducerNode and for a given
+	 * time range
+	 * 
+	 * @param id
+	 *            id of the eventProducerNode
+	 * @param start
+	 *            starting time slice
+	 * @param end
+	 *            ending time slice
+	 */
 	private void print(int id, int start, int end) {
 		EventProducerNode epn = hierarchy.getEventProducerNodes().get(id);
 		List<Part> parts = computeParts(epn, start, end);
@@ -116,8 +150,7 @@ public class HierarchyPart {
 			if (((VisualAggregatedData) p.getData()).isAggregated())
 				drawStandardAggregate(p.getStartPart(), epn.getIndex(),
 						p.getEndPart(), epn.getWeight(),
-						((VisualAggregatedData) p.getData()).getValue(), epn
-								.getMe().getName());
+						((VisualAggregatedData) p.getData()).getValue(), epn);
 			else {
 				boolean aggy = false;
 				for (EventProducerNode ep : epn.getChildrenNodes()) {
@@ -138,13 +171,13 @@ public class HierarchyPart {
 									epn.getIndex(), pagg.getEndPart(),
 									epn.getWeight(),
 									((VisualAggregatedData) p.getData())
-											.getValue(), epn.getMe().getName());
+											.getValue(), epn);
 						else
 							drawNotCleanVisualAggregate(pagg.getStartPart(),
 									epn.getIndex(), pagg.getEndPart(),
 									epn.getWeight(),
 									((VisualAggregatedData) p.getData())
-											.getValue(), epn.getMe().getName());
+											.getValue(), epn);
 					}
 				}
 			}
@@ -179,7 +212,6 @@ public class HierarchyPart {
 							cleanCut = false;
 						break;
 					}
-
 				}
 				if (commonCut == false)
 					break;
@@ -219,64 +251,37 @@ public class HierarchyPart {
 	}
 
 	private void drawStandardAggregate(int logicX, int logicY, int logicX2,
-			int sizeY, int number, String name) {
+			int sizeY, int number, EventProducerNode epn) {
 		final RectangleFigure rectangle = new RectangleFigure();
-		rectangle.setBackgroundColor(colors.getColors().get(number).getBg());
-		rectangle.setForegroundColor(colors.getColors().get(number).getBg());
-		rectangle.setLineWidth(2);
+		MajState state = proportion.getMajState(epn, logicX, logicX2);
+		rectangle.setBackgroundColor(FramesocColorManager.getInstance()
+				.getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setForegroundColor(FramesocColorManager.getInstance()
+				.getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setAlpha(state.getAmplitude255M());
+		rectangle.setLineWidth(1);
 
-		rectangle.setToolTip(new Label(" " + name + " "));
+		rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
+				+ state.getState() + ", " + state.getAmplitude100() + "%) "));
 		int xa = (int) ((logicX * logicWidth + Border));
-		int ya = (int) (rootHeight - height + logicY * logicHeight);
+		int ya = (int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb = xendlist.get(logicX2);
-		int yb = (int) (ya + sizeY * logicHeight) - space;
+		int yb = yendlist.get(logicY + sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 	}
 
 	private void drawNotCleanVisualAggregate(int logicX, int logicY,
-			int logicX2, int sizeY, int number, String name) {
+			int logicX2, int sizeY, int number, EventProducerNode epn) {
 		final RectangleFigure rectangle = new RectangleFigure();
-		rectangle.setBackgroundColor(ColorConstants.white);
-		rectangle.setForegroundColor(ColorConstants.black);
-
-		rectangle.setLineWidth(2);
-
-		rectangle.setToolTip(new Label(" " + name + " "));
-		rectangle.setLayoutManager(new BorderLayout());
-		rectangle.setPreferredSize(1000, 1000);
-		Label lab = new Label("?");
-		lab.setTextAlignment(PositionConstants.CENTER);
-		lab.setLabelAlignment(SWT.CENTER);
-		lab.setForegroundColor(ColorConstants.red);
-		rectangle
-				.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
-		// rectangle.add(lab, BorderLayout.CENTER);
-		int xa = (int) ((logicX * logicWidth + Border));
-		int ya = (int) (rootHeight - height + logicY * logicHeight);
-		int xb = xendlist.get(logicX2);
-		int yb = (int) (ya + sizeY * logicHeight) - space;
-		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
-		final PolylineConnection line = new PolylineConnection();
-		line.setBackgroundColor(ColorConstants.black);
-		line.setForegroundColor(ColorConstants.black);
-		line.setEndpoints(new Point(xa, ya), new Point(xb, yb));
-		root.add(line);
-		final PolylineConnection line2 = new PolylineConnection();
-		line2.setBackgroundColor(ColorConstants.black);
-		line2.setForegroundColor(ColorConstants.black);
-		line2.setEndpoints(new Point(xa, yb), new Point(xb, ya));
-		root.add(line2);
-	}
-
-	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2,
-			int sizeY, int number, String name) {
-		final RectangleFigure rectangle = new RectangleFigure();
-		rectangle.setBackgroundColor(ColorConstants.white);
-		rectangle.setForegroundColor(ColorConstants.black);
-
-		rectangle.setLineWidth(2);
-
-		rectangle.setToolTip(new Label(" " + name + " "));
+		MajState state = proportion.getMajState(epn, logicX, logicX2);
+		rectangle.setBackgroundColor(FramesocColorManager.getInstance()
+				.getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setForegroundColor(FramesocColorManager.getInstance()
+				.getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setAlpha(state.getAmplitude255M());
+		rectangle.setLineWidth(1);
+		rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
+				+ state.getState() + ", " + state.getAmplitude100() + "%) "));
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
 		Label lab = new Label("?");
@@ -287,16 +292,113 @@ public class HierarchyPart {
 				.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 		// rectangle.add(lab, BorderLayout.CENTER);
 		int xa = (int) ((logicX * logicWidth + Border));
-		int ya = (int) (rootHeight - height + logicY * logicHeight);
+		int ya = (int) (rootHeight - height + logicY * logicHeight - Border);
 		int xb = xendlist.get(logicX2);
-		int yb = (int) (ya + sizeY * logicHeight) - space;
+		int yb = yendlist.get(logicY + sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 		final PolylineConnection line = new PolylineConnection();
-		line.setBackgroundColor(ColorConstants.black);
-		line.setForegroundColor(ColorConstants.black);
-		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
+		Color color = ColorConstants.black;
+		boolean light = isColorLight(rectangle.getBackgroundColor(),
+				rectangle.getAlpha());
+		if (!light) {
+			color = ColorConstants.white;
+		}
+		line.setBackgroundColor(color);
+		line.setForegroundColor(color);
+		line.setEndpoints(new Point(xa, ya), new Point(xb, yb));
+		line.setAntialias(SWT.ON);
+		line.setLineWidth(1);
+		// line.setAlpha(state.getAmplitude255());
 		root.add(line);
+		final PolylineConnection line2 = new PolylineConnection();
+		line2.setBackgroundColor(color);
+		line2.setForegroundColor(color);
+		line2.setEndpoints(new Point(xa, yb), new Point(xb, ya));
+		line2.setAntialias(SWT.ON);
+		line2.setLineWidth(1);
+		root.add(line2);
+		// line2.setAlpha(state.getAmplitude255());
+		if (light) {
+			drawRectangleBorder(xa, xb, ya, yb);
+		}
+	}
 
+	private void drawRectangleBorder(int xa, int xb, int ya, int yb) {
+		final PolylineConnection rect1 = new PolylineConnection();
+		rect1.setBackgroundColor(ColorConstants.black);
+		rect1.setForegroundColor(ColorConstants.black);
+		rect1.setLineWidth(rectangleBorder);
+		rect1.setEndpoints(new Point(xa, ya), new Point(xb, ya));
+		final PolylineConnection rect2 = new PolylineConnection();
+		rect2.setBackgroundColor(ColorConstants.black);
+		rect2.setForegroundColor(ColorConstants.black);
+		rect2.setLineWidth(rectangleBorder);
+		rect2.setEndpoints(new Point(xa, yb), new Point(xb, yb));
+		final PolylineConnection rect3 = new PolylineConnection();
+		rect3.setBackgroundColor(ColorConstants.black);
+		rect3.setForegroundColor(ColorConstants.black);
+		rect3.setLineWidth(rectangleBorder);
+		rect3.setEndpoints(new Point(xa, ya), new Point(xa, yb));
+		final PolylineConnection rect4 = new PolylineConnection();
+		rect4.setBackgroundColor(ColorConstants.black);
+		rect4.setForegroundColor(ColorConstants.black);
+		rect4.setLineWidth(rectangleBorder);
+		rect4.setEndpoints(new Point(xb, ya), new Point(xb, yb));
+		root.add(rect1);
+		root.add(rect2);
+		root.add(rect3);
+		root.add(rect4);
+	}
+
+	private boolean isColorLight(Color color, int alpha) {
+		return (alpha < AlphaThreshold || ((color.getBlue() < ColorThreshold)
+				&& (color.getRed() < ColorThreshold) && (color.getGreen() < ColorThreshold)));
+	}
+
+	private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2,
+			int sizeY, int number, EventProducerNode epn) {
+		final RectangleFigure rectangle = new RectangleFigure();
+		MajState state = proportion.getMajState(epn, logicX, logicX2);
+		rectangle.setBackgroundColor(FramesocColorManager.getInstance()
+				.getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setForegroundColor(FramesocColorManager.getInstance()
+				.getEventTypeColor(state.getState()).getSwtColor());
+		rectangle.setAlpha(state.getAmplitude255M());
+		rectangle.setLineWidth(1);
+
+		rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
+				+ state.getState() + ", " + state.getAmplitude100() + "%) "));
+
+		rectangle.setLayoutManager(new BorderLayout());
+		rectangle.setPreferredSize(1000, 1000);
+		Label lab = new Label("?");
+		lab.setTextAlignment(PositionConstants.CENTER);
+		lab.setLabelAlignment(SWT.CENTER);
+		lab.setForegroundColor(ColorConstants.black);
+		rectangle
+				.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
+		// rectangle.add(lab, BorderLayout.CENTER);
+		int xa = (int) ((logicX * logicWidth + Border));
+		int ya = (int) (rootHeight - height + logicY * logicHeight - Border);
+		int xb = xendlist.get(logicX2);
+		int yb = yendlist.get(logicY + sizeY);
+		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
+		final PolylineConnection line = new PolylineConnection();
+		Color color = ColorConstants.black;
+		boolean light = isColorLight(rectangle.getBackgroundColor(),
+				rectangle.getAlpha());
+		if (!light) {
+			color = ColorConstants.white;
+		}
+		line.setBackgroundColor(color);
+		line.setForegroundColor(color);
+		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
+		line.setLineWidth(1);
+		line.setAntialias(SWT.ON);
+		root.add(line);
+		if (light) {
+			drawRectangleBorder(xa, xb, ya, yb);
+		}
 	}
 
 	private void setIndex(final int index) {

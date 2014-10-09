@@ -31,13 +31,13 @@
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MatrixProportion"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.mode.MatrixProportion"
             operator="Mode"
             param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
             time_compatibility="SMode"
             selection_priority="1"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.views.ProportionMatrixView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.mode.views.ProportionMatrixView">
       </aggregation_operator>
    </extension>
 

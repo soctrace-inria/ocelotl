@@ -17,30 +17,37 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts;
+package fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager;
 
+import java.util.List;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import fr.inria.lpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuSTOperator;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 
-public class MatrixParts extends VisuSTOperator {
+public interface IMicroDescManager {
 
-	public MatrixParts() {
-		super();
-	}
+	public void computeDichotomy() throws OcelotlException;
 
-	public MatrixParts(final OcelotlCore ocelotlCore) {
-		super(ocelotlCore);
-	}
+	public void computeParts();
 
-	@Override
-	protected void computeParts() {
-	}
+	public void computeQualities();
 
+	public List<EventProducer> getEventProducers();
 
-	@Override
-	protected void initParts() {
-		// TODO Auto-generated method stub
-		
-	}
+	public List<Double> getParameters();
+
+	public List<DLPQuality> getQualities();
+
+	public void printParameters();
+
+	public void printParts();
+
+	public void reset(IProgressMonitor monitor) throws OcelotlException;
+
+	public void print(OcelotlCore core);
 
 }

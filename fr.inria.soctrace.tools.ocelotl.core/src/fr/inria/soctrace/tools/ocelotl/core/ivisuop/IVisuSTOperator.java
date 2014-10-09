@@ -2,8 +2,8 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
- * overview by using aggregation techniques
+ * Ocelotl is a FrameSoC plug in which enables to visualize a trace 
+ * overview by using a time aggregation technique
  *
  * (C) Copyright 2013 INRIA
  *
@@ -17,24 +17,14 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.visualizations.parts;
+package fr.inria.soctrace.tools.ocelotl.core.ivisuop;
 
-import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 
-public class Parts extends VisuTOperator {
+public interface IVisuSTOperator extends IVisuOperator {
 
-	public Parts() {
-		super();
-	}
+	public EventProducerHierarchy getHierarchy();
 
-	public Parts(final OcelotlCore ocelotlCore) {
-		super(ocelotlCore);
-	}
-
-	@Override
-	protected void computeParts() {
-		initParts();
-	}
+	public int getSliceNumber();
 
 }

@@ -17,24 +17,12 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
+package fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime;
 
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public interface IAggregatedView {
+public interface ISpaceTimeManager extends IMicroDescManager {
 
-	void createDiagram(IMicroDescManager iMicroDescManager, TimeRegion time);
+	EventProducerHierarchy getHierarchy();
 
-	public void deleteDiagram();
-
-	public long getEnd();
-
-	public long getStart();
-
-	public void init(TimeLineViewWrapper wrapper);
-
-	public void resizeDiagram();
-
-	public void createSnapshotFor(String fileName);
 }

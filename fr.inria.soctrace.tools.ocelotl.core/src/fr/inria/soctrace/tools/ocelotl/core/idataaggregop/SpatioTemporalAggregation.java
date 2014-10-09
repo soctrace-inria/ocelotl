@@ -17,24 +17,20 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
+package fr.inria.soctrace.tools.ocelotl.core.idataaggregop;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import org.eclipse.core.runtime.IProgressMonitor;
 
-public interface IAggregatedView {
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 
-	void createDiagram(IMicroDescManager iMicroDescManager, TimeRegion time);
+public class SpatioTemporalAggregation implements IDataAggregationOperator {
 
-	public void deleteDiagram();
-
-	public long getEnd();
-
-	public long getStart();
-
-	public void init(TimeLineViewWrapper wrapper);
-
-	public void resizeDiagram();
-
-	public void createSnapshotFor(String fileName);
+	@Override
+	public SpaceTimeAggregation2Manager createManager(
+			MicroscopicDescription microMod, IProgressMonitor monitor)
+			throws OcelotlException {
+		return new SpaceTimeAggregation2Manager(microMod, monitor);
+	}
 }

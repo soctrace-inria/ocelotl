@@ -17,24 +17,32 @@
  *     Generoso Pagano <generoso.pagano@inria.fr>
  */
 
-package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
+package fr.inria.soctrace.tools.ocelotl.core.ivisuop;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+public class AggregatedData implements IPartData {
+	private boolean aggregated = true;
+	private int value = -2;
 
-public interface IAggregatedView {
+	public boolean isAggregated() {
+		return aggregated;
+	}
 
-	void createDiagram(IMicroDescManager iMicroDescManager, TimeRegion time);
+	public void setAggregated(boolean aggregated) {
+		this.aggregated = aggregated;
+	}
 
-	public void deleteDiagram();
+	public int getValue() {
+		return value;
+	}
 
-	public long getEnd();
+	public void setValue(int value) {
+		this.value = value;
+	}
 
-	public long getStart();
+	public AggregatedData(boolean aggregated, int value) {
+		super();
+		this.aggregated = aggregated;
+		this.value = value;
+	}
 
-	public void init(TimeLineViewWrapper wrapper);
-
-	public void resizeDiagram();
-
-	public void createSnapshotFor(String fileName);
 }

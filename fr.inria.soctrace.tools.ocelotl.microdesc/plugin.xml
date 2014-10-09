@@ -30,7 +30,7 @@
          name="GenericAggregationOperators"
          point="fr.inria.soctrace.tools.ocelotl.core.timeaggregator">
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TemporalAggregation"
+            class="fr.inria.soctrace.tools.ocelotl.core.idataaggregop.TemporalAggregation"
             event_category="ALL"
             generic="true"
             trace_formats="ALL"
@@ -41,7 +41,7 @@
             ts_default_number="100">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.SpatioTemporalAggregation"
+            class="fr.inria.soctrace.tools.ocelotl.core.idataaggregop.SpatioTemporalAggregation"
             event_category="ALL"
             generic="true"
             trace_formats="ALL"

@@ -35,12 +35,12 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
-public class VariableDistribution extends Microscopic3DModel {
+public class VariableDistribution extends Microscopic3DDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(VariableDistribution.class);
 	

@@ -31,11 +31,11 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.micromodel.Microscopic3DModel;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
-public class EventDistribution extends Microscopic3DModel {
+public class EventDistribution extends Microscopic3DDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventDistribution.class);
 	private TimeSliceStateManager timeSliceManager;
