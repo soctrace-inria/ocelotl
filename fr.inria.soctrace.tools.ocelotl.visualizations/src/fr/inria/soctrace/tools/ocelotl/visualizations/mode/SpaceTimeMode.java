@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.ISpaceTimeManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregation2Manager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
-import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.ISpaceTimeManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
+import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
 
 public class SpaceTimeMode extends Mode {
 	

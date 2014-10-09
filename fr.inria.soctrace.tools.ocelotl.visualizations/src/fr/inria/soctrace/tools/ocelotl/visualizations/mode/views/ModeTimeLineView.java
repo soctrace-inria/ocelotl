@@ -6,13 +6,13 @@ import java.util.List;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregationManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregationManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
-import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
+import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.Mode;
 
 public class ModeTimeLineView extends TimeLineView {

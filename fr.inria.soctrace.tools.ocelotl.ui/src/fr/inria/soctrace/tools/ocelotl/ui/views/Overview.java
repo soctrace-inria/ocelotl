@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Bundle;
 
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
@@ -31,7 +31,7 @@ public class Overview {
 	private AggregatedView timeLineView;
 	private TimeRegion globalTimeRegion;
 	private IMicroDescManager md;
-	private ISpaceAggregationOperator spaceOperator;
+	private IVisuOperator visuOperator;
 	private boolean redrawOverview;
 	// Show the currently displayed zone
 	private SelectFigure displayedZone;
@@ -71,7 +71,7 @@ public class Overview {
 		// Set the parameter to the computed initial parameter
 		ocelotlView.getParams().setParameter(ocelotlView.computeInitialParameter());
 		
-		timeLineView.setSpaceOperator(spaceOperator);
+		timeLineView.setSpaceOperator(visuOperator);
 
 		timeLineView.createDiagram(iMicroDescManager, time);
 
@@ -109,7 +109,7 @@ public class Overview {
 			// Compute the view according to the new parameter value
 			iMicroDescManager.computeParts();
 			
-			this.spaceOperator.setOcelotlCore(ocelotlView.getOcelotlCore());
+			this.visuOperator.setOcelotlCore(ocelotlView.getOcelotlCore());
 
 			//spaceOperator = ocelotlView.getOcelotlCore().getSpaceOperator().copy();
 			createDiagram(iMicroDescManager, time);
@@ -183,21 +183,21 @@ public class Overview {
 		this.selectedZone = selectedZone;
 	}
 
-	public ISpaceAggregationOperator getSpaceOperator() {
-		return spaceOperator;
+	public IVisuOperator getSpaceOperator() {
+		return visuOperator;
 	}
 
-	public void setSpaceOperator(ISpaceAggregationOperator spaceOperator) {
-		this.spaceOperator = spaceOperator;
+	public void setSpaceOperator(IVisuOperator spaceOperator) {
+		this.visuOperator = spaceOperator;
 	}
 
 	
 	public void setSelectedOperator(String spaceOperator) {
-		final Bundle mybundle = Platform.getBundle(ocelotlView.getOcelotlCore().getSpaceOperators().getOperatorList().get(
+		final Bundle mybundle = Platform.getBundle(ocelotlView.getOcelotlCore().getVisuOperators().getOperatorList().get(
 				spaceOperator).getBundle());
 		try {
-			this.spaceOperator = (ISpaceAggregationOperator) mybundle.loadClass(
-					ocelotlView.getOcelotlCore().getSpaceOperators().getOperatorList().get(spaceOperator).getOperatorClass())
+			this.visuOperator = (IVisuOperator) mybundle.loadClass(
+					ocelotlView.getOcelotlCore().getVisuOperators().getOperatorList().get(spaceOperator).getOperatorClass())
 					.newInstance();
 
 		} catch (InstantiationException | IllegalAccessException

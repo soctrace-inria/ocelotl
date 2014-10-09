@@ -1,6 +1,6 @@
 package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts;
 
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.IPartData;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IPartData;
 
 public class VisualAggregatedData implements IPartData {
 	private boolean visualAggregate = false;

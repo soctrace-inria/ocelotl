@@ -7,14 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregationManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregationManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
 
-public class Mode implements ISpaceAggregationOperator {
+public class Mode implements IVisuOperator {
 
 	protected OcelotlCore ocelotlCore;
 	protected HashMap<Integer, MajState> majStates;

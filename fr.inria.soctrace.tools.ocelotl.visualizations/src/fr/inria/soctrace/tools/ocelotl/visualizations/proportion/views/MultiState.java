@@ -37,7 +37,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 
 public class MultiState {

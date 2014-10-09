@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -278,7 +278,7 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	private SelectFigure					selectFigure;
 
-	protected ISpaceAggregationOperator		spaceOperator	= null;
+	protected IVisuOperator		spaceOperator	= null;
 
 	public final static Color				selectColorFG	= ColorConstants.blue;
 
@@ -369,11 +369,11 @@ abstract public class AggregatedView implements IAggregatedView {
 		return time;
 	}
 	
-	public ISpaceAggregationOperator getSpaceOperator() {
+	public IVisuOperator getSpaceOperator() {
 		return spaceOperator;
 	}
 
-	public void setSpaceOperator(ISpaceAggregationOperator spaceOperator) {
+	public void setSpaceOperator(IVisuOperator spaceOperator) {
 		this.spaceOperator = spaceOperator;
 	}
 

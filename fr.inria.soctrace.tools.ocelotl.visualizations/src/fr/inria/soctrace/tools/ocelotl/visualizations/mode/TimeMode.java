@@ -6,12 +6,12 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.ITimeManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.ITimeManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregation3Manager;
+import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
 
 public class TimeMode extends Mode {
 

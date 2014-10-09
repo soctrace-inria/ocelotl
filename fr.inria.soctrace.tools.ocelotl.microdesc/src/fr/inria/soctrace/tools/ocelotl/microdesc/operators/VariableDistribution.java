@@ -33,18 +33,16 @@ import fr.inria.soctrace.lib.model.Event;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
-import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
-import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
-public class VariableDistribution extends _3DMicroDescription {
+public class VariableDistribution extends Microscopic3DDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(VariableDistribution.class);
 	
@@ -70,13 +68,13 @@ public class VariableDistribution extends _3DMicroDescription {
 
 		private void matrixUpdate(final IVariable variable, final EventProducer ep,
 				final Map<Long, Double> distrib) {
-			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(variable.getType())) {
+			synchronized (getMatrix()) {
+				if (!getMatrix().get(0).get(ep).containsKey(variable.getType())) {
 					logger.debug("Adding " + variable.getType()
 							+ " variable");
-					// addKey(state.getStateType());
-					for (int incr = 0; incr < matrix.size(); incr++)
-						for (final EventProducer epset : matrix.get(incr)
+
+					for (int incr = 0; incr < getMatrix().size(); incr++)
+						for (final EventProducer epset : getMatrix().get(incr)
 								.keySet())
 							matrixPushType(incr, epset, variable.getType());
 				}
@@ -109,18 +107,12 @@ public class VariableDistribution extends _3DMicroDescription {
 
 	private TimeSliceVariableManager timeSliceManager;
 
-	public VariableDistribution() throws SoCTraceException {
+	public VariableDistribution() {
 		super();
 	}
-
-	public VariableDistribution(final OcelotlParameters parameters,
-			IProgressMonitor monitor) throws SoCTraceException,
-			OcelotlException {
-		super(parameters, monitor);
-	}
-
+	
 	@Override
-	protected void computeSubMatrix(List<EventProducer> eventProducers,
+	public void computeSubMatrix(List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
@@ -146,42 +138,38 @@ public class VariableDistribution extends _3DMicroDescription {
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}
+	
+	@Override
+	public void rebuildDirty(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		buildNormalMatrix(monitor);
+	}
 
 	@Override
-	public ITimeAggregationOperator copy() {
+	public MicroscopicDescription copy() {
 		VariableDistribution aNewDist = null;
-		try {
-			aNewDist = new VariableDistribution();
-			aNewDist.parameters = new OcelotlParameters(this.parameters);
-			aNewDist.matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
-			int i;
+		aNewDist = new VariableDistribution();
+		aNewDist.parameters = new OcelotlParameters(this.parameters);
+		aNewDist.matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
+		int i;
 
-			for (i = 0; i < matrix.size(); i++) {
-				aNewDist.matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
-				for (EventProducer ep : parameters.getAllEventProducers())
-					aNewDist.matrix.get((int) i).put(ep, new HashMap<String, Double>());
-			}
+		for (i = 0; i < matrix.size(); i++) {
+			aNewDist.matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
+			for (EventProducer ep : parameters.getAllEventProducers())
+				aNewDist.matrix.get((int) i).put(ep, new HashMap<String, Double>());
+		}
 
-			for (i = 0; i < matrix.size(); i++) {
-				for (EventProducer anEP : parameters.getAllEventProducers()) {
-					for (String state : matrix.get(i).get(anEP).keySet())
-						aNewDist.matrix.get(i).get(anEP)
-								.put(state, matrix.get(i).get(anEP).get(state));
-				}
+		for (i = 0; i < matrix.size(); i++) {
+			for (EventProducer anEP : parameters.getAllEventProducers()) {
+				for (String state : matrix.get(i).get(anEP).keySet())
+					aNewDist.matrix.get(i).get(anEP)
+							.put(state, matrix.get(i).get(anEP).get(state));
 			}
-		} catch (SoCTraceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return aNewDist;
 	}
 
-
-
-	@Override
-	protected boolean isCacheLoadable(File cacheFile, DataCache datacache) {
-		return (cacheFile != null && (!datacache.isRebuildDirty() || datacache
-				.getBuildingStrategy() != DatacacheStrategy.DATACACHE_DATABASE));
-	}
 
 }

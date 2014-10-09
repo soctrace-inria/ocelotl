@@ -22,14 +22,16 @@ package fr.inria.soctrace.tools.ocelotl.core;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.PartManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceAggregationOperatorManager;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.ITimeAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop.TimeAggregationOperatorManager;
+import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.DataAggregationOperatorManager;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuOperatorManager;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescriptionTypeManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.PartManager;
 
 public class OcelotlCore {
 
@@ -47,10 +49,12 @@ public class OcelotlCore {
 	OcelotlParameters ocelotlParameters;
 	IMicroDescManager lpaggregManager;
 	PartManager partManager;
-	TimeAggregationOperatorManager timeOperators;
-	ITimeAggregationOperator timeOperator;
-	SpaceAggregationOperatorManager spaceOperators;
-	ISpaceAggregationOperator spaceOperator;
+	MicroscopicDescriptionTypeManager microModelTypeManager;
+	MicroscopicDescription microModel;
+	DataAggregationOperatorManager aggregOperators;
+	IDataAggregationOperator aggregOperator;
+	VisuOperatorManager visuOperators;
+	IVisuOperator visuOperator;
 
 	public OcelotlCore() {
 		super();
@@ -62,16 +66,25 @@ public class OcelotlCore {
 		init(ocelotlParameters);
 	}
 
-	public void initTimeOperator(IProgressMonitor monitor) throws OcelotlException {
-		setTimeOperator(monitor);
-		if(monitor.isCanceled())
+	public void initAggregOperator(IProgressMonitor monitor)
+			throws OcelotlException {
+		setMicroModel(monitor);
+		setAggregOperator(monitor);
+		if (monitor.isCanceled())
 			return;
 		try {
-			lpaggregManager = timeOperator.createManager(monitor);
-			if(monitor.isCanceled())
+			microModel.setOcelotlParameters(ocelotlParameters, monitor);
+			lpaggregManager = aggregOperator.createManager(microModel, monitor);
+			if (monitor.isCanceled())
 				return;
 		} catch (UnsatisfiedLinkError e) {
 			throw new OcelotlException(OcelotlException.JNI);
+		} catch (SoCTraceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -87,7 +100,7 @@ public class OcelotlCore {
 	public void computeParts() {
 		lpaggregManager.computeParts();
 		// lpaggregManager.printParts();
-		setSpaceOperator();
+		setVisuOperator();
 		lpaggregManager.print(this);
 	}
 
@@ -107,41 +120,52 @@ public class OcelotlCore {
 		return partManager;
 	}
 
-	public ISpaceAggregationOperator getSpaceOperator() {
-		return spaceOperator;
+	public IVisuOperator getVisuOperator() {
+		return visuOperator;
 	}
 
-	public SpaceAggregationOperatorManager getSpaceOperators() {
-		return spaceOperators;
+	public VisuOperatorManager getVisuOperators() {
+		return visuOperators;
 	}
 
-	public ITimeAggregationOperator getTimeOperator() {
-		return timeOperator;
+	public IDataAggregationOperator getAggregOperator() {
+		return aggregOperator;
 	}
 
-	public TimeAggregationOperatorManager getTimeOperators() {
-		return timeOperators;
+	public DataAggregationOperatorManager getAggregOperators() {
+		return aggregOperators;
+	}
+
+	public MicroscopicDescriptionTypeManager getMicromodelTypes() {
+		return microModelTypeManager;
 	}
 
 	public void init(final OcelotlParameters ocelotlParameters)
 			throws SoCTraceException {
 		setOcelotlParameters(ocelotlParameters);
-		timeOperators = new TimeAggregationOperatorManager(ocelotlParameters);
-		spaceOperators = new SpaceAggregationOperatorManager(this);
+		aggregOperators = new DataAggregationOperatorManager(ocelotlParameters);
+		visuOperators = new VisuOperatorManager(this);
+		microModelTypeManager = new MicroscopicDescriptionTypeManager();
 	}
 
 	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {
 		this.ocelotlParameters = ocelotlParameters;
 	}
 
-	public void setSpaceOperator() {
-		spaceOperators.activateSelectedOperator();
-		spaceOperator = spaceOperators.getSelectedOperator();
+	public void setVisuOperator() {
+		visuOperators.activateSelectedOperator();
+		visuOperator = visuOperators.getSelectedOperator();
 	}
-	
-	public void setTimeOperator(IProgressMonitor monitor) throws OcelotlException {
-		timeOperators.activateSelectedOperator(monitor);
-		timeOperator = timeOperators.getSelectedOperator();
+
+	public void setAggregOperator(IProgressMonitor monitor)
+			throws OcelotlException {
+		aggregOperators.activateSelectedOperator(monitor);
+		aggregOperator = aggregOperators.getSelectedOperator();
+	}
+
+	public void setMicroModel(IProgressMonitor monitor) throws OcelotlException {
+		microModelTypeManager.activateSelectedMicroModel(ocelotlParameters);
+		microModel = microModelTypeManager.getSelectedMicroModel();
 	}
 
 }

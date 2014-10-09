@@ -7,7 +7,7 @@ import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.ToolbarLayout;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.matrixproportion.MajState;
+import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
 
 public class ModeFigure extends RectangleFigure {
 
