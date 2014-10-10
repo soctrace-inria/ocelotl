@@ -1,0 +1,8 @@
+*.class
+*/bin
+/bin
+/doc
+*~
+.project
+.cproject
+
