@@ -750,6 +750,10 @@ public class DataCache {
 			TimeRegion timeRegion = new TimeRegion(params.getStartTimestamp(),
 					params.getEndTimestamp());
 			oParam.setTimeRegion(timeRegion);
+			
+			if (!params.getMicroModelType().equals("null")) {
+				oParam.setMicroModelType(params.getMicroModelType());
+			}
 
 			if (!params.getTimeAggOperator().equals("null")) {
 				oParam.setTimeAggOperator(params.getTimeAggOperator());
