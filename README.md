@@ -21,9 +21,9 @@ Check our [user guide](https://github.com/dosimont/ocelotl/wiki/User-Guide) to i
 ### Support or Contact
 You can contact us by email:
 
-[Damien Dosimont] (mailto:damien.dosimont_at_imag.fr),
-[Youenn Corre] (mailto:youenn.corre_at_inria.fr),
-[Generoso Pagano] (mailto:generoso.pagano_at_inria.fr) (replace _at_ by @)
+[Damien Dosimont] (mailto:damien.dosimont-at-imag.fr),
+[Youenn Corre] (mailto:youenn.corre-at-inria.fr),
+[Generoso Pagano] (mailto:generoso.pagano-at-inria.fr) (replace -at- by @)
 
 ### Ocelotl User List
 You can subscribe to the Ocelotl user list using this [form](http://lists.gforge.inria.fr/cgi-bin/mailman/listinfo/ocelotl-users)
