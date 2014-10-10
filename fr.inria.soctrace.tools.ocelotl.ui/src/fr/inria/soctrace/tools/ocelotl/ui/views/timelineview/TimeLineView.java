@@ -21,7 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregationManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -50,7 +50,7 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 	}
 
 	@Override
-	public void createDiagram(final IMicroDescManager manager, final TimeRegion time) {
+	public void createDiagram(final IDataAggregManager manager, final TimeRegion time) {
 		createDiagram(((TimeAggregationManager) manager).getParts(), time);
 	}
 

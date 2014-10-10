@@ -19,12 +19,12 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public interface IAggregatedView {
 
-	void createDiagram(IMicroDescManager iMicroDescManager, TimeRegion time);
+	void createDiagram(IDataAggregManager iMicroDescManager, TimeRegion time);
 
 	public void deleteDiagram();
 

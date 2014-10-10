@@ -31,7 +31,7 @@
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.mode.MatrixProportion"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.mode.Mode"
             operator="Mode"
             param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
@@ -40,13 +40,13 @@
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.mode.views.ProportionMatrixView">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.mode.Mode"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.simplemode.SimpleMode"
             operator="Simple Mode"
             param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
             time_compatibility="Proportion"
             selection_priority="5"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.mode.views.ModeTimeLineView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.simplemode.views.ModeTimeLineView">
       </aggregation_operator>
    </extension>
 

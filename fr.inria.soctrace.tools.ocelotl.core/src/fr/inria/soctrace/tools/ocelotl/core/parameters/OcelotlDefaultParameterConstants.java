@@ -31,7 +31,7 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Should the curves show increasing quality ?
 	 */
-	public static final boolean GrowingQualities = true;
+	public static final boolean IncreasingQualities = true;
 
 	/**
 	 * Number of time slices

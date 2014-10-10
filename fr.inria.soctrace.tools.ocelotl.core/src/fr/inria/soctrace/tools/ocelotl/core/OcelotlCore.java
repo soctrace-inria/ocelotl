@@ -22,7 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.PartManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
@@ -47,7 +47,7 @@ public class OcelotlCore {
 	}
 
 	OcelotlParameters ocelotlParameters;
-	IMicroDescManager lpaggregManager;
+	IDataAggregManager lpaggregManager;
 	PartManager partManager;
 	MicroscopicDescriptionTypeManager microModelTypeManager;
 	MicroscopicDescription microModel;
@@ -104,7 +104,7 @@ public class OcelotlCore {
 		lpaggregManager.print(this);
 	}
 
-	public IMicroDescManager getLpaggregManager() {
+	public IDataAggregManager getLpaggregManager() {
 		return lpaggregManager;
 	}
 

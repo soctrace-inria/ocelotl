@@ -141,6 +141,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			loadCachefile = dialog.open();
 
 			if (loadCachefile != null) {
+				comboType.removeAll();
 				comboTime.removeAll();
 				comboSpace.removeAll();
 
@@ -171,7 +172,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 							// If no trace was found
 							if (trace == null)
-								throw new OcelotlException(OcelotlException.INVALID_CACHED_TRACE);
+								throw new OcelotlException(OcelotlException.INVALID_CACHED_TRACE + ": TraceId - " +  traceID);
 
 							// Load the trace
 							confDataLoader.load(trace);
@@ -181,33 +182,33 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 								@Override
 								public void run() {
-									// Load the aggregation operators
-									for (final String op : ocelotlCore.getAggregOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
-										comboTime.add(op);
+
+									for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
+										comboType.add(type);
 									}
 
-									comboTime.setText("");
-
-									// Search for the corresponding operator
-									for (int i = 0; i < comboTime.getItemCount(); i++) {
-										if (comboTime.getItem(i).equals(ocelotlParameters.getTimeAggOperator())) {
-											comboTime.select(i);
-											comboTime.notifyListeners(SWT.Selection, new Event());
+									comboType.setText("");
+									
+									// Search for the corresponding metrics
+									for (int i = 0; i < comboType.getItemCount(); i++) {
+										if (comboType.getItem(i).equals(ocelotlParameters.getMicroModelType())) {
+											comboType.select(i);
+											comboType.notifyListeners(SWT.Selection, new Event());
 											break;
 										}
 									}
-
+									
 									// If no operator was found
-									if (comboTime.getText().isEmpty())
+									if (comboType.getText().isEmpty())
 										try {
-											throw new OcelotlException(OcelotlException.INVALID_CACHED_OPERATOR);
+											throw new OcelotlException(OcelotlException.INVALID_MICRO_DESCRIPTION  + ": " + ocelotlParameters.getMicroModelType());
 										} catch (OcelotlException e) {
 											MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 											return;
 										}
 
 									// Set the corresponding parameters
-									spinnerTSNumber.setSelection(ocelotlParameters.getTimeSlicesNumber());
+									//spinnerTSNumber.setSelection(ocelotlParameters.getTimeSlicesNumber());
 									textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 									textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 
@@ -282,18 +283,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 			else
 				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-		}
-	}
-
-	private class DecreasingQualityRadioSelectionAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			if (btnDecreasingQualities.getSelection()) {
-				btnGrowingQualities.setSelection(false);
-				ocelotlParameters.setGrowingQualities(false);
-				qualityView.createDiagram();
-			}
 		}
 	}
 
@@ -444,15 +433,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 
-	private class GrowingQualityRadioSelectionAdapter extends SelectionAdapter {
+	private class IncreasingQualityRadioSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (btnGrowingQualities.getSelection()) {
-				btnDecreasingQualities.setSelection(false);
-				ocelotlParameters.setGrowingQualities(true);
-				qualityView.createDiagram();
-			}
+			btnDecreasingQualities.setSelection(!btnGrowingQualities.getSelection());
+			ocelotlParameters.setGrowingQualities(btnGrowingQualities.getSelection());
+			ocelotlParameters.getOcelotlSettings().setIncreasingQualities(btnGrowingQualities.getSelection());
+			qualityView.createDiagram();
 		}
 	}
 
@@ -462,6 +450,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 			if (hasChanged != HasChanged.ALL)
 				hasChanged = HasChanged.NORMALIZE;
+			
+			ocelotlParameters.getOcelotlSettings().setNormalizedCurve(btnNormalize.getSelection());
+			
 			if(confDataLoader.getCurrentTrace() == null || comboSpace.getText().equals("") || comboTime.getText().equals(""))
 				return;
 			
@@ -487,7 +478,12 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 			}
 			
 			comboTime.setText("");
-
+			
+			if (comboTime.getItems().length != 0) {
+				comboTime.setText(comboTime.getItem(0));
+				// Set the selected operator as operator in Ocelotl
+				comboTime.notifyListeners(SWT.Selection, new Event());
+			}
 		}
 	}
 	
@@ -581,7 +577,6 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 				}
 			}
 		}
-
 	}
 
 	private class ParameterModifyListener implements ModifyListener {
@@ -599,7 +594,6 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ)
 				hasChanged = HasChanged.PARAMETER;
 		}
-
 	}
 
 	private class ParameterUpAdapter extends SelectionAdapter {
@@ -615,7 +609,6 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 						break;
 					}
 				}
-
 			}
 		}
 	}
@@ -638,17 +631,18 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 		public void widgetSelected(final SelectionEvent e) {
 			ocelotlParameters.getDataCache().setCacheActive(btnCacheEnabled.getSelection());
 			boolean cacheActivation = ocelotlParameters.getDataCache().isCacheActive();
-				btnDeleteDataCache.setEnabled(cacheActivation);
-				datacacheDirectory.setEnabled(cacheActivation);
-				btnChangeCacheDirectory.setEnabled(cacheActivation);
-				btnRadioButton.setEnabled(cacheActivation);
-				btnRadioButton_1.setEnabled(cacheActivation);
-				btnRadioButton_2.setEnabled(cacheActivation);
-				btnRadioButton_3.setEnabled(cacheActivation);
-				cacheTimeSliceValue.setEnabled(cacheActivation);
-				dataCacheSize.setEnabled(cacheActivation);		
+			
+			btnDeleteDataCache.setEnabled(cacheActivation);
+			datacacheDirectory.setEnabled(cacheActivation);
+			btnChangeCacheDirectory.setEnabled(cacheActivation);
+			btnRadioButton.setEnabled(cacheActivation);
+			btnRadioButton_1.setEnabled(cacheActivation);
+			btnRadioButton_2.setEnabled(cacheActivation);
+			btnRadioButton_3.setEnabled(cacheActivation);
+			cacheTimeSliceValue.setEnabled(cacheActivation);
+			dataCacheSize.setEnabled(cacheActivation);
 		}
-		
+
 	}
 
 	private class Settings2SelectionAdapter extends SelectionAdapter {
@@ -685,14 +679,17 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			if (confDataLoader.getCurrentTrace() == null)
-				return;
+			ocelotlParameters.getOcelotlSettings().setThresholdPrecision(Float.parseFloat(textThreshold.getText()));
+
 			try {
 				if (Float.parseFloat(textThreshold.getText()) < Float.MIN_VALUE || Float.parseFloat(textThreshold.getText()) > 1)
-					textThreshold.setText("0.001");
+					textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
 			} catch (final NumberFormatException err) {
-				textThreshold.setText("0.001");
+				textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
 			}
+			if (confDataLoader.getCurrentTrace() == null)
+				return;
+
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
 				hasChanged = HasChanged.THRESHOLD;
 		}
@@ -801,11 +798,11 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			final String title = "Loading Trace";
-comboType.removeAll();
+			comboType.removeAll();
 			comboTime.removeAll();
 			comboSpace.removeAll();
 			trace = traceMap.get(comboTraces.getSelectionIndex());
-	
+
 			final Job job = new Job(title) {
 
 				@Override
@@ -940,11 +937,8 @@ comboType.removeAll();
 
 	private void cleanAll() {
 		hasChanged = HasChanged.ALL;
-		textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
 		textTimestampStart.setText(String.valueOf(OcelotlDefaultParameterConstants.TimestampStart));
 		textTimestampEnd.setText(String.valueOf(OcelotlDefaultParameterConstants.TimestampEnd));
-		btnNormalize.setSelection(OcelotlDefaultParameterConstants.Normalize);
-		btnGrowingQualities.setSelection(OcelotlDefaultParameterConstants.GrowingQualities);
 		spinnerTSNumber.setSelection(OcelotlDefaultParameterConstants.TimeSliceNumber);
 		textRun.setText(String.valueOf(OcelotlDefaultParameterConstants.RunParameter));
 	}
@@ -1115,7 +1109,6 @@ comboType.removeAll();
 		tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
-		
 		//Trace overview
 		final TabItem tbtmTimeAggregationParameters = new TabItem(tabFolder, SWT.NONE);
 		tbtmTimeAggregationParameters.setText("Trace Overview");
@@ -1194,13 +1187,13 @@ comboType.removeAll();
 		comboTime.setFont(cantarell8);
 		comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
 		comboTime.setText("");
-		
-				btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
-				btnSettings.setToolTipText("Settings");
-				btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-				btnSettings.setFont(cantarell8);
-				btnSettings.addSelectionListener(new SettingsSelectionAdapter());
-		
+
+		btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
+		btnSettings.setToolTipText("Settings");
+		btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
+		btnSettings.setFont(cantarell8);
+		btnSettings.addSelectionListener(new SettingsSelectionAdapter());
+
 		btnSaveDataCache = new Button(compositeAggregationOperator, SWT.NONE);
 		btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
 		btnSaveDataCache.setToolTipText("Save Current Microscopic Description");
@@ -1266,7 +1259,7 @@ comboType.removeAll();
 
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
 		btnNormalize.setFont(cantarell8);
-		btnNormalize.setSelection(true);
+		btnNormalize.setSelection(ocelotlParameters.getOcelotlSettings().isNormalizedCurve());
 		btnNormalize.setText("Normalize Qualities");
 		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 		new Label(groupQualityCurveSettings, SWT.NONE);
@@ -1276,17 +1269,17 @@ comboType.removeAll();
 		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnGrowingQualities.setFont(cantarell8);
 		btnGrowingQualities.setText("Complexity gain (green)\nInformation gain (red)");
-		btnGrowingQualities.setSelection(true);
-		btnGrowingQualities.addSelectionListener(new GrowingQualityRadioSelectionAdapter());
-		btnGrowingQualities.setSelection(false);
+		btnGrowingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
+		btnGrowingQualities.setSelection(ocelotlParameters.getOcelotlSettings().getIncreasingQualities());
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)");
-		btnDecreasingQualities.setSelection(false);
+		btnDecreasingQualities.setSelection(!ocelotlParameters.getOcelotlSettings().getIncreasingQualities());
 		btnDecreasingQualities.setFont(cantarell8);
+		btnDecreasingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
@@ -1300,13 +1293,13 @@ comboType.removeAll();
 		gd_textThreshold.widthHint = 100;
 		textThreshold.setLayoutData(gd_textThreshold);
 		textThreshold.setFont(cantarell8);
-		new Label(groupQualityCurveSettings, SWT.NONE);
-		new Label(groupQualityCurveSettings, SWT.NONE);
-		new Label(groupQualityCurveSettings, SWT.NONE);
-		new Label(groupQualityCurveSettings, SWT.NONE);
-
 		textThreshold.addModifyListener(new ThresholdModifyListener());
-		btnDecreasingQualities.addSelectionListener(new DecreasingQualityRadioSelectionAdapter());
+		textThreshold.setText(String.valueOf(ocelotlParameters.getOcelotlSettings().getThresholdPrecision()));
+		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
+		new Label(groupQualityCurveSettings, SWT.NONE);
+	
 		sashFormAdvancedParameters.setWeights(new int[] { 1 });
 		
 		// Datacache settings
@@ -1630,10 +1623,10 @@ comboType.removeAll();
 		ocelotlParameters.setTrace(confDataLoader.getCurrentTrace());
 		ocelotlParameters.setNormalize(btnNormalize.getSelection());
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
-	ocelotlParameters.setMicroModelType(comboType.getText());
+		ocelotlParameters.setMicroModelType(comboType.getText());
 		ocelotlParameters.setTimeAggOperator(comboTime.getText());
 		ocelotlParameters.setSpaceAggOperator(comboSpace.getText());
-		
+
 		ocelotlParameters.setEventsPerThread(spinnerEventSize.getSelection());
 		ocelotlParameters.setThreadNumber(spinnerThread.getSelection());
 		ocelotlParameters.setMaxEventProducers(spinnerDivideDbQuery.getSelection());

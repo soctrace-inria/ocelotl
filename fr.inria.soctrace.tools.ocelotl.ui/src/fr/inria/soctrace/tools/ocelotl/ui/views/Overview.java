@@ -18,26 +18,34 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Bundle;
 
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 
 public class Overview {
-	
-	private OcelotlView ocelotlView;
-	private Figure root;
-	private Canvas canvas;
-	private AggregatedView timeLineView;
-	private TimeRegion globalTimeRegion;
-	private IMicroDescManager md;
-	private IVisuOperator visuOperator;
-	private boolean redrawOverview;
+
+	private OcelotlView				ocelotlView;
+
+	private MicroscopicDescription	microModel;
+	private IDataAggregManager		aggregManager;
+	private IVisuOperator			visuOperator;
+
+	private Figure					root;
+	private Canvas					canvas;
+	private AggregatedView			timeLineView;
+	private boolean					redrawOverview;
+	private double					parameter;
+	private int						timeSlice;
+
+	private TimeRegion				globalTimeRegion;
+
 	// Show the currently displayed zone
-	private SelectFigure displayedZone;
+	private SelectFigure			displayedZone;
 	// Show the currently selected zone
-	private SelectFigure selectedZone;
-	private int Border = 10;
+	private SelectFigure			selectedZone;
+	private int						Border	= 10;
 
 	public Overview(OcelotlView aView) {
 		super();
@@ -45,7 +53,7 @@ public class Overview {
 		redrawOverview = true;
 		globalTimeRegion = null;
 	}
-	
+
 	public Canvas init(final Composite parent) {
 		root = new Figure();
 		root.setFont(parent.getFont());
@@ -61,8 +69,8 @@ public class Overview {
 		root.setSize(parent.getSize().x, parent.getSize().y);
 		return canvas;
 	}
-	
-	public void createDiagram(IMicroDescManager iMicroDescManager, TimeRegion time) {
+
+	public void createDiagram(IDataAggregManager iMicroDescManager, TimeRegion time) {
 		globalTimeRegion = new TimeRegion(time);
 
 		// Save the current parameter
@@ -70,9 +78,8 @@ public class Overview {
 
 		// Set the parameter to the computed initial parameter
 		ocelotlView.getParams().setParameter(ocelotlView.computeInitialParameter());
-		
-		timeLineView.setSpaceOperator(visuOperator);
 
+		timeLineView.setSpaceOperator(visuOperator);
 		timeLineView.createDiagram(iMicroDescManager, time);
 
 		// Restore the parameter
@@ -83,19 +90,20 @@ public class Overview {
 	 * 
 	 */
 	public void resizeDiagram() {
-		if (md != null && globalTimeRegion != null) {
+		if (aggregManager != null && globalTimeRegion != null) {
 			canvas.redraw();
-			createDiagram(md, globalTimeRegion);
+			createDiagram(aggregManager, globalTimeRegion);
 			root.repaint();
 		}
 	}
 
 	/**
 	 * Update the overview (the selection, and the drawing)
+	 * 
 	 * @param iMicroDescManager
 	 * @param time
 	 */
-	public void updateDiagram(IMicroDescManager iMicroDescManager, TimeRegion time) {
+	public void updateDiagram(IDataAggregManager iMicroDescManager, TimeRegion time) {
 		// Update the selected region with the displayed region
 		if (!redrawOverview && newTimeRegionLonger(time)) {
 			redrawOverview = true;
@@ -104,14 +112,15 @@ public class Overview {
 
 		if (redrawOverview) {
 			// Perform a deep copy of the microdescription model
-			md = iMicroDescManager.copy();
+			aggregManager = iMicroDescManager.copy();
 
 			// Compute the view according to the new parameter value
 			iMicroDescManager.computeParts();
-			
+
 			this.visuOperator.setOcelotlCore(ocelotlView.getOcelotlCore());
 
-			//spaceOperator = ocelotlView.getOcelotlCore().getSpaceOperator().copy();
+			// spaceOperator =
+			// ocelotlView.getOcelotlCore().getSpaceOperator().copy();
 			createDiagram(iMicroDescManager, time);
 			redrawOverview = false;
 		}
@@ -119,7 +128,7 @@ public class Overview {
 		displayedZone.draw(time);
 		updateSelection(time);
 	}
-	
+
 	/**
 	 * Check if the new time region is larger than the actual displayed one
 	 * 
@@ -127,17 +136,15 @@ public class Overview {
 	 *            the tested time region
 	 * @return true if it is larger, false otherwise
 	 */
-	public boolean newTimeRegionLonger(TimeRegion time)
-	{
-		if(time.getTimeStampStart() < globalTimeRegion.getTimeStampStart() || time.getTimeStampEnd() > globalTimeRegion.getTimeStampEnd())
-		{
+	public boolean newTimeRegionLonger(TimeRegion time) {
+		if (time.getTimeStampStart() < globalTimeRegion.getTimeStampStart() || time.getTimeStampEnd() > globalTimeRegion.getTimeStampEnd()) {
 			long newDuration = time.getTimeStampEnd() - time.getTimeStampStart();
 			long currentDuration = globalTimeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart();
-			
-			if(newDuration > currentDuration)
+
+			if (newDuration > currentDuration)
 				return true;
 		}
-		
+
 		return false;
 	}
 
@@ -145,14 +152,14 @@ public class Overview {
 		// Update the selected region with the displayed region
 		selectedZone.draw(time);
 	}
-	
+
 	/**
 	 * Don't the show the selection anymore
 	 */
 	public void deleteSelection() {
 		selectedZone.delete();
 	}
-	
+
 	public IAggregatedView getTimeLineView() {
 		return timeLineView;
 	}
@@ -162,6 +169,7 @@ public class Overview {
 		this.timeLineView.setRoot(root);
 		this.timeLineView.setCanvas(canvas);
 		this.redrawOverview = true;
+
 		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
 		selectedZone = new SelectFigure(ColorConstants.blue, ColorConstants.blue);
 		displayedZone = new SelectFigure(ColorConstants.white, ColorConstants.white);
@@ -174,7 +182,7 @@ public class Overview {
 	public void setRedrawOverview(boolean redrawOverview) {
 		this.redrawOverview = redrawOverview;
 	}
-	
+
 	public SelectFigure getSelectedZone() {
 		return selectedZone;
 	}
@@ -191,28 +199,22 @@ public class Overview {
 		this.visuOperator = spaceOperator;
 	}
 
-	
 	public void setSelectedOperator(String spaceOperator) {
-		final Bundle mybundle = Platform.getBundle(ocelotlView.getOcelotlCore().getVisuOperators().getOperatorList().get(
-				spaceOperator).getBundle());
+		final Bundle mybundle = Platform.getBundle(ocelotlView.getOcelotlCore().getVisuOperators().getOperatorList().get(spaceOperator).getBundle());
 		try {
-			this.visuOperator = (IVisuOperator) mybundle.loadClass(
-					ocelotlView.getOcelotlCore().getVisuOperators().getOperatorList().get(spaceOperator).getOperatorClass())
-					.newInstance();
+			this.visuOperator = (IVisuOperator) mybundle.loadClass(ocelotlView.getOcelotlCore().getVisuOperators().getOperatorList().get(spaceOperator).getOperatorClass()).newInstance();
 
-		} catch (InstantiationException | IllegalAccessException
-				| ClassNotFoundException e1) {
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	//	this.spaceOperator.setOcelotlCore(ocelotlView.getOcelotlCore());
 	}
-	
+
 	private class SelectFigure extends RectangleFigure {
 
-		Color foreground;
-		Color background;
-		
+		Color	foreground;
+		Color	background;
+
 		public SelectFigure(Color foreGround, Color backGround) {
 			super();
 			final ToolbarLayout layout = new ToolbarLayout();
@@ -234,12 +236,11 @@ public class Overview {
 
 			if (getParent() != root)
 				root.add(this);
-			root.setConstraint(this,
-					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height), new Point(
-							(int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), 2)));
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height),
+					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), 2)));
 			root.repaint();
 		}
-		
+
 		/**
 		 * Remove the selection from display
 		 */
@@ -250,7 +251,5 @@ public class Overview {
 			root.repaint();
 		}
 	}
-	
-	
-	
+
 }

@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.visualizations.mode;
+package fr.inria.soctrace.tools.ocelotl.visualizations.simplemode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,14 +7,14 @@ import java.util.List;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.ISpaceTimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
 
-public class SpaceTimeMode extends Mode {
+public class SpaceTimeMode extends SimpleMode {
 	
 	protected ISpaceTimeManager spaceTimeManager;
 	HashMap<EventProducerNode, ArrayList<HashMap<String, Double>>> proportions;
@@ -23,7 +23,7 @@ public class SpaceTimeMode extends Mode {
 	protected long timeSliceDuration;
 	private List<String> states;
 	
-	public SpaceTimeMode(OcelotlCore ocelotlCore, IMicroDescManager lpaggregManager) {
+	public SpaceTimeMode(OcelotlCore ocelotlCore, IDataAggregManager lpaggregManager) {
 		this.ocelotlCore = ocelotlCore;
 		spaceTimeManager = (ISpaceTimeManager) lpaggregManager;
 		hierarchy = spaceTimeManager.getHierarchy();
@@ -43,7 +43,6 @@ public class SpaceTimeMode extends Mode {
 	}
 	
 	protected void initParts() {
-		
 		parts = new ArrayList<Part>();
 		//int oldPart = 0;
 		parts.add(new Part(0, 1, new PartMap()));

@@ -19,9 +19,9 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 
-public interface ISpaceTimeManager extends IMicroDescManager {
+public interface ISpaceTimeManager extends IDataAggregManager {
 
 	EventProducerHierarchy getHierarchy();
 

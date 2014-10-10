@@ -44,7 +44,7 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.VisualAggregatedData;
 import fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
-import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MatrixProportion;
+import fr.inria.soctrace.tools.ocelotl.visualizations.mode.Mode;
 
 public class HierarchyProportion {
 
@@ -64,9 +64,9 @@ public class HierarchyProportion {
 	private int minLogicWeight = 1;
 	private List<Integer> xendlist;
 	private List<Integer> yendlist;
-	private MatrixProportion proportion;
+	private Mode proportion;
 
-	public HierarchyProportion(MatrixProportion proportion,
+	public HierarchyProportion(Mode proportion,
 			EventProducerHierarchy hierarchy, final IFigure root, int space) {
 		super();
 		setIndex(index);

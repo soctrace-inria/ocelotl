@@ -21,9 +21,9 @@ package fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time;
 
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 
-public interface ITimeManager extends IMicroDescManager {
+public interface ITimeManager extends IDataAggregManager {
 
 	public List<Integer> getParts();
 

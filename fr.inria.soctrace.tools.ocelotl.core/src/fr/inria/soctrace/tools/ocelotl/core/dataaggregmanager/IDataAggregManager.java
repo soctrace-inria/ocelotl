@@ -28,7 +28,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 
-public interface IMicroDescManager {
+public interface IDataAggregManager {
 
 	public void computeDichotomy() throws OcelotlException;
 
@@ -50,6 +50,6 @@ public interface IMicroDescManager {
 
 	public void print(OcelotlCore core);
 
-	public IMicroDescManager copy();
+	public IDataAggregManager copy();
 	
 }

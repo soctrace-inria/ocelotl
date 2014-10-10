@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.visualizations.mode;
+package fr.inria.soctrace.tools.ocelotl.visualizations.simplemode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,18 +8,18 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.ITimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregation3Manager;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
 
-public class TimeMode extends Mode {
+public class TimeMode extends SimpleMode {
 
 	private List<String> states;
 	protected List<Part> parts;
 	protected ITimeManager timeManager;
 
-	public TimeMode(OcelotlCore ocelotlCore, IMicroDescManager lpaggregManager) {
+	public TimeMode(OcelotlCore ocelotlCore, IDataAggregManager lpaggregManager) {
 		this.ocelotlCore = ocelotlCore;
 		this.timeManager = (ITimeManager) lpaggregManager;
 		computeParts();
@@ -75,8 +75,6 @@ public class TimeMode extends Mode {
 		double tempMax = 0.0;
 		MajState maj;
 		int index;
-	//	List<String> states = ((TimeAggregation3Manager) ocelotlCore
-	//			.getLpaggregManager()).getKeys();
 
 		for (index = 0; index < parts.size(); index++) {
 			maj = new MajState("void", max);

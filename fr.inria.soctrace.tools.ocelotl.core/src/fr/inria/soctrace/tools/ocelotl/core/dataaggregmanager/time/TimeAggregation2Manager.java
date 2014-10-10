@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import fr.inria.lpaggreg.time.JNITimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic2DDescription;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 
@@ -69,7 +69,7 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 	}
 
 	@Override
-	public IMicroDescManager copy() {
+	public IDataAggregManager copy() {
 		TimeAggregation2Manager aNewManager = null;
 
 		aNewManager = new TimeAggregation2Manager(matrix,  new NullProgressMonitor());

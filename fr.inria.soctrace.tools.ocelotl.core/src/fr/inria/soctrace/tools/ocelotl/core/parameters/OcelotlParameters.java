@@ -59,7 +59,7 @@ public class OcelotlParameters {
 	private String timeAggOperator;
 	private String spaceAggOperator;
 	private String microModelType;
-	private boolean growingQualities = OcelotlDefaultParameterConstants.GrowingQualities;
+	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
 	private DataCache dataCache = new DataCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 	private OcelotlSettings	ocelotlSettings = new OcelotlSettings();
