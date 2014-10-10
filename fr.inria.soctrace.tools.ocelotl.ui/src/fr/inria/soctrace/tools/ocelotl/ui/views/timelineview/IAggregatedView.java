@@ -19,7 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public interface IAggregatedView {

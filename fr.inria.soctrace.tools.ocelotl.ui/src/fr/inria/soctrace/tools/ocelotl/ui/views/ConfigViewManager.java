@@ -37,8 +37,8 @@ public class ConfigViewManager {
 	
 	public void init(){
 		try {
-			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getBundle());
-			window = (IAggregationWindow) mybundle.loadClass(ocelotlView.getCore().getTimeOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
+			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getAggregOperators().getSelectedOperatorResource().getBundle());
+			window = (IAggregationWindow) mybundle.loadClass(ocelotlView.getCore().getAggregOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

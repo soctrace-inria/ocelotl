@@ -313,11 +313,9 @@ public class DataCache {
 	protected boolean similarParameters(CacheParameters newParam,
 			CacheParameters cacheParam) {
 		
-		// TODO implement inter-operator compatibility
-		// Is the aggregation operator the same?
-		if (!(newParam.getTimeAggOperator().equals(
-				cacheParam.getTimeAggOperator()) && (!newParam
-				.getTimeAggOperator().equals("null"))))
+		if (!(newParam.getMicroModelType().equals(
+				cacheParam.getMicroModelType()) && (!newParam
+				.getMicroModelType().equals("null"))))
 			return false;
 
 		// Are timestamps equal or are they included inside the cache
@@ -591,7 +589,7 @@ public class DataCache {
 
 						logger.debug("Found " + param.getTraceName() + " in "
 								+ traceCache.toString() + ", "
-								+ param.getTimeAggOperator() + ", "
+								+ param.getMicroModelType() + ", "
 								+ param.getSpaceAggOperator() + ", "
 								+ param.getStartTimestamp() + ", "
 								+ param.getEndTimestamp());
@@ -710,7 +708,7 @@ public class DataCache {
 					// Database unique ID
 					params.setTraceID(Integer.parseInt(header[1]));
 					// Time Aggregation Operator
-					params.setTimeAggOperator(header[2]);
+					params.setMicroModelType(header[2]);
 					// Space Aggregation Operator
 					params.setSpaceAggOperator(header[3]);
 					// Start timestamp
@@ -752,6 +750,10 @@ public class DataCache {
 			TimeRegion timeRegion = new TimeRegion(params.getStartTimestamp(),
 					params.getEndTimestamp());
 			oParam.setTimeRegion(timeRegion);
+			
+			if (!params.getMicroModelType().equals("null")) {
+				oParam.setMicroModelType(params.getMicroModelType());
+			}
 
 			if (!params.getTimeAggOperator().equals("null")) {
 				oParam.setTimeAggOperator(params.getTimeAggOperator());

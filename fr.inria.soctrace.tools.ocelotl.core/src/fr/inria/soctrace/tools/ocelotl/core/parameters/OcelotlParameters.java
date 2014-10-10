@@ -58,6 +58,7 @@ public class OcelotlParameters {
 	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
 	private String timeAggOperator;
 	private String spaceAggOperator;
+	private String microModelType;
 	private boolean growingQualities = OcelotlDefaultParameterConstants.GrowingQualities;
 	private DataCache dataCache = new DataCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
@@ -86,6 +87,7 @@ public class OcelotlParameters {
 		this.maxEventProducers = op.maxEventProducers;
 		this.timeAggOperator = op.timeAggOperator;
 		this.spaceAggOperator = op.spaceAggOperator;
+		this.microModelType = op.microModelType;
 		this.growingQualities = op.growingQualities;
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
 		this.iSpaceConfig = op.iSpaceConfig;
@@ -321,6 +323,14 @@ public class OcelotlParameters {
 
 	public void setEventsPerThread(int eventsPerThread) {
 		this.eventsPerThread = eventsPerThread;
+	}
+
+	public String getMicroModelType() {
+		return microModelType;
+	}
+
+	public void setMicroModelType(String microModelType) {
+		this.microModelType = microModelType;
 	}
 
 }
