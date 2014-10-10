@@ -1,6 +1,6 @@
 #Ocelotl Analysis Tool
 
-![Ocelotl Screenshot](images/screenshots/ocelotl_spatiotemporal.png)
+![Ocelotl Screenshot](http://dosimont.github.io/ocelotl/images/screenshots/ocelotl_spatiotemporal.png)
 
 ### Update Site
 
