@@ -42,7 +42,7 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 
 	@Override
 	abstract protected void computeDiagram();
-	
+
 	private void computeSpace() {
 		space = Space;
 		while ((root.getSize().width - 2 * Border) / parts.size() - space < space && space > 0)

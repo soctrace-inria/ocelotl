@@ -10,19 +10,15 @@ import org.slf4j.LoggerFactory;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.ITimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregation3Manager;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
 
-public class SimpleMode implements IVisuOperator {
+public class SimpleMode extends VisuTOperator {
 
-	protected OcelotlCore ocelotlCore;
 	protected HashMap<Integer, MajState> majStates;
-	protected IDataAggregManager lpaggregManager;
-	protected List<Part> parts;
 	private List<String> states;
 	protected ITimeManager timeManager;
 
@@ -36,7 +32,7 @@ public class SimpleMode implements IVisuOperator {
 	@Override
 	public void setOcelotlCore(OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
-		lpaggregManager = (IDataAggregManager) ocelotlCore.getLpaggregManager();
+		lpaggregManager = (ITimeManager) ocelotlCore.getLpaggregManager();
 		timeManager = (ITimeManager) ocelotlCore.getLpaggregManager();
 		computeParts();
 	}
@@ -50,22 +46,6 @@ public class SimpleMode implements IVisuOperator {
 		super();
 	}
 
-	/**
-	 * Check whether the operator is temporal or spatio-temporal and then
-	 * compute the majstates with appropriate class
-	 */
-	/*
-	 * public void computeParts() { if
-	 * (SpaceTimeAggregationManager.class.isAssignableFrom(ocelotlCore
-	 * .getLpaggregManager().getClass())) { majStates = new
-	 * SpaceTimeMode(ocelotlCore, lpaggregManager).getMajStates(); } else if
-	 * (TimeAggregationManager.class.isAssignableFrom(ocelotlCore
-	 * .getLpaggregManager().getClass())) { majStates = new
-	 * TimeMode(ocelotlCore, ocelotlCore.getLpaggregManager()).getMajStates(); }
-	 * else { logger.error("Non supported class type: " +
-	 * ocelotlCore.getLpaggregManager().getClass().getName()); } }
-	 */
-
 	public HashMap<Integer, MajState> getMajStates() {
 		return majStates;
 	}
@@ -73,7 +53,8 @@ public class SimpleMode implements IVisuOperator {
 	public void setMajStates(HashMap<Integer, MajState> majStates) {
 		this.majStates = majStates;
 	}
-
+	
+	@Override
 	public void computeParts() {
 		initParts();
 		initStates();

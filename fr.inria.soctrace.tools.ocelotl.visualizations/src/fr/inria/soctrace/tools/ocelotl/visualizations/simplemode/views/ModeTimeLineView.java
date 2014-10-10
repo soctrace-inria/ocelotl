@@ -6,10 +6,7 @@ import java.util.List;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregationManager;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregationManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuTOperator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
@@ -19,7 +16,7 @@ public class ModeTimeLineView extends TimeLineView {
 
 	public ModeTimeLineView(OcelotlView ocelotlView) {
 		super(ocelotlView);
-		 space = 1;
+		space = 1;
 	}
 
 	@Override
@@ -42,27 +39,10 @@ public class ModeTimeLineView extends TimeLineView {
 							/ parts.size() - space + Border, Border)));
 			j = j + aggParts.get(i);
 			part.getUpdateManager().performUpdate();
-			MajState mState = ((SimpleMode) spaceOperator).getMajStates().get(i);
+			MajState mState = ((SimpleMode) ocelotlView.getOcelotlCore()
+					.getVisuOperator()).getMajStates().get(i);
 			part.draw(mState);
 		}
-	}
-
-	@Override
-	public void createDiagram(final IDataAggregManager manager, final TimeRegion time) {
-		if (SpaceTimeAggregationManager.class.isAssignableFrom(manager.getClass())) {
-			List<Integer> newParts = computePseudoParts(((SpaceTimeAggregationManager) manager).getHierarchy().getRoot().getParts());
-			createDiagram(newParts, time);
-		} else if (TimeAggregationManager.class.isAssignableFrom(manager.getClass())) {
-			createDiagram(((TimeAggregationManager) manager).getParts(), time);
-		}
-	}
-	
-	List<Integer> computePseudoParts(List<Integer> parts) {
-		List<Integer> pseudoParts = new ArrayList<Integer>();
-		for (int i = 0; i < parts.size(); i++) {
-			pseudoParts.add(i);
-		}
-		return pseudoParts;
 	}
 
 }
