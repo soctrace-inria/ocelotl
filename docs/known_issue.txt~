@@ -1,0 +1,3 @@
+Known Issues:
+*Depending on the main window size or on the screen resolution, some components of the Ocelotl UI might not be displayed correclty or might be partially hidden.
+    -Workaround: Resize the window, put Ocelotl in full screen by double-clicking on the Ocelotl tab or use the resize handles of the Ocelotl widgets to resize them accordingly
