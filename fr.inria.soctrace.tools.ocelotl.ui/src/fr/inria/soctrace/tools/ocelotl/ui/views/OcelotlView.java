@@ -1675,7 +1675,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 	//When receiving a notification, update the trace list
 	@Override
-	public void handle(String topic, Object data) {
+	public void handle(FramesocBusTopic topic, Object data) {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED) || topic.equals(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED) || topic.equals(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED)) {
 			refreshTraces();
 		}
