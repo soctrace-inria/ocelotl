@@ -1,5 +1,8 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
@@ -17,35 +20,38 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Bundle;
 
+import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 
 public class Overview {
 
-	private OcelotlView				ocelotlView;
+	private OcelotlView					ocelotlView;
 
-	private MicroscopicDescription	microModel;
-	private IDataAggregManager		aggregManager;
-	private IVisuOperator			visuOperator;
+	private MicroscopicDescription		microModel;
+	private IDataAggregationOperator	aggregManager;
+	private IDataAggregManager			aggregOperator;
+	private IVisuOperator				visuOperator;
 
-	private Figure					root;
-	private Canvas					canvas;
-	private AggregatedView			timeLineView;
-	private boolean					redrawOverview;
-	private double					parameter;
-	private int						timeSlice;
+	private Figure						root;
+	private Canvas						canvas;
+	private AggregatedView				timeLineView;
+	private boolean						redrawOverview;
+	private double						parameter;
+	private int							timeSlice;
 
-	private TimeRegion				globalTimeRegion;
+	private TimeRegion					globalTimeRegion;
 
 	// Show the currently displayed zone
-	private SelectFigure			displayedZone;
+	private SelectFigure				displayedZone;
 	// Show the currently selected zone
-	private SelectFigure			selectedZone;
-	private int						Border	= 10;
+	private SelectFigure				selectedZone;
+	private int							Border	= 10;
 
 	public Overview(OcelotlView aView) {
 		super();
@@ -79,8 +85,8 @@ public class Overview {
 		// Set the parameter to the computed initial parameter
 		ocelotlView.getParams().setParameter(ocelotlView.computeInitialParameter());
 
-		timeLineView.setSpaceOperator(visuOperator);
-		timeLineView.createDiagram(iMicroDescManager, time);
+		///timeLineView.setVisuOperator(visuOperator);
+		timeLineView.createDiagram(iMicroDescManager, time, visuOperator);
 
 		// Restore the parameter
 		ocelotlView.getParams().setParameter(tempParam);
@@ -90,9 +96,9 @@ public class Overview {
 	 * 
 	 */
 	public void resizeDiagram() {
-		if (aggregManager != null && globalTimeRegion != null) {
+		if (aggregOperator != null && globalTimeRegion != null) {
 			canvas.redraw();
-			createDiagram(aggregManager, globalTimeRegion);
+			createDiagram(aggregOperator, globalTimeRegion);
 			root.repaint();
 		}
 	}
@@ -102,8 +108,9 @@ public class Overview {
 	 * 
 	 * @param iMicroDescManager
 	 * @param time
+	 * @throws OcelotlException 
 	 */
-	public void updateDiagram(IDataAggregManager iMicroDescManager, TimeRegion time) {
+	public void updateDiagram(IDataAggregManager iMicroDescManager, TimeRegion time) throws OcelotlException {
 		// Update the selected region with the displayed region
 		if (!redrawOverview && newTimeRegionLonger(time)) {
 			redrawOverview = true;
@@ -111,17 +118,23 @@ public class Overview {
 		}
 
 		if (redrawOverview) {
+			microModel = ocelotlView.getOcelotlCore().getMicroModel();
+			
 			// Perform a deep copy of the microdescription model
-			aggregManager = iMicroDescManager.copy();
 
+			// Init aggreg
+			aggregManager = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator());
+			aggregOperator = aggregManager.createManager(microModel, new NullProgressMonitor());
+
+			aggregOperator.computeQualities();
+			aggregOperator.computeDichotomy();
+			
 			// Compute the view according to the new parameter value
-			iMicroDescManager.computeParts();
+			aggregOperator.computeParts();
 
-			this.visuOperator.setOcelotlCore(ocelotlView.getOcelotlCore());
+			this.visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregOperator);
 
-			// spaceOperator =
-			// ocelotlView.getOcelotlCore().getSpaceOperator().copy();
-			createDiagram(iMicroDescManager, time);
+			createDiagram(aggregOperator, time);
 			redrawOverview = false;
 		}
 
@@ -165,10 +178,6 @@ public class Overview {
 	}
 
 	public void setTimeLineView(AggregatedView timeLineView) {
-		this.timeLineView = timeLineView;
-		this.timeLineView.setRoot(root);
-		this.timeLineView.setCanvas(canvas);
-		this.redrawOverview = true;
 
 		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
 		selectedZone = new SelectFigure(ColorConstants.blue, ColorConstants.blue);
@@ -191,23 +200,34 @@ public class Overview {
 		this.selectedZone = selectedZone;
 	}
 
-	public IVisuOperator getSpaceOperator() {
+	public IVisuOperator getVisuOperator() {
 		return visuOperator;
 	}
 
-	public void setSpaceOperator(IVisuOperator spaceOperator) {
-		this.visuOperator = spaceOperator;
+	public void setVisuOperator(IVisuOperator visuOperator) {
+		this.visuOperator = visuOperator;
 	}
 
-	public void setSelectedOperator(String spaceOperator) {
-		final Bundle mybundle = Platform.getBundle(ocelotlView.getOcelotlCore().getVisuOperators().getOperatorList().get(spaceOperator).getBundle());
-		try {
-			this.visuOperator = (IVisuOperator) mybundle.loadClass(ocelotlView.getOcelotlCore().getVisuOperators().getOperatorList().get(spaceOperator).getOperatorClass()).newInstance();
+	public void setVisuOperator(String name) {
+		// Init visu
+		visuOperator = ocelotlView.getOcelotlCore().getVisuOperators().instantiateOperator(name);
+		
+		final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getBundle());
 
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e1) {
+		try {
+			this.timeLineView = (AggregatedView) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
+
+		this.timeLineView.setRoot(root);
+		this.timeLineView.setCanvas(canvas);
+		this.redrawOverview = true;
+		
+		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
+		selectedZone = new SelectFigure(ColorConstants.blue, ColorConstants.blue);
+		displayedZone = new SelectFigure(ColorConstants.white, ColorConstants.white);
 	}
 
 	private class SelectFigure extends RectangleFigure {

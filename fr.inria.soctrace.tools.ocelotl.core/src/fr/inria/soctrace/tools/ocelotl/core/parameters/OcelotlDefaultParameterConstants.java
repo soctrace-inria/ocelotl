@@ -79,6 +79,16 @@ public class OcelotlDefaultParameterConstants {
 	public static final int NUMBER_OF_THREADS = 8;
 	
 	/**
+	 * Visualization operator for the overview
+	 */
+	public static final String OVERVIEW_VISU_OPERATOR = "Simple Mode";
+	
+	/**
+	 * Aggregation Operator for the overview
+	 */
+	public static final String OVERVIEW_AGGREG_OPERATOR = "Temporal Aggregation";
+	
+	/**
 	 * Number of events loaded by thread
 	 */
 	public static final int EVENTS_PER_THREAD = 10000;

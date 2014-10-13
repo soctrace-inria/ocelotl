@@ -42,5 +42,4 @@ public class MatrixParts extends VisuSTOperator {
 		// TODO Auto-generated method stub
 		
 	}
-
 }

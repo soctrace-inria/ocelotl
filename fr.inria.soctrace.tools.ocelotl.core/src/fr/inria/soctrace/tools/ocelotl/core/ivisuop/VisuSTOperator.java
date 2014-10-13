@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.ivisuop;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.ISpaceTimeManager;
 
@@ -64,6 +65,20 @@ abstract public class VisuSTOperator implements
 	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
 		lpaggregManager = (ISpaceTimeManager) ocelotlCore.getLpaggregManager();
+		timeSliceNumber = ocelotlCore.getOcelotlParameters()
+				.getTimeSlicesNumber();
+		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()
+				.getTimeDuration()
+				/ timeSliceNumber;
+		hierarchy = lpaggregManager.getHierarchy();
+		initParts();
+		computeParts();
+	}
+	
+	@Override
+	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
+		this.ocelotlCore = ocelotlCore;
+		lpaggregManager = (ISpaceTimeManager) aManager;
 		timeSliceNumber = ocelotlCore.getOcelotlParameters()
 				.getTimeSlicesNumber();
 		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()

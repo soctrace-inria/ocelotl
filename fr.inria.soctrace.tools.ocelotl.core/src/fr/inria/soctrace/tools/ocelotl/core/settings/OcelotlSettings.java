@@ -34,6 +34,11 @@ public class OcelotlSettings {
 	private double thresholdPrecision;
 	private boolean increasingQualities;
 
+	private String overviewVisuOperator;
+	private double overviewParameter;
+	private String overviewAggregOperator;
+	private int overviewTimesliceNumber;
+
 	// Default directory where the config file is
 	private String defaultConfigFile;
 
@@ -61,6 +66,8 @@ public class OcelotlSettings {
 		normalizedCurve = OcelotlDefaultParameterConstants.Normalize;
 		thresholdPrecision = OcelotlDefaultParameterConstants.Threshold;
 		increasingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
+		overviewVisuOperator = OcelotlDefaultParameterConstants.OVERVIEW_VISU_OPERATOR;
+		overviewAggregOperator = OcelotlDefaultParameterConstants.OVERVIEW_AGGREG_OPERATOR;
 
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -297,7 +304,6 @@ public class OcelotlSettings {
 	public void setNormalizedCurve(boolean normalizedCurve) {
 		if (this.normalizedCurve != normalizedCurve) {
 			this.normalizedCurve = normalizedCurve;
-			;
 			saveSettings();
 		}
 	}
@@ -320,6 +326,51 @@ public class OcelotlSettings {
 	public void setIncreasingQualities(boolean increasingQualities) {
 		if (this.increasingQualities != increasingQualities) {
 			this.increasingQualities = increasingQualities;
+			saveSettings();
+		}
+	}
+
+	public String getOverviewVisuOperator() {
+		return overviewVisuOperator;
+	}
+
+	public void setOverviewVisuOperator(String overviewVisuOperator) {
+		if (!this.overviewVisuOperator.equals(overviewVisuOperator)) {
+			this.overviewVisuOperator = overviewVisuOperator;
+			saveSettings();
+		}
+	}
+
+	public double getOverviewParameter() {
+		return overviewParameter;
+	}
+
+	public void setOverviewParameter(double overviewParameter) {
+		if (this.overviewParameter != overviewParameter) {
+			this.overviewParameter = overviewParameter;
+			saveSettings();
+		}
+	}
+
+	public int getOverviewTimesliceNumber() {
+		return overviewTimesliceNumber;
+	}
+
+	public void setOverviewTimesliceNumber(int overviewTimesliceNumber) {
+		if (this.overviewTimesliceNumber != overviewTimesliceNumber) {
+			this.overviewTimesliceNumber = overviewTimesliceNumber;
+			saveSettings();
+		}
+	}
+
+	public String getOverviewAggregOperator() {
+		return overviewAggregOperator;
+	}
+
+	public void setOverviewAggregOperator(String overviewAggregOperator) {
+		this.overviewAggregOperator = overviewAggregOperator;
+		if (!this.overviewAggregOperator.equals(overviewAggregOperator)) {
+			this.overviewAggregOperator = overviewAggregOperator;
 			saveSettings();
 		}
 	}

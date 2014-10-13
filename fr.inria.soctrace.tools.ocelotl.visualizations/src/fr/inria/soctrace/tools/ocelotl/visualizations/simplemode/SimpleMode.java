@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.ITimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregation3Manager;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
@@ -22,8 +20,6 @@ public class SimpleMode extends VisuTOperator {
 	private List<String> states;
 	protected ITimeManager timeManager;
 
-	private static final Logger logger = LoggerFactory.getLogger(SimpleMode.class);
-
 	@Override
 	public OcelotlCore getOcelotlCore() {
 		return ocelotlCore;
@@ -34,6 +30,14 @@ public class SimpleMode extends VisuTOperator {
 		this.ocelotlCore = ocelotlCore;
 		lpaggregManager = (ITimeManager) ocelotlCore.getLpaggregManager();
 		timeManager = (ITimeManager) ocelotlCore.getLpaggregManager();
+		computeParts();
+	}
+	
+	@Override
+	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
+		this.ocelotlCore = ocelotlCore;
+		//lpaggregManager = (ITimeManager) aManager;
+		timeManager = (ITimeManager) aManager;
 		computeParts();
 	}
 

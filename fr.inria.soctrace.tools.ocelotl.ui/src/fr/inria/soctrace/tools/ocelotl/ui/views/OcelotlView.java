@@ -342,7 +342,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									}
 									return Status.CANCEL_STATUS;
 								}
-								monitor.setTaskName("Initializing Time Operator");
+								monitor.setTaskName("Initializing Aggregqtion Operator");
 								ocelotlCore.initAggregOperator(monitor);
 								monitor.worked(1);
 							}
@@ -411,12 +411,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						public void run() {
 							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
-							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
+							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion(), ocelotlCore.getVisuOperator());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							textRun.setText(String.valueOf(getParams().getParameter()));
 							qualityView.createDiagram();
 							tabFolder.setSelection(1);
-							overView.updateDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
+							try {
+								overView.updateDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
+							} catch (OcelotlException e) {
+								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+							}
 							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 						}
 					});
@@ -530,8 +534,7 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 			ocelotlCore.getVisuOperators().setSelectedOperator(comboSpace.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
-			overView.setTimeLineView((AggregatedView)timeLineViewManager.create("Simple Mode"));
-			overView.setSelectedOperator("Simple Mode");
+			overView.setVisuOperator(ocelotlParameters.getOcelotlSettings().getOverviewVisuOperator());
 		}
 	}
 	
@@ -694,7 +697,7 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 				hasChanged = HasChanged.THRESHOLD;
 		}
 	}
-	
+
 	private class DeleteDataCache extends SelectionAdapter {
 
 		@Override
@@ -710,14 +713,13 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			DirectoryDialog dialog = new DirectoryDialog(getSite().getShell());
-		    String newCacheDir = dialog.open();
-		    if(newCacheDir != null)
-		    {
-		    	//Update the current datacache path
-		    	ocelotlParameters.getDataCache().setCacheDirectory(newCacheDir);
-		    	//Update the displayed path
-		    	datacacheDirectory.setText(ocelotlParameters.getDataCache().getCacheDirectory());
-		    }
+			String newCacheDir = dialog.open();
+			if (newCacheDir != null) {
+				// Update the current datacache path
+				ocelotlParameters.getDataCache().setCacheDirectory(newCacheDir);
+				// Update the displayed path
+				datacacheDirectory.setText(ocelotlParameters.getDataCache().getCacheDirectory());
+			}
 		}
 	}
 
@@ -824,11 +826,10 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-								for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories()))
-								{
+								for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 									comboType.add(type);
 								}
-								
+
 								comboType.setText("");
 							}
 						});
@@ -987,7 +988,6 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 	@Override
 	public void createPartControl(final Composite parent) {
 		final Display display = Display.getCurrent();
-
 		display.addFilter(SWT.KeyDown, new Listener() {
 
 			@Override
@@ -1016,6 +1016,7 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		
 		timeAxisView = new TimeAxisView();
 		qualityView = new QualityView(this);
 		timeLineViewWrapper = new TimeLineViewWrapper(this);
@@ -1694,7 +1695,7 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 
 	//When receiving a notification, update the trace list
 	@Override
-	public void handle(String topic, Object data) {
+	public void handle(FramesocBusTopic topic, Object data) {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED) || topic.equals(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED) || topic.equals(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED)) {
 			refreshTraces();
 		}

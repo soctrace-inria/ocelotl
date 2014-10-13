@@ -6,7 +6,6 @@ import java.util.List;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuTOperator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.mode.MajState;
@@ -39,8 +38,7 @@ public class ModeTimeLineView extends TimeLineView {
 							/ parts.size() - space + Border, Border)));
 			j = j + aggParts.get(i);
 			part.getUpdateManager().performUpdate();
-			MajState mState = ((SimpleMode) ocelotlView.getOcelotlCore()
-					.getVisuOperator()).getMajStates().get(i);
+			MajState mState = ((SimpleMode) visuOperator).getMajStates().get(i);
 			part.draw(mState);
 		}
 	}

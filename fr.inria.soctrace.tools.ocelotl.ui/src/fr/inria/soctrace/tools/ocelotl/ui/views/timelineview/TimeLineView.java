@@ -23,6 +23,7 @@ import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -49,11 +50,11 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 			space = space - 1;
 	}
 
-	@Override
-	public void createDiagram(final IDataAggregManager manager, final TimeRegion time) {
+	public void createDiagram(IDataAggregManager manager, TimeRegion time, IVisuOperator aVisuOperator) {
+		setVisuOperator(aVisuOperator);
 		createDiagram(((TimeAggregationManager) manager).getParts(), time);
 	}
-
+	
 	public void createDiagram(final List<Integer> parts, final TimeRegion time) {
 		root.removeAll();
 		figures.clear();

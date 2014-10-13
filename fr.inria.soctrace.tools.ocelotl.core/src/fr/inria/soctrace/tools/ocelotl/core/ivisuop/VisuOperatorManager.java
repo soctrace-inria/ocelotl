@@ -57,8 +57,9 @@ public class VisuOperatorManager {
 	private static final String OP_TIME_COMPATIBILITY = "time_compatibility"; //$NON-NLS-1$
 	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
 
-	private static final Logger logger = LoggerFactory.getLogger(VisuOperatorManager.class);
-	
+	private static final Logger logger = LoggerFactory
+			.getLogger(VisuOperatorManager.class);
+
 	public VisuOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
 		this.ocelotlCore = ocelotlCore;
@@ -88,8 +89,31 @@ public class VisuOperatorManager {
 		selectedOperator.setOcelotlCore(ocelotlCore);
 	}
 
+	/**
+	 * Instantiate the visualization operator
+	 * 
+	 * @param name
+	 *            Name of the operator to instantiate
+	 * @return the instantiated operator
+	 */
+	public IVisuOperator instantiateOperator(String name) {
+		IVisuOperator instantiatedOperator = null;
+
+		final Bundle mybundle = Platform.getBundle(operatorList.get(
+				selectedOperatorName).getBundle());
+		try {
+			instantiatedOperator = (IVisuOperator) mybundle.loadClass(
+					operatorList.get(name).getOperatorClass()).newInstance();
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return instantiatedOperator;
+	}
+
 	public List<String> getOperators(final List<String> compatibility) {
-		logger.debug("Comparing Space Operator trace format with "
+		logger.debug("Comparing Visualization Operator trace format with "
 				+ compatibility);
 		final List<String> op = new ArrayList<String>();
 		for (final VisuOperatorResource r : operatorList.values()) {
@@ -106,12 +130,12 @@ public class VisuOperatorManager {
 
 			@Override
 			public int compare(final String arg0, final String arg1) {
-				int diff = operatorList.get(arg0).getSelectionPriority() - operatorList.get(arg1).getSelectionPriority();
-				
-				//If the two operators have the same priority
-				if (diff == 0)
-				{
-					//Sort them alphabetically
+				int diff = operatorList.get(arg0).getSelectionPriority()
+						- operatorList.get(arg1).getSelectionPriority();
+
+				// If the two operators have the same priority
+				if (diff == 0) {
+					// Sort them alphabetically
 					return arg0.compareTo(arg1);
 				}
 
@@ -129,11 +153,10 @@ public class VisuOperatorManager {
 		return operatorList.get(selectedOperatorName);
 	}
 
-	
-	public VisuOperatorResource getSelectedOperatorResource(String anOperatorName) {
+	public VisuOperatorResource getSelectedOperatorResource(
+			String anOperatorName) {
 		return operatorList.get(anOperatorName);
 	}
-
 
 	// private void init() throws SoCTraceException {
 	// List = new HashMap<String, ISpaceAggregationOperator>();
@@ -148,8 +171,7 @@ public class VisuOperatorManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length
-				+ " Space aggregation operators detected:");
+		logger.debug(config.length + " Visualization aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final VisuOperatorResource resource = new VisuOperatorResource();
@@ -159,7 +181,8 @@ public class VisuOperatorManager {
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
-			resource.setSelectionPriority(Integer.parseInt(e.getAttribute(OP_SELECTION_PRIORITY)));
+			resource.setSelectionPriority(Integer.parseInt(e
+					.getAttribute(OP_SELECTION_PRIORITY)));
 			resource.setBundle(e.getContributor().getName());
 			// logger.debug(resource.getBundle());
 			operatorList.put(resource.getName(), resource);
@@ -183,8 +206,8 @@ public class VisuOperatorManager {
 
 	}
 
-public HashMap<String, VisuOperatorResource> getOperatorList() {
+	public HashMap<String, VisuOperatorResource> getOperatorList() {
 		return operatorList;
 	}
-	
+
 }

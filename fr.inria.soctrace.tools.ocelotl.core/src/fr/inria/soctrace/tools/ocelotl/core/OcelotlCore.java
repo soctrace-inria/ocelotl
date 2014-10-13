@@ -73,10 +73,14 @@ public class OcelotlCore {
 		if (monitor.isCanceled())
 			return;
 		try {
+			// Build microscopic description
 			microModel.setOcelotlParameters(ocelotlParameters, monitor);
-			lpaggregManager = aggregOperator.createManager(microModel, monitor);
+			
 			if (monitor.isCanceled())
 				return;
+			
+			// Instantiate the aggregation operator
+			lpaggregManager = aggregOperator.createManager(microModel, monitor);
 		} catch (UnsatisfiedLinkError e) {
 			throw new OcelotlException(OcelotlException.JNI);
 		} catch (SoCTraceException e) {
@@ -103,6 +107,22 @@ public class OcelotlCore {
 		setVisuOperator();
 		lpaggregManager.print(this);
 	}
+	
+	/**
+	 * Instantiate the managers for the elements of the core (Microscopic
+	 * description, data aggregation and visualization operator)
+	 * 
+	 * @param ocelotlParameters
+	 *            the parameters
+	 * @throws SoCTraceException
+	 */
+	public void init(final OcelotlParameters ocelotlParameters)
+			throws SoCTraceException {
+		setOcelotlParameters(ocelotlParameters);
+		microModelTypeManager = new MicroscopicDescriptionTypeManager();
+		aggregOperators = new DataAggregationOperatorManager(ocelotlParameters);
+		visuOperators = new VisuOperatorManager(this);
+	}
 
 	public IDataAggregManager getLpaggregManager() {
 		return lpaggregManager;
@@ -116,8 +136,12 @@ public class OcelotlCore {
 		return partManager;
 	}
 
-	public PartManager getPartsManager() {
-		return partManager;
+	public MicroscopicDescription getMicroModel() {
+		return microModel;
+	}
+
+	public void setMicroModel(MicroscopicDescription microModel) {
+		this.microModel = microModel;
 	}
 
 	public IVisuOperator getVisuOperator() {
@@ -138,14 +162,6 @@ public class OcelotlCore {
 
 	public MicroscopicDescriptionTypeManager getMicromodelTypes() {
 		return microModelTypeManager;
-	}
-
-	public void init(final OcelotlParameters ocelotlParameters)
-			throws SoCTraceException {
-		setOcelotlParameters(ocelotlParameters);
-		aggregOperators = new DataAggregationOperatorManager(ocelotlParameters);
-		visuOperators = new VisuOperatorManager(this);
-		microModelTypeManager = new MicroscopicDescriptionTypeManager();
 	}
 
 	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {

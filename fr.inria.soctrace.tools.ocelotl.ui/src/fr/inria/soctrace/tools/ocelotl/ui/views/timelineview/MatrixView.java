@@ -22,6 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -65,9 +66,10 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 				computeDiagram();
 			}
 	}
-
+	
 	@Override
-	public void createDiagram(final IDataAggregManager manager, final TimeRegion time) {
+	public void createDiagram(final IDataAggregManager manager, final TimeRegion time, IVisuOperator aVisuOperator) {
+		setVisuOperator(aVisuOperator);
 		createDiagram(((SpaceTimeAggregationManager) manager).getHierarchy(), time);
 	}
 

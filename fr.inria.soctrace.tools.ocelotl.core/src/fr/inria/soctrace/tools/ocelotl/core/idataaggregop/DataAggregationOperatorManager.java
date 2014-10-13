@@ -175,6 +175,29 @@ public class DataAggregationOperatorManager {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Instantiate an aggregation operator
+	 * 
+	 * @param name
+	 *            name of the aggregation operator to instantiate
+	 * @return the instantiated operator if successful, null otherwise
+	 */
+	public IDataAggregationOperator instantiateOperator(final String name) {
+		IDataAggregationOperator instantiateOperator = null;
+		final Bundle mybundle = Platform.getBundle(operatorList.get(name)
+				.getBundle());
+		try {
+			instantiateOperator = (IDataAggregationOperator) mybundle
+					.loadClass(operatorList.get(name).getOperatorClass())
+					.newInstance();
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return instantiateOperator;
+	}
 
 	public HashMap<String, DataAggregationOperatorResource> getOperatorList() {
 		return operatorList;
