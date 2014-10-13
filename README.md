@@ -31,6 +31,10 @@ Follow the [wiki](https://github.com/dosimont/ocelotl/wiki/User-Guide) to set a 
 Check our [wiki](https://github.com/dosimont/ocelotl/wiki/User-Guide) to install, configure and use Ocelotl.
 A detailed [user guide](https://github.com/dosimont/ocelotl/raw/master/docs/OCELOTL_userguide.pdf) is also available for more details.
 
+##Licence
+
+Ocelotl is based on the Eclipse framework and it is released under the [EPL (Eclipse Public License) v 1.0](https://www.eclipse.org/legal/epl-v10.html). The legal documentation has been written following the guidelines specified [here](http://www.eclipse.org/legal/guidetolegaldoc.php).
+
 ## Support and Contact
 You can contact us by email:
 
@@ -40,7 +44,7 @@ You can contact us by email:
 
 or follow us on [github](https://github.com/dosimont/ocelotl)
 
-## Ocelotl User List
+### Ocelotl User List
 You can subscribe to the Ocelotl user list using this [form](http://lists.gforge.inria.fr/cgi-bin/mailman/listinfo/ocelotl-users)
 and post a message to the list members by sending an email to
 [ocelotl-users[at]lists.gforge.inria.fr](mailto:ocelotl-users[at]lists.gforge.inria.fr)
