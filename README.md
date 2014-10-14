@@ -1,8 +1,8 @@
 #Ocelotl Analysis Tool
 
-Ocelotl is an innovative visualization tool, which provides overviews for execution trace analysis by using a data aggregation technique. This technique enables to find anomalies in huge traces containing up to several billion of events, while keeping reasonable computation time and providing simple representation that does not overload the user.
+Ocelotl is an innovative visualization tool, which provides overviews for execution trace analysis by using a data aggregation technique. This technique enables to find anomalies in huge traces containing up to several billion of events, while keeping a fast computation time and providing a simple representation that does not overload the user.
 
-Ocelotl is integrated into [Framesoc](http://generoso.github.io/framesoc/), a generic trace management and analysis infrastructure. You can thus take advantage of the tool bunch provided by Framesoc, and switch from an Ocelotl's overview to more detailed representations once you know where to focus.
+Ocelotl is integrated into [Framesoc](http://generoso.github.io/framesoc/), a generic trace management and analysis infrastructure. You can take advantage of the tool bunch provided by Framesoc, and switch from an Ocelotl's overview to more detailed representations once you know where to focus.
 
 ![Ocelotl Screenshot](http://dosimont.github.io/ocelotl/images/screenshots/ocelotl_spatiotemporal.png)
 
@@ -20,7 +20,7 @@ and press Enter. The Ocelolt tool should then be available. Then click on _Next_
 
 ### Download the Sources
 
-Alternatively, You may want to work with Ocelotl sources. They are available here :
+Alternatively, you may want to work with Ocelotl sources.
 
 [List of releases](https://github.com/dosimont/ocelotl/releases)
 
@@ -33,7 +33,7 @@ A detailed [user guide](https://github.com/dosimont/ocelotl/raw/master/docs/OCEL
 
 ##Licence
 
-Ocelotl is based on the Eclipse framework and it is released under the [EPL (Eclipse Public License) v 1.0](https://www.eclipse.org/legal/epl-v10.html). The legal documentation has been written following the guidelines specified [here](http://www.eclipse.org/legal/guidetolegaldoc.php).
+Ocelotl is based on the Eclipse framework and it is released under the [EPL (Eclipse Public License) v1.0](https://www.eclipse.org/legal/epl-v10.html). The legal documentation has been written following the guidelines specified [here](http://www.eclipse.org/legal/guidetolegaldoc.php).
 
 ## Support and Contact
 You can contact us by email:
@@ -42,9 +42,9 @@ You can contact us by email:
 [Youenn Corre] (mailto:youenn.corre-at-inria.fr),
 [Generoso Pagano] (mailto:generoso.pagano-at-inria.fr) (replace -at- by @)
 
-or follow us on [github](https://github.com/dosimont/ocelotl)
+or follow us on [github](https://github.com/dosimont/ocelotl).
 
 ### Ocelotl User List
 You can subscribe to the Ocelotl user list using this [form](http://lists.gforge.inria.fr/cgi-bin/mailman/listinfo/ocelotl-users)
 and post a message to the list members by sending an email to
-[ocelotl-users[at]lists.gforge.inria.fr](mailto:ocelotl-users[at]lists.gforge.inria.fr)
+[ocelotl-users-at-lists.gforge.inria.fr](mailto:ocelotl-users-at-lists.gforge.inria.fr)
