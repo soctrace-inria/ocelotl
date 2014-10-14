@@ -1,6 +1,6 @@
 #Ocelotl Analysis Tool
 
-Ocelotl is an innovative visualization tool, which provides overviews for execution trace analysis by using a data aggregation technique. This technique enables to find anomalies in huge traces containing up to several billion of events, while keeping a fast computation time and providing a simple representation that does not overload the user.
+Ocelotl is an innovative visualization tool, which provides overviews for execution trace analysis by using a data aggregation technique. This technique enables to find anomalies in huge traces containing up to several billions of events, while keeping a fast computation time and providing a simple representation that does not overload the user.
 
 Ocelotl is integrated into [Framesoc](http://generoso.github.io/framesoc/), a generic trace management and analysis infrastructure. You can take advantage of the tool bunch provided by Framesoc, and switch from an Ocelotl's overview to more detailed representations once you know where to focus.
 
