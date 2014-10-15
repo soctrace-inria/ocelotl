@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/fr.inria.soctrace.tools.ocelotl.feature_1.0.1.beta.jar" id="fr.inria.soctrace.tools.ocelotl.feature" version="1.0.1.beta" os="linux" arch="x86,x86_64">
+      <category name="Ocelotl Tool"/>
+   </feature>
+   <category-def name="Ocelotl Tool" label="Ocelotl Tool"/>
+</site>
