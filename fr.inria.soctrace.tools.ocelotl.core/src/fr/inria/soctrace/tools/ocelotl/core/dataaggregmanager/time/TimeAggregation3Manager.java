@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 
 import fr.inria.lpaggreg.time.JNITimeAggregation3;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 
@@ -78,20 +76,5 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		timeAggregation = new JNITimeAggregation3();
 		fillVectors(monitor);
 	}
-
-	public TimeAggregation3Manager copy() {
-		TimeAggregation3Manager aNewManager = new TimeAggregation3Manager(
-				this.matrix, new NullProgressMonitor());
-		try {
-			aNewManager.matrix = (Microscopic3DDescription) matrix.copy();
-		} catch (OcelotlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		aNewManager.timeAggregation = timeAggregation.copy();
-		aNewManager.qualities = timeAggregation.getQualityList();
-		aNewManager.parts = this.getParts();
-
-		return aNewManager;
-	}
+	
 }

@@ -32,7 +32,7 @@ public interface IDataAggregManager {
 
 	public void computeDichotomy() throws OcelotlException;
 
-	public void computeParts();
+	public void computeParts(double aParameter);
 
 	public void computeQualities();
 
@@ -50,6 +50,4 @@ public interface IDataAggregManager {
 
 	public void print(OcelotlCore core);
 
-	public IDataAggregManager copy();
-	
 }

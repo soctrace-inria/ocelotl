@@ -1,6 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -20,6 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Bundle;
 
+import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
@@ -42,7 +44,7 @@ public class Overview {
 	private Canvas						canvas;
 	private AggregatedView				timeLineView;
 	private boolean						redrawOverview;
-	private double						parameter;
+	private double						parameter = 0.0;
 	private int							timeSlice;
 
 	private TimeRegion					globalTimeRegion;
@@ -60,6 +62,11 @@ public class Overview {
 		globalTimeRegion = null;
 	}
 
+	/**
+	 * Initialize the canvas
+	 * @param parent
+	 * @return
+	 */
 	public Canvas init(final Composite parent) {
 		root = new Figure();
 		root.setFont(parent.getFont());
@@ -76,29 +83,22 @@ public class Overview {
 		return canvas;
 	}
 
-	public void createDiagram(IDataAggregManager iMicroDescManager, TimeRegion time) {
+	/**
+	 * Draw the diagram
+	 * @param time
+	 */
+	public void createDiagram(TimeRegion time) {
 		globalTimeRegion = new TimeRegion(time);
-
-		// Save the current parameter
-		double tempParam = ocelotlView.getParams().getParameter();
-
-		// Set the parameter to the computed initial parameter
-		ocelotlView.getParams().setParameter(ocelotlView.computeInitialParameter());
-
-		///timeLineView.setVisuOperator(visuOperator);
-		timeLineView.createDiagram(iMicroDescManager, time, visuOperator);
-
-		// Restore the parameter
-		ocelotlView.getParams().setParameter(tempParam);
+		timeLineView.createDiagram(aggregOperator, time, visuOperator);
 	}
 
 	/**
-	 * 
+	 * Redraw the diagram to adapt to the new size of the display
 	 */
 	public void resizeDiagram() {
 		if (aggregOperator != null && globalTimeRegion != null) {
 			canvas.redraw();
-			createDiagram(aggregOperator, globalTimeRegion);
+			createDiagram(globalTimeRegion);
 			root.repaint();
 		}
 	}
@@ -106,35 +106,36 @@ public class Overview {
 	/**
 	 * Update the overview (the selection, and the drawing)
 	 * 
-	 * @param iMicroDescManager
 	 * @param time
-	 * @throws OcelotlException 
+	 * @throws OcelotlException
 	 */
-	public void updateDiagram(IDataAggregManager iMicroDescManager, TimeRegion time) throws OcelotlException {
+	public void updateDiagram(TimeRegion time) throws OcelotlException {
 		// Update the selected region with the displayed region
 		if (!redrawOverview && newTimeRegionLonger(time)) {
 			redrawOverview = true;
 			globalTimeRegion = new TimeRegion(time);
 		}
 
+		// is it necessary to change completely the computed model
 		if (redrawOverview) {
+			// Get the same micro model
 			microModel = ocelotlView.getOcelotlCore().getMicroModel();
-			
-			// Perform a deep copy of the microdescription model
 
-			// Init aggreg
+			// Init the aggregation operator
 			aggregManager = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator());
 			aggregOperator = aggregManager.createManager(microModel, new NullProgressMonitor());
 
 			aggregOperator.computeQualities();
 			aggregOperator.computeDichotomy();
 			
+			parameter = computeInitialParameter();
+
 			// Compute the view according to the new parameter value
-			aggregOperator.computeParts();
+			aggregOperator.computeParts(parameter);
 
 			this.visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregOperator);
 
-			createDiagram(aggregOperator, time);
+			createDiagram(time);
 			redrawOverview = false;
 		}
 
@@ -143,7 +144,8 @@ public class Overview {
 	}
 
 	/**
-	 * Check if the new time region is larger than the actual displayed one
+	 * Check if the new time region is larger than the actual displayed one.
+	 * Used to know if it is necessary to recompute a new view of the overview
 	 * 
 	 * @param time
 	 *            the tested time region
@@ -178,10 +180,7 @@ public class Overview {
 	}
 
 	public void setTimeLineView(AggregatedView timeLineView) {
-
-		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
-		selectedZone = new SelectFigure(ColorConstants.blue, ColorConstants.blue);
-		displayedZone = new SelectFigure(ColorConstants.white, ColorConstants.white);
+		this.timeLineView = timeLineView;
 	}
 
 	public boolean isRedrawOverview() {
@@ -208,12 +207,20 @@ public class Overview {
 		this.visuOperator = visuOperator;
 	}
 
-	public void setVisuOperator(String name) {
-		// Init visu
+	/**
+	 * Initialize the visualization operator and perform additional init
+	 * operation
+	 * 
+	 * @param name
+	 *            the name of the visualization operator
+	 */
+	public void initVisuOperator(String name) {
+		// Instantiate the chosen visu operator
 		visuOperator = ocelotlView.getOcelotlCore().getVisuOperators().instantiateOperator(name);
-		
+
 		final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getBundle());
 
+		// Instantiate the actual view
 		try {
 			this.timeLineView = (AggregatedView) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
@@ -221,20 +228,59 @@ public class Overview {
 			e.printStackTrace();
 		}
 
+		// Init the view
 		this.timeLineView.setRoot(root);
 		this.timeLineView.setCanvas(canvas);
 		this.redrawOverview = true;
-		
+
+		// Init other stuff
 		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
 		selectedZone = new SelectFigure(ColorConstants.blue, ColorConstants.blue);
 		displayedZone = new SelectFigure(ColorConstants.white, ColorConstants.white);
 	}
 
+	/**
+	 * Search for the parameter that has the largest gap (sum of the differences
+	 * in gain and loss values) between two consecutive gain and loss values
+	 * 
+	 * @return the corresponding parameter value, or 0.0 as default
+	 */
+	public double computeInitialParameter() {
+		double diffG = 0.0, diffL = 0.0;
+		double sumDiff = 0.0;
+		double maxDiff = 0.0;
+		int indexMaxQual = -1;
+		int i;
+		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) aggregOperator.getQualities();
+		for (i = 1; i < qual.size(); i++) {
+			// Compute the difference for the gain and the loss
+			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
+			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
+
+			// Compute sum of both
+			sumDiff = diffG + diffL;
+
+			if (sumDiff > maxDiff) {
+				maxDiff = sumDiff;
+				indexMaxQual = i;
+			}
+		}
+		if (indexMaxQual > 0 && indexMaxQual < aggregOperator.getParameters().size())
+			return aggregOperator.getParameters().get(indexMaxQual -1);
+
+		// No index found or the value is invalid, return 1.0 as default
+		return 0.0;
+	}
+	
+	/**
+	 * Class for describing and displaying selected zones
+	 */
 	private class SelectFigure extends RectangleFigure {
 
 		Color	foreground;
 		Color	background;
 
+		// Init with a given color set
 		public SelectFigure(Color foreGround, Color backGround) {
 			super();
 			final ToolbarLayout layout = new ToolbarLayout();
@@ -247,6 +293,12 @@ public class Overview {
 			setAlpha(50);
 		}
 
+		/**
+		 * Draw the actual selected time region
+		 * 
+		 * @param timeRegion
+		 *            the time region (time boundaries of the region)
+		 */
 		public void draw(final TimeRegion timeRegion) {
 			// If there is no zoom, don't show indicator
 			if (timeRegion.compareTimeRegion(globalTimeRegion)) {

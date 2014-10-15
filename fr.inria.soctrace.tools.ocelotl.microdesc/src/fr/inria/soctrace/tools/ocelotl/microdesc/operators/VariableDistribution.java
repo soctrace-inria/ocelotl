@@ -36,8 +36,6 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
-import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
-import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
@@ -146,30 +144,5 @@ public class VariableDistribution extends Microscopic3DDescription {
 			InterruptedException, OcelotlException {
 		buildNormalMatrix(monitor);
 	}
-
-	@Override
-	public MicroscopicDescription copy() {
-		VariableDistribution aNewDist = null;
-		aNewDist = new VariableDistribution();
-		aNewDist.parameters = new OcelotlParameters(this.parameters);
-		aNewDist.matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
-		int i;
-
-		for (i = 0; i < matrix.size(); i++) {
-			aNewDist.matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
-			for (EventProducer ep : parameters.getAllEventProducers())
-				aNewDist.matrix.get((int) i).put(ep, new HashMap<String, Double>());
-		}
-
-		for (i = 0; i < matrix.size(); i++) {
-			for (EventProducer anEP : parameters.getAllEventProducers()) {
-				for (String state : matrix.get(i).get(anEP).keySet())
-					aNewDist.matrix.get(i).get(anEP)
-							.put(state, matrix.get(i).get(anEP).get(state));
-			}
-		}
-		return aNewDist;
-	}
-
 
 }

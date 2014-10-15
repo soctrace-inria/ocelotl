@@ -23,11 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-
 import fr.inria.lpaggreg.time.JNITimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic2DDescription;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 
@@ -67,21 +64,4 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 		timeAggregation = new JNITimeAggregation2();
 		fillVectors(monitor);
 	}
-
-	@Override
-	public IDataAggregManager copy() {
-		TimeAggregation2Manager aNewManager = null;
-
-		aNewManager = new TimeAggregation2Manager(matrix,  new NullProgressMonitor());
-		//aNewManager.matrix = new _2DMicroDescription();//initVectors();
-		/*for (int i = 0; i < matrix.getMatrix().size(); i++) {
-			for (EventProducer ep : ocelotlParameters.getEventProducers()) {
-				aNewManager.matrix.getMatrix().get(i).get(ep)
-						.put(this.matrix.getMatrix().get(i));
-			}
-		}*/
-		return aNewManager;
-	}
-
-
 }

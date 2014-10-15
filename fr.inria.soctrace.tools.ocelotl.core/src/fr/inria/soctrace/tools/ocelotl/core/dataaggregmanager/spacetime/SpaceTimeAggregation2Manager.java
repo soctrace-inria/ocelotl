@@ -24,11 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-
 import fr.inria.lpaggreg.spacetime.JNISpaceTimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
@@ -117,21 +114,6 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 
 	private void setHierarchy() throws OcelotlException {
 		hierarchy = new EventProducerHierarchy(getEventProducers());
-	}
-
-	@Override
-	public IDataAggregManager copy() {
-		SpaceTimeAggregation2Manager aNewManager = null;
-		try {
-			aNewManager = new SpaceTimeAggregation2Manager(matrix, new NullProgressMonitor());
-			aNewManager.matrix = (Microscopic3DDescription) matrix.copy();
-			aNewManager.qualities = timeAggregation.getQualityList();
-			aNewManager.hierarchy = this.getHierarchy();
-		} catch (OcelotlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return aNewManager;
 	}
 
 }

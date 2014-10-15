@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;

@@ -102,7 +102,7 @@ public class OcelotlCore {
 	}
 
 	public void computeParts() {
-		lpaggregManager.computeParts();
+		lpaggregManager.computeParts(ocelotlParameters.getParameter());
 		// lpaggregManager.printParts();
 		setVisuOperator();
 		lpaggregManager.print(this);

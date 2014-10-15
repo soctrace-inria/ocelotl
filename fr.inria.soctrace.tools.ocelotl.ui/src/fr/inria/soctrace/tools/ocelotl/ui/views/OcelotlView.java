@@ -88,7 +88,6 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
@@ -417,7 +416,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							qualityView.createDiagram();
 							tabFolder.setSelection(1);
 							try {
-								overView.updateDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
+								overView.updateDiagram(ocelotlParameters.getTimeRegion());
 							} catch (OcelotlException e) {
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 							}
@@ -534,7 +533,7 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 			ocelotlCore.getVisuOperators().setSelectedOperator(comboSpace.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
-			overView.setVisuOperator(ocelotlParameters.getOcelotlSettings().getOverviewVisuOperator());
+			overView.initVisuOperator(ocelotlParameters.getOcelotlSettings().getOverviewVisuOperator());
 		}
 	}
 	

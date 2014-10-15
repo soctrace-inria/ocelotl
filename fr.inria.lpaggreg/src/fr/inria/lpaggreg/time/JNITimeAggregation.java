@@ -76,21 +76,4 @@ public class JNITimeAggregation implements ITimeAggregation {
 		return jniWrapper.getPartNumber();
 	}
 
-	@Override
-	public ITimeAggregation copy() {
-		JNITimeAggregation aNewJNI = new JNITimeAggregation();
-		aNewJNI.jniWrapper = jniWrapper;
-		
-		int i;
-		aNewJNI.parameters = new ArrayList<Double>();
-		for (i = 0; i < parameters.size(); i++)
-			aNewJNI.parameters.add(parameters.get(i));
-
-		aNewJNI.qualities = new ArrayList<DLPQuality>();
-		for (i = 0; i < qualities.size(); i++)
-			aNewJNI.qualities.add(qualities.get(i));
-
-		return aNewJNI;
-	}
-
 }

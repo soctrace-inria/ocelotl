@@ -27,6 +27,4 @@ public interface ISpaceTimeAggregation {
 	public void addRoot(int id);
 
 	public void addLeaf(int id, int parentID, Object values);
-	
-	public ISpaceTimeAggregation copy();
 }

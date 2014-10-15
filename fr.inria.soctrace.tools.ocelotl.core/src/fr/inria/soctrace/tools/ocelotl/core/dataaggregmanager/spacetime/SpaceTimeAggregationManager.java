@@ -60,10 +60,10 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	}
 
 	@Override
-	public void computeParts() {
+	public void computeParts(double aParameter) {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
-		timeAggregation.computeParts(ocelotlParameters.getParameter());
+		timeAggregation.computeParts(aParameter);
 		updateHierarchy();
 		int i = 0;
 		for (i = 0; i < parameters.size() - 1; i++)

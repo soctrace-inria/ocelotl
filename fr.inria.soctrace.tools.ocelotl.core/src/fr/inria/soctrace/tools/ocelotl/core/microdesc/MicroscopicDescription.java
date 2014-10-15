@@ -873,6 +873,4 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		buildMicroscopicModel(parameters, monitor);
 	}
 	
-	public abstract MicroscopicDescription copy() throws OcelotlException;
-
 }
