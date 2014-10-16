@@ -23,12 +23,12 @@ import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.Part;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.PartMap;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.time.TimeAggregation3Manager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregation3Manager;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
 
-public class Proportion extends SpaceTAggregationOperator {
+public class Proportion extends VisuTOperator {
 
 	private List<String>		states;
 	private double				max;

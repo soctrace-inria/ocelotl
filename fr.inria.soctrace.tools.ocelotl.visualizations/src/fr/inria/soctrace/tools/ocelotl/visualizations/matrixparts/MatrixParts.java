@@ -20,9 +20,9 @@
 package fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceSTAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuSTOperator;
 
-public class MatrixParts extends SpaceSTAggregationOperator {
+public class MatrixParts extends VisuSTOperator {
 
 	public MatrixParts() {
 		super();

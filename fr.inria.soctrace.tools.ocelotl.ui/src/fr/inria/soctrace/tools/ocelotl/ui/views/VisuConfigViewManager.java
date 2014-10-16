@@ -38,8 +38,8 @@ public class VisuConfigViewManager {
 		IVisualizationWindow window = null;
 
 		try {
-			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getBundle());
-			window = (IVisualizationWindow) mybundle.loadClass(ocelotlView.getCore().getSpaceOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
+			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource().getBundle());
+			window = (IVisualizationWindow) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource().getParamWinClass()).getDeclaredConstructor(Shell.class).newInstance(ocelotlView.getSite().getShell());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException | NullPointerException e) {
 			// e.printStackTrace();
 			return;
