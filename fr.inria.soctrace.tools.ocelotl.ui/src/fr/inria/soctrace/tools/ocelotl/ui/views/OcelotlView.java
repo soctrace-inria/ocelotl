@@ -480,6 +480,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			// Get the available aggregation operators
 			comboTime.removeAll();
 			comboSpace.removeAll();
+			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
 			
 			for (final String op : ocelotlCore.getAggregOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 				comboTime.add(op);
@@ -504,7 +505,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				return;
 			hasChanged = HasChanged.ALL;
 			ocelotlParameters.getEventProducers().clear();
-			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
+
 			ocelotlCore.getAggregOperators().setSelectedOperator(comboTime.getText());
 			// Set the number of time slice
 			spinnerTSNumber.setSelection(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getTs());
@@ -1156,10 +1157,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		
 		final Group groupTypes = new Group(sashFormTSandCurve, SWT.NONE);
 		groupTypes.setFont(cantarell8);
-		groupTypes.setText("Metrics");
+		groupTypes.setText("Metric");
 		groupTypes.setLayout(new GridLayout(1, false));
 		
 		final Composite compositeType = new Composite(groupTypes, SWT.NONE);
+		compositeType.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		compositeType.setFont(cantarell8);
 		compositeType.setLayout(new GridLayout(1, false));
 		
@@ -1173,7 +1175,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		
 		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
 		groupAggregationOperator.setFont(cantarell8);
-		groupAggregationOperator.setText("Analysis Type");
+		groupAggregationOperator.setText("Data Aggregation Type");
 		groupAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
@@ -1516,7 +1518,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		textRun.addModifyListener(new ParameterModifyListener());
 		scrolledComposite_1.setContent(group);
 		scrolledComposite_1.setMinSize(group.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashForm.setWeights(new int[] {190, 221, 34});
+		sashForm.setWeights(new int[] {198, 211, 36});
 		sashForm_1.setWeights(new int[] {635, 265});
 		sashFormGlobal.setWeights(new int[] { 395 });
 
@@ -1689,7 +1691,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		ocelotlParameters.setAllEventTypes(confDataLoader.getTypes());
 		ocelotlParameters.setCatEventTypes(confDataLoader.getTypesByCat());
-		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getEventCategory()));
+		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getMicromodelTypes().getSelectedOperatorResource().getType()));
 		// Init operator specific configuration
 		ocelotlParameters.setAllEventProducers(confDataLoader.getProducers());
 		if (ocelotlParameters.getEventProducers().isEmpty())
