@@ -59,6 +59,7 @@ public class DataAggregationOperatorManager {
 	private static final String OP_UNIT = "unit"; //$NON-NLS-1$
 	private static final String OP_TS = "ts_default_number"; //$NON-NLS-1$
 	private static final String OP_VALUE_TYPE = "value_type"; //$NON-NLS-1$
+	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(DataAggregationOperatorManager.class);
@@ -105,9 +106,17 @@ public class DataAggregationOperatorManager {
 
 			@Override
 			public int compare(final String arg0, final String arg1) {
-				return arg0.compareTo(arg1);
-			}
+				int diff = operatorList.get(arg0).getSelectionPriority()
+						- operatorList.get(arg1).getSelectionPriority();
 
+				// If the two operators have the same priority
+				if (diff == 0) {
+					// Sort them alphabetically
+					return arg0.compareTo(arg1);
+				}
+
+				return diff;
+			}
 		});
 		return op;
 	}
@@ -147,6 +156,7 @@ public class DataAggregationOperatorManager {
 			resource.setUnit(e.getAttribute(OP_UNIT));
 			resource.setTs(e.getAttribute(OP_TS));
 			resource.setValueType(e.getAttribute(OP_VALUE_TYPE));
+			resource.setSelectionPriority(e.getAttribute(OP_SELECTION_PRIORITY));
 			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
 					+ resource.getTraceFormats());

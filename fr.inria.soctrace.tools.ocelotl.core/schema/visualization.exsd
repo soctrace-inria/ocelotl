@@ -3,7 +3,7 @@
 <schema targetNamespace="fr.inria.soctrace.tools.ocelotl.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="fr.inria.soctrace.tools.ocelotl.core" id="spaceaggregopext" name="SpaceAggregationOperatorExt"/>
+         <meta.schema plugin="fr.inria.soctrace.tools.ocelotl.core" id="visualizationext" name="VisualizationOperatorExt"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <choice minOccurs="1" maxOccurs="unbounded">
-            <element ref="aggregation_operator"/>
+            <element ref="visualization_operator"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,7 +47,7 @@
       </complexType>
    </element>
 
-   <element name="aggregation_operator">
+   <element name="visualization_operator">
       <complexType>
          <attribute name="operator" type="string" use="required">
             <annotation>
@@ -62,7 +62,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.ISpaceAggregationOperator"/>
+                  <meta.attribute kind="java" basedOn=":fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator"/>
                </appinfo>
             </annotation>
          </attribute>

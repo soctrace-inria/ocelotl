@@ -126,6 +126,8 @@ public class VisuOperatorManager {
 						if (!op.contains(r.getName()))
 							op.add(r.getName());
 		}
+		
+		// Sort according to the selection priority level
 		Collections.sort(op, new Comparator<String>() {
 
 			@Override

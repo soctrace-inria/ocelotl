@@ -40,6 +40,7 @@ public class DataAggregationOperatorResource {
 	int ts;
 	String valueType;
 	String bundle;
+	int selectionPriority;
 
 	public DataAggregationOperatorResource() {
 		// TODO Auto-generated constructor stub
@@ -187,6 +188,18 @@ public class DataAggregationOperatorResource {
 
 	public void setValueType(String attribute) {
 		valueType = attribute;
+	}
+	
+	public int getSelectionPriority() {
+		return selectionPriority;
+	}
+
+	public void setSelectionPriority(String selectionPriority) {
+		try {
+			this.selectionPriority = Integer.parseInt(selectionPriority);
+		} catch (NumberFormatException e) {
+			this.selectionPriority = 0;
+		}
 	}
 
 	private List<String> decompose(List<String> list, String string) {

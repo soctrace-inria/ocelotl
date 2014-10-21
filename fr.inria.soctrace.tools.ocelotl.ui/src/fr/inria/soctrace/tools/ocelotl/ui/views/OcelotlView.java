@@ -483,6 +483,7 @@ private class ComboTypeSelectionAdapter extends SelectionAdapter {
 			comboTime.setText("");
 			
 			if (comboTime.getItems().length != 0) {
+				// Items are sorted according to the selection priority
 				comboTime.setText(comboTime.getItem(0));
 				// Set the selected operator as operator in Ocelotl
 				comboTime.notifyListeners(SWT.Selection, new Event());

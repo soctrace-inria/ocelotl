@@ -139,6 +139,14 @@
             </annotation>
          </attribute>
 
+         <attribute name="selection_priority" type="int" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+
       </complexType>
    </element>
 
