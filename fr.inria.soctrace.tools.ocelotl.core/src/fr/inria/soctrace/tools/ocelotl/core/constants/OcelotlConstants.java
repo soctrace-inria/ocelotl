@@ -78,4 +78,8 @@ public class OcelotlConstants {
 	 * Size of the configuration file
 	 */
 	static final public int CONFIGURATION_NORMAL_SIZE = 9;
+	
+	public static final String MultipleValueExtensionSeparator = ", ";
 }
+
+
