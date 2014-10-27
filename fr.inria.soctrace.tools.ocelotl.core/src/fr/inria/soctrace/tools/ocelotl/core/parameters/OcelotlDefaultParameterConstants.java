@@ -71,7 +71,7 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Default number of time slices used when generating a cache
 	 */
-	public static final int DEFAULT_CACHE_TS_NUMBER = 10000;
+	public static final int DEFAULT_CACHE_TS_NUMBER = 1000;
 
 	/**
 	 * Number of threads for computation

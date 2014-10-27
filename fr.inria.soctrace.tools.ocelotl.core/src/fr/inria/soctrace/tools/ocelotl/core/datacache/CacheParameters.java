@@ -13,6 +13,7 @@ public class CacheParameters {
 		private long endTimestamp;
 		private int nbTimeSlice;
 		private String timeAggOperator;
+		private String microModelType;
 		private String spaceAggOperator;
 
 		public CacheParameters() {
@@ -23,6 +24,7 @@ public class CacheParameters {
 			nbTimeSlice = 0;
 			timeAggOperator = "null";
 			spaceAggOperator = "null";
+			microModelType = "null";
 		}
 
 		/**
@@ -48,6 +50,12 @@ public class CacheParameters {
 				spaceAggOperator = "null";
 			} else {
 				spaceAggOperator = oParam.getSpaceAggOperator();
+			}
+			
+			if (oParam.getMicroModelType() == null) {
+				microModelType = "null";
+			} else {
+				microModelType = oParam.getMicroModelType();
 			}
 		}
 		
@@ -105,5 +113,13 @@ public class CacheParameters {
 
 		public void setSpaceAggOperator(String spaceAggOperator) {
 			this.spaceAggOperator = spaceAggOperator;
+		}
+
+		public String getMicroModelType() {
+			return microModelType;
+		}
+
+		public void setMicroModelType(String microModelType) {
+			this.microModelType = microModelType;
 		}
 }

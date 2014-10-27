@@ -2,7 +2,7 @@
 <feature
       id="fr.inria.soctrace.tools.ocelotl.feature"
       label="Ocelotl"
-      version="0.1.4.qualifier"
+      version="1.0.1.qualifier"
       provider-name="INRIA"
       plugin="fr.inria.soctrace.tools.ocelotl.brand"
       os="linux,win32"

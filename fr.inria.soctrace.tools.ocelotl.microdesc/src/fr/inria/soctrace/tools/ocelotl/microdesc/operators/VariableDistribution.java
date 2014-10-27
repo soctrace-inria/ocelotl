@@ -19,7 +19,9 @@
 
 package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,13 +35,12 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IVariable;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.itimeaggregop._3DMicroDescription;
-import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceVariableManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
-public class VariableDistribution extends _3DMicroDescription {
+public class VariableDistribution extends Microscopic3DDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(VariableDistribution.class);
 	
@@ -65,13 +66,13 @@ public class VariableDistribution extends _3DMicroDescription {
 
 		private void matrixUpdate(final IVariable variable, final EventProducer ep,
 				final Map<Long, Double> distrib) {
-			synchronized (matrix) {
-				if (!matrix.get(0).get(ep).containsKey(variable.getType())) {
+			synchronized (getMatrix()) {
+				if (!getMatrix().get(0).get(ep).containsKey(variable.getType())) {
 					logger.debug("Adding " + variable.getType()
 							+ " variable");
-					// addKey(state.getStateType());
-					for (int incr = 0; incr < matrix.size(); incr++)
-						for (final EventProducer epset : matrix.get(incr)
+
+					for (int incr = 0; incr < getMatrix().size(); incr++)
+						for (final EventProducer epset : getMatrix().get(incr)
 								.keySet())
 							matrixPushType(incr, epset, variable.getType());
 				}
@@ -104,22 +105,17 @@ public class VariableDistribution extends _3DMicroDescription {
 
 	private TimeSliceVariableManager timeSliceManager;
 
-	public VariableDistribution() throws SoCTraceException {
+	public VariableDistribution() {
 		super();
 	}
-
-	public VariableDistribution(final OcelotlParameters parameters,
-			IProgressMonitor monitor) throws SoCTraceException,
-			OcelotlException {
-		super(parameters, monitor);
-	}
-
+	
 	@Override
-	protected void computeSubMatrix(List<EventProducer> eventProducers,
+	public void computeSubMatrix(List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
+		monitor.subTask("Query variables");
 		eventIterator = ocelotlQueries.getVariableIterator(eventProducers,
 				time, monitor);
 		if (monitor.isCanceled()) {
@@ -129,6 +125,7 @@ public class VariableDistribution extends _3DMicroDescription {
 		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()
@@ -138,6 +135,14 @@ public class VariableDistribution extends _3DMicroDescription {
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+	
+	@Override
+	public void rebuildDirty(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws SoCTraceException,
+			InterruptedException, OcelotlException {
+		buildNormalMatrix(monitor);
 	}
 
 }

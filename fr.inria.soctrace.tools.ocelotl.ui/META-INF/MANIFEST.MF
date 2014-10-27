@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ui
 Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.ui;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1.qualifier
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.ui.Activator
 Bundle-Vendor: INRIA
 Require-Bundle: org.eclipse.ui,
@@ -22,8 +22,7 @@ Bundle-ActivationPolicy: lazy
 Import-Package: fr.inria.soctrace.framesoc.ui.model,
  fr.inria.soctrace.lib.utils,
  fr.inria.soctrace.tools.ocelotl.core,
- fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager,
- org.eclipse.core.resources
+ fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager
 Export-Package: fr.inria.soctrace.tools.ocelotl.ui.loaders,
  fr.inria.soctrace.tools.ocelotl.ui.views,
  fr.inria.soctrace.tools.ocelotl.ui.views.timelineview

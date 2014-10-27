@@ -19,9 +19,9 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.IMicroDescManager;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.EventProducerHierarchy;
-import fr.inria.soctrace.tools.ocelotl.core.timeaggregmanager.spacetime.SpaceTimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregationManager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 

@@ -69,6 +69,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
@@ -108,7 +109,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper
  */
 public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
-
 	public Trace aTestTrace;
 
 	public void loadFromParam(TestParameters someParams, boolean activeCache) {
@@ -147,7 +147,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					// If no trace was found
 					if (aTestTrace == null)
 						throw new OcelotlException(OcelotlException.INVALID_CACHED_TRACE);
-					
+
 					// Load the trace
 					confDataLoader.load(aTestTrace);
 
@@ -158,7 +158,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						@Override
 						public void run() {
 							// Load the aggregation operators
-							for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
+							for (final String op : ocelotlCore.getAggregOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 								comboTime.add(op);
 							}
 
@@ -188,12 +188,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							ocelotlParameters.getDataCache().setBuildingStrategy(testParams.getDatacacheStrat());
 							
-							/*ArrayList<EventProducer> evProd = new ArrayList<EventProducer>();
+							ArrayList<EventProducer> evProd = new ArrayList<EventProducer>();
 							int i;
 							for (i = 0; i < testParams.getNbEventProd(); i++) {
 								evProd.add(ocelotlParameters.getAllEventProducers().get(i));
 							}
-							ocelotlParameters.setEventProducers(evProd);*/
+							ocelotlParameters.setEventProducers(evProd);
 							
 							hasChanged = HasChanged.ALL;
 							
@@ -305,7 +305,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			// Display a warning if the selected file already exists
 			dialog.setOverwrite(true);
 			
-			Date date = new Date(System.currentTimeMillis() * 1000);
+			Date date = new Date(System.currentTimeMillis());
 			
 			// Set a default file name
 			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId() + "_" + date);
@@ -331,6 +331,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			loadCachefile = dialog.open();
 
 			if (loadCachefile != null) {
+				comboType.removeAll();
 				comboTime.removeAll();
 				comboSpace.removeAll();
 
@@ -371,24 +372,24 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 								@Override
 								public void run() {
-									// Load the aggregation operators
-									for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
-										comboTime.add(op);
+									// Load the type operators
+									for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
+										comboType.add(type);
 									}
 
-									comboTime.setText("");
+									comboType.setText("");
 
-									// Search for the corresponding operator
-									for (int i = 0; i < comboTime.getItemCount(); i++) {
-										if (comboTime.getItem(i).equals(ocelotlParameters.getTimeAggOperator())) {
-											comboTime.select(i);
-											comboTime.notifyListeners(SWT.Selection, new Event());
+									// Search for the corresponding metrics
+									for (int i = 0; i < comboType.getItemCount(); i++) {
+										if (comboType.getItem(i).equals(ocelotlParameters.getMicroModelType())) {
+											comboType.select(i);
+											comboType.notifyListeners(SWT.Selection, new Event());
 											break;
 										}
 									}
 
 									// If no operator was found
-									if (comboTime.getText().isEmpty())
+									if (comboType.getText().isEmpty())
 										try {
 											throw new OcelotlException(OcelotlException.INVALID_CACHED_OPERATOR);
 										} catch (OcelotlException e) {
@@ -397,7 +398,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 										}
 
 									// Set the corresponding parameters
-									spinnerTSNumber.setSelection(ocelotlParameters.getTimeSlicesNumber());
 									textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 									textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 
@@ -528,7 +528,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			} else {
 			//	textRun.setText("1.0");
 			}
-			//oldParameters = new OcelotlParameters(ocelotlParameters);
 			setConfiguration();
 			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
@@ -548,7 +547,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								}
 								monitor.setTaskName("Initializing Time Operator");
 								aDm.start();
-								ocelotlCore.initTimeOperator(monitor);
+								ocelotlCore.initAggregOperator(monitor);
 								aDm.end("Microscopic Rebuilding");
 								monitor.worked(1);
 							}
@@ -592,7 +591,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						// if (hasChanged == HasChanged.ALL || hasChanged ==
 						// HasChanged.NORMALIZE || hasChanged ==
 						// HasChanged.PARAMETER)
-			
+						aDm.start();
 						ocelotlCore.computeParts();
 						monitor.worked(1);
 
@@ -618,12 +617,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						public void run() {
 							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
-							aDm.start();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							qualityView.createDiagram();
-							aDm.end("Compute parts and display");
+
 							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
+							aDm.end("Compute parts and display");
 						}
 					});
 
@@ -678,12 +677,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				return;
 			hasChanged = HasChanged.ALL;
 			ocelotlParameters.getEventProducers().clear();
-			ocelotlCore.getTimeOperators().setSelectedOperator(comboTime.getText());
-			spinnerTSNumber.setSelection(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getTs());
-			
+			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
+			ocelotlCore.getAggregOperators().setSelectedOperator(comboTime.getText());
+			// Set the number of time slice
+			spinnerTSNumber.setSelection(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getTs());
+
 			// Get the available visualizations
 			comboSpace.removeAll();
-			for (final String op : ocelotlCore.getSpaceOperators().getOperators(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getSpaceCompatibility())) {
+			for (final String op : ocelotlCore.getVisuOperators().getOperators(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getSpaceCompatibility())) {
 				comboSpace.add(op);
 			}
 
@@ -708,7 +709,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				return;
 			if (hasChanged == HasChanged.NOTHING)
 				hasChanged = HasChanged.PARAMETER;
-			ocelotlCore.getSpaceOperators().setSelectedOperator(comboSpace.getText());
+			ocelotlCore.getVisuOperators().setSelectedOperator(comboSpace.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
 		}
@@ -800,7 +801,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
-			if (timeLineView != null) {
+			if(timeLineView != null)
+			{
 				timeLineView.resizeDiagram();
 				timeAxisView.resizeDiagram();
 			}
@@ -812,6 +814,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			ocelotlParameters.getDataCache().setCacheActive(btnCacheEnabled.getSelection());
+	boolean cacheActivation = ocelotlParameters.getDataCache().isCacheActive();
+				btnDeleteDataCache.setEnabled(cacheActivation);
+				datacacheDirectory.setEnabled(cacheActivation);
+				btnChangeCacheDirectory.setEnabled(cacheActivation);
+				btnRadioButton.setEnabled(cacheActivation);
+				btnRadioButton_1.setEnabled(cacheActivation);
+				btnRadioButton_2.setEnabled(cacheActivation);
+				btnRadioButton_3.setEnabled(cacheActivation);
+				cacheTimeSliceValue.setEnabled(cacheActivation);
+				dataCacheSize.setEnabled(cacheActivation);		
 		}
 	}
 
@@ -898,7 +910,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				} else {
 					// Set the cache size at the entered value converted from
 					// Megabytes to bytes
-					ocelotlParameters.getDataCache().setCacheMaxSize(Integer.valueOf(dataCacheSize.getText()) * 1000000);
+					ocelotlParameters.getDataCache().setCacheMaxSize(Long.valueOf(dataCacheSize.getText()) * 1000000);
 				}
 			} catch (final NumberFormatException err) {
 				dataCacheSize.setSelection((int) ocelotlParameters.getDataCache().getCacheMaxSize());
@@ -928,7 +940,7 @@ private class CacheTimeSliceListener implements ModifyListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(spinnerDivideDbQuery.getText()));
+			ocelotlParameters.getOcelotlSettings().setMaxEventProducersPerQuery(Integer.valueOf(spinnerDivideDbQuery.getText()));
 		}
 	}
 	
@@ -936,7 +948,7 @@ private class CacheTimeSliceListener implements ModifyListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			ocelotlParameters.getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(spinnerEventSize.getText()));
+			ocelotlParameters.getOcelotlSettings().setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
 		}
 	}
 	
@@ -965,6 +977,7 @@ private class CacheTimeSliceListener implements ModifyListener {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			final String title = "Loading Trace";
+			comboType.removeAll();
 			comboTime.removeAll();
 			comboSpace.removeAll();
 			trace = traceMap.get(comboTraces.getSelectionIndex());
@@ -990,16 +1003,11 @@ private class CacheTimeSliceListener implements ModifyListener {
 
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-								for (final String op : ocelotlCore.getTimeOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories()))
-								{
-									comboTime.add(op);
+									for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
+									comboType.add(type);
 								}
 								
-								comboTime.setText("");
-								// btnRemoveEventProducer.notifyListeners(SWT.Selection,
-								// new Event());
-								// btnAddAllEventProducer.notifyListeners(SWT.Selection,
-								// new Event());
+								comboType.setText("");
 							}
 						});
 					} catch (final Exception e) {
@@ -1023,6 +1031,7 @@ private class CacheTimeSliceListener implements ModifyListener {
 	private Button						btnGrowingQualities;
 	private Button						btnDecreasingQualities;
 	private Button						btnSettings;
+private Combo						comboType;
 	private Combo						comboTime;
 	private Combo						comboTraces;
 	private final ConfDataLoader		confDataLoader	= new ConfDataLoader();
@@ -1202,7 +1211,7 @@ private class CacheTimeSliceListener implements ModifyListener {
 		final SashForm sashForm_4 = new SashForm(sashFormView, SWT.BORDER | SWT.VERTICAL);
 		compositeMatrixView = new Composite(sashForm_4, SWT.BORDER);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-cantarell8 = new Font(compositeMatrixView.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
+		cantarell8 = new Font(compositeMatrixView.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
 		timeLineViewWrapper.init(compositeMatrixView);
@@ -1222,11 +1231,11 @@ cantarell8 = new Font(compositeMatrixView.getDisplay(), new FontData("Cantarell"
 		groupTime.setSize(422, 110);
 		groupTime.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-	groupTime.setFont(cantarell8);
+		groupTime.setFont(cantarell8);
 		groupTime.setLayout(new GridLayout(11, false));
 
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
-			lblStartTimestamp.setFont(cantarell8);
+		lblStartTimestamp.setFont(cantarell8);
 		lblStartTimestamp.setText("Start");
 
 		textTimestampStart = new Text(groupTime, SWT.BORDER);
@@ -1325,7 +1334,7 @@ cantarell8 = new Font(compositeMatrixView.getDisplay(), new FontData("Cantarell"
 		
 		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
 		groupAggregationOperator.setFont(cantarell8);
-		groupAggregationOperator.setText("Microscopic Description");
+		groupAggregationOperator.setText("Analysis Type");
 		groupAggregationOperator.setLayout(new GridLayout(1, false));
 
 		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
@@ -1381,7 +1390,7 @@ cantarell8 = new Font(compositeMatrixView.getDisplay(), new FontData("Cantarell"
 		btnSettings2.setToolTipText("Settings");
 		btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
 		btnSettings2.setFont(cantarell8);
-		sashFormTSandCurve.setWeights(new int[] { 1, 1, 1 });
+		sashFormTSandCurve.setWeights(new int[] { 1, 1, 1, 1 });
 		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
 
 		
@@ -1573,9 +1582,9 @@ Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
 		cachepolicy.get(ocelotlParameters.getOcelotlSettings().getCachePolicy()).setSelection(true);
 		
 		if (ocelotlParameters.getOcelotlSettings().getCacheSize() > 0) {
-			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000);
+			dataCacheSize.setSelection((int)ocelotlParameters.getOcelotlSettings().getCacheSize() / 1000000);
 		} else {
-			dataCacheSize.setSelection(ocelotlParameters.getOcelotlSettings().getCacheSize());
+			dataCacheSize.setSelection((int)ocelotlParameters.getOcelotlSettings().getCacheSize());
 		}
 		sashFormSettings.setWeights(new int[] {1});	
 		
@@ -1796,7 +1805,7 @@ Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
 		}
 	}
 	
-	@Override
+		@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
 	}
@@ -1808,7 +1817,7 @@ Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
 
 	//When receiving a notification, update the trace list
 	@Override
-	public void handle(String topic, Object data) {
+	public void handle(FramesocBusTopic topic, Object data) {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED) || topic.equals(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED) || topic.equals(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED)) {
 			refreshTraces();
 		}
@@ -1822,14 +1831,14 @@ Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
 
 		ocelotlParameters.setAllEventTypes(confDataLoader.getTypes());
 		ocelotlParameters.setCatEventTypes(confDataLoader.getTypesByCat());
-		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getTimeOperators().getSelectedOperatorResource().getEventCategory()));
+		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getEventCategory()));
 		// Init operator specific configuration
 
 		ocelotlParameters.setAllEventProducers(confDataLoader.getProducers());
 		if (ocelotlParameters.getEventProducers().isEmpty())
 			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
 		
-	ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
+		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		manager = new ConfigViewManager(this);
 		manager.init();
 	}
@@ -1907,4 +1916,36 @@ Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
 		}
 	}
 	
+	/**
+	 * Search for the parameter that has the largest gap (sum of the differences
+	 * in gain and loss values) between two consecutive gain and loss values
+	 * 
+	 * @return the corresponding parameter value, or 1.0 as default
+	 */
+	public double computeInitialParameter() {
+		double diffG = 0.0, diffL = 0.0;
+		double sumDiff = 0.0;
+		double maxDiff = 0.0;
+		int indexMaxQual = -1;
+		int i;
+		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) ocelotlCore.getLpaggregManager().getQualities();
+		for (i = 1; i < qual.size(); i++) {
+			// Compute the difference for the gain and the loss
+			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
+			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
+
+			// Compute sum of both
+			sumDiff = diffG + diffL;
+
+			if (sumDiff > maxDiff) {
+				maxDiff = sumDiff;
+				indexMaxQual = i;
+			}
+		}
+		if (indexMaxQual > 0 && indexMaxQual < ocelotlCore.getLpaggregManager().getParameters().size())
+			return ocelotlCore.getLpaggregManager().getParameters().get(indexMaxQual - 1);
+
+		// No index found or the value is invalid, return 1.0 as default
+		return 1.0;
+	}
 }

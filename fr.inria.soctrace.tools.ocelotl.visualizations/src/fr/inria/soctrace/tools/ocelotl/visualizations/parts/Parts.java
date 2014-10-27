@@ -20,9 +20,9 @@
 package fr.inria.soctrace.tools.ocelotl.visualizations.parts;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop.SpaceTAggregationOperator;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
 
-public class Parts extends SpaceTAggregationOperator {
+public class Parts extends VisuTOperator {
 
 	public Parts() {
 		super();
