@@ -13,6 +13,7 @@ public class TestParameters {
 	private long startTimestamp;
 	private long endTimestamp;
 	private int nbTimeSlice;
+	private ArrayList<Integer> timeSlicesCollection;
 	private int nbEventProd;
 	private String timeAggOperator;
 	private String spaceAggOperator;
@@ -36,6 +37,7 @@ public class TestParameters {
 		directory = "";
 		setNumberOfRepetition(1);
 		setActivateCache(false);
+		timeSlicesCollection =  new ArrayList<Integer>();
 	}
 
 	/**
@@ -202,5 +204,13 @@ public class TestParameters {
 
 	public void setNbEventProd(int nbEventProd) {
 		this.nbEventProd = nbEventProd;
+	}
+
+	public ArrayList<Integer> getTimeSlicesCollection() {
+		return timeSlicesCollection;
+	}
+
+	public void setTimeSlicesCollection(ArrayList<Integer> timeSlicesCollection) {
+		this.timeSlicesCollection = timeSlicesCollection;
 	}
 }

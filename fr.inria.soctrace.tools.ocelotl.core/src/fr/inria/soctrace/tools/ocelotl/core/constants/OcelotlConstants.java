@@ -42,7 +42,7 @@ public class OcelotlConstants {
 	/**
 	 * Number of field in the header of a cache file 
 	 */
-	static public final int CACHE_HEADER_NORMAL_SIZE = 9;
+	static public final int CACHE_HEADER_NORMAL_SIZE = 10;
 	
 	/**
 	 * Maximum size of the data cache in bytes.
@@ -58,7 +58,7 @@ public class OcelotlConstants {
 	/**
 	 * Maximal ratio value of dirty time slices in a cache
 	 */
-	static public double MAXIMAL_DIRTY_RATIO = 0.9;
+	static public double MAXIMAL_DIRTY_RATIO = 1.0;
 	
 	/**
 	 * Possible datacache rebuilding strategies

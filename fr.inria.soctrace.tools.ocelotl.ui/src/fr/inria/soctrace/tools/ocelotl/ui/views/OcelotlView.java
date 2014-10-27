@@ -93,6 +93,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench2;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench3;
 import fr.inria.soctrace.tools.ocelotl.ui.TestParameters;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
@@ -108,7 +109,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper
 public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 
-	Trace aTestTrace;
+	public Trace aTestTrace;
 
 	public void loadFromParam(TestParameters someParams, boolean activeCache) {
 		final TestParameters testParams = someParams;
@@ -146,7 +147,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					// If no trace was found
 					if (aTestTrace == null)
 						throw new OcelotlException(OcelotlException.INVALID_CACHED_TRACE);
-
+					
 					// Load the trace
 					confDataLoader.load(aTestTrace);
 
@@ -187,12 +188,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							ocelotlParameters.getDataCache().setBuildingStrategy(testParams.getDatacacheStrat());
 							
-							ArrayList<EventProducer> evProd = new ArrayList<EventProducer>();
+							/*ArrayList<EventProducer> evProd = new ArrayList<EventProducer>();
 							int i;
 							for (i = 0; i < testParams.getNbEventProd(); i++) {
 								evProd.add(ocelotlParameters.getAllEventProducers().get(i));
 							}
-							ocelotlParameters.setEventProducers(evProd);
+							ocelotlParameters.setEventProducers(evProd);*/
 							
 							hasChanged = HasChanged.ALL;
 							
@@ -268,7 +269,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					line = bufFileReader.readLine();
 					if (line.equals("v2")) {
 						aTest = new TestBench2(loadCachefile, view);
-					} else {
+					} else 
+						if (line.equals("v3")) {
+							aTest = new TestBench3(loadCachefile, view);
+						}
+						else
+					{
 						aTest = new TestBench(loadCachefile, view);
 					}
 					aTest.parseFile();
@@ -522,7 +528,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			} else {
 			//	textRun.setText("1.0");
 			}
-			oldParameters = new OcelotlParameters(ocelotlParameters);
+			//oldParameters = new OcelotlParameters(ocelotlParameters);
 			setConfiguration();
 			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
@@ -535,7 +541,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
 								if (monitor.isCanceled()) {
-									restoreConfiguration();
 									synchronized (lock) {
 										running = false;
 									}
@@ -549,7 +554,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
 								if (monitor.isCanceled()) {
-									restoreConfiguration();
 									synchronized (lock) {
 										running = false;
 									}
@@ -564,7 +568,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
 								if (monitor.isCanceled()) {
-									restoreConfiguration();
 									synchronized (lock) {
 										running = false;
 									}
@@ -580,7 +583,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 						hasChanged = HasChanged.PARAMETER;
 						if (monitor.isCanceled()) {
-							restoreConfiguration();
 							synchronized (lock) {
 								running = false;
 							}
@@ -590,7 +592,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						// if (hasChanged == HasChanged.ALL || hasChanged ==
 						// HasChanged.NORMALIZE || hasChanged ==
 						// HasChanged.PARAMETER)
-						aDm.start();
+			
 						ocelotlCore.computeParts();
 						monitor.worked(1);
 
@@ -616,12 +618,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 						public void run() {
 							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
+							aDm.start();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							qualityView.createDiagram();
-
-							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 							aDm.end("Compute parts and display");
+							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 						}
 					});
 
@@ -798,8 +800,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
-			if(timeLineView != null)
-			{
+			if (timeLineView != null) {
 				timeLineView.resizeDiagram();
 				timeAxisView.resizeDiagram();
 			}
@@ -1058,7 +1059,6 @@ private class CacheTimeSliceListener implements ModifyListener {
 	private Spinner								cacheTimeSliceValue;
 	private Font						cantarell8;
 	private Snapshot 					snapshot;
-	private OcelotlParameters			oldParameters;
 	
 	/**
 	 * Followed topics
@@ -1796,17 +1796,6 @@ Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
 		}
 	}
 	
-	public void restoreConfiguration() {
-		ocelotlParameters.setTrace(oldParameters.getTrace());
-		ocelotlParameters.setNormalize(oldParameters.isNormalize());
-		ocelotlParameters.setTimeSlicesNumber(oldParameters.getTimeSlicesNumber());
-		ocelotlParameters.setTimeAggOperator(oldParameters.getTimeAggOperator());
-		ocelotlParameters.setThreshold(oldParameters.getThreshold());
-		ocelotlParameters.setParameter(oldParameters.getParameter());
-		ocelotlParameters.setTimeRegion(oldParameters.getTimeRegion());
-		hasChanged = HasChanged.ALL;
-	}
-
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub

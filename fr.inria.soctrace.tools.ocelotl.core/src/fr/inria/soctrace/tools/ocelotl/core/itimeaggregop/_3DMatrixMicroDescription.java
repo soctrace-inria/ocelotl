@@ -114,6 +114,7 @@ public abstract class _3DMatrixMicroDescription extends
 	@Override
 	public String matrixToCSV() {
 		StringBuffer stringBuf = new StringBuffer();
+		long nbEvents = 0;
 		int slice = 0;
 		// For each slice
 		for (final HashMap<EventProducer, HashMap<String, Double>> it : matrix) {
@@ -121,15 +122,20 @@ public abstract class _3DMatrixMicroDescription extends
 			for (final EventProducer ep : it.keySet()) {
 				// For each event type
 				for (String evtType : it.get(ep).keySet()) {
-					if (it.get(ep).get(evtType) != 0.0)
+					if (it.get(ep).get(evtType) != 0.0) {
 						stringBuf.append(slice + OcelotlConstants.CSVDelimiter
 								+ ep.getId() + OcelotlConstants.CSVDelimiter
 								+ evtType + OcelotlConstants.CSVDelimiter
 								+ it.get(ep).get(evtType) + "\n");
+						nbEvents++;
+					}
 				}
 			}
 			slice++;
 		}
+		density = ((double) nbEvents / (double) (matrix.size()
+				* matrix.get(0).size() * matrix.get(0).get(matrix.get(0).keySet().iterator().next())
+				.size()));
 		return stringBuf.toString();
 	}
 

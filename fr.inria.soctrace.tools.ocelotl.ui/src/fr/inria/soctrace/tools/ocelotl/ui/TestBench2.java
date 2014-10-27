@@ -124,11 +124,13 @@ public class TestBench2 extends TestBench {
 				aTest.setDirectory(dir.getAbsolutePath());
 				
 				statData = statData + aTest.toString().replace("_", ";") + "\n";
-				statData = statData + "Number of Producer; number of TIme Slice; Microscopic Model; Compute Qualities;Compute Dichotomies; Compute best cuts + display\n";
-				//for (int i = 20; i <= 40; i++) {
-				for (int i = 660; i <= 1000; i = i +20) {
+				statData = statData + "Number of events; Number of Producer; number of Time Slices; Microscopic Model; Compute Qualities;Compute Dichotomies; Compute best cuts + display\n";
+				
+				
+				for (int i = 10; i <= 35; i++) {
+				//for (int i = 660; i <= 1000; i = i +20) {
 					aTest.setNbTimeSlice(i);
-					for(j = 16; j <= 583; j = j + 20)
+					for(j = 16; j <= 583; j = j + 2)
 					{
 					aTest.setNbEventProd(j);
 					//for (int j = 0; j < aTest.getNumberOfRepetition(); j++) {
@@ -227,7 +229,7 @@ public class TestBench2 extends TestBench {
 				}
 			}
 
-			stat = aTest.getNbTimeSlice() + ";" + aTest.getNbEventProd() + ";" + microscopicModel + ";" + computeQualities + ";" + computeDicho + ";" +  computePartAndDisplay+ "\n";
+			stat = theView.aTestTrace.getNumberOfEvents() + aTest.getNbTimeSlice() + ";" + aTest.getNbEventProd() + ";" + microscopicModel + ";" + computeQualities + ";" + computeDicho + ";" +  computePartAndDisplay+ "\n";
 			//saveMatrixTime + ";" + loadMatrixTime + ";" + loadDirtyMatrixTime + ";" + dirtyTS + ";" + usedTS + ";" + ratio + ";" + computationTime + "\n";
 
 			bufFileReader.close();

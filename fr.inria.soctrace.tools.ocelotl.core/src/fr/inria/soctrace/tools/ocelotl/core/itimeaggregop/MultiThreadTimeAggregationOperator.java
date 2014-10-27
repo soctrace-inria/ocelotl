@@ -64,6 +64,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 	protected OcelotlParameters parameters;
 	protected OcelotlQueries ocelotlQueries;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
+	double density;
 
 	abstract protected void computeMatrix(IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException;
@@ -239,7 +240,7 @@ public abstract class MultiThreadTimeAggregationOperator {
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
-		Date convertedDate = new Date(System.currentTimeMillis() * 1000);
+		Date convertedDate = new Date(System.currentTimeMillis());
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"
@@ -250,6 +251,8 @@ public abstract class MultiThreadTimeAggregationOperator {
 		try {
 			PrintWriter writer = new PrintWriter(filePath, "UTF-8");
 
+			String matrix = matrixToCSV();
+			
 			// write header (parameters)
 			// traceName; timeAggOp; spaceAggOp starTimestamp; endTimestamp;
 			// timeSliceNumber; parameter; threshold
@@ -268,11 +271,12 @@ public abstract class MultiThreadTimeAggregationOperator {
 					+ parameters.getTimeSlicesNumber()
 					+ OcelotlConstants.CSVDelimiter + parameters.getParameter()
 					+ OcelotlConstants.CSVDelimiter + parameters.getThreshold()
+					+ OcelotlConstants.CSVDelimiter + density
 					+ "\n";
 			writer.print(header);
 
 			// Iterate over matrix and write data
-			writer.print(matrixToCSV());
+			writer.print(matrix);
 
 			// Close the fd
 			writer.flush();
