@@ -22,23 +22,17 @@ package fr.inria.soctrace.tools.ocelotl.core.idataaggregop;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
+
 public class DataAggregationOperatorResource {
 
-	private static final String Split = ", ";
-
 	String operatorClass;
-
 	String name;
-
-	boolean generic;
-	List<String> traceFormats = new ArrayList<String>();
-	List<String> spaceCompatibility = new ArrayList<String>();
-	List<String> eventCategory = new ArrayList<String>();
+	List<String> visuCompatibility = new ArrayList<String>();
+	List<String> dimension = new ArrayList<String>();
 	String paramWinClass;
 	String paramConfig;
-	String unit;
 	int ts;
-	String valueType;
 	String bundle;
 	int selectionPriority;
 
@@ -49,20 +43,16 @@ public class DataAggregationOperatorResource {
 	public DataAggregationOperatorResource(final String operatorClass,
 			final String name, final boolean generic,
 			final List<String> traceFormats,
-			final List<String> spaceCompatibility, final String paramWinClass,
+			final List<String> visuCompatibility, final String paramWinClass,
 			final String paramConfig, final List<String> eventCategory,
 			final String ts, final String unit, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
-		this.generic = generic;
-		this.traceFormats = traceFormats;
-		this.spaceCompatibility = spaceCompatibility;
+		this.visuCompatibility = visuCompatibility;
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
-		this.eventCategory = eventCategory;
 		setTs(ts);
-		this.unit = unit;
 		this.bundle = bundle;
 	}
 
@@ -74,9 +64,7 @@ public class DataAggregationOperatorResource {
 		super();
 		this.operatorClass = operatorClass;
 		this.name = name;
-		this.generic = generic;
-		setTraceFormats(traceFormats);
-		setSpaceCompatibility(spaceCompatibility);
+		setVisuCompatibility(spaceCompatibility);
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
 		this.bundle = bundle;
@@ -88,14 +76,6 @@ public class DataAggregationOperatorResource {
 
 	public String getName() {
 		return name;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
 	}
 
 	public int getTs() {
@@ -122,28 +102,16 @@ public class DataAggregationOperatorResource {
 		return paramWinClass;
 	}
 
-	public List<String> getSpaceCompatibility() {
-		return spaceCompatibility;
+	public List<String> getVisuCompatibility() {
+		return visuCompatibility;
 	}
 
-	public List<String> getTraceFormats() {
-		return traceFormats;
-	}
-
-	public boolean isGeneric() {
-		return generic;
-	}
-
-	public String getValueType() {
-		return valueType;
+	public List<String> getDimension() {
+		return dimension;
 	}
 
 	public void setBundle(final String bundle) {
 		this.bundle = bundle;
-	}
-
-	public void setGeneric(final boolean generic) {
-		this.generic = generic;
 	}
 
 	public void setName(final String name) {
@@ -162,34 +130,14 @@ public class DataAggregationOperatorResource {
 		this.paramWinClass = paramWinClass;
 	}
 
-	public void setSpaceCompatibility(final List<String> spaceCompatibility) {
-		this.spaceCompatibility = spaceCompatibility;
+	public void setVisuCompatibility(final List<String> visuCompatibility) {
+		this.visuCompatibility = visuCompatibility;
 	}
 
-	public void setSpaceCompatibility(final String spaceCompatibility) {
-		decompose(this.spaceCompatibility, spaceCompatibility);
+	public void setVisuCompatibility(final String visuCompatibility) {
+		decompose(this.visuCompatibility, visuCompatibility);
 	}
 
-	public void setEventCategory(final List<String> eventCategory) {
-		this.eventCategory = eventCategory;
-	}
-
-	public void setEventCategory(final String eventCategory) {
-		decompose(this.eventCategory, eventCategory);
-	}
-
-	public void setTraceFormats(final List<String> traceFormats) {
-		this.traceFormats = traceFormats;
-	}
-
-	public void setTraceFormats(final String traceFormats) {
-		decompose(this.traceFormats, traceFormats);
-	}
-
-	public void setValueType(String attribute) {
-		valueType = attribute;
-	}
-	
 	public int getSelectionPriority() {
 		return selectionPriority;
 	}
@@ -203,15 +151,20 @@ public class DataAggregationOperatorResource {
 	}
 
 	private List<String> decompose(List<String> list, String string) {
-		final String[] tmp = string.split(Split);
+		final String[] tmp = string
+				.split(OcelotlConstants.MultipleValueExtensionSeparator);
 		list.clear();
 		for (final String s : tmp)
 			list.add(s);
 		return list;
 	}
 
-	public List<String> getEventCategory() {
-		return eventCategory;
+	public void setDimension(final List<String> dimension) {
+		this.dimension = dimension;
+	}
+
+	public void setDimension(final String dimension) {
+		decompose(this.dimension, dimension);
 	}
 
 }

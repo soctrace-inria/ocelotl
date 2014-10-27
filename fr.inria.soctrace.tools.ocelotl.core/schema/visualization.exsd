@@ -96,7 +96,7 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="time_compatibility" type="string" use="required">
+         <attribute name="metric_compatibility" type="string" use="required">
             <annotation>
                <documentation>
                   
@@ -104,6 +104,13 @@
             </annotation>
          </attribute>
          <attribute name="selection_priority" type="int" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="aggregator_compatibility" type="string" use="required">
             <annotation>
                <documentation>
                   

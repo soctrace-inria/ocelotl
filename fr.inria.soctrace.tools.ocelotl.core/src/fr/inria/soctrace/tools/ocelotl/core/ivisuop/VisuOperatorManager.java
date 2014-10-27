@@ -39,6 +39,9 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class VisuOperatorManager {
 
+	private static final Logger logger = LoggerFactory
+			.getLogger(VisuOperatorManager.class);
+	
 	HashMap<String, VisuOperatorResource> operatorList;
 	IVisuOperator selectedOperator;
 	String selectedOperatorName;
@@ -49,16 +52,12 @@ public class VisuOperatorManager {
 	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.visualization"; //$NON-NLS-1$
 	private static final String OP_NAME = "operator"; //$NON-NLS-1$
 	private static final String OP_CLASS = "class"; //$NON-NLS-1$
-	private static final String OP_VISUALIZATION = "visualization";
-	private static final String OP_PARAM_WIN = "param_win";
-	private static final String OP_PARAM_CONFIG = "param_config";//$NON-NLS-1$
-																	//	private static final String							OP_PARAM_WIN				= "param_win";												//$NON-NLS-1$
-																	//	private static final String							OP_PARAM_CONFIG				= "param_config";											//$NON-NLS-1$
-	private static final String OP_TIME_COMPATIBILITY = "time_compatibility"; //$NON-NLS-1$
+	private static final String OP_VISUALIZATION = "visualization"; //$NON-NLS-1$
+	private static final String OP_PARAM_WIN = "param_win"; //$NON-NLS-1$
+	private static final String OP_PARAM_CONFIG = "param_config";//$NON-NLS-1$							
+	private static final String OP_METRIC_COMPATIBILITY = "metric_compatibility"; //$NON-NLS-1$
 	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(VisuOperatorManager.class);
+	private static final String OP_AGGREGATOR_COMPATIBILITY = "aggregator_compatibility"; //$NON-NLS-1$
 
 	public VisuOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
@@ -88,7 +87,6 @@ public class VisuOperatorManager {
 		}
 		selectedOperator.setOcelotlCore(ocelotlCore);
 	}
-
 	/**
 	 * Instantiate the visualization operator
 	 * 
@@ -111,22 +109,27 @@ public class VisuOperatorManager {
 		}
 		return instantiatedOperator;
 	}
-
-	public List<String> getOperators(final List<String> compatibility) {
+	public List<String> getOperators(final List<String> metricCompatibility, final List<String> aggregCompatibility) {
 		logger.debug("Comparing Visualization Operator trace format with "
-				+ compatibility);
+				+ metricCompatibility);
 		final List<String> op = new ArrayList<String>();
-		for (final VisuOperatorResource r : operatorList.values()) {
+		for (final VisuOperatorResource resource : operatorList.values()) {
 			StringBuffer buff = new StringBuffer();
-			buff.append(r.getTimeCompatibility());
+			buff.append(resource.getTimeCompatibility());
 			logger.debug(buff.toString());
-			for (final String comp : compatibility)
-				for (final String s : r.getTimeCompatibility())
-					if (s.equals(comp))
-						if (!op.contains(r.getName()))
-							op.add(r.getName());
+			// Check metric compatibility
+			for (final String metricComp : metricCompatibility)
+				for (final String ownTimeComp : resource.getTimeCompatibility())
+					if (ownTimeComp.equals(metricComp))
+						// Check aggregation compatiblity
+						for (final String aggComp : aggregCompatibility)
+							for (String ownAggComp : resource
+									.getAggregatorCompatibility())
+								if (ownAggComp.equals(aggComp))
+									if (!op.contains(resource.getName()))
+										op.add(resource.getName());
+
 		}
-		
 		// Sort according to the selection priority level
 		Collections.sort(op, new Comparator<String>() {
 
@@ -154,8 +157,7 @@ public class VisuOperatorManager {
 	public VisuOperatorResource getSelectedOperatorResource() {
 		return operatorList.get(selectedOperatorName);
 	}
-
-	public VisuOperatorResource getSelectedOperatorResource(
+public VisuOperatorResource getSelectedOperatorResource(
 			String anOperatorName) {
 		return operatorList.get(anOperatorName);
 	}
@@ -179,17 +181,17 @@ public class VisuOperatorManager {
 			final VisuOperatorResource resource = new VisuOperatorResource();
 			resource.setOperatorClass(e.getAttribute(OP_CLASS));
 			resource.setName(e.getAttribute(OP_NAME));
-			resource.setTimeCompatibility(e.getAttribute(OP_TIME_COMPATIBILITY));
+			resource.setTimeCompatibility(e.getAttribute(OP_METRIC_COMPATIBILITY));
+			resource.setAggregatorCompatibility(e.getAttribute(OP_AGGREGATOR_COMPATIBILITY));
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
 			resource.setSelectionPriority(Integer.parseInt(e
 					.getAttribute(OP_SELECTION_PRIORITY)));
 			resource.setBundle(e.getContributor().getName());
-			// logger.debug(resource.getBundle());
 			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
-					+ resource.getTimeCompatibility());
+					+ resource.getTimeCompatibility() + " " + resource.getAggregatorCompatibility());
 		}
 	}
 
@@ -207,7 +209,6 @@ public class VisuOperatorManager {
 		}
 
 	}
-
 	public HashMap<String, VisuOperatorResource> getOperatorList() {
 		return operatorList;
 	}
