@@ -19,10 +19,15 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -247,6 +252,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				return;
 
 			snapshot.takeSnapShot();
+			playSound("/media/snapshot.wav");
 		}
 	}
 
@@ -1823,5 +1829,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		// No index found or the value is invalid, return 1.0 as default
 		return 1.0;
 	}
+	
+	public static synchronized void playSound(final String soundPath) {
+		try {
+			URL soundFile = OcelotlView.class.getResource(soundPath);
+			Clip clip = AudioSystem.getClip();
+			AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
+			clip.open(inputStream);
+			clip.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 
 }
