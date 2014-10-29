@@ -382,7 +382,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 							
 							// Compute the parameter value
-							ocelotlParameters.setParameter(computeInitialParameter());
+							ocelotlParameters.setParameter(1.0);
 						}
 
 						hasChanged = HasChanged.PARAMETER;
