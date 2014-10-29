@@ -149,7 +149,7 @@ public class VisuOperatorManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " Space aggregation operators detected:");
+		logger.debug(config.length + " Visualizations detected:");
 
 		for (final IConfigurationElement e : config) {
 			final VisuOperatorResource resource = new VisuOperatorResource();

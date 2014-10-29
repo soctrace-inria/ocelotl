@@ -124,7 +124,7 @@ public class DataAggregationOperatorManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " Time aggregation operators detected:");
+		logger.debug(config.length + " Data aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final DataAggregationOperatorResource resource = new DataAggregationOperatorResource();
@@ -139,6 +139,8 @@ public class DataAggregationOperatorManager {
 			resource.setDimension(e.getAttribute(OP_DIMENSION));
 			resource.setSelectionPriority(e.getAttribute(OP_SELECTION_PRIORITY));
 			operatorList.put(resource.getName(), resource);
+			logger.debug("    " + resource.getName() + " "
+					+ resource.getVisuCompatibility());
 		}
 	}
 

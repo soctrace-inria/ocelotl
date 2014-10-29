@@ -95,7 +95,7 @@ public class MicroscopicDescriptionTypeManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " Microscopic model types detected:");
+		logger.debug(config.length + " Metrics detected:");
 
 		for (final IConfigurationElement e : config) {
 			final MicroscopicDescriptionTypeResource resource = new MicroscopicDescriptionTypeResource();
