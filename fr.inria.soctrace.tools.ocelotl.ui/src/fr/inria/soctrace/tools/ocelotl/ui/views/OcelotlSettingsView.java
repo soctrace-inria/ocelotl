@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -30,10 +31,12 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
+import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
 
 public class OcelotlSettingsView extends Dialog {
-	
+
 	private OcelotlView							ocelotlView;
+	private OcelotlSettings						settings;
 	private Button								btnDeleteDataCache;
 	private Text								datacacheDirectory;
 	private Button								btnChangeCacheDirectory;
@@ -51,106 +54,73 @@ public class OcelotlSettingsView extends Dialog {
 	private Spinner								dataCacheSize;
 	private Font								cantarell8;
 	private Text								textThreshold;
-	
+	private DatacachePolicy						currentSelectedDatacachePolicy;
+	private String								currentDatacacheDir;
+
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
 		this.ocelotlView = ocelotlView;
+		settings = ocelotlView.getParams().getOcelotlSettings();
+		currentSelectedDatacachePolicy = settings.getCachePolicy();
+		currentDatacacheDir = "";
 	}
 
 	public void openDialog() {
 		this.open();
 	}
 
-	private class CacheTimeSliceListener implements ModifyListener {
+	/*
+	 * private class CacheTimeSliceListener implements ModifyListener {
+	 * 
+	 * @Override public void modifyText(final ModifyEvent e) {
+	 * ocelotlView.getParams
+	 * ().getOcelotlSettings().setCacheTimeSliceNumber(Integer
+	 * .valueOf(cacheTimeSliceValue.getText())); } }
+	 */
 
-		@Override
-		public void modifyText(final ModifyEvent e) {
-			ocelotlView.getParams().getOcelotlSettings().setCacheTimeSliceNumber(Integer.valueOf(cacheTimeSliceValue.getText()));
-		}
-	}
+	/*
+	 * private class ThreadNumberListener implements ModifyListener {
+	 * 
+	 * @Override public void modifyText(final ModifyEvent e) {
+	 * ocelotlView.getParams
+	 * ().getOcelotlSettings().setNumberOfThread(Integer.valueOf
+	 * (spinnerThread.getText())); } }
+	 */
 
-	private class ThreadNumberListener implements ModifyListener {
-
-		@Override
-		public void modifyText(final ModifyEvent e) {
-			ocelotlView.getParams().getOcelotlSettings().setNumberOfThread(Integer.valueOf(spinnerThread.getText()));
-		}
-	}
-
-	private class MaxEventProducerListener implements ModifyListener {
-
-		@Override
-		public void modifyText(final ModifyEvent e) {
-			ocelotlView.getParams().getOcelotlSettings().setMaxEventProducersPerQuery(Integer.valueOf(spinnerDivideDbQuery.getText()));
-		}
-	}
-
-	private class EventPerThreadListener implements ModifyListener {
-
-		@Override
-		public void modifyText(final ModifyEvent e) {
-			ocelotlView.getParams().getOcelotlSettings().setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
-		}
-	}
+	/*
+	 * private class MaxEventProducerListener implements ModifyListener {
+	 * 
+	 * @Override public void modifyText(final ModifyEvent e) {
+	 * ocelotlView.getParams
+	 * ().getOcelotlSettings().setMaxEventProducersPerQuery(
+	 * Integer.valueOf(spinnerDivideDbQuery.getText())); } }
+	 */
+	/*
+	 * private class EventPerThreadListener implements ModifyListener {
+	 * 
+	 * @Override public void modifyText(final ModifyEvent e) {
+	 * ocelotlView.getParams
+	 * ().getOcelotlSettings().setEventsPerThread(Integer.valueOf
+	 * (spinnerEventSize.getText())); } }
+	 */
 
 	private class cachePolicyListener extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			if (btnRadioButton.getSelection()) {
-				ocelotlView.getParams().getOcelotlSettings().setCachePolicy(DatacachePolicy.CACHEPOLICY_SLOW);
+				currentSelectedDatacachePolicy = DatacachePolicy.CACHEPOLICY_SLOW;
 			}
 			if (btnRadioButton_1.getSelection()) {
-				ocelotlView.getParams().getOcelotlSettings().setCachePolicy(DatacachePolicy.CACHEPOLICY_FAST);
+				currentSelectedDatacachePolicy = DatacachePolicy.CACHEPOLICY_FAST;
 			}
 			if (btnRadioButton_2.getSelection()) {
-				ocelotlView.getParams().getOcelotlSettings().setCachePolicy(DatacachePolicy.CACHEPOLICY_ASK);
+				currentSelectedDatacachePolicy = DatacachePolicy.CACHEPOLICY_ASK;
 			}
 			if (btnRadioButton_3.getSelection()) {
-				ocelotlView.getParams().getOcelotlSettings().setCachePolicy(DatacachePolicy.CACHEPOLICY_AUTO);
+				currentSelectedDatacachePolicy = DatacachePolicy.CACHEPOLICY_AUTO;
 			}
 		}
-	}
-
-	private class DataCacheSizeListener implements ModifyListener {
-
-		@Override
-		public void modifyText(final ModifyEvent e) {
-			try {
-				if (Integer.valueOf(dataCacheSize.getText()) < 0) {
-					ocelotlView.getParams().getDataCache().setCacheMaxSize(-1);
-				} else {
-					// Set the cache size at the entered value converted from
-					// Megabytes to bytes
-					ocelotlView.getParams().getDataCache().setCacheMaxSize(Long.valueOf(dataCacheSize.getText()) * 1000000);
-				}
-			} catch (final NumberFormatException err) {
-				dataCacheSize.setSelection((int) ocelotlView.getParams().getDataCache().getCacheMaxSize());
-			} catch (OcelotlException e1) {
-				MessageDialog.openInformation(getShell(), "Error", e1.getMessage());
-			}
-		}
-	}
-
-	private class ThresholdModifyListener implements ModifyListener {
-
-		@Override
-		public void modifyText(final ModifyEvent e) {
-			ocelotlView.getParams().getOcelotlSettings().setThresholdPrecision(Float.parseFloat(textThreshold.getText()));
-
-			try {
-				if (Float.parseFloat(textThreshold.getText()) < Float.MIN_VALUE || Float.parseFloat(textThreshold.getText()) > 1)
-					textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
-			} catch (final NumberFormatException err) {
-				textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
-			}
-		/*	if (confDataLoader.getCurrentTrace() == null)
-				return;
-
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
-				hasChanged = HasChanged.THRESHOLD;
-		}*/
-	}
 	}
 
 	private class DeleteDataCache extends SelectionAdapter {
@@ -158,31 +128,62 @@ public class OcelotlSettingsView extends Dialog {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			// Ask user confirmation
-			if (MessageDialog.openConfirm(getShell(), "Delete cached data", "This will delete all cached data. Do you want to continue ?"))
+			if (MessageDialog.openConfirm(getShell(), "Delete cached data", "This will delete all cached data and it cannot be cancelled. Do you want to continue ?"))
 				ocelotlView.getParams().getDataCache().deleteCache();
 		}
 	}
 
+	public void modifyDataCacheSize() {
+		try {
+			if (Integer.valueOf(dataCacheSize.getText()) < 0) {
+				ocelotlView.getParams().getDataCache().setCacheMaxSize(-1);
+			} else {
+				// Set the cache size at the entered value converted from
+				// Megabytes to bytes
+				ocelotlView.getParams().getDataCache().setCacheMaxSize(Long.valueOf(dataCacheSize.getText()) * 1000000);
+			}
+		} catch (final NumberFormatException err) {
+			dataCacheSize.setSelection((int) ocelotlView.getParams().getDataCache().getCacheMaxSize());
+		} catch (OcelotlException e1) {
+			MessageDialog.openInformation(getShell(), "Error", e1.getMessage());
+		}
+	}
+	
 	private class ModifyDatacacheDirectory extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			DirectoryDialog dialog = new DirectoryDialog(getShell());
 			String newCacheDir = dialog.open();
+			// Did the user cancel?
 			if (newCacheDir != null) {
-				// Update the current datacache path
-				ocelotlView.getParams().getDataCache().setCacheDirectory(newCacheDir);
-				// Update the displayed path
-				datacacheDirectory.setText(ocelotlView.getParams().getDataCache().getCacheDirectory());
+				// Is the directory valid
+				if (ocelotlView.getParams().getDataCache().checkCacheDirectoryValidity(newCacheDir)) {
+					currentDatacacheDir = newCacheDir;
+
+					// Update the displayed path
+					datacacheDirectory.setText(newCacheDir);
+				} else {
+					MessageDialog.openInformation(getShell(), "Error", "Invalid datacache directory: the specified directory cannot be created or do not have the read acces rights");
+				}
 			}
 		}
 	}
 
+	/**
+	 * If necessary, update the cache directory
+	 */
+	private void updateCacheDir() {
+		// Was there change in the datacache directory ?
+		if (!currentDatacacheDir.isEmpty())
+			// If so, update the current datacache path
+			ocelotlView.getParams().getDataCache().setCacheDirectory(currentDatacacheDir);
+	}
+	
 	private class EnableCacheListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			ocelotlView.getParams().getDataCache().setCacheActive(btnCacheEnabled.getSelection());
-			boolean cacheActivation = ocelotlView.getParams().getDataCache().isCacheActive();
+			boolean cacheActivation = btnCacheEnabled.getSelection();
 
 			btnDeleteDataCache.setEnabled(cacheActivation);
 			datacacheDirectory.setEnabled(cacheActivation);
@@ -196,6 +197,19 @@ public class OcelotlSettingsView extends Dialog {
 		}
 	}
 
+
+	public void modifyThreshold(final ModifyEvent e) {
+		// TODO thresholdHasChanged = ?
+		
+		if (Float.parseFloat(textThreshold.getText()) < Float.MIN_VALUE || Float.parseFloat(textThreshold.getText()) > 1)
+			textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
+		else {
+			ocelotlView.getParams().getOcelotlSettings().setThresholdPrecision(Float.parseFloat(textThreshold.getText()));
+		}
+
+	}
+
+
 	private class IncreasingQualityRadioSelectionAdapter extends SelectionAdapter {
 
 		@Override
@@ -203,7 +217,7 @@ public class OcelotlSettingsView extends Dialog {
 			btnDecreasingQualities.setSelection(!btnGrowingQualities.getSelection());
 			ocelotlView.getParams().setGrowingQualities(btnGrowingQualities.getSelection());
 			ocelotlView.getParams().getOcelotlSettings().setIncreasingQualities(btnGrowingQualities.getSelection());
-		//	qualityView.createDiagram();
+			// qualityView.createDiagram();
 		}
 	}
 
@@ -211,17 +225,18 @@ public class OcelotlSettingsView extends Dialog {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-		//	if (hasChanged != HasChanged.ALL)
-		//		hasChanged = HasChanged.NORMALIZE;
+			// if (hasChanged != HasChanged.ALL)
+			// hasChanged = HasChanged.NORMALIZE;
 
-		ocelotlView.getParams().getOcelotlSettings().setNormalizedCurve(btnNormalize.getSelection());
+			ocelotlView.getParams().getOcelotlSettings().setNormalizedCurve(btnNormalize.getSelection());
 
-		//	if (confDataLoader.getCurrentTrace() == null || comboSpace.getText().equals("") || comboTime.getText().equals(""))
-		//		return;
-		//	btnRun.notifyListeners(SWT.Selection, new Event());
+			// if (confDataLoader.getCurrentTrace() == null ||
+			// comboSpace.getText().equals("") ||
+			// comboTime.getText().equals(""))
+			// return;
+			// btnRun.notifyListeners(SWT.Selection, new Event());
 		}
 	}
-
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
@@ -353,7 +368,7 @@ public class OcelotlSettingsView extends Dialog {
 		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_text.widthHint = 100;
 		dataCacheSize.setLayoutData(gd_text);
-		dataCacheSize.addModifyListener(new DataCacheSizeListener());
+	//	dataCacheSize.addModifyListener(new DataCacheSizeListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
@@ -368,7 +383,6 @@ public class OcelotlSettingsView extends Dialog {
 		gd_cacheTimeSliceValue.widthHint = 100;
 		cacheTimeSliceValue.setLayoutData(gd_cacheTimeSliceValue);
 		cacheTimeSliceValue.setSelection(ocelotlView.getParams().getOcelotlSettings().getCacheTimeSliceNumber());
-		cacheTimeSliceValue.addModifyListener(new CacheTimeSliceListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		Label lblCachePolicy = new Label(groupDataCacheSettings, SWT.NONE);
@@ -433,7 +447,6 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerEventSize.setMinimum(OcelotlDefaultParameterConstants.MIN_EVENTS_PER_THREAD);
 		spinnerEventSize.setMaximum(OcelotlDefaultParameterConstants.MAX_EVENTS_PER_THREAD);
 		spinnerEventSize.setSelection(ocelotlView.getParams().getOcelotlSettings().getEventsPerThread());
-		spinnerEventSize.addModifyListener(new EventPerThreadListener());
 
 		final Group grpDivideDbQuery = new Group(advancedSettingsSashForm, SWT.NONE);
 		grpDivideDbQuery.setFont(cantarell8);
@@ -450,7 +463,6 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerDivideDbQuery.setMinimum(OcelotlDefaultParameterConstants.MIN_EVENT_PRODUCERS_PER_QUERY);
 		spinnerDivideDbQuery.setMaximum(OcelotlDefaultParameterConstants.MAX_EVENT_PRODUCERS_PER_QUERY);
 		spinnerDivideDbQuery.setSelection(ocelotlView.getParams().getOcelotlSettings().getMaxEventProducersPerQuery());
-		spinnerDivideDbQuery.addModifyListener(new MaxEventProducerListener());
 
 		final Group grpMultiThread = new Group(advancedSettingsSashForm, SWT.NONE);
 		grpMultiThread.setFont(cantarell8);
@@ -467,24 +479,47 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerThread.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_THREAD);
 		spinnerThread.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_THREAD);
 		spinnerThread.setSelection(ocelotlView.getParams().getOcelotlSettings().getNumberOfThread());
-		spinnerThread.addModifyListener(new ThreadNumberListener());
 		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1 });
 
 		return sashFormGlobal;
 	}
-	
+
 	@Override
 	protected void okPressed() {
 		saveSettings();
 		super.okPressed();
 	}
 
-	
-	void saveSettings()
-	{
-		
+	/**
+	 * Set a customize title for the setting window
+	 */
+	@Override
+	protected void configureShell(Shell newShell) {
+		super.configureShell(newShell);
+		newShell.setText("Ocelotl Settings");
 	}
-	
+
+	/**
+	 * Save all the settings into the configuration file
+	 */
+	void saveSettings() {
+		// Cache settings
+		ocelotlView.getParams().getDataCache().setCacheActive(btnCacheEnabled.getSelection());
+		settings.setCacheTimeSliceNumber(Integer.valueOf(cacheTimeSliceValue.getText()));
+		modifyDataCacheSize();
+		updateCacheDir();
+		settings.setCachePolicy(currentSelectedDatacachePolicy);
+
+		// Advanced settings
+		settings.setNumberOfThread(Integer.valueOf(spinnerThread.getText()));
+		settings.setMaxEventProducersPerQuery(Integer.valueOf(spinnerDivideDbQuery.getText()));
+		settings.setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
+
+		// Curve settings
+		
+		ocelotlView.updateSettings();
+	}
+
 	@Override
 	protected void cancelPressed() {
 		super.cancelPressed();

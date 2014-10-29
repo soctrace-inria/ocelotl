@@ -160,44 +160,7 @@ public class DataCache {
 	public void setCacheDirectory(String cacheDirectory) {
 
 		if (!this.cacheDirectory.equals(cacheDirectory)) {
-			// Check the existence of the cache directory
-			File dir = new File(cacheDirectory);
-			if (!dir.exists()) {
-				logger.debug("Cache directory (" + cacheDirectory
-						+ ") does not exist and will be created now.");
-
-				// Create the directory
-				if (!dir.mkdirs()) {
-					logger.error("Failed to create cache directory: "
-							+ cacheDirectory + ".");
-
-					if (this.cacheDirectory.isEmpty()) {
-						logger.error("The current cache directory is still: "
-								+ this.cacheDirectory);
-					} else {
-						validDirectory = false;
-						logger.error("The cache will be turned off.");
-					}
-					return;
-				}
-			}
-
-			// Check that we have at least the reading rights
-			if (!dir.canRead()) {
-				logger.error("The application does not have the rights to read in the given directory: "
-						+ cacheDirectory + ".");
-
-				if (this.cacheDirectory.isEmpty()) {
-					validDirectory = false;
-					logger.error("The cache will be turned off.");
-				} else {
-					logger.error("The current cache directory is still: "
-							+ this.cacheDirectory);
-				}
-				return;
-			}
-
-			validDirectory = true;
+			validDirectory = checkCacheDirectoryValidity(cacheDirectory);
 
 			// Everything's OK, set the cache directory
 			this.cacheDirectory = cacheDirectory;
@@ -208,6 +171,56 @@ public class DataCache {
 			// Search the directory for existing cache files
 			readCachedData();
 		}
+	}
+	
+	/**
+	 * Check that the cache directory is a valid one, i.e. does it exist and can
+	 * it be read
+	 * 
+	 * @param cacheDirectory
+	 *            path to the cache directory
+	 * @return true if valid, false otherwise
+	 */
+	public boolean checkCacheDirectoryValidity(String cacheDirectory) {
+		
+		// Check the existence of the cache directory
+		File dir = new File(cacheDirectory);
+		if (!dir.exists()) {
+			logger.debug("Cache directory (" + cacheDirectory
+					+ ") does not exist and will be created now.");
+
+			// Create the directory
+			if (!dir.mkdirs()) {
+				logger.error("Failed to create cache directory: "
+						+ cacheDirectory + ".");
+
+				if (this.cacheDirectory.isEmpty()) {
+					logger.error("The current cache directory is still: "
+							+ this.cacheDirectory);
+				} else {
+					validDirectory = false;
+					logger.error("The cache will be turned off.");
+				}
+				return false;
+			}
+		}
+
+		// Check that we have at least the reading rights
+		if (!dir.canRead()) {
+			logger.error("The application does not have the rights to read in the given directory: "
+					+ cacheDirectory + ".");
+
+			if (this.cacheDirectory.isEmpty()) {
+				validDirectory = false;
+				logger.error("The cache will be turned off.");
+			} else {
+				logger.error("The current cache directory is still: "
+						+ this.cacheDirectory);
+			}
+			return false;
+		}
+		
+		return true;
 	}
 
 	public int getTimeSliceFactor() {

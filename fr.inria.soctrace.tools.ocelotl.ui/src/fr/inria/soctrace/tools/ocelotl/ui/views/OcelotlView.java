@@ -1475,4 +1475,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			e.printStackTrace();
 		}
 	}
+	
+	public void updateSettings() {
+		if (confDataLoader.getCurrentTrace() == null)
+			return;
+
+		if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
+			hasChanged = HasChanged.THRESHOLD;
+	}
 }
