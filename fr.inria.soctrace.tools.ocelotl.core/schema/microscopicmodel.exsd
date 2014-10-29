@@ -46,17 +46,17 @@
          </attribute>
       </complexType>
    </element>
-   
+
    <element name="microscopic_model">
       <complexType>
-       <attribute name="name" type="string" use="required">
+         <attribute name="name" type="string" use="required">
             <annotation>
-               <documentation>   
+               <documentation>
+                  
                </documentation>
             </annotation>
          </attribute>
-         
-          <attribute name="class" type="string" use="required">
+         <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
                   
@@ -66,17 +66,17 @@
                </appinfo>
             </annotation>
          </attribute>
-         
-         <attribute name="type" type="string" use="required">
+         <attribute name="event_category" type="string" use="required">
             <annotation>
-               <documentation>  
+               <documentation>
+                  
                </documentation>
             </annotation>
          </attribute>
-         
          <attribute name="unit" use="required">
             <annotation>
                <documentation>
+                  
                </documentation>
             </annotation>
             <simpleType>
@@ -89,6 +89,41 @@
                   </enumeration>
                </restriction>
             </simpleType>
+         </attribute>
+         <attribute name="visual_compatibility" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="trace_formats" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="generic" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="value_type" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="selection_priority" type="int" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
          </attribute>
       </complexType>
    </element>

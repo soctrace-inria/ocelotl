@@ -22,11 +22,14 @@ package fr.inria.soctrace.tools.ocelotl.core.ivisuop;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
+
 public class VisuOperatorResource {
 
 	String operatorClass;
 	String name;
 	List<String> timeCompatibility = new ArrayList<String>();
+	List<String> aggregatorCompatibility = new ArrayList<String>();
 	String paramWinClass;
 	String paramConfig;
 	String visualization;
@@ -67,6 +70,10 @@ public class VisuOperatorResource {
 	public List<String> getTimeCompatibility() {
 		return timeCompatibility;
 	}
+	
+	public List<String> getAggregatorCompatibility() {
+		return aggregatorCompatibility;
+	}
 
 	public String getVisualization() {
 		return visualization;
@@ -93,9 +100,15 @@ public class VisuOperatorResource {
 	}
 
 	public void setTimeCompatibility(final String string) {
-		final String[] tmp = string.split(", ");
+		final String[] tmp = string.split(OcelotlConstants.MultipleValueExtensionSeparator);
 		for (final String s : tmp)
 			timeCompatibility.add(s);
+	}
+	
+	public void setAggregatorCompatibility(final String string) {
+		final String[] tmp = string.split(OcelotlConstants.MultipleValueExtensionSeparator);
+		for (final String s : tmp)
+			aggregatorCompatibility.add(s);
 	}
 
 	public void setVisualization(final String visualization) {
