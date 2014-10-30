@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Otf2
-Bundle-SymbolicName: fr.inria.soctrace.tools.importer.otf2;singleton:=true
+Bundle-Name: Paraver
+Bundle-SymbolicName: fr.inria.soctrace.tools.importer.paraver;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: fr.inria.soctrace.tools.importer.paraver.Activator
 Bundle-Vendor: INRIA
@@ -16,4 +16,5 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: fr.inria.soctrace.tools.ocelotl.core.events,
- org.apache.commons.io
+ org.apache.commons.io,
+ org.eclipse.core.resources

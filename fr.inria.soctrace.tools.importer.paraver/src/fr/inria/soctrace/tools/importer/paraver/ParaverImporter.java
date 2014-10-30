@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FilenameUtils;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
@@ -30,9 +31,11 @@ import fr.inria.soctrace.lib.storage.DBObject.DBMode;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
 import fr.inria.soctrace.lib.storage.TraceDBObject;
 import fr.inria.soctrace.lib.utils.DeltaManager;
+import fr.inria.soctrace.tools.importer.pajedump.core.PJDumpConstants;
 import fr.inria.soctrace.tools.importer.pajedump.core.PJDumpParser;
+import fr.inria.soctrace.tools.importer.pajedump.core.PJDumpTraceMetadata;
 import fr.inria.soctrace.tools.importer.paraver.core.ParaverConstants;
-import fr.inria.soctrace.tools.importer.paraver.core.ParaverParser;
+import fr.inria.soctrace.tools.importer.paraver.core.ParaverTraceMetadata;
 import fr.inria.soctrace.tools.importer.paraver.reader.ParaverPrintWrapper;
 
 /**
@@ -51,11 +54,29 @@ public class ParaverImporter extends FramesocTool {
 	public class ParaverImporterPluginJobBody implements IPluginToolJobBody {
 
 		private String args[];
+		
+		class ParaverParser extends PJDumpParser{
+			String alias;
+			
+			public ParaverParser(SystemDBObject sysDB, TraceDBObject traceDB,
+					String traceFile, String alias) {
+				super(sysDB, traceDB, traceFile);
+				this.alias=alias;
+			}
+
+			protected void saveTraceMetadata(boolean partialImport) throws SoCTraceException {
+
+				ParaverTraceMetadata metadata = new ParaverTraceMetadata(sysDB, traceDB.getDBName(),
+						alias, numberOfEvents, minTimestamp, maxTimestamp);
+				metadata.createMetadata();
+				metadata.saveMetadata();
+			}
+		}
 
 		public ParaverImporterPluginJobBody(String[] args) {
 			this.args = args;
 		}
-
+		
 		@Override
 		public void run(IProgressMonitor monitor) {
 			DeltaManager delta = new DeltaManager();
@@ -89,14 +110,17 @@ public class ParaverImporter extends FramesocTool {
 				// parsing
 				ArrayList<String> arguments = new ArrayList<String>();
 				String input=traceFile.replace(ParaverConstants.TRACE_EXT, "");
+				String output=ResourcesPlugin.getWorkspace().getRoot().getLocation().toString()+File.separator+"tmp";
 				arguments.add("-i");
 				arguments.add(input);
 				arguments.add("-o");
-				arguments.add(input);
+				arguments.add(output);
 				arguments.add("-f");
-				arguments.add("pjdump");
+				arguments.add(PJDumpConstants.TRACE_EXT.replace(".", ""));
 				ParaverPrintWrapper printer = new ParaverPrintWrapper(arguments);
-				PJDumpParser parser = new PJDumpParser(sysDB, traceDB, traceFile.replace(ParaverConstants.TRACE_EXT, ""));
+				printer.executeSync(monitor);
+				
+				ParaverParser parser = new ParaverParser(sysDB, traceDB, output+PJDumpConstants.TRACE_EXT, FilenameUtils.getBaseName(input));
 				parser.parseTrace(monitor, 1, 1);
 
 			} catch (SoCTraceException ex) {

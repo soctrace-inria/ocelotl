@@ -11,7 +11,7 @@
 package fr.inria.soctrace.tools.importer.paraver.core;
 
 /**
- * Constants for Otf2 parser
+ * Constants for Paraver parser
  * 
  * TODO: add more
  * 

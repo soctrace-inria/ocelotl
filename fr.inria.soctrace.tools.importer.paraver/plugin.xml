@@ -5,8 +5,8 @@
          point="fr.inria.soctrace.framesoc.core.tool">
       <tool
             class="fr.inria.soctrace.tools.importer.paraver.ParaverImporter"
-            doc="Select the OTF2 anchor file."
-            name="OTF2 Importer"
+            doc="Select the Paraver .prv file."
+            name="Paraver Importer"
             type="IMPORT">
       </tool>
    </extension>

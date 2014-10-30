@@ -17,7 +17,10 @@ import java.util.SimpleTimeZone;
 import fr.inria.soctrace.framesoc.core.tools.importers.AbstractTraceMetadataManager;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.model.utils.ModelConstants.TimeUnit;
 import fr.inria.soctrace.lib.storage.SystemDBObject;
+import fr.inria.soctrace.tools.importer.pajedump.core.PJDumpConstants;
+import fr.inria.soctrace.tools.importer.pajedump.core.PJDumpTraceMetadata;
 
 /**
  * Class to manage Otf2 Trace metadata.
@@ -27,88 +30,40 @@ import fr.inria.soctrace.lib.storage.SystemDBObject;
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class ParaverTraceMetadata extends AbstractTraceMetadataManager {
+public class ParaverTraceMetadata extends PJDumpTraceMetadata {
 
-	private Trace buffer = new Trace(0);
-
+	private String dbName;
+	private String alias;
+	private int events;
+	private long min;
+	private long max;
+	
 	@Override
 	public String getTraceTypeName() {
 		return ParaverConstants.TRACE_TYPE;
 	}
-
-	public ParaverTraceMetadata(SystemDBObject sysDB, String dbName, String alias)
-			throws SoCTraceException {
-		super(sysDB);
-		this.buffer.setDbName(dbName);
-		this.buffer.setAlias(alias + getCurrentDate());
-	}
-
-	public void setNumberOfEvents(int events) {
-		this.buffer.setNumberOfEvents(events);
-	}
-
-	public void setMinTimestamp(long min) {
-		this.buffer.setMinTimestamp(min);
-	}
-
-	public void setMaxTimestamp(long max) {
-		this.buffer.setMaxTimestamp(max);
+		
+	public ParaverTraceMetadata(SystemDBObject sysDB, String dbName, String alias, int events, long min, long max) throws SoCTraceException {
+	super(sysDB, dbName, alias, events, min, max);
 	}
 	
-	public void setTimeUnit(int timeUnit) {
-		this.buffer.setTimeUnit(timeUnit);
-	}
-
 	@Override
 	public void setTraceFields(Trace trace) {
-
-		// fields read by the buffer
-		trace.setAlias(buffer.getAlias());
-		trace.setDbName(buffer.getDbName());
-		
-		trace.setNumberOfEvents(buffer.getNumberOfEvents());
-		trace.setMinTimestamp(buffer.getMinTimestamp());
-		trace.setMaxTimestamp(buffer.getMaxTimestamp());
-		
-		trace.setTimeUnit(buffer.getTimeUnit());
-		trace.setTracedApplication(buffer.getTracedApplication());
-		trace.setOperatingSystem(buffer.getOperatingSystem());
-
-		// standard fields
+		trace.setAlias(alias);
+		trace.setDbName(dbName);
 		trace.setDescription("paraver trace imported " + getCurrentDate());
+		trace.setNumberOfCpus(1);
+		trace.setNumberOfEvents(events);
 		trace.setOutputDevice("paraver");
 		trace.setProcessed(false);
-
-		// not used fields
-		trace.setNumberOfCpus(1);
-		trace.setBoard("none");
-
+		trace.setMinTimestamp(min);
+		trace.setMaxTimestamp(max);
+		trace.setTimeUnit(TimeUnit.NANOSECONDS.getInt());
+		
+		trace.setTracedApplication("unknown");
+		trace.setBoard("unknown");
+		trace.setOperatingSystem("unknown");
 	}
 
-	/**
-	 * Get the current date.
-	 * 
-	 * @return a string with the current date
-	 */
-	private String getCurrentDate() {
-		SimpleDateFormat sdf = new SimpleDateFormat();
-		sdf.setTimeZone(new SimpleTimeZone(0, "GMT"));
-		sdf.applyPattern("dd MMM yyyy HH:mm:ss z");
-		return sdf.format(new Date()).toString();
-	}
-	
-	/**
-	 * Get the exposant of the time unit
-	 * 
-	 * @return a string with the current date
-	 */
-	public int getTimeUnit(long ticksPerSecond) {
-		int exp = 0;
-		while (ticksPerSecond >= 10) {
-			ticksPerSecond = ticksPerSecond / 10;
-			exp++;
-		}
-		return -1 * exp;
-	}
 
 }

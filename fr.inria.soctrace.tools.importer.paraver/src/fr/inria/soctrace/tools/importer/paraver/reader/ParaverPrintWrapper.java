@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -34,10 +35,12 @@ public class ParaverPrintWrapper extends ExternalProgramWrapper {
 
 	private final static Logger logger = LoggerFactory.getLogger(ParaverPrintWrapper.class);
 
+	
+	private static final String CMD = "perl";
 	/**
-	 * Default oft2-print executable location
+	 * Default perl script executable location
 	 */
-	private static final String DEFAULT_PATH = "exe" + File.separator + "otf2-print";
+	private static final String SCRIPT_PATH = "perl" + File.separator + "prv2pjdump.pl";
 
 	/**
 	 * Constructor
@@ -46,7 +49,14 @@ public class ParaverPrintWrapper extends ExternalProgramWrapper {
 	 *            program arguments
 	 */
 	public ParaverPrintWrapper(List<String> arguments) {
-		super(readPath(), arguments);
+		super(CMD, generateArgs(arguments));
+	}
+
+	private static List<String> generateArgs(List<String> arguments) {
+		ArrayList<String> arguments2 =new ArrayList<String>();
+		arguments2.add(readPath());
+		arguments2.addAll(arguments);
+		return arguments2;
 	}
 
 	/**
@@ -57,7 +67,7 @@ public class ParaverPrintWrapper extends ExternalProgramWrapper {
 	private static String readPath() {
 			// executable path
 			Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
-			Path path = new Path(DEFAULT_PATH);
+			Path path = new Path(SCRIPT_PATH);
 			URL fileURL = FileLocator.find(bundle, path, null);
 			String executablePath = null;
 			try {
