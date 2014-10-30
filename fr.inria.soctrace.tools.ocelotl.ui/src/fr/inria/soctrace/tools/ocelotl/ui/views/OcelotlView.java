@@ -646,19 +646,22 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 
-	private class LaunchSettingWindow extends SelectionAdapter {
-
-		private final OcelotlView	view;
-
-		public LaunchSettingWindow(final OcelotlView view) {
-			this.view = view;
-		}
-
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			final OcelotlSettingsView settingsView = new OcelotlSettingsView(view);
-			settingsView.openDialog();
-		}
+	/**
+	 * Add the settings button to the toolbar
+	 * 
+	 * @param view
+	 * @return the action creating the window settings
+	 */
+	private Action createSettingWindow(final OcelotlView view) {
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.framesoc.ui", "icons/management.png");
+		final Action showSettings = new Action("Ocelotl Settings", img) {
+			@Override
+			public void run() {
+				final OcelotlSettingsView settingsView = new OcelotlSettingsView(view);
+				settingsView.openDialog();
+			}
+		};
+		return showSettings;
 	}
 
 	private void enableActions(boolean enabled) {
@@ -769,7 +772,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Font						cantarell8;
 	private Overview					overView;
 	private TabFolder					tabFolder;
-	private Button						settings;
 
 	/**
 	 * Followed topics
@@ -966,12 +968,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnTakeSnapshot.setFont(cantarell8);
 		btnTakeSnapshot.setToolTipText("Take a snapshot of the current view.");
 		btnTakeSnapshot.addSelectionListener(new TakeSnapshotAdapter());
-
-		settings = new Button(groupTime, SWT.NONE);
-		settings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-		settings.setFont(cantarell8);
-		settings.setToolTipText("Access to Ocelotl settings.");
-		settings.addSelectionListener(new LaunchSettingWindow(this));
 
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
@@ -1173,6 +1169,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			toolBar.add(createGanttAction());
 		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.EVENT_TABLE_VIEW_ID))
 			toolBar.add(createTableAction());
+		
+		toolBar.add(createSettingWindow(this));
 
 		cleanAll();
 	}
