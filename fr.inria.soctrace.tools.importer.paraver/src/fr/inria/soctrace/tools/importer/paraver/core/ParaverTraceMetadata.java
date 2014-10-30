@@ -31,12 +31,6 @@ import fr.inria.soctrace.tools.importer.pajedump.core.PJDumpTraceMetadata;
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
 public class ParaverTraceMetadata extends PJDumpTraceMetadata {
-
-	private String dbName;
-	private String alias;
-	private int events;
-	private long min;
-	private long max;
 	
 	@Override
 	public String getTraceTypeName() {
