@@ -2,8 +2,10 @@ package fr.inria.soctrace.tools.ocelotl.visualizations.mode;
 
 public class MajState {
 	
+	final static double Threshold=0.3;
 	private String state;
 	private double amplitude;
+	
 	
 	public String getState() {
 		return state;
@@ -32,7 +34,7 @@ public class MajState {
 	public MajState(String state, double amplitude) {
 		super();
 		this.state = state;
-		this.amplitude = amplitude;
+		this.amplitude = amplitude*(1.0-Threshold)+Threshold;
 	}
 	
 	
