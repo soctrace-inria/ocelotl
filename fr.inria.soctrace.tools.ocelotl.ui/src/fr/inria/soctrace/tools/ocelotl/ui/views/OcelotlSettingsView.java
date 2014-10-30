@@ -14,6 +14,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -29,6 +30,7 @@ import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
@@ -46,7 +48,7 @@ public class OcelotlSettingsView extends Dialog {
 	private Spinner								cacheTimeSliceValue;
 	private TabFolder							tabFolder;
 	private Button								btnNormalize;
-	private Button								btnGrowingQualities;
+	private Button								btnIncreasingQualities;
 	private Button								btnDecreasingQualities;
 	private Spinner								spinnerEventSize;
 	private Spinner								spinnerDivideDbQuery;
@@ -54,6 +56,8 @@ public class OcelotlSettingsView extends Dialog {
 	private Spinner								dataCacheSize;
 	private Font								cantarell8;
 	private Text								textThreshold;
+	private Text								snapshotDirectory;
+	private Button								btnChangeSnapshotDirectory;
 	private DatacachePolicy						currentSelectedDatacachePolicy;
 	private String								currentDatacacheDir;
 
@@ -68,41 +72,6 @@ public class OcelotlSettingsView extends Dialog {
 	public void openDialog() {
 		this.open();
 	}
-
-	/*
-	 * private class CacheTimeSliceListener implements ModifyListener {
-	 * 
-	 * @Override public void modifyText(final ModifyEvent e) {
-	 * ocelotlView.getParams
-	 * ().getOcelotlSettings().setCacheTimeSliceNumber(Integer
-	 * .valueOf(cacheTimeSliceValue.getText())); } }
-	 */
-
-	/*
-	 * private class ThreadNumberListener implements ModifyListener {
-	 * 
-	 * @Override public void modifyText(final ModifyEvent e) {
-	 * ocelotlView.getParams
-	 * ().getOcelotlSettings().setNumberOfThread(Integer.valueOf
-	 * (spinnerThread.getText())); } }
-	 */
-
-	/*
-	 * private class MaxEventProducerListener implements ModifyListener {
-	 * 
-	 * @Override public void modifyText(final ModifyEvent e) {
-	 * ocelotlView.getParams
-	 * ().getOcelotlSettings().setMaxEventProducersPerQuery(
-	 * Integer.valueOf(spinnerDivideDbQuery.getText())); } }
-	 */
-	/*
-	 * private class EventPerThreadListener implements ModifyListener {
-	 * 
-	 * @Override public void modifyText(final ModifyEvent e) {
-	 * ocelotlView.getParams
-	 * ().getOcelotlSettings().setEventsPerThread(Integer.valueOf
-	 * (spinnerEventSize.getText())); } }
-	 */
 
 	private class cachePolicyListener extends SelectionAdapter {
 
@@ -148,6 +117,36 @@ public class OcelotlSettingsView extends Dialog {
 			MessageDialog.openInformation(getShell(), "Error", e1.getMessage());
 		}
 	}
+
+	private class ModifySnapshotDirectory extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			DirectoryDialog dialog = new DirectoryDialog(getShell());
+			String newSnapDir = dialog.open();
+			// Did the user cancel?
+			if (newSnapDir != null) {
+				// Is the directory valid
+				if (ocelotlView.getSnapshot().checkSnapDirectoryValidity(newSnapDir)) {
+
+					// Update the displayed path
+					snapshotDirectory.setText(newSnapDir);
+				} else {
+					MessageDialog.openInformation(getShell(), "Error", "Invalid snapshot directory: the specified directory cannot be created or do not have the write acces rights.");
+				}
+			}
+		}
+	}
+	
+	/**
+	 * If necessary, update the snapshot directory
+	 */
+	private void modifySnapshotDir() {
+		// Was there change in the datacache directory ?
+		if (!snapshotDirectory.getText().equals(settings.getSnapShotDirectory()))
+			// If so, update the current datacache path
+			ocelotlView.getSnapshot().setSnapshotDirectory(snapshotDirectory.getText());
+	}
 	
 	private class ModifyDatacacheDirectory extends SelectionAdapter {
 
@@ -164,11 +163,12 @@ public class OcelotlSettingsView extends Dialog {
 					// Update the displayed path
 					datacacheDirectory.setText(newCacheDir);
 				} else {
-					MessageDialog.openInformation(getShell(), "Error", "Invalid datacache directory: the specified directory cannot be created or do not have the read acces rights");
+					MessageDialog.openInformation(getShell(), "Error", "Invalid datacache directory: the specified directory cannot be created or do not have the read acces rights.");
 				}
 			}
 		}
 	}
+
 
 	/**
 	 * If necessary, update the cache directory
@@ -179,7 +179,7 @@ public class OcelotlSettingsView extends Dialog {
 			// If so, update the current datacache path
 			ocelotlView.getParams().getDataCache().setCacheDirectory(currentDatacacheDir);
 	}
-	
+
 	private class EnableCacheListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
@@ -197,44 +197,53 @@ public class OcelotlSettingsView extends Dialog {
 		}
 	}
 
+	private class ThresholdModifyListener implements ModifyListener {
 
-	public void modifyThreshold(final ModifyEvent e) {
-		// TODO thresholdHasChanged = ?
-		
-		if (Float.parseFloat(textThreshold.getText()) < Float.MIN_VALUE || Float.parseFloat(textThreshold.getText()) > 1)
-			textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
-		else {
-			ocelotlView.getParams().getOcelotlSettings().setThresholdPrecision(Float.parseFloat(textThreshold.getText()));
+		@Override
+		public void modifyText(final ModifyEvent e) {
+
+			try {
+				if (Float.parseFloat(textThreshold.getText()) < Float.MIN_VALUE || Float.parseFloat(textThreshold.getText()) > 1)
+					textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
+			} catch (final NumberFormatException err) {
+				textThreshold.setText(String.valueOf(OcelotlDefaultParameterConstants.Threshold));
+			}
 		}
-
 	}
 
+	public void modifyThreshold() {
+
+		double textThresholdValue = Double.parseDouble(textThreshold.getText());
+		if (settings.getThresholdPrecision() != textThresholdValue) {
+			settings.setThresholdPrecision(textThresholdValue);
+
+			if (ocelotlView.getHasChanged() == HasChanged.NOTHING || ocelotlView.getHasChanged() == HasChanged.EQ || ocelotlView.getHasChanged() == HasChanged.PARAMETER)
+				ocelotlView.setHasChanged(HasChanged.THRESHOLD);
+		}
+	}
 
 	private class IncreasingQualityRadioSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			btnDecreasingQualities.setSelection(!btnGrowingQualities.getSelection());
-			ocelotlView.getParams().setGrowingQualities(btnGrowingQualities.getSelection());
-			ocelotlView.getParams().getOcelotlSettings().setIncreasingQualities(btnGrowingQualities.getSelection());
+			btnDecreasingQualities.setSelection(!btnIncreasingQualities.getSelection());
+		}
+	}
+
+	public void modifyIncreasingQuality() {
+		if (settings.getIncreasingQualities() != btnIncreasingQualities.getSelection()) {
+			ocelotlView.getParams().setGrowingQualities(btnIncreasingQualities.getSelection());
+			settings.setIncreasingQualities(btnIncreasingQualities.getSelection());
 			// qualityView.createDiagram();
 		}
 	}
 
-	private class NormalizeSelectionAdapter extends SelectionAdapter {
+	public void modifyNormalize() {
+		if (settings.isNormalizedCurve() != btnNormalize.getSelection()) {
+			settings.setNormalizedCurve(btnNormalize.getSelection());
 
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			// if (hasChanged != HasChanged.ALL)
-			// hasChanged = HasChanged.NORMALIZE;
-
-			ocelotlView.getParams().getOcelotlSettings().setNormalizedCurve(btnNormalize.getSelection());
-
-			// if (confDataLoader.getCurrentTrace() == null ||
-			// comboSpace.getText().equals("") ||
-			// comboTime.getText().equals(""))
-			// return;
-			// btnRun.notifyListeners(SWT.Selection, new Event());
+			if (ocelotlView.getHasChanged() != HasChanged.ALL)
+				ocelotlView.setHasChanged(HasChanged.NORMALIZE);
 		}
 	}
 
@@ -268,27 +277,26 @@ public class OcelotlSettingsView extends Dialog {
 
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
 		btnNormalize.setFont(cantarell8);
-		btnNormalize.setSelection(ocelotlView.getParams().getOcelotlSettings().isNormalizedCurve());
+		btnNormalize.setSelection(settings.isNormalizedCurve());
 		btnNormalize.setText("Normalize Qualities");
-		btnNormalize.addSelectionListener(new NormalizeSelectionAdapter());
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
-		btnGrowingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
-		btnGrowingQualities.setFont(cantarell8);
-		btnGrowingQualities.setText("Complexity gain (green)\nInformation gain (red)");
-		btnGrowingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
-		btnGrowingQualities.setSelection(ocelotlView.getParams().getOcelotlSettings().getIncreasingQualities());
+		btnIncreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
+		btnIncreasingQualities.setFont(cantarell8);
+		btnIncreasingQualities.setText("Complexity gain (green)\nInformation gain (red)");
+		btnIncreasingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
+		btnIncreasingQualities.setSelection(settings.getIncreasingQualities());
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)");
-		btnDecreasingQualities.setSelection(!ocelotlView.getParams().getOcelotlSettings().getIncreasingQualities());
 		btnDecreasingQualities.setFont(cantarell8);
 		btnDecreasingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
+		btnDecreasingQualities.setSelection(!settings.getIncreasingQualities());
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
@@ -303,7 +311,7 @@ public class OcelotlSettingsView extends Dialog {
 		textThreshold.setLayoutData(gd_textThreshold);
 		textThreshold.setFont(cantarell8);
 		textThreshold.addModifyListener(new ThresholdModifyListener());
-		textThreshold.setText(String.valueOf(ocelotlView.getParams().getOcelotlSettings().getThresholdPrecision()));
+		textThreshold.setText(String.valueOf(settings.getThresholdPrecision()));
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
@@ -327,7 +335,7 @@ public class OcelotlSettingsView extends Dialog {
 		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
 		btnCacheEnabled.setFont(cantarell8);
 		btnCacheEnabled.setText("Cache Enabled");
-		btnCacheEnabled.setSelection(ocelotlView.getParams().getOcelotlSettings().isCacheActivated());
+		btnCacheEnabled.setSelection(settings.isCacheActivated());
 		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
 
 		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
@@ -368,8 +376,13 @@ public class OcelotlSettingsView extends Dialog {
 		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_text.widthHint = 100;
 		dataCacheSize.setLayoutData(gd_text);
-	//	dataCacheSize.addModifyListener(new DataCacheSizeListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
+
+		if (settings.getCacheSize() > 0) {
+			dataCacheSize.setSelection((int) (settings.getCacheSize() / 1000000));
+		} else {
+			dataCacheSize.setSelection((int) settings.getCacheSize());
+		}
 
 		Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
 		lblCacheTimeSlices.setText("Cache time slices:");
@@ -382,7 +395,7 @@ public class OcelotlSettingsView extends Dialog {
 		GridData gd_cacheTimeSliceValue = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_cacheTimeSliceValue.widthHint = 100;
 		cacheTimeSliceValue.setLayoutData(gd_cacheTimeSliceValue);
-		cacheTimeSliceValue.setSelection(ocelotlView.getParams().getOcelotlSettings().getCacheTimeSliceNumber());
+		cacheTimeSliceValue.setSelection(settings.getCacheTimeSliceNumber());
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		Label lblCachePolicy = new Label(groupDataCacheSettings, SWT.NONE);
@@ -409,7 +422,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		btnRadioButton_3 = new Button(groupDataCacheSettings, SWT.RADIO);
 		btnRadioButton_3.addSelectionListener(new cachePolicyListener());
-		btnRadioButton_3.setText("Auto");
+		btnRadioButton_3.setText("Auto.");
 		btnRadioButton_3.setFont(cantarell8);
 		new Label(groupDataCacheSettings, SWT.NONE);
 
@@ -417,14 +430,9 @@ public class OcelotlSettingsView extends Dialog {
 		cachepolicy.put(DatacachePolicy.CACHEPOLICY_FAST, btnRadioButton_1);
 		cachepolicy.put(DatacachePolicy.CACHEPOLICY_ASK, btnRadioButton_2);
 		cachepolicy.put(DatacachePolicy.CACHEPOLICY_AUTO, btnRadioButton_3);
-		cachepolicy.get(ocelotlView.getParams().getOcelotlSettings().getCachePolicy()).setSelection(true);
-
-		if (ocelotlView.getParams().getOcelotlSettings().getCacheSize() > 0) {
-			dataCacheSize.setSelection((int) (ocelotlView.getParams().getOcelotlSettings().getCacheSize() / 1000000));
-		} else {
-			dataCacheSize.setSelection((int) ocelotlView.getParams().getOcelotlSettings().getCacheSize());
-		}
+		cachepolicy.get(settings.getCachePolicy()).setSelection(true);
 		sashFormSettings.setWeights(new int[] { 1 });
+		btnCacheEnabled.notifyListeners(SWT.Selection, new Event());
 
 		// Thread settings
 		final TabItem tbtmAdvancedSettings = new TabItem(tabFolder, SWT.NONE);
@@ -446,7 +454,7 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerEventSize.setFont(cantarell8);
 		spinnerEventSize.setMinimum(OcelotlDefaultParameterConstants.MIN_EVENTS_PER_THREAD);
 		spinnerEventSize.setMaximum(OcelotlDefaultParameterConstants.MAX_EVENTS_PER_THREAD);
-		spinnerEventSize.setSelection(ocelotlView.getParams().getOcelotlSettings().getEventsPerThread());
+		spinnerEventSize.setSelection(settings.getEventsPerThread());
 
 		final Group grpDivideDbQuery = new Group(advancedSettingsSashForm, SWT.NONE);
 		grpDivideDbQuery.setFont(cantarell8);
@@ -462,7 +470,7 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerDivideDbQuery.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		spinnerDivideDbQuery.setMinimum(OcelotlDefaultParameterConstants.MIN_EVENT_PRODUCERS_PER_QUERY);
 		spinnerDivideDbQuery.setMaximum(OcelotlDefaultParameterConstants.MAX_EVENT_PRODUCERS_PER_QUERY);
-		spinnerDivideDbQuery.setSelection(ocelotlView.getParams().getOcelotlSettings().getMaxEventProducersPerQuery());
+		spinnerDivideDbQuery.setSelection(settings.getMaxEventProducersPerQuery());
 
 		final Group grpMultiThread = new Group(advancedSettingsSashForm, SWT.NONE);
 		grpMultiThread.setFont(cantarell8);
@@ -478,9 +486,42 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerThread.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		spinnerThread.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_THREAD);
 		spinnerThread.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_THREAD);
-		spinnerThread.setSelection(ocelotlView.getParams().getOcelotlSettings().getNumberOfThread());
+		spinnerThread.setSelection(settings.getNumberOfThread());
 		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1 });
 
+		// Miscellaneous settings	
+		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtMiscSettings.setText("Misc.");
+
+		final SashForm sashFormMiscSettings = new SashForm(tabFolder, SWT.VERTICAL);
+		sashFormMiscSettings.setFont(cantarell8);
+		tbtMiscSettings.setControl(sashFormMiscSettings);
+
+		final Group groupMiscSettings = new Group(sashFormMiscSettings, SWT.NONE);
+		groupMiscSettings.setFont(cantarell8);
+		groupMiscSettings.setText("Misc. Settings");
+		groupMiscSettings.setLayout(new GridLayout(3, false));
+
+		final Label lblSnapshotDirectory = new Label(groupMiscSettings, SWT.NONE);
+		lblSnapshotDirectory.setFont(cantarell8);
+		lblSnapshotDirectory.setText("Snapshot directory:");
+
+		final GridData gd_MiscDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_MiscDir.widthHint = 100;
+
+		snapshotDirectory = new Text(groupMiscSettings, SWT.BORDER);
+		snapshotDirectory.setLayoutData(gd_MiscDir);
+		snapshotDirectory.setFont(cantarell8);
+		snapshotDirectory.setEditable(false);
+		snapshotDirectory.setText(settings.getSnapShotDirectory());
+
+		btnChangeSnapshotDirectory = new Button(groupMiscSettings, SWT.PUSH);
+		btnChangeSnapshotDirectory.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+		btnChangeSnapshotDirectory.setToolTipText("Change Snapshot Directory");
+		btnChangeSnapshotDirectory.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/fldr_obj.gif"));
+		btnChangeSnapshotDirectory.setFont(cantarell8);
+		btnChangeSnapshotDirectory.addSelectionListener(new ModifySnapshotDirectory());
+		
 		return sashFormGlobal;
 	}
 
@@ -516,8 +557,12 @@ public class OcelotlSettingsView extends Dialog {
 		settings.setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
 
 		// Curve settings
+		modifyThreshold();
+		modifyNormalize();
+		modifyIncreasingQuality();
 		
-		ocelotlView.updateSettings();
+		//Misc.
+		modifySnapshotDir();
 	}
 
 	@Override

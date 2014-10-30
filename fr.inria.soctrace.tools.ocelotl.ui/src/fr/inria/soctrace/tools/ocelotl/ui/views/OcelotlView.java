@@ -493,7 +493,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					visuCompatibilities.add(aVisu);
 				}
 			}
-			
+
 			for (final String op : ocelotlCore.getVisuOperators().getOperators(visuCompatibilities, ocelotlCore.getAggregOperators().getSelectedOperatorResource().getDimension())) {
 				comboSpace.add(op);
 			}
@@ -1233,6 +1233,22 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		return ocelotlCore;
 	}
 
+	public HasChanged getHasChanged() {
+		return hasChanged;
+	}
+
+	public void setHasChanged(HasChanged hasChanged) {
+		this.hasChanged = hasChanged;
+	}
+
+	public Snapshot getSnapshot() {
+		return snapshot;
+	}
+
+	public void setSnapshot(Snapshot snapshot) {
+		this.snapshot = snapshot;
+	}
+
 	private void refreshTraces() {
 		try {
 			confDataLoader.loadTraces();
@@ -1475,12 +1491,5 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			e.printStackTrace();
 		}
 	}
-	
-	public void updateSettings() {
-		if (confDataLoader.getCurrentTrace() == null)
-			return;
 
-		if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER)
-			hasChanged = HasChanged.THRESHOLD;
-	}
 }

@@ -268,5 +268,46 @@ public class Snapshot {
 		}
 		return result.toByteArray();
 	}
+	
+	/**
+	 * Check that the snapshot directory is a valid one, i.e. does it exist and can
+	 * it be written in
+	 * 
+	 * @param snapDirectory
+	 *            path to the new snap directory
+	 * @return true if valid, false otherwise
+	 */
+	public boolean checkSnapDirectoryValidity(String snapDirectory) {
+
+		// Check the existence of the cache directory
+		File dir = new File(snapDirectory);
+		if (!dir.exists()) {
+			logger.debug("Snapshot directory (" + snapDirectory + ") does not exist and will be created now.");
+
+			// Create the directory
+			if (!dir.mkdirs()) {
+				logger.error("Failed to create snapshot directory: " + snapDirectory + ".");
+
+				if (this.snapshotDirectory.isEmpty()) {
+					logger.error("The current snapshot directory is still: " + this.snapshotDirectory);
+				}
+				return false;
+			}
+		}
+
+		// Check that we have at least the reading rights
+		if (!dir.canWrite()) {
+			logger.error("The application does not have the rights to write in the given directory: " + snapDirectory + ".");
+
+			if (this.snapshotDirectory.isEmpty()) {
+				logger.error("The cache will be turned off.");
+			} else {
+				logger.error("The current cache directory is still: " + this.snapshotDirectory);
+			}
+			return false;
+		}
+
+		return true;
+	}
 
 }
