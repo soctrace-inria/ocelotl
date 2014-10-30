@@ -17,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,10 +119,23 @@ public class ParaverImporter extends FramesocTool {
 				arguments.add("-f");
 				arguments.add(PJDumpConstants.TRACE_EXT.replace(".", ""));
 				ParaverPrintWrapper printer = new ParaverPrintWrapper(arguments);
-				printer.executeSync(monitor);
 				
-				ParaverParser parser = new ParaverParser(sysDB, traceDB, output+PJDumpConstants.TRACE_EXT, FilenameUtils.getBaseName(input));
+				IStatus status=printer.executeSync(monitor);
+				if (status.equals(IStatus.CANCEL)||monitor.isCanceled()){
+					throw new SoCTraceException();
+				}
+				String trueOutput=output+PJDumpConstants.TRACE_EXT;
+				File outputFile = new File(trueOutput);
+//				while(!outputFile.exists())
+//				{
+//					outputFile = new File(output);
+//					if (monitor.isCanceled()){
+//						throw new SoCTraceException();
+//					}
+//				}
+				ParaverParser parser = new ParaverParser(sysDB, traceDB, trueOutput, FilenameUtils.getBaseName(input));
 				parser.parseTrace(monitor, 1, 1);
+				outputFile.delete();
 
 			} catch (SoCTraceException ex) {
 				System.err.println(ex.getMessage());
