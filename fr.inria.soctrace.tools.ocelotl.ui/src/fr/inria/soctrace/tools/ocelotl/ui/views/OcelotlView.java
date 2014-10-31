@@ -893,17 +893,128 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		qualityView = new QualityView(this);
 		timeLineViewWrapper = new TimeLineViewWrapper(this);
 		overView = new Overview(this);
+		cantarell8 = new Font(sashFormGlobal.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
 
 		final SashForm sashForm_1 = new SashForm(sashFormGlobal, SWT.BORDER);
 		sashForm_1.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
+		// Central view
 		sashFormView = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashFormView.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
+		// Top bar of the central view
+		// Trace settings
+		final ScrolledComposite topBarScrollComposite = new ScrolledComposite(sashFormView, SWT.BORDER | SWT.H_SCROLL);
+		topBarScrollComposite.setExpandHorizontal(true);
+		topBarScrollComposite.setExpandVertical(true);
+
+		final Group groupTraces = new Group(topBarScrollComposite, SWT.NONE);
+		groupTraces.setSize(422, 100);
+		groupTraces.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		groupTraces.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		groupTraces.setFont(cantarell8);
+		groupTraces.setLayout(new GridLayout(12, false));
+
+		final Label lblTrace = new Label(groupTraces, SWT.NONE);
+		lblTrace.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		lblTrace.setFont(cantarell8);
+		lblTrace.setText("Trace");
+		new Label(groupTraces, SWT.NONE);
+
+		new Label(groupTraces, SWT.NONE);
+
+		final Label lblMetric = new Label(groupTraces, SWT.NONE);
+		lblMetric.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		lblMetric.setFont(cantarell8);
+		lblMetric.setText("Metric");
+		new Label(groupTraces, SWT.NONE);
+
+		final Label lblAggreg = new Label(groupTraces, SWT.NONE);
+		lblAggreg.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		lblAggreg.setFont(cantarell8);
+		lblAggreg.setText("Data Aggregation Type");
+		new Label(groupTraces, SWT.NONE);
+		new Label(groupTraces, SWT.NONE);
+		new Label(groupTraces, SWT.NONE);
+
+		final Label lblVisualization = new Label(groupTraces, SWT.NONE);
+		lblVisualization.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
+		lblVisualization.setFont(cantarell8);
+		lblVisualization.setText("Visualization");
+		new Label(groupTraces, SWT.NONE);
+		new Label(groupTraces, SWT.NONE);
+
+		comboTraces = new Combo(groupTraces, SWT.READ_ONLY);
+		comboTraces.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		comboTraces.setFont(cantarell8);
+		comboTraces.addSelectionListener(new TraceAdapter());
+
+		int index = 0;
+		// Fill with the available traces
+		for (final Trace t : confDataLoader.getTraces()) {
+			comboTraces.add(t.getAlias(), index);
+			traceMap.put(index, t);
+			index++;
+		}
+
+		Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
+		btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
+		btnLoadDataCache.setToolTipText("Load a Microscopic Description");
+		btnLoadDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		btnLoadDataCache.addSelectionListener(new LoadDataListener());
+
+		comboType = new Combo(groupTraces, SWT.READ_ONLY);
+		final GridData gd_comboType = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_comboType.widthHint = 170;
+		comboType.setLayoutData(gd_comboType);
+		comboType.setFont(cantarell8);
+		comboType.addSelectionListener(new ComboTypeSelectionAdapter());
+		comboType.setText("");
+		new Label(groupTraces, SWT.NONE);
+
+		comboTime = new Combo(groupTraces, SWT.READ_ONLY);
+		final GridData gd_comboAggregationOperator = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_comboAggregationOperator.widthHint = 170;
+		comboTime.setLayoutData(gd_comboAggregationOperator);
+		comboTime.setFont(cantarell8);
+		comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
+		comboTime.setText("");
+		new Label(groupTraces, SWT.NONE);
+
+		btnSettings = new Button(groupTraces, SWT.NONE);
+		btnSettings.setToolTipText("Settings");
+		btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
+		btnSettings.setFont(cantarell8);
+		btnSettings.addSelectionListener(new SettingsSelectionAdapter());
+
+		btnSaveDataCache = new Button(groupTraces, SWT.NONE);
+		btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
+		btnSaveDataCache.setToolTipText("Save Current Microscopic Description");
+		btnSaveDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		btnSaveDataCache.addSelectionListener(new SaveDataListener());
+
+		comboSpace = new Combo(groupTraces, SWT.READ_ONLY);
+		final GridData gd_comboSpace = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_comboSpace.widthHint = 170;
+		comboSpace.setLayoutData(gd_comboSpace);
+		comboSpace.setFont(cantarell8);
+		comboSpace.setText("");
+		comboSpace.addSelectionListener(new ComboSpaceSelectionAdapter());
+		new Label(groupTraces, SWT.NONE);
+
+		btnSettings2 = new Button(groupTraces, SWT.NONE);
+		btnSettings2.setToolTipText("Settings");
+		btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
+		btnSettings2.setFont(cantarell8);
+		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
+
+		topBarScrollComposite.setContent(groupTraces);
+		topBarScrollComposite.setMinSize(groupTraces.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
+		// Display of aggregation results
 		final SashForm sashForm_4 = new SashForm(sashFormView, SWT.BORDER | SWT.VERTICAL);
 		compositeMatrixView = new Composite(sashForm_4, SWT.BORDER);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		cantarell8 = new Font(compositeMatrixView.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
 		timeLineViewWrapper.init(compositeMatrixView);
@@ -915,6 +1026,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
 		sashForm_4.setWeights(new int[] { 388, 24 });
 
+		// Bottom bar of the central view
 		final ScrolledComposite scrolledComposite = new ScrolledComposite(sashFormView, SWT.BORDER | SWT.H_SCROLL);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
@@ -975,144 +1087,30 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		textTimestampStart.addModifyListener(new ConfModificationListener());
 		scrolledComposite.setContent(groupTime);
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashFormView.setWeights(new int[] { 418, 36 });
+		sashFormView.setWeights(new int[] { 55, 620, 57 });
 
+		// Right column
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 
-		tabFolder = new TabFolder(sashForm, SWT.NONE);
-		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
-
-		// Trace overview
-		final TabItem tbtmTimeAggregationParameters = new TabItem(tabFolder, SWT.NONE);
-		tbtmTimeAggregationParameters.setText("Trace Overview");
-
-		final SashForm sashFormTSandCurve = new SashForm(tabFolder, SWT.VERTICAL);
-		tbtmTimeAggregationParameters.setControl(sashFormTSandCurve);
-		sashFormTSandCurve.setFont(cantarell8);
-
-		final Group groupTraces = new Group(sashFormTSandCurve, SWT.NONE);
-		groupTraces.setFont(cantarell8);
-		groupTraces.setText("Trace");
-		groupTraces.setLayout(new GridLayout(1, false));
-
-		final Composite composite_1 = new Composite(groupTraces, SWT.NONE);
-		final GridData gd_composite_1 = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_composite_1.minimumHeight = 20;
-		gd_composite_1.widthHint = 285;
-		composite_1.setLayoutData(gd_composite_1);
-		composite_1.setLayout(new GridLayout(2, false));
-		comboTraces = new Combo(composite_1, SWT.READ_ONLY);
-		final GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_comboTraces.widthHint = 179;
-		comboTraces.setLayoutData(gd_comboTraces);
-		comboTraces.setFont(cantarell8);
-
-		Button btnLoadDataCache = new Button(composite_1, SWT.NONE);
-		btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
-		btnLoadDataCache.setToolTipText("Load a Microscopic Description");
-		btnLoadDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		btnLoadDataCache.addSelectionListener(new LoadDataListener());
-
-		comboTraces.addSelectionListener(new TraceAdapter());
-		int index = 0;
-		// Fill with the available traces
-		for (final Trace t : confDataLoader.getTraces()) {
-			comboTraces.add(t.getAlias(), index);
-			traceMap.put(index, t);
-			index++;
-		}
-
-		final Group groupTypes = new Group(sashFormTSandCurve, SWT.NONE);
-		groupTypes.setFont(cantarell8);
-		groupTypes.setText("Metric");
-		groupTypes.setLayout(new GridLayout(1, false));
-
-		final Composite compositeType = new Composite(groupTypes, SWT.NONE);
-		compositeType.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		compositeType.setFont(cantarell8);
-		compositeType.setLayout(new GridLayout(1, false));
-
-		comboType = new Combo(compositeType, SWT.READ_ONLY);
-		final GridData gd_comboType = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-		gd_comboType.widthHint = 170;
-		comboType.setLayoutData(gd_comboType);
-		comboType.setFont(cantarell8);
-		comboType.addSelectionListener(new ComboTypeSelectionAdapter());
-		comboType.setText("");
-
-		final Group groupAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
-		groupAggregationOperator.setFont(cantarell8);
-		groupAggregationOperator.setText("Data Aggregation Type");
-		groupAggregationOperator.setLayout(new GridLayout(1, false));
-
-		final Composite compositeAggregationOperator = new Composite(groupAggregationOperator, SWT.NONE);
-		compositeAggregationOperator.setFont(cantarell8);
-		compositeAggregationOperator.setLayout(new GridLayout(3, false));
-		final GridData gd_compositeAggregationOperator = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_compositeAggregationOperator.minimumHeight = 20;
-		gd_compositeAggregationOperator.widthHint = 85;
-		compositeAggregationOperator.setLayoutData(gd_compositeAggregationOperator);
-
-		comboTime = new Combo(compositeAggregationOperator, SWT.READ_ONLY);
-		final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-		gd_comboAggregationOperator.widthHint = 170;
-		comboTime.setLayoutData(gd_comboAggregationOperator);
-		comboTime.setFont(cantarell8);
-		comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
-		comboTime.setText("");
-
-		btnSettings = new Button(compositeAggregationOperator, SWT.NONE);
-		btnSettings.setToolTipText("Settings");
-		btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-		btnSettings.setFont(cantarell8);
-		btnSettings.addSelectionListener(new SettingsSelectionAdapter());
-
-		btnSaveDataCache = new Button(compositeAggregationOperator, SWT.NONE);
-		btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
-		btnSaveDataCache.setToolTipText("Save Current Microscopic Description");
-		btnSaveDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		btnSaveDataCache.addSelectionListener(new SaveDataListener());
-
-		final Group grpSpaceAggregationOperator = new Group(sashFormTSandCurve, SWT.NONE);
-		grpSpaceAggregationOperator.setText("Visualization");
-		grpSpaceAggregationOperator.setFont(cantarell8);
-		grpSpaceAggregationOperator.setLayout(new GridLayout(1, false));
-
-		final Composite composite = new Composite(grpSpaceAggregationOperator, SWT.NONE);
-		final GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-		gd_composite.minimumHeight = 20;
-		gd_composite.widthHint = 85;
-		composite.setLayoutData(gd_composite);
-		composite.setFont(cantarell8);
-		composite.setLayout(new GridLayout(2, false));
-
-		comboSpace = new Combo(composite, SWT.READ_ONLY);
-		comboSpace.setFont(cantarell8);
-		final GridData gd_combo = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
-		gd_combo.widthHint = 170;
-		comboSpace.setLayoutData(gd_combo);
-		comboSpace.setText("");
-		comboSpace.addSelectionListener(new ComboSpaceSelectionAdapter());
-
-		btnSettings2 = new Button(composite, SWT.NONE);
-		btnSettings2.setToolTipText("Settings");
-		btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-		btnSettings2.setFont(cantarell8);
-		sashFormTSandCurve.setWeights(new int[] { 1, 1, 1, 1 });
-		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
-
-		// Overview
-		final TabItem tbtmOverview = new TabItem(tabFolder, SWT.NONE);
-		tbtmOverview.setText("Overview");
-
-		SashForm overviewSashForm = new SashForm(tabFolder, SWT.VERTICAL);
-		tbtmOverview.setControl(overviewSashForm);
+		// overview
+		final SashForm overviewSashForm = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
 		final Composite compositeOverview = new Composite(overviewSashForm, SWT.BORDER);
 		compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeOverview.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeOverview.setLayout(new FillLayout(SWT.HORIZONTAL));
 		overView.init(compositeOverview);
+
+		// Stat and legend
+		tabFolder = new TabFolder(sashForm, SWT.NONE);
+		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
+
+		// Legends
+		final TabItem tbtmOverview = new TabItem(tabFolder, SWT.NONE);
+		tbtmOverview.setText("Legend");
+
+		SashForm statSashForm = new SashForm(tabFolder, SWT.VERTICAL);
+		tbtmOverview.setControl(statSashForm);
 
 		// Quality curves display
 		final Composite compositeQualityView = new Composite(sashForm, SWT.BORDER);
@@ -1121,6 +1119,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		qualityView.initDiagram(compositeQualityView);
 		compositeQualityView.setLayout(new FillLayout(SWT.HORIZONTAL));
 
+		// Bottom bar of the quality view
 		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(sashForm, SWT.H_SCROLL);
 		scrolledComposite_1.setExpandHorizontal(true);
 		scrolledComposite_1.setExpandVertical(true);
@@ -1159,7 +1158,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		textRun.addModifyListener(new ParameterModifyListener());
 		scrolledComposite_1.setContent(group);
 		scrolledComposite_1.setMinSize(group.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashForm.setWeights(new int[] { 190, 221, 34 });
+		sashForm.setWeights(new int[] { 34, 190, 221, 34 });
 		sashForm_1.setWeights(new int[] { 635, 265 });
 		sashFormGlobal.setWeights(new int[] { 395 });
 
@@ -1169,7 +1168,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			toolBar.add(createGanttAction());
 		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.EVENT_TABLE_VIEW_ID))
 			toolBar.add(createTableAction());
-		
+
 		toolBar.add(createSettingWindow(this));
 
 		cleanAll();
