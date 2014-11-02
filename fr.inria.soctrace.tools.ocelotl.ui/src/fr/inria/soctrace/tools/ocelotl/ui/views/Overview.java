@@ -36,8 +36,8 @@ public class Overview {
 	private OcelotlView					ocelotlView;
 
 	private MicroscopicDescription		microModel;
-	private IDataAggregationOperator	aggregManager;
-	private IDataAggregManager			aggregOperator;
+	private IDataAggregationOperator	aggregOperator;
+	private IDataAggregManager			aggregManager;
 	private IVisuOperator				visuOperator;
 
 	private Figure						root;
@@ -53,7 +53,7 @@ public class Overview {
 	private SelectFigure				displayedZone;
 	// Show the currently selected zone
 	private SelectFigure				selectedZone;
-	private int							Border	= 10;
+	private int							Border	= 3;
 
 	public Overview(OcelotlView aView) {
 		super();
@@ -89,14 +89,15 @@ public class Overview {
 	 */
 	public void createDiagram(TimeRegion time) {
 		globalTimeRegion = new TimeRegion(time);
-		timeLineView.createDiagram(aggregOperator, time, visuOperator);
+		timeLineView.setBorder(Border);
+		timeLineView.createDiagram(aggregManager, time, visuOperator);
 	}
 
 	/**
 	 * Redraw the diagram to adapt to the new size of the display
 	 */
 	public void resizeDiagram() {
-		if (aggregOperator != null && globalTimeRegion != null) {
+		if (aggregManager != null && globalTimeRegion != null) {
 			canvas.redraw();
 			createDiagram(globalTimeRegion);
 			root.repaint();
@@ -122,18 +123,20 @@ public class Overview {
 			microModel = ocelotlView.getOcelotlCore().getMicroModel();
 
 			// Init the aggregation operator
-			aggregManager = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator());
-			aggregOperator = aggregManager.createManager(microModel, new NullProgressMonitor());
-
-			aggregOperator.computeQualities();
-			aggregOperator.computeDichotomy();
-			
-			parameter = computeInitialParameter();
+			if (!ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator().equals(ocelotlView.getParams().getTimeAggOperator())){
+				aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator());
+				aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
+				aggregManager.computeQualities();
+				aggregManager.computeDichotomy();
+			}else{
+				aggregManager=ocelotlView.getOcelotlCore().getLpaggregManager();
+			}
+			parameter = ocelotlView.getOcelotlCore().computeInitialParameter();
 
 			// Compute the view according to the new parameter value
-			aggregOperator.computeParts(parameter);
+			aggregManager.computeParts(parameter);
 
-			this.visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregOperator);
+			this.visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
 
 			createDiagram(time);
 			redrawOverview = false;
@@ -235,42 +238,11 @@ public class Overview {
 
 		// Init other stuff
 		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
-		selectedZone = new SelectFigure(ColorConstants.blue, ColorConstants.blue);
+		selectedZone = new SelectFigure(ColorConstants.black, ColorConstants.black);
 		displayedZone = new SelectFigure(ColorConstants.white, ColorConstants.white);
 	}
 
-	/**
-	 * Search for the parameter that has the largest gap (sum of the differences
-	 * in gain and loss values) between two consecutive gain and loss values
-	 * 
-	 * @return the corresponding parameter value, or 0.0 as default
-	 */
-	public double computeInitialParameter() {
-		double diffG = 0.0, diffL = 0.0;
-		double sumDiff = 0.0;
-		double maxDiff = 0.0;
-		int indexMaxQual = -1;
-		int i;
-		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) aggregOperator.getQualities();
-		for (i = 1; i < qual.size(); i++) {
-			// Compute the difference for the gain and the loss
-			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
-			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
 
-			// Compute sum of both
-			sumDiff = diffG + diffL;
-
-			if (sumDiff > maxDiff) {
-				maxDiff = sumDiff;
-				indexMaxQual = i;
-			}
-		}
-		if (indexMaxQual > 0 && indexMaxQual < aggregOperator.getParameters().size())
-			return aggregOperator.getParameters().get(indexMaxQual -1);
-
-		// No index found or the value is invalid, return 1.0 as default
-		return 0.0;
-	}
 	
 	/**
 	 * Class for describing and displaying selected zones
@@ -290,7 +262,7 @@ public class Overview {
 			this.background = backGround;
 			setForegroundColor(this.foreground);
 			setBackgroundColor(this.background);
-			setAlpha(50);
+			setAlpha(75);
 		}
 
 		/**
@@ -309,7 +281,7 @@ public class Overview {
 			if (getParent() != root)
 				root.add(this);
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height),
-					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), 2)));
+					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), 0)));
 			root.repaint();
 		}
 

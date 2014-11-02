@@ -376,7 +376,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 
 							// Compute the parameter value
-							ocelotlParameters.setParameter(computeInitialParameter());
+							ocelotlParameters.setParameter(ocelotlCore.computeInitialParameter());
 						}
 
 						hasChanged = HasChanged.PARAMETER;
@@ -422,6 +422,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							qualityView.createDiagram();
 							tabFolder.setSelection(1);
 							try {
+								
 								overView.updateDiagram(ocelotlParameters.getTimeRegion());
 							} catch (OcelotlException e) {
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
@@ -452,8 +453,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlParameters.getEventProducers().clear();
 
 			// Get the available aggregation operators
+			comboTime.setEnabled(true);
 			comboTime.removeAll();
-			comboSpace.removeAll();
 			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
 
 			for (final String op : ocelotlCore.getAggregOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
@@ -482,7 +483,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlCore.getAggregOperators().setSelectedOperator(comboTime.getText());
 			// Set the number of time slice
 			spinnerTSNumber.setSelection(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getTs());
-
+			comboSpace.setEnabled(true);
 			// Get the available visualizations
 			comboSpace.removeAll();
 			// Get visu compatibility from both micro model and aggregation
@@ -519,6 +520,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				return;
 			if (hasChanged == HasChanged.NOTHING)
 				hasChanged = HasChanged.PARAMETER;
+			btnRun.setEnabled(true);
 			ocelotlCore.getVisuOperators().setSelectedOperator(comboSpace.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
@@ -627,7 +629,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			// hasChanged = HasChanged.ALL;
-			if (comboSpace.getText().equals(""))
+			if (!comboSpace.getEnabled())
 				return;
 			final VisuConfigViewManager manager = new VisuConfigViewManager(view);
 			manager.openConfigWindows();
@@ -638,7 +640,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (comboTime.getText().equals(""))
+			if (!comboTime.getEnabled())
 				return;
 
 			hasChanged = HasChanged.ALL;
@@ -679,11 +681,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
+			trace = traceMap.get(comboTraces.getSelectionIndex());
 			final String title = "Loading Trace";
 			comboType.removeAll();
 			comboTime.removeAll();
 			comboSpace.removeAll();
-			trace = traceMap.get(comboTraces.getSelectionIndex());
 
 			final Job job = new Job(title) {
 
@@ -705,7 +707,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							public void run() {
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
-
+								comboType.setEnabled(true);
+								comboType.removeAll();
 								for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 									comboType.add(type);
 								}
@@ -876,6 +879,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 						buttonUp.notifyListeners(SWT.Selection, new Event());
 					break;
+				case SWT.ARROW_UP:
+					// Make sure we are not in an editable field
+					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+						buttonDown.notifyListeners(SWT.Selection, new Event());
+					break;
+				case SWT.ARROW_DOWN:
+					// Make sure we are not in an editable field
+					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+						buttonUp.notifyListeners(SWT.Selection, new Event());
+					break;
 				case SWT.KEYPAD_CR:
 				case SWT.CR:
 					btnRun.notifyListeners(SWT.Selection, new Event());
@@ -913,100 +926,67 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		groupTraces.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTraces.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTraces.setFont(cantarell8);
-		groupTraces.setLayout(new GridLayout(12, false));
+		groupTraces.setLayout(new GridLayout(8, false));
+		
+				comboTraces = new Combo(groupTraces, SWT.READ_ONLY);
+				GridData gd_comboTraces = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+				gd_comboTraces.widthHint = 170;
+				comboTraces.setLayoutData(gd_comboTraces);
+				comboTraces.setFont(cantarell8);
+				comboTraces.addSelectionListener(new TraceAdapter());
+		
+				Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
+				btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
+				btnLoadDataCache.setToolTipText("Load a Microscopic Description");
+				btnLoadDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+				btnLoadDataCache.addSelectionListener(new LoadDataListener());
+		
+				comboType = new Combo(groupTraces, SWT.READ_ONLY);
+				final GridData gd_comboType = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+				gd_comboType.widthHint = 150;
+				comboType.setLayoutData(gd_comboType);
+				comboType.setFont(cantarell8);
+				comboType.add("Metric");
+				comboType.setText("Metric");
+				comboType.addSelectionListener(new ComboTypeSelectionAdapter());
+		
+				comboTime = new Combo(groupTraces, SWT.READ_ONLY);
+				final GridData gd_comboAggregationOperator = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+				gd_comboAggregationOperator.widthHint = 150;
+				comboTime.setLayoutData(gd_comboAggregationOperator);
+				comboTime.setFont(cantarell8);
+				comboTime.add("Data Aggregation Type");
+				comboTime.setText("Data Aggregation Type");
+				comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
+				//comboTime.setText("");
+		
+				btnSettings = new Button(groupTraces, SWT.NONE);
+				btnSettings.setToolTipText("Settings");
+				btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
+				btnSettings.setFont(cantarell8);
+				btnSettings.addSelectionListener(new SettingsSelectionAdapter());
+		
+				btnSaveDataCache = new Button(groupTraces, SWT.NONE);
+				btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
+				btnSaveDataCache.setToolTipText("Save Current Microscopic Description");
+				btnSaveDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+				btnSaveDataCache.addSelectionListener(new SaveDataListener());
+		
+				comboSpace = new Combo(groupTraces, SWT.READ_ONLY);
+				final GridData gd_comboSpace = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+				gd_comboSpace.widthHint = 150;
+				comboSpace.setLayoutData(gd_comboSpace);
+				comboSpace.setFont(cantarell8);
+				comboSpace.add("Visualization");
+				comboSpace.setText("Visualization");
+				comboSpace.addSelectionListener(new ComboSpaceSelectionAdapter());
+		
+				btnSettings2 = new Button(groupTraces, SWT.NONE);
+				btnSettings2.setToolTipText("Settings");
+				btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
+				btnSettings2.setFont(cantarell8);
+				btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
 
-		final Label lblTrace = new Label(groupTraces, SWT.NONE);
-		lblTrace.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
-		lblTrace.setFont(cantarell8);
-		lblTrace.setText("Trace");
-		new Label(groupTraces, SWT.NONE);
-
-		new Label(groupTraces, SWT.NONE);
-
-		final Label lblMetric = new Label(groupTraces, SWT.NONE);
-		lblMetric.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
-		lblMetric.setFont(cantarell8);
-		lblMetric.setText("Metric");
-		new Label(groupTraces, SWT.NONE);
-
-		final Label lblAggreg = new Label(groupTraces, SWT.NONE);
-		lblAggreg.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
-		lblAggreg.setFont(cantarell8);
-		lblAggreg.setText("Data Aggregation Type");
-		new Label(groupTraces, SWT.NONE);
-		new Label(groupTraces, SWT.NONE);
-		new Label(groupTraces, SWT.NONE);
-
-		final Label lblVisualization = new Label(groupTraces, SWT.NONE);
-		lblVisualization.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, true, 1, 1));
-		lblVisualization.setFont(cantarell8);
-		lblVisualization.setText("Visualization");
-		new Label(groupTraces, SWT.NONE);
-		new Label(groupTraces, SWT.NONE);
-
-		comboTraces = new Combo(groupTraces, SWT.READ_ONLY);
-		comboTraces.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		comboTraces.setFont(cantarell8);
-		comboTraces.addSelectionListener(new TraceAdapter());
-
-		int index = 0;
-		// Fill with the available traces
-		for (final Trace t : confDataLoader.getTraces()) {
-			comboTraces.add(t.getAlias(), index);
-			traceMap.put(index, t);
-			index++;
-		}
-
-		Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
-		btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
-		btnLoadDataCache.setToolTipText("Load a Microscopic Description");
-		btnLoadDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		btnLoadDataCache.addSelectionListener(new LoadDataListener());
-
-		comboType = new Combo(groupTraces, SWT.READ_ONLY);
-		final GridData gd_comboType = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_comboType.widthHint = 170;
-		comboType.setLayoutData(gd_comboType);
-		comboType.setFont(cantarell8);
-		comboType.addSelectionListener(new ComboTypeSelectionAdapter());
-		comboType.setText("");
-		new Label(groupTraces, SWT.NONE);
-
-		comboTime = new Combo(groupTraces, SWT.READ_ONLY);
-		final GridData gd_comboAggregationOperator = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_comboAggregationOperator.widthHint = 170;
-		comboTime.setLayoutData(gd_comboAggregationOperator);
-		comboTime.setFont(cantarell8);
-		comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
-		comboTime.setText("");
-		new Label(groupTraces, SWT.NONE);
-
-		btnSettings = new Button(groupTraces, SWT.NONE);
-		btnSettings.setToolTipText("Settings");
-		btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-		btnSettings.setFont(cantarell8);
-		btnSettings.addSelectionListener(new SettingsSelectionAdapter());
-
-		btnSaveDataCache = new Button(groupTraces, SWT.NONE);
-		btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
-		btnSaveDataCache.setToolTipText("Save Current Microscopic Description");
-		btnSaveDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		btnSaveDataCache.addSelectionListener(new SaveDataListener());
-
-		comboSpace = new Combo(groupTraces, SWT.READ_ONLY);
-		final GridData gd_comboSpace = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_comboSpace.widthHint = 170;
-		comboSpace.setLayoutData(gd_comboSpace);
-		comboSpace.setFont(cantarell8);
-		comboSpace.setText("");
-		comboSpace.addSelectionListener(new ComboSpaceSelectionAdapter());
-		new Label(groupTraces, SWT.NONE);
-
-		btnSettings2 = new Button(groupTraces, SWT.NONE);
-		btnSettings2.setToolTipText("Settings");
-		btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-		btnSettings2.setFont(cantarell8);
-		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
 
 		topBarScrollComposite.setContent(groupTraces);
 		topBarScrollComposite.setMinSize(groupTraces.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -1087,7 +1067,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		textTimestampStart.addModifyListener(new ConfModificationListener());
 		scrolledComposite.setContent(groupTime);
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashFormView.setWeights(new int[] { 55, 620, 57 });
+		sashFormView.setWeights(new int[] {27, 393, 25});
 
 		// Right column
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
@@ -1158,8 +1138,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		textRun.addModifyListener(new ParameterModifyListener());
 		scrolledComposite_1.setContent(group);
 		scrolledComposite_1.setMinSize(group.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashForm.setWeights(new int[] { 34, 190, 221, 34 });
-		sashForm_1.setWeights(new int[] { 635, 265 });
+		sashForm.setWeights(new int[] {31, 175, 212, 24});
+		sashForm_1.setWeights(new int[] {504, 306});
 		sashFormGlobal.setWeights(new int[] { 395 });
 
 		final IActionBars actionBars = getViewSite().getActionBars();
@@ -1170,6 +1150,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			toolBar.add(createTableAction());
 
 		toolBar.add(createSettingWindow(this));
+		refreshTraces();
 
 		cleanAll();
 	}
@@ -1261,6 +1242,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			index++;
 		}
 
+		comboType.setEnabled(false);
+		comboTime.setEnabled(false);
+		comboSpace.setEnabled(false);
+		btnRun.setEnabled(false);
+		
 		ocelotlParameters.getDataCache().buildDictionary(confDataLoader.getTraces());
 	}
 
@@ -1450,32 +1436,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	 * 
 	 * @return the corresponding parameter value, or 1.0 as default
 	 */
-	public double computeInitialParameter() {
-		double diffG = 0.0, diffL = 0.0;
-		double sumDiff = 0.0;
-		double maxDiff = 0.0;
-		int indexMaxQual = -1;
-		int i;
-		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) ocelotlCore.getLpaggregManager().getQualities();
-		for (i = 1; i < qual.size(); i++) {
-			// Compute the difference for the gain and the loss
-			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
-			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
+	//TODO should be in OcelotlCore
 
-			// Compute sum of both
-			sumDiff = diffG + diffL;
-
-			if (sumDiff > maxDiff) {
-				maxDiff = sumDiff;
-				indexMaxQual = i;
-			}
-		}
-		if (indexMaxQual > 0 && indexMaxQual < ocelotlCore.getLpaggregManager().getParameters().size())
-			return ocelotlCore.getLpaggregManager().getParameters().get(indexMaxQual - 1);
-
-		// No index found or the value is invalid, return 1.0 as default
-		return 1.0;
-	}
 
 	public static synchronized void playSound(final String soundPath) {
 		try {

@@ -19,8 +19,11 @@
 
 package fr.inria.soctrace.tools.ocelotl.core;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.PartManager;
@@ -182,6 +185,29 @@ public class OcelotlCore {
 	public void setMicroModel(IProgressMonitor monitor) throws OcelotlException {
 		microModelTypeManager.activateSelectedMicroModel(ocelotlParameters);
 		microModel = microModelTypeManager.getSelectedMicroModel();
+	}
+	
+	public double computeInitialParameter() {
+		double diffG = 0.0, diffL = 0.0;
+		double sumDiff = 0.0;
+		double maxDiff = 0.0;
+		int indexMaxQual = -1;
+		int i;
+		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) getLpaggregManager().getQualities();
+		for (i = 1; i < qual.size(); i++) {
+			// Compute the difference for the gain and the loss
+			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
+			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
+
+			// Compute sum of both
+			sumDiff = Math.abs(diffG - diffL);
+
+			if (sumDiff > maxDiff) {
+				maxDiff = sumDiff;
+				indexMaxQual = i-1;
+			}
+		}
+			return getLpaggregManager().getParameters().get(indexMaxQual + 1);
 	}
 
 }

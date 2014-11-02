@@ -19,7 +19,7 @@ public class ModeFigure extends RectangleFigure {
 	public void draw(MajState majState) {
 		removeAll();
 		final RectangleFigure roundedRectangle = new RectangleFigure();
-		roundedRectangle.setLineWidth(1);
+		roundedRectangle.setLineWidth(0);
 		final ToolbarLayout roundedLayout = new ToolbarLayout();
 		roundedRectangle.setLayoutManager(roundedLayout);
 		roundedRectangle.setPreferredSize(1000, 1000);
@@ -31,7 +31,8 @@ public class ModeFigure extends RectangleFigure {
 		setConstraint(roundedRectangle, getBounds());
 		setLayoutManager(layout);
 		setLineWidth(0);
-		setForegroundColor(ColorConstants.black);
+		setForegroundColor(FramesocColorManager.getInstance()
+				.getEventTypeColor(majState.getState()).getSwtColor());
 		setBackgroundColor(FramesocColorManager.getInstance()
 				.getEventTypeColor(majState.getState()).getSwtColor());
 	}

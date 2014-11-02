@@ -271,7 +271,7 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	protected TimeRegion					resetTime;
 
-	public final static int					Border			= 10;
+	public static int						Border			= 10;
 
 	protected final int						Space			= 3;
 	protected final OcelotlView				ocelotlView;
@@ -290,6 +290,12 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public static int getBorder() {
 		return Border;
+	}
+	
+	
+
+	public static void setBorder(int border) {
+		Border = border;
 	}
 
 	public static Color getSelectcolorbg() {
