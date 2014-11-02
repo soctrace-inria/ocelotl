@@ -4,6 +4,7 @@ public class MajState {
 
 	private String state;
 	private double amplitude;
+	private final static double Offset = 100.0;
 
 	public String getState() {
 		return state;
@@ -25,8 +26,8 @@ public class MajState {
 		return (int) (amplitude * 255.0);
 	}
 
-	public int getAmplitude255M() {
-		return (int) ((Math.min(amplitude * 255.0, 255.0)));
+	public int getAmplitude255Shifted() {
+		return (int) (Offset+(Math.min(amplitude, 1.0)*(255.0-Offset)));
 	}
 
 	public int getAmplitude100() {

@@ -319,7 +319,7 @@ public class HierarchyProportion {
 				.getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setForegroundColor(FramesocColorManager.getInstance()
 				.getEventTypeColor(state.getState()).getSwtColor());
-		rectangle.setAlpha(state.getAmplitude255M());
+		rectangle.setAlpha(state.getAmplitude255Shifted());
 		rectangle.setLineWidth(1);
 
 		rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
@@ -353,15 +353,16 @@ public class HierarchyProportion {
 			int sizeY, int number, EventProducerNode epn, boolean clean) {
 		final RectangleFigure rectangle = new RectangleFigure();
 		MajState state = proportion.getMajState(epn, logicX, logicX2);
+		String label=" " + epn.getMe().getName() + " ("
+				+ state.getState() + ", " + state.getAmplitude100() + "%) ";
 		rectangle.setBackgroundColor(FramesocColorManager.getInstance()
 				.getEventTypeColor(state.getState()).getSwtColor());
 		rectangle.setForegroundColor(FramesocColorManager.getInstance()
 				.getEventTypeColor(state.getState()).getSwtColor());
 		// Set the alpha transparency according to the proportion
-		rectangle.setAlpha(state.getAmplitude255M());
+		rectangle.setAlpha(state.getAmplitude255Shifted());
 		rectangle.setLineWidth(1);
-		rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
-				+ state.getState() + ", " + state.getAmplitude100() + "%) "));
+		rectangle.setToolTip(new Label(label));
 		rectangle.setLayoutManager(new BorderLayout());
 		rectangle.setPreferredSize(1000, 1000);
 		
@@ -369,8 +370,7 @@ public class HierarchyProportion {
 		lab.setTextAlignment(PositionConstants.CENTER);
 		lab.setLabelAlignment(SWT.CENTER);
 		lab.setForegroundColor(ColorConstants.black);
-		rectangle
-				.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
+		rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 
 		int xa = (int) ((logicX * logicWidth + Border));
 		int ya = (int) (rootHeight - height + logicY * logicHeight - Border);
@@ -378,36 +378,88 @@ public class HierarchyProportion {
 		int yb = yendlist.get(logicY + sizeY);
 		root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 				
-		// Draw a line to show that this is an aggregation due to a lack of space
-		final PolylineConnection line = new PolylineConnection();
-		Color color = ColorConstants.black;
-		boolean light = isColorLight(rectangle.getBackgroundColor(),
-				rectangle.getAlpha());
-		if (!light) {
-			color = ColorConstants.white;
+		
+		if (!clean){
+			drawTextureDirty(xa, xb, ya, yb, label);
+		}else{
+			drawTextureClean(xa, xb, ya, yb, label);
 		}
-		line.setBackgroundColor(color);
-		line.setForegroundColor(color);
-		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
-		line.setLineWidth(1);
-		line.setAntialias(SWT.ON);
-		root.add(line);
+		
+//		line.setBackgroundColor(color);
+//		line.setForegroundColor(color);
+//		line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
+//		line.setLineWidth(1);
+//		line.setAntialias(SWT.ON);
+//		root.add(line);
+//
+//		// Draw another line if the aggregation contains more temporal cut inside
+//		if (!clean) {
+//			final PolylineConnection line2 = new PolylineConnection();
+//			line2.setBackgroundColor(color);
+//			line2.setForegroundColor(color);
+//			line2.setEndpoints(new Point(xa, ya), new Point(xb, yb));
+//			line2.setAntialias(SWT.ON);
+//			line2.setLineWidth(1);
+//			root.add(line2);
+//		}
 
-		// Draw another line if the aggregation contains more temporal cut inside
-		if (!clean) {
-			final PolylineConnection line2 = new PolylineConnection();
-			line2.setBackgroundColor(color);
-			line2.setForegroundColor(color);
-			line2.setEndpoints(new Point(xa, ya), new Point(xb, yb));
-			line2.setAntialias(SWT.ON);
-			line2.setLineWidth(1);
-			root.add(line2);
-		}
+//		// If the color is too light then draw a border
+//		if (light) {
+//			drawRectangleBorder(xa, xb, ya, yb);
+//		}
+	}
 
-		// If the color is too light then draw a border
-		if (light) {
-			drawRectangleBorder(xa, xb, ya, yb);
+	private void drawTextureDirty(int xa, int xb, int ya, int yb, String label) {
+		int spaceDirty=6;
+		for (int x=xa+spaceDirty; x<(xb+yb-ya); x=x+spaceDirty+1){
+			final PolylineConnection line = new PolylineConnection();
+			int xinit=x;
+			int yinit=ya;
+			int xfinal=Math.max(xa, (xinit-(yb-ya)));
+			int yfinal=Math.min(yb, ya+xinit-xfinal);
+			if (xb<xinit){
+				yinit=Math.min(yb,ya+xinit-xb);
+				xinit=xb;
+			}
+			line.setBackgroundColor(ColorConstants.white);
+			line.setForegroundColor(ColorConstants.white);
+			line.setEndpoints(new Point(xinit, yinit), new Point(xfinal, yfinal));
+			line.setLineWidth(1);
+			line.setAntialias(SWT.ON);
+			line.setToolTip(new Label(label));
+			root.add(line);		
 		}
+	}
+
+	private void drawTextureClean(int xa, int xb, int ya, int yb, String label) {
+		int spaceClean=8;
+		int spaceClean2=2;
+		int iteration=3;
+		int i=0;
+		for (int x=xa+spaceClean2; x<(xb+yb-ya); x=x+spaceClean2+1){
+			i++;
+			if (i>iteration){
+				i=0;
+				x+=spaceClean;
+			}
+			final PolylineConnection line = new PolylineConnection();
+			int xinit=x;
+			int yinit=ya;
+			int xfinal=Math.max(xa, (xinit-(yb-ya)));
+			int yfinal=Math.min(yb, ya+xinit-xfinal);
+			if (xb<xinit){
+				yinit=Math.min(yb,ya+xinit-xb);
+				xinit=xb;
+			}
+			line.setBackgroundColor(ColorConstants.white);
+			line.setForegroundColor(ColorConstants.white);
+			line.setEndpoints(new Point(xinit, yinit), new Point(xfinal, yfinal));
+			line.setLineWidth(1);
+			line.setAntialias(SWT.ON);
+			line.setToolTip(new Label(label));
+			root.add(line);	
+		}
+		
 	}
 
 	private void drawRectangleBorder(int xa, int xb, int ya, int yb) {
