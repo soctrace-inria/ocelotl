@@ -34,7 +34,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 abstract public class MatrixView extends AggregatedView implements IAggregatedView {
 
 	protected EventProducerHierarchy	hierarchy;
-	protected int						space;
+	protected int						space=Space;
 
 	public MatrixView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
@@ -43,12 +43,6 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 
 	@Override
 	abstract protected void computeDiagram();
-
-	private void computeSpace() {
-		space = Space;
-		while ((root.getSize().width - 2 * Border) / hierarchy.getRoot().getParts().size() - space < space && space > 0)
-			space = space - 1;
-	}
 
 	public void createDiagram(final EventProducerHierarchy hierarchy, final TimeRegion time) {
 		root.removeAll();
@@ -62,7 +56,6 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 		}
 		if (hierarchy != null)
 			if (hierarchy.getRoot().getParts() != null) {
-				computeSpace();
 				computeDiagram();
 			}
 	}

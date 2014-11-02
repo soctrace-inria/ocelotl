@@ -49,10 +49,10 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.mode.Mode;
 public class HierarchyProportion {
 
 	private int index;
-	private static final int Border = PartMatrixView.Border;
+	private int Border = 10;
 	private static final int ColorThreshold = 175;
 	private static final int AlphaThreshold = 190;
-	private int space = 3;
+	private int space;
 	private int rectangleBorder = 1;
 	private EventProducerHierarchy hierarchy;
 	private IFigure root;

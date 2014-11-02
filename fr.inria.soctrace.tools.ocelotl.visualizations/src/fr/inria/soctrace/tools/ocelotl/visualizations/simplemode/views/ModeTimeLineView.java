@@ -15,7 +15,6 @@ public class ModeTimeLineView extends TimeLineView {
 
 	public ModeTimeLineView(OcelotlView ocelotlView) {
 		super(ocelotlView);
-		space = 1;
 	}
 
 	@Override

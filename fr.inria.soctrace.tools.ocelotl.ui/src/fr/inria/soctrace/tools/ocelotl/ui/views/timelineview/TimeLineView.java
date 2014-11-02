@@ -35,7 +35,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 abstract public class TimeLineView extends AggregatedView implements IAggregatedView {
 
 	protected List<Integer>	parts	= null;
-	protected int			space;
+	protected int			space=Space;
 
 	public TimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
@@ -46,8 +46,8 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 
 	private void computeSpace() {
 		space = Space;
-		while ((root.getSize().width - 2 * Border) / parts.size() - space < space && space > 0)
-			space = space - 1;
+//		while ((root.getSize().width - 2 * Border) / parts.size() - space < space && space > 2)
+//			space = space - 1;
 	}
 
 	public void createDiagram(IDataAggregManager manager, TimeRegion time, IVisuOperator aVisuOperator) {
@@ -66,7 +66,6 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 			selectTime = new TimeRegion(time);
 		}
 		if (parts != null) {
-			computeSpace();
 			computeDiagram();
 		}
 	}

@@ -35,7 +35,7 @@ public class StateProportionTimeLineView extends TimeLineView {
 	protected void computeDiagram() {
 			for (int i = 0; i < ((IVisuTOperator) ocelotlView.getCore().getVisuOperator()).getPartNumber(); i++) {
 				// TODO manage parts
-				final MultiState part = new MultiState(i, (Proportion) ocelotlView.getCore().getVisuOperator(), root, space);
+				final MultiState part = new MultiState(i, (Proportion) ocelotlView.getCore().getVisuOperator(), root, Space);
 				part.init();
 			}
 	}

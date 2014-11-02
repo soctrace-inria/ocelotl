@@ -45,7 +45,7 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartColorManag
 public class HierarchyPart {
 
 	private int index;
-	private static final int Border = PartMatrixView.Border;
+	private int Border = 10;
 	private int space = 3;
 	private EventProducerHierarchy hierarchy;
 	private IFigure root;

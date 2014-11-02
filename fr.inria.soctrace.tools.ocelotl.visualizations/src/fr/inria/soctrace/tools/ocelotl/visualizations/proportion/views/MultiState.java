@@ -43,7 +43,7 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion;
 public class MultiState {
 
 	private int index;
-	private static final int Border = StateProportionTimeLineView.Border;
+	private int Border = 10;
 	//Minimal height for a rectangle to be displayed
 	private static final int MinHeight = 6;
 	//Minimal size of the icon to be displayed
@@ -62,7 +62,7 @@ public class MultiState {
 		setIndex(index);
 		this.distribution = distribution;
 		this.root = root;
-		this.space = space;
+		this.space = 1;
 		this.iconManager = new IconManager();
 	}
 
@@ -112,27 +112,13 @@ public class MultiState {
 				rect.setBackgroundColor(FramesocColorManager.getInstance()
 						.getEventTypeColor(state).getSwtColor());
 				rect.setForegroundColor(ColorConstants.white);
-				rect.setLineWidth(0);
-				//If the color is too light add a border
-				if (isTooLight(rect.getBackgroundColor())) {
-					rect.setForegroundColor(ColorConstants.black);
-					rect.setLineWidth(1);
-				}
+				rect.setLineWidth(1);
 				final Label label = new Label(" " + state + ": "
 						+ valueFormat.format(value) + " ");
 				rect.setToolTip(label);
 				//If the height of the state proportion is big enough
 				if (y1 * value / m - space > MinHeight) {
 					//Draw a rectangle
-					if (isTooLight(rect.getBackgroundColor()))
-						root.add(rect, new Rectangle(new Point(
-								(int) (distribution.getPart(index)
-										.getStartPart() * x0 / d + Border + 1),
-								(int) (y0 - y1 * total / m)), new Point(
-								(int) (distribution.getPart(index).getEndPart()
-										* x0 / d - space + Border - 1),
-								(int) (y0 + space - y1 * (total + value) / m))));
-					else
 						root.add(rect, new Rectangle(new Point(
 								(int) (distribution.getPart(index)
 										.getStartPart() * x0 / d + Border),
