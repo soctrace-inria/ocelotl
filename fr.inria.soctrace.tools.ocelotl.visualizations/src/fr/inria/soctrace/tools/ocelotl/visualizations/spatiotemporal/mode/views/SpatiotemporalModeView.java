@@ -40,8 +40,8 @@ public class SpatiotemporalModeView extends MatrixView {
 
 		private static final int ColorThreshold = 175;
 		private static final int AlphaThreshold = 190;
-		int spaceClean=7;
-		int spaceDirty=8;
+		int spaceClean=8;
+		int spaceDirty=10;
 		int spaceDirty2=1;
 		int iterationDirty=3;
 		private int rectangleBorder = 1;

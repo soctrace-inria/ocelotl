@@ -138,10 +138,10 @@ public class Overview {
 
 			this.visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
 
-			createDiagram(time);
+			
 			redrawOverview = false;
 		}
-
+		createDiagram(time);
 		displayedZone.draw(time);
 		updateSelection(time);
 	}
