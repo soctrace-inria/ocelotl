@@ -40,9 +40,9 @@ public class SpatiotemporalModeView extends MatrixView {
 
 		private static final int ColorThreshold = 175;
 		private static final int AlphaThreshold = 190;
-		int spaceClean=6;
-		int spaceDirty=8;
-		int spaceDirty2=2;
+		int spaceClean=5;
+		int spaceDirty=7;
+		int spaceDirty2=1;
 		int iterationDirty=3;
 		private int rectangleBorder = 1;
 		private double rootHeight;
@@ -369,15 +369,15 @@ public class SpatiotemporalModeView extends MatrixView {
 		}
 
 		private void drawTextureClean(int xa, int xb, int ya, int yb, String label) {
-			for (int x=xa+spaceClean; x<(xb+yb-ya); x=x+spaceClean+1){
+			for (int x=xa+spaceClean-yb+ya; x<(xb); x=x+spaceClean+1){
 				final PolylineConnection line = new PolylineConnection();
 				int xinit=x;
 				int yinit=ya;
-				int xfinal=Math.max(xa, (xinit-(yb-ya)));
-				int yfinal=Math.min(yb, ya+xinit-xfinal);
-				if (xb<xinit){
-					yinit=Math.min(yb,ya+xinit-xb);
-					xinit=xb;
+				int xfinal=Math.min(xb, (xinit+(yb-ya)));
+				int yfinal=Math.min(yb, ya+xfinal-xinit);
+				if (xa>xinit){
+					yinit=Math.min(yb,ya+xinit-xa);
+					xinit=xa;
 				}
 				line.setBackgroundColor(ColorConstants.white);
 				line.setForegroundColor(ColorConstants.white);
