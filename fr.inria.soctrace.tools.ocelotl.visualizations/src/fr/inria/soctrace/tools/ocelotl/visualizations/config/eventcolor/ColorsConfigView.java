@@ -68,7 +68,6 @@ public class ColorsConfigView extends Dialog implements IVisualizationWindow {
 			final ColorDialog dialog = new ColorDialog(getShell());
 			dialog.setRGB(config.getColors().getRGB(state));
 			config.getColors().setRGB(state, dialog.open());
-
 		}
 	}
 

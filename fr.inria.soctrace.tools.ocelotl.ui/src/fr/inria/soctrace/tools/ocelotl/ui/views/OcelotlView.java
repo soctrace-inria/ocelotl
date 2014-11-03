@@ -71,7 +71,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
@@ -640,7 +639,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			final float p = Float.parseFloat(textRun.getText());
 			if (ocelotlCore.getLpaggregManager() != null) {
 				textRun.setText(Double.toString(ocelotlCore.computeInitialParameter()));
 				btnRun.notifyListeners(SWT.Selection, new Event());
@@ -656,6 +654,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			if (timeLineView != null) {
 				timeLineView.resizeDiagram();
 				timeAxisView.resizeDiagram();
+				overView.deleteSelection();
 			}
 		}
 	}
@@ -728,6 +727,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			comboType.removeAll();
 			comboTime.removeAll();
 			comboSpace.removeAll();
+			overView.reset();
 
 			final Job job = new Job(title) {
 
@@ -854,6 +854,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED);
+		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
 		topics.registerAll();
 	}
 
@@ -1404,6 +1405,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED) || topic.equals(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED) || topic.equals(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED)) {
 			refreshTraces();
 		}
+		if ((topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED))) {
+			if (timeLineView != null)
+				timeLineView.resizeDiagram();
+		}
 	}
 
 	/**
@@ -1502,15 +1507,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 
-	/**
-	 * Search for the parameter that has the largest gap (sum of the differences
-	 * in gain and loss values) between two consecutive gain and loss values
-	 * 
-	 * @return the corresponding parameter value, or 1.0 as default
-	 */
-	//TODO should be in OcelotlCore
-
-
+	
 	public static synchronized void playSound(final String soundPath) {
 		try {
 			URL soundFile = OcelotlView.class.getResource(soundPath);

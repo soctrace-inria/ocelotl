@@ -207,6 +207,12 @@ public class OcelotlCore {
 		microModel = microModelTypeManager.getSelectedMicroModel();
 	}
 	
+	/**
+	 * Search for the parameter that has the largest gap (sum of the differences
+	 * in gain and loss values) between two consecutive gain and loss values
+	 * 
+	 * @return the corresponding parameter value, or 1.0 as default
+	 */
 	public double computeInitialParameter() {
 		double diffG = 0.0, diffL = 0.0;
 		double sumDiff = 0.0;

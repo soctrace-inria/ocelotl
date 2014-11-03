@@ -1,7 +1,6 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -21,7 +20,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Bundle;
 
-import fr.inria.lpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
+import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
+import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
 import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
@@ -31,7 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 
-public class Overview {
+public class Overview implements IFramesocBusListener {
 
 	private OcelotlView					ocelotlView;
 
@@ -48,18 +49,38 @@ public class Overview {
 	private int							timeSlice;
 
 	private TimeRegion					globalTimeRegion;
-
+	private TimeRegion					zoomedTimeRegion;
+	
 	// Show the currently displayed zone
 	private SelectFigure				displayedZone;
 	// Show the currently selected zone
 	private SelectFigure				selectedZone;
 	private int							Border	= 3;
+	
+	/**
+	 * Followed topics
+	 */
+	protected FramesocBusTopicList		topics			= null;
 
 	public Overview(OcelotlView aView) {
 		super();
 		ocelotlView = aView;
 		redrawOverview = true;
 		globalTimeRegion = null;
+		
+		// Register update to synchronize traces
+		topics = new FramesocBusTopicList(this);
+		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
+		topics.registerAll();
+	}
+	
+	// When receiving a notification, update the trace list
+	@Override
+	public void handle(FramesocBusTopic topic, Object data) {
+		if (topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED) && aggregManager != null) {
+			createDiagram(globalTimeRegion);
+			displayedZone.draw(zoomedTimeRegion);
+		}
 	}
 
 	/**
@@ -97,11 +118,13 @@ public class Overview {
 	 * Redraw the diagram to adapt to the new size of the display
 	 */
 	public void resizeDiagram() {
+		root.removeAll();
+		canvas.update();
 		if (aggregManager != null && globalTimeRegion != null) {
-			canvas.redraw();
 			createDiagram(globalTimeRegion);
-			root.repaint();
+			displayedZone.draw(zoomedTimeRegion);
 		}
+		root.repaint();
 	}
 
 	/**
@@ -116,6 +139,8 @@ public class Overview {
 			redrawOverview = true;
 			globalTimeRegion = new TimeRegion(time);
 		}
+		
+		zoomedTimeRegion = new TimeRegion(time);
 
 		// is it necessary to change completely the computed model
 		if (redrawOverview) {
@@ -123,14 +148,14 @@ public class Overview {
 			microModel = ocelotlView.getOcelotlCore().getMicroModel();
 
 			// Init the aggregation operator
-			if (!ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator().equals(ocelotlView.getParams().getTimeAggOperator())){
+	//		if (!ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator().equals(ocelotlView.getParams().getTimeAggOperator())) {
 				aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator());
 				aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
 				aggregManager.computeQualities();
 				aggregManager.computeDichotomy();
-			}else{
-				aggregManager=ocelotlView.getOcelotlCore().getLpaggregManager();
-			}
+		//	} else {
+		//		aggregManager = ocelotlView.getOcelotlCore().getLpaggregManager();
+	//		}
 			parameter = ocelotlView.getOcelotlCore().computeInitialParameter();
 
 			// Compute the view according to the new parameter value
@@ -138,11 +163,10 @@ public class Overview {
 
 			this.visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
 
-			
 			redrawOverview = false;
 			createDiagram(time);
 		}
-		
+			
 		displayedZone.draw(time);
 		updateSelection(time);
 	}
@@ -239,11 +263,19 @@ public class Overview {
 
 		// Init other stuff
 		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
+		initSelectionFigure();
+	}
+	
+	public void initSelectionFigure() {
 		selectedZone = new SelectFigure(ColorConstants.black, ColorConstants.black);
 		displayedZone = new SelectFigure(ColorConstants.white, ColorConstants.white);
 	}
 
 
+	public void reset() {
+		aggregManager = null;
+		globalTimeRegion = null;
+	}
 	
 	/**
 	 * Class for describing and displaying selected zones
@@ -281,6 +313,7 @@ public class Overview {
 
 			if (getParent() != root)
 				root.add(this);
+			
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height),
 					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), 0)));
 			root.repaint();

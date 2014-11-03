@@ -28,7 +28,6 @@ public class TemporalMode extends VisuTOperator {
 	@Override
 	public void setOcelotlCore(OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
-		lpaggregManager = (ITimeManager) ocelotlCore.getLpaggregManager();
 		timeManager = (ITimeManager) ocelotlCore.getLpaggregManager();
 		computeParts();
 	}
@@ -36,7 +35,6 @@ public class TemporalMode extends VisuTOperator {
 	@Override
 	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
 		this.ocelotlCore = ocelotlCore;
-		//lpaggregManager = (ITimeManager) aManager;
 		timeManager = (ITimeManager) aManager;
 		computeParts();
 	}

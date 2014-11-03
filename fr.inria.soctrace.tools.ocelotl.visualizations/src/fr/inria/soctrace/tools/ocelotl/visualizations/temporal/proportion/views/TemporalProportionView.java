@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ImageFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
@@ -37,7 +36,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
-import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuTOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
@@ -114,19 +112,34 @@ public class TemporalProportionView extends TimeLineView {
 							.getEventTypeColor(state).getSwtColor());
 					rect.setForegroundColor(ColorConstants.white);
 					rect.setLineWidth(1);
+					//If the color is too light add a border
+					if (isTooLight(rect.getBackgroundColor())) {
+						rect.setForegroundColor(ColorConstants.black);
+						rect.setLineWidth(1);
+					}
 					final Label label = new Label(" " + state + ": "
 							+ valueFormat.format(value) + " ");
 					rect.setToolTip(label);
 					//If the height of the state proportion is big enough
 					if (y1 * value / m - stackSpace > MinHeight) {
 						//Draw a rectangle
+						if (isTooLight(rect.getBackgroundColor()))
+							 root.add(rect, new Rectangle(new Point(
+							 (int) (distribution.getPart(index)
+							 .getStartPart() * x0 / d + aBorder + 1),
+							 (int) (y0 - y1 * total / m)), new Point(
+							 (int) (distribution.getPart(index).getEndPart()
+							 * x0 / d - space + aBorder - 1),
+							 (int) (y0 + space - y1 * (total + value) / m))));
+						else {
 							root.add(rect, new Rectangle(new Point(
-									(int) (distribution.getPart(index)
-											.getStartPart() * x0 / d + aBorder),
-									(int) (y0 - y1 * total / m)), new Point(
-									(int) (distribution.getPart(index).getEndPart()
-											* x0 / d - stackSpace + aBorder), (int) (y0
-											+ stackSpace - y1 * (total + value) / m))));
+								(int) (distribution.getPart(index)
+										.getStartPart() * x0 / d + aBorder),
+								(int) (y0 - y1 * total / m)), new Point(
+								(int) (distribution.getPart(index).getEndPart()
+										* x0 / d - stackSpace + aBorder), (int) (y0
+										+ stackSpace - y1 * (total + value) / m))));
+						}
 						total += value;
 					} else { // else aggregates it
 						agg += value;
