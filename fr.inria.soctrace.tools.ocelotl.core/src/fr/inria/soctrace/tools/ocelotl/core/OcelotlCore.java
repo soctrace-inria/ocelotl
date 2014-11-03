@@ -35,6 +35,8 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescriptionTypeManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperator;
+import fr.inria.soctrace.tools.ocelotl.core.statistics.StatisticOperatorManager;
 
 public class OcelotlCore {
 
@@ -58,6 +60,8 @@ public class OcelotlCore {
 	IDataAggregationOperator aggregOperator;
 	VisuOperatorManager visuOperators;
 	IVisuOperator visuOperator;
+	StatisticOperatorManager statOperators;
+	IStatisticOperator statOperator;
 
 	public OcelotlCore() {
 		super();
@@ -125,6 +129,7 @@ public class OcelotlCore {
 		microModelTypeManager = new MicroscopicDescriptionTypeManager();
 		aggregOperators = new DataAggregationOperatorManager(ocelotlParameters);
 		visuOperators = new VisuOperatorManager(this);
+		statOperators = new StatisticOperatorManager(this);
 	}
 
 	public IDataAggregManager getLpaggregManager() {
@@ -154,6 +159,16 @@ public class OcelotlCore {
 	public VisuOperatorManager getVisuOperators() {
 		return visuOperators;
 	}
+	
+	
+
+	public StatisticOperatorManager getStatOperators() {
+		return statOperators;
+	}
+
+	public IStatisticOperator getStatOperator() {
+		return statOperator;
+	}
 
 	public IDataAggregationOperator getAggregOperator() {
 		return aggregOperator;
@@ -174,6 +189,11 @@ public class OcelotlCore {
 	public void setVisuOperator() {
 		visuOperators.activateSelectedOperator();
 		visuOperator = visuOperators.getSelectedOperator();
+	}
+	
+	public void setStatOperator() {
+		statOperators.activateSelectedOperator();
+		statOperator = statOperators.getSelectedOperator();
 	}
 
 	public void setAggregOperator(IProgressMonitor monitor)

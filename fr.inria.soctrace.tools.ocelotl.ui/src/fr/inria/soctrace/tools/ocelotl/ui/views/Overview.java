@@ -140,8 +140,9 @@ public class Overview {
 
 			
 			redrawOverview = false;
+			createDiagram(time);
 		}
-		createDiagram(time);
+		
 		displayedZone.draw(time);
 		updateSelection(time);
 	}

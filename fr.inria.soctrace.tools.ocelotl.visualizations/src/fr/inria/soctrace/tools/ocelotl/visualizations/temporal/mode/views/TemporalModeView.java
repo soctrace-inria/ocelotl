@@ -26,7 +26,7 @@ public class TemporalModeView extends TimeLineView {
 		for (i = 0; i < parts.size(); i++)
 			aggParts.set(parts.get(i), aggParts.get(parts.get(i)) + 1);
 		int j = 0;
-
+		root.removeAll();
 		for (i = 0; i < aggParts.size(); i++) {
 			final ModeFigure part = new ModeFigure();
 			figures.add(part);
