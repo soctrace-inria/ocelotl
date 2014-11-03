@@ -34,7 +34,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 abstract public class MatrixView extends AggregatedView implements IAggregatedView {
 
 	protected EventProducerHierarchy	hierarchy;
-	protected int						space=Space;
 
 	public MatrixView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
