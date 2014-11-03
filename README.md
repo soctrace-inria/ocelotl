@@ -4,7 +4,7 @@ Ocelotl is an innovative visualization tool, which provides overviews for execut
 
 Ocelotl is integrated into [Framesoc](http://generoso.github.io/framesoc/), a generic trace management and analysis infrastructure. You can take advantage of the tool bunch provided by Framesoc, and switch from an Ocelotl's overview to more detailed representations once you know where to focus.
 
-![Ocelotl Screenshot](http://dosimont.github.io/ocelotl/images/screenshots/ocelotl_spatiotemporal.png)
+![Ocelotl Screenshot](http://soctrace-inria.github.io/ocelotl/images/screenshots/ocelotl_spatiotemporal.png)
 
 ##Get Ocelotl Now!
 
@@ -28,8 +28,8 @@ Follow the [wiki](https://github.com/dosimont/ocelotl/wiki/User-Guide) to set a 
 
 ## Wiki and User Guide
 
-Check our [wiki](https://github.com/dosimont/ocelotl/wiki/User-Guide) to install, configure and use Ocelotl.
-A detailed [user guide](https://github.com/dosimont/ocelotl/raw/master/docs/OCELOTL_userguide.pdf) is also available for more details.
+Check our [wiki](https://github.com/soctrace-inria/ocelotl/wiki/User-Guide) to install, configure and use Ocelotl.
+A detailed [user guide](https://github.com/soctrace-inria/ocelotl/raw/master/docs/OCELOTL_userguide.pdf) is also available for more details.
 
 ##Licence
 
@@ -42,7 +42,7 @@ You can contact us by email:
 [Youenn Corre] (mailto:youenn.corre-at-inria.fr),
 [Generoso Pagano] (mailto:generoso.pagano-at-inria.fr) (replace -at- by @)
 
-or follow us on [github](https://github.com/dosimont/ocelotl).
+or follow us on [github](https://github.com/soctrace-inria/ocelotl).
 
 ### Ocelotl User List
 You can subscribe to the Ocelotl user list using this [form](http://lists.gforge.inria.fr/cgi-bin/mailman/listinfo/ocelotl-users)
