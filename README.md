@@ -22,9 +22,9 @@ and press Enter. The Framesoc and Ocelotl tools should then be available. If Fra
 
 Alternatively, you may want to work with Ocelotl sources.
 
-[List of releases](https://github.com/dosimont/ocelotl/releases)
+[List of releases](https://github.com/soctrace-inria/ocelotl/releases)
 
-Follow the [wiki](https://github.com/dosimont/ocelotl/wiki/User-Guide) to set a developer environment.
+Follow the [wiki](https://github.com/soctrace-inria/ocelotl/wiki/User-Guide) to set a developer environment.
 
 ## Wiki and User Guide
 
