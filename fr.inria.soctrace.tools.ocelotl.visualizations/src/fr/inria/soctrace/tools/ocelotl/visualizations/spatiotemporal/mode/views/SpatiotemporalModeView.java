@@ -40,8 +40,8 @@ public class SpatiotemporalModeView extends MatrixView {
 
 		private static final int ColorThreshold = 175;
 		private static final int AlphaThreshold = 190;
-		int spaceClean=5;
-		int spaceDirty=7;
+		int spaceClean=7;
+		int spaceDirty=8;
 		int spaceDirty2=1;
 		int iterationDirty=3;
 		private int rectangleBorder = 1;
@@ -362,9 +362,9 @@ public class SpatiotemporalModeView extends MatrixView {
 					
 			
 			if (!clean){
-				drawTextureClean(xa, xb, ya, yb, label);
-			}else{
 				drawTextureDirty(xa, xb, ya, yb, label);
+			}else{
+				drawTextureClean(xa, xb, ya, yb, label);
 			}
 		}
 
@@ -376,7 +376,7 @@ public class SpatiotemporalModeView extends MatrixView {
 				int xfinal=Math.min(xb, (xinit+(yb-ya)));
 				int yfinal=Math.min(yb, ya+xfinal-xinit);
 				if (xa>xinit){
-					yinit=Math.min(yb,ya+xinit-xa);
+					yinit=Math.min(yb,ya-xinit+xa);
 					xinit=xa;
 				}
 				line.setBackgroundColor(ColorConstants.white);
