@@ -43,7 +43,7 @@ public class SpatiotemporalModeView extends MatrixView {
 		int spaceClean=7;
 		int spaceDirty=8;
 		int spaceDirty2=1;
-		int iterationDirty=2;
+		int iterationDirty=3;
 		private int rectangleBorder = 1;
 		private double rootHeight;
 		private double height;
@@ -393,7 +393,7 @@ public class SpatiotemporalModeView extends MatrixView {
 			int i=0;
 			for (int x=xa+spaceDirty2; x<(xb+yb-ya); x=x+spaceDirty2+1){
 				i++;
-				if (i>iterationDirty){
+				if (i>iterationDirty-1){
 					i=0;
 					x+=spaceDirty;
 				}
