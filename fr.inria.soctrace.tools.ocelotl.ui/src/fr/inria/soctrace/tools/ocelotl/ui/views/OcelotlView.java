@@ -1001,8 +1001,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				gd_comboAggregationOperator.widthHint = 150;
 				comboTime.setLayoutData(gd_comboAggregationOperator);
 				comboTime.setFont(cantarell8);
-				comboTime.add("Data Aggregation Type");
-				comboTime.setText("Data Aggregation Type");
+				comboTime.add("Dimensions");
+				comboTime.setText("Dimensions");
 				comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
 				//comboTime.setText("");
 		
