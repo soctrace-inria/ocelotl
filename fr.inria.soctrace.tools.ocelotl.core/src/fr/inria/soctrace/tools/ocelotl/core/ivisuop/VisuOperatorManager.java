@@ -175,7 +175,7 @@ public VisuOperatorResource getSelectedOperatorResource(
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " Visualization aggregation operators detected:");
+		logger.debug(config.length + " visualizations detected:");
 
 		for (final IConfigurationElement e : config) {
 			final VisuOperatorResource resource = new VisuOperatorResource();
