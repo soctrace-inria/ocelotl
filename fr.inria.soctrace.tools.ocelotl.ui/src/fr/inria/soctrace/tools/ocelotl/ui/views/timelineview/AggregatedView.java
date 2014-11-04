@@ -440,8 +440,8 @@ abstract public class AggregatedView implements IAggregatedView {
 		this.root = root;
 	}
 
-	public void setVisuOperator(final IVisuOperator visuOperator) {
-		this.visuOperator = visuOperator;
+	public void setVisuOperator(final IVisuOperator spaceOperator) {
+		visuOperator = spaceOperator;
 	}
 
 }
