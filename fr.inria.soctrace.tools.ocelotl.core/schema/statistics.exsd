@@ -83,7 +83,7 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="view" type="string">
+         <attribute name="view" type="string"  use="required">
             <annotation>
                <documentation>
                   

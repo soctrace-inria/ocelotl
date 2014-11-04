@@ -22,15 +22,12 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.statview;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -44,7 +41,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 public class StatViewWrapper {
 
 	private Figure							root;
-	private Canvas							canvas;
 	private final OcelotlView				ocelotlView;
 	private IStatView						view;
 	private final List<ControlListener>		controlListeners		= new ArrayList<ControlListener>();
@@ -58,25 +54,19 @@ public class StatViewWrapper {
 
 	public void addControlListener(final ControlListener controlListener) {
 		controlListeners.add(controlListener);
-		canvas.addControlListener(controlListener);
-
 	}
 
 	public void addMouseListener(final MouseListener mouse) {
 		mouseListeners.add(mouse);
 		root.addMouseListener(mouse);
-
 	}
 
 	public void addMouseMotionListener(final MouseMotionListener mouse) {
 		mouseMotionListeners.add(mouse);
 		root.addMouseMotionListener(mouse);
-
 	}
 
 	public void cleanControlListeners() {
-		for (final ControlListener c : controlListeners)
-			canvas.removeControlListener(c);
 		controlListeners.clear();
 	}
 
@@ -92,10 +82,6 @@ public class StatViewWrapper {
 		mouseMotionListeners.clear();
 	}
 
-	public Canvas getCanvas() {
-		return canvas;
-	}
-
 	public OcelotlView getOcelotlView() {
 		return ocelotlView;
 	}
@@ -108,20 +94,13 @@ public class StatViewWrapper {
 		return view;
 	}
 
-	public Canvas init(final Composite parent) {
+	public void init(final Composite parent) {
 		root = new Figure();
 		root.setFont(parent.getFont());
 		final XYLayout layout = new XYLayout();
 		root.setLayoutManager(layout);
-		canvas = new Canvas(parent, SWT.DOUBLE_BUFFERED);
-		canvas.setBackground(ColorConstants.white);
-		canvas.setSize(parent.getSize());
-		final LightweightSystem lws = new LightweightSystem(canvas);
-		lws.setContents(root);
-		lws.setControl(canvas);
 		root.setFont(SWTResourceManager.getFont("Cantarell", 24, SWT.NORMAL));
 		root.setSize(parent.getSize().x, parent.getSize().y);
-		return canvas;
 	}
 
 	public void setView(final IStatView view) {

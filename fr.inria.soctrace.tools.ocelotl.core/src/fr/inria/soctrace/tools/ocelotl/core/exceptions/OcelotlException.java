@@ -12,6 +12,7 @@ public class OcelotlException extends Exception {
 	public static final String NO_EVENTS = "Error: No events found";
 	public static final String JNI =  "Error: problem with native library";
 	public static final String NO_TRACE = "Error: No trace selected";
+	public static final String NO_TYPE = "Error: No type selected";
 	public static final String NO_MICROSCOPIC_DESCRIPTION = "Error: No microscopic description selected";
 	public static final String NO_VISUALIZATION = "Error: No visualitazion selected";
 	public static final String INVALID_TIMERANGE = "Error: The starting timestamp is greater than the ending timestamp";

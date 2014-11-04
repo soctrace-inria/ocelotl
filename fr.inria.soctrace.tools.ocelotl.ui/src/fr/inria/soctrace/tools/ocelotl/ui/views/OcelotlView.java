@@ -98,6 +98,8 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatViewWrapper;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.jface.viewers.TreeViewer;
 
 /**
  * Main view for Ocelotl
@@ -422,6 +424,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							textRun.setText(String.valueOf(getParams().getParameter()));
 							qualityView.createDiagram();
+							statView.createDiagram();
 							tabFolder.setSelection(1);
 							try {
 								
@@ -521,7 +524,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				comboStatistics.notifyListeners(SWT.Selection, new Event());
 			}
 			
-
 			// Set default settings
 			setDefaultDescriptionSettings();
 		}
@@ -774,7 +776,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			};
 			job.setUser(true);
 			job.schedule();
-
 		}
 	}
 
@@ -828,6 +829,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private ConfigViewManager			manager;
 	private Combo	comboStatistics;
 	private Button	buttonHome;
+	private Composite	statComposite;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -840,6 +842,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters = new OcelotlParameters();
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
+		statViewManager = new StatViewManager(this);
 
 		try {
 			ocelotlParameters.getDataCache().setSettings(ocelotlParameters.getOcelotlSettings());
@@ -917,20 +920,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			public void handleEvent(final Event e) {
 				switch (e.keyCode) {
 				case SWT.ARROW_LEFT:
-					// Make sure we are not in an editable field
-					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-						buttonDown.notifyListeners(SWT.Selection, new Event());
-					break;
-				case SWT.ARROW_RIGHT:
-					// Make sure we are not in an editable field
-					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-						buttonUp.notifyListeners(SWT.Selection, new Event());
-					break;
 				case SWT.ARROW_UP:
 					// Make sure we are not in an editable field
 					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 						buttonDown.notifyListeners(SWT.Selection, new Event());
 					break;
+				case SWT.ARROW_RIGHT:
 				case SWT.ARROW_DOWN:
 					// Make sure we are not in an editable field
 					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
@@ -952,6 +947,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		timeAxisView = new TimeAxisView();
 		qualityView = new QualityView(this);
 		timeLineViewWrapper = new TimeLineViewWrapper(this);
+		statViewWrapper = new StatViewWrapper(this);
 		overView = new Overview(this);
 		cantarell8 = new Font(sashFormGlobal.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
 
@@ -981,6 +977,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				comboTraces.setLayoutData(gd_comboTraces);
 				comboTraces.setFont(cantarell8);
 				comboTraces.addSelectionListener(new TraceAdapter());
+				comboTraces.setToolTipText("Trace selection");
 		
 				Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
 				btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
@@ -996,6 +993,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				comboType.add("Metric");
 				comboType.setText("Metric");
 				comboType.addSelectionListener(new ComboTypeSelectionAdapter());
+				comboType.setToolTipText("Metric selection");
 		
 				comboTime = new Combo(groupTraces, SWT.READ_ONLY);
 				final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
@@ -1005,7 +1003,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				comboTime.add("Dimensions");
 				comboTime.setText("Dimensions");
 				comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
-				//comboTime.setText("");
+				comboTime.setToolTipText("Dimensions selection");
 		
 				btnSettings = new Button(groupTraces, SWT.NONE);
 				btnSettings.setToolTipText("Settings");
@@ -1027,6 +1025,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				comboSpace.add("Visualization");
 				comboSpace.setText("Visualization");
 				comboSpace.addSelectionListener(new ComboSpaceSelectionAdapter());
+				comboSpace.setToolTipText("Visualization selection");
 		
 				btnSettings2 = new Button(groupTraces, SWT.NONE);
 				btnSettings2.setToolTipText("Settings");
@@ -1120,7 +1119,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 
-		// overview
+		// Overview
 		final SashForm overviewSashForm = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
 		final Composite compositeOverview = new Composite(overviewSashForm, SWT.BORDER);
 		compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -1132,7 +1131,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
-		// Legends
+		// Statistics
 		final TabItem tbtmOverview = new TabItem(tabFolder, SWT.NONE);
 		tbtmOverview.setText("Statistics");
 
@@ -1151,9 +1150,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		comboStatistics.setText("Statistics");
 		comboStatistics.addSelectionListener(new ComboStatSelectionAdapter());
 		
-		Composite composite_1 = new Composite(composite, SWT.NONE);
-		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		statSashForm.setWeights(new int[] {1});
+		statComposite = new Composite(composite, SWT.NONE);
+		statComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		statViewWrapper.init(statComposite);
 
 		// Quality curves display
 		final Composite compositeQualityView = new Composite(sashForm, SWT.BORDER);
@@ -1298,6 +1297,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		this.snapshot = snapshot;
 	}
 
+	public Composite getStatComposite() {
+		return statComposite;
+	}
+
+	public void setStatComposite(Composite statComposite) {
+		this.statComposite = statComposite;
+	}
+
 	private void refreshTraces() {
 		try {
 			confDataLoader.loadTraces();
@@ -1438,6 +1445,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	 */
 	public void checkInputs() throws OcelotlException {
 		checkTrace();
+		checkType();
 		checkMicroscopicDescription();
 		checkVisualization();
 		checkTimeStamp();
@@ -1453,6 +1461,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		// If no trace is selected
 		if (confDataLoader.getCurrentTrace() == null)
 			throw new OcelotlException(OcelotlException.NO_TRACE);
+	}
+	
+	/**
+	 * Check that a type was selected
+	 * 
+	 * @throws OcelotlException
+	 *             if no type was selected
+	 */
+	public void checkType() throws OcelotlException {
+		// If no trace is selected
+		if (comboType.getText().equals(""))
+			throw new OcelotlException(OcelotlException.NO_TYPE);
 	}
 
 	/**

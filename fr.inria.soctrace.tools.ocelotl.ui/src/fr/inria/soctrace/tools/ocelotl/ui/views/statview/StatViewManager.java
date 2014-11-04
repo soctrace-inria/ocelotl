@@ -36,28 +36,28 @@ public class StatViewManager {
 	}
 
 	public IStatView create() {
-		IStatView timeLineView = null;
+		IStatView statView = null;
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource().getBundle());
-			timeLineView = (IStatView) mybundle.loadClass(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource().getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+			statView = (IStatView) mybundle.loadClass(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource().getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return timeLineView;
+		return statView;
 
 	}
 	
 	public IStatView create(String aVisualization) {
-		IStatView timeLineView = null;
+		IStatView statView = null;
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource(aVisualization).getBundle());
-			timeLineView = (IStatView) mybundle.loadClass(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource(aVisualization).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+			statView = (IStatView) mybundle.loadClass(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource(aVisualization).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return timeLineView;
+		return statView;
 
 	}
 

@@ -34,14 +34,13 @@ import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class StatisticOperatorManager {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(StatisticOperatorManager.class);
-	
+
 	HashMap<String, StatisticOperatorResource> operatorList;
 	IStatisticOperator selectedOperator;
 	String selectedOperatorName;
@@ -53,7 +52,7 @@ public class StatisticOperatorManager {
 	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.statistics"; //$NON-NLS-1$
 	private static final String OP_NAME = "operator"; //$NON-NLS-1$
 	private static final String OP_CLASS = "class"; //$NON-NLS-1$
-	private static final String OP_VISUALIZATION = "visualization"; //$NON-NLS-1$
+	private static final String OP_VIEW = "view"; //$NON-NLS-1$
 	private static final String OP_PARAM_WIN = "param_win"; //$NON-NLS-1$
 	private static final String OP_PARAM_CONFIG = "param_config";//$NON-NLS-1$							
 	private static final String OP_METRIC_COMPATIBILITY = "metric_compatibility"; //$NON-NLS-1$
@@ -88,6 +87,7 @@ public class StatisticOperatorManager {
 		}
 		selectedOperator.setOcelotlCore(ocelotlCore);
 	}
+
 	/**
 	 * Instantiate the visualization operator
 	 * 
@@ -110,9 +110,10 @@ public class StatisticOperatorManager {
 		}
 		return instantiatedOperator;
 	}
-	public List<String> getOperators(final List<String> metricCompatibility, final List<String> aggregCompatibility) {
-		logger.debug("Comparing Statistic Operator with "
-				+ metricCompatibility);
+
+	public List<String> getOperators(final List<String> metricCompatibility,
+			final List<String> aggregCompatibility) {
+		logger.debug("Comparing Statistic Operator with " + metricCompatibility);
 		final List<String> op = new ArrayList<String>();
 		for (final StatisticOperatorResource resource : operatorList.values()) {
 			StringBuffer buff = new StringBuffer();
@@ -158,7 +159,8 @@ public class StatisticOperatorManager {
 	public StatisticOperatorResource getSelectedOperatorResource() {
 		return operatorList.get(selectedOperatorName);
 	}
-public StatisticOperatorResource getSelectedOperatorResource(
+
+	public StatisticOperatorResource getSelectedOperatorResource(
 			String anOperatorName) {
 		return operatorList.get(anOperatorName);
 	}
@@ -176,23 +178,27 @@ public StatisticOperatorResource getSelectedOperatorResource(
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " Visualization aggregation operators detected:");
+		logger.debug(config.length
+				+ " Statistics operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final StatisticOperatorResource resource = new StatisticOperatorResource();
 			resource.setOperatorClass(e.getAttribute(OP_CLASS));
 			resource.setName(e.getAttribute(OP_NAME));
-			resource.setTimeCompatibility(e.getAttribute(OP_METRIC_COMPATIBILITY));
-			resource.setAggregatorCompatibility(e.getAttribute(OP_AGGREGATOR_COMPATIBILITY));
+			resource.setTimeCompatibility(e
+					.getAttribute(OP_METRIC_COMPATIBILITY));
+			resource.setAggregatorCompatibility(e
+					.getAttribute(OP_AGGREGATOR_COMPATIBILITY));
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
-			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
+			resource.setVisualization(e.getAttribute(OP_VIEW));
 			resource.setSelectionPriority(Integer.parseInt(e
 					.getAttribute(OP_SELECTION_PRIORITY)));
 			resource.setBundle(e.getContributor().getName());
 			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
-					+ resource.getTimeCompatibility() + " " + resource.getAggregatorCompatibility());
+					+ resource.getTimeCompatibility() + " "
+					+ resource.getAggregatorCompatibility());
 		}
 	}
 
@@ -210,6 +216,7 @@ public StatisticOperatorResource getSelectedOperatorResource(
 		}
 
 	}
+
 	public HashMap<String, StatisticOperatorResource> getOperatorList() {
 		return operatorList;
 	}
