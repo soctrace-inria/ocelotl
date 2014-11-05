@@ -19,10 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.statview;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
-import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperator;
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
 public interface IStatView {
 
@@ -34,5 +30,4 @@ public interface IStatView {
 
 	public void resizeDiagram();
 
-	public void createSnapshotFor(String fileName);
 }

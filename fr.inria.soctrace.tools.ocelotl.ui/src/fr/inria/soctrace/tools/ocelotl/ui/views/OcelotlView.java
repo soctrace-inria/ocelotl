@@ -189,6 +189,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								@Override
 								public void run() {
 
+									// Load the type operators
 									for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 										comboType.add(type);
 									}
@@ -214,7 +215,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 										}
 
 									// Set the corresponding parameters
-
 									textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 									textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 
@@ -464,6 +464,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			}
 
 			comboTime.setText("");
+
 			if (comboTime.getItems().length != 0) {
 				// Items are sorted according to the selection priority
 				comboTime.setText(comboTime.getItem(0));
@@ -490,7 +491,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			comboSpace.removeAll();
 			comboStatistics.setEnabled(true);
 			// Get the available visualizations
-			comboStatistics.removeAll();
+			comboStatistics.removeAll();			
 			// Get visu compatibility from both micro model and aggregation
 			// operator
 			ArrayList<String> visuCompatibilities = new ArrayList<String>();
@@ -521,7 +522,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				comboStatistics.notifyListeners(SWT.Selection, new Event());
 			}
 			
-
 			// Set default settings
 			setDefaultDescriptionSettings();
 		}
@@ -634,7 +634,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			}
 		}
 	}
-	
+
 	private class DefaultParameterAdapter extends SelectionAdapter {
 
 		@Override
@@ -654,7 +654,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			if (timeLineView != null) {
 				timeLineView.resizeDiagram();
 				timeAxisView.resizeDiagram();
-				overView.deleteSelection();
 			}
 		}
 	}
@@ -754,6 +753,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 									comboType.add(type);
 								}
+
 								// Since the types are sorted by priority, set
 								// the default
 								// choice to the first item
@@ -819,16 +819,15 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Font						cantarell8;
 	private Overview					overView;
 	private TabFolder					tabFolder;
-
 	/**
 	 * Followed topics
 	 */
-	protected FramesocBusTopicList		topics			= null;
+	protected FramesocBusTopicList				topics			= null;
 
 	private ConfigViewManager			manager;
 	private Combo	comboStatistics;
 	private Button	buttonHome;
-
+	
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
 		try {
@@ -916,22 +915,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			@Override
 			public void handleEvent(final Event e) {
 				switch (e.keyCode) {
+				case SWT.ARROW_UP:
 				case SWT.ARROW_LEFT:
 					// Make sure we are not in an editable field
 					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 						buttonDown.notifyListeners(SWT.Selection, new Event());
 					break;
-				case SWT.ARROW_RIGHT:
-					// Make sure we are not in an editable field
-					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-						buttonUp.notifyListeners(SWT.Selection, new Event());
-					break;
-				case SWT.ARROW_UP:
-					// Make sure we are not in an editable field
-					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-						buttonDown.notifyListeners(SWT.Selection, new Event());
-					break;
 				case SWT.ARROW_DOWN:
+				case SWT.ARROW_RIGHT:
 					// Make sure we are not in an editable field
 					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 						buttonUp.notifyListeners(SWT.Selection, new Event());
@@ -1107,7 +1098,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnTakeSnapshot.setFont(cantarell8);
 		btnTakeSnapshot.setToolTipText("Take a snapshot of the current view.");
 		btnTakeSnapshot.addSelectionListener(new TakeSnapshotAdapter());
-
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
 		textTimestampEnd.addModifyListener(new ConfModificationListener());
@@ -1189,21 +1179,20 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		buttonUp.setToolTipText("Decrease Parameter");
 		buttonUp.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/elcl16/forward_nav.gif"));
 		buttonUp.setFont(cantarell8);
-		
+
 		buttonHome = new Button(group, SWT.NONE);
 		buttonHome.setToolTipText("Default Parameter");
 		buttonHome.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/elcl16/home_nav.gif"));
 		buttonHome.setFont(cantarell8);
 		buttonHome.addSelectionListener(new DefaultParameterAdapter());
 		
-		
 		btnRun = new Button(group, SWT.NONE);
 		btnRun.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/ocelotl16.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
 		btnRun.setText("RUN!");
-		
-				btnRun.addSelectionListener(new GetAggregationAdapter());
+
+		btnRun.addSelectionListener(new GetAggregationAdapter());
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
 		buttonDown.addSelectionListener(new ParameterDownAdapter());
 		textRun.addModifyListener(new ParameterModifyListener());
@@ -1507,7 +1496,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 
-	
 	public static synchronized void playSound(final String soundPath) {
 		try {
 			URL soundFile = OcelotlView.class.getResource(soundPath);
@@ -1519,4 +1507,5 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			e.printStackTrace();
 		}
 	}
+
 }

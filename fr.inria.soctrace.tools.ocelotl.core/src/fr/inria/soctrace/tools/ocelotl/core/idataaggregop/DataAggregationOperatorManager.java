@@ -124,7 +124,7 @@ public class DataAggregationOperatorManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " aggregation operators detected:");
+		logger.debug(config.length + " Data aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final DataAggregationOperatorResource resource = new DataAggregationOperatorResource();
@@ -166,7 +166,6 @@ public class DataAggregationOperatorManager {
 			e.printStackTrace();
 		}
 	}
-
 
 	/**
 	 * Instantiate an aggregation operator

@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class StatisticOperatorManager {
