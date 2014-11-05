@@ -81,7 +81,7 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Visualization operator for the overview
 	 */
-	public static final String OVERVIEW_VISU_OPERATOR = "Mode";
+	public static final String OVERVIEW_VISU_OPERATOR = "Temporal Mode";
 	
 	/**
 	 * Aggregation Operator for the overview

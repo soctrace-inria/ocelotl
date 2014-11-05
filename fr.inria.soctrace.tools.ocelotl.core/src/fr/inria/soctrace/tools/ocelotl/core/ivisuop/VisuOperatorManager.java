@@ -87,6 +87,7 @@ public class VisuOperatorManager {
 		}
 		selectedOperator.setOcelotlCore(ocelotlCore);
 	}
+
 	/**
 	 * Instantiate the visualization operator
 	 * 
@@ -157,7 +158,8 @@ public class VisuOperatorManager {
 	public VisuOperatorResource getSelectedOperatorResource() {
 		return operatorList.get(selectedOperatorName);
 	}
-public VisuOperatorResource getSelectedOperatorResource(
+
+	public VisuOperatorResource getSelectedOperatorResource(
 			String anOperatorName) {
 		return operatorList.get(anOperatorName);
 	}
@@ -175,7 +177,7 @@ public VisuOperatorResource getSelectedOperatorResource(
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " visualizations detected:");
+		logger.debug(config.length + " Visualizations detected:");
 
 		for (final IConfigurationElement e : config) {
 			final VisuOperatorResource resource = new VisuOperatorResource();
@@ -207,8 +209,8 @@ public VisuOperatorResource getSelectedOperatorResource(
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException | NullPointerException e) {
 		}
-
 	}
+
 	public HashMap<String, VisuOperatorResource> getOperatorList() {
 		return operatorList;
 	}

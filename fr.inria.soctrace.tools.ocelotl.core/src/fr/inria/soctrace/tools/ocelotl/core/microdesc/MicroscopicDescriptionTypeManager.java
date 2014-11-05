@@ -95,7 +95,7 @@ public class MicroscopicDescriptionTypeManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " metrics detected:");
+		logger.debug(config.length + " Metrics detected:");
 
 		for (final IConfigurationElement e : config) {
 			final MicroscopicDescriptionTypeResource resource = new MicroscopicDescriptionTypeResource();
@@ -113,7 +113,7 @@ public class MicroscopicDescriptionTypeManager {
 					.getAttribute(OP_VISUALIZATION_COMPATIBILITY));
 			typeList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
-					+ resource.getTraceFormats() + resource.getVisuCompatibility());
+					+ resource.getTraceFormats() + " " + resource.getVisuCompatibility());
 		}
 	}
 

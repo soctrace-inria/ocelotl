@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.statview;
 
+
 public interface IStatView {
 
 	void createDiagram();

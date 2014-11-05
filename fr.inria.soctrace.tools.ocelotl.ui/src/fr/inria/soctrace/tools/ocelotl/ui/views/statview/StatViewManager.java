@@ -45,9 +45,8 @@ public class StatViewManager {
 			e.printStackTrace();
 		}
 		return statView;
-
 	}
-	
+
 	public IStatView create(String aVisualization) {
 		IStatView statView = null;
 		try {
@@ -58,7 +57,6 @@ public class StatViewManager {
 			e.printStackTrace();
 		}
 		return statView;
-
 	}
 
 

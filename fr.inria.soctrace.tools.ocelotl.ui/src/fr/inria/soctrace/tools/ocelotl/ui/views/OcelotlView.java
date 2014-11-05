@@ -189,6 +189,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								@Override
 								public void run() {
 
+									// Load the type operators		
 									for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 										comboType.add(type);
 									}
@@ -552,7 +553,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlCore.getStatOperators().setSelectedOperator(comboStatistics.getText());
 			statView = statViewManager.create();
 			statViewWrapper.setView(statView);
-			statView.deleteDiagram();
 		}
 	}
 
@@ -1198,7 +1198,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/ocelotl16.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
 		btnRun.setText("RUN!");
-		btnRun.setToolTipText("RUN!");
 		
 				btnRun.addSelectionListener(new GetAggregationAdapter());
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
