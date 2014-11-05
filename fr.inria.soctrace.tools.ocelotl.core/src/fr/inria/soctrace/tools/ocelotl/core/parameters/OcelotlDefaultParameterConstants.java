@@ -31,7 +31,7 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Should the curves show increasing quality ?
 	 */
-	public static final boolean GrowingQualities = true;
+	public static final boolean IncreasingQualities = true;
 
 	/**
 	 * Number of time slices
@@ -77,6 +77,16 @@ public class OcelotlDefaultParameterConstants {
 	 * Number of threads for computation
 	 */
 	public static final int NUMBER_OF_THREADS = 8;
+	
+	/**
+	 * Visualization operator for the overview
+	 */
+	public static final String OVERVIEW_VISU_OPERATOR = "Temporal Mode";
+	
+	/**
+	 * Aggregation Operator for the overview
+	 */
+	public static final String OVERVIEW_AGGREG_OPERATOR = "Temporal Aggregation";
 	
 	/**
 	 * Number of events loaded by thread

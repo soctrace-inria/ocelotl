@@ -109,11 +109,10 @@ public class DataAggregationOperatorResource {
 	public List<String> getDimension() {
 		return dimension;
 	}
-	
+
 	public void setBundle(final String bundle) {
 		this.bundle = bundle;
 	}
-
 
 	public void setName(final String name) {
 		this.name = name;
@@ -139,14 +138,6 @@ public class DataAggregationOperatorResource {
 		decompose(this.visuCompatibility, visuCompatibility);
 	}
 
-	private List<String> decompose(List<String> list, String string) {
-		final String[] tmp = string.split(OcelotlConstants.MultipleValueExtensionSeparator);
-		list.clear();
-		for (final String s : tmp)
-			list.add(s);
-		return list;
-	}
-	
 	public int getSelectionPriority() {
 		return selectionPriority;
 	}
@@ -158,7 +149,16 @@ public class DataAggregationOperatorResource {
 			this.selectionPriority = 0;
 		}
 	}
-	
+
+	private List<String> decompose(List<String> list, String string) {
+		final String[] tmp = string
+				.split(OcelotlConstants.MultipleValueExtensionSeparator);
+		list.clear();
+		for (final String s : tmp)
+			list.add(s);
+		return list;
+	}
+
 	public void setDimension(final List<String> dimension) {
 		this.dimension = dimension;
 	}

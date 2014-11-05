@@ -40,7 +40,6 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		reset(monitor);
 	}
 
-
 	@Override
 	protected void fillVectors(IProgressMonitor monitor) {
 		for (int i = 0; i < matrix.getMatrix().size(); i++) {
@@ -56,7 +55,6 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 							.getMatrix().get(i).get(key).get(key2));
 			}
 		}
-
 	}
 
 	@Override
@@ -78,5 +76,5 @@ public class TimeAggregation3Manager extends TimeAggregationManager {
 		timeAggregation = new JNITimeAggregation3();
 		fillVectors(monitor);
 	}
-
+	
 }

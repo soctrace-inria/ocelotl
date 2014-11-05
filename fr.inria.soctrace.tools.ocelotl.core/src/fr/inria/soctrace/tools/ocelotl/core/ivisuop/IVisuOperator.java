@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.ivisuop;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 
 public interface IVisuOperator {
 
@@ -27,4 +28,5 @@ public interface IVisuOperator {
 
 	public void setOcelotlCore(OcelotlCore ocelotlCore);
 
+	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager);
 }

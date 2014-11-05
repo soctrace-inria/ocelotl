@@ -88,8 +88,30 @@ public class VisuOperatorManager {
 		selectedOperator.setOcelotlCore(ocelotlCore);
 	}
 
+	/**
+	 * Instantiate the visualization operator
+	 * 
+	 * @param name
+	 *            Name of the operator to instantiate
+	 * @return the instantiated operator
+	 */
+	public IVisuOperator instantiateOperator(String name) {
+		IVisuOperator instantiatedOperator = null;
+
+		final Bundle mybundle = Platform.getBundle(operatorList.get(
+				selectedOperatorName).getBundle());
+		try {
+			instantiatedOperator = (IVisuOperator) mybundle.loadClass(
+					operatorList.get(name).getOperatorClass()).newInstance();
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return instantiatedOperator;
+	}
 	public List<String> getOperators(final List<String> metricCompatibility, final List<String> aggregCompatibility) {
-		logger.debug("Comparing Space Operator trace format with "
+		logger.debug("Comparing Visualization Operator trace format with "
 				+ metricCompatibility);
 		final List<String> op = new ArrayList<String>();
 		for (final VisuOperatorResource resource : operatorList.values()) {
@@ -109,6 +131,7 @@ public class VisuOperatorManager {
 										op.add(resource.getName());
 
 		}
+		// Sort according to the selection priority level
 		Collections.sort(op, new Comparator<String>() {
 
 			@Override
@@ -134,6 +157,11 @@ public class VisuOperatorManager {
 
 	public VisuOperatorResource getSelectedOperatorResource() {
 		return operatorList.get(selectedOperatorName);
+	}
+
+	public VisuOperatorResource getSelectedOperatorResource(
+			String anOperatorName) {
+		return operatorList.get(anOperatorName);
 	}
 
 	// private void init() throws SoCTraceException {
@@ -181,7 +209,10 @@ public class VisuOperatorManager {
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException | NullPointerException e) {
 		}
+	}
 
+	public HashMap<String, VisuOperatorResource> getOperatorList() {
+		return operatorList;
 	}
 
 }

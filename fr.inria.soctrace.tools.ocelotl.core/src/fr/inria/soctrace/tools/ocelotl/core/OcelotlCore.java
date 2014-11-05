@@ -19,10 +19,13 @@
 
 package fr.inria.soctrace.tools.ocelotl.core;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.PartManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
@@ -32,6 +35,8 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescriptionTypeManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperator;
+import fr.inria.soctrace.tools.ocelotl.core.statistics.StatisticOperatorManager;
 
 public class OcelotlCore {
 
@@ -47,7 +52,7 @@ public class OcelotlCore {
 	}
 
 	OcelotlParameters ocelotlParameters;
-	IMicroDescManager lpaggregManager;
+	IDataAggregManager lpaggregManager;
 	PartManager partManager;
 	MicroscopicDescriptionTypeManager microModelTypeManager;
 	MicroscopicDescription microModel;
@@ -55,6 +60,8 @@ public class OcelotlCore {
 	IDataAggregationOperator aggregOperator;
 	VisuOperatorManager visuOperators;
 	IVisuOperator visuOperator;
+	StatisticOperatorManager statOperators;
+	IStatisticOperator statOperator;
 
 	public OcelotlCore() {
 		super();
@@ -73,10 +80,14 @@ public class OcelotlCore {
 		if (monitor.isCanceled())
 			return;
 		try {
+			// Build microscopic description
 			microModel.setOcelotlParameters(ocelotlParameters, monitor);
-			lpaggregManager = aggregOperator.createManager(microModel, monitor);
+			
 			if (monitor.isCanceled())
 				return;
+			
+			// Instantiate the aggregation operator
+			lpaggregManager = aggregOperator.createManager(microModel, monitor);
 		} catch (UnsatisfiedLinkError e) {
 			throw new OcelotlException(OcelotlException.JNI);
 		} catch (SoCTraceException e) {
@@ -98,13 +109,30 @@ public class OcelotlCore {
 	}
 
 	public void computeParts() {
-		lpaggregManager.computeParts();
+		lpaggregManager.computeParts(ocelotlParameters.getParameter());
 		// lpaggregManager.printParts();
 		setVisuOperator();
 		lpaggregManager.print(this);
 	}
+	
+	/**
+	 * Instantiate the managers for the elements of the core (Microscopic
+	 * description, data aggregation and visualization operator)
+	 * 
+	 * @param ocelotlParameters
+	 *            the parameters
+	 * @throws SoCTraceException
+	 */
+	public void init(final OcelotlParameters ocelotlParameters)
+			throws SoCTraceException {
+		setOcelotlParameters(ocelotlParameters);
+		microModelTypeManager = new MicroscopicDescriptionTypeManager();
+		aggregOperators = new DataAggregationOperatorManager(ocelotlParameters);
+		visuOperators = new VisuOperatorManager(this);
+		statOperators = new StatisticOperatorManager(this);
+	}
 
-	public IMicroDescManager getLpaggregManager() {
+	public IDataAggregManager getLpaggregManager() {
 		return lpaggregManager;
 	}
 
@@ -116,8 +144,12 @@ public class OcelotlCore {
 		return partManager;
 	}
 
-	public PartManager getPartsManager() {
-		return partManager;
+	public MicroscopicDescription getMicroModel() {
+		return microModel;
+	}
+
+	public void setMicroModel(MicroscopicDescription microModel) {
+		this.microModel = microModel;
 	}
 
 	public IVisuOperator getVisuOperator() {
@@ -126,6 +158,16 @@ public class OcelotlCore {
 
 	public VisuOperatorManager getVisuOperators() {
 		return visuOperators;
+	}
+	
+	
+
+	public StatisticOperatorManager getStatOperators() {
+		return statOperators;
+	}
+
+	public IStatisticOperator getStatOperator() {
+		return statOperator;
 	}
 
 	public IDataAggregationOperator getAggregOperator() {
@@ -140,14 +182,6 @@ public class OcelotlCore {
 		return microModelTypeManager;
 	}
 
-	public void init(final OcelotlParameters ocelotlParameters)
-			throws SoCTraceException {
-		setOcelotlParameters(ocelotlParameters);
-		aggregOperators = new DataAggregationOperatorManager(ocelotlParameters);
-		visuOperators = new VisuOperatorManager(this);
-		microModelTypeManager = new MicroscopicDescriptionTypeManager();
-	}
-
 	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {
 		this.ocelotlParameters = ocelotlParameters;
 	}
@@ -155,6 +189,11 @@ public class OcelotlCore {
 	public void setVisuOperator() {
 		visuOperators.activateSelectedOperator();
 		visuOperator = visuOperators.getSelectedOperator();
+	}
+	
+	public void setStatOperator() {
+		statOperators.activateSelectedOperator();
+		statOperator = statOperators.getSelectedOperator();
 	}
 
 	public void setAggregOperator(IProgressMonitor monitor)
@@ -166,6 +205,35 @@ public class OcelotlCore {
 	public void setMicroModel(IProgressMonitor monitor) throws OcelotlException {
 		microModelTypeManager.activateSelectedMicroModel(ocelotlParameters);
 		microModel = microModelTypeManager.getSelectedMicroModel();
+	}
+	
+	/**
+	 * Search for the parameter that has the largest gap (sum of the differences
+	 * in gain and loss values) between two consecutive gain and loss values
+	 * 
+	 * @return the corresponding parameter value, or 1.0 as default
+	 */
+	public double computeInitialParameter() {
+		double diffG = 0.0, diffL = 0.0;
+		double sumDiff = 0.0;
+		double maxDiff = 0.0;
+		int indexMaxQual = -1;
+		int i;
+		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) getLpaggregManager().getQualities();
+		for (i = 1; i < qual.size(); i++) {
+			// Compute the difference for the gain and the loss
+			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
+			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
+
+			// Compute sum of both
+			sumDiff = Math.abs(diffG - diffL);
+
+			if (sumDiff > maxDiff) {
+				maxDiff = sumDiff;
+				indexMaxQual = i-1;
+			}
+		}
+			return getLpaggregManager().getParameters().get(indexMaxQual + 1);
 	}
 
 }

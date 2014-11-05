@@ -30,7 +30,15 @@ public class OcelotlSettings {
 	private int eventsPerThread;
 	private int maxEventProducersPerQuery;
 	private int numberOfThread;
-	
+	private boolean normalizedCurve;
+	private double thresholdPrecision;
+	private boolean increasingQualities;
+
+	private String overviewVisuOperator;
+	private double overviewParameter;
+	private String overviewAggregOperator;
+	private int overviewTimesliceNumber;
+
 	// Default directory where the config file is
 	private String defaultConfigFile;
 
@@ -48,12 +56,18 @@ public class OcelotlSettings {
 		snapShotDirectory = ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
 				+ "/ocelotlSnapshot";
-		
+
 		cachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 		cacheTimeSliceNumber = OcelotlDefaultParameterConstants.DEFAULT_CACHE_TS_NUMBER;
 		eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
 		maxEventProducersPerQuery = OcelotlDefaultParameterConstants.EventProducersPerQuery;
 		numberOfThread = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
+
+		normalizedCurve = OcelotlDefaultParameterConstants.Normalize;
+		thresholdPrecision = OcelotlDefaultParameterConstants.Threshold;
+		increasingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
+		overviewVisuOperator = OcelotlDefaultParameterConstants.OVERVIEW_VISU_OPERATOR;
+		overviewAggregOperator = OcelotlDefaultParameterConstants.OVERVIEW_AGGREG_OPERATOR;
 
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -83,10 +97,10 @@ public class OcelotlSettings {
 				if (line != null) {
 					String[] config = line.split(OcelotlConstants.CSVDelimiter);
 
-					// If the configuration has the right number of objects 
+					// If the configuration has the right number of objects
 					if (config.length == OcelotlConstants.CONFIGURATION_NORMAL_SIZE) {
 						setCacheActivated(Boolean.valueOf(config[0]));
-						setCacheDirectory(config[1]);			
+						setCacheDirectory(config[1]);
 						if (Integer.parseInt(config[2]) >= 0) {
 							// Convert from megabytes to bytes
 							setCacheSize(Long.parseLong(config[2]) * 1000000);
@@ -99,6 +113,9 @@ public class OcelotlSettings {
 						setEventsPerThread(Integer.valueOf(config[6]));
 						setMaxEventProducersPerQuery(Integer.valueOf(config[7]));
 						setNumberOfThread(Integer.valueOf(config[8]));
+						setNormalizedCurve(Boolean.valueOf(config[9]));
+						setThresholdPrecision(Double.valueOf(config[10]));
+						setIncreasingQualities(Boolean.valueOf(config[11]));
 					} else {
 						logger.debug("Invalid configuration file: Default values will be used");
 					}
@@ -115,8 +132,7 @@ public class OcelotlSettings {
 				logger.debug("Snapshot directory: " + snapShotDirectory);
 				logger.debug("Cache Policy: " + cachePolicy);
 				logger.debug("Cache Time slices: " + cacheTimeSliceNumber);
-				
-				
+
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -145,7 +161,7 @@ public class OcelotlSettings {
 			output.append(cacheSize / 1000000);
 		} else {
 			output.append(-1);
-		}		
+		}
 		output.append(";");
 		output.append(snapShotDirectory);
 		output.append(";");
@@ -158,7 +174,13 @@ public class OcelotlSettings {
 		output.append(maxEventProducersPerQuery);
 		output.append(";");
 		output.append(numberOfThread);
-		
+		output.append(";");
+		output.append(normalizedCurve);
+		output.append(";");
+		output.append(thresholdPrecision);
+		output.append(";");
+		output.append(increasingQualities);
+
 		String newSettings = output.toString();
 
 		PrintWriter writer;
@@ -271,6 +293,84 @@ public class OcelotlSettings {
 	public void setNumberOfThread(int numberOfThread) {
 		if (this.numberOfThread != numberOfThread) {
 			this.numberOfThread = numberOfThread;
+			saveSettings();
+		}
+	}
+
+	public boolean isNormalizedCurve() {
+		return normalizedCurve;
+	}
+
+	public void setNormalizedCurve(boolean normalizedCurve) {
+		if (this.normalizedCurve != normalizedCurve) {
+			this.normalizedCurve = normalizedCurve;
+			saveSettings();
+		}
+	}
+
+	public double getThresholdPrecision() {
+		return thresholdPrecision;
+	}
+
+	public void setThresholdPrecision(double thresholdPrecision) {
+		if (this.thresholdPrecision != thresholdPrecision) {
+			this.thresholdPrecision = thresholdPrecision;
+			saveSettings();
+		}
+	}
+
+	public boolean getIncreasingQualities() {
+		return increasingQualities;
+	}
+
+	public void setIncreasingQualities(boolean increasingQualities) {
+		if (this.increasingQualities != increasingQualities) {
+			this.increasingQualities = increasingQualities;
+			saveSettings();
+		}
+	}
+
+	public String getOverviewVisuOperator() {
+		return overviewVisuOperator;
+	}
+
+	public void setOverviewVisuOperator(String overviewVisuOperator) {
+		if (!this.overviewVisuOperator.equals(overviewVisuOperator)) {
+			this.overviewVisuOperator = overviewVisuOperator;
+			saveSettings();
+		}
+	}
+
+	public double getOverviewParameter() {
+		return overviewParameter;
+	}
+
+	public void setOverviewParameter(double overviewParameter) {
+		if (this.overviewParameter != overviewParameter) {
+			this.overviewParameter = overviewParameter;
+			saveSettings();
+		}
+	}
+
+	public int getOverviewTimesliceNumber() {
+		return overviewTimesliceNumber;
+	}
+
+	public void setOverviewTimesliceNumber(int overviewTimesliceNumber) {
+		if (this.overviewTimesliceNumber != overviewTimesliceNumber) {
+			this.overviewTimesliceNumber = overviewTimesliceNumber;
+			saveSettings();
+		}
+	}
+
+	public String getOverviewAggregOperator() {
+		return overviewAggregOperator;
+	}
+
+	public void setOverviewAggregOperator(String overviewAggregOperator) {
+		this.overviewAggregOperator = overviewAggregOperator;
+		if (!this.overviewAggregOperator.equals(overviewAggregOperator)) {
+			this.overviewAggregOperator = overviewAggregOperator;
 			saveSettings();
 		}
 	}

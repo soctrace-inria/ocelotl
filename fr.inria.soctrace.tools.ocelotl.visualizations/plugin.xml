@@ -6,42 +6,52 @@
          name="GenericSpaceAggregationOperators"
          point="fr.inria.soctrace.tools.ocelotl.core.visualization">
       <visualization_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.parts.Parts"
-            operator="Parts"
-            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.parts.config.PartsConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.parts.config.PartsConfigView"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.TemporalPartition"
+            operator="Temporal Partition"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.temporalpartition.PartitionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.temporalpartition.PartitionConfigView"
             metric_compatibility="PARTS"
             aggregator_compatibility="2D"
             selection_priority="4"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.parts.views.PartTimeLineView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.TemporalPartitionView">
       </visualization_operator>
       <visualization_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.Proportion"
-            operator="Proportion"
-            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.TemporalProportion"
+            operator="Temporal Stacked Bar Chart"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"
             metric_compatibility="PROPORTIONS"
             aggregator_compatibility="2D"
             selection_priority="3"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views.StateProportionTimeLineView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.TemporalProportionView">
       </visualization_operator>
       <visualization_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.MatrixParts"
-            operator="Matrix"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.SpatiotemporalPartition"
+            operator="Spatiotemporal Partition"
             metric_compatibility="PARTS"
             aggregator_compatibility="3D"
             selection_priority="2"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts.views.PartMatrixView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.views.SpatiotemporalPartitionView">
       </visualization_operator>
       <visualization_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.mode.MatrixProportion"
-            operator="Mode"
-            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ProportionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.proportion.config.ManageColorsDialog"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.SpatiotemporalMode"
+            operator="Spatiotemporal Mode"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"
             metric_compatibility="MODE"
             aggregator_compatibility="3D"
             selection_priority="1"
-            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.mode.views.ProportionMatrixView">
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views.SpatiotemporalModeView">
+      </visualization_operator>
+  	  <visualization_operator
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.TemporalMode"
+            operator="Temporal Mode"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"
+  			metric_compatibility="MODE"
+            aggregator_compatibility="2D"
+            selection_priority="5"
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.views.TemporalModeView">
       </visualization_operator>
    </extension>
 </plugin>

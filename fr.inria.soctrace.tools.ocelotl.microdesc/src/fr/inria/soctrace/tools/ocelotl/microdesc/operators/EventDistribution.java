@@ -19,7 +19,10 @@
 
 package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -144,6 +147,14 @@ public class EventDistribution extends Microscopic3DDescription {
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+	
+	@Override
+	public void rebuildDirty(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException, SoCTraceException,
+			InterruptedException, OcelotlException {
+		buildNormalMatrix(monitor);
 	}
 
 }

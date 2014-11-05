@@ -21,8 +21,9 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import java.util.List;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -34,27 +35,19 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 abstract public class TimeLineView extends AggregatedView implements IAggregatedView {
 
 	protected List<Integer>	parts	= null;
-	protected int			space;
 
 	public TimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
-
 	}
 
 	@Override
 	abstract protected void computeDiagram();
 
-	private void computeSpace() {
-		space = Space;
-		while ((root.getSize().width - 2 * Border) / parts.size() - space < space && space > 0)
-			space = space - 1;
-	}
-
-	@Override
-	public void createDiagram(final IMicroDescManager manager, final TimeRegion time) {
+	public void createDiagram(IDataAggregManager manager, TimeRegion time, IVisuOperator aVisuOperator) {
+		setVisuOperator(aVisuOperator);
 		createDiagram(((TimeAggregationManager) manager).getParts(), time);
 	}
-
+	
 	public void createDiagram(final List<Integer> parts, final TimeRegion time) {
 		root.removeAll();
 		figures.clear();
@@ -66,7 +59,6 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 			selectTime = new TimeRegion(time);
 		}
 		if (parts != null) {
-			computeSpace();
 			computeDiagram();
 		}
 	}

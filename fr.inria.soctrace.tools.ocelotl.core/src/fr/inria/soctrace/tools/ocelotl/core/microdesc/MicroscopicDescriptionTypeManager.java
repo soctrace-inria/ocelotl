@@ -113,7 +113,7 @@ public class MicroscopicDescriptionTypeManager {
 					.getAttribute(OP_VISUALIZATION_COMPATIBILITY));
 			typeList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
-					+ resource.getTraceFormats());
+					+ resource.getTraceFormats() + " " + resource.getVisuCompatibility());
 		}
 	}
 

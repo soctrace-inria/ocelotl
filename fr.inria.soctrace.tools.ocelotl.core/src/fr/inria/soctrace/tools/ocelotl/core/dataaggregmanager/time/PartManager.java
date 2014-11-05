@@ -86,8 +86,6 @@ public class PartManager {
 	}
 
 	public void print() {
-	
-
 		logger.info("");
 		logger.info("*******************");
 		logger.info("AGGREGATION RESULTS");
@@ -111,7 +109,6 @@ public class PartManager {
 				.getTimeStampEnd());
 		logger.info(buff.toString());
 		logger.info("");
-
 	}
 
 	public void setLpaggregCore(final OcelotlCore lpaggregCore) {

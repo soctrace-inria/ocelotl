@@ -234,7 +234,6 @@ public class EventProducerHierarchy {
 		}
 		root.setWeight();
 		root.setChildIndex();
-
 	}
 
 	public void setParts(EventProducer ep, List<Integer> parts) {
@@ -281,7 +280,6 @@ public class EventProducerHierarchy {
 
 	public void setParts(int id, List<Integer> parts) {
 		eventProducerNodes.get(id).setParts(parts);
-
 	}
 
 	public int getParentID(int id) {

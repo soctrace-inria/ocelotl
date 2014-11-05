@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.ITimeManager;
 
 abstract public class VisuTOperator implements
@@ -65,13 +66,18 @@ abstract public class VisuTOperator implements
 		return timeSliceNumber;
 	}
 
+	// Initialize the number of parts for the current aggregation parameter
 	protected void initParts() {
 		int oldPart = 0;
+		// First part
 		parts.add(new Part(0, 1, null));
 		for (int i = 0; i < lpaggregManager.getParts().size(); i++)
+			// If we are still in the same part
 			if (lpaggregManager.getParts().get(i) == oldPart)
+				// Extend the current part
 				parts.get(parts.size() - 1).setEndPart(i + 1);
 			else {
+				// Start a new part
 				oldPart = lpaggregManager.getParts().get(i);
 				parts.add(new Part(i, i + 1, null));
 			}
@@ -81,6 +87,20 @@ abstract public class VisuTOperator implements
 	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
 		lpaggregManager = (ITimeManager) ocelotlCore.getLpaggregManager();
+		timeSliceNumber = ocelotlCore.getOcelotlParameters()
+				.getTimeSlicesNumber();
+		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()
+				.getTimeDuration()
+				/ timeSliceNumber;
+		parts = new ArrayList<Part>();
+		initParts();
+		computeParts();
+	}
+	
+	@Override
+	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
+		this.ocelotlCore = ocelotlCore;
+		lpaggregManager = (ITimeManager) aManager;
 		timeSliceNumber = ocelotlCore.getOcelotlParameters()
 				.getTimeSlicesNumber();
 		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()

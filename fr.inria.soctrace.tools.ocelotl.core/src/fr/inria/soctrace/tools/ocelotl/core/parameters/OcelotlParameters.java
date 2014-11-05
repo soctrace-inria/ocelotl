@@ -32,6 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.Datacache
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
+import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperatorConfig;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 
@@ -58,8 +59,9 @@ public class OcelotlParameters {
 	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
 	private String timeAggOperator;
 	private String spaceAggOperator;
+	private String statOperator;
 	private String microModelType;
-	private boolean growingQualities = OcelotlDefaultParameterConstants.GrowingQualities;
+	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
 	private DataCache dataCache = new DataCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 	private OcelotlSettings	ocelotlSettings = new OcelotlSettings();
@@ -69,6 +71,7 @@ public class OcelotlParameters {
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
 	private ISpaceConfig iSpaceConfig;
+	private IStatisticOperatorConfig statisticOperatorConfig;
 
 	public OcelotlParameters() {
 		super();
@@ -331,6 +334,22 @@ public class OcelotlParameters {
 
 	public void setMicroModelType(String microModelType) {
 		this.microModelType = microModelType;
+	}
+
+	public IStatisticOperatorConfig getStatisticOperatorConfig() {
+		return statisticOperatorConfig;
+	}
+
+	public void setStatisticOperatorConfig(IStatisticOperatorConfig statisticOperatorConfig) {
+		this.statisticOperatorConfig = statisticOperatorConfig;
+	}
+
+	public String getStatOperator() {
+		return statOperator;
+	}
+
+	public void setStatOperator(String statOperator) {
+		this.statOperator = statOperator;
 	}
 
 }

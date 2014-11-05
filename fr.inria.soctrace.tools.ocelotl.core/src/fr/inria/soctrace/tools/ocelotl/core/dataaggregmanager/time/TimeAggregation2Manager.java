@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import fr.inria.lpaggreg.time.JNITimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic2DDescription;
@@ -65,5 +64,4 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 		timeAggregation = new JNITimeAggregation2();
 		fillVectors(monitor);
 	}
-
 }

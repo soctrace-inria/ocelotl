@@ -16,15 +16,15 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.ocelotl.visualizations;uses:="org.eclipse.ui.plugin,org.osgi.framework",
- fr.inria.soctrace.tools.ocelotl.visualizations.matrixparts,
- fr.inria.soctrace.tools.ocelotl.visualizations.parts;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
- fr.inria.soctrace.tools.ocelotl.visualizations.parts.views;
+ fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition,
+ fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
+ fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views;
   uses:="fr.inria.soctrace.tools.ocelotl.ui.views,
    org.eclipse.swt.graphics,
    org.eclipse.draw2d,
    fr.inria.soctrace.tools.ocelotl.ui.views.timelineview",
- fr.inria.soctrace.tools.ocelotl.visualizations.proportion;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
- fr.inria.soctrace.tools.ocelotl.visualizations.proportion.views;
+ fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion;uses:="fr.inria.soctrace.tools.ocelotl.core.ispaceaggregop,fr.inria.soctrace.tools.ocelotl.core",
+ fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views;
   uses:="fr.inria.soctrace.tools.ocelotl.spaceaggregop.operators.stateproportion,
    fr.inria.soctrace.tools.ocelotl.ui.views,
    org.eclipse.draw2d,

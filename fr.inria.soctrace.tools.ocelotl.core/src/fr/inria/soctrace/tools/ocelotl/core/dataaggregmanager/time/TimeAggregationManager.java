@@ -63,10 +63,10 @@ public abstract class TimeAggregationManager implements ITimeManager {
 	}
 
 	@Override
-	public void computeParts() {
+	public void computeParts(double aParameter) {
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
-		parts = timeAggregation.getParts(ocelotlParameters.getParameter());
+		parts = timeAggregation.getParts(aParameter);
 		dm.end("LPAGGREG - COMPUTE PARTS");
 	}
 

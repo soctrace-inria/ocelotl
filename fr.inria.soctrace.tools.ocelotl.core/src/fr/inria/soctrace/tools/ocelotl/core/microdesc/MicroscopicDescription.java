@@ -872,5 +872,5 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 		buildMicroscopicModel(parameters, monitor);
 	}
-
+	
 }

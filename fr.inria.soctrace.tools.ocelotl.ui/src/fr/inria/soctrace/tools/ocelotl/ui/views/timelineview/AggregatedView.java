@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -60,10 +61,26 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 abstract public class AggregatedView implements IAggregatedView {
+	
+	protected Figure						root;
+	protected Canvas						canvas;
+	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
+	protected TimeRegion					time;
+	protected TimeRegion					selectTime;
+	protected TimeRegion					resetTime;
+	protected int							aBorder			= 10;
+	protected final int						space			= 3;
+	protected final OcelotlView				ocelotlView;
+	private SelectFigure					selectFigure;
+	protected IVisuOperator					visuOperator	= null;
+	public final static Color				selectColorFG	= ColorConstants.blue;
+	public final static Color				selectColorBG	= ColorConstants.lightGray;
+	public final static Color				activeColorFG	= ColorConstants.black;
+	public final static Color				activeColorBG	= ColorConstants.darkBlue;
 
 	private class SelectFigure extends RectangleFigure {
 
-		public SelectFigure() {
+		private SelectFigure() {
 			super();
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
@@ -84,8 +101,8 @@ abstract public class AggregatedView implements IAggregatedView {
 			if (getParent() != root)
 				root.add(this);
 			root.setConstraint(this,
-					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height), new Point(
-							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), 2)));
+					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), root.getSize().height), new Point(
+							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), 2)));
 			root.repaint();
 		}
 	}
@@ -119,21 +136,21 @@ abstract public class AggregatedView implements IAggregatedView {
 		@Override
 		public void mouseDragged(final MouseEvent arg0) {
 			if ((state == State.PRESSED_G || state == State.DRAG_G || state == State.DRAG_G_START) && arg0.getLocation().getDistance(currentPoint) > 10) {
-				long moved = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
-				if (state != State.DRAG_G_START) {
+				long moved = (long) ((double) ((arg0.x - aBorder) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * aBorder)) + resetTime.getTimeStampStart();
+				if (state != State.DRAG_G_START)
 					state = State.DRAG_G;
-				}
 				moved = Math.max(moved, resetTime.getTimeStampStart());
 				moved = Math.min(moved, resetTime.getTimeStampEnd());
 				fixed = Math.max(fixed, resetTime.getTimeStampStart());
 				fixed = Math.min(fixed, resetTime.getTimeStampEnd());
-				if (fixed < moved) {
+				if (fixed < moved)
 					selectTime = new TimeRegion(fixed, moved);
-				} else
+				else
 					selectTime = new TimeRegion(moved, fixed);
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
 				selectFigure.draw(selectTime, false);
+				ocelotlView.getOverView().updateSelection(selectTime);
 				if (ocelotlView.getTimeRegion().compareTimeRegion(time)) {
 					ocelotlView.getTimeAxisView().unselect();
 					if (selectFigure.getParent() != null)
@@ -164,7 +181,7 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		@Override
 		public void mouseMoved(final MouseEvent arg0) {
-			if (selectFigure != null && root.getChildren().contains(selectFigure)) {
+			if (selectFigure != null && root.getChildren().contains(selectFigure))
 				if (Math.abs(selectFigure.getBounds().x - arg0.x) < Threshold) {
 					state = State.MOVE_START;
 					shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
@@ -175,7 +192,6 @@ abstract public class AggregatedView implements IAggregatedView {
 					state = State.RELEASED;
 					shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 				}
-			}
 
 		}
 
@@ -183,7 +199,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		public void mousePressed(final MouseEvent arg0) {
 			if (arg0.button == 1 && resetTime != null) {
 				currentPoint = arg0.getLocation();
-				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
+				long p3 = (long) ((double) ((arg0.x - aBorder) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * aBorder)) + resetTime.getTimeStampStart();
 				if (state == State.MOVE_START) {
 					p3 = selectTime.getTimeStampStart();
 					fixed = selectTime.getTimeStampEnd();
@@ -204,7 +220,7 @@ abstract public class AggregatedView implements IAggregatedView {
 				ocelotlView.setTimeRegion(selectTime);
 				ocelotlView.getTimeAxisView().select(selectTime, false);
 				selectFigure.draw(selectTime, false);
-
+				ocelotlView.getOverView().updateSelection(selectTime);
 			}
 		}
 
@@ -212,37 +228,37 @@ abstract public class AggregatedView implements IAggregatedView {
 		public void mouseReleased(final MouseEvent arg0) {
 
 			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
-			if (state == State.DRAG_G || state == State.DRAG_G_START) {
+			if (state == State.DRAG_G || state == State.DRAG_G_START)
 				mouseDragged(arg0);
-			}
 			state = State.RELEASED;
 			if (time == null)
 				return;
 
 			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-				double sliceSize = (double) resetTime.getTimeDuration() / (double) ocelotlView.getTimeSliceNumber();
+				final double sliceSize = (double) resetTime.getTimeDuration() / (double) ocelotlView.getTimeSliceNumber();
 				int i = 0;
-				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++) {
-					if ((selectTime.getTimeStampStart() >= ((long) ((sliceSize * i) + resetTime.getTimeStampStart()))) && (selectTime.getTimeStampStart() < ((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart())))) {
-						selectTime.setTimeStampStart((long) ((sliceSize * i) + resetTime.getTimeStampStart()));
+				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++)
+					if (selectTime.getTimeStampStart() >= (long) (sliceSize * i + resetTime.getTimeStampStart()) && selectTime.getTimeStampStart() < (long) (sliceSize * (i + 1) + resetTime.getTimeStampStart())) {
+						selectTime.setTimeStampStart((long) (sliceSize * i + resetTime.getTimeStampStart()));
 						break;
 					}
-				}
-				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++) {
-					if ((selectTime.getTimeStampEnd() > ((long) ((sliceSize * i) + resetTime.getTimeStampStart()))) && (selectTime.getTimeStampEnd() <= ((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart())))) {
-						selectTime.setTimeStampEnd((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart()));
+				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++)
+					if (selectTime.getTimeStampEnd() > (long) (sliceSize * i + resetTime.getTimeStampStart()) && selectTime.getTimeStampEnd() <= (long) (sliceSize * (i + 1) + resetTime.getTimeStampStart())) {
+						selectTime.setTimeStampEnd((long) (sliceSize * (i + 1) + resetTime.getTimeStampStart()));
 						break;
 					}
-				}
 				ocelotlView.getTimeAxisView().select(selectTime, true);
 				ocelotlView.setTimeRegion(selectTime);
 				selectFigure.draw(selectTime, true);
+				ocelotlView.getOverView().updateSelection(selectTime);
 			} else {
 				ocelotlView.getTimeAxisView().resizeDiagram();
+				ocelotlView.getOverView().deleteSelection();
 				if (selectFigure.getParent() != null)
 					root.remove(selectFigure);
 				root.repaint();
 			}
+
 		}
 	}
 
@@ -254,37 +270,6 @@ abstract public class AggregatedView implements IAggregatedView {
 		return activeColorFG;
 	}
 
-	protected Figure						root;
-
-	protected Canvas						canvas;
-
-	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
-
-	protected TimeRegion					time;
-
-	protected TimeRegion					selectTime;
-
-	protected TimeRegion					resetTime;
-
-	public final static int					Border			= 10;
-
-	protected final int						Space			= 3;
-	protected final OcelotlView				ocelotlView;
-
-	private SelectFigure					selectFigure;
-
-	public final static Color				selectColorFG	= ColorConstants.blue;
-
-	public final static Color				selectColorBG	= ColorConstants.lightGray;
-
-	public final static Color				activeColorFG	= ColorConstants.black;
-
-	public final static Color				activeColorBG	= ColorConstants.darkBlue;
-
-	public static int getBorder() {
-		return Border;
-	}
-
 	public static Color getSelectcolorbg() {
 		return selectColorBG;
 	}
@@ -292,6 +277,8 @@ abstract public class AggregatedView implements IAggregatedView {
 	public static Color getSelectcolorfg() {
 		return selectColorFG;
 	}
+
+
 
 	public AggregatedView(final OcelotlView ocelotlView) {
 		super();
@@ -301,11 +288,64 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	abstract protected void computeDiagram();
 
+	private byte[] createImage(final Figure figure, final int format) {
+
+		final Device device = Display.getCurrent();
+		final Rectangle r = figure.getBounds();
+
+		final ByteArrayOutputStream result = new ByteArrayOutputStream();
+
+		Image image = null;
+		GC gc = null;
+		Graphics g = null;
+		try {
+			image = new Image(device, r.width, r.height);
+			gc = new GC(image);
+			g = new SWTGraphics(gc);
+			g.translate(r.x * -1, r.y * -1);
+
+			figure.paint(g);
+
+			final ImageLoader imageLoader = new ImageLoader();
+			imageLoader.data = new ImageData[] { image.getImageData() };
+			imageLoader.save(result, format);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (g != null)
+				g.dispose();
+			if (gc != null)
+				gc.dispose();
+			if (image != null)
+				image.dispose();
+		}
+		return result.toByteArray();
+	}
+
+	// TODO take resolution in to account (given as a parameter)
+	@Override
+	public void createSnapshotFor(final String fileName) {
+		final byte[] imageBytes = createImage(root, SWT.IMAGE_PNG);
+
+		try {
+			final FileOutputStream out = new FileOutputStream(fileName);
+			out.write(imageBytes);
+			out.flush();
+			out.close();
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public void deleteDiagram() {
 		root.removeAll();
 		figures.clear();
 		root.repaint();
+	}
+
+	public int getBorder() {
+		return aBorder;
 	}
 
 	public Canvas getCanvas() {
@@ -342,7 +382,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	}
 
 	public int getSpace() {
-		return Space;
+		return space;
 	}
 
 	@Override
@@ -352,6 +392,10 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public TimeRegion getTime() {
 		return time;
+	}
+
+	public IVisuOperator getVisuOperator() {
+		return visuOperator;
 	}
 
 	@Override
@@ -365,12 +409,14 @@ abstract public class AggregatedView implements IAggregatedView {
 			public void controlMoved(final ControlEvent arg0) {
 				canvas.redraw();
 				resizeDiagram();
+				ocelotlView.getOverView().resizeDiagram();
 			}
 
 			@Override
 			public void controlResized(final ControlEvent arg0) {
 				canvas.redraw();
 				resizeDiagram();
+				ocelotlView.getOverView().resizeDiagram();
 			}
 		});
 
@@ -382,54 +428,20 @@ abstract public class AggregatedView implements IAggregatedView {
 		selectFigure = new SelectFigure();
 	}
 
-	public void createSnapshotFor(String fileName) {
-		byte[] imageBytes = createImage(root, SWT.IMAGE_PNG);
-
-		try {
-			FileOutputStream out = new FileOutputStream(fileName);
-			out.write(imageBytes);
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void setBorder(final int border) {
+		this.aBorder = border;
 	}
 
-	private byte[] createImage(Figure figure, int format) {
+	public void setCanvas(final Canvas canvas) {
+		this.canvas = canvas;
+	}
 
-		Device device = Display.getCurrent();
-		Rectangle r = figure.getBounds();
+	public void setRoot(final Figure root) {
+		this.root = root;
+	}
 
-		ByteArrayOutputStream result = new ByteArrayOutputStream();
-
-		Image image = null;
-		GC gc = null;
-		Graphics g = null;
-		try {
-			image = new Image(device, r.width, r.height);
-			gc = new GC(image);
-			g = new SWTGraphics(gc);
-			g.translate(r.x * -1, r.y * -1);
-
-			figure.paint(g);
-
-			ImageLoader imageLoader = new ImageLoader();
-			imageLoader.data = new ImageData[] { image.getImageData() };
-			imageLoader.save(result, format);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (g != null) {
-				g.dispose();
-			}
-			if (gc != null) {
-				gc.dispose();
-			}
-			if (image != null) {
-				image.dispose();
-			}
-		}
-		return result.toByteArray();
+	public void setVisuOperator(final IVisuOperator spaceOperator) {
+		visuOperator = spaceOperator;
 	}
 
 }
