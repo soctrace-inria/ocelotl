@@ -310,7 +310,6 @@ public class DataCache {
 			similarParameters(cParam, cache);
 			return cachedData.get(cache);
 		}
-			
 	}
 
 	/**

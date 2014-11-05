@@ -45,7 +45,6 @@ public class StateDistribution extends Microscopic3DDescription {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(StateDistribution.class);
-	private TimeSliceStateManager timeSliceManager;
 
 	class OcelotlThread extends Thread {
 
@@ -103,7 +102,7 @@ public class StateDistribution extends Microscopic3DDescription {
 				// For each event
 				for (final Event event : events) {
 					// Convert to state
-					state = new GenericState(event, timeSliceManager);
+					state = new GenericState(event, (TimeSliceStateManager) timeSliceManager);
 					// Get duration of the state for every time slice it is in
 					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
@@ -133,8 +132,9 @@ public class StateDistribution extends Microscopic3DDescription {
 			ocelotlQueries.closeIterator();
 			return;
 		}
-		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		
+		setTimeSliceManager(new TimeSliceStateManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)

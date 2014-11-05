@@ -19,87 +19,16 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.timeslice;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class TimeSliceStateManager {
-
-	protected final List<TimeSlice> timeSlices = new ArrayList<TimeSlice>();
-	protected final TimeRegion timeRegion;
-	protected long slicesNumber;
-
-	protected double sliceDuration;
-	private static final Logger logger = LoggerFactory.getLogger(TimeSliceStateManager.class);
+public class TimeSliceStateManager extends TimeSliceManager {
 
 	public TimeSliceStateManager(final TimeRegion timeRegion,
 			final long slicesNumber) {// TODO use region
-		super();
-		this.timeRegion = timeRegion;
-		this.slicesNumber = slicesNumber;
-		// duration + 1 to make sure that no extra time slice is created to
-		// cover the last unit of time
-		sliceDuration = ((double) timeRegion.getTimeDuration() + 1.0)
-				/ (double) slicesNumber;
-		timeSlicesInit();
-	}
-
-	public double getSliceDuration() {
-		return sliceDuration;
-	}
-
-	public long getSlicesNumber() {
-		return slicesNumber;
-	}
-
-	public TimeRegion getTimeRegion() {
-		return timeRegion;
-	}
-
-	/**
-	 * Get the number of a time slice the timestamp is in
-	 * 
-	 * @param timeStamp
-	 * @return the number of the time slice the time stamp is in
-	 * 
-	 */
-	public long getTimeSlice(final long timeStamp) {
-		long slice = Math.max(0L, (long) Math.floor(((timeStamp - timeRegion
-				.getTimeStampStart()) / sliceDuration)) - 1);
-		for (long i = slice; i < timeSlices.size(); i++) {
-			final TimeSlice it = timeSlices.get((int) i);
-			if (it.startIsInsideMe(timeStamp)) {
-				slice = it.getNumber();
-				break;
-			}
-		}
-		return slice;
-	}
-	
-	public TimeSlice getATimeSlice(final long timeStamp) {
-		TimeSlice slice = null;
-
-		long presumeTimeSlice = Math.max(0L, (long)
-				((timeStamp - timeRegion.getTimeStampStart()) / sliceDuration)
-						- 1);
-		for (long i = presumeTimeSlice; i < timeSlices.size(); i++) {
-			final TimeSlice it = timeSlices.get((int) i);
-			if (it.startIsInsideMe(timeStamp)) {
-				slice = it;
-				break;
-			}
-		}
-		return slice;
-	}
-
-	public List<TimeSlice> getTimeSlices() {
-		return timeSlices;
+		super(timeRegion, slicesNumber);
 	}
 
 	public Map<Long, Double> getStateDistribution(
@@ -135,29 +64,6 @@ public class TimeSliceStateManager {
 				timeSlicesDistribution.put(i, (double) temp);
 		}
 		return timeSlicesDistribution;
-	}
-
-	public void printInfos() {
-		logger.info("TimeSliceManager: " + slicesNumber + " slices, "
-				+ sliceDuration + " ns duration");
-	}
-
-	public void setValues(final List<Integer> values) {
-		for (int i = 0; i < values.size(); i++)
-			timeSlices.get(i).setValue(values.get(i));
-	}
-
-	public void timeSlicesInit() {
-		int i = 0;
-		double currentTime = timeRegion.getTimeStampStart();
-		while (currentTime < timeRegion.getTimeStampEnd()) {
-			timeSlices.add(new TimeSlice(new TimeRegion((long) currentTime,
-					(long) (currentTime + sliceDuration)), i));
-			currentTime += sliceDuration;
-			i++;
-		}
-
-		slicesNumber = i;
 	}
 
 }

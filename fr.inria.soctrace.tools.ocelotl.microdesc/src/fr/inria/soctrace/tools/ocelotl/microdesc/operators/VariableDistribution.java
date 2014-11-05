@@ -44,7 +44,6 @@ public class VariableDistribution extends Microscopic3DDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(VariableDistribution.class);
 	
-	
 	class OcelotlThread extends Thread {
 
 		List<EventProducer> eventProducers;
@@ -92,7 +91,7 @@ public class VariableDistribution extends Microscopic3DDescription {
 				
 				IVariable variable;
 				for (final Event event : events) {
-					variable = new GenericVariable(event, timeSliceManager);
+					variable = new GenericVariable(event, (TimeSliceVariableManager) timeSliceManager);
 					final Map<Long, Double> distrib = variable
 							.getTimeSlicesDistribution();
 					matrixUpdate(variable, event.getEventProducer(), distrib);
@@ -102,8 +101,6 @@ public class VariableDistribution extends Microscopic3DDescription {
 			}
 		}
 	}
-
-	private TimeSliceVariableManager timeSliceManager;
 
 	public VariableDistribution() {
 		super();
@@ -122,8 +119,9 @@ public class VariableDistribution extends Microscopic3DDescription {
 			ocelotlQueries.closeIterator();
 			return;
 		}
-		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+
+		setTimeSliceManager(new TimeSliceVariableManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)

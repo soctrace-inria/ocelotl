@@ -16,12 +16,15 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class Microscopic3DDescription extends MicroscopicDescription {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(Microscopic3DDescription.class);
+	
+	protected TimeSliceManager timeSliceManager;
 
 	protected List<HashMap<EventProducer, HashMap<String, Double>>> matrix;
 
@@ -31,6 +34,8 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 	}
 
 	public void initToZero(Collection<EventProducer> eventProducers) {
+		setTimeSliceManager(new TimeSliceManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		for (int slice = 0; slice < parameters.getTimeSlicesNumber(); slice++) {
 			for (EventProducer ep : eventProducers) {
 				for (String evType : typeNames) {
@@ -203,5 +208,13 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 			for (final EventProducer ep : it.keySet())
 				logger.debug(ep.getName() + " = " + it.get(ep));
 		}
+	}
+
+	public TimeSliceManager getTimeSliceManager() {
+		return timeSliceManager;
+	}
+
+	public void setTimeSliceManager(TimeSliceManager timeSliceManager) {
+		this.timeSliceManager = timeSliceManager;
 	}
 }

@@ -34,7 +34,7 @@ import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperatorConfig;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 
 public class OcelotlParameters {
 
@@ -66,7 +66,7 @@ public class OcelotlParameters {
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 	private OcelotlSettings	ocelotlSettings = new OcelotlSettings();
 	
-	private TimeSliceStateManager timeSliceManager;
+	private TimeSliceManager timeSliceManager;
 
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
@@ -244,11 +244,11 @@ public class OcelotlParameters {
 		this.eventProducerHierarchy = eventProducerHierarchy;
 	}
 
-	public TimeSliceStateManager getTimeSliceManager() {
+	public TimeSliceManager getTimeSliceManager() {
 		return timeSliceManager;
 	}
 
-	public void setTimeSliceManager(TimeSliceStateManager timeSliceManager) {
+	public void setTimeSliceManager(TimeSliceManager timeSliceManager) {
 		this.timeSliceManager = timeSliceManager;
 	}
 

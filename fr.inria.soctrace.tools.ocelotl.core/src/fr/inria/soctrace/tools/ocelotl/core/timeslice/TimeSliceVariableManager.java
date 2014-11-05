@@ -5,7 +5,7 @@ import java.util.Map;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
-public class TimeSliceVariableManager extends TimeSliceStateManager{
+public class TimeSliceVariableManager extends TimeSliceManager{
 
 	public TimeSliceVariableManager(TimeRegion timeRegion, long slicesNumber) {
 		super(timeRegion, slicesNumber);

@@ -88,7 +88,7 @@ import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
@@ -98,8 +98,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatViewWrapper;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.jface.viewers.TreeViewer;
 
 /**
  * Main view for Ocelotl
@@ -216,7 +214,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 										}
 
 									// Set the corresponding parameters
-
 									textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 									textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 
@@ -427,12 +424,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							statView.createDiagram();
 							tabFolder.setSelection(1);
 							try {
-								
 								overView.updateDiagram(ocelotlParameters.getTimeRegion());
 							} catch (OcelotlException e) {
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 							}
-							ocelotlParameters.setTimeSliceManager(new TimeSliceStateManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
+							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 						}
 					});
 
@@ -556,6 +552,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlCore.getStatOperators().setSelectedOperator(comboStatistics.getText());
 			statView = statViewManager.create();
 			statViewWrapper.setView(statView);
+			statView.deleteDiagram();
 		}
 	}
 
@@ -1201,6 +1198,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/ocelotl16.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
 		btnRun.setText("RUN!");
+		btnRun.setToolTipText("RUN!");
 		
 				btnRun.addSelectionListener(new GetAggregationAdapter());
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
@@ -1305,6 +1303,22 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		this.statComposite = statComposite;
 	}
 
+	public Text getTextTimestampEnd() {
+		return textTimestampEnd;
+	}
+
+	public void setTextTimestampEnd(Text textTimestampEnd) {
+		this.textTimestampEnd = textTimestampEnd;
+	}
+
+	public Text getTextTimestampStart() {
+		return textTimestampStart;
+	}
+
+	public void setTextTimestampStart(Text textTimestampStart) {
+		this.textTimestampStart = textTimestampStart;
+	}
+
 	private void refreshTraces() {
 		try {
 			confDataLoader.loadTraces();
@@ -1350,7 +1364,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		try {
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());
 			ocelotlParameters.setTimeRegion(new TimeRegion(Long.valueOf(textTimestampStart.getText()), Long.valueOf(textTimestampEnd.getText())));
-			// Set a list of all the events
 		} catch (final NumberFormatException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}

@@ -2,19 +2,9 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-            id="idGenericStatistics"
+         id="idGenericStatistics"
          name="Statistics"
          point="fr.inria.soctrace.tools.ocelotl.core.statistics">
-		 <statistic_operator
-            class="fr.inria.soctrace.tools.ocelotl.statistics.operators.StatTemporal"
-            operator="Temporal Summary"
-            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"
-            metric_compatibility="PROPORTIONS, MODE"
-            aggregator_compatibility="2D, 3D"
-            selection_priority="1"
-            view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTreeView">
-      </statistic_operator>
        <statistic_operator
             class="fr.inria.soctrace.tools.ocelotl.statistics.operators.StatProducer"
             operator="Event Producer"
@@ -23,7 +13,7 @@
             metric_compatibility="PROPORTIONS, MODE"
             aggregator_compatibility="2D, 3D"
             selection_priority="2"
-            view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTreeView">
+            view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
       </statistic_operator>
 	</extension>
 </plugin>
