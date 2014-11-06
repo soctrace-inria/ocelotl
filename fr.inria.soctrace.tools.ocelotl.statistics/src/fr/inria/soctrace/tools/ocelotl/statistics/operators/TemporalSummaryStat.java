@@ -63,9 +63,9 @@ public class TemporalSummaryStat extends StatisticsProvider {
 		statData = new ArrayList<SummaryStatModel>();
 
 		for (String ep : data.keySet()) {
-			statData.add(new SummaryStatModel(ep, data.get(ep), (data.get(ep)
-					/ total) * 100.0, FramesocColorManager.getInstance()
-					.getEventTypeColor(ep).getSwtColor()));
+			statData.add(new SummaryStatModel(ep, data.get(ep),
+					(data.get(ep) / total) * 100.0, FramesocColorManager
+							.getInstance().getEventTypeColor(ep).getSwtColor()));
 		}
 	}
 
@@ -112,12 +112,14 @@ public class TemporalSummaryStat extends StatisticsProvider {
 		public SummaryStatModel(String aName, double aValue,
 				double aProportion, Color aColor) {
 			this.fields.put(OcelotlStatisticsTableColumn.NAME, aName);
-			NumberFormat formatter = new DecimalFormat("#0.000");
-			this.fields.put(OcelotlStatisticsTableColumn.OCCURRENCES,
-					String.valueOf(aValue));
 
+			NumberFormat occurenceFormatter = new DecimalFormat("#0.00E00");
+			this.fields.put(OcelotlStatisticsTableColumn.OCCURRENCES,
+					occurenceFormatter.format(aValue));
+
+			NumberFormat percentFormatter = new DecimalFormat("#0.000");
 			this.fields.put(OcelotlStatisticsTableColumn.PERCENTAGE,
-					formatter.format(aProportion) + " %");
+					percentFormatter.format(aProportion) + " %");
 			this.color = aColor;
 		}
 
@@ -128,5 +130,5 @@ public class TemporalSummaryStat extends StatisticsProvider {
 			return color;
 		}
 	}
-	
+
 }
