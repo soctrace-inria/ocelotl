@@ -232,7 +232,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	}
 
 	public class OcelotlStatisticsColumnComparator extends ViewerComparator {
-		private OcelotlStatisticsTableColumn col = OcelotlStatisticsTableColumn.OCCURRENCES;
+		private OcelotlStatisticsTableColumn col = OcelotlStatisticsTableColumn.PERCENTAGE;
 		private int direction = SWT.DOWN;
 
 		public int getDirection() {
