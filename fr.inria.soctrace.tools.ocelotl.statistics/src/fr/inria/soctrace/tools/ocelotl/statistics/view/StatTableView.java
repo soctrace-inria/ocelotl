@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -110,9 +111,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		dispose();
 		statProvider = new TemporalSummaryStat(ocelotlView);
 		createPartControl(ocelotlView.getStatComposite());
-		statProvider.computeData();
-		updateTableData();
-		compositeTable.update();
+		updateData();
 	}
 	
 	private void disposeImages() {
@@ -133,6 +132,13 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		if (tableViewer != null)
 			tableViewer.setInput(statProvider);
 	}
+	
+	@Override
+	public void updateData() {
+		statProvider.computeData();
+		updateTableData();
+		tableViewer.refresh();
+	}
 
 	@Override
 	public void resizeDiagram() {
@@ -144,6 +150,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	public void createPartControl(Composite parent) {
 		compositeTable = parent;
 		GridLayout gl_compositeTable = new GridLayout(1, false);
+		 
 		compositeTable.setLayout(gl_compositeTable);
 
 		// Filter
@@ -162,7 +169,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		});*/
 		
 		// Table
-		tableViewer = new TableViewer(compositeTable, SWT.MULTI | SWT.H_SCROLL
+		tableViewer = new TableViewer(compositeTable, SWT.FILL | SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		tableViewer.setContentProvider(new StatContentProvider());
 		comparator = new OcelotlStatisticsColumnComparator();

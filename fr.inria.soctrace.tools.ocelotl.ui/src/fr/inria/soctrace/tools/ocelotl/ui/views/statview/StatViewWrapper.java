@@ -29,7 +29,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  */
 public class StatViewWrapper {
 
-	//private Figure							root;
 	private final OcelotlView				ocelotlView;
 	private IStatView						view;
 

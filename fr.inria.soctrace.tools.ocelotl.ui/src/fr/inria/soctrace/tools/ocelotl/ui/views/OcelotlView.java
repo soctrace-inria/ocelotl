@@ -42,8 +42,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -626,6 +624,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				timeLineView.resizeDiagram();
 				timeAxisView.resizeDiagram();
 				overView.deleteSelection();
+				statView.updateData();
 			}
 		}
 	}
@@ -1127,7 +1126,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		comboStatistics.addSelectionListener(new ComboStatSelectionAdapter());
 		
 		statComposite = new Composite(composite, SWT.NONE);
-		statComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
+		statComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		statViewWrapper.init(statComposite);
 
 		// Quality curves display
@@ -1295,6 +1294,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 	public void setTextTimestampStart(Text textTimestampStart) {
 		this.textTimestampStart = textTimestampStart;
+	}
+
+	public IStatView getStatView() {
+		return statView;
+	}
+
+	public void setStatView(IStatView statView) {
+		this.statView = statView;
 	}
 
 	private void refreshTraces() {

@@ -30,4 +30,5 @@ public interface IStatView {
 
 	public void resizeDiagram();
 
+	public void updateData();
 }

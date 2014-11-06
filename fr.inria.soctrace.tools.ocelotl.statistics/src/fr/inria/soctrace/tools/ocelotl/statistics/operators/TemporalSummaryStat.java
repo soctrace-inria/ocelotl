@@ -13,6 +13,7 @@ import fr.inria.soctrace.framesoc.ui.model.TableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
+import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.statistics.view.OcelotlStatisticsTableColumn;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -35,14 +36,13 @@ public class TemporalSummaryStat extends StatisticsProvider {
 		data = new HashMap<String, Double>();
 		double total = 0.0;
 
-		Long startingDate = Long.valueOf(ocelotlview.getTextTimestampStart()
-				.getText());
-		Long endingDate = Long.valueOf(ocelotlview.getTextTimestampEnd()
-				.getText());
-		
-		int startingSlice = (int) microModel.getTimeSliceManager().getTimeSlice(startingDate);
-		int endingSlice = (int) microModel.getTimeSliceManager().getTimeSlice(endingDate);
-		
+		setupTimeRegion();
+
+		int startingSlice = (int) microModel.getTimeSliceManager()
+				.getTimeSlice(timeRegion.getTimeStampStart());
+		int endingSlice = (int) microModel.getTimeSliceManager().getTimeSlice(
+				timeRegion.getTimeStampEnd());
+
 		for (i = startingSlice; i <= endingSlice; i++) {
 			for (EventProducer ep : microModel.getMatrix().get(i).keySet()) {
 				for (String et : microModel.getMatrix().get(i).get(ep).keySet()) {
@@ -67,6 +67,15 @@ public class TemporalSummaryStat extends StatisticsProvider {
 					/ total) * 100.0, FramesocColorManager.getInstance()
 					.getEventTypeColor(ep).getSwtColor()));
 		}
+	}
+
+	private void setupTimeRegion() {
+		Long startingDate = Long.valueOf(ocelotlview.getTextTimestampStart()
+				.getText());
+		Long endingDate = Long.valueOf(ocelotlview.getTextTimestampEnd()
+				.getText());
+
+		timeRegion = new TimeRegion(startingDate, endingDate);
 	}
 
 	@Override

@@ -234,6 +234,7 @@ abstract public class AggregatedView implements IAggregatedView {
 			if (time == null)
 				return;
 
+			// If the selection is different than the whole region
 			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
 				final double sliceSize = (double) resetTime.getTimeDuration() / (double) ocelotlView.getTimeSliceNumber();
 				int i = 0;
@@ -251,6 +252,7 @@ abstract public class AggregatedView implements IAggregatedView {
 				ocelotlView.setTimeRegion(selectTime);
 				selectFigure.draw(selectTime, true);
 				ocelotlView.getOverView().updateSelection(selectTime);
+				ocelotlView.getStatView().updateData();
 			} else {
 				ocelotlView.getTimeAxisView().resizeDiagram();
 				ocelotlView.getOverView().deleteSelection();
