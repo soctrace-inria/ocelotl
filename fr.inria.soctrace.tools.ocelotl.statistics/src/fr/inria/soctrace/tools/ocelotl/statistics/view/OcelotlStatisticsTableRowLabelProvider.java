@@ -82,7 +82,6 @@ public class OcelotlStatisticsTableRowLabelProvider extends OwnerDrawLabelProvid
 		int imgy = bounds.height > 0 ? bounds.y + bounds.height : bounds.y;
 		int texty = bounds.y + 3;
 		event.gc.drawText(text, bounds.x + img.getBounds().width + 10, texty, true);
-		event.gc.drawImage(img, 5 + bounds.x, imgy);
-				
+		event.gc.drawImage(img, 5 + bounds.x, imgy);	
 	}
 }

@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.lib.model
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: fr.inria.soctrace.framesoc.ui.colors,
+Import-Package: fr.inria.soctrace.framesoc.core.bus,
+ fr.inria.soctrace.framesoc.ui.colors,
  fr.inria.soctrace.framesoc.ui.model,
  fr.inria.soctrace.framesoc.ui.providers,
  fr.inria.soctrace.lib.query.conditions,
@@ -23,4 +24,5 @@ Import-Package: fr.inria.soctrace.framesoc.ui.colors,
  fr.inria.soctrace.tools.ocelotl.ui.loaders,
  fr.inria.soctrace.tools.ocelotl.ui.views,
  fr.inria.soctrace.tools.ocelotl.ui.views.statview,
+ org.eclipse.wb.swt,
  org.slf4j

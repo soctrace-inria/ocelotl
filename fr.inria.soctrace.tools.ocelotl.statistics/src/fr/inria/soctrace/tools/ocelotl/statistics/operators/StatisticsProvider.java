@@ -15,4 +15,6 @@ public abstract class StatisticsProvider {
 	public abstract void computeData();
 
 	public abstract List getTableData();
+	
+	public abstract void updateColor();
 }

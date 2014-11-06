@@ -155,7 +155,7 @@ public class Overview implements IFramesocBusListener {
 				aggregManager.computeDichotomy();
 		//	} else {
 		//		aggregManager = ocelotlView.getOcelotlCore().getLpaggregManager();
-	//		}
+			//}
 			parameter = ocelotlView.getOcelotlCore().computeInitialParameter();
 
 			// Compute the view according to the new parameter value

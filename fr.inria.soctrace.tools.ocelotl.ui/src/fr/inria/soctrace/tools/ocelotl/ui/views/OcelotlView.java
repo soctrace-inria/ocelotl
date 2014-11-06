@@ -423,7 +423,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							textRun.setText(String.valueOf(getParams().getParameter()));
 							qualityView.createDiagram();
 							statView.createDiagram();
-							tabFolder.setSelection(1);
 							try {
 								overView.updateDiagram(ocelotlParameters.getTimeRegion());
 							} catch (OcelotlException e) {
@@ -553,33 +552,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlCore.getStatOperators().setSelectedOperator(comboStatistics.getText());
 			statView = statViewManager.create();
 			statViewWrapper.setView(statView);
-		}
-	}
-
-	@SuppressWarnings("unused")
-	private class OcelotlKeyListener extends KeyAdapter {
-
-		@Override
-		public void keyPressed(final KeyEvent e) {
-			switch (e.keyCode) {
-			case SWT.ARROW_LEFT:
-				// Make sure we are not in an editable field
-				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-					buttonDown.notifyListeners(SWT.Selection, new Event());
-				break;
-			case SWT.ARROW_RIGHT:
-				// Make sure we are not in an editable field
-				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-					buttonUp.notifyListeners(SWT.Selection, new Event());
-				break;
-			case SWT.KEYPAD_CR:
-			case SWT.CR:
-				btnRun.notifyListeners(SWT.Selection, new Event());
-				break;
-			case SWT.ESC:
-				btnReset.notifyListeners(SWT.Selection, new Event());
-				break;
-			}
 		}
 	}
 
@@ -775,6 +747,39 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			job.schedule();
 		}
 	}
+	
+	private class KeyboardEventListener implements Listener {
+
+		@Override
+		public void handleEvent(final Event e) {
+			switch (e.keyCode) {
+			case SWT.ARROW_LEFT:
+			case SWT.ARROW_UP:
+				// Make sure we are not in an editable field
+				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					buttonDown.notifyListeners(SWT.Selection, new Event());
+				break;
+			case SWT.ARROW_RIGHT:
+			case SWT.ARROW_DOWN:
+				// Make sure we are not in an editable field
+				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					buttonUp.notifyListeners(SWT.Selection, new Event());
+				break;
+				
+			case SWT.SPACE:
+				statView.resizeDiagram();
+				break;
+			case SWT.KEYPAD_CR:
+			case SWT.CR:
+				if(!e.widget.isListening(e.type))
+					btnRun.notifyListeners(SWT.Selection, new Event());
+				break;
+			case SWT.ESC:
+				btnReset.notifyListeners(SWT.Selection, new Event());
+				break;
+			}
+		}
+	}
 
 	public static final String			ID				= "fr.inria.soctrace.tools.ocelotl.ui.OcelotlView"; //$NON-NLS-1$
 	public static final String			PLUGIN_ID		= Activator.PLUGIN_ID;
@@ -910,34 +915,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	@Override
 	public void createPartControl(final Composite parent) {
 		final Display display = Display.getCurrent();
-
-		display.addFilter(SWT.KeyDown, new Listener() {
-
-			@Override
-			public void handleEvent(final Event e) {
-				switch (e.keyCode) {
-				case SWT.ARROW_LEFT:
-				case SWT.ARROW_UP:
-					// Make sure we are not in an editable field
-					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-						buttonDown.notifyListeners(SWT.Selection, new Event());
-					break;
-				case SWT.ARROW_RIGHT:
-				case SWT.ARROW_DOWN:
-					// Make sure we are not in an editable field
-					if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
-						buttonUp.notifyListeners(SWT.Selection, new Event());
-					break;
-				case SWT.KEYPAD_CR:
-				case SWT.CR:
-					btnRun.notifyListeners(SWT.Selection, new Event());
-					break;
-				case SWT.ESC:
-					btnReset.notifyListeners(SWT.Selection, new Event());
-					break;
-				}
-			}
-		});
+		display.addFilter(SWT.KeyDown, new KeyboardEventListener());
+		
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
@@ -1129,11 +1108,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
 		// Statistics
-		final TabItem tbtmOverview = new TabItem(tabFolder, SWT.NONE);
-		tbtmOverview.setText("Statistics");
+		final TabItem tbtmStat = new TabItem(tabFolder, SWT.NONE);
+		tbtmStat.setText("Statistics");
 
 		SashForm statSashForm = new SashForm(tabFolder, SWT.VERTICAL);
-		tbtmOverview.setControl(statSashForm);
+		tbtmStat.setControl(statSashForm);
 		
 		Composite composite = new Composite(statSashForm, SWT.NONE);
 		composite.setLayout(new GridLayout(1, false));
@@ -1148,7 +1127,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		comboStatistics.addSelectionListener(new ComboStatSelectionAdapter());
 		
 		statComposite = new Composite(composite, SWT.NONE);
-		statComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		statComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
 		statViewWrapper.init(statComposite);
 
 		// Quality curves display
@@ -1199,7 +1178,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
 		btnRun.setText("RUN!");
 		
-				btnRun.addSelectionListener(new GetAggregationAdapter());
+		btnRun.addSelectionListener(new GetAggregationAdapter());
 		buttonUp.addSelectionListener(new ParameterUpAdapter());
 		buttonDown.addSelectionListener(new ParameterDownAdapter());
 		textRun.addModifyListener(new ParameterModifyListener());
