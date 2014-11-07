@@ -22,9 +22,18 @@ public abstract class StatisticsProvider {
 		timeRegion = new TimeRegion(startTimeStamp, endTimeStamp);
 	}
 	
+	/**
+	 * Compute the statistics data
+	 */
 	public abstract void computeData();
 
+	/*
+	 * Provide a list of data to put in the table
+	 */
 	public abstract List getTableData();
 	
+	/**
+	 * Update the color of the event types
+	 */
 	public abstract void updateColor();
 }

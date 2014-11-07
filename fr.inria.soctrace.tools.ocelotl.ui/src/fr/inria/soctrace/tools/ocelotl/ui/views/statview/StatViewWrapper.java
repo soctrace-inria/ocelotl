@@ -30,7 +30,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 public class StatViewWrapper {
 
 	private final OcelotlView				ocelotlView;
-	private IStatView						view;
+	private IStatView						statView;
 
 	public StatViewWrapper(final OcelotlView ocelotlView) {
 		super();
@@ -42,7 +42,7 @@ public class StatViewWrapper {
 	}
 
 	public IStatView getView() {
-		return view;
+		return statView;
 	}
 
 	public void init(final Composite parent) {
@@ -50,8 +50,8 @@ public class StatViewWrapper {
 	}
 
 	public void setView(final IStatView view) {
-		this.view = view;
-		view.init(this);
+		this.statView = view;
+		statView.init(this);
 	}
 
 }

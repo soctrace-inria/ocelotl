@@ -157,7 +157,8 @@ public class StatisticOperatorManager {
 	public StatisticOperatorResource getSelectedOperatorResource() {
 		return operatorList.get(selectedOperatorName);
 	}
-public StatisticOperatorResource getSelectedOperatorResource(
+	
+	public StatisticOperatorResource getSelectedOperatorResource(
 			String anOperatorName) {
 		return operatorList.get(anOperatorName);
 	}

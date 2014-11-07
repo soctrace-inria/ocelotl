@@ -6,15 +6,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -26,8 +22,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
@@ -41,12 +35,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatView;
 
 public class StatTableView extends StatView implements IFramesocBusListener {
-
-	/**
-	 * Logger
-	 */
-	private final static Logger logger = LoggerFactory
-			.getLogger(StatTableView.class);
 
 	/**
 	 * Followed topics
@@ -95,26 +83,34 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
 		topics.registerAll();
+		
+		dispose();
+		createPartControl(ocelotlView.getStatComposite());
 	}
 	
 	@Override
 	public void handle(FramesocBusTopic topic, Object data) {
-		if (statProvider != null && tableViewer != null) {
-			disposeImages();
-			statProvider.updateColor();
-			updateTableData();
-			tableViewer.refresh();
+		// If color has changed
+		if ((topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED))) {
+			if (statProvider != null && tableViewer != null) {
+				// Get rid of the cached images
+				disposeImages();
+				// Update colors and the table
+				statProvider.updateColor();
+				updateTableData();
+			}
 		}
 	}
 
 	@Override
 	public void createDiagram() {
-		dispose();
 		statProvider = new TemporalSummaryStat(ocelotlView);
-		createPartControl(ocelotlView.getStatComposite());
 		updateData();
 	}
 	
+	/**
+	 * Delete cached images (square next to the event types)
+	 */
 	private void disposeImages() {
 		Iterator<Image> it = images.values().iterator();
 		while (it.hasNext()) {
@@ -129,32 +125,40 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			tableViewer.setInput(null);
 	}
 
+	/**
+	 * If data has changed
+	 */
 	public void updateTableData() {
-		if (tableViewer != null)
+		if (tableViewer != null) {
 			tableViewer.setInput(statProvider);
+			tableViewer.refresh();
+		}
 	}
 	
 	@Override
 	public void updateData() {
 		statProvider.computeData();
 		updateTableData();
-		tableViewer.refresh();
 		// Needed for correct redraw of the table
 		compositeTable.layout();
 	}
 
 	@Override
 	public void resizeDiagram() {
-		tableViewer.refresh();
 		compositeTable.redraw();
 		compositeTable.update();
 		compositeTable.layout();
 	}
 
+	/**
+	 * Create the widgets for the statistics operators using table
+	 * 
+	 * @param parent
+	 *            Composite parent widget
+	 */
 	public void createPartControl(Composite parent) {
 		compositeTable = parent;
 		GridLayout gl_compositeTable = new GridLayout(1, false);
-		 
 		compositeTable.setLayout(gl_compositeTable);
 
 		// Filter
@@ -179,27 +183,31 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		comparator = new OcelotlStatisticsColumnComparator();
 		tableViewer.setComparator(comparator);
 		createColumns();
+		
 		Table table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		table.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		// Default sorting of the table
 		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(1));
 		tableViewer.getTable().setSortDirection(SWT.UP);
 	}
 
 	private void createColumns() {
+		// For each column
 		for (final OcelotlStatisticsTableColumn col : OcelotlStatisticsTableColumn
 				.values()) {
 			TableViewerColumn elemsViewerCol = new TableViewerColumn(
 					tableViewer, SWT.NONE);
 
+			// If it is the column name
 			if (col.equals(OcelotlStatisticsTableColumn.NAME)) {
 				// add a filter for this column
 				//nameFilter = new OcelotlStatisticsTableRowFilter(col);
 				//tableViewer.addFilter(nameFilter);
 
-				// the label provider puts also the image
+				// the label provider also puts the image
 				elemsViewerCol
 						.setLabelProvider(new OcelotlStatisticsTableRowLabelProvider(
 								col, images));
@@ -209,6 +217,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			final TableColumn elemsTableCol = elemsViewerCol.getColumn();
 			elemsTableCol.setWidth(col.getWidth());
 			elemsTableCol.setText(col.getHeader());
+			// Set sorting comparator when clicking on a column header
 			elemsTableCol.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -230,11 +239,18 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		this.statProvider = statProvider;
 	}
 
+	/**
+	 * Delete the old widgets
+	 */
 	public void dispose() {
 		for (Control c : ocelotlView.getStatComposite().getChildren())
 			c.dispose();
 	}
 
+	/**
+	 * Class used to sort the column (copied and adapted from StatisticsColumnComparator in
+	 * framesoc)
+	 */
 	public class OcelotlStatisticsColumnComparator extends ViewerComparator {
 		private OcelotlStatisticsTableColumn col = OcelotlStatisticsTableColumn.PERCENTAGE;
 		private int direction = SWT.DOWN;
