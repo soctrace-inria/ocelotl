@@ -29,6 +29,7 @@ import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
 import fr.inria.soctrace.framesoc.ui.model.TableRow;
 import fr.inria.soctrace.framesoc.ui.providers.TableRowLabelProvider;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.statistics.operators.StatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.statistics.operators.TemporalSummaryStat;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -104,7 +105,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 
 	@Override
 	public void createDiagram() {
-		statProvider = new TemporalSummaryStat(ocelotlView);
+		statProvider.setMicroMode(ocelotlView.getOcelotlCore().getMicroModel());
 		updateData();
 	}
 	
@@ -235,8 +236,8 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		return statProvider;
 	}
 
-	public void setStatProvider(StatisticsProvider statProvider) {
-		this.statProvider = statProvider;
+	public void setStatProvider(IStatisticsProvider statProvider) {
+		this.statProvider = (StatisticsProvider) statProvider;
 	}
 
 	/**

@@ -13,6 +13,7 @@ import fr.inria.soctrace.framesoc.ui.model.TableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.statistics.view.OcelotlStatisticsTableColumn;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -26,8 +27,6 @@ public class TemporalSummaryStat extends StatisticsProvider {
 
 	public TemporalSummaryStat(OcelotlView aView) {
 		super(aView);
-		microModel = (Microscopic3DDescription) ocelotlview.getOcelotlCore()
-				.getMicroModel();
 	}
 	
 	@Override
@@ -79,16 +78,19 @@ public class TemporalSummaryStat extends StatisticsProvider {
 		}
 	}
 
-
-	
 	/**
 	 * Get the currently selected time region from the ocelotl view
 	 */
 	protected void setupTimeRegion() {
-		Long startingDate = Long.valueOf(ocelotlview.getTextTimestampStart()
-				.getText());
-		Long endingDate = Long.valueOf(ocelotlview.getTextTimestampEnd()
-				.getText());
+		TimeRegion currentTimeregion = microModel.getTimeSliceManager()
+				.getTimeRegion();
+
+		// If we perform a reset on the timestamp, make sure we don't take
+		// values higher than the current region
+		Long startingDate = Math.max(currentTimeregion.getTimeStampStart(),
+				Long.valueOf(ocelotlview.getTextTimestampStart().getText()));
+		Long endingDate = Math.min(currentTimeregion.getTimeStampEnd(),
+				Long.valueOf(ocelotlview.getTextTimestampEnd().getText()));
 
 		timeRegion = new TimeRegion(startingDate, endingDate);
 	}
@@ -96,6 +98,10 @@ public class TemporalSummaryStat extends StatisticsProvider {
 	@Override
 	public List<SummaryStatModel> getTableData() {
 		return statData;
+	}
+	
+	public void setMicroMode(MicroscopicDescription aMicroModel) {
+		microModel = (Microscopic3DDescription) aMicroModel;
 	}
 
 	@Override

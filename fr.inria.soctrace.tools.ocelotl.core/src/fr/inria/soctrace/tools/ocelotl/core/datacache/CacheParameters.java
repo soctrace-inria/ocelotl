@@ -46,10 +46,10 @@ public class CacheParameters {
 				timeAggOperator = oParam.getTimeAggOperator();
 			}
 
-			if (oParam.getSpaceAggOperator() == null) {
+			if (oParam.getVisuOperator() == null) {
 				spaceAggOperator = "null";
 			} else {
-				spaceAggOperator = oParam.getSpaceAggOperator();
+				spaceAggOperator = oParam.getVisuOperator();
 			}
 			
 			if (oParam.getMicroModelType() == null) {

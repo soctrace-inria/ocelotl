@@ -58,7 +58,7 @@ public class OcelotlParameters {
 	private int eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
 	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
 	private String timeAggOperator;
-	private String spaceAggOperator;
+	private String visuOperator;
 	private String statOperator;
 	private String microModelType;
 	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
@@ -89,7 +89,7 @@ public class OcelotlParameters {
 		this.trace = op.trace;
 		this.maxEventProducers = op.maxEventProducers;
 		this.timeAggOperator = op.timeAggOperator;
-		this.spaceAggOperator = op.spaceAggOperator;
+		this.visuOperator = op.visuOperator;
 		this.microModelType = op.microModelType;
 		this.growingQualities = op.growingQualities;
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
@@ -119,8 +119,8 @@ public class OcelotlParameters {
 		this.eventTypes = types;
 	}
 	
-	public String getSpaceAggOperator() {
-		return spaceAggOperator;
+	public String getVisuOperator() {
+		return visuOperator;
 	}
 
 	public double getThreshold() {
@@ -175,8 +175,8 @@ public class OcelotlParameters {
 		this.parameter = parameter;
 	}
 
-	public void setSpaceAggOperator(final String spaceAggOperator) {
-		this.spaceAggOperator = spaceAggOperator;
+	public void setVisuOperator(final String visuOperator) {
+		this.visuOperator = visuOperator;
 	}
 
 	public void setThreshold(final double threshold) {

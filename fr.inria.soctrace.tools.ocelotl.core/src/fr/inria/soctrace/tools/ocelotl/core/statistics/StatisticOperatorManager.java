@@ -207,6 +207,7 @@ public class StatisticOperatorManager {
 			parameters.setStatisticOperatorConfig((selectedConfig));
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException | NullPointerException e) {
+			e.printStackTrace();
 		}
 
 	}

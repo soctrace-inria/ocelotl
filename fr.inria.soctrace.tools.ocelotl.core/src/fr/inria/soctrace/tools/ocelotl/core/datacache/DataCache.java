@@ -772,7 +772,7 @@ public class DataCache {
 			}
 
 			if (!params.getSpaceAggOperator().equals("null")) {
-				oParam.setSpaceAggOperator(params.getSpaceAggOperator());
+				oParam.setVisuOperator(params.getSpaceAggOperator());
 			}
 		}
 

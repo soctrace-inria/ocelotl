@@ -594,7 +594,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getMicroModelType()
 					+ OcelotlConstants.CSVDelimiter
-					+ parameters.getSpaceAggOperator()
+					+ parameters.getVisuOperator()
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getTimeRegion().getTimeStampStart()
 					+ OcelotlConstants.CSVDelimiter

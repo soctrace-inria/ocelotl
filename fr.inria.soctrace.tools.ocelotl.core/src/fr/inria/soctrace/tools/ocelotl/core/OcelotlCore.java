@@ -159,8 +159,6 @@ public class OcelotlCore {
 	public VisuOperatorManager getVisuOperators() {
 		return visuOperators;
 	}
-	
-	
 
 	public StatisticOperatorManager getStatOperators() {
 		return statOperators;

@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
+import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class StatViewManager {
@@ -37,9 +38,14 @@ public class StatViewManager {
 
 	public IStatView create() {
 		IStatView statView = null;
+		IStatisticsProvider statProvider = null;
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource().getBundle());
 			statView = (IStatView) mybundle.loadClass(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource().getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+
+			// Set statistics operator
+			statProvider = (IStatisticsProvider) mybundle.loadClass(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource().getOperatorClass()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+			statView.setStatProvider(statProvider);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,15 +55,18 @@ public class StatViewManager {
 
 	public IStatView create(String aVisualization) {
 		IStatView statView = null;
+		IStatisticsProvider statProvider = null;
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource(aVisualization).getBundle());
 			statView = (IStatView) mybundle.loadClass(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource(aVisualization).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+
+			statProvider = (IStatisticsProvider) mybundle.loadClass(ocelotlView.getCore().getStatOperators().getSelectedOperatorResource().getOperatorClass()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+			statView.setStatProvider(statProvider);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return statView;
 	}
-
 
 }

@@ -143,7 +143,7 @@ public class Snapshot {
 		output.append("\nTime Operator: ");
 		output.append(theView.getParams().getTimeAggOperator());
 		output.append("\nSpace Operator: ");
-		output.append(theView.getParams().getSpaceAggOperator());
+		output.append(theView.getParams().getVisuOperator());
 		output.append("\nParameter: ");
 		output.append(theView.getParams().getParameter());
 		output.append("\nGain: ");
