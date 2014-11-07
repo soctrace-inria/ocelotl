@@ -71,14 +71,14 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected int							aBorder			= 10;
 	protected final int						space			= 3;
 	protected final OcelotlView				ocelotlView;
-	private SelectFigure					selectFigure;
+	protected SelectFigure					selectFigure;
 	protected IVisuOperator					visuOperator	= null;
 	public final static Color				selectColorFG	= ColorConstants.blue;
 	public final static Color				selectColorBG	= ColorConstants.lightGray;
 	public final static Color				activeColorFG	= ColorConstants.black;
 	public final static Color				activeColorBG	= ColorConstants.darkBlue;
 
-	private class SelectFigure extends RectangleFigure {
+	class SelectFigure extends RectangleFigure {
 
 		private SelectFigure() {
 			super();
@@ -90,7 +90,7 @@ abstract public class AggregatedView implements IAggregatedView {
 			setAlpha(50);
 		}
 
-		public void draw(final TimeRegion timeRegion, final boolean active) {
+		public void draw(final TimeRegion timeRegion, final boolean active, int y0, int y1) {
 			if (active) {
 				setForegroundColor(activeColorFG);
 				setBackgroundColor(activeColorBG);
@@ -100,9 +100,16 @@ abstract public class AggregatedView implements IAggregatedView {
 			}
 			if (getParent() != root)
 				root.add(this);
+
+			if (y0 == -1)
+				y0 = root.getSize().height;
+
+			if (y1 == -1)
+				y1 = 2;
+			
 			root.setConstraint(this,
-					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), root.getSize().height), new Point(
-							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), 2)));
+					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
+							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y1)));
 			root.repaint();
 		}
 	}
@@ -110,7 +117,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	static public enum State {
 		PRESSED_D, DRAG_D, PRESSED_G, DRAG_G, DRAG_G_START, RELEASED, MOVE_START, MOVE_END, EXITED;
 	}
-
+/*
 	class TimeMouseListener implements MouseListener, MouseMotionListener {
 
 		private static final long	Threshold	= 5;
@@ -263,7 +270,7 @@ abstract public class AggregatedView implements IAggregatedView {
 
 		}
 	}
-
+*/
 	public static Color getActivecolorbg() {
 		return activeColorBG;
 	}
@@ -422,7 +429,7 @@ abstract public class AggregatedView implements IAggregatedView {
 			}
 		});
 
-		final TimeMouseListener mouse = new TimeMouseListener();
+		final SpatioTemporalMouseListener mouse = new SpatioTemporalMouseListener(this);
 		wrapper.cleanMouseListeners();
 		wrapper.cleanMouseMotionListeners();
 		wrapper.addMouseListener(mouse);
