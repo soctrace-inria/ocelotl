@@ -725,8 +725,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									comboType.add(type);
 								}
 								// Since the types are sorted by priority, set
-								// the default
-								// choice to the first item
+								// the default choice to the first item
 								if (comboType.getItems().length != 0) {
 									comboType.setText(comboType.getItem(0));
 									// Set the selected type as operator in
@@ -1123,6 +1122,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		comboStatistics.setFont(cantarell8);
 		comboStatistics.add("Statistics");
 		comboStatistics.setText("Statistics");
+		comboStatistics.setToolTipText("Statistics");
 		comboStatistics.addSelectionListener(new ComboStatSelectionAdapter());
 		
 		statComposite = new Composite(composite, SWT.NONE);

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -138,6 +139,8 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		statProvider.computeData();
 		updateTableData();
 		tableViewer.refresh();
+		// Needed for correct redraw of the table
+		compositeTable.layout();
 	}
 
 	@Override
@@ -145,6 +148,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		tableViewer.refresh();
 		compositeTable.redraw();
 		compositeTable.update();
+		compositeTable.layout();
 	}
 
 	public void createPartControl(Composite parent) {
@@ -179,7 +183,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		table.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		table.setBounds(0, 0, 1000, 550);
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(1));
 		tableViewer.getTable().setSortDirection(SWT.UP);
 	}
