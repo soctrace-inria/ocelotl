@@ -236,18 +236,17 @@ abstract public class AggregatedView implements IAggregatedView {
 
 			// If the selection is different than the whole region
 			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-				final double sliceSize = (double) resetTime.getTimeDuration() / (double) ocelotlView.getTimeSliceNumber();
-				int i = 0;
-				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++)
-					if (selectTime.getTimeStampStart() >= (long) (sliceSize * i + resetTime.getTimeStampStart()) && selectTime.getTimeStampStart() < (long) (sliceSize * (i + 1) + resetTime.getTimeStampStart())) {
-						selectTime.setTimeStampStart((long) (sliceSize * i + resetTime.getTimeStampStart()));
-						break;
-					}
-				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++)
-					if (selectTime.getTimeStampEnd() > (long) (sliceSize * i + resetTime.getTimeStampStart()) && selectTime.getTimeStampEnd() <= (long) (sliceSize * (i + 1) + resetTime.getTimeStampStart())) {
-						selectTime.setTimeStampEnd((long) (sliceSize * (i + 1) + resetTime.getTimeStampStart()));
-						break;
-					}
+				// Get time slice numbers from the time slice manager
+				int startingSlice = (int) ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager()
+						.getTimeSlice(selectTime.getTimeStampStart());
+				int endingSlice = (int) ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(
+						selectTime.getTimeStampEnd());
+				
+				// Since the timestamp of the last time slice goes further than the max timestamp of the trace, we must check that we are not over it
+				long endTimeStamp = Math.min(resetTime.getTimeStampEnd(), ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingSlice).getTimeRegion().getTimeStampEnd());
+				
+				selectTime.setTimeStampStart(ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingSlice).getTimeRegion().getTimeStampStart());
+				selectTime.setTimeStampEnd(endTimeStamp);
 				ocelotlView.getTimeAxisView().select(selectTime, true);
 				ocelotlView.setTimeRegion(selectTime);
 				selectFigure.draw(selectTime, true);

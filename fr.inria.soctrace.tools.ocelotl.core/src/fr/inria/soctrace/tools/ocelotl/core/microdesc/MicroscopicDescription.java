@@ -29,6 +29,7 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class MicroscopicDescription implements IMicroscopicDescription {
@@ -42,6 +43,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected int epit = 0;
 	protected int eventsNumber;
 	protected OcelotlQueries ocelotlQueries;
+	protected TimeSliceManager timeSliceManager;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MicroscopicDescription.class);
@@ -92,6 +94,14 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 	public void setDataCache(DataCache dataCache) {
 		this.dataCache = dataCache;
+	}
+
+	public TimeSliceManager getTimeSliceManager() {
+		return timeSliceManager;
+	}
+
+	public void setTimeSliceManager(TimeSliceManager timeSliceManager) {
+		this.timeSliceManager = timeSliceManager;
 	}
 
 	/**

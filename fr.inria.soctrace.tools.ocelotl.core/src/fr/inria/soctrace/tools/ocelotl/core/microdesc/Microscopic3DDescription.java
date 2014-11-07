@@ -24,8 +24,6 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 	private static final Logger logger = LoggerFactory
 			.getLogger(Microscopic3DDescription.class);
 	
-	protected TimeSliceManager timeSliceManager;
-
 	protected List<HashMap<EventProducer, HashMap<String, Double>>> matrix;
 
 	public Microscopic3DDescription() {
@@ -214,7 +212,4 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 		return timeSliceManager;
 	}
 
-	public void setTimeSliceManager(TimeSliceManager timeSliceManager) {
-		this.timeSliceManager = timeSliceManager;
-	}
 }
