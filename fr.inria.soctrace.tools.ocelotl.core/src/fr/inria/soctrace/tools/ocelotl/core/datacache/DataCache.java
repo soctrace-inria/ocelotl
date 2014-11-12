@@ -768,7 +768,7 @@ public class DataCache {
 			}
 
 			if (!params.getTimeAggOperator().equals("null")) {
-				oParam.setTimeAggOperator(params.getTimeAggOperator());
+				oParam.setDataAggOperator(params.getTimeAggOperator());
 			}
 
 			if (!params.getSpaceAggOperator().equals("null")) {

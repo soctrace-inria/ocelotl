@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -441,6 +442,9 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		bufFileReader.close();
 	}
 
+	/**
+	 * Rebuild the matrix from the cache with no problem detected 
+	 */
 	public void rebuildClean(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException {
@@ -574,7 +578,12 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
-		Date convertedDate = new Date(System.currentTimeMillis());
+		Date theDate = new Date(System.currentTimeMillis());
+
+		// Reformat the date to remove unsupported characters in file name (e.g.
+		// ":" on windows)
+		String convertedDate = new SimpleDateFormat("dd-MM-yyyy hhmmss z")
+				.format(theDate);
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
 				+ parameters.getTrace().getAlias() + "_"

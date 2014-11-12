@@ -57,7 +57,7 @@ public class OcelotlParameters {
 	private int maxEventProducers = OcelotlDefaultParameterConstants.EventProducersPerQuery;
 	private int eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
 	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
-	private String timeAggOperator;
+	private String dataAggOperator;
 	private String visuOperator;
 	private String statOperator;
 	private String microModelType;
@@ -88,7 +88,7 @@ public class OcelotlParameters {
 		this.threshold = op.threshold;
 		this.trace = op.trace;
 		this.maxEventProducers = op.maxEventProducers;
-		this.timeAggOperator = op.timeAggOperator;
+		this.dataAggOperator = op.dataAggOperator;
 		this.visuOperator = op.visuOperator;
 		this.microModelType = op.microModelType;
 		this.growingQualities = op.growingQualities;
@@ -127,8 +127,8 @@ public class OcelotlParameters {
 		return threshold;
 	}
 
-	public String getTimeAggOperator() {
-		return timeAggOperator;
+	public String getDataAggOperator() {
+		return dataAggOperator;
 	}
 
 	public TimeRegion getTimeRegion() {
@@ -183,8 +183,8 @@ public class OcelotlParameters {
 		this.threshold = threshold;
 	}
 
-	public void setTimeAggOperator(final String timeAggOperator) {
-		this.timeAggOperator = timeAggOperator;
+	public void setDataAggOperator(final String timeAggOperator) {
+		this.dataAggOperator = timeAggOperator;
 	}
 
 	public void setTimeRegion(final TimeRegion timeRegion) {

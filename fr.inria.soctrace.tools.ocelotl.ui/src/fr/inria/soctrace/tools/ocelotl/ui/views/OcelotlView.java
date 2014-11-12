@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -119,10 +120,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			// Display a warning if the selected file already exists
 			dialog.setOverwrite(true);
 
-			Date date = new Date(System.currentTimeMillis());
-
+			Date aDate = new Date(System.currentTimeMillis());
+			String convertedDate = new SimpleDateFormat("dd-MM-yyyy hhmmss z").format(aDate);
+			
 			// Set a default file name
-			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId() + "_" + date);
+			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId() + "_" + convertedDate);
 
 			String saveCachefile = dialog.open();
 
@@ -241,18 +243,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				job.setUser(true);
 				job.schedule();
 			}
-		}
-	}
-
-	private class TakeSnapshotAdapter extends SelectionAdapter {
-
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			if (confDataLoader.getCurrentTrace() == null || ocelotlParameters.getTrace() == null)
-				return;
-
-			snapshot.takeSnapShot();
-			playSound("/media/snapshot.wav");
 		}
 	}
 
@@ -674,9 +664,32 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				settingsView.openDialog();
 			}
 		};
+		showSettings.setToolTipText("Ocelotl settings.");
 		return showSettings;
 	}
+	
+	/**
+	 * Add the snapshot button to the toolbar
+	 * 
+	 * @param view
+	 * @return the action taking a snapshot
+	 */
+	private Action createSnapshot() {
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/snapshot-icon.png");
+		final Action takeSnapshot = new Action("Ocelotl Settings", img) {
+			@Override
+			public void run() {
+				if (confDataLoader.getCurrentTrace() == null || ocelotlParameters.getTrace() == null)
+					return;
 
+				snapshot.takeSnapShot();
+				playSound("/media/snapshot.wav");
+			}
+		};
+		takeSnapshot.setToolTipText("Take a snapshot of the current view.");
+		return takeSnapshot;
+	}
+	
 	private void enableActions(boolean enabled) {
 		IActionBars actionBars = getViewSite().getActionBars();
 		IToolBarManager toolBar = actionBars.getToolBarManager();
@@ -1075,12 +1088,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		spinnerTSNumber.setMaximum(OcelotlDefaultParameterConstants.maxTimeslice);
 		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
 
-		Button btnTakeSnapshot = new Button(groupTime, SWT.NONE);
-		btnTakeSnapshot.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/snapshot-icon.png"));
-		btnTakeSnapshot.setFont(cantarell8);
-		btnTakeSnapshot.setToolTipText("Take a snapshot of the current view.");
-		btnTakeSnapshot.addSelectionListener(new TakeSnapshotAdapter());
-
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
 		textTimestampEnd.addModifyListener(new ConfModificationListener());
@@ -1195,6 +1202,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			toolBar.add(createTableAction());
 
 		toolBar.add(createSettingWindow(this));
+		toolBar.add(createSnapshot());
 		refreshTraces();
 
 		cleanAll();
@@ -1337,7 +1345,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setNormalize(ocelotlParameters.getOcelotlSettings().isNormalizedCurve());
 		ocelotlParameters.setTimeSlicesNumber(spinnerTSNumber.getSelection());
 		ocelotlParameters.setMicroModelType(comboType.getText());
-		ocelotlParameters.setTimeAggOperator(comboTime.getText());
+		ocelotlParameters.setDataAggOperator(comboTime.getText());
 		ocelotlParameters.setVisuOperator(comboVisu.getText());
 		ocelotlParameters.setStatOperator(comboStatistics.getText());
 		ocelotlParameters.setEventsPerThread(ocelotlParameters.getOcelotlSettings().getEventsPerThread());
