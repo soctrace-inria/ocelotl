@@ -32,6 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterato
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
+import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 
 public abstract class MicroscopicDescription implements IMicroscopicDescription {
 	protected DataCache dataCache;
@@ -582,14 +583,19 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 		// Reformat the date to remove unsupported characters in file name (e.g.
 		// ":" on windows)
-		String convertedDate = new SimpleDateFormat("dd-MM-yyyy hhmmss z")
+		String convertedDate = new SimpleDateFormat("dd-MM-yyyy HHmmss z")
 				.format(theDate);
-
-		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
-				+ parameters.getTrace().getAlias() + "_"
+		
+		String fileName = parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
 				+ parameters.getMicroModelType() + "_" + convertedDate;
-
+		
+		fileName = FilenameValidator.checkNameValidity(fileName);
+			
+		
+		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
+				+ fileName;
+		
 		// Write to file,
 		try {
 			PrintWriter writer = new PrintWriter(filePath, "UTF-8");

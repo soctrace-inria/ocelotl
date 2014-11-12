@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.lpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class Snapshot {
@@ -175,8 +176,12 @@ public class Snapshot {
 		}
 
 		Date aDate = new Date(System.currentTimeMillis());
-		String convertedDate = new SimpleDateFormat("dd-MM-yyyy hhmmss z").format(aDate);
-		dirName = snapshotDirectory + "/" + theView.getParams().getTrace().getAlias() + "_" + convertedDate;
+		String convertedDate = new SimpleDateFormat("dd-MM-yyyy HHmmss z").format(aDate);
+		
+		String fileName = theView.getParams().getTrace().getAlias() + "_" + convertedDate;
+		fileName = FilenameValidator.checkNameValidity(fileName);
+			
+		dirName = snapshotDirectory + "/" + fileName;
 
 		// Create the specific snaphot directory
 		dir = new File(dirName);

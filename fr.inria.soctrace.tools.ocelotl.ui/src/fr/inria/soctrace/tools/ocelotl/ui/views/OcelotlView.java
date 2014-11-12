@@ -88,6 +88,7 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterCo
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
+import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
@@ -121,10 +122,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			dialog.setOverwrite(true);
 
 			Date aDate = new Date(System.currentTimeMillis());
-			String convertedDate = new SimpleDateFormat("dd-MM-yyyy hhmmss z").format(aDate);
-			
+			String convertedDate = new SimpleDateFormat("dd-MM-yyyy HHmmss z").format(aDate);
+			String fileName = ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId() + "_" + convertedDate;
+			fileName = FilenameValidator.checkNameValidity(fileName);
+				
 			// Set a default file name
-			dialog.setFileName(ocelotlParameters.getTrace().getAlias() + "_" + ocelotlParameters.getTrace().getId() + "_" + convertedDate);
+			dialog.setFileName(fileName);
 
 			String saveCachefile = dialog.open();
 
