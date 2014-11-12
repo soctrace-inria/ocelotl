@@ -8,8 +8,8 @@
 		<statistic_operator
 			class="fr.inria.soctrace.tools.ocelotl.statistics.operators.TemporalSummaryStat"
 			operator="Temporal Summary"
-			param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
-			param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"
+			param_config=""
+			param_win=""
 			metric_compatibility="ALL, VARIABLE"
 			aggregator_compatibility="2D, 3D"
 			selection_priority="1"
@@ -18,8 +18,8 @@
 		<statistic_operator
 			class="fr.inria.soctrace.tools.ocelotl.statistics.operators.TemporalStateSummaryStat"
 			operator="Temporal State Summary"
-			param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
-			param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"
+			param_config=""
+			param_win=""
 			metric_compatibility="STATE"
 			aggregator_compatibility="2D, 3D"
 			selection_priority="2"
