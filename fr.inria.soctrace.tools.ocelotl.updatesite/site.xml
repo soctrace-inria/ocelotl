@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/fr.inria.soctrace.tools.ocelotl.feature_1.0.4.beta.jar" id="fr.inria.soctrace.tools.ocelotl.feature" version="1.0.4.beta" os="linux" arch="x86,x86_64">
+      <category name="soctrace-inria"/>
+   </feature>
+   <category-def name="soctrace-inria" label="SoC-Trace Inria"/>
+</site>
