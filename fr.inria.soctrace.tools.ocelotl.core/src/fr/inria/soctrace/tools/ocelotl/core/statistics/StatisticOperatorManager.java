@@ -200,13 +200,20 @@ public class StatisticOperatorManager {
 		selectedOperatorName = name;
 		final Bundle mybundle = Platform.getBundle(operatorList.get(
 				selectedOperatorName).getBundle());
+		
+		String paramClassName = operatorList.get(selectedOperatorName).getParamConfig();
+		
+		// Check if a configuration class was provided
+		if(paramClassName.isEmpty())
+			return;
+		
 		try {
 			selectedConfig = (IStatisticOperatorConfig) mybundle.loadClass(
-					operatorList.get(selectedOperatorName).getParamConfig())
-					.newInstance();
+					paramClassName).newInstance();
 			parameters.setStatisticOperatorConfig((selectedConfig));
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException | NullPointerException e) {
+			e.printStackTrace();
 		}
 
 	}

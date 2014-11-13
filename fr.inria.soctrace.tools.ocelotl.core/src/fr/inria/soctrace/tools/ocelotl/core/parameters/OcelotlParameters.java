@@ -57,8 +57,8 @@ public class OcelotlParameters {
 	private int maxEventProducers = OcelotlDefaultParameterConstants.EventProducersPerQuery;
 	private int eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
 	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
-	private String timeAggOperator;
-	private String spaceAggOperator;
+	private String dataAggOperator;
+	private String visuOperator;
 	private String statOperator;
 	private String microModelType;
 	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
@@ -88,8 +88,8 @@ public class OcelotlParameters {
 		this.threshold = op.threshold;
 		this.trace = op.trace;
 		this.maxEventProducers = op.maxEventProducers;
-		this.timeAggOperator = op.timeAggOperator;
-		this.spaceAggOperator = op.spaceAggOperator;
+		this.dataAggOperator = op.dataAggOperator;
+		this.visuOperator = op.visuOperator;
 		this.microModelType = op.microModelType;
 		this.growingQualities = op.growingQualities;
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
@@ -119,16 +119,16 @@ public class OcelotlParameters {
 		this.eventTypes = types;
 	}
 	
-	public String getSpaceAggOperator() {
-		return spaceAggOperator;
+	public String getVisuOperator() {
+		return visuOperator;
 	}
 
 	public double getThreshold() {
 		return threshold;
 	}
 
-	public String getTimeAggOperator() {
-		return timeAggOperator;
+	public String getDataAggOperator() {
+		return dataAggOperator;
 	}
 
 	public TimeRegion getTimeRegion() {
@@ -175,16 +175,16 @@ public class OcelotlParameters {
 		this.parameter = parameter;
 	}
 
-	public void setSpaceAggOperator(final String spaceAggOperator) {
-		this.spaceAggOperator = spaceAggOperator;
+	public void setVisuOperator(final String visuOperator) {
+		this.visuOperator = visuOperator;
 	}
 
 	public void setThreshold(final double threshold) {
 		this.threshold = threshold;
 	}
 
-	public void setTimeAggOperator(final String timeAggOperator) {
-		this.timeAggOperator = timeAggOperator;
+	public void setDataAggOperator(final String timeAggOperator) {
+		this.dataAggOperator = timeAggOperator;
 	}
 
 	public void setTimeRegion(final TimeRegion timeRegion) {

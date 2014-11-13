@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -29,7 +30,9 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
+import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 
 public abstract class MicroscopicDescription implements IMicroscopicDescription {
 	protected DataCache dataCache;
@@ -42,6 +45,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected int epit = 0;
 	protected int eventsNumber;
 	protected OcelotlQueries ocelotlQueries;
+	protected TimeSliceManager timeSliceManager;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MicroscopicDescription.class);
@@ -92,6 +96,14 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 	public void setDataCache(DataCache dataCache) {
 		this.dataCache = dataCache;
+	}
+
+	public TimeSliceManager getTimeSliceManager() {
+		return timeSliceManager;
+	}
+
+	public void setTimeSliceManager(TimeSliceManager timeSliceManager) {
+		this.timeSliceManager = timeSliceManager;
 	}
 
 	/**
@@ -431,6 +443,9 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		bufFileReader.close();
 	}
 
+	/**
+	 * Rebuild the matrix from the cache with no problem detected 
+	 */
 	public void rebuildClean(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException {
@@ -564,13 +579,23 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
-		Date convertedDate = new Date(System.currentTimeMillis());
+		Date theDate = new Date(System.currentTimeMillis());
 
-		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
-				+ parameters.getTrace().getAlias() + "_"
+		// Reformat the date to remove unsupported characters in file name (e.g.
+		// ":" on windows)
+		String convertedDate = new SimpleDateFormat("dd-MM-yyyy HHmmss z")
+				.format(theDate);
+		
+		String fileName = parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
 				+ parameters.getMicroModelType() + "_" + convertedDate;
-
+		
+		fileName = FilenameValidator.checkNameValidity(fileName);
+			
+		
+		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
+				+ fileName;
+		
 		// Write to file,
 		try {
 			PrintWriter writer = new PrintWriter(filePath, "UTF-8");
@@ -584,7 +609,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getMicroModelType()
 					+ OcelotlConstants.CSVDelimiter
-					+ parameters.getSpaceAggOperator()
+					+ parameters.getVisuOperator()
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getTimeRegion().getTimeStampStart()
 					+ OcelotlConstants.CSVDelimiter

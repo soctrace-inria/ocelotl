@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.lpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class Snapshot {
@@ -89,8 +91,8 @@ public class Snapshot {
 	 */
 	public String saveConfig(String aDirPath) {
 		String config = getParameters();
-
 		PrintWriter writer;
+		
 		try {
 			writer = new PrintWriter(aDirPath + "/parameters.txt", "UTF-8");
 
@@ -140,10 +142,12 @@ public class Snapshot {
 		output.append(theView.getParams().getTimeRegion().getTimeStampStart());
 		output.append("\nEnd timestamp: ");
 		output.append(theView.getParams().getTimeRegion().getTimeStampEnd());
-		output.append("\nTime Operator: ");
-		output.append(theView.getParams().getTimeAggOperator());
-		output.append("\nSpace Operator: ");
-		output.append(theView.getParams().getSpaceAggOperator());
+		output.append("\nMetric type: ");
+		output.append(theView.getParams().getMicroModelType());
+		output.append("\nAggregation Operator: ");
+		output.append(theView.getParams().getDataAggOperator());
+		output.append("\nVisualization Operator: ");
+		output.append(theView.getParams().getVisuOperator());
 		output.append("\nParameter: ");
 		output.append(theView.getParams().getParameter());
 		output.append("\nGain: ");
@@ -172,7 +176,12 @@ public class Snapshot {
 		}
 
 		Date aDate = new Date(System.currentTimeMillis());
-		dirName = snapshotDirectory + "/" + theView.getParams().getTrace().getAlias() + "_" + aDate.toString();
+		String convertedDate = new SimpleDateFormat("dd-MM-yyyy HHmmss z").format(aDate);
+		
+		String fileName = theView.getParams().getTrace().getAlias() + "_" + convertedDate;
+		fileName = FilenameValidator.checkNameValidity(fileName);
+			
+		dirName = snapshotDirectory + "/" + fileName;
 
 		// Create the specific snaphot directory
 		dir = new File(dirName);

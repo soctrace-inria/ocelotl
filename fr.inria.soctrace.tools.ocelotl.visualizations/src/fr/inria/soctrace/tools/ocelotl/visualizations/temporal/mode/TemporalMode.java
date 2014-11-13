@@ -61,7 +61,7 @@ public class TemporalMode extends VisuTOperator {
 		initParts();
 		initStates();
 		aggregateStates();
-		computeMajStates();
+		computeMainStates();
 	}
 
 	protected void initParts() {
@@ -100,7 +100,7 @@ public class TemporalMode extends VisuTOperator {
 		return ((TimeAggregation3Manager) timeManager).getKeys();
 	}
 
-	public void computeMajStates() {
+	public void computeMainStates() {
 		mainStates = new HashMap<Integer, MainState>();
 		double max = 0.0;
 		double tempMax = 0.0;

@@ -94,7 +94,6 @@ public class Overview implements IFramesocBusListener {
 		final XYLayout layout = new XYLayout();
 		root.setLayoutManager(layout);
 		canvas = new Canvas(parent, SWT.DOUBLE_BUFFERED);
-		canvas.setBackground(ColorConstants.white);
 		canvas.setSize(parent.getSize());
 		final LightweightSystem lws = new LightweightSystem(canvas);
 		lws.setContents(root);

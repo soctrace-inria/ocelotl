@@ -19,6 +19,7 @@ Import-Package: fr.inria.soctrace.framesoc.core.bus,
  fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.microdesc,
  fr.inria.soctrace.tools.ocelotl.core.parameters,
+ fr.inria.soctrace.tools.ocelotl.core.statistics,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
  fr.inria.soctrace.tools.ocelotl.core.timeslice,
  fr.inria.soctrace.tools.ocelotl.ui.loaders,
@@ -26,3 +27,4 @@ Import-Package: fr.inria.soctrace.framesoc.core.bus,
  fr.inria.soctrace.tools.ocelotl.ui.views.statview,
  org.eclipse.wb.swt,
  org.slf4j
+Export-Package: fr.inria.soctrace.tools.ocelotl.statistics.operators

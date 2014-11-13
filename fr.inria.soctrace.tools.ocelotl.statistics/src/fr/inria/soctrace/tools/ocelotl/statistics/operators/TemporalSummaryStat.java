@@ -13,6 +13,7 @@ import fr.inria.soctrace.framesoc.ui.model.TableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.statistics.view.OcelotlStatisticsTableColumn;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -26,10 +27,8 @@ public class TemporalSummaryStat extends StatisticsProvider {
 
 	public TemporalSummaryStat(OcelotlView aView) {
 		super(aView);
-		microModel = (Microscopic3DDescription) ocelotlview.getOcelotlCore()
-				.getMicroModel();
 	}
-
+	
 	@Override
 	public void computeData() {
 		int i;
@@ -40,10 +39,10 @@ public class TemporalSummaryStat extends StatisticsProvider {
 
 		// Get the corresponding time slices
 		int startingSlice = (int) microModel.getTimeSliceManager()
-				.getTimeSlice(timeRegion.getTimeStampStart());
+				.getTimeSlice(timeRegion.getTimeStampStart() + 1);
 		int endingSlice = (int) microModel.getTimeSliceManager().getTimeSlice(
 				timeRegion.getTimeStampEnd());
-
+		
 		// Get data from the microscopic model
 		for (i = startingSlice; i <= endingSlice; i++) {
 			for (EventProducer ep : microModel.getMatrix().get(i).keySet()) {
@@ -71,7 +70,7 @@ public class TemporalSummaryStat extends StatisticsProvider {
 			double proportion = 0.0;
 			// If there was no value in the selected zone, let proportion at 0
 			if (total != 0)
-				proportion = (data.get(ep) / total) * 100.0;
+				proportion = (data.get(ep) / total) * 100;
 			
 			statData.add(new SummaryStatModel(ep, data.get(ep),
 					proportion, FramesocColorManager
@@ -82,11 +81,16 @@ public class TemporalSummaryStat extends StatisticsProvider {
 	/**
 	 * Get the currently selected time region from the ocelotl view
 	 */
-	private void setupTimeRegion() {
-		Long startingDate = Long.valueOf(ocelotlview.getTextTimestampStart()
-				.getText());
-		Long endingDate = Long.valueOf(ocelotlview.getTextTimestampEnd()
-				.getText());
+	protected void setupTimeRegion() {
+		TimeRegion currentTimeregion = microModel.getTimeSliceManager()
+				.getTimeRegion();
+
+		// If we perform a reset on the timestamp, make sure we don't take
+		// values higher than the current region
+		Long startingDate = Math.max(currentTimeregion.getTimeStampStart(),
+				Long.valueOf(ocelotlview.getTextTimestampStart().getText()));
+		Long endingDate = Math.min(currentTimeregion.getTimeStampEnd(),
+				Long.valueOf(ocelotlview.getTextTimestampEnd().getText()));
 
 		timeRegion = new TimeRegion(startingDate, endingDate);
 	}
@@ -94,6 +98,10 @@ public class TemporalSummaryStat extends StatisticsProvider {
 	@Override
 	public List<SummaryStatModel> getTableData() {
 		return statData;
+	}
+	
+	public void setMicroMode(MicroscopicDescription aMicroModel) {
+		microModel = (Microscopic3DDescription) aMicroModel;
 	}
 
 	@Override

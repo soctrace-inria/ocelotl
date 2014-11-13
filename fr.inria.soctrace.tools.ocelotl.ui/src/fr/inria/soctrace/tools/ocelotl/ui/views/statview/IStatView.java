@@ -19,6 +19,8 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.statview;
 
+import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticsProvider;
+
 
 public interface IStatView {
 
@@ -31,4 +33,7 @@ public interface IStatView {
 	public void resizeDiagram();
 
 	public void updateData();
+	
+	public void setStatProvider(IStatisticsProvider aStatProvider);
+	
 }

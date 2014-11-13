@@ -768,11 +768,11 @@ public class DataCache {
 			}
 
 			if (!params.getTimeAggOperator().equals("null")) {
-				oParam.setTimeAggOperator(params.getTimeAggOperator());
+				oParam.setDataAggOperator(params.getTimeAggOperator());
 			}
 
 			if (!params.getSpaceAggOperator().equals("null")) {
-				oParam.setSpaceAggOperator(params.getSpaceAggOperator());
+				oParam.setVisuOperator(params.getSpaceAggOperator());
 			}
 		}
 

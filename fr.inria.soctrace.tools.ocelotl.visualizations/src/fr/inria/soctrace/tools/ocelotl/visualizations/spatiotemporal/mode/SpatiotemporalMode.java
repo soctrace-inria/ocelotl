@@ -64,6 +64,7 @@ public class SpatiotemporalMode extends VisuSTOperator {
 			proportions.get(node).add(new HashMap<String, Double>());
 			// And for each state of the part
 			for (String state : getStates())
+				// Init to zero
 				proportions.get(node).get(i).put(state, 0.0);
 		}
 		// If node is a leaf
@@ -113,7 +114,7 @@ public class SpatiotemporalMode extends VisuSTOperator {
 	 *            the index of the ending slice
 	 * @return the state with the biggest proportion
 	 */
-	public MainState getMajState(EventProducerNode epn, int start, int end) {
+	public MainState getMainState(EventProducerNode epn, int start, int end) {
 		double max = 0.0;
 		MainState maj = new MainState(Void, max);
 		for (String state : getStates()) {

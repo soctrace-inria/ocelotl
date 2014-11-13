@@ -294,7 +294,7 @@ public class SpatiotemporalModeView extends MatrixView {
 		private void drawStandardAggregate(int logicX, int logicY, int logicX2,
 				int sizeY, int number, EventProducerNode epn) {
 			final RectangleFigure rectangle = new RectangleFigure();
-			MainState state = spatiotemporalMode.getMajState(epn, logicX, logicX2);
+			MainState state = spatiotemporalMode.getMainState(epn, logicX, logicX2);
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()
 					.getEventTypeColor(state.getState()).getSwtColor());
 			rectangle.setForegroundColor(FramesocColorManager.getInstance()
@@ -332,7 +332,7 @@ public class SpatiotemporalModeView extends MatrixView {
 		private void drawVisualAggregate(int logicX, int logicY, int logicX2,
 				int sizeY, int number, EventProducerNode epn, boolean clean) {
 			final RectangleFigure rectangle = new RectangleFigure();
-			MainState state = spatiotemporalMode.getMajState(epn, logicX, logicX2);
+			MainState state = spatiotemporalMode.getMainState(epn, logicX, logicX2);
 			String label=" " + epn.getMe().getName() + " ("
 					+ state.getState() + ", " + state.getAmplitude100() + "%) ";
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()
