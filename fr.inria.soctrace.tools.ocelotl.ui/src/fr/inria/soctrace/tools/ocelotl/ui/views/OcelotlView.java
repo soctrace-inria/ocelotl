@@ -35,8 +35,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -67,7 +65,6 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -78,8 +75,8 @@ import fr.inria.soctrace.framesoc.ui.model.GanttTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.HistogramTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.PieTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TableTraceIntervalAction;
-import fr.inria.soctrace.framesoc.ui.model.TraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
+import fr.inria.soctrace.framesoc.ui.perspective.FramesocPart;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
@@ -108,7 +105,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class OcelotlView extends ViewPart implements IFramesocBusListener {
+public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 	private class SaveDataListener extends SelectionAdapter {
 
@@ -696,15 +693,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		return takeSnapshot;
 	}
 
-	private void enableActions(boolean enabled) {
-		IActionBars actionBars = getViewSite().getActionBars();
-		IToolBarManager toolBar = actionBars.getToolBarManager();
-		for (IContributionItem item : toolBar.getItems()) {
-			if (item instanceof ActionContributionItem) {
-				((ActionContributionItem) item).getAction().setEnabled(enabled);
-			}
-		}
-	}
+	/*
+	 * private void enableActions(boolean enabled) { IActionBars actionBars =
+	 * getViewSite().getActionBars(); IToolBarManager toolBar =
+	 * actionBars.getToolBarManager(); for (IContributionItem item :
+	 * toolBar.getItems()) { if (item instanceof ActionContributionItem) {
+	 * ((ActionContributionItem) item).getAction().setEnabled(enabled); } } }
+	 */
 
 	private class TraceAdapter extends SelectionAdapter {
 		private Trace	trace;
@@ -894,7 +889,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		super.dispose();
 	}
 
-	private TraceIntervalDescriptor getIntervalDescriptor() {
+	@Override
+	protected TraceIntervalDescriptor getIntervalDescriptor() {
 		if (confDataLoader.getCurrentTrace() == null)
 			return null;
 		TraceIntervalDescriptor des = new TraceIntervalDescriptor();
@@ -902,42 +898,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		des.setStartTimestamp(getTimeRegion().getTimeStampStart());
 		des.setEndTimestamp(getTimeRegion().getTimeStampEnd());
 		return des;
-	}
-	
-	private TraceIntervalAction createTableAction() {
-		return new TableTraceIntervalAction() {
-			@Override
-			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
-				return getIntervalDescriptor();
-			}
-		};
-	}
-
-	private TraceIntervalAction createGanttAction() {
-		return new GanttTraceIntervalAction() {
-			@Override
-			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
-				return getIntervalDescriptor();
-			}
-		};
-	}
-
-	private TraceIntervalAction createPieAction() {
-		return new PieTraceIntervalAction() {
-			@Override
-			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
-				return getIntervalDescriptor();
-			}
-		};
-	}
-	
-	private TraceIntervalAction createHistogramAction() {
-		return new HistogramTraceIntervalAction() {
-			@Override
-			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
-				return getIntervalDescriptor();
-			}
-		};
 	}
 
 	@Override
@@ -1211,12 +1171,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		final IActionBars actionBars = getViewSite().getActionBars();
 		final IToolBarManager toolBar = actionBars.getToolBarManager();
-		
+
 		TableTraceIntervalAction.add(toolBar, createTableAction());
 		GanttTraceIntervalAction.add(toolBar, createGanttAction());
 		PieTraceIntervalAction.add(toolBar, createPieAction());
 		HistogramTraceIntervalAction.add(toolBar, createHistogramAction());
-		
+
 		toolBar.add(new Separator());
 
 		toolBar.add(createSettingWindow(this));
@@ -1561,5 +1521,21 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void createFramesocPartControl(Composite parent) {
+		createPartControl(parent);
+	}
+
+	@Override
+	public String getId() {
+		// TODO Auto-generated method stub
+		return "Toto";
+	}
+
+	@Override
+	public void showTrace(Trace trace, Object data) {
+		// TODO Auto-generated method stub
 	}
 }
