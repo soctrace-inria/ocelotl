@@ -42,10 +42,12 @@ public class EventProducerHierarchy {
 		private EventProducerNode parentNode;
 		private List<EventProducerNode> childrenNodes = new ArrayList<EventProducerNode>();
 		private List<Integer> parts;
+		// Number of leaf event producers in the node
 		private int weight = 1;
 		private Aggregation aggregated = Aggregation.NULL;
 		private Object values;
 		private int index;
+		private int hierarchyLevel;
 
 		public EventProducerNode(EventProducer ep) {
 			if(ep == null)
@@ -126,6 +128,9 @@ public class EventProducerHierarchy {
 			return childrenNodes;
 		}
 
+		/**
+		 * Sort children nodes alphabetically
+		 */
 		public void sortChildrenNodes() {
 			Collections.sort(childrenNodes,
 					new Comparator<EventProducerNode>() {
@@ -171,6 +176,12 @@ public class EventProducerHierarchy {
 				values = null;
 		}
 
+		/**
+		 * Compute the weight (number of leaves in the node) for the node and
+		 * recursively for all its children
+		 * 
+		 * @return the newly computed weight
+		 */
 		public int setWeight() {
 			if (childrenNodes.isEmpty())
 				return weight;
@@ -182,6 +193,11 @@ public class EventProducerHierarchy {
 			return weight;
 		}
 
+		/**
+		 * Recursively compute the index of the node based on the sum of the
+		 * weights of the previous children so that each node indicates the
+		 * previous leaves in the sorting order (currently alphabetical)
+		 */
 		public void setChildIndex() {
 			if (this == root) {
 				index = 0;
@@ -201,6 +217,51 @@ public class EventProducerHierarchy {
 
 		public void setIndex(int index) {
 			this.index = index;
+		}
+		
+		/**
+		 * Check whether or not the current epn contain another epn
+		 * 
+		 * @param anEpn
+		 * @return true if is the same or one of the children is the same, false
+		 *         otherwise
+		 */
+		public boolean contains(EventProducerNode anEpn) {
+			if (this == anEpn)
+				return true;
+
+			if (!childrenNodes.isEmpty()) {
+				for (EventProducerNode epn : childrenNodes) {
+					if (epn.contains(anEpn))
+						return true;
+				}
+			}
+			return false;
+		}
+		
+		public List<EventProducerNode> containsAll(List<EventProducerNode> epns) {
+			ArrayList<EventProducerNode> containingEpn = new ArrayList<EventProducerNode>();
+			boolean containsAll = true;
+			
+
+			for (EventProducerNode anEpn : epns) {
+				if (!contains(anEpn)) {
+					containsAll = false;
+					break;
+				}
+			}
+
+			if (containsAll)
+				containingEpn.add(this);
+		
+
+			if (!childrenNodes.isEmpty()) {
+				for (EventProducerNode epnChild : this.getChildrenNodes()) {
+					containingEpn.addAll(epnChild.containsAll(epns));		
+				}
+			}
+
+			return containingEpn;
 		}
 	}
 
@@ -224,6 +285,7 @@ public class EventProducerHierarchy {
 			if (!eventProducerNodes.containsKey(ep.getId()))
 				eventProducerNodes.put(ep.getId(), new EventProducerNode(ep));
 		}
+		// If there are some node with no parent
 		if (!orphans.isEmpty()) {
 		//	System.err.println("Careful: hierarchy is incomplete and some elements will be destroyed!");
 			throw new OcelotlException(OcelotlException.INCOMPLETE_HIERARCHY);
@@ -289,5 +351,15 @@ public class EventProducerHierarchy {
 	public Object getValues(int id) {
 		return eventProducerNodes.get(id).getValues();
 	}
+	
+	public EventProducerNode findSmallestContainingNode(List<EventProducerNode> epns) {
+		ArrayList<EventProducerNode> containingEpn = new ArrayList<EventProducerNode>();
+		containingEpn.addAll(root.containsAll(epns));
+		
+		//smallest nodechildren
+		//embedding all epns
+		return containingEpn.get(0);
+	}
+	
 
 }

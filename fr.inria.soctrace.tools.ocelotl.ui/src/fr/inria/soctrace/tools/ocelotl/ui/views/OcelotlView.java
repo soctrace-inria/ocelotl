@@ -319,7 +319,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				running = true;
 			}
 
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ || hasChanged == HasChanged.PARAMETER) {
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER) {
 				hasChanged = HasChanged.PARAMETER;
 			} else {
 				textRun.setText("1.0");
@@ -575,7 +575,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			} catch (final NumberFormatException err) {
 				textRun.setText("0");
 			}
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.EQ)
+			if (hasChanged == HasChanged.NOTHING)
 				hasChanged = HasChanged.PARAMETER;
 		}
 	}

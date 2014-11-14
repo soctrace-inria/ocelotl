@@ -33,15 +33,15 @@ public class SpatiotemporalModeView extends MatrixView {
 	public SpatiotemporalModeView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
 	}
-	
+
 	public class DrawSpatialMode {
 
 		private static final int ColorThreshold = 175;
 		private static final int AlphaThreshold = 190;
-		int spaceClean=8;
-		int spaceDirty=10;
-		int spaceDirty2=1;
-		int iterationDirty=3;
+		int spaceClean = 8;
+		int spaceDirty = 10;
+		int spaceDirty2 = 1;
+		int iterationDirty = 3;
 		private int rectangleBorder = 1;
 		private double rootHeight;
 		private double height;
@@ -74,7 +74,8 @@ public class SpatiotemporalModeView extends MatrixView {
 		private void initY() {
 			yendlist.clear();
 			for (int i = 0; i <= hierarchy.getRoot().getWeight(); i++)
-				yendlist.add((int) (rootHeight - height + i * logicHeight - space - aBorder));
+				yendlist.add((int) (rootHeight - height + i * logicHeight
+						- space - aBorder));
 		}
 
 		public void draw() {
@@ -83,10 +84,11 @@ public class SpatiotemporalModeView extends MatrixView {
 			width = root.getSize().width - (2 * aBorder);
 			logicWidth = width / (hierarchy.getRoot().getParts().size());
 			logicHeight = height / hierarchy.getRoot().getWeight();
+			epnMapping = new HashMap<Rectangle, EventProducerNode>();
 			initX();
 			initY();
-			print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot().getParts()
-					.size());
+			print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot()
+					.getParts().size());
 		}
 
 		/**
@@ -100,7 +102,8 @@ public class SpatiotemporalModeView extends MatrixView {
 		 *            the ending time slice
 		 * @return a list of temporal TemporalPartition
 		 */
-		private List<Part> computeParts(EventProducerNode epn, int start, int end) {
+		private List<Part> computeParts(EventProducerNode epn, int start,
+				int end) {
 			List<Part> parts = new ArrayList<Part>();
 			int oldPart = epn.getParts().get(start);
 			// Init part
@@ -125,8 +128,8 @@ public class SpatiotemporalModeView extends MatrixView {
 		}
 
 		/**
-		 * Print the matrix of data for a given eventproducerNode and for a given
-		 * time range
+		 * Print the matrix of data for a given eventproducerNode and for a
+		 * given time range
 		 * 
 		 * @param id
 		 *            id of the eventProducerNode
@@ -146,12 +149,12 @@ public class SpatiotemporalModeView extends MatrixView {
 							p.getEndPart(), epn.getWeight(),
 							((VisualAggregation) p.getData()).getValue(), epn);
 				else {
-					// Check for each child that we have enough vertical space to
-					// display them
+					// Check for each child that we have enough vertical space
+					// to display them
 					boolean aggy = false;
 					for (EventProducerNode ep : epn.getChildrenNodes()) {
-						// if the space needed to print an element is smaller than 1
-						// pixel
+						// if the space needed to print an element is smaller
+						// than 1 pixel
 						if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
 							// Aggregate
 							aggy = true;
@@ -166,16 +169,15 @@ public class SpatiotemporalModeView extends MatrixView {
 						List<Part> aggParts = computeCommonCuts(epn,
 								p.getStartPart(), p.getEndPart());
 						for (Part pagg : aggParts) {
-							// Does the aggregated data contain some temporal cut
+							// Does the aggregated data contain some temporal
+							// cut
 							boolean hasNoCut = ((VisualAggregation) pagg
 									.getData()).isNoCutInside();
-							drawVisualAggregate(
-									pagg.getStartPart(),
-									epn.getIndex(),
-									pagg.getEndPart(),
+							drawVisualAggregate(pagg.getStartPart(),
+									epn.getIndex(), pagg.getEndPart(),
 									epn.getWeight(),
-									((VisualAggregation) p.getData()).getValue(),
-									epn, hasNoCut);
+									((VisualAggregation) p.getData())
+											.getValue(), epn, hasNoCut);
 						}
 					}
 				}
@@ -183,7 +185,8 @@ public class SpatiotemporalModeView extends MatrixView {
 		}
 
 		/**
-		 * Compute the common cut between the event producer node and its children
+		 * Compute the common cut between the event producer node and its
+		 * children
 		 * 
 		 * @param epn
 		 *            the event producer node
@@ -260,23 +263,24 @@ public class SpatiotemporalModeView extends MatrixView {
 								.getStartPart())
 					// Add a new part in the gap between the last part and the
 					// current common part
-					parts.add(new Part(parts.get(parts.size() - 1).getEndPart(),
-							ptemp.getStartPart(), new VisualAggregation(true,
-									false, -1, false)));
+					parts.add(new Part(
+							parts.get(parts.size() - 1).getEndPart(), ptemp
+									.getStartPart(), new VisualAggregation(
+									true, false, -1, false)));
 				// Add the common part
 				parts.add(ptemp);
 			}
 			// if the last part does not go until the end time slice
 			if (parts.get(parts.size() - 1).getEndPart() != end)
 				// Add a part to fill the gap
-				parts.add(new Part(parts.get(parts.size() - 1).getEndPart(), end,
-						new VisualAggregation(true, false, -1, false)));
+				parts.add(new Part(parts.get(parts.size() - 1).getEndPart(),
+						end, new VisualAggregation(true, false, -1, false)));
 			return parts;
 		}
 
 		/**
-		 * Recursively print all the children of the event producer with the given
-		 * id
+		 * Recursively print all the children of the event producer with the
+		 * given id
 		 * 
 		 * @param id
 		 *            id of the event producer
@@ -286,15 +290,16 @@ public class SpatiotemporalModeView extends MatrixView {
 		 *            ending slice
 		 */
 		private void printChildren(int id, int start, int end) {
-			for (EventProducerNode ep : hierarchy.getEventProducerNodes().get(id)
-					.getChildrenNodes())
+			for (EventProducerNode ep : hierarchy.getEventProducerNodes()
+					.get(id).getChildrenNodes())
 				print(ep.getID(), start, end);
 		}
 
 		private void drawStandardAggregate(int logicX, int logicY, int logicX2,
 				int sizeY, int number, EventProducerNode epn) {
 			final RectangleFigure rectangle = new RectangleFigure();
-			MainState state = spatiotemporalMode.getMainState(epn, logicX, logicX2);
+			MainState state = spatiotemporalMode.getMainState(epn, logicX,
+					logicX2);
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()
 					.getEventTypeColor(state.getState()).getSwtColor());
 			rectangle.setForegroundColor(FramesocColorManager.getInstance()
@@ -302,14 +307,20 @@ public class SpatiotemporalModeView extends MatrixView {
 			rectangle.setAlpha(state.getAmplitude255Shifted());
 			rectangle.setLineWidth(1);
 
-			rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " ("
-					+ state.getState() + ", " + state.getAmplitude100() + "%) "));
-			
+			rectangle
+					.setToolTip(new Label(" " + epn.getMe().getName() + " ("
+							+ state.getState() + ", " + state.getAmplitude100()
+							+ "%) "));
+
 			int xa = (int) ((logicX * logicWidth + aBorder));
 			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
 			int xb = xendlist.get(logicX2);
 			int yb = yendlist.get(logicY + sizeY);
-			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
+			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb,
+					yb)));
+			
+			epnMapping.put(new Rectangle(new Point(xa, ya), new Point(xb,
+					yb)), epn);
 		}
 
 		/**
@@ -322,8 +333,9 @@ public class SpatiotemporalModeView extends MatrixView {
 		 * @param logicY
 		 * @param logicX2
 		 * @param sizeY
+		 *	Height of the aggregate (number of represented leave nodes)
 		 * @param number
-		 * ?? (not used: to delete ?) 
+		 *            ?? (not used: to delete ?)
 		 * @param epn
 		 *            the event producer
 		 * @param clean
@@ -332,8 +344,9 @@ public class SpatiotemporalModeView extends MatrixView {
 		private void drawVisualAggregate(int logicX, int logicY, int logicX2,
 				int sizeY, int number, EventProducerNode epn, boolean clean) {
 			final RectangleFigure rectangle = new RectangleFigure();
-			MainState state = spatiotemporalMode.getMainState(epn, logicX, logicX2);
-			String label=" " + epn.getMe().getName() + " ("
+			MainState state = spatiotemporalMode.getMainState(epn, logicX,
+					logicX2);
+			String label = " " + epn.getMe().getName() + " ("
 					+ state.getState() + ", " + state.getAmplitude100() + "%) ";
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()
 					.getEventTypeColor(state.getState()).getSwtColor());
@@ -345,74 +358,84 @@ public class SpatiotemporalModeView extends MatrixView {
 			rectangle.setToolTip(new Label(label));
 			rectangle.setLayoutManager(new BorderLayout());
 			rectangle.setPreferredSize(1000, 1000);
-			
+
 			Label lab = new Label("?");
 			lab.setTextAlignment(PositionConstants.CENTER);
 			lab.setLabelAlignment(SWT.CENTER);
 			lab.setForegroundColor(ColorConstants.black);
-			rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
+			rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11,
+					SWT.BOLD));
 
 			int xa = (int) ((logicX * logicWidth + aBorder));
 			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
 			int xb = xendlist.get(logicX2);
 			int yb = yendlist.get(logicY + sizeY);
-			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
-					
+			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb,
+					yb)));
 			
-			if (!clean){
+			epnMapping.put(new Rectangle(new Point(xa, ya), new Point(xb,
+					yb)), epn);
+
+			if (!clean) {
 				drawTextureDirty(xa, xb, ya, yb, label);
-			}else{
+			} else {
 				drawTextureClean(xa, xb, ya, yb, label);
 			}
 		}
 
-		private void drawTextureClean(int xa, int xb, int ya, int yb, String label) {
-			for (int x=xa+spaceClean-yb+ya; x<(xb); x=x+spaceClean+1){
+		private void drawTextureClean(int xa, int xb, int ya, int yb,
+				String label) {
+			for (int x = xa + spaceClean - yb + ya; x < (xb); x = x
+					+ spaceClean + 1) {
 				final PolylineConnection line = new PolylineConnection();
-				int xinit=x;
-				int yinit=ya;
-				int xfinal=Math.min(xb, (xinit+(yb-ya)));
-				int yfinal=Math.min(yb, ya+xfinal-xinit);
-				if (xa>xinit){
-					yinit=Math.min(yb,ya-xinit+xa);
-					xinit=xa;
+				int xinit = x;
+				int yinit = ya;
+				int xfinal = Math.min(xb, (xinit + (yb - ya)));
+				int yfinal = Math.min(yb, ya + xfinal - xinit);
+				if (xa > xinit) {
+					yinit = Math.min(yb, ya - xinit + xa);
+					xinit = xa;
 				}
 				line.setBackgroundColor(ColorConstants.white);
 				line.setForegroundColor(ColorConstants.white);
-				line.setEndpoints(new Point(xinit, yinit), new Point(xfinal, yfinal));
+				line.setEndpoints(new Point(xinit, yinit), new Point(xfinal,
+						yfinal));
 				line.setLineWidth(1);
 				line.setAntialias(SWT.ON);
 				line.setToolTip(new Label(label));
-				root.add(line);		
+				root.add(line);
 			}
 		}
 
-		private void drawTextureDirty(int xa, int xb, int ya, int yb, String label) {
-			int i=0;
-			for (int x=xa+spaceDirty2; x<(xb+yb-ya); x=x+spaceDirty2+1){
+		private void drawTextureDirty(int xa, int xb, int ya, int yb,
+				String label) {
+			int i = 0;
+			for (int x = xa + spaceDirty2; x < (xb + yb - ya); x = x
+					+ spaceDirty2 + 1) {
 				i++;
-				if (i>iterationDirty-1){
-					i=0;
-					x+=spaceDirty;
+				if (i > iterationDirty - 1) {
+					i = 0;
+					x += spaceDirty;
 				}
 				final PolylineConnection line = new PolylineConnection();
-				int xinit=x;
-				int yinit=ya;
-				int xfinal=Math.max(xa, (xinit-(yb-ya)));
-				int yfinal=Math.min(yb, ya+xinit-xfinal);
-				if (xb<xinit){
-					yinit=Math.min(yb,ya+xinit-xb);
-					xinit=xb;
+				int xinit = x;
+				int yinit = ya;
+				int xfinal = Math.max(xa, (xinit - (yb - ya)));
+				int yfinal = Math.min(yb, ya + xinit - xfinal);
+				if (xb < xinit) {
+					yinit = Math.min(yb, ya + xinit - xb);
+					xinit = xb;
 				}
 				line.setBackgroundColor(ColorConstants.white);
 				line.setForegroundColor(ColorConstants.white);
-				line.setEndpoints(new Point(xinit, yinit), new Point(xfinal, yfinal));
+				line.setEndpoints(new Point(xinit, yinit), new Point(xfinal,
+						yfinal));
 				line.setLineWidth(1);
 				line.setAntialias(SWT.ON);
 				line.setToolTip(new Label(label));
-				root.add(line);	
+				root.add(line);
 			}
-			
+
 		}
 
 		@SuppressWarnings("unused")

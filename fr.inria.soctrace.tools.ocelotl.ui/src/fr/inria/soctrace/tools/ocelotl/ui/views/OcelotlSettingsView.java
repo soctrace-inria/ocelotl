@@ -217,7 +217,7 @@ public class OcelotlSettingsView extends Dialog {
 		if (settings.getThresholdPrecision() != textThresholdValue) {
 			settings.setThresholdPrecision(textThresholdValue);
 
-			if (ocelotlView.getHasChanged() == HasChanged.NOTHING || ocelotlView.getHasChanged() == HasChanged.EQ || ocelotlView.getHasChanged() == HasChanged.PARAMETER)
+			if (ocelotlView.getHasChanged() == HasChanged.NOTHING || ocelotlView.getHasChanged() == HasChanged.PARAMETER)
 				ocelotlView.setHasChanged(HasChanged.THRESHOLD);
 		}
 	}

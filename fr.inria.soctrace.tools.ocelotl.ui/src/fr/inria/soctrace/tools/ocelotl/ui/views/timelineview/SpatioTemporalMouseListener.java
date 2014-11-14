@@ -1,14 +1,20 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
+import java.util.ArrayList;
+
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.State;
 
@@ -22,7 +28,7 @@ public class SpatioTemporalMouseListener implements MouseListener, MouseMotionLi
 	Shell						shell		= display.getActiveShell();
 	long						fixed;
 	AggregatedView				aggregatedView;
-	int originY;
+	int originY, originX;
 
 	public SpatioTemporalMouseListener(AggregatedView theview) {
 		super();
@@ -104,6 +110,7 @@ public class SpatioTemporalMouseListener implements MouseListener, MouseMotionLi
 			currentPoint = arg0.getLocation();
 			long p3 = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
 			if (state == State.MOVE_START) {
+				originX = arg0.getLocation().x();
 				originY = arg0.getLocation().y();
 				p3 = aggregatedView.selectTime.getTimeStampStart();
 				fixed = aggregatedView.selectTime.getTimeStampEnd();
@@ -114,6 +121,7 @@ public class SpatioTemporalMouseListener implements MouseListener, MouseMotionLi
 				state = State.DRAG_G;
 			} else {
 				state = State.PRESSED_G;
+				originX = arg0.getLocation().x();
 				originY = arg0.getLocation().y();
 				p3 = Math.max(p3, aggregatedView.resetTime.getTimeStampStart());
 				p3 = Math.min(p3, aggregatedView.resetTime.getTimeStampEnd());
@@ -159,13 +167,69 @@ public class SpatioTemporalMouseListener implements MouseListener, MouseMotionLi
 					break;
 				}
 			
+			SpaceTimeAggregation2Manager STManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
+			EventProducerHierarchy hierarchy = STManager.getHierarchy();
+			
 			// Compute the selected spatiotemporal region
 			int y1 = arg0.y;
+			
+			Rectangle currentRect = new Rectangle(originX, originY, arg0.x - originX, y1 - originY);
+			ArrayList<EventProducerNode> currentProducers = new ArrayList<EventProducerNode>();
+			
+			// 
+			for (Rectangle aRect : aggregatedView.epnMapping.keySet()) {
+				if (currentRect.intersects(aRect)) {
+					currentProducers.add(aggregatedView.epnMapping.get(aRect));
+				}
+			}
+			
+			int embeddedEpn = 0;
+			int tempCount = 0;
+			EventProducerNode selectedNode = currentProducers.get(0);
+			// Find the top epn that encompasses all the selected ones
+			for (EventProducerNode anEPN : currentProducers) {
+				tempCount = 0;
+				for (EventProducerNode otherEPN : currentProducers) {
+					if (anEPN.contains(otherEPN))
+						tempCount++;
+				}
+				if (tempCount > embeddedEpn) {
+					embeddedEpn = tempCount;
+					selectedNode = anEPN;
+				}
+			}
+
+			if (embeddedEpn != currentProducers.size()) {
+				selectedNode = hierarchy.findSmallestContainingNode(currentProducers);
+			}
+
+			//Compute the selection (cf. SpatioTemporalModeView) 
+			
 			//compute height (root.height) + logic height
 			int rootHeight = aggregatedView.root.getSize().height;
 			int height = rootHeight - aggregatedView.aBorder;
+	
 			int logicHeight = height / hierarchy.getRoot().getWeight();
-			//then compute correspondence with the weight of each ep
+		
+			// then compute correspondence with the weight of each ep
+			for (EventProducerNode aChild : hierarchy.getRoot().getChildrenNodes()) {
+				if (aChild.getWeight() > originY) {
+					//originY = aChild.getIndex() * logicHeight;
+					originY = (int) (rootHeight - height +  aChild.getIndex() * logicHeight - 5);
+					break;
+				}
+			}
+			
+			for (EventProducerNode aChild : hierarchy.getRoot().getChildrenNodes()) {
+				if (aChild.getWeight() > y1) {
+					//originY = aChild.getIndex() * logicHeight;
+					y1 = originY +  aChild.getWeight();
+					break;
+				}
+			}
+
+			int originWeight;
+			int cornerWeight;
 			
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
