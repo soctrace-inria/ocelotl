@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
@@ -46,7 +45,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
+
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -73,7 +72,6 @@ abstract public class AggregatedView implements IAggregatedView {
 	public final static Color				selectColorBG	= ColorConstants.lightGray;
 	public final static Color				activeColorFG	= ColorConstants.black;
 	public final static Color				activeColorBG	= ColorConstants.darkBlue;
-	protected HashMap<Rectangle, EventProducerNode> epnMapping;
 	
 	class SelectFigure extends RectangleFigure {
 
@@ -271,7 +269,19 @@ abstract public class AggregatedView implements IAggregatedView {
 			}
 		});
 
-		final SpatioTemporalMouseListener mouse = new SpatioTemporalMouseListener(this);
+		OcelotlMouseListener mouse;
+		switch (ocelotlView.getOcelotlCore().getAggregOperators().getSelectedOperator().getAggregType()) {
+		case TEMPORAL:
+			mouse = new TemporalMouseListener(this);
+			break;
+		case SPATIOTEMPORAL:
+			mouse = new SpatioTemporalMouseListener(this);
+			break;
+		default:
+			mouse = new TemporalMouseListener(this);
+			break;
+		}
+
 		wrapper.cleanMouseListeners();
 		wrapper.cleanMouseMotionListeners();
 		wrapper.addMouseListener(mouse);

@@ -84,7 +84,6 @@ public class SpatiotemporalModeView extends MatrixView {
 			width = root.getSize().width - (2 * aBorder);
 			logicWidth = width / (hierarchy.getRoot().getParts().size());
 			logicHeight = height / hierarchy.getRoot().getWeight();
-			epnMapping = new HashMap<Rectangle, EventProducerNode>();
 			initX();
 			initY();
 			print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot()
@@ -318,9 +317,6 @@ public class SpatiotemporalModeView extends MatrixView {
 			int yb = yendlist.get(logicY + sizeY);
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb,
 					yb)));
-			
-			epnMapping.put(new Rectangle(new Point(xa, ya), new Point(xb,
-					yb)), epn);
 		}
 
 		/**
@@ -372,10 +368,6 @@ public class SpatiotemporalModeView extends MatrixView {
 			int yb = yendlist.get(logicY + sizeY);
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb,
 					yb)));
-			
-			epnMapping.put(new Rectangle(new Point(xa, ya), new Point(xb,
-					yb)), epn);
-
 			if (!clean) {
 				drawTextureDirty(xa, xb, ya, yb, label);
 			} else {

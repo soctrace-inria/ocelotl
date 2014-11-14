@@ -1,8 +1,6 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
@@ -12,7 +10,7 @@ import org.eclipse.swt.widgets.Shell;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.State;
 
-public class TemporalMouseListener implements MouseListener, MouseMotionListener {
+public class TemporalMouseListener extends OcelotlMouseListener {
 
 	private static final long	Threshold	= 5;
 	State						state		= State.RELEASED;

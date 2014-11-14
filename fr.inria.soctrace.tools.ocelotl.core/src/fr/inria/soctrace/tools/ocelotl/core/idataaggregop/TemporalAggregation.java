@@ -21,15 +21,22 @@ package fr.inria.soctrace.tools.ocelotl.core.idataaggregop;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.AggregationType;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregation3Manager;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 
 public class TemporalAggregation implements IDataAggregationOperator {
 
+	protected AggregationType aggregType = AggregationType.TEMPORAL;
+	
 	@Override
 	public TimeAggregation3Manager createManager(
 			MicroscopicDescription microMod, IProgressMonitor monitor) {
 		return new TimeAggregation3Manager(microMod, monitor);
 	}
 
+	@Override
+	public AggregationType getAggregType() {
+		return aggregType;
+	}
 }

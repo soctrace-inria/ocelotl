@@ -79,4 +79,9 @@ public class OcelotlConstants {
 	static final public int CONFIGURATION_NORMAL_SIZE = 12;
 
 	public static final String MultipleValueExtensionSeparator = ", ";
+	
+	static public enum AggregationType {
+		TEMPORAL, SPATIOTEMPORAL
+	}
+	
 }

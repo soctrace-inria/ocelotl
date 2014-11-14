@@ -29,7 +29,7 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 
 public interface IDataAggregManager {
-
+	
 	public void computeDichotomy() throws OcelotlException;
 
 	public void computeParts(double aParameter);

@@ -3,8 +3,6 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 import java.util.ArrayList;
 
 import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
@@ -17,7 +15,7 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTim
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.State;
 
-public class SpatioTemporalMouseListener implements MouseListener, MouseMotionListener {
+public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	private static final long	Threshold	= 5;
 	State						state		= State.RELEASED;
