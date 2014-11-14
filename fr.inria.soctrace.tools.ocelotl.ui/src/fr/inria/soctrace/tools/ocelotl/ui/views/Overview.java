@@ -23,11 +23,11 @@ import org.osgi.framework.Bundle;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
 import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
-import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
@@ -45,46 +45,47 @@ public class Overview implements IFramesocBusListener {
 	private Canvas						canvas;
 	private AggregatedView				timeLineView;
 	private boolean						redrawOverview;
-	private double						parameter = 0.0;
+	private double						parameter	= 0.0;
 	private int							timeSlice;
 
 	private TimeRegion					globalTimeRegion;
 	private TimeRegion					zoomedTimeRegion;
-	
+
 	// Show the currently displayed zone
 	private SelectFigure				displayedZone;
 	// Show the currently selected zone
 	private SelectFigure				selectedZone;
-	private int							Border	= 3;
-	
+	private int							Border		= 3;
+
 	/**
 	 * Followed topics
 	 */
-	protected FramesocBusTopicList		topics			= null;
+	protected FramesocBusTopicList		topics		= null;
 
 	public Overview(OcelotlView aView) {
 		super();
 		ocelotlView = aView;
 		redrawOverview = true;
 		globalTimeRegion = null;
-		
+
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
 		topics.registerAll();
 	}
-	
+
 	// When receiving a notification, update the trace list
 	@Override
 	public void handle(FramesocBusTopic topic, Object data) {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED) && aggregManager != null) {
 			createDiagram(globalTimeRegion);
-			displayedZone.draw(zoomedTimeRegion);
+			displayedZone.draw(zoomedTimeRegion, true);
 		}
 	}
 
 	/**
 	 * Initialize the canvas
+	 * 
 	 * @param parent
 	 * @return
 	 */
@@ -105,6 +106,7 @@ public class Overview implements IFramesocBusListener {
 
 	/**
 	 * Draw the diagram
+	 * 
 	 * @param time
 	 */
 	public void createDiagram(TimeRegion time) {
@@ -121,7 +123,7 @@ public class Overview implements IFramesocBusListener {
 		canvas.update();
 		if (aggregManager != null && globalTimeRegion != null) {
 			createDiagram(globalTimeRegion);
-			displayedZone.draw(zoomedTimeRegion);
+			displayedZone.draw(zoomedTimeRegion, true);
 		}
 		root.repaint();
 	}
@@ -138,7 +140,7 @@ public class Overview implements IFramesocBusListener {
 			redrawOverview = true;
 			globalTimeRegion = new TimeRegion(time);
 		}
-		
+
 		zoomedTimeRegion = new TimeRegion(time);
 
 		// is it necessary to change completely the computed model
@@ -147,14 +149,17 @@ public class Overview implements IFramesocBusListener {
 			microModel = ocelotlView.getOcelotlCore().getMicroModel();
 
 			// Init the aggregation operator
-	//		if (!ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator().equals(ocelotlView.getParams().getTimeAggOperator())) {
-				aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator());
-				aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
-				aggregManager.computeQualities();
-				aggregManager.computeDichotomy();
-		//	} else {
-		//		aggregManager = ocelotlView.getOcelotlCore().getLpaggregManager();
-			//}
+			// if
+			// (!ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator().equals(ocelotlView.getParams().getTimeAggOperator()))
+			// {
+			aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator());
+			aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
+			aggregManager.computeQualities();
+			aggregManager.computeDichotomy();
+			// } else {
+			// aggregManager =
+			// ocelotlView.getOcelotlCore().getLpaggregManager();
+			// }
 			parameter = ocelotlView.getOcelotlCore().computeInitialParameter();
 
 			// Compute the view according to the new parameter value
@@ -165,8 +170,8 @@ public class Overview implements IFramesocBusListener {
 			redrawOverview = false;
 			createDiagram(time);
 		}
-			
-		displayedZone.draw(time);
+
+		displayedZone.draw(time, true);
 		updateSelection(time);
 	}
 
@@ -192,7 +197,7 @@ public class Overview implements IFramesocBusListener {
 
 	public void updateSelection(TimeRegion time) {
 		// Update the selected region with the displayed region
-		selectedZone.draw(time);
+		selectedZone.draw(time, false);
 	}
 
 	/**
@@ -264,18 +269,17 @@ public class Overview implements IFramesocBusListener {
 		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
 		initSelectionFigure();
 	}
-	
+
 	public void initSelectionFigure() {
 		selectedZone = new SelectFigure(ColorConstants.black, ColorConstants.black);
-		displayedZone = new SelectFigure(ColorConstants.white, ColorConstants.white);
+		displayedZone = new SelectFigure(ColorConstants.black, ColorConstants.darkBlue);
 	}
-
 
 	public void reset() {
 		aggregManager = null;
 		globalTimeRegion = null;
 	}
-	
+
 	/**
 	 * Class for describing and displaying selected zones
 	 */
@@ -294,7 +298,7 @@ public class Overview implements IFramesocBusListener {
 			this.background = backGround;
 			setForegroundColor(this.foreground);
 			setBackgroundColor(this.background);
-			setAlpha(75);
+			setAlpha(90);
 		}
 
 		/**
@@ -302,8 +306,9 @@ public class Overview implements IFramesocBusListener {
 		 * 
 		 * @param timeRegion
 		 *            the time region (time boundaries of the region)
+		 * @param b
 		 */
-		public void draw(final TimeRegion timeRegion) {
+		public void draw(final TimeRegion timeRegion, boolean displayed) {
 			// If there is no zoom, don't show indicator
 			if (timeRegion.compareTimeRegion(globalTimeRegion)) {
 				delete();
@@ -312,9 +317,13 @@ public class Overview implements IFramesocBusListener {
 
 			if (getParent() != root)
 				root.add(this);
-			
-			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height),
-					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), 0)));
+
+			int delta = 0;
+			if (!displayed) {
+				delta = 2;
+			}
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height - delta),
+					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), delta)));
 			root.repaint();
 		}
 
