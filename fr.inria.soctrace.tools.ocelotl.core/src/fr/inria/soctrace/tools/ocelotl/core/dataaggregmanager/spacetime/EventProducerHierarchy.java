@@ -47,6 +47,8 @@ public class EventProducerHierarchy {
 		private Aggregation aggregated = Aggregation.NULL;
 		private Object values;
 		private int index;
+		// Depth in the hierarchy level of the node (the smaller, the higher
+		// in the hierarchy)
 		private int hierarchyLevel;
 
 		public EventProducerNode(EventProducer ep) {
@@ -57,6 +59,7 @@ public class EventProducerHierarchy {
 			id = me.getId();
 			orphans.put(id, this);
 			leaves.put(id, this);
+			hierarchyLevel = 0;
 			setParent();
 		}
 
@@ -99,6 +102,7 @@ public class EventProducerHierarchy {
 									.getParentId())));
 				parentNode = eventProducerNodes.get(me.getParentId());
 				parentNode.addChild(this);
+				hierarchyLevel = parentNode.getHierarchyLevel() + 1;
 				orphans.remove(id);
 
 			} catch (NullPointerException e) {
@@ -219,6 +223,14 @@ public class EventProducerHierarchy {
 			this.index = index;
 		}
 		
+		public int getHierarchyLevel() {
+			return hierarchyLevel;
+		}
+
+		public void setHierarchyLevel(int hierarchyLevel) {
+			this.hierarchyLevel = hierarchyLevel;
+		}
+
 		/**
 		 * Check whether or not the current epn contain another epn
 		 * 
@@ -239,11 +251,19 @@ public class EventProducerHierarchy {
 			return false;
 		}
 		
+		/**
+		 * Provide all the children nodes that contain the epn given as input
+		 * 
+		 * @param epns
+		 *            List of epn
+		 * @return The list of all the epn containg all the epn provided in
+		 *         parameters
+		 */
 		public List<EventProducerNode> containsAll(List<EventProducerNode> epns) {
 			ArrayList<EventProducerNode> containingEpn = new ArrayList<EventProducerNode>();
 			boolean containsAll = true;
 			
-
+			// Check if we contains all
 			for (EventProducerNode anEpn : epns) {
 				if (!contains(anEpn)) {
 					containsAll = false;
@@ -251,17 +271,47 @@ public class EventProducerHierarchy {
 				}
 			}
 
+			// And if so, add ourself
 			if (containsAll)
 				containingEpn.add(this);
-		
 
+			// Recursively check for the children nodes
 			if (!childrenNodes.isEmpty()) {
 				for (EventProducerNode epnChild : this.getChildrenNodes()) {
-					containingEpn.addAll(epnChild.containsAll(epns));		
+					containingEpn.addAll(epnChild.containsAll(epns));
 				}
 			}
 
 			return containingEpn;
+		}
+		
+		
+		/**
+		 * Check whether or not a node and its children is included within the
+		 * given boundaries
+		 * 
+		 * @param start
+		 *            the starting boundary
+		 * @param end
+		 *            the ending boundaries
+		 * @return The list of nodes contains within the given boundaries
+		 */
+		public List<EventProducerNode> withinBoundary(int start, int end) {
+			ArrayList<EventProducerNode> containedEpn = new ArrayList<EventProducerNode>();
+			
+			// Check if we are within the boundaries
+			if ((index + weight >= start && index + weight <= end)
+					|| (index >= start && index <= end))
+				containedEpn.add(this);
+
+			// Recursively check for the children nodes
+			if (!childrenNodes.isEmpty()) {
+				for (EventProducerNode epnChild : this.getChildrenNodes()) {
+					containedEpn.addAll(epnChild.withinBoundary(start, end));
+				}
+			}
+
+			return containedEpn;
 		}
 	}
 
@@ -352,14 +402,49 @@ public class EventProducerHierarchy {
 		return eventProducerNodes.get(id).getValues();
 	}
 	
-	public EventProducerNode findSmallestContainingNode(List<EventProducerNode> epns) {
+	/**
+	 * Find the node the lowest in the hierarchy that contains all the event
+	 * producer nodes given as arguments
+	 * 
+	 * @param epns
+	 *            List of event producer nodes that we want to embedded
+	 * @return The found event producer node
+	 */
+	public EventProducerNode findSmallestContainingNode(
+			List<EventProducerNode> epns) {
 		ArrayList<EventProducerNode> containingEpn = new ArrayList<EventProducerNode>();
 		containingEpn.addAll(root.containsAll(epns));
-		
-		//smallest nodechildren
-		//embedding all epns
-		return containingEpn.get(0);
+
+		EventProducerNode smallestContainingNode = containingEpn.get(0);
+
+		// Find the deepest epn in the hierarchy (should be unique)
+		for (EventProducerNode epn : containingEpn) {
+			if (epn.getHierarchyLevel() > smallestContainingNode
+					.getHierarchyLevel())
+				smallestContainingNode = epn;
+		}
+
+		return smallestContainingNode;
 	}
 	
+	/**
+	 * Search for all the leave nodes that are within the given boundaries
+	 * 
+	 * @param start
+	 *            the starting boundary
+	 * @param end
+	 *            the ending boundaries
+	 * @return The list of nodes contains within the given boundaries
+	 */
+	public ArrayList<EventProducerNode> findNodeWithin(int start, int end) {
+		ArrayList<EventProducerNode> containedEpn = new ArrayList<EventProducerNode>();
+
+		for (EventProducerNode epn : leaves.values()) {
+			if ((epn.index + epn.weight >= start && epn.index + epn.weight < end)
+					|| (epn.index >= start && epn.index <= end))
+				containedEpn.add(epn);
+		}
+		return containedEpn;
+	}
 
 }

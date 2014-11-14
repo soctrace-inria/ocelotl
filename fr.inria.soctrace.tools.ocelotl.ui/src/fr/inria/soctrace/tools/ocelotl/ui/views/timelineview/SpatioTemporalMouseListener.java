@@ -6,7 +6,6 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
@@ -171,66 +170,25 @@ public class SpatioTemporalMouseListener implements MouseListener, MouseMotionLi
 			EventProducerHierarchy hierarchy = STManager.getHierarchy();
 			
 			// Compute the selected spatiotemporal region
-			int y1 = arg0.y;
-			
-			Rectangle currentRect = new Rectangle(originX, originY, arg0.x - originX, y1 - originY);
-			ArrayList<EventProducerNode> currentProducers = new ArrayList<EventProducerNode>();
-			
-			// 
-			for (Rectangle aRect : aggregatedView.epnMapping.keySet()) {
-				if (currentRect.intersects(aRect)) {
-					currentProducers.add(aggregatedView.epnMapping.get(aRect));
-				}
-			}
-			
-			int embeddedEpn = 0;
-			int tempCount = 0;
-			EventProducerNode selectedNode = currentProducers.get(0);
-			// Find the top epn that encompasses all the selected ones
-			for (EventProducerNode anEPN : currentProducers) {
-				tempCount = 0;
-				for (EventProducerNode otherEPN : currentProducers) {
-					if (anEPN.contains(otherEPN))
-						tempCount++;
-				}
-				if (tempCount > embeddedEpn) {
-					embeddedEpn = tempCount;
-					selectedNode = anEPN;
-				}
-			}
-
-			if (embeddedEpn != currentProducers.size()) {
-				selectedNode = hierarchy.findSmallestContainingNode(currentProducers);
-			}
-
-			//Compute the selection (cf. SpatioTemporalModeView) 
+			int y0, y1;
+			y0 = Math.min(originY, arg0.y);
+			y1 = Math.max(originY, arg0.y);
 			
 			//compute height (root.height) + logic height
 			int rootHeight = aggregatedView.root.getSize().height;
-			int height = rootHeight - aggregatedView.aBorder;
-	
-			int logicHeight = height / hierarchy.getRoot().getWeight();
-		
-			// then compute correspondence with the weight of each ep
-			for (EventProducerNode aChild : hierarchy.getRoot().getChildrenNodes()) {
-				if (aChild.getWeight() > originY) {
-					//originY = aChild.getIndex() * logicHeight;
-					originY = (int) (rootHeight - height +  aChild.getIndex() * logicHeight - 5);
-					break;
-				}
-			}
+			int height = rootHeight - (2 * aggregatedView.aBorder);
+			double accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
 			
-			for (EventProducerNode aChild : hierarchy.getRoot().getChildrenNodes()) {
-				if (aChild.getWeight() > y1) {
-					//originY = aChild.getIndex() * logicHeight;
-					y1 = originY +  aChild.getWeight();
-					break;
-				}
-			}
+			int startingHeight = (int) (((double) (y0 - aggregatedView.aBorder)) / accurateLogicHeight);
+			int endingHeight = (int) (((double) (y1 - aggregatedView.aBorder)) / accurateLogicHeight);
+			
+			ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
+			EventProducerNode selectedNode = hierarchy.findSmallestContainingNode(currentProducers);
 
-			int originWeight;
-			int cornerWeight;
-			
+			//Compute the selection (cf. SpatioTemporalModeView) 		
+			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
+			y1 = originY + (int) ((selectedNode.getWeight() ) * accurateLogicHeight);
+
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
 			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, originY, y1);
