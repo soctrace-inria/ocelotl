@@ -215,23 +215,23 @@ public class OcelotlCore {
 		double diffG = 0.0, diffL = 0.0;
 		double sumDiff = 0.0;
 		double maxDiff = 0.0;
-		int indexMaxQual = -1;
-		int i;
 		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) getLpaggregManager().getQualities();
-		for (i = 1; i < qual.size(); i++) {
+		int indexMaxQual = qual.size()-1;
+		int i;
+		for (i = 0; i < qual.size()-1; i++) {
 			// Compute the difference for the gain and the loss
-			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
-			diffL = Math.abs(qual.get(i - 1).getLoss() - qual.get(i).getLoss());
+			diffG = Math.abs(qual.get(i + 1).getGain() - qual.get(i).getGain());
+			diffL = Math.abs(qual.get(i + 1).getLoss() - qual.get(i).getLoss());
 
 			// Compute sum of both
 			sumDiff = Math.abs(diffG - diffL);
 
 			if (sumDiff > maxDiff) {
 				maxDiff = sumDiff;
-				indexMaxQual = i-1;
+				indexMaxQual = i;
 			}
 		}
-			return getLpaggregManager().getParameters().get(indexMaxQual + 1);
+			return getLpaggregManager().getParameters().get(indexMaxQual);
 	}
 
 }
