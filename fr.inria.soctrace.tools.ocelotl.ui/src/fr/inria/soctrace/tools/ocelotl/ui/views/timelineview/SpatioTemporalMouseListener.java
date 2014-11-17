@@ -242,9 +242,15 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			int height = rootHeight - (2 * aggregatedView.aBorder);
 			double accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
 
-			// Compute the number of current producers
-			int startingHeight = (int) (((double) (y0 - aggregatedView.aBorder)) / accurateLogicHeight);
+			// Compute the boundaries of the event producer
+			// Round up to the nearest integer (multiply by 2.0, round then divide by 2)
+			double rounding = (((double) (y0 - aggregatedView.aBorder)) / accurateLogicHeight) * 2.0;
+			int startingHeight = (int) (Math.round(rounding) / 2); 
 			int endingHeight = (int) (((double) (y1 - aggregatedView.aBorder)) / accurateLogicHeight);
+			// Might happen when selecting a unique point
+			if (startingHeight > endingHeight) {
+				endingHeight = startingHeight;
+			}
 
 			// Find the event producer node containing all the selected node
 			ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
@@ -252,7 +258,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 			// Compute the selection bound for drawing (cf.
 			// SpatioTemporalModeView)
-			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
+			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder); 
 			cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight);
 		}
 

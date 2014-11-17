@@ -451,7 +451,7 @@ public class EventProducerHierarchy {
 		ArrayList<EventProducerNode> containedEpn = new ArrayList<EventProducerNode>();
 
 		for (EventProducerNode epn : leaves.values()) {
-			if ((epn.index + epn.weight >= start && epn.index + epn.weight < end)
+			if ((epn.index + epn.weight > start && epn.index + epn.weight < end)
 					|| (epn.index >= start && epn.index <= end))
 				containedEpn.add(epn);
 		}
