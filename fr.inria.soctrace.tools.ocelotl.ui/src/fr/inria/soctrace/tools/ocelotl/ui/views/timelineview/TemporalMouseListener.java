@@ -13,8 +13,8 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.Mous
 public class TemporalMouseListener extends OcelotlMouseListener {
 
 	private static final long	Threshold	= 5;
-	MouseState						state		= MouseState.RELEASED;
-	MouseState						previous	= MouseState.RELEASED;
+	MouseState					state		= MouseState.RELEASED;
+	MouseState					previous	= MouseState.RELEASED;
 	Point						currentPoint;
 	Display						display		= Display.getCurrent();
 	Shell						shell		= display.getActiveShell();
@@ -92,7 +92,6 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 				state = MouseState.RELEASED;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 			}
-
 	}
 
 	@Override

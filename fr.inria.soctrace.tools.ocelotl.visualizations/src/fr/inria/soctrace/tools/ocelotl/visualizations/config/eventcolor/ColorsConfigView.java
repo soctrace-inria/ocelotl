@@ -152,7 +152,7 @@ public class ColorsConfigView extends Dialog implements IVisualizationWindow {
 	}
 
 	private void setParameters() {
-		config.setTypes(ocelotlView.getParams().getTraceTypeConfig().getTypes());
+		config.setTypes(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
 		listViewerEventTypes.setInput(config.getTypes());
 	}
 	

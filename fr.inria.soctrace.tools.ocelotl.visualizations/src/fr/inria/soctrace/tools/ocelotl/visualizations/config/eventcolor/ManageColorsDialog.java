@@ -148,7 +148,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
     protected Control createDialogArea(Composite parent) {
 
     	Composite all = (Composite) super.createDialogArea(parent);
-    	config.setTypes(ocelotlView.getParams().getTraceTypeConfig().getTypes());
+    	config.setTypes(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
         
         comboModelEntity = new Combo(all, SWT.READ_ONLY);
         comboModelEntity.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

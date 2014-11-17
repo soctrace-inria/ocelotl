@@ -42,6 +42,8 @@ public class OcelotlParameters {
 	private static boolean forceJava = false;
 
 	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
+	private List<EventProducer> currentProducers = new ArrayList<EventProducer>();
+	private List<EventProducer> spatiallySelectedProducers = new ArrayList<EventProducer>();
 	private List<EventType> eventTypes = new LinkedList<EventType>();
 	private List<EventType> allEventTypes;
 	private List<EventType> operatorEventTypes;
@@ -61,6 +63,7 @@ public class OcelotlParameters {
 	private String visuOperator;
 	private String statOperator;
 	private String microModelType;
+	private boolean spatialSelection;
 	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
 	private DataCache dataCache = new DataCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
@@ -157,6 +160,7 @@ public class OcelotlParameters {
 
 	public void setEventProducers(final List<EventProducer> eventProducers) {
 		this.eventProducers = eventProducers;
+		updateCurrentProducers();
 	}
 
 	public void setGrowingQualities(final boolean growingQualities) {
@@ -350,6 +354,61 @@ public class OcelotlParameters {
 
 	public void setStatOperator(String statOperator) {
 		this.statOperator = statOperator;
+	}
+
+	public List<EventProducer> getCurrentProducers() {
+		return currentProducers;
+	}
+
+	public void setCurrentProducers(List<EventProducer> selectedEventProducers) {
+		// Make sure we make a deep copy
+		this.currentProducers = new ArrayList<EventProducer>();
+		this.currentProducers.addAll(selectedEventProducers);
+	}
+	
+	public List<EventProducer> getSpatiallySelectedProducers() {
+		return spatiallySelectedProducers;
+	}
+
+	public void setSpatiallySelectedProducers(
+			List<EventProducer> spatiallySelectedProducers) {
+		// Make sure we make a deep copy
+		this.spatiallySelectedProducers = new ArrayList<EventProducer>();
+		this.spatiallySelectedProducers.addAll(spatiallySelectedProducers);
+		
+		updateCurrentProducers();
+	}
+
+	public boolean isSpatialSelection() {
+		return spatialSelection;
+	}
+
+	public void setSpatialSelection(boolean spatialSelection) {
+		this.spatialSelection = spatialSelection;
+	}
+	
+	/**
+	 * Update the selected producers when the filtered event producers has
+	 * changed
+	 */
+	public void updateCurrentProducers() {
+		// If there is no current spatial selection
+		if (spatialSelection == false) {
+			// Then selectedProducer is identical to eventProducers
+			setCurrentProducers(eventProducers);
+		} else {
+			ArrayList<EventProducer> currentSelection = new ArrayList<EventProducer>();
+
+			// Make the intersection of the selected producers and the filtered
+			// ones
+			for (EventProducer anEP : eventProducers) {
+				if (spatiallySelectedProducers.contains(anEP)) {
+					currentSelection.add(anEP);
+				}
+			}
+
+			setCurrentProducers(currentSelection);
+		}
 	}
 
 }

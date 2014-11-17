@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
@@ -18,8 +19,8 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.Mous
 public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	private static final long	Threshold	= 5;
-	MouseState						state		= MouseState.RELEASED;
-	MouseState						previous	= MouseState.RELEASED;
+	MouseState					state		= MouseState.RELEASED;
+	MouseState					previous	= MouseState.RELEASED;
 	Point						currentPoint;
 	Display						display		= Display.getCurrent();
 	Shell						shell		= display.getActiveShell();
@@ -258,8 +259,18 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 			// Compute the selection bound for drawing (cf.
 			// SpatioTemporalModeView)
-			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder); 
+			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
 			cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight);
+
+			ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
+
+			// If only one producer is selected, then also add the parent
+			// producer to avoid that the building of the micro model fails
+			if (selectedNode.getChildrenNodes().isEmpty()) {
+				selectedProducers.add(selectedNode.getParentNode().getMe());
+			}
+			aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
+			aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 		}
 
 		aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);

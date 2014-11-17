@@ -188,7 +188,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		return result.toByteArray();
 	}
 
-	// TODO take resolution in to account (given as a parameter)
+	// TODO take resolution into account (given as a parameter)
 	@Override
 	public void createSnapshotFor(final String fileName) {
 		final byte[] imageBytes = createImage(root, SWT.IMAGE_PNG);
@@ -287,6 +287,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		});
 
 		OcelotlMouseListener mouse;
+		// Choose the mouse listener depending on the type of aggregation
 		switch (ocelotlView.getOcelotlCore().getAggregOperators().getSelectedOperator().getAggregType()) {
 		case TEMPORAL:
 			mouse = new TemporalMouseListener(this);
@@ -299,6 +300,9 @@ abstract public class AggregatedView implements IAggregatedView {
 			break;
 		}
 
+		// Reset the spatial selection flag
+		ocelotlView.getOcelotlParameters().setSpatialSelection(false);
+		
 		wrapper.cleanMouseListeners();
 		wrapper.cleanMouseMotionListeners();
 		wrapper.addMouseListener(mouse);

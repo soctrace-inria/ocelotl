@@ -591,7 +591,7 @@ public abstract class DistributionBaseView extends Dialog implements
 			final ITraceTypeConfig config) {
 		this.ocelotlView = ocelotlView;
 		this.config = (DistributionConfig) config;
-		this.params = ocelotlView.getParams();
+		this.params = ocelotlView.getOcelotlParameters();
 		setParameters();
 	}
 

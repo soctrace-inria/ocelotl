@@ -139,7 +139,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			dm.start();
 
 			HashMap<String, EventProducer> eventProducers = new HashMap<String, EventProducer>();
-			for (EventProducer ep : parameters.getEventProducers()) {
+			for (EventProducer ep : parameters.getCurrentProducers()) {
 				eventProducers.put(String.valueOf(ep.getId()), ep);
 			}
 
@@ -645,7 +645,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	 * @return true if nothing is filtered out, false otherwise
 	 */
 	public boolean noFiltering() {
-		if (parameters.getEventProducers().size() != parameters
+		if (parameters.getCurrentProducers().size() != parameters
 				.getEventProducerHierarchy().getEventProducers().size()) {
 			logger.debug("At least one event producer is filtered: cache will not be generated.");
 			return false;

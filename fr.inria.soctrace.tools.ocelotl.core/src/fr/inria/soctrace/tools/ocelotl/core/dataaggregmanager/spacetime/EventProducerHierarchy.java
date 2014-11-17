@@ -50,7 +50,7 @@ public class EventProducerHierarchy {
 		// Depth in the hierarchy level of the node (the smaller, the higher
 		// in the hierarchy)
 		private int hierarchyLevel;
-
+		
 		public EventProducerNode(EventProducer ep) {
 			if(ep == null)
 				throw new NullPointerException();
@@ -296,7 +296,6 @@ public class EventProducerHierarchy {
 			return containingEpn;
 		}
 		
-		
 		/**
 		 * Check whether or not a node and its children is included within the
 		 * given boundaries
@@ -324,6 +323,21 @@ public class EventProducerHierarchy {
 
 			return containedEpn;
 		}
+		
+		
+		public ArrayList<EventProducer> getContainedProducers() {
+			ArrayList<EventProducer> producers = new ArrayList<EventProducer>();
+			producers.add(this.me);
+
+			// Recursively get producers of the children nodes
+			if (!childrenNodes.isEmpty()) {
+				for (EventProducerNode epnChild : this.getChildrenNodes()) {
+					producers.addAll(epnChild.getContainedProducers());
+				}
+			}
+
+			return producers;
+		}
 	}
 
 	private Map<Integer, EventProducerNode> eventProducerNodes = new HashMap<Integer, EventProducerNode>();
@@ -346,6 +360,7 @@ public class EventProducerHierarchy {
 			if (!eventProducerNodes.containsKey(ep.getId()))
 				eventProducerNodes.put(ep.getId(), new EventProducerNode(ep));
 		}
+		
 		// If there are some node with no parent
 		if (!orphans.isEmpty()) {
 		//	System.err.println("Careful: hierarchy is incomplete and some elements will be destroyed!");
