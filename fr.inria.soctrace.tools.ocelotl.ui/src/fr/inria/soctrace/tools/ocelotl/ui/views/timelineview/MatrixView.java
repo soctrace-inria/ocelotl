@@ -37,7 +37,7 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 
 	public MatrixView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
-
+		mouse = new SpatioTemporalMouseListener(this);
 	}
 
 	@Override

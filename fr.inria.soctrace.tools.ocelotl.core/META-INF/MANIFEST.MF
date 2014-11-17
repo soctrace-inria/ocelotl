@@ -38,4 +38,5 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
  fr.inria.soctrace.tools.ocelotl.core.timeslice,
  fr.inria.soctrace.tools.ocelotl.core.utils
-Import-Package: org.eclipse.core.resources
+Import-Package: fr.inria.soctrace.framesoc.ui.model,
+ org.eclipse.core.resources

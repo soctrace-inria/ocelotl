@@ -68,6 +68,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected final OcelotlView				ocelotlView;
 	protected SelectFigure					selectFigure;
 	protected IVisuOperator					visuOperator	= null;
+	protected OcelotlMouseListener			mouse;
 	public final static Color				selectColorFG	= ColorConstants.blue;
 	public final static Color				selectColorBG	= ColorConstants.lightGray;
 	public final static Color				activeColorFG	= ColorConstants.black;
@@ -286,20 +287,6 @@ abstract public class AggregatedView implements IAggregatedView {
 			}
 		});
 
-		OcelotlMouseListener mouse;
-		// Choose the mouse listener depending on the type of aggregation
-		switch (ocelotlView.getOcelotlCore().getAggregOperators().getSelectedOperator().getAggregType()) {
-		case TEMPORAL:
-			mouse = new TemporalMouseListener(this);
-			break;
-		case SPATIOTEMPORAL:
-			mouse = new SpatioTemporalMouseListener(this);
-			break;
-		default:
-			mouse = new TemporalMouseListener(this);
-			break;
-		}
-
 		// Reset the spatial selection flag
 		ocelotlView.getOcelotlParameters().setSpatialSelection(false);
 		
@@ -309,7 +296,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
 	}
-
+	
 	public void setBorder(final int border) {
 		this.aBorder = border;
 	}
