@@ -96,15 +96,26 @@ public class EventProducerHierarchy {
 		private void setParent() {
 			try {
 				if (!eventProducerNodes.containsKey(me.getParentId()))
-					eventProducerNodes.put(
-							me.getParentId(),
-							new EventProducerNode(eventProducers.get(me
-									.getParentId())));
+					// Is the parent id is a known producer
+					if (eventProducers.containsKey(me.getParentId())) {
+						eventProducerNodes.put(
+								me.getParentId(),
+								new EventProducerNode(eventProducers.get(me
+										.getParentId())));
+					} else {
+						// If not make it root (which has no parent)
+						parentNode = null;
+						if (root == null) {
+							root = this;
+							orphans.remove(id);
+						}
+						return;
+					}
+
 				parentNode = eventProducerNodes.get(me.getParentId());
 				parentNode.addChild(this);
 				hierarchyLevel = parentNode.getHierarchyLevel() + 1;
 				orphans.remove(id);
-
 			} catch (NullPointerException e) {
 				parentNode = null;
 				if (root == null) {

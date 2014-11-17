@@ -8,13 +8,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.State;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.MouseState;
 
 public class TemporalMouseListener extends OcelotlMouseListener {
 
 	private static final long	Threshold	= 5;
-	State						state		= State.RELEASED;
-	State						previous	= State.RELEASED;
+	MouseState						state		= MouseState.RELEASED;
+	MouseState						previous	= MouseState.RELEASED;
 	Point						currentPoint;
 	Display						display		= Display.getCurrent();
 	Shell						shell		= display.getActiveShell();
@@ -35,10 +35,10 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseDragged(final MouseEvent arg0) {
-		if ((state == State.PRESSED_G || state == State.DRAG_G || state == State.DRAG_G_START) && arg0.getLocation().getDistance(currentPoint) > 10) {
+		if ((state == MouseState.PRESSED_LEFT || state == MouseState.DRAG_LEFT || state == MouseState.DRAG_LEFT_START) && arg0.getLocation().getDistance(currentPoint) > 10) {
 			long moved = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
-			if (state != State.DRAG_G_START)
-				state = State.DRAG_G;
+			if (state != MouseState.DRAG_LEFT_START)
+				state = MouseState.DRAG_LEFT;
 			moved = Math.max(moved, aggregatedView.resetTime.getTimeStampStart());
 			moved = Math.min(moved, aggregatedView.resetTime.getTimeStampEnd());
 			fixed = Math.max(fixed, aggregatedView.resetTime.getTimeStampStart());
@@ -67,8 +67,8 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
-		if (state != State.RELEASED && state != State.MOVE_START && state != State.MOVE_END && state != State.EXITED) {
-			state = State.EXITED;
+		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.EXITED) {
+			state = MouseState.EXITED;
 			mouseReleased(arg0);
 		}
 	}
@@ -83,13 +83,13 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	public void mouseMoved(final MouseEvent arg0) {
 		if (aggregatedView.selectFigure != null && aggregatedView.root.getChildren().contains(aggregatedView.selectFigure))
 			if (Math.abs(aggregatedView.selectFigure.getBounds().x - arg0.x) < Threshold) {
-				state = State.MOVE_START;
+				state = MouseState.H_MOVE_START;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
 			} else if (Math.abs(aggregatedView.selectFigure.getBounds().x + aggregatedView.selectFigure.getBounds().width - arg0.x) < Threshold) {
-				state = State.MOVE_END;
+				state = MouseState.H_MOVE_END;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
 			} else {
-				state = State.RELEASED;
+				state = MouseState.RELEASED;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 			}
 
@@ -100,16 +100,16 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 		if (arg0.button == 1 && aggregatedView.resetTime != null) {
 			currentPoint = arg0.getLocation();
 			long p3 = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
-			if (state == State.MOVE_START) {
+			if (state == MouseState.H_MOVE_START) {
 				p3 = aggregatedView.selectTime.getTimeStampStart();
 				fixed = aggregatedView.selectTime.getTimeStampEnd();
-				state = State.DRAG_G_START;
-			} else if (state == State.MOVE_END) {
+				state = MouseState.DRAG_LEFT_START;
+			} else if (state == MouseState.H_MOVE_END) {
 				p3 = aggregatedView.selectTime.getTimeStampEnd();
 				fixed = aggregatedView.selectTime.getTimeStampStart();
-				state = State.DRAG_G;
+				state = MouseState.DRAG_LEFT;
 			} else {
-				state = State.PRESSED_G;
+				state = MouseState.PRESSED_LEFT;
 				p3 = Math.max(p3, aggregatedView.resetTime.getTimeStampStart());
 				p3 = Math.min(p3, aggregatedView.resetTime.getTimeStampEnd());
 				aggregatedView.selectTime = new TimeRegion(aggregatedView.resetTime);
@@ -128,9 +128,9 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	public void mouseReleased(final MouseEvent arg0) {
 
 		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
-		if (state == State.DRAG_G || state == State.DRAG_G_START)
+		if (state == MouseState.DRAG_LEFT || state == MouseState.DRAG_LEFT_START)
 			mouseDragged(arg0);
-		state = State.RELEASED;
+		state = MouseState.RELEASED;
 		if (aggregatedView.time == null)
 			return;
 

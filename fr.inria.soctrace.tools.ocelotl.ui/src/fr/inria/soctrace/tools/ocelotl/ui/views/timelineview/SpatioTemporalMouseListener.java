@@ -13,19 +13,20 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventPro
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.State;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.MouseState;
 
 public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	private static final long	Threshold	= 5;
-	State						state		= State.RELEASED;
-	State						previous	= State.RELEASED;
+	MouseState						state		= MouseState.RELEASED;
+	MouseState						previous	= MouseState.RELEASED;
 	Point						currentPoint;
 	Display						display		= Display.getCurrent();
 	Shell						shell		= display.getActiveShell();
 	long						fixed;
 	AggregatedView				aggregatedView;
-	int originY, originX;
+	int							originY, cornerY;
+	boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
 
 	public SpatioTemporalMouseListener(AggregatedView theview) {
 		super();
@@ -41,28 +42,35 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseDragged(final MouseEvent arg0) {
-		if ((state == State.PRESSED_G || state == State.DRAG_G || state == State.DRAG_G_START) && arg0.getLocation().getDistance(currentPoint) > 10) {
+		// If we are in the current dragging state and we have make move greater than 10 pixels
+		if ((state == MouseState.PRESSED_LEFT || state == MouseState.DRAG_LEFT || state == MouseState.DRAG_LEFT_HORIZONTAL || state == MouseState.DRAG_LEFT_VERTICAL)
+				&& arg0.getLocation().getDistance(currentPoint) > 10) {
 			long moved = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
-			if (state != State.DRAG_G_START)
-				state = State.DRAG_G;
-			moved = Math.max(moved, aggregatedView.resetTime.getTimeStampStart());
-			moved = Math.min(moved, aggregatedView.resetTime.getTimeStampEnd());
-			fixed = Math.max(fixed, aggregatedView.resetTime.getTimeStampStart());
-			fixed = Math.min(fixed, aggregatedView.resetTime.getTimeStampEnd());
-			if (fixed < moved)
-				aggregatedView.selectTime = new TimeRegion(fixed, moved);
-			else
-				aggregatedView.selectTime = new TimeRegion(moved, fixed);
+			
+			// If we are not performing a vertical drag
+			if (state != MouseState.DRAG_LEFT_VERTICAL) {
+				// Update x the coordinates
+				moved = Math.max(moved, aggregatedView.resetTime.getTimeStampStart());
+				moved = Math.min(moved, aggregatedView.resetTime.getTimeStampEnd());
+				fixed = Math.max(fixed, aggregatedView.resetTime.getTimeStampStart());
+				fixed = Math.min(fixed, aggregatedView.resetTime.getTimeStampEnd());
+				if (fixed < moved)
+					aggregatedView.selectTime = new TimeRegion(fixed, moved);
+				else
+					aggregatedView.selectTime = new TimeRegion(moved, fixed);
+			}
+			
+			// If we are not performing an horizontal drag 
+			if (!(state == MouseState.DRAG_LEFT_HORIZONTAL)) {
+				// Update the height coordinate with the current one of the mouse
+				cornerY = arg0.y;
+			}
+			
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, false);
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, originY, arg0.y);
+			
+			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, originY, cornerY);
 			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
-			if (aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time)) {
-				aggregatedView.ocelotlView.getTimeAxisView().unselect();
-				if (aggregatedView.selectFigure.getParent() != null)
-					aggregatedView.root.remove(aggregatedView.selectFigure);
-				aggregatedView.root.repaint();
-			}
 		}
 
 	}
@@ -73,9 +81,9 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
-		if (state != State.RELEASED && state != State.MOVE_START && state != State.MOVE_END && state != State.EXITED) {
-			state = State.EXITED;
+		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.V_MOVE_END && state != MouseState.V_MOVE_START && state != MouseState.EXITED) {
 			mouseReleased(arg0);
+			state = MouseState.EXITED;
 		}
 	}
 
@@ -87,18 +95,63 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseMoved(final MouseEvent arg0) {
+		// If there is a current selection 
 		if (aggregatedView.selectFigure != null && aggregatedView.root.getChildren().contains(aggregatedView.selectFigure))
-			if (Math.abs(aggregatedView.selectFigure.getBounds().x - arg0.x) < Threshold) {
-				state = State.MOVE_START;
+			closeToSelectionEdges(arg0);
+			
+			// If we are close to one vertical edge
+			if (closeToVStart) {
+				state = MouseState.H_MOVE_START;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
-			} else if (Math.abs(aggregatedView.selectFigure.getBounds().x + aggregatedView.selectFigure.getBounds().width - arg0.x) < Threshold) {
-				state = State.MOVE_END;
+				// Or the other vertical edge
+			} else if (closeToVEnd) {
+				state = MouseState.H_MOVE_END;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+			} else if (closeToHStart) {
+				state = MouseState.V_MOVE_START;
+				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZENS));
+			} else if (closeToHEnd) {
+				state = MouseState.V_MOVE_END;
+				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZENS));
 			} else {
-				state = State.RELEASED;
+				state = MouseState.RELEASED;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 			}
+	}
+	
+	/**
+	 * Check if we are close to an edge of the selection
+	 * 
+	 * @param arg0
+	 *            mouse parameters
+	 */
+	public void closeToSelectionEdges(MouseEvent arg0) {
+		closeToVStart = closeToVEnd = closeToHStart = closeToHEnd = false;
+		boolean withinX = false, withinY = false;
+		int xBound = aggregatedView.selectFigure.getBounds().x();
+		int yBound = aggregatedView.selectFigure.getBounds().y();
+		int height = aggregatedView.selectFigure.getBounds().height();
+		int width = aggregatedView.selectFigure.getBounds().width();
 
+		// Are we within the vertical or horizontal boundaries of the selection
+		if (xBound <= arg0.x && (xBound + width) >= arg0.x)
+			withinX = true;
+		if (yBound <= arg0.y && (yBound + height) >= arg0.y)
+			withinY = true;
+
+		// Check each edge
+		if (Math.abs(xBound - arg0.x) < Threshold && withinY) {
+			closeToVStart = true;
+		}
+		if (Math.abs((xBound + width) - arg0.x) < Threshold && withinY) {
+			closeToVEnd = true;
+		}
+		if (Math.abs(yBound - arg0.y) < Threshold && withinX) {
+			closeToHStart = true;
+		}
+		if (Math.abs((yBound + height) - arg0.y) < Threshold && withinX) {
+			closeToHEnd = true;
+		}
 	}
 
 	@Override
@@ -106,20 +159,28 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		if (arg0.button == 1 && aggregatedView.resetTime != null) {
 			currentPoint = arg0.getLocation();
 			long p3 = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
-			if (state == State.MOVE_START) {
-				originX = arg0.getLocation().x();
-				originY = arg0.getLocation().y();
+			// We are dragging horizontally by the left side
+			if (state == MouseState.H_MOVE_START) {
+				originY = aggregatedView.selectFigure.getBounds().y();
 				p3 = aggregatedView.selectTime.getTimeStampStart();
 				fixed = aggregatedView.selectTime.getTimeStampEnd();
-				state = State.DRAG_G_START;
-			} else if (state == State.MOVE_END) {
+				state = MouseState.DRAG_LEFT_HORIZONTAL;	
+			} else if (state == MouseState.H_MOVE_END) {// We are dragging horizontally by the right side
 				p3 = aggregatedView.selectTime.getTimeStampEnd();
 				fixed = aggregatedView.selectTime.getTimeStampStart();
-				state = State.DRAG_G;
-			} else {
-				state = State.PRESSED_G;
-				originX = arg0.getLocation().x();
+				state = MouseState.DRAG_LEFT_HORIZONTAL;
+			} else if (state == MouseState.V_MOVE_START) {// We are dragging vertically by the up side
+				originY = cornerY;
+				cornerY = arg0.y;
+				state = MouseState.DRAG_LEFT_VERTICAL;
+			} else if (state == MouseState.V_MOVE_END) {// We are dragging vertically by the bottom side
+				originY = aggregatedView.selectFigure.getBounds().y();
+				cornerY = arg0.y;
+				state = MouseState.DRAG_LEFT_VERTICAL;
+			} else {// We are starting a new selection
+				state = MouseState.PRESSED_LEFT;
 				originY = arg0.getLocation().y();
+				cornerY = originY;
 				p3 = Math.max(p3, aggregatedView.resetTime.getTimeStampStart());
 				p3 = Math.min(p3, aggregatedView.resetTime.getTimeStampEnd());
 				aggregatedView.selectTime = new TimeRegion(aggregatedView.resetTime);
@@ -127,12 +188,10 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 				aggregatedView.selectTime.setTimeStampEnd(p3);
 				fixed = p3;
 			}
-
-			int y1 = (arg0.y - aggregatedView.aBorder);
 			
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, false);
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, originY, y1);
+			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, originY, cornerY);
 			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
 		}
 	}
@@ -140,65 +199,68 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
 
+		// Reset to normal cursor
 		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
-		if (state == State.DRAG_G || state == State.DRAG_G_START)
+		
+		if (state == MouseState.DRAG_LEFT_VERTICAL || state == MouseState.DRAG_LEFT_HORIZONTAL)
 			mouseDragged(arg0);
-		state = State.RELEASED;
+		
+		previous = state;
+		state = MouseState.RELEASED;
+
 		if (aggregatedView.time == null)
 			return;
 
-		// If the selection is different than the whole region
-		if (!aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time)) {
-			final double sliceSize = (double) aggregatedView.resetTime.getTimeDuration() / (double) aggregatedView.ocelotlView.getTimeSliceNumber();
-			int i = 0;
-			for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
-				if (aggregatedView.selectTime.getTimeStampStart() >= (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart())
-						&& aggregatedView.selectTime.getTimeStampStart() < (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
-					aggregatedView.selectTime.setTimeStampStart((long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart()));
-					break;
-				}
-			for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
-				if (aggregatedView.selectTime.getTimeStampEnd() > (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart())
-						&& aggregatedView.selectTime.getTimeStampEnd() <= (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
-					aggregatedView.selectTime.setTimeStampEnd((long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart()));
-					break;
-				}
-			
-			SpaceTimeAggregation2Manager STManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
-			EventProducerHierarchy hierarchy = STManager.getHierarchy();
-			
+		final double sliceSize = (double) aggregatedView.resetTime.getTimeDuration() / (double) aggregatedView.ocelotlView.getTimeSliceNumber();
+		int i = 0;
+		for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
+			if (aggregatedView.selectTime.getTimeStampStart() >= (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart())
+					&& aggregatedView.selectTime.getTimeStampStart() < (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
+				aggregatedView.selectTime.setTimeStampStart((long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart()));
+				break;
+			}
+		for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
+			if (aggregatedView.selectTime.getTimeStampEnd() > (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart()) && aggregatedView.selectTime.getTimeStampEnd() <= (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
+				aggregatedView.selectTime.setTimeStampEnd((long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart()));
+				break;
+			}
+
+		// Get the event producer hierarchy
+		SpaceTimeAggregation2Manager STManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
+		EventProducerHierarchy hierarchy = STManager.getHierarchy();
+
+		// If we are performing an horizontal drag then don't change the
+		// selected hierarchy
+		if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
 			// Compute the selected spatiotemporal region
 			int y0, y1;
 			y0 = Math.min(originY, arg0.y);
 			y1 = Math.max(originY, arg0.y);
-			
-			//compute height (root.height) + logic height
+
+			// Compute various height values
 			int rootHeight = aggregatedView.root.getSize().height;
 			int height = rootHeight - (2 * aggregatedView.aBorder);
 			double accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
-			
+
+			// Compute the number of current producers
 			int startingHeight = (int) (((double) (y0 - aggregatedView.aBorder)) / accurateLogicHeight);
 			int endingHeight = (int) (((double) (y1 - aggregatedView.aBorder)) / accurateLogicHeight);
-			
+
+			// Find the event producer node containing all the selected node
 			ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
 			EventProducerNode selectedNode = hierarchy.findSmallestContainingNode(currentProducers);
 
-			//Compute the selection (cf. SpatioTemporalModeView) 		
+			// Compute the selection bound for drawing (cf.
+			// SpatioTemporalModeView)
 			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
-			y1 = originY + (int) ((selectedNode.getWeight() ) * accurateLogicHeight);
-
-			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
-			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, originY, y1);
-			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
-			aggregatedView.ocelotlView.getStatView().updateData();
-		} else {
-			aggregatedView.ocelotlView.getTimeAxisView().resizeDiagram();
-			aggregatedView.ocelotlView.getOverView().deleteSelection();
-			if (aggregatedView.selectFigure.getParent() != null)
-				aggregatedView.root.remove(aggregatedView.selectFigure);
-			aggregatedView.root.repaint();
+			cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight);
 		}
+
+		aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
+		aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
+		aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, originY, cornerY);
+		aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
+		aggregatedView.ocelotlView.getStatView().updateData();
 	}
 	
 }

@@ -85,6 +85,18 @@ abstract public class AggregatedView implements IAggregatedView {
 			setAlpha(50);
 		}
 
+		/**
+		 * Draw the current select figure
+		 * 
+		 * @param timeRegion
+		 *            selected time region
+		 * @param active
+		 *            Is the selection currently active
+		 * @param y0
+		 *            origin height
+		 * @param y1
+		 *            corner height
+		 */
 		public void draw(final TimeRegion timeRegion, final boolean active, int y0, int y1) {
 			if (active) {
 				setForegroundColor(activeColorFG);
@@ -96,21 +108,26 @@ abstract public class AggregatedView implements IAggregatedView {
 			if (getParent() != root)
 				root.add(this);
 
+			// Default values for selecting the height of the graph
 			if (y0 == -1)
 				y0 = root.getSize().height;
 
 			if (y1 == -1)
 				y1 = 2;
-			
-			root.setConstraint(this,
-					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
-							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y1)));
+
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
+					(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder - 1), y1)));
 			root.repaint();
 		}
 	}
-
-	static public enum State {
-		PRESSED_D, DRAG_D, PRESSED_G, DRAG_G, DRAG_G_START, RELEASED, MOVE_START, MOVE_END, EXITED;
+	
+	/**
+	 * States of the mouse
+	 */
+	static public enum MouseState {
+		PRESSED_D, DRAG_D, PRESSED_LEFT, DRAG_LEFT, DRAG_LEFT_START, 
+		DRAG_LEFT_VERTICAL, DRAG_LEFT_HORIZONTAL,
+		RELEASED, H_MOVE_START, H_MOVE_END, V_MOVE_START, V_MOVE_END, EXITED;
 	}
 
 	public static Color getActivecolorbg() {
