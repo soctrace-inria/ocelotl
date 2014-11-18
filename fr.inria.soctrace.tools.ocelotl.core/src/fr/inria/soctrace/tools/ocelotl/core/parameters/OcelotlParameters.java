@@ -41,14 +41,18 @@ public class OcelotlParameters {
 	// Modify to deactivate JNI
 	private static boolean forceJava = false;
 
+	// List of the event producers in the trace and that are not filtered out
 	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
+	// List of the event producers taken into account for computation
 	private List<EventProducer> currentProducers = new ArrayList<EventProducer>();
+	// List of the event producers selected through a spatial selection 
 	private List<EventProducer> spatiallySelectedProducers = new ArrayList<EventProducer>();
 	private List<EventType> eventTypes = new LinkedList<EventType>();
 	private List<EventType> allEventTypes;
 	private List<EventType> operatorEventTypes;
 	private List<EventProducer> allEventProducers;
 	private List<List<EventType>> catEventTypes;
+	// Hierarchy to display the event producer in the settings windows
     private SimpleEventProducerHierarchy eventProducerHierarchy;
 	private int timeSlicesNumber = OcelotlDefaultParameterConstants.TimeSliceNumber;
 	private TimeRegion timeRegion;
@@ -83,6 +87,14 @@ public class OcelotlParameters {
 	public OcelotlParameters(OcelotlParameters op) {
 		super();
 		this.eventProducers = op.eventProducers;
+		this.currentProducers = op.currentProducers;
+		// Make a deep copy
+		this.spatiallySelectedProducers = new ArrayList<EventProducer>(op.spatiallySelectedProducers);
+		this.eventTypes = op.eventTypes;
+		this.allEventTypes = op.allEventTypes;
+		this.operatorEventTypes = op.operatorEventTypes;
+		this.allEventProducers = op.allEventProducers;
+		this.catEventTypes = op.catEventTypes;
 		this.eventProducerHierarchy = op.eventProducerHierarchy;
 		this.timeSlicesNumber = op.timeSlicesNumber;
 		this.timeRegion = op.timeRegion;
@@ -91,16 +103,22 @@ public class OcelotlParameters {
 		this.threshold = op.threshold;
 		this.trace = op.trace;
 		this.maxEventProducers = op.maxEventProducers;
+		this.eventsPerThread = op.eventsPerThread;
+		this.threadNumber = op.threadNumber;
 		this.dataAggOperator = op.dataAggOperator;
 		this.visuOperator = op.visuOperator;
+		this.statOperator = op.statOperator;
 		this.microModelType = op.microModelType;
+		this.spatialSelection = op.spatialSelection;
 		this.growingQualities = op.growingQualities;
+		this.dataCache = op.dataCache;
+		this.dataCachePolicy = op.dataCachePolicy;
+		this.ocelotlSettings = op.ocelotlSettings;
+		this.timeSliceManager = op.timeSliceManager;
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
 		this.iSpaceConfig = op.iSpaceConfig;
-		this.timeSliceManager = op.timeSliceManager;
-		this.ocelotlSettings = op.ocelotlSettings;
+		this.statisticOperatorConfig = op.statisticOperatorConfig;
 	}
-	
 	
 	public List<EventProducer> getEventProducers() {
 		return eventProducers;

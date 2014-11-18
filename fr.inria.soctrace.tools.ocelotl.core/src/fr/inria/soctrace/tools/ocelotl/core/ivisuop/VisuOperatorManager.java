@@ -201,9 +201,16 @@ public class VisuOperatorManager {
 		selectedOperatorName = name;
 		final Bundle mybundle = Platform.getBundle(operatorList.get(
 				selectedOperatorName).getBundle());
+
+		String paramClassName = operatorList.get(selectedOperatorName)
+				.getParamConfig();
+
+		// Check if a configuration class was provided
+		if (paramClassName.isEmpty())
+			return;
+
 		try {
-			selectedConfig = (ISpaceConfig) mybundle.loadClass(
-					operatorList.get(selectedOperatorName).getParamConfig())
+			selectedConfig = (ISpaceConfig) mybundle.loadClass(paramClassName)
 					.newInstance();
 			parameters.setSpaceConfig(selectedConfig);
 		} catch (InstantiationException | IllegalAccessException

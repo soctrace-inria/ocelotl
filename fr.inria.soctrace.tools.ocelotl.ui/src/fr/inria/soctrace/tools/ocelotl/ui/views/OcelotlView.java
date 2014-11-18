@@ -35,8 +35,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -420,6 +418,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 							}
 							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
+							snapshotAction.setEnabled(true);
+							
+							history.saveHistory();
 						}
 					});
 
@@ -471,6 +472,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				return;
 			hasChanged = HasChanged.ALL;
 			ocelotlParameters.getEventProducers().clear();
+			history.reset();
 			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
 			ocelotlCore.getAggregOperators().setSelectedOperator(comboDimension.getText());
 			// Set the number of time slice
@@ -678,7 +680,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	/**
 	 * Add the snapshot button to the toolbar
 	 * 
-	 * @param view
 	 * @return the action taking a snapshot
 	 */
 	private Action createSnapshot() {
@@ -697,14 +698,29 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		return takeSnapshot;
 	}
 	
-	private void enableActions(boolean enabled) {
-		IActionBars actionBars = getViewSite().getActionBars();
-		IToolBarManager toolBar = actionBars.getToolBarManager();
-		for (IContributionItem item : toolBar.getItems()) {
-			if (item instanceof ActionContributionItem) {
-				((ActionContributionItem) item).getAction().setEnabled(enabled);
+
+	private Action createNextZoom() {
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/plus.png");
+		final Action nextZoom = new Action("Next zoom value", img) {
+			@Override
+			public void run() {
+				history.restoreNextHistory();
 			}
-		}
+		};
+		nextZoom.setToolTipText("Go to the next zooming value.");
+		return nextZoom;
+	}
+	
+	private Action createPrevZoom() {
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/minus.png");
+		final Action prevZoom = new Action("Previous zoom value", img) {
+			@Override
+			public void run() {
+				history.restorePrevHistory();
+			}
+		};
+		prevZoom.setToolTipText("Go back to the previous zooming value.");
+		return prevZoom;
 	}
 
 	private class TraceAdapter extends SelectionAdapter {
@@ -836,6 +852,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Font						cantarell8;
 	private Overview					overView;
 	private TabFolder					tabFolder;
+	private Action 						settings;
+	private Action 						snapshotAction;
+	private Action 						nextZoom;
+	private Action 						prevZoom;
+	private ActionHistory				history;
 
 	/**
 	 * Followed topics
@@ -867,7 +888,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 
 		snapshot = new Snapshot(ocelotlParameters.getOcelotlSettings().getSnapShotDirectory(), this);
-
+		history = new ActionHistory(this);
+		
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED);
@@ -1207,8 +1229,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		if (FramesocPartManager.getInstance().isFramesocPartExisting(FramesocViews.EVENT_TABLE_VIEW_ID))
 			toolBar.add(createTableAction());
 
-		toolBar.add(createSettingWindow(this));
-		toolBar.add(createSnapshot());
+		settings = createSettingWindow(this);
+		snapshotAction = createSnapshot();
+		prevZoom = createPrevZoom();
+		nextZoom = createNextZoom();
+
+		toolBar.add(settings);
+		toolBar.add(snapshotAction);
+		toolBar.add(prevZoom);
+		toolBar.add(nextZoom);
+
 		refreshTraces();
 
 		cleanAll();
@@ -1318,6 +1348,22 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		this.statView = statView;
 	}
 
+	public Action getNextZoom() {
+		return nextZoom;
+	}
+
+	public void setNextZoom(Action nextZoom) {
+		this.nextZoom = nextZoom;
+	}
+
+	public Action getPrevZoom() {
+		return prevZoom;
+	}
+
+	public void setPrevZoom(Action prevZoom) {
+		this.prevZoom = prevZoom;
+	}
+
 	private void refreshTraces() {
 		try {
 			confDataLoader.loadTraces();
@@ -1338,6 +1384,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		comboVisu.setEnabled(false);
 		comboStatistics.setEnabled(false);
 		btnRun.setEnabled(false);
+		snapshotAction.setEnabled(false);
+		nextZoom.setEnabled(false);
+		prevZoom.setEnabled(false);
 		
 		ocelotlParameters.getDataCache().buildDictionary(confDataLoader.getTraces());
 	}

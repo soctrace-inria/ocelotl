@@ -76,7 +76,7 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="param_win" type="string">
+         <attribute name="param_win" type="string" use="required">
             <annotation>
                <documentation>
                   
@@ -86,7 +86,7 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="param_config" type="string">
+         <attribute name="param_config" type="string" use="required">
             <annotation>
                <documentation>
                   

@@ -29,6 +29,8 @@
             class="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.SpatiotemporalPartition"
             operator="Spatiotemporal Partition"
             metric_compatibility="PARTS"
+            param_config=""
+            param_win=""
             aggregator_compatibility="3D"
             selection_priority="2"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.views.SpatiotemporalPartitionView">
