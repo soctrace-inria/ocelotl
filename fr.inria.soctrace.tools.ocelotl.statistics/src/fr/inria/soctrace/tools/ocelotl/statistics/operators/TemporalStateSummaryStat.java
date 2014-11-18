@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
+import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -25,13 +26,18 @@ public class TemporalStateSummaryStat extends TemporalSummaryStat {
 		// add +1 to avoid falling on the ending timestamp of the previous
 		// timeslice (which overlaps with starting timestamp of the next one)
 		int startingSlice = (int) microModel.getTimeSliceManager()
-				.getTimeSlice(timeRegion.getTimeStampStart() + 1);
+				.getTimeSlice(timeRegion.getTimeStampStart() + 2);
 		int endingSlice = (int) microModel.getTimeSliceManager().getTimeSlice(
 				timeRegion.getTimeStampEnd());
 		
 		// Get data from the microscopic model
 		for (i = startingSlice; i <= endingSlice; i++) {
 			for (EventProducer ep : microModel.getMatrix().get(i).keySet()) {
+				if (ocelotlview.getOcelotlParameters().isSpatialSelection()
+						&& (!ocelotlview.getOcelotlParameters()
+								.getSpatiallySelectedProducers().contains(ep))) {
+					continue;
+				}
 				for (String et : microModel.getMatrix().get(i).get(ep).keySet()) {
 					// If first time we meet the event type
 					if (!data.containsKey(et)) {
@@ -44,8 +50,21 @@ public class TemporalStateSummaryStat extends TemporalSummaryStat {
 			}
 		}
 
-		total = timeRegion.getTimeDuration() * microModel.getMatrix().get(0).keySet().size();
-		statData = new ArrayList<SummaryStatModel>();
+		int nbProducers;
+		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
+			nbProducers = ocelotlview.getOcelotlParameters()
+					.getCurrentProducers().size();
+			
+			if (nbProducers == 2)
+				// Since we add the parent producers when only one producer is
+				// selected, we remove it to have correct data
+				nbProducers = 1;
+		} else {
+			nbProducers = microModel.getMatrix().get(0).keySet().size();
+		}
+		
+		total = timeRegion.getTimeDuration() * nbProducers;
+		statData = new ArrayList<ITableRow>();
 
 		// Create the data objects for the table
 		for (String ep : data.keySet()) {

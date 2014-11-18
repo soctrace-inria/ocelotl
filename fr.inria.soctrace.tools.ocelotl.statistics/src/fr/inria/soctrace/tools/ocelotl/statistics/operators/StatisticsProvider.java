@@ -1,7 +1,5 @@
 package fr.inria.soctrace.tools.ocelotl.statistics.operators;
 
-import java.util.List;
-
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -31,11 +29,6 @@ public abstract class StatisticsProvider implements IStatisticsProvider {
 	
 	public abstract void setMicroMode(MicroscopicDescription microModel);
 
-	/*
-	 * Provide a list of data to put in the table
-	 */
-	public abstract List getTableData();
-	
 	/**
 	 * Update the color of the event types
 	 */

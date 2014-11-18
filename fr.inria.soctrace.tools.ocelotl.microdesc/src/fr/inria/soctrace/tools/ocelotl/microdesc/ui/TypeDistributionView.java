@@ -34,13 +34,13 @@ public class TypeDistributionView extends DistributionBaseView {
 	@Override
 	public void setParameters() {
 		if (config.getTypes().isEmpty())
-			config.getTypes().addAll(ocelotlView.getParams().getOperatorEventTypes());	
+			config.getTypes().addAll(ocelotlView.getOcelotlParameters().getOperatorEventTypes());	
 	}
 
 	@Override
 	protected java.util.List<EventType> getEventTypes() {
 		java.util.List<EventType> types = new ArrayList<EventType>();
-		types.addAll(ocelotlView.getParams().getOperatorEventTypes());	
+		types.addAll(ocelotlView.getOcelotlParameters().getOperatorEventTypes());	
 		return types;
 	}
 }

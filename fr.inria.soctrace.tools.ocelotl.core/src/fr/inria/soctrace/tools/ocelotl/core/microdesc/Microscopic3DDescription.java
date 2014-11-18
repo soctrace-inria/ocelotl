@@ -124,7 +124,7 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 	@Override
 	public void initVectors() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
-		final List<EventProducer> producers = parameters.getEventProducers();
+		final List<EventProducer> producers = parameters.getCurrentProducers();
 		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
 			matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
 
@@ -149,16 +149,16 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
-		final int epsize = getOcelotlParameters().getEventProducers().size();
+		final int epsize = getOcelotlParameters().getCurrentProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0
 				|| epsize < getOcelotlParameters().getMaxEventProducers())
-			computeSubMatrix(getOcelotlParameters().getEventProducers(),
+			computeSubMatrix(getOcelotlParameters().getCurrentProducers(),
 					monitor);
 		else {
 			final List<EventProducer> producers = getOcelotlParameters()
-					.getEventProducers().size() == 0 ? ocelotlQueries
+					.getCurrentProducers().size() == 0 ? ocelotlQueries
 					.getAllEventProducers() : getOcelotlParameters()
-					.getEventProducers();
+					.getCurrentProducers();
 			for (int i = 0; i < epsize; i = i
 					+ getOcelotlParameters().getMaxEventProducers())
 				computeSubMatrix(

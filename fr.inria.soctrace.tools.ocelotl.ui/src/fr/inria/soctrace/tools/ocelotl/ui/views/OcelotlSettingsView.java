@@ -64,7 +64,7 @@ public class OcelotlSettingsView extends Dialog {
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
 		this.ocelotlView = ocelotlView;
-		settings = ocelotlView.getParams().getOcelotlSettings();
+		settings = ocelotlView.getOcelotlParameters().getOcelotlSettings();
 		currentSelectedDatacachePolicy = settings.getCachePolicy();
 		currentDatacacheDir = "";
 	}
@@ -98,21 +98,21 @@ public class OcelotlSettingsView extends Dialog {
 		public void widgetSelected(final SelectionEvent e) {
 			// Ask user confirmation
 			if (MessageDialog.openConfirm(getShell(), "Delete cached data", "This will delete all cached data and it cannot be cancelled. Do you want to continue ?"))
-				ocelotlView.getParams().getDataCache().deleteCache();
+				ocelotlView.getOcelotlParameters().getDataCache().deleteCache();
 		}
 	}
 
 	public void modifyDataCacheSize() {
 		try {
 			if (Integer.valueOf(dataCacheSize.getText()) < 0) {
-				ocelotlView.getParams().getDataCache().setCacheMaxSize(-1);
+				ocelotlView.getOcelotlParameters().getDataCache().setCacheMaxSize(-1);
 			} else {
 				// Set the cache size at the entered value converted from
 				// Megabytes to bytes
-				ocelotlView.getParams().getDataCache().setCacheMaxSize(Long.valueOf(dataCacheSize.getText()) * 1000000);
+				ocelotlView.getOcelotlParameters().getDataCache().setCacheMaxSize(Long.valueOf(dataCacheSize.getText()) * 1000000);
 			}
 		} catch (final NumberFormatException err) {
-			dataCacheSize.setSelection((int) ocelotlView.getParams().getDataCache().getCacheMaxSize());
+			dataCacheSize.setSelection((int) ocelotlView.getOcelotlParameters().getDataCache().getCacheMaxSize());
 		} catch (OcelotlException e1) {
 			MessageDialog.openInformation(getShell(), "Error", e1.getMessage());
 		}
@@ -157,7 +157,7 @@ public class OcelotlSettingsView extends Dialog {
 			// Did the user cancel?
 			if (newCacheDir != null) {
 				// Is the directory valid
-				if (ocelotlView.getParams().getDataCache().checkCacheDirectoryValidity(newCacheDir)) {
+				if (ocelotlView.getOcelotlParameters().getDataCache().checkCacheDirectoryValidity(newCacheDir)) {
 					currentDatacacheDir = newCacheDir;
 
 					// Update the displayed path
@@ -177,7 +177,7 @@ public class OcelotlSettingsView extends Dialog {
 		// Was there change in the datacache directory ?
 		if (!currentDatacacheDir.isEmpty())
 			// If so, update the current datacache path
-			ocelotlView.getParams().getDataCache().setCacheDirectory(currentDatacacheDir);
+			ocelotlView.getOcelotlParameters().getDataCache().setCacheDirectory(currentDatacacheDir);
 	}
 
 	private class EnableCacheListener extends SelectionAdapter {
@@ -217,7 +217,7 @@ public class OcelotlSettingsView extends Dialog {
 		if (settings.getThresholdPrecision() != textThresholdValue) {
 			settings.setThresholdPrecision(textThresholdValue);
 
-			if (ocelotlView.getHasChanged() == HasChanged.NOTHING || ocelotlView.getHasChanged() == HasChanged.EQ || ocelotlView.getHasChanged() == HasChanged.PARAMETER)
+			if (ocelotlView.getHasChanged() == HasChanged.NOTHING || ocelotlView.getHasChanged() == HasChanged.PARAMETER)
 				ocelotlView.setHasChanged(HasChanged.THRESHOLD);
 		}
 	}
@@ -232,7 +232,7 @@ public class OcelotlSettingsView extends Dialog {
 
 	public void modifyIncreasingQuality() {
 		if (settings.getIncreasingQualities() != btnIncreasingQualities.getSelection()) {
-			ocelotlView.getParams().setGrowingQualities(btnIncreasingQualities.getSelection());
+			ocelotlView.getOcelotlParameters().setGrowingQualities(btnIncreasingQualities.getSelection());
 			settings.setIncreasingQualities(btnIncreasingQualities.getSelection());
 			// qualityView.createDiagram();
 		}
@@ -357,7 +357,7 @@ public class OcelotlSettingsView extends Dialog {
 		datacacheDirectory.setLayoutData(gd_dataCacheDir);
 		datacacheDirectory.setFont(cantarell8);
 		datacacheDirectory.setEditable(false);
-		datacacheDirectory.setText(ocelotlView.getParams().getDataCache().getCacheDirectory());
+		datacacheDirectory.setText(ocelotlView.getOcelotlParameters().getDataCache().getCacheDirectory());
 
 		btnChangeCacheDirectory = new Button(groupDataCacheSettings, SWT.PUSH);
 		btnChangeCacheDirectory.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
@@ -545,7 +545,7 @@ public class OcelotlSettingsView extends Dialog {
 	 */
 	void saveSettings() {
 		// Cache settings
-		ocelotlView.getParams().getDataCache().setCacheActive(btnCacheEnabled.getSelection());
+		ocelotlView.getOcelotlParameters().getDataCache().setCacheActive(btnCacheEnabled.getSelection());
 		settings.setCacheTimeSliceNumber(Integer.valueOf(cacheTimeSliceValue.getText()));
 		modifyDataCacheSize();
 		updateCacheDir();

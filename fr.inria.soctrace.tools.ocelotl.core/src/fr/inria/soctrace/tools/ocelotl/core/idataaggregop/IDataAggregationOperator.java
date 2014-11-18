@@ -10,5 +10,4 @@ public interface IDataAggregationOperator {
 
 	public IDataAggregManager createManager(MicroscopicDescription microMod,
 			IProgressMonitor monitor) throws OcelotlException;
-
 }

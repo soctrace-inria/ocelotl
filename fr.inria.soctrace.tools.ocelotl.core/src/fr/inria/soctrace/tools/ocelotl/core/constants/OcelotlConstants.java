@@ -27,11 +27,10 @@ public class OcelotlConstants {
 	 * TS: number of time slices has changed
 	 * NORMALIZE: quality curve normalization has changed 
 	 * PARAMETER: parameter has changed
-	 * EQ: 
 	 * NOTHING: nothing has changed
 	 */
 	static public enum HasChanged {
-		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
+		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, NOTHING
 	}
 	
 	/**

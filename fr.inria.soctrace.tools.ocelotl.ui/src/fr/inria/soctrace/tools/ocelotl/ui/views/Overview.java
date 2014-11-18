@@ -147,13 +147,13 @@ public class Overview implements IFramesocBusListener {
 			microModel = ocelotlView.getOcelotlCore().getMicroModel();
 
 			// Init the aggregation operator
-	//		if (!ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator().equals(ocelotlView.getParams().getTimeAggOperator())) {
-				aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator());
+			//if (!ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator().equals(ocelotlView.getParams().getTimeAggOperator())) {
+				aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator());
 				aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
 				aggregManager.computeQualities();
 				aggregManager.computeDichotomy();
-		//	} else {
-		//		aggregManager = ocelotlView.getOcelotlCore().getLpaggregManager();
+			//	} else {
+			//		aggregManager = ocelotlView.getOcelotlCore().getLpaggregManager();
 			//}
 			parameter = ocelotlView.getOcelotlCore().computeInitialParameter();
 

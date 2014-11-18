@@ -41,6 +41,7 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	protected ISpaceTimeAggregation timeAggregation;
 	protected OcelotlParameters ocelotlParameters;
 	protected EventProducerHierarchy hierarchy;
+
 	private static final Logger logger = LoggerFactory.getLogger(SpaceTimeAggregationManager.class);
 
 	public SpaceTimeAggregationManager(final OcelotlParameters ocelotlParameters) {
@@ -162,5 +163,4 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 	public void print(OcelotlCore core) {
 
 	}
-
 }

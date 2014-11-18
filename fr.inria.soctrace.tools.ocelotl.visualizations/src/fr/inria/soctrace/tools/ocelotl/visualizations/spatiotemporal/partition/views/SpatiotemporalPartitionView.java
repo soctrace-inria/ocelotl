@@ -70,7 +70,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 
 		public void draw() {
 			rootHeight = root.getSize().height;
-			height = rootHeight - aBorder;
+			height = rootHeight - (2 * aBorder);
 			width = root.getSize().width - (2 * aBorder);
 			logicWidth = width / (hierarchy.getRoot().getParts().size());
 			logicHeight = height / hierarchy.getRoot().getWeight();
@@ -220,7 +220,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 
 			rectangle.setToolTip(new Label(" " + name + " "));
 			int xa = (int) ((logicX * logicWidth + aBorder));
-			int ya = (int) (rootHeight - height + logicY * logicHeight);
+			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
 			int xb = xendlist.get(logicX2);
 			int yb = (int) (ya + sizeY * logicHeight) - space;
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
@@ -245,7 +245,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 					.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 			// rectangle.add(lab, BorderLayout.CENTER);
 			int xa = (int) ((logicX * logicWidth + aBorder));
-			int ya = (int) (rootHeight - height + logicY * logicHeight);
+			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
 			int xb = xendlist.get(logicX2);
 			int yb = (int) (ya + sizeY * logicHeight) - space;
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
@@ -280,7 +280,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 					.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 			// rectangle.add(lab, BorderLayout.CENTER);
 			int xa = (int) ((logicX * logicWidth + aBorder));
-			int ya = (int) (rootHeight - height + logicY * logicHeight);
+			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
 			int xb = xendlist.get(logicX2);
 			int yb = (int) (ya + sizeY * logicHeight) - space;
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));

@@ -9,6 +9,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
+import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.framesoc.ui.model.TableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
@@ -23,7 +24,7 @@ public class TemporalSummaryStat extends StatisticsProvider {
 	Microscopic3DDescription microModel;
 	HashMap<String, Double> data;
 	HashMap<String, Double> proportions;
-	List<SummaryStatModel> statData;
+	List<ITableRow> statData;
 
 	public TemporalSummaryStat(OcelotlView aView) {
 		super(aView);
@@ -39,13 +40,19 @@ public class TemporalSummaryStat extends StatisticsProvider {
 
 		// Get the corresponding time slices
 		int startingSlice = (int) microModel.getTimeSliceManager()
-				.getTimeSlice(timeRegion.getTimeStampStart() + 1);
+				.getTimeSlice(timeRegion.getTimeStampStart() + 2);
 		int endingSlice = (int) microModel.getTimeSliceManager().getTimeSlice(
 				timeRegion.getTimeStampEnd());
 		
 		// Get data from the microscopic model
 		for (i = startingSlice; i <= endingSlice; i++) {
 			for (EventProducer ep : microModel.getMatrix().get(i).keySet()) {
+				// Get only the spatially selected elements
+				if (ocelotlview.getOcelotlParameters().isSpatialSelection()
+						&& (!ocelotlview.getOcelotlParameters()
+								.getSpatiallySelectedProducers().contains(ep))) {
+					continue;
+				}
 				for (String et : microModel.getMatrix().get(i).get(ep).keySet()) {
 					// If first time we meet the event type
 					if (!data.containsKey(et)) {
@@ -63,7 +70,7 @@ public class TemporalSummaryStat extends StatisticsProvider {
 			total = total + aValue;
 		}
 
-		statData = new ArrayList<SummaryStatModel>();
+		statData = new ArrayList<ITableRow>();
 
 		// Create the data objects for the table
 		for (String ep : data.keySet()) {
@@ -96,7 +103,7 @@ public class TemporalSummaryStat extends StatisticsProvider {
 	}
 
 	@Override
-	public List<SummaryStatModel> getTableData() {
+	public List<ITableRow> getTableData() {
 		return statData;
 	}
 	
@@ -106,8 +113,10 @@ public class TemporalSummaryStat extends StatisticsProvider {
 
 	@Override
 	public void updateColor() {
-		for (SummaryStatModel aStat : statData) {
+		for (ITableRow aRow : statData) {
+			SummaryStatModel aStat = (SummaryStatModel) aRow;
 			try {
+
 				aStat.setColor(FramesocColorManager
 						.getInstance()
 						.getEventTypeColor(

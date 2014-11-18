@@ -48,7 +48,7 @@ public class Snapshot {
 
 	public void setSnapshotDirectory(String snapshotDirectory) {
 		this.snapshotDirectory = snapshotDirectory;
-		theView.getParams().getOcelotlSettings().setSnapShotDirectory(this.snapshotDirectory);
+		theView.getOcelotlParameters().getOcelotlSettings().setSnapShotDirectory(this.snapshotDirectory);
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class Snapshot {
 
 		// Look for the gain and loss value
 		for (int i = 0; i < parameters.size() - 1; i++) {
-			if (theView.getParams().getParameter() < parameters.get(i)) {
+			if (theView.getOcelotlParameters().getParameter() < parameters.get(i)) {
 				if (i > 0)
 					i = i - 1;
 
@@ -135,21 +135,21 @@ public class Snapshot {
 
 		StringBuffer output = new StringBuffer();
 		output.append("Trace name: ");
-		output.append(theView.getParams().getTrace().getAlias());
+		output.append(theView.getOcelotlParameters().getTrace().getAlias());
 		output.append("\nNumber of slices: ");
-		output.append(theView.getParams().getTimeSlicesNumber());
+		output.append(theView.getOcelotlParameters().getTimeSlicesNumber());
 		output.append("\nStart timestamp: ");
-		output.append(theView.getParams().getTimeRegion().getTimeStampStart());
+		output.append(theView.getOcelotlParameters().getTimeRegion().getTimeStampStart());
 		output.append("\nEnd timestamp: ");
-		output.append(theView.getParams().getTimeRegion().getTimeStampEnd());
+		output.append(theView.getOcelotlParameters().getTimeRegion().getTimeStampEnd());
 		output.append("\nMetric type: ");
-		output.append(theView.getParams().getMicroModelType());
+		output.append(theView.getOcelotlParameters().getMicroModelType());
 		output.append("\nAggregation Operator: ");
-		output.append(theView.getParams().getDataAggOperator());
+		output.append(theView.getOcelotlParameters().getDataAggOperator());
 		output.append("\nVisualization Operator: ");
-		output.append(theView.getParams().getVisuOperator());
+		output.append(theView.getOcelotlParameters().getVisuOperator());
 		output.append("\nParameter: ");
-		output.append(theView.getParams().getParameter());
+		output.append(theView.getOcelotlParameters().getParameter());
 		output.append("\nGain: ");
 		output.append(gain);
 		output.append(" - Loss: ");
@@ -178,7 +178,7 @@ public class Snapshot {
 		Date aDate = new Date(System.currentTimeMillis());
 		String convertedDate = new SimpleDateFormat("dd-MM-yyyy HHmmss z").format(aDate);
 		
-		String fileName = theView.getParams().getTrace().getAlias() + "_" + convertedDate;
+		String fileName = theView.getOcelotlParameters().getTrace().getAlias() + "_" + convertedDate;
 		fileName = FilenameValidator.checkNameValidity(fileName);
 			
 		dirName = snapshotDirectory + "/" + fileName;

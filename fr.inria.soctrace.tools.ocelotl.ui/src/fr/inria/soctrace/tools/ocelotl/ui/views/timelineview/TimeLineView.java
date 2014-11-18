@@ -38,6 +38,7 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 
 	public TimeLineView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
+		mouse = new TemporalMouseListener(this);
 	}
 
 	@Override
