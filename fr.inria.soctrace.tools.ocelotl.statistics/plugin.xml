@@ -7,7 +7,7 @@
 		point="fr.inria.soctrace.tools.ocelotl.core.statistics">
 		<statistic_operator
 			class="fr.inria.soctrace.tools.ocelotl.statistics.operators.TemporalSummaryStat"
-			operator="Temporal Summary"
+			operator="Summary"
 			param_config=""
 			param_win=""
 			metric_compatibility="ALL, VARIABLE"
@@ -17,7 +17,7 @@
 		</statistic_operator>
 		<statistic_operator
 			class="fr.inria.soctrace.tools.ocelotl.statistics.operators.TemporalStateSummaryStat"
-			operator="Temporal State Summary"
+			operator="State Summary"
 			param_config=""
 			param_win=""
 			metric_compatibility="STATE"
