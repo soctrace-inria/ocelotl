@@ -783,10 +783,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonUp.notifyListeners(SWT.Selection, new Event());
 				break;
-				
-			case SWT.SPACE:
-				statView.resizeDiagram();
-				break;
 			case SWT.KEYPAD_CR:
 			case SWT.CR:
 				if(!e.widget.isListening(e.type))
@@ -847,9 +843,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	protected FramesocBusTopicList		topics			= null;
 
 	private ConfigViewManager			manager;
-	private Combo	comboStatistics;
-	private Button	buttonHome;
-	private Composite	statComposite;
+	private Combo						comboStatistics;
+	private Button						buttonHome;
+	private Composite					statComposite;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1067,6 +1063,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		gd_textTimestampStart.widthHint = 150;
 		textTimestampStart.setLayoutData(gd_textTimestampStart);
 		textTimestampStart.setFont(cantarell8);
+		textTimestampStart.setToolTipText("Starting timestamp value");
 
 		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
 		lblEndTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
@@ -1078,6 +1075,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		gd_textTimestampEnd.widthHint = 150;
 		textTimestampEnd.setLayoutData(gd_textTimestampEnd);
 		textTimestampEnd.setFont(cantarell8);
+		textTimestampEnd.setToolTipText("Ending timestamp value");
 
 		btnReset = new Button(groupTime, SWT.NONE);
 		btnReset.setToolTipText("Reset Timestamps");
@@ -1189,6 +1187,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnRun.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/ocelotl16.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
+		btnRun.setToolTipText("Launch an analysis");
 		btnRun.setText("RUN!");
 		
 		btnRun.addSelectionListener(new GetAggregationAdapter());

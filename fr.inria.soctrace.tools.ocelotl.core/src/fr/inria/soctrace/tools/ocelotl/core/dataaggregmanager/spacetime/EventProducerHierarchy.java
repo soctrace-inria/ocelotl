@@ -243,7 +243,7 @@ public class EventProducerHierarchy {
 		}
 
 		/**
-		 * Check whether or not the current epn contain another epn
+		 * Check whether or not the current epn contain another epn given as parameter
 		 * 
 		 * @param anEpn
 		 * @return true if is the same or one of the children is the same, false
@@ -267,7 +267,7 @@ public class EventProducerHierarchy {
 		 * 
 		 * @param epns
 		 *            List of epn
-		 * @return The list of all the epn containg all the epn provided in
+		 * @return The list of all the epn containing all the epn provided in
 		 *         parameters
 		 */
 		public List<EventProducerNode> containsAll(List<EventProducerNode> epns) {
@@ -323,8 +323,13 @@ public class EventProducerHierarchy {
 
 			return containedEpn;
 		}
-		
-		
+
+		/**
+		 * Search for all the event producers in the hierarchy of the current
+		 * epn (including itself)
+		 * 
+		 * @return the list of all the found event producers
+		 */
 		public ArrayList<EventProducer> getContainedProducers() {
 			ArrayList<EventProducer> producers = new ArrayList<EventProducer>();
 			producers.add(this.me);

@@ -124,6 +124,12 @@ abstract public class AggregatedView implements IAggregatedView {
 	
 	/**
 	 * States of the mouse
+	 * 
+	 * PRESSED_LEFT: Left button pressed
+	 * DRAG_LEFT_VERTICAL/DRAG_LEFT_HORIZONTAL: dragging of the mouse with the left button on the vertical axis (horizontal resp.)
+	 * RELEASED: Button is released
+	 * EXITED: Cursor out of the zone
+	 * H/V_MOVE_START/END: starting a horizontal/vertical (H/V) dragging move from one side (left, right, up or bottom)
 	 */
 	static public enum MouseState {
 		PRESSED_D, DRAG_D, PRESSED_LEFT, DRAG_LEFT, DRAG_LEFT_START, 
