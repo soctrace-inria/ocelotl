@@ -973,67 +973,67 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		
 			
 		comboTraces = new Combo(groupTraces, SWT.READ_ONLY);
-		GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_comboTraces.widthHint = 170;
-		comboTraces.setLayoutData(gd_comboTraces);
-		comboTraces.setFont(cantarell8);
-		comboTraces.addSelectionListener(new TraceAdapter());
-		comboTraces.setToolTipText("Trace selection");
-
-		Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
-		btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
-		btnLoadDataCache.setToolTipText("Load a Microscopic Description");
-		btnLoadDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		btnLoadDataCache.addSelectionListener(new LoadDataListener());
-
-		comboType = new Combo(groupTraces, SWT.READ_ONLY);
-		final GridData gd_comboType = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_comboType.widthHint = 150;
-		comboType.setLayoutData(gd_comboType);
-		comboType.setFont(cantarell8);
-		comboType.add("Metric");
-		comboType.setText("Metric");
-		comboType.addSelectionListener(new ComboTypeSelectionAdapter());
-		comboType.setToolTipText("Metric selection");
-
-		comboTime = new Combo(groupTraces, SWT.READ_ONLY);
-		final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_comboAggregationOperator.widthHint = 150;
-		comboTime.setLayoutData(gd_comboAggregationOperator);
-		comboTime.setFont(cantarell8);
-		comboTime.add("Dimensions");
-		comboTime.setText("Dimensions");
-		comboTime.addSelectionListener(new ComboTimeSelectionAdapter());
-		comboTime.setToolTipText("Dimensions selection");
-
-		btnSettings = new Button(groupTraces, SWT.NONE);
-		btnSettings.setToolTipText("Settings");
-		btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-		btnSettings.setFont(cantarell8);
-		btnSettings.addSelectionListener(new SettingsSelectionAdapter());
-
-		btnSaveDataCache = new Button(groupTraces, SWT.NONE);
-		btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
-		btnSaveDataCache.setToolTipText("Save Current Microscopic Description");
-		btnSaveDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
-		btnSaveDataCache.addSelectionListener(new SaveDataListener());
-
-		comboVisu = new Combo(groupTraces, SWT.READ_ONLY);
-		final GridData gd_comboSpace = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_comboSpace.widthHint = 150;
-		comboVisu.setLayoutData(gd_comboSpace);
-		comboVisu.setFont(cantarell8);
-		comboVisu.add("Visualization");
-		comboVisu.setText("Visualization");
-		comboVisu.addSelectionListener(new ComboVisuSelectionAdapter());
-		comboVisu.setToolTipText("Visualization selection");
-
-		btnSettings2 = new Button(groupTraces, SWT.NONE);
-		btnSettings2.setToolTipText("Settings");
-		btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
-		btnSettings2.setFont(cantarell8);
-		btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
-
+		 				GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		 				gd_comboTraces.widthHint = 170;
+		 				comboTraces.setLayoutData(gd_comboTraces);
+		 				comboTraces.setFont(cantarell8);
+		 				comboTraces.addSelectionListener(new TraceAdapter());
+		 				comboTraces.setToolTipText("Trace selection");
+		 		
+		 				Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
+		 				btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
+		 				btnLoadDataCache.setToolTipText("Load a Microscopic Description");
+		 				btnLoadDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		 				btnLoadDataCache.addSelectionListener(new LoadDataListener());
+		 		
+		 				comboType = new Combo(groupTraces, SWT.READ_ONLY);
+		 				final GridData gd_comboType = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		 				gd_comboType.widthHint = 150;
+		 				comboType.setLayoutData(gd_comboType);
+		 				comboType.setFont(cantarell8);
+		 				comboType.add("Metric");
+		 				comboType.setText("Metric");
+		 				comboType.addSelectionListener(new ComboTypeSelectionAdapter());
+		 				comboType.setToolTipText("Metric selection");
+		 		
+		 				comboDimension = new Combo(groupTraces, SWT.READ_ONLY);
+		 				final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		 				gd_comboAggregationOperator.widthHint = 150;
+		 				comboDimension.setLayoutData(gd_comboAggregationOperator);
+		 				comboDimension.setFont(cantarell8);
+		 				comboDimension.add("Dimensions");
+		 				comboDimension.setText("Dimensions");
+		 				comboDimension.addSelectionListener(new ComboDimensionSelectionAdapter());
+		 				comboDimension.setToolTipText("Dimensions selection");
+		 		
+		 				btnSettings = new Button(groupTraces, SWT.NONE);
+		 				btnSettings.setToolTipText("Settings");
+		 				btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
+		 				btnSettings.setFont(cantarell8);
+		 				btnSettings.addSelectionListener(new SettingsSelectionAdapter());
+		 		
+		 				btnSaveDataCache = new Button(groupTraces, SWT.NONE);
+		 				btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
+		 				btnSaveDataCache.setToolTipText("Save Current Microscopic Description");
+		 				btnSaveDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
+		 				btnSaveDataCache.addSelectionListener(new SaveDataListener());
+		 		
+		 				comboVisu = new Combo(groupTraces, SWT.READ_ONLY);
+		 				final GridData gd_comboSpace = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		 				gd_comboSpace.widthHint = 150;
+		 				comboVisu.setLayoutData(gd_comboSpace);
+						comboVisu.setFont(cantarell8);
+		 				comboVisu.add("Visualization");
+		 				comboVisu.setText("Visualization");
+		 				comboVisu.addSelectionListener(new ComboVisuSelectionAdapter());
+		 				comboVisu.setToolTipText("Visualization selection");
+		 		
+		 				btnSettings2 = new Button(groupTraces, SWT.NONE);
+		 				btnSettings2.setToolTipText("Settings");
+	 				btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
+						btnSettings2.setFont(cantarell8);
+						btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
+		
 		topBarScrollComposite.setContent(groupTraces);
 		topBarScrollComposite.setMinSize(groupTraces.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
