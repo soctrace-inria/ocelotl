@@ -6,14 +6,15 @@ import java.util.HashMap;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-public class TemporalStateSummaryStat extends TemporalSummaryStat {
-
-	public TemporalStateSummaryStat(OcelotlView aView) {
+public class StateLeaveSummaryStat extends SummaryStat{
+	
+	public StateLeaveSummaryStat(OcelotlView aView) {
 		super(aView);
 	}
-	
+
 	@Override
 	public void computeData() {
 		int i;
@@ -33,11 +34,9 @@ public class TemporalStateSummaryStat extends TemporalSummaryStat {
 		// Get data from the microscopic model
 		for (i = startingSlice; i <= endingSlice; i++) {
 			for (EventProducer ep : microModel.getMatrix().get(i).keySet()) {
-				if (ocelotlview.getOcelotlParameters().isSpatialSelection()
-						&& (!ocelotlview.getOcelotlParameters()
-								.getSpatiallySelectedProducers().contains(ep))) {
+				if (!isInSpatialSelection(ep) || !isLeaf(ep))
 					continue;
-				}
+
 				for (String et : microModel.getMatrix().get(i).get(ep).keySet()) {
 					// If first time we meet the event type
 					if (!data.containsKey(et)) {
@@ -52,15 +51,10 @@ public class TemporalStateSummaryStat extends TemporalSummaryStat {
 
 		int nbProducers;
 		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
-			nbProducers = ocelotlview.getOcelotlParameters()
-					.getCurrentProducers().size();
-			
-			if (nbProducers == 2)
-				// Since we add the parent producers when only one producer is
-				// selected, we remove it to have correct data
-				nbProducers = 1;
+			nbProducers = numberOfSelectedLeaves();
 		} else {
-			nbProducers = microModel.getMatrix().get(0).keySet().size();
+			nbProducers = ocelotlview.getOcelotlParameters()
+					.getEventProducerHierarchy().getLeaves().values().size();
 		}
 		
 		total = timeRegion.getTimeDuration() * nbProducers;
@@ -79,4 +73,26 @@ public class TemporalStateSummaryStat extends TemporalSummaryStat {
 		}
 	}
 	
+	protected boolean isLeaf(EventProducer ep) {
+		return ocelotlview.getOcelotlParameters().getEventProducerHierarchy()
+				.isLeaf(ep);
+	}
+	
+	/**
+	 * Select the leaf producers among the current selected producer
+	 * 
+	 * @return the current number of selected leaves producers
+	 */
+	public Integer numberOfSelectedLeaves() {
+		int numberOfLeaves = 0;
+
+		for (SimpleEventProducerNode anSepn : ocelotlview
+				.getOcelotlParameters().getEventProducerHierarchy().getLeaves()
+				.values())
+			if (ocelotlview.getOcelotlParameters().getCurrentProducers()
+					.contains(anSepn.getMe()))
+				numberOfLeaves++;
+
+		return numberOfLeaves;
+	}
 }

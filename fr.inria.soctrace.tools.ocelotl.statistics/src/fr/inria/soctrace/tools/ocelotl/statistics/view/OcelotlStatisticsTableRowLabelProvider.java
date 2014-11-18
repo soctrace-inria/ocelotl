@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.TableItem;
 import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.statistics.operators.TemporalSummaryStat.SummaryStatModel;
+import fr.inria.soctrace.tools.ocelotl.statistics.operators.SummaryStat.SummaryStatModel;
 
 public class OcelotlStatisticsTableRowLabelProvider extends OwnerDrawLabelProvider  {
 

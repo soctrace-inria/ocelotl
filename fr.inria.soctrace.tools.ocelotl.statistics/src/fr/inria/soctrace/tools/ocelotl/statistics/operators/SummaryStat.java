@@ -19,14 +19,14 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.statistics.view.OcelotlStatisticsTableColumn;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-public class TemporalSummaryStat extends StatisticsProvider {
+public class SummaryStat extends StatisticsProvider {
 
 	Microscopic3DDescription microModel;
 	HashMap<String, Double> data;
 	HashMap<String, Double> proportions;
 	List<ITableRow> statData;
 
-	public TemporalSummaryStat(OcelotlView aView) {
+	public SummaryStat(OcelotlView aView) {
 		super(aView);
 	}
 	
@@ -48,11 +48,9 @@ public class TemporalSummaryStat extends StatisticsProvider {
 		for (i = startingSlice; i <= endingSlice; i++) {
 			for (EventProducer ep : microModel.getMatrix().get(i).keySet()) {
 				// Get only the spatially selected elements
-				if (ocelotlview.getOcelotlParameters().isSpatialSelection()
-						&& (!ocelotlview.getOcelotlParameters()
-								.getSpatiallySelectedProducers().contains(ep))) {
+				if (!isInSpatialSelection(ep)) 
 					continue;
-				}
+				
 				for (String et : microModel.getMatrix().get(i).get(ep).keySet()) {
 					// If first time we meet the event type
 					if (!data.containsKey(et)) {
@@ -100,6 +98,15 @@ public class TemporalSummaryStat extends StatisticsProvider {
 				Long.valueOf(ocelotlview.getTextTimestampEnd().getText()));
 
 		timeRegion = new TimeRegion(startingDate, endingDate);
+	}
+
+	protected boolean isInSpatialSelection(EventProducer ep) {
+		if (ocelotlview.getOcelotlParameters().isSpatialSelection()
+				&& (!ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers().contains(ep)))
+			return false;
+
+		return true;
 	}
 
 	@Override

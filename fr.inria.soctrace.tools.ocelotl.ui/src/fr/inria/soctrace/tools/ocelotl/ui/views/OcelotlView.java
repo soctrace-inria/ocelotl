@@ -542,11 +542,14 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 			if (confDataLoader.getCurrentTrace() == null)
 				return;
-			if (hasChanged == HasChanged.NOTHING)
-				hasChanged = HasChanged.PARAMETER;
+
 			ocelotlCore.getStatOperators().setSelectedOperator(comboStatistics.getText());
 			statView = statViewManager.create();
 			statViewWrapper.setView(statView);
+			
+			// If there is a diagram displayed then also update the stat table
+			if(ocelotlCore.getLpaggregManager() != null)
+				statView.createDiagram();
 		}
 	}
 

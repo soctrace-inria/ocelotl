@@ -260,7 +260,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			// Compute the selection bound for drawing (cf.
 			// SpatioTemporalModeView)
 			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
-			cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight);
+			cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
 
 			ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
 
