@@ -17,14 +17,12 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.ISpaceTimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.Aggregation;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.MatrixView;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.SpatioTemporalAggregate;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.SpatioTemporalAggregateView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainState;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.SpatiotemporalMode;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.VisualAggregation;
@@ -59,40 +57,39 @@ public class SpatiotemporalModeView extends MatrixView {
 			super();
 			xendlist = new ArrayList<Integer>();
 			yendlist = new ArrayList<Integer>();
-			aggregates = new ArrayList<SpatioTemporalAggregate>();
+			aggregates = new ArrayList<SpatioTemporalAggregateView>();
 		}
 
 		/**
 		 * Compute the list of X values according to the number of time slices
 		 * (parts)
 		 */
-		protected void initX(EventProducerNode epn) {
+		protected void initX() {
 			xendlist.clear();
-			for (int i = 0; i <= epn.getParts().size(); i++)
+			for (int i = 0; i <= hierarchy.getRoot().getParts().size(); i++)
 				xendlist.add((int) (i * logicWidth + aBorder - space));
 		}
 
 		/**
 		 * Compute the list of Y values according to the weight of the root node
 		 */
-		protected void initY(EventProducerNode epn) {
+		protected void initY() {
 			yendlist.clear();
-			for (int i = 0; i <= epn.getWeight(); i++)
+			for (int i = 0; i <= hierarchy.getRoot().getWeight(); i++)
 				yendlist.add((int) (rootHeight - height + i * logicHeight
 						- space - aBorder));
 		}
 
-		public void draw(EventProducerNode epn, int start, int end) {
+		public void draw() {
 			rootHeight = root.getSize().height;
 			height = rootHeight - (2 * aBorder);
 			width = root.getSize().width - (2 * aBorder);
-			logicWidth = width / epn.getParts().size();
-			logicHeight = height / epn.getWeight();
-			initX(epn);
-			initY(epn);
-			print(epn, start, end);
-			//print(epn, 0, epn
-			//		.getParts().size());
+			logicWidth = width / hierarchy.getRoot().getParts().size();
+			logicHeight = height / hierarchy.getRoot().getWeight();
+			initX();
+			initY();
+			print(hierarchy.getRoot(), 0, hierarchy.getRoot()
+					.getParts().size());
 		}
 
 		/**
@@ -372,7 +369,7 @@ public class SpatiotemporalModeView extends MatrixView {
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb,
 					yb)));
 			
-			aggregates.add(new SpatioTemporalAggregate(new Rectangle(new Point(xa, ya), new Point(xb,
+			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(new Point(xa, ya), new Point(xb,
 					yb)), epn, logicX, logicX2));
 			
 			if (!clean) {
@@ -474,21 +471,6 @@ public class SpatiotemporalModeView extends MatrixView {
 	}
 
 	@Override
-	protected void computeDiagram(EventProducerHierarchy aHierarchy, int start, int end) {
-		if (!aHierarchy.getRoot().getParts().isEmpty()) {
-			spatiotemporalMode = new SpatiotemporalMode();
-			spatiotemporalMode.setLpaggregManager((ISpaceTimeManager)ocelotlView.getOcelotlCore().getLpaggregManager());
-			spatiotemporalMode.setHierarchy(aHierarchy);
-			spatiotemporalMode.initParts();
-					//(SpatiotemporalMode) ocelotlView.getCore()
-					//.getVisuOperator();
-			DrawAggregate hp = new DrawAggregate();
-			//hp.print(aHierarchy.getRoot(), start, end);
-			hp.draw(aHierarchy.getRoot(), start, end);
-		}
-	}
-	
-	@Override
 	protected void computeDiagram(EventProducerNode aNode, int start, int end) {
 		if (!aNode.getParts().isEmpty()) {
 			spatiotemporalMode = (SpatiotemporalMode) ocelotlView.getCore()
@@ -497,7 +479,6 @@ public class SpatiotemporalModeView extends MatrixView {
 			hp.draw(aNode, start, end);
 		}
 	}
-
 	
 	@Override
 	protected void computeDiagram() {
@@ -505,8 +486,7 @@ public class SpatiotemporalModeView extends MatrixView {
 			spatiotemporalMode = (SpatiotemporalMode) ocelotlView.getCore()
 					.getVisuOperator();
 			DrawSpatialMode hp = new DrawSpatialMode();
-			hp.draw(hierarchy.getRoot(), 0, hierarchy.getRoot()
-							.getParts().size());
+			hp.draw();
 		}
 	}
 
@@ -524,7 +504,6 @@ public class SpatiotemporalModeView extends MatrixView {
 		 * Compute the list of X values according to the number of time slices
 		 * (parts)
 		 */
-		@Override
 		protected void initX(EventProducerNode epn) {
 			xendlist.clear();
 			for (int i = 0; i <= epn.getParts().size(); i++)
@@ -534,7 +513,6 @@ public class SpatiotemporalModeView extends MatrixView {
 		/**
 		 * Compute the list of Y values according to the weight of the root node
 		 */
-		@Override
 		protected void initY(EventProducerNode epn) {
 			yendlist.clear();
 			for (int i = 0; i <= epn.getWeight(); i++)
@@ -542,7 +520,6 @@ public class SpatiotemporalModeView extends MatrixView {
 						- space - aBorder));
 		}
 
-		@Override
 		public void draw(EventProducerNode epn, int start, int end) {
 			startingSlice = start;
 			endingSlice = end;

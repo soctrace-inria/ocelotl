@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
@@ -47,7 +46,6 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -71,7 +69,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected SelectFigure							selectFigure;
 	protected IVisuOperator							visuOperator	= null;
 	protected OcelotlMouseListener					mouse;
-	protected List<SpatioTemporalAggregate>						aggregates;
+	protected List<SpatioTemporalAggregateView>						aggregates;
 	public final static Color						selectColorFG	= ColorConstants.blue;
 	public final static Color						selectColorBG	= ColorConstants.lightGray;
 	public final static Color						activeColorFG	= ColorConstants.black;
@@ -274,11 +272,11 @@ abstract public class AggregatedView implements IAggregatedView {
 		return visuOperator;
 	}
 
-	public List<SpatioTemporalAggregate> getAggregates() {
+	public List<SpatioTemporalAggregateView> getAggregates() {
 		return aggregates;
 	}
 
-	public void setAggregates(ArrayList<SpatioTemporalAggregate> aggregateMapping) {
+	public void setAggregates(ArrayList<SpatioTemporalAggregateView> aggregateMapping) {
 		this.aggregates = aggregateMapping;
 	}
 

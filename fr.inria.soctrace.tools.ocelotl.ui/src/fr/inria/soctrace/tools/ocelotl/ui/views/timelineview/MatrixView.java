@@ -80,6 +80,5 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 		this.hierarchy = hierarchy;
 	}
 
-	protected abstract void computeDiagram(EventProducerHierarchy aHierarchy, int start, int end);
 	protected abstract void computeDiagram(EventProducerNode aHierarchy, int start, int end);
 }
