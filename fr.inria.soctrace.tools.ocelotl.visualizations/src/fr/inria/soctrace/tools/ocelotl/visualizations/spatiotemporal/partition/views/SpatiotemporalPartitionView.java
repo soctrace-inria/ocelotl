@@ -40,6 +40,7 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventPro
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.MatrixView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.SpatioTemporalAggregateView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.VisualAggregation;
 import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.PartitionColorManager;
 
@@ -47,22 +48,23 @@ public class SpatiotemporalPartitionView extends MatrixView {
 	
 	public class DrawPartition {
 
-		private double rootHeight;
-		private double height;
-		private double width;
-		private double logicWidth;
-		private double logicHeight;
-		private int minLogicWeight = 3;
-		private PartitionColorManager colors;
-		private List<Integer> xendlist;
+		protected double rootHeight;
+		protected double height;
+		protected double width;
+		protected double logicWidth;
+		protected double logicHeight;
+		protected int minLogicWeight = 3;
+		protected PartitionColorManager colors;
+		protected List<Integer> xendlist;
 
 		public DrawPartition() {
 			super();
 			xendlist = new ArrayList<Integer>();
 			colors = new PartitionColorManager();
+			aggregates = new ArrayList<SpatioTemporalAggregateView>();
 		}
 
-		private void initX() {
+		protected void initX() {
 			xendlist.clear();
 			for (int i = 0; i <= hierarchy.getRoot().getParts().size(); i++)
 				xendlist.add((int) (i * logicWidth + aBorder - space));
@@ -75,11 +77,11 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			logicWidth = width / (hierarchy.getRoot().getParts().size());
 			logicHeight = height / hierarchy.getRoot().getWeight();
 			initX();
-			print(hierarchy.getRoot().getID(), 0, hierarchy.getRoot().getParts()
+			print(hierarchy.getRoot(), 0, hierarchy.getRoot().getParts()
 					.size());
 		}
 
-		private List<Part> computeParts(EventProducerNode epn, int start, int end) {
+		protected List<Part> computeParts(EventProducerNode epn, int start, int end) {
 			List<Part> parts = new ArrayList<Part>();
 			int oldPart = epn.getParts().get(start);
 			parts.add(new Part(start, start + 1, new VisualAggregation(false,
@@ -101,8 +103,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			return parts;
 		}
 
-		private void print(int id, int start, int end) {
-			EventProducerNode epn = hierarchy.getEventProducerNodes().get(id);
+		protected void print(EventProducerNode epn, int start, int end) {
 			List<Part> parts = computeParts(epn, start, end);
 			for (Part p : parts) {
 				if (((VisualAggregation) p.getData()).isAggregated())
@@ -119,7 +120,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 						}
 					}
 					if (aggy == false)
-						printChildren(id, p.getStartPart(), p.getEndPart());
+						printChildren(epn, p.getStartPart(), p.getEndPart());
 					else {
 						List<Part> aggParts = computeCommonCuts(epn,
 								p.getStartPart(), p.getEndPart());
@@ -130,13 +131,13 @@ public class SpatiotemporalPartitionView extends MatrixView {
 										epn.getIndex(), pagg.getEndPart(),
 										epn.getWeight(),
 										((VisualAggregation) p.getData())
-												.getValue(), epn.getMe().getName());
+												.getValue(), epn);
 							else
 								drawNotCleanVisualAggregate(pagg.getStartPart(),
 										epn.getIndex(), pagg.getEndPart(),
 										epn.getWeight(),
 										((VisualAggregation) p.getData())
-												.getValue(), epn.getMe().getName());
+												.getValue(), epn);
 						}
 					}
 				}
@@ -144,7 +145,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 
 		}
 
-		private List<Part> computeCommonCuts(EventProducerNode epn, int start,
+		protected List<Part> computeCommonCuts(EventProducerNode epn, int start,
 				int end) {
 			HashMap<EventProducerNode, List<Part>> hm = new HashMap<EventProducerNode, List<Part>>();
 			List<Part> commonParts = new ArrayList<Part>();
@@ -204,13 +205,13 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			return parts;
 		}
 
-		private void printChildren(int id, int start, int end) {
-			for (EventProducerNode ep : hierarchy.getEventProducerNodes().get(id)
+		protected void printChildren(EventProducerNode epn, int start, int end) {
+			for (EventProducerNode ep : epn
 					.getChildrenNodes())
-				print(ep.getID(), start, end);
+				print(ep, start, end);
 		}
 
-		private void drawStandardAggregate(int logicX, int logicY, int logicX2,
+		protected void drawStandardAggregate(int logicX, int logicY, int logicX2,
 				int sizeY, int number, String name) {
 			final RectangleFigure rectangle = new RectangleFigure();
 			rectangle.setBackgroundColor(colors.getColors().get(number).getBg());
@@ -225,15 +226,15 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
 		}
 
-		private void drawNotCleanVisualAggregate(int logicX, int logicY,
-				int logicX2, int sizeY, int number, String name) {
+		protected void drawNotCleanVisualAggregate(int logicX, int logicY,
+				int logicX2, int sizeY, int number, EventProducerNode epn) {
 			final RectangleFigure rectangle = new RectangleFigure();
 			rectangle.setBackgroundColor(ColorConstants.white);
 			rectangle.setForegroundColor(ColorConstants.black);
 
 			rectangle.setLineWidth(2);
 
-			rectangle.setToolTip(new Label(" " + name + " "));
+			rectangle.setToolTip(new Label(" " +  epn.getMe().getName() + " "));
 			rectangle.setLayoutManager(new BorderLayout());
 			rectangle.setPreferredSize(1000, 1000);
 			Label lab = new Label("?");
@@ -258,17 +259,20 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			line2.setForegroundColor(ColorConstants.black);
 			line2.setEndpoints(new Point(xa, yb), new Point(xb, ya));
 			root.add(line2);
+			
+			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(new Point(xa, ya), new Point(xb,
+					yb)), epn, logicX, logicX2));
 		}
 
-		private void drawCleanVisualAggregate(int logicX, int logicY, int logicX2,
-				int sizeY, int number, String name) {
+		protected void drawCleanVisualAggregate(int logicX, int logicY, int logicX2,
+				int sizeY, int number, EventProducerNode epn) {
 			final RectangleFigure rectangle = new RectangleFigure();
 			rectangle.setBackgroundColor(ColorConstants.white);
 			rectangle.setForegroundColor(ColorConstants.black);
 
 			rectangle.setLineWidth(2);
 
-			rectangle.setToolTip(new Label(" " + name + " "));
+			rectangle.setToolTip(new Label(" " + epn.getMe().getName() + " "));
 			rectangle.setLayoutManager(new BorderLayout());
 			rectangle.setPreferredSize(1000, 1000);
 			Label lab = new Label("?");
@@ -288,13 +292,12 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			line.setForegroundColor(ColorConstants.black);
 			line.setEndpoints(new Point(xa, yb), new Point(xb, ya));
 			root.add(line);
-
+			
+			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(new Point(xa, ya), new Point(xb,
+					yb)), epn, logicX, logicX2));
 		}
-
-
 	}
 	
-
 	public SpatiotemporalPartitionView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
 		
@@ -308,4 +311,87 @@ public class SpatiotemporalPartitionView extends MatrixView {
 		}
 	}
 
+	@Override
+	protected void computeDiagram(EventProducerNode aNode, int start,
+			int end) {
+		if (!aNode.getParts().isEmpty()) {
+			DrawAggregate hp = new DrawAggregate();
+			hp.draw(aNode, start, end);
+		}
+	}
+
+	
+	public class DrawAggregate extends DrawPartition {
+		private EventProducerNode theNode;
+		
+		private int startingSlice; 
+		private int endingSlice;
+		
+		public DrawAggregate() {
+			super();
+		}
+
+		protected void initX(EventProducerNode epn) {
+			xendlist.clear();
+			for (int i = 0; i <= epn.getParts().size(); i++)
+				xendlist.add((int) (i * logicWidth + aBorder - space));
+		}
+
+		public void draw(EventProducerNode aNode, int start,
+				int end) {
+			startingSlice = start;
+			endingSlice = end;
+			theNode = aNode;
+			rootHeight = root.getSize().height;
+			height = rootHeight - (2 * aBorder);
+			width = root.getSize().width - (2 * aBorder);
+			logicWidth = width / (end - start);
+			logicHeight = height / theNode.getWeight();
+			initX(theNode);
+			print(theNode, startingSlice, endingSlice);
+		}
+
+		protected void print(EventProducerNode epn, int start, int end) {
+			List<Part> parts = computeParts(epn, start, end);
+			for (Part p : parts) {
+				if (((VisualAggregation) p.getData()).isAggregated())
+					drawStandardAggregate(p.getStartPart() - startingSlice,
+							epn.getIndex() - theNode.getIndex(), p.getEndPart()
+									- startingSlice, epn.getWeight(),
+							((VisualAggregation) p.getData()).getValue(), epn
+									.getMe().getName());
+				else {
+					boolean aggy = false;
+					for (EventProducerNode ep : epn.getChildrenNodes()) {
+						if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
+							aggy = true;
+							break;
+						}
+					}
+					if (aggy == false)
+						printChildren(epn, p.getStartPart(), p.getEndPart());
+					else {
+						List<Part> aggParts = computeCommonCuts(epn,
+								p.getStartPart(), p.getEndPart());
+						for (Part pagg : aggParts) {
+							if (((VisualAggregation) pagg.getData())
+									.isNoCutInside())
+								drawCleanVisualAggregate(pagg.getStartPart() - startingSlice,
+										epn.getIndex() - theNode.getIndex(), pagg.getEndPart() - startingSlice,
+										epn.getWeight(),
+										((VisualAggregation) p.getData())
+												.getValue(), epn);
+							else
+								drawNotCleanVisualAggregate(pagg.getStartPart() - startingSlice,
+										epn.getIndex() - theNode.getIndex(), pagg.getEndPart() - startingSlice,
+										epn.getWeight(),
+										((VisualAggregation) p.getData())
+												.getValue(), epn);
+						}
+					}
+				}
+			}
+
+		}
+	}
 }
