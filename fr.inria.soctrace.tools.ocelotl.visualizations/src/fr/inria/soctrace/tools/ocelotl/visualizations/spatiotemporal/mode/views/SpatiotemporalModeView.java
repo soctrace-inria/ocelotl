@@ -413,6 +413,9 @@ public class SpatiotemporalModeView extends MatrixView {
 					i = 0;
 					x += spaceDirty;
 				}
+				if (x >= (xb + yb - ya)){
+					break;
+				}
 				final PolylineConnection line = new PolylineConnection();
 				int xinit = x;
 				int yinit = ya;

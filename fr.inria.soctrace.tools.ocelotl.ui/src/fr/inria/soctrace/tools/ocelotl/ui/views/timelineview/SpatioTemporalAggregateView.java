@@ -85,13 +85,13 @@ public class SpatioTemporalAggregateView {
 			// New dialog
 			Shell dialog = new Shell(ocelotlview.getSite().getShell());
 			dialog.setText("Aggregation Content");
-			dialog.setSize(500, 530);
+			dialog.setSize(1000, 700);
 			
 			// Init drawing display zone
 			final Composite compositeOverview = new Composite(dialog, SWT.BORDER);
 			compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 			compositeOverview.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-			compositeOverview.setSize(500, 500);
+			compositeOverview.setSize(1000, 700);
 			compositeOverview.setLayout(new FillLayout(SWT.HORIZONTAL));
 			
 			Figure root;
