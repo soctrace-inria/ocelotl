@@ -1,8 +1,0 @@
-- text field check unusable!
-- [fixed] save to db exception
-- use job for long operations
-- user feedback
-- crash  # A fatal error has been detected by the Java Runtime Environment: SIGSEGV (0xb) at pc=0x00007f17745cac3f, pid=6549, tid=139738708535040
-- [fixed] view id doesn't match
-- comments and license!!!!!!!!! COPY AND PASTE LIKE A THUG!
-
