@@ -24,8 +24,7 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.ISpaceTimeManager;
 
-abstract public class VisuSTOperator implements
-		IVisuSTOperator {
+abstract public class VisuSTOperator implements IVisuSTOperator {
 
 	protected EventProducerHierarchy hierarchy;
 	protected OcelotlCore ocelotlCore;
@@ -61,6 +60,18 @@ abstract public class VisuSTOperator implements
 		return hierarchy;
 	}
 
+	public void setHierarchy(EventProducerHierarchy hierarchy) {
+		this.hierarchy = hierarchy;
+	}
+
+	public ISpaceTimeManager getLpaggregManager() {
+		return lpaggregManager;
+	}
+
+	public void setLpaggregManager(ISpaceTimeManager lpaggregManager) {
+		this.lpaggregManager = lpaggregManager;
+	}
+
 	@Override
 	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
@@ -74,7 +85,7 @@ abstract public class VisuSTOperator implements
 		initParts();
 		computeParts();
 	}
-	
+
 	@Override
 	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
 		this.ocelotlCore = ocelotlCore;

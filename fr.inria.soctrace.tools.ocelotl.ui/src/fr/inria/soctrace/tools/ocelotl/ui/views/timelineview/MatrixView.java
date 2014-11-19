@@ -22,6 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -79,4 +80,6 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 		this.hierarchy = hierarchy;
 	}
 
+	protected abstract void computeDiagram(EventProducerHierarchy aHierarchy, int start, int end);
+	protected abstract void computeDiagram(EventProducerNode aHierarchy, int start, int end);
 }

@@ -96,7 +96,6 @@ public class SpatiotemporalPartitionView extends MatrixView {
 							new VisualAggregation(false,
 									epn.getParts().get(i) != -1, epn.getParts()
 											.get(i), true));
-
 				}
 			}
 			return parts;
@@ -304,7 +303,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 	@Override
 	protected void computeDiagram() {
 		if (!hierarchy.getRoot().getParts().isEmpty()) {
-			DrawPartition hp=new DrawPartition();
+			DrawPartition hp = new DrawPartition();
 			hp.draw();
 		}
 	}

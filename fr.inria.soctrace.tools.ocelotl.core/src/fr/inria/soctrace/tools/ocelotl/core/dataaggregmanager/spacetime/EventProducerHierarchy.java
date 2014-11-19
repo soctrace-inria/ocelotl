@@ -62,6 +62,21 @@ public class EventProducerHierarchy {
 			hierarchyLevel = 0;
 			setParent();
 		}
+		
+		public EventProducerNode(EventProducerNode epn) {
+			me = epn.getMe();
+			id = me.getId();
+			hierarchyLevel = 0;
+			
+			for (EventProducerNode epnChild : epn.getChildrenNodes()) {
+				eventProducerNodes.put(epnChild.id, new EventProducerNode(epnChild));
+			}
+			parts = new ArrayList<Integer>(epn.getParts());
+			values = epn.values;
+			aggregated = epn.aggregated;
+			index = 0;
+			weight = 1;
+		}
 
 		public Aggregation isAggregated() {
 			return aggregated;
@@ -476,6 +491,34 @@ public class EventProducerHierarchy {
 				containedEpn.add(epn);
 		}
 		return containedEpn;
+	}
+	
+	public EventProducerHierarchy(EventProducerNode aNode) {
+		super();
+		for (EventProducer ep : aNode.getContainedProducers()) {
+			this.eventProducers.put(ep.getId(), ep);
+		}
+		root = new EventProducerNode(aNode);
+		eventProducerNodes.put(root.id, root);
+		updateHierarchy();
+	}
+	
+	private void updateHierarchy() {
+		/*root.getContainedProducers();
+
+		for (EventProducer ep : eventProducers.values()) {
+			if (!eventProducerNodes.containsKey(ep.getId()))
+				eventProducerNodes.put(ep.getId(), new EventProducerNode(ep));
+		}*/
+		for(EventProducerNode epn: eventProducerNodes.values())
+		if (epn != root) {
+			epn.parentNode = eventProducerNodes.get(epn.getMe().getParentId());
+			epn.parentNode.addChild(epn);
+			epn.hierarchyLevel = epn.parentNode.getHierarchyLevel() + 1;
+		}
+		
+		root.setWeight();
+		root.setChildIndex();
 	}
 
 }

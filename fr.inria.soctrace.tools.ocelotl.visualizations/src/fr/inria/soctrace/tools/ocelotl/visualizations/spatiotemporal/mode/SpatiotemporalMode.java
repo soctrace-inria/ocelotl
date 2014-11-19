@@ -46,7 +46,7 @@ public class SpatiotemporalMode extends VisuSTOperator {
 	}
 
 	@Override
-	protected void initParts() {
+	public void initParts() {
 		proportions = new HashMap<EventProducerNode, ArrayList<HashMap<String, Double>>>();
 		computeProportions(hierarchy.getRoot());
 	}
@@ -98,7 +98,6 @@ public class SpatiotemporalMode extends VisuSTOperator {
 														.size()));
 				}
 			}
-
 		}
 	}
 

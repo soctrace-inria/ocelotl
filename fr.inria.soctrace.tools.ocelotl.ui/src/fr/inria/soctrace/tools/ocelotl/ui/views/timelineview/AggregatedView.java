@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
@@ -46,6 +47,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -57,22 +59,23 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  */
 abstract public class AggregatedView implements IAggregatedView {
 	
-	protected Figure						root;
-	protected Canvas						canvas;
-	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
-	protected TimeRegion					time;
-	protected TimeRegion					selectTime;
-	protected TimeRegion					resetTime;
-	protected int							aBorder			= 10;
-	protected final int						space			= 3;
-	protected final OcelotlView				ocelotlView;
-	protected SelectFigure					selectFigure;
-	protected IVisuOperator					visuOperator	= null;
-	protected OcelotlMouseListener			mouse;
-	public final static Color				selectColorFG	= ColorConstants.blue;
-	public final static Color				selectColorBG	= ColorConstants.lightGray;
-	public final static Color				activeColorFG	= ColorConstants.black;
-	public final static Color				activeColorBG	= ColorConstants.darkBlue;
+	protected Figure								root;
+	protected Canvas								canvas;
+	protected final List<RectangleFigure>			figures			= new ArrayList<RectangleFigure>();
+	protected TimeRegion							time;
+	protected TimeRegion							selectTime;
+	protected TimeRegion							resetTime;
+	protected int									aBorder			= 10;
+	protected final int								space			= 3;
+	protected final OcelotlView						ocelotlView;
+	protected SelectFigure							selectFigure;
+	protected IVisuOperator							visuOperator	= null;
+	protected OcelotlMouseListener					mouse;
+	protected List<SpatioTemporalAggregate>						aggregates;
+	public final static Color						selectColorFG	= ColorConstants.blue;
+	public final static Color						selectColorBG	= ColorConstants.lightGray;
+	public final static Color						activeColorFG	= ColorConstants.black;
+	public final static Color						activeColorBG	= ColorConstants.darkBlue;
 	
 	class SelectFigure extends RectangleFigure {
 
@@ -269,6 +272,14 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public IVisuOperator getVisuOperator() {
 		return visuOperator;
+	}
+
+	public List<SpatioTemporalAggregate> getAggregates() {
+		return aggregates;
+	}
+
+	public void setAggregates(ArrayList<SpatioTemporalAggregate> aggregateMapping) {
+		this.aggregates = aggregateMapping;
 	}
 
 	@Override

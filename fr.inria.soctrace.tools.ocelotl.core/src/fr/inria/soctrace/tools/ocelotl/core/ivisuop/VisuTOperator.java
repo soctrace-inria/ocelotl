@@ -26,8 +26,7 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.ITimeManager;
 
-abstract public class VisuTOperator implements
-		IVisuTOperator {
+abstract public class VisuTOperator implements IVisuTOperator {
 
 	protected List<Part> parts;
 	protected OcelotlCore ocelotlCore;
@@ -96,7 +95,7 @@ abstract public class VisuTOperator implements
 		initParts();
 		computeParts();
 	}
-	
+
 	@Override
 	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
 		this.ocelotlCore = ocelotlCore;

@@ -1,19 +1,35 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
+import org.osgi.framework.Bundle;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
+import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuSTOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
+import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.MouseState;
 
 public class SpatioTemporalMouseListener extends OcelotlMouseListener {
@@ -195,89 +211,172 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, originY, cornerY);
 			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
 		}
+		
+		// If right click
+		if(arg0.button == 3 && aggregatedView.resetTime != null) {
+			Point clickCoord = new Point(arg0.x, arg0.y);
+		
+			SpatioTemporalAggregate selectedAggregate = null;
+			// Find the corresponding aggregate
+			for (SpatioTemporalAggregate aggreg : aggregatedView.getAggregates()) {
+				if (aggreg.getAggregateZone().contains(clickCoord)) {
+					selectedAggregate = aggreg;
+				}
+			}
+
+			// If none was found
+			if(selectedAggregate == null)
+				return;
+			
+			// Compute the starting and ending timestamps
+			//long start = (long) ((double) ((selectedAggregate.getAggregateZone().x() - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
+			//long end = (long) ((double) ((selectedRect.x() + selectedRect.width() - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
+					
+			// Get time slice numbers from the time slice manager
+			//int startingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(start);
+			//int endingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(end);
+			
+			
+			// Trigger the display
+			displayAggregate(selectedAggregate.getEventProducerNode(), selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice());
+		}
 	}
 
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
 
-		// Reset to normal cursor
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
-		
-		if (state == MouseState.DRAG_LEFT_VERTICAL || state == MouseState.DRAG_LEFT_HORIZONTAL)
-			mouseDragged(arg0);
-		
-		previous = state;
-		state = MouseState.RELEASED;
+		if (arg0.button == 1) {
+			// Reset to normal cursor
+			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 
-		if (aggregatedView.time == null)
-			return;
+			if (state == MouseState.DRAG_LEFT_VERTICAL || state == MouseState.DRAG_LEFT_HORIZONTAL)
+				mouseDragged(arg0);
 
-		final double sliceSize = (double) aggregatedView.resetTime.getTimeDuration() / (double) aggregatedView.ocelotlView.getTimeSliceNumber();
-		int i = 0;
-		for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
-			if (aggregatedView.selectTime.getTimeStampStart() >= (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart())
-					&& aggregatedView.selectTime.getTimeStampStart() < (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
-				aggregatedView.selectTime.setTimeStampStart((long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart()));
-				break;
+			previous = state;
+			state = MouseState.RELEASED;
+
+			if (aggregatedView.time == null)
+				return;
+
+			final double sliceSize = (double) aggregatedView.resetTime.getTimeDuration() / (double) aggregatedView.ocelotlView.getTimeSliceNumber();
+			int i = 0;
+			for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
+				if (aggregatedView.selectTime.getTimeStampStart() >= (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart())
+						&& aggregatedView.selectTime.getTimeStampStart() < (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
+					aggregatedView.selectTime.setTimeStampStart((long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart()));
+					break;
+				}
+			for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
+				if (aggregatedView.selectTime.getTimeStampEnd() > (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart())
+						&& aggregatedView.selectTime.getTimeStampEnd() <= (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
+					aggregatedView.selectTime.setTimeStampEnd((long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart()));
+					break;
+				}
+
+			// Get the event producer hierarchy
+			SpaceTimeAggregation2Manager STManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
+			EventProducerHierarchy hierarchy = STManager.getHierarchy();
+
+			// If we are performing an horizontal drag then don't change the
+			// selected hierarchy
+			if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
+				// Compute the selected spatiotemporal region
+				int y0, y1;
+				y0 = Math.min(originY, arg0.y);
+				y1 = Math.max(originY, arg0.y);
+
+				// Compute various height values
+				int rootHeight = aggregatedView.root.getSize().height;
+				int height = rootHeight - (2 * aggregatedView.aBorder);
+				double accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
+
+				// Compute the boundaries of the event producer
+				// Round up to the nearest integer (multiply by 2.0, round then
+				// divide by 2)
+				double rounding = (((double) (y0 - aggregatedView.aBorder)) / accurateLogicHeight) * 2.0;
+				int startingHeight = (int) (Math.round(rounding) / 2);
+				int endingHeight = (int) (((double) (y1 - aggregatedView.aBorder)) / accurateLogicHeight);
+				// Might happen when selecting a unique point
+				if (startingHeight > endingHeight) {
+					endingHeight = startingHeight;
+				}
+
+				// Find the event producer node containing all the selected node
+				ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
+				EventProducerNode selectedNode = hierarchy.findSmallestContainingNode(currentProducers);
+
+				// Compute the selection bound for drawing (cf.
+				// SpatioTemporalModeView)
+				originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
+				cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+
+				ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
+
+				// If only one producer is selected, then also add the parent
+				// producer to avoid that the building of the micro model fails
+				if (selectedNode.getChildrenNodes().isEmpty()) {
+					selectedProducers.add(selectedNode.getParentNode().getMe());
+				}
+				aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
+				aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 			}
-		for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
-			if (aggregatedView.selectTime.getTimeStampEnd() > (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart()) && aggregatedView.selectTime.getTimeStampEnd() <= (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
-				aggregatedView.selectTime.setTimeStampEnd((long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart()));
-				break;
-			}
 
-		// Get the event producer hierarchy
-		SpaceTimeAggregation2Manager STManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
-		EventProducerHierarchy hierarchy = STManager.getHierarchy();
-
-		// If we are performing an horizontal drag then don't change the
-		// selected hierarchy
-		if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
-			// Compute the selected spatiotemporal region
-			int y0, y1;
-			y0 = Math.min(originY, arg0.y);
-			y1 = Math.max(originY, arg0.y);
-
-			// Compute various height values
-			int rootHeight = aggregatedView.root.getSize().height;
-			int height = rootHeight - (2 * aggregatedView.aBorder);
-			double accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
-
-			// Compute the boundaries of the event producer
-			// Round up to the nearest integer (multiply by 2.0, round then divide by 2)
-			double rounding = (((double) (y0 - aggregatedView.aBorder)) / accurateLogicHeight) * 2.0;
-			int startingHeight = (int) (Math.round(rounding) / 2); 
-			int endingHeight = (int) (((double) (y1 - aggregatedView.aBorder)) / accurateLogicHeight);
-			// Might happen when selecting a unique point
-			if (startingHeight > endingHeight) {
-				endingHeight = startingHeight;
-			}
-
-			// Find the event producer node containing all the selected node
-			ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
-			EventProducerNode selectedNode = hierarchy.findSmallestContainingNode(currentProducers);
-
-			// Compute the selection bound for drawing (cf.
-			// SpatioTemporalModeView)
-			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
-			cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
-
-			ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
-
-			// If only one producer is selected, then also add the parent
-			// producer to avoid that the building of the micro model fails
-			if (selectedNode.getChildrenNodes().isEmpty()) {
-				selectedProducers.add(selectedNode.getParentNode().getMe());
-			}
-			aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
-			aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
+			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
+			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
+			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, originY, cornerY);
+			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
+			aggregatedView.ocelotlView.getStatView().updateData();
 		}
-
-		aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
-		aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
-		aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, originY, cornerY);
-		aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
-		aggregatedView.ocelotlView.getStatView().updateData();
 	}
 	
+	public void displayAggregate(EventProducerNode anEpn, int startTimeSlice, int endTimeSlice) {
+		String name = aggregatedView.ocelotlView.getOcelotlParameters().getVisuOperator();
+
+		try {
+			final Bundle mybundle = Platform.getBundle(aggregatedView.ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getBundle());
+
+			MatrixView newView;
+
+			// Instantiate the actual view
+			newView = (MatrixView) mybundle.loadClass(aggregatedView.ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(aggregatedView.ocelotlView);
+
+			Shell dialog = new Shell(shell);
+			dialog.setText("Dialog");
+			dialog.setSize(500, 530);
+			
+			final Composite compositeOverview = new Composite(dialog, SWT.BORDER);
+			compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+			compositeOverview.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+			compositeOverview.setSize(500, 500);
+			compositeOverview.setLayout(new FillLayout(SWT.HORIZONTAL));
+			
+			Figure root;
+			Canvas canvas;
+			root = new Figure();
+			root.setFont(compositeOverview.getFont());
+			final XYLayout layout = new XYLayout();
+			root.setLayoutManager(layout);
+			canvas = new Canvas(compositeOverview, SWT.DOUBLE_BUFFERED);
+			canvas.setSize(compositeOverview.getSize());
+			final LightweightSystem lws = new LightweightSystem(canvas);
+			lws.setContents(root);
+			lws.setControl(canvas);
+			root.setFont(SWTResourceManager.getFont("Cantarell", 24, SWT.NORMAL));
+			root.setSize(compositeOverview.getSize().x, compositeOverview.getSize().y);
+			
+			EventProducerHierarchy hierarchy = new EventProducerHierarchy(anEpn);
+			
+			dialog.open();
+			canvas.update();
+			newView.setRoot(root);
+			newView.setCanvas(canvas);
+			newView.computeDiagram(anEpn, startTimeSlice, endTimeSlice);
+			root.repaint();
+			
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
+
 }

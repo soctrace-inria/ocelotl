@@ -135,20 +135,17 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 		// If the selection is different than the whole region
 		if (!aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time)) {
-			final double sliceSize = (double) aggregatedView.resetTime.getTimeDuration() / (double) aggregatedView.ocelotlView.getTimeSliceNumber();
-			int i = 0;
-			for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
-				if (aggregatedView.selectTime.getTimeStampStart() >= (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart())
-						&& aggregatedView.selectTime.getTimeStampStart() < (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
-					aggregatedView.selectTime.setTimeStampStart((long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart()));
-					break;
-				}
-			for (i = 0; i < aggregatedView.ocelotlView.getTimeSliceNumber(); i++)
-				if (aggregatedView.selectTime.getTimeStampEnd() > (long) (sliceSize * i + aggregatedView.resetTime.getTimeStampStart())
-						&& aggregatedView.selectTime.getTimeStampEnd() <= (long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart())) {
-					aggregatedView.selectTime.setTimeStampEnd((long) (sliceSize * (i + 1) + aggregatedView.resetTime.getTimeStampStart()));
-					break;
-				}
+			// Get time slice numbers from the time slice manager
+			int startingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.selectTime.getTimeStampStart());
+			int endingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.selectTime.getTimeStampEnd());
+			
+			// Since the timestamp of the last time slice goes further than the
+			// max timestamp of the trace, we must check that we are not over it
+			long endTimeStamp = Math.min(aggregatedView.resetTime.getTimeStampEnd(), aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingSlice).getTimeRegion().getTimeStampEnd());
+			
+			aggregatedView.selectTime.setTimeStampStart(aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingSlice).getTimeRegion().getTimeStampStart());
+			aggregatedView.selectTime.setTimeStampEnd(endTimeStamp);
+			
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
 			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, -1, 1);
