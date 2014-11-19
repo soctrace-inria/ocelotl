@@ -261,7 +261,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			root.add(line2);
 			
 			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(new Point(xa, ya), new Point(xb,
-					yb)), epn, logicX, logicX2));
+					yb)), epn, logicX, logicX2, xb-xa));
 		}
 
 		protected void drawCleanVisualAggregate(int logicX, int logicY, int logicX2,
@@ -294,7 +294,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			root.add(line);
 			
 			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(new Point(xa, ya), new Point(xb,
-					yb)), epn, logicX, logicX2));
+					yb)), epn, logicX, logicX2, xb-xa));
 		}
 	}
 	

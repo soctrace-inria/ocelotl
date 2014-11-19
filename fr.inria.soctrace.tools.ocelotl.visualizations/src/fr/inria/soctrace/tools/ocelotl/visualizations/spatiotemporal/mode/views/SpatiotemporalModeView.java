@@ -370,7 +370,7 @@ public class SpatiotemporalModeView extends MatrixView {
 					yb)));
 			
 			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(new Point(xa, ya), new Point(xb,
-					yb)), epn, logicX, logicX2));
+					yb)), epn, logicX, logicX2, xb-xa, label));
 			
 			if (!clean) {
 				drawTextureDirty(xa, xb, ya, yb, label);
