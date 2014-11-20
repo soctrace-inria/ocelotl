@@ -72,6 +72,7 @@ public class OcelotlParameters {
 	private DataCache dataCache = new DataCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 	private OcelotlSettings	ocelotlSettings = new OcelotlSettings();
+	private Integer	timeSliceFactor = 1;
 	
 	private TimeSliceManager timeSliceManager;
 
@@ -118,6 +119,7 @@ public class OcelotlParameters {
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
 		this.iSpaceConfig = op.iSpaceConfig;
 		this.statisticOperatorConfig = op.statisticOperatorConfig;
+		this.timeSliceFactor = op.timeSliceFactor;
 	}
 	
 	public List<EventProducer> getEventProducers() {
@@ -348,6 +350,14 @@ public class OcelotlParameters {
 
 	public void setEventsPerThread(int eventsPerThread) {
 		this.eventsPerThread = eventsPerThread;
+	}
+
+	public Integer getTimeSliceFactor() {
+		return timeSliceFactor;
+	}
+
+	public void setTimeSliceFactor(Integer timeSliceFactor) {
+		this.timeSliceFactor = timeSliceFactor;
 	}
 
 	public String getMicroModelType() {

@@ -89,11 +89,6 @@ public class DataCache {
 	 */
 	protected boolean rebuildDirty;
 
-	/**
-	 * Set whether the cache is active or not
-	 */
-	protected boolean cacheActive = true;
-
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
 
 	protected DatacacheStrategy buildingStrategy;
@@ -117,15 +112,6 @@ public class DataCache {
 	public void setTimeSliceMapping(
 			HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping) {
 		this.timeSliceMapping = timeSliceMapping;
-	}
-
-	public boolean isCacheActive() {
-		return cacheActive;
-	}
-
-	public void setCacheActive(boolean cacheActive) {
-		this.cacheActive = cacheActive;
-		settings.setCacheActivated(this.cacheActive);
 	}
 
 	public boolean isRebuildDirty() {
@@ -308,6 +294,7 @@ public class DataCache {
 			return null;
 		} else {
 			similarParameters(cParam, cache);
+			parameters.setTimeSliceFactor(timeSliceFactor);
 			return cachedData.get(cache);
 		}
 	}

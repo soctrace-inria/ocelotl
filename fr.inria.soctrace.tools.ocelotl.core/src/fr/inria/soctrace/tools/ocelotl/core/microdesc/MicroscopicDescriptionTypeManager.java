@@ -134,18 +134,25 @@ public class MicroscopicDescriptionTypeManager {
 	}
 
 	public void setSelectedMicroModel(final String name) {
+		selectedMicroModel = instantiateMicroModel(name);
+		selectedType = name;
+	}
+	
+	public MicroscopicDescription instantiateMicroModel(final String name) {
+		MicroscopicDescription aNewMicromodel = null;
+
 		final Bundle mybundle = Platform.getBundle(typeList.get(name)
 				.getBundle());
-	
 		try {
-			selectedMicroModel = (MicroscopicDescription) mybundle.loadClass(
+			aNewMicromodel = (MicroscopicDescription) mybundle.loadClass(
 					typeList.get(name).getMicroModelClass()).newInstance();
-			selectedType = name;
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+
+		return aNewMicromodel;
 	}
 	
 	public HashMap<String, MicroscopicDescriptionTypeResource> getTypeList() {

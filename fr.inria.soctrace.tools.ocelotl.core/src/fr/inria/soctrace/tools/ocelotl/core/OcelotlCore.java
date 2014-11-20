@@ -209,15 +209,18 @@ public class OcelotlCore {
 	 * Search for the parameter that has the largest gap (sum of the differences
 	 * in gain and loss values) between two consecutive gain and loss values
 	 * 
+	 * @param aDataAggregManager
+	 *            the data aggregation manager used to find the parameter
+	 * 
 	 * @return the corresponding parameter value, or 1.0 as default
 	 */
-	public double computeInitialParameter() {
+	public double computeInitialParameter(IDataAggregManager aDataAggregManager) {
 		double diffG = 0.0, diffL = 0.0;
 		double sumDiff = 0.0;
 		double maxDiff = 0.0;
 		int indexMaxQual = -1;
 		int i;
-		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) getLpaggregManager().getQualities();
+		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) aDataAggregManager.getQualities();
 		for (i = 1; i < qual.size(); i++) {
 			// Compute the difference for the gain and the loss
 			diffG = Math.abs(qual.get(i - 1).getGain() - qual.get(i).getGain());
@@ -231,7 +234,7 @@ public class OcelotlCore {
 				indexMaxQual = i-1;
 			}
 		}
-			return getLpaggregManager().getParameters().get(indexMaxQual + 1);
+			return aDataAggregManager.getParameters().get(indexMaxQual + 1);
 	}
 
 }

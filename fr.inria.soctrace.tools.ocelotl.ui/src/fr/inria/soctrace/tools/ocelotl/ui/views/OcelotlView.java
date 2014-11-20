@@ -369,7 +369,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							}
 
 							// Compute the parameter value
-							ocelotlParameters.setParameter(ocelotlCore.computeInitialParameter());
+							ocelotlParameters.setParameter(ocelotlCore.computeInitialParameter(ocelotlCore.getLpaggregManager()));
 						}
 
 						hasChanged = HasChanged.PARAMETER;
@@ -414,18 +414,23 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							textRun.setText(String.valueOf(getOcelotlParameters().getParameter()));
 							qualityView.createDiagram();
 							statView.createDiagram();
+							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
+							snapshotAction.setEnabled(true);
+							
 							try {
 								overView.updateDiagram(ocelotlParameters.getTimeRegion());
+								// Do we need to compute everything
+								if(overView.isRedrawOverview())
+									overView.getOverviewThread().start();
+								
 							} catch (OcelotlException e) {
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 							}
-							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
-							snapshotAction.setEnabled(true);
 							
 							history.saveHistory();
 						}
 					});
-
+					
 					synchronized (lock) {
 						running = false;
 					}
@@ -450,7 +455,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			// Get the available aggregation operators
 			comboDimension.setEnabled(true);
 			comboDimension.removeAll();
-			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
 
 			for (final String op : ocelotlCore.getAggregOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 				comboDimension.add(op);
@@ -517,6 +521,9 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 			// Set default settings
 			setDefaultDescriptionSettings();
+			
+			// Init the overview
+			overView.initVisuOperator(ocelotlParameters.getOcelotlSettings().getOverviewVisuOperator());
 		}
 	}
 
@@ -532,7 +539,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			ocelotlCore.getVisuOperators().setSelectedOperator(comboVisu.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
-			overView.initVisuOperator(ocelotlParameters.getOcelotlSettings().getOverviewVisuOperator());
 		}
 	}
 
@@ -609,7 +615,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			if (ocelotlCore.getLpaggregManager() != null) {
-				textRun.setText(Double.toString(ocelotlCore.computeInitialParameter()));
+				textRun.setText(Double.toString(ocelotlCore.computeInitialParameter(ocelotlCore.getLpaggregManager())));
 				btnRun.notifyListeners(SWT.Selection, new Event());
 			}
 		}
@@ -1355,6 +1361,14 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 	public void setPrevZoom(Action prevZoom) {
 		this.prevZoom = prevZoom;
+	}
+
+	public Combo getComboType() {
+		return comboType;
+	}
+
+	public void setComboType(Combo comboType) {
+		this.comboType = comboType;
 	}
 
 	private void refreshTraces() {

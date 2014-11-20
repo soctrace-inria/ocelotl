@@ -17,17 +17,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Bundle;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
 import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
+import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
@@ -40,7 +43,8 @@ public class Overview implements IFramesocBusListener {
 	private IDataAggregationOperator	aggregOperator;
 	private IDataAggregManager			aggregManager;
 	private IVisuOperator				visuOperator;
-
+	private OcelotlParameters			overviewParameters;
+	
 	private Figure						root;
 	private Canvas						canvas;
 	private AggregatedView				timeLineView;
@@ -56,6 +60,7 @@ public class Overview implements IFramesocBusListener {
 	// Show the currently selected zone
 	private SelectFigure				selectedZone;
 	private int							Border		= 3;
+	private OverviewThread              overviewThread = null;
 
 	/**
 	 * Followed topics
@@ -67,7 +72,7 @@ public class Overview implements IFramesocBusListener {
 		ocelotlView = aView;
 		redrawOverview = true;
 		globalTimeRegion = null;
-
+		
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
@@ -78,7 +83,7 @@ public class Overview implements IFramesocBusListener {
 	@Override
 	public void handle(FramesocBusTopic topic, Object data) {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED) && aggregManager != null) {
-			createDiagram(globalTimeRegion);
+			createDiagram();
 			displayedZone.draw(zoomedTimeRegion, true);
 		}
 	}
@@ -109,10 +114,10 @@ public class Overview implements IFramesocBusListener {
 	 * 
 	 * @param time
 	 */
-	public void createDiagram(TimeRegion time) {
-		globalTimeRegion = new TimeRegion(time);
+	public void createDiagram() {
+		globalTimeRegion = new TimeRegion(overviewParameters.getTimeRegion());
 		timeLineView.setBorder(Border);
-		timeLineView.createDiagram(aggregManager, time, visuOperator);
+		timeLineView.createDiagram(aggregManager, globalTimeRegion, visuOperator);
 	}
 
 	/**
@@ -122,7 +127,7 @@ public class Overview implements IFramesocBusListener {
 		root.removeAll();
 		canvas.update();
 		if (aggregManager != null && globalTimeRegion != null) {
-			createDiagram(globalTimeRegion);
+			createDiagram();
 			displayedZone.draw(zoomedTimeRegion, true);
 		}
 		root.repaint();
@@ -135,61 +140,19 @@ public class Overview implements IFramesocBusListener {
 	 * @throws OcelotlException
 	 */
 	public void updateDiagram(TimeRegion time) throws OcelotlException {
-		// Update the selected region with the displayed region
-		if (!redrawOverview && newTimeRegionLonger(time)) {
-			redrawOverview = true;
-			globalTimeRegion = new TimeRegion(time);
-		}
+		if(overviewThread != null && overviewThread.isAlive())
+			return;
 
 		zoomedTimeRegion = new TimeRegion(time);
 
 		// is it necessary to change completely the computed model
 		if (redrawOverview) {
-			// Get the same micro model
-			microModel = ocelotlView.getOcelotlCore().getMicroModel();
-
-			// Init the aggregation operator
-			//if (!ocelotlView.getParams().getOcelotlSettings().getOverviewAggregOperator().equals(ocelotlView.getParams().getTimeAggOperator())) {
-				aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator());
-				aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
-				aggregManager.computeQualities();
-				aggregManager.computeDichotomy();
-			//	} else {
-			//		aggregManager = ocelotlView.getOcelotlCore().getLpaggregManager();
-			//}
-			parameter = ocelotlView.getOcelotlCore().computeInitialParameter();
-
-			// Compute the view according to the new parameter value
-			aggregManager.computeParts(parameter);
-
-			this.visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
-
-			redrawOverview = false;
-			createDiagram(time);
+			overviewThread = new OverviewThread(time);
+			return;
 		}
 
 		displayedZone.draw(time, true);
 		updateSelection(time);
-	}
-
-	/**
-	 * Check if the new time region is larger than the actual displayed one.
-	 * Used to know if it is necessary to recompute a new view of the overview
-	 * 
-	 * @param time
-	 *            the tested time region
-	 * @return true if it is larger, false otherwise
-	 */
-	public boolean newTimeRegionLonger(TimeRegion time) {
-		if (time.getTimeStampStart() < globalTimeRegion.getTimeStampStart() || time.getTimeStampEnd() > globalTimeRegion.getTimeStampEnd()) {
-			long newDuration = time.getTimeStampEnd() - time.getTimeStampStart();
-			long currentDuration = globalTimeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart();
-
-			if (newDuration > currentDuration)
-				return true;
-		}
-
-		return false;
 	}
 
 	public void updateSelection(TimeRegion time) {
@@ -228,6 +191,14 @@ public class Overview implements IFramesocBusListener {
 		this.selectedZone = selectedZone;
 	}
 
+	public OverviewThread getOverviewThread() {
+		return overviewThread;
+	}
+
+	public void setOverviewThread(OverviewThread overviewThread) {
+		this.overviewThread = overviewThread;
+	}
+
 	public IVisuOperator getVisuOperator() {
 		return visuOperator;
 	}
@@ -256,23 +227,45 @@ public class Overview implements IFramesocBusListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		root.removeAll();
+		canvas.update();
 
 		// Init the view
-		this.timeLineView.setRoot(root);
-		this.timeLineView.setCanvas(canvas);
-		this.redrawOverview = true;
+		timeLineView.setRoot(root);
+		timeLineView.setCanvas(canvas);
+		redrawOverview = true;
+		timeSlice = ocelotlView.getOcelotlCore().getAggregOperators().getSelectedOperatorResource().getTs();
 
 		// Init other stuff
-		globalTimeRegion = new TimeRegion(this.ocelotlView.getTimeRegion());
+		globalTimeRegion = new TimeRegion(ocelotlView.getTimeRegion());
 		initSelectionFigure();
 	}
 
+	// Set the overview parameters with the current ocelotlParameters
+	public void updateOverviewParameters(OcelotlParameters ocelotlParameters) {
+		// Copy the current ocelotl parameters
+		overviewParameters = new OcelotlParameters(ocelotlView.getOcelotlParameters());
+		
+		// Set the time slice number at the current value for overview
+		overviewParameters.setTimeSlicesNumber(timeSlice);
+		
+		// Set the time region at global
+		TimeRegion overviewTimeRegion  = new TimeRegion(overviewParameters.getTrace().getMinTimestamp(), overviewParameters.getTrace().getMaxTimestamp());
+		overviewParameters.setTimeRegion(overviewTimeRegion);
+	}
+	
 	public void initSelectionFigure() {
 		selectedZone = new SelectFigure(ColorConstants.black, ColorConstants.black);
 		displayedZone = new SelectFigure(ColorConstants.black, ColorConstants.darkBlue);
 	}
 
 	public void reset() {
+		if (overviewThread != null && overviewThread.isAlive()) {
+			overviewThread.interrupt();
+		}
+			
+		overviewThread = null;
 		aggregManager = null;
 		globalTimeRegion = null;
 	}
@@ -332,6 +325,80 @@ public class Overview implements IFramesocBusListener {
 				root.remove(this);
 
 			root.repaint();
+		}
+	}
+
+	
+	class OverviewThread extends Thread {
+		TimeRegion	time;
+
+		public OverviewThread(TimeRegion time) {
+			super();
+			this.time = time;
+		}
+
+		@Override
+		public void run() {
+			try {
+				updateOverviewParameters(ocelotlView.getOcelotlParameters());
+
+				// Get a new micro model
+				microModel = ocelotlView.getOcelotlCore().getMicromodelTypes().instantiateMicroModel(overviewParameters.getMicroModelType());
+
+				// Build the microscopic description
+				microModel.setOcelotlParameters(overviewParameters, new NullProgressMonitor());
+			    if (Thread.interrupted()) 
+			        return;
+			    
+				// Init the aggregation operator
+				aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator());
+				aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
+				aggregManager.computeQualities();
+			    if (Thread.interrupted()) 
+			        return;
+			    
+			    
+				aggregManager.computeDichotomy();
+			    if (Thread.interrupted()) 
+			        return;
+			    
+			    
+				parameter = ocelotlView.getOcelotlCore().computeInitialParameter(aggregManager);
+
+				// Compute the view according to the new parameter value
+				aggregManager.computeParts(parameter);
+			    if (Thread.interrupted()) 
+			        return;
+			    
+			    
+				visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
+			    if (Thread.interrupted()) 
+			        return;
+			    
+			    
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						createDiagram();
+						displayedZone.draw(time, true);
+						updateSelection(time);
+					}
+				});
+			    if (Thread.interrupted()) 
+			        return;
+			    
+			    
+				redrawOverview = false;
+			} catch (OcelotlException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SoCTraceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

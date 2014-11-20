@@ -468,7 +468,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			if (eventProducers.containsKey(values[1])) {
 				// Fill the matrix
 				rebuildMatrix(values, eventProducers.get(values[1]),
-						getDataCache().getTimeSliceFactor());
+						parameters.getTimeSliceFactor());
 			}
 
 			if (monitor.isCanceled()) {
@@ -575,7 +575,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void saveMatrix() {
 		// Check that no event type or event producer was filtered out which
 		// would result in an incomplete datacache
-		if (!parameters.getDataCache().isCacheActive() || !noFiltering()
+		if (!parameters.getOcelotlSettings().isCacheActivated() || !noFiltering()
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
@@ -676,7 +676,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				.getTimeRegion().getTimeStampEnd())
 			return false;
 
-		if (parameters.getDataCache().isCacheActive()) {
+		if (parameters.getOcelotlSettings().isCacheActivated()) {
 			try {
 				// Set the number of time slices for the generated cache
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
@@ -764,7 +764,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		initVectors();
 
 		// If the cache is enabled
-		if (parameters.getDataCache().isCacheActive()) {
+		if (parameters.getOcelotlSettings().isCacheActivated()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
 			// If a cache was found

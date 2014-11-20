@@ -545,7 +545,7 @@ public class OcelotlSettingsView extends Dialog {
 	 */
 	void saveSettings() {
 		// Cache settings
-		ocelotlView.getOcelotlParameters().getDataCache().setCacheActive(btnCacheEnabled.getSelection());
+		settings.setCacheActivated(btnCacheEnabled.getSelection());
 		settings.setCacheTimeSliceNumber(Integer.valueOf(cacheTimeSliceValue.getText()));
 		modifyDataCacheSize();
 		updateCacheDir();
