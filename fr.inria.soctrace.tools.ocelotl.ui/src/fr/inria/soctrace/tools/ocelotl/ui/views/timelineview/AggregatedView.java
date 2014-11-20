@@ -70,10 +70,10 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected IVisuOperator							visuOperator	= null;
 	protected OcelotlMouseListener					mouse;
 	protected List<SpatioTemporalAggregateView>						aggregates;
-	public final static Color						selectColorFG	= ColorConstants.blue;
-	public final static Color						selectColorBG	= ColorConstants.lightGray;
+	public final static Color						selectColorFG	= ColorConstants.darkBlue;
+	public final static Color						selectColorBG	= ColorConstants.darkBlue;
 	public final static Color						activeColorFG	= ColorConstants.black;
-	public final static Color						activeColorBG	= ColorConstants.darkBlue;
+	public final static Color						activeColorBG	= ColorConstants.black;
 	
 	class SelectFigure extends RectangleFigure {
 
@@ -82,9 +82,9 @@ abstract public class AggregatedView implements IAggregatedView {
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 			setLayoutManager(layout);
-			setForegroundColor(ColorConstants.blue);
-			setBackgroundColor(ColorConstants.lightGray);
-			setAlpha(50);
+			setForegroundColor(selectColorFG);
+			setBackgroundColor(selectColorBG);
+			setAlpha(70);
 		}
 
 		/**
