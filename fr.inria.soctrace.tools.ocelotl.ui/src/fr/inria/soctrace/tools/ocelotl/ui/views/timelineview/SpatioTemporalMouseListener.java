@@ -287,6 +287,15 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 				// SpatioTemporalModeView)
 				originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
 				cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+				
+				// If the selected producer is too small (1 pixel), take the
+				// parent node until the size is > 1 pixel
+				while ((cornerY - originY) <= 1) {
+					selectedNode = selectedNode.getParentNode();
+
+					originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
+					cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+				}
 
 				ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
 

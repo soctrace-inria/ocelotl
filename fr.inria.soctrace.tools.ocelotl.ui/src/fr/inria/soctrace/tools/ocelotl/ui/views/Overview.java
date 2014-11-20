@@ -357,24 +357,20 @@ public class Overview implements IFramesocBusListener {
 			    if (Thread.interrupted()) 
 			        return;
 			    
-			    
 				aggregManager.computeDichotomy();
 			    if (Thread.interrupted()) 
 			        return;
-			    
-			    
+			     
 				parameter = ocelotlView.getOcelotlCore().computeInitialParameter(aggregManager);
 
 				// Compute the view according to the new parameter value
 				aggregManager.computeParts(parameter);
 			    if (Thread.interrupted()) 
 			        return;
-			    
-			    
+			    	    
 				visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
 			    if (Thread.interrupted()) 
 			        return;
-			    
 			    
 				Display.getDefault().syncExec(new Runnable() {
 					@Override
@@ -386,8 +382,7 @@ public class Overview implements IFramesocBusListener {
 				});
 			    if (Thread.interrupted()) 
 			        return;
-			    
-			    
+			     
 				redrawOverview = false;
 			} catch (OcelotlException e) {
 				// TODO Auto-generated catch block
