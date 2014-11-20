@@ -60,11 +60,11 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 			}
 	}
 	
-	public void createDiagram(EventProducerNode aHierarchy, int start, int end) {
+	public void createDiagram(EventProducerNode aNode, int start, int end) {
 		root.removeAll();
 		figures.clear();
 		canvas.update();
-		computeDiagram(aHierarchy, start, end);
+		computeDiagram(aNode, start, end);
 	}
 	
 	@Override
@@ -87,5 +87,5 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 		this.hierarchy = hierarchy;
 	}
 
-	protected abstract void computeDiagram(EventProducerNode aHierarchy, int start, int end);
+	protected abstract void computeDiagram(EventProducerNode aNode, int start, int end);
 }

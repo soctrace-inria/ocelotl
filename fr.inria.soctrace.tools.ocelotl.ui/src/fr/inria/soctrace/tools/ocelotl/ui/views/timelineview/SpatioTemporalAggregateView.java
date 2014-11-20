@@ -3,13 +3,11 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.XYLayout;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -22,56 +20,52 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import org.osgi.framework.Bundle;
 
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
-import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.MouseState;
 
 public class SpatioTemporalAggregateView {
-	
-	private class SpatioTemporalAggregateMouseListener implements MouseListener{
 
-
+	private class SpatioTemporalAggregateMouseListener implements MouseListener {
 
 		@Override
 		public void mouseDoubleClicked(MouseEvent arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void mousePressed(MouseEvent arg0) {
 			dialog.close();
-			
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 	}
 
-	public final static int Height=700;
-	private int width;
-	private Rectangle aggregateZone;
-	private EventProducerNode eventProducerNode;
-	private int startingTimeSlice;
-	private int endingTimeSlice;
-	private Shell	dialog;
-	private Canvas	canvas;
-	private MatrixView	newView;
-	private Figure	root;
-	private String label;
-	
+	public final static int		Height	= 700;
+	private int					width;
+	private Rectangle			aggregateZone;
+	private EventProducerNode	eventProducerNode;
+	private int					startingTimeSlice;
+	private int					endingTimeSlice;
+	private Shell				dialog;
+	private Canvas				canvas;
+	private MatrixView			aggregationView;
+	private Figure				root;
+	private String				label;
+	private Composite			compositeOverview;
+
 	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width) {
 		super();
 		this.aggregateZone = aggregateZone;
 		this.eventProducerNode = eventProducerNode;
 		this.startingTimeSlice = startingTimeSlice;
 		this.endingTimeSlice = endingTimeSlice;
-		this.width=width;
-		label="Aggregate Content";
+		this.width = width;
+		label = "Aggregate Content";
 	}
 
 	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width, String label) {
@@ -80,8 +74,8 @@ public class SpatioTemporalAggregateView {
 		this.eventProducerNode = eventProducerNode;
 		this.startingTimeSlice = startingTimeSlice;
 		this.endingTimeSlice = endingTimeSlice;
-		this.width=width;
-		this.label=label;
+		this.width = width;
+		this.label = label;
 	}
 
 	public Rectangle getAggregateZone() {
@@ -115,37 +109,39 @@ public class SpatioTemporalAggregateView {
 	public void setEndingTimeSlice(int endingTimeSlice) {
 		this.endingTimeSlice = endingTimeSlice;
 	}
-	
+
 	/**
 	 * Display the content of the aggregation in a new window
 	 * 
 	 * @param ocelotlview
 	 *            the current ocelotl view
 	 */
-	public void display(OcelotlView ocelotlview)
-	{
+	public void display(OcelotlView ocelotlview) {
 		String name = ocelotlview.getOcelotlParameters().getVisuOperator();
 
 		try {
 			final Bundle mybundle = Platform.getBundle(ocelotlview.getCore().getVisuOperators().getSelectedOperatorResource(name).getBundle());
 
 			// Instantiate the actual view
-			newView = (MatrixView) mybundle.loadClass(ocelotlview.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlview);
+			aggregationView = (MatrixView) mybundle.loadClass(ocelotlview.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlview);
 
-			// New dialog
-			dialog = new Shell(ocelotlview.getSite().getShell(), SWT.SHELL_TRIM|SWT.RESIZE);
+			// New window
+			dialog = new Shell(ocelotlview.getSite().getShell().getDisplay());
 			dialog.setText(label);
-			dialog.setSize(width+(newView.getBorder()*3), Height);
+			dialog.setSize(width + (aggregationView.getBorder() * 3), Height);
+			// Set location of the new window centered around the centered of the eclipse window
+			dialog.setLocation(ocelotlview.getSite().getShell().getLocation().x + ocelotlview.getSite().getShell().getSize().x / 2 - width / 2, ocelotlview.getSite().getShell().getLocation().y + ocelotlview.getSite().getShell().getSize().y / 2 - Height / 2);
 			dialog.setLayout(new FillLayout());
 
-			
 			// Init drawing display zone
-			final Composite compositeOverview = new Composite(dialog, SWT.BORDER);
+			compositeOverview = new Composite(dialog, SWT.BORDER);
 			compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 			compositeOverview.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-			compositeOverview.setSize(width+(newView.getBorder()*3), Height);
+			// Make sure we remove the title bar from the size in order not
+			// display it fully
+			compositeOverview.setSize(dialog.getSize().x, dialog.getSize().y - (dialog.getSize().y - dialog.getClientArea().height));
 			compositeOverview.setLayout(new FillLayout());
-			
+
 			root = new Figure();
 			root.setFont(compositeOverview.getFont());
 			final XYLayout layout = new XYLayout();
@@ -157,32 +153,39 @@ public class SpatioTemporalAggregateView {
 			lws.setControl(canvas);
 			root.setFont(SWTResourceManager.getFont("Cantarell", 24, SWT.NORMAL));
 			root.setSize(compositeOverview.getSize().x, compositeOverview.getSize().y);
-			newView.setRoot(root);
-			newView.setCanvas(canvas);
-			dialog.addControlListener(new ControlListener() {
 
-				@Override
-				public void controlMoved(final ControlEvent arg0) {
-					canvas.redraw();
-					newView.createDiagram(eventProducerNode, startingTimeSlice, endingTimeSlice);
-					//root.repaint();
-				}
-
-				@Override
-				public void controlResized(final ControlEvent arg0) {
-					canvas.redraw();
-					newView.createDiagram(eventProducerNode, startingTimeSlice, endingTimeSlice);
-					//root.repaint();
-				}
-			});
+			aggregationView.setRoot(root);
+			aggregationView.setCanvas(canvas);
+			dialog.addControlListener(new dialogControlListener());
+			
 			dialog.open();
-			newView.setRoot(root);
-			newView.setCanvas(canvas);
+			aggregationView.setRoot(root);
+			aggregationView.setCanvas(canvas);
 			root.addMouseListener(new SpatioTemporalAggregateMouseListener());
-			newView.createDiagram(eventProducerNode, startingTimeSlice, endingTimeSlice);
+
+			// Trigger the display
+			aggregationView.createDiagram(eventProducerNode, startingTimeSlice, endingTimeSlice);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-	}	
+		}
+	}
+
+	// Listener for resize event of the window
+	private class dialogControlListener implements ControlListener {
+		@Override
+		public void controlMoved(final ControlEvent arg0) {
+			canvas.redraw();
+			aggregationView.createDiagram(eventProducerNode, startingTimeSlice, endingTimeSlice);
+		}
+
+		@Override
+		public void controlResized(final ControlEvent arg0) {
+			// Prevent bad redraw when maximizing the window 
+			compositeOverview.setSize(dialog.getSize().x, dialog.getSize().y - (dialog.getSize().y - dialog.getClientArea().height));
+			canvas.redraw();
+			aggregationView.createDiagram(eventProducerNode, startingTimeSlice, endingTimeSlice);
+		}
+	}
+	
 }

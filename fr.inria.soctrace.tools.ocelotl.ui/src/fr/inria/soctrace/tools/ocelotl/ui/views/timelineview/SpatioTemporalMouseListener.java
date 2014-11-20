@@ -221,8 +221,9 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
 
-		// If left click
-		if (arg0.button == 1 || state == MouseState.EXITED) {
+		// If left click or arriving through an exit event
+		// and if the released correspond to an action actually started in the view
+		if ((arg0.button == 1 || state == MouseState.EXITED) && state != MouseState.RELEASED) {
 			// Reset to normal cursor
 			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 
