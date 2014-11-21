@@ -117,6 +117,10 @@ public class DataAggregationOperatorManager {
 	public DataAggregationOperatorResource getSelectedOperatorResource() {
 		return operatorList.get(selectedOperatorName);
 	}
+	
+	public DataAggregationOperatorResource getOperatorResource(String anOperator) {
+		return operatorList.get(anOperator);
+	}
 
 	private void init() throws SoCTraceException {
 		operatorList = new HashMap<String, DataAggregationOperatorResource>();

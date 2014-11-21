@@ -291,14 +291,12 @@ abstract public class AggregatedView implements IAggregatedView {
 			public void controlMoved(final ControlEvent arg0) {
 				canvas.redraw();
 				resizeDiagram();
-				ocelotlView.getOverView().resizeDiagram();
 			}
 
 			@Override
 			public void controlResized(final ControlEvent arg0) {
 				canvas.redraw();
 				resizeDiagram();
-				ocelotlView.getOverView().resizeDiagram();
 			}
 		});
 

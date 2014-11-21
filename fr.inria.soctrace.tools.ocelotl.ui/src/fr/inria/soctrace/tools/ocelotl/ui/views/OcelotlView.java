@@ -613,6 +613,25 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			}
 		}
 	}
+	
+	private class OverviewParameterUpAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (overView != null)
+				overView.modifyParameterUp();
+		}
+	}
+
+	private class OverviewParameterDownAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+
+			if (overView != null)
+				overView.modifyParameterDown();
+		}
+	}
 
 	private class DefaultParameterAdapter extends SelectionAdapter {
 
@@ -671,6 +690,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 			hasChanged = HasChanged.ALL;
 			aggregationSettingsManager.openConfigWindows();
+			// Set the redraw of the overview
+			overView.setRedrawOverview(true);
 		}
 	}
 
@@ -826,6 +847,16 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				// Make sure we are not in an editable field
 				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonUp.notifyListeners(SWT.Selection, new Event());
+				break;	
+			case 117:// Letter u
+				// Make sure we are not in an editable field
+				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					overViewParamDown.notifyListeners(SWT.Selection, new Event());
+				break;
+			case 105:// Letter i
+				// Make sure we are not in an editable field
+				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					overViewParamUp.notifyListeners(SWT.Selection, new Event());
 				break;
 			case SWT.KEYPAD_CR:
 			case SWT.CR:
@@ -897,6 +928,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	private Composite					statComposite;
 	private Text						textDisplayedStart;
 	private Text						textDisplayedEnd;
+	private Button						overViewParamUp;
+	private Button						overViewParamDown;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1176,13 +1209,29 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 
 		// Overview
-		final SashForm overviewSashForm = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
-		final Composite compositeOverview = new Composite(overviewSashForm, SWT.BORDER);
+		final SashForm overviewSashForm = new SashForm(sashForm, SWT.BORDER | SWT.HORIZONTAL);
+		overviewSashForm.setLayout(new GridLayout(2, false));
+		
+		final Composite compositeOverview = new Composite(overviewSashForm, SWT.FILL);
 		compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeOverview.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		compositeOverview.setLayout(new FillLayout(SWT.HORIZONTAL));
+		compositeOverview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
+		compositeOverview.setLayout(new FillLayout(SWT.FILL));
 		overView.init(compositeOverview);
-
+		
+		final SashForm buttonSashForm = new SashForm(overviewSashForm, SWT.BORDER | SWT.VERTICAL);
+		overViewParamDown = new Button(buttonSashForm, SWT.NONE);
+		overViewParamDown.setToolTipText("Decrease Overview Parameter");
+		overViewParamDown.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/minus.png"));
+		overViewParamDown.setFont(cantarell8);
+		overViewParamDown.addSelectionListener(new OverviewParameterDownAdapter());
+		overViewParamUp = new Button(buttonSashForm, SWT.NONE);
+		overViewParamUp.setToolTipText("Increase Overview Parameter");
+		overViewParamUp.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/plus.png"));
+		overViewParamUp.setFont(cantarell8);
+		overViewParamUp.addSelectionListener(new OverviewParameterUpAdapter());
+		overviewSashForm.setWeights(new int[] {95, 5});
+		
 		// Stat and legend
 		tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
