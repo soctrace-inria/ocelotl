@@ -220,6 +220,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 									// Set the corresponding parameters
 									textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 									textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+									textDisplayedStart.setText(textTimestampStart.getText());
+									textDisplayedEnd.setText(textTimestampEnd.getText());
 
 									// And launch the display
 									btnRun.notifyListeners(SWT.Selection, new Event());
@@ -416,6 +418,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							statView.createDiagram();
 							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 							snapshotAction.setEnabled(true);
+							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
+							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							
 							try {
 								overView.updateDiagram(ocelotlParameters.getTimeRegion());
@@ -626,6 +630,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
+
 			if (timeLineView != null) {
 				timeLineView.resizeDiagram();
 				timeAxisView.resizeDiagram();
@@ -753,6 +758,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			comboType.removeAll();
 			comboDimension.removeAll();
 			comboVisu.removeAll();
+			btnRun.setEnabled(false);
 			overView.reset();
 
 			final Job job = new Job(title) {
@@ -775,6 +781,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							public void run() {
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
+								textDisplayedStart.setText(textTimestampStart.getText());
+								textDisplayedEnd.setText(textTimestampEnd.getText());
 								comboType.setEnabled(true);
 								comboType.removeAll();
 								for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
@@ -887,6 +895,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	private Combo						comboStatistics;
 	private Button						buttonHome;
 	private Composite					statComposite;
+	private Text						textDisplayedStart;
+	private Text						textDisplayedEnd;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1070,7 +1080,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		groupTime.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(cantarell8);
-		groupTime.setLayout(new GridLayout(11, false));
+		groupTime.setLayout(new GridLayout(15, false));
 
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setFont(cantarell8);
@@ -1078,19 +1088,18 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 		textTimestampStart = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textTimestampStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
-		gd_textTimestampStart.widthHint = 150;
+		gd_textTimestampStart.widthHint = 100;
 		textTimestampStart.setLayoutData(gd_textTimestampStart);
 		textTimestampStart.setFont(cantarell8);
 		textTimestampStart.setToolTipText("Starting timestamp value");
 
 		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
-		lblEndTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		lblEndTimestamp.setFont(cantarell8);
 		lblEndTimestamp.setText("End");
 
 		textTimestampEnd = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textTimestampEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
-		gd_textTimestampEnd.widthHint = 150;
+		gd_textTimestampEnd.widthHint = 100;
 		textTimestampEnd.setLayoutData(gd_textTimestampEnd);
 		textTimestampEnd.setFont(cantarell8);
 		textTimestampEnd.setToolTipText("Ending timestamp value");
@@ -1098,6 +1107,34 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		btnReset = new Button(groupTime, SWT.NONE);
 		btnReset.setToolTipText("Reset Timestamps");
 		btnReset.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/undo_edit.gif"));
+		
+		Label lblDisplayedStart = new Label(groupTime, SWT.NONE);
+		lblDisplayedStart.setFont(cantarell8);
+		lblDisplayedStart.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblDisplayedStart.setText("Displayed start");
+		
+		textDisplayedStart = new Text(groupTime, SWT.BORDER);
+		textDisplayedStart.setText("-");
+		final GridData gd_textDisplayedStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+		gd_textDisplayedStart.widthHint = 100;
+		textDisplayedStart.setEditable(false);
+		textDisplayedStart.setFont(cantarell8);
+		textDisplayedStart.setLayoutData(gd_textDisplayedStart);
+		textDisplayedStart.setToolTipText("Starting timestamp of the current display");
+		
+		Label lblDisplayedEnd = new Label(groupTime, SWT.NONE);
+		lblDisplayedEnd.setFont(cantarell8);
+		lblDisplayedEnd.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblDisplayedEnd.setText("Displayed end");
+		
+		textDisplayedEnd = new Text(groupTime, SWT.BORDER);
+		textDisplayedEnd.setText("-");
+		final GridData gd_textDisplayedEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+		gd_textDisplayedEnd.widthHint = 100;
+		textDisplayedEnd.setEditable(false);
+		textDisplayedEnd.setFont(cantarell8);
+		textDisplayedEnd.setLayoutData(gd_textDisplayedEnd);
+		textDisplayedEnd.setToolTipText("Ending timestamp of the current display");
 
 		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
 		lblTSNumber.setFont(cantarell8);
@@ -1105,11 +1142,26 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
 		final GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_spinnerTSNumber.widthHint = 100;
+		gd_spinnerTSNumber.widthHint = 55;
 		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
 		spinnerTSNumber.setFont(cantarell8);
 		spinnerTSNumber.setMaximum(OcelotlDefaultParameterConstants.maxTimeslice);
 		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
 
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
