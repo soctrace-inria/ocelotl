@@ -252,6 +252,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 				// over it
 				long endTimeStamp = Math.min(aggregatedView.resetTime.getTimeStampEnd(), aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingSlice).getTimeRegion().getTimeStampEnd());
 
+				// Since timestamps start and end of two adjacent time slice overlap, add 1 to the starting timestamp 
 				aggregatedView.selectTime.setTimeStampStart(aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingSlice).getTimeRegion().getTimeStampStart() + 1);
 				aggregatedView.selectTime.setTimeStampEnd(endTimeStamp);
 			}
