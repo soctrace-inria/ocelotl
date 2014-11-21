@@ -639,11 +639,11 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		}
 	}
 
-	private class Settings2SelectionAdapter extends SelectionAdapter {
+	private class VisualizationSettingsSelectionAdapter extends SelectionAdapter {
 
 		private final OcelotlView	view;
 
-		public Settings2SelectionAdapter(final OcelotlView view) {
+		public VisualizationSettingsSelectionAdapter(final OcelotlView view) {
 			this.view = view;
 		}
 
@@ -657,7 +657,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		}
 	}
 
-	private class SettingsSelectionAdapter extends SelectionAdapter {
+	private class AggregationSettingsSelectionAdapter extends SelectionAdapter {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
@@ -665,12 +665,12 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				return;
 
 			hasChanged = HasChanged.ALL;
-			manager.openConfigWindows();
+			aggregationSettingsManager.openConfigWindows();
 		}
 	}
 
 	/**
-	 * Add the settings button to the toolbar
+	 * Create the settings button for the toolbar
 	 * 
 	 * @param view
 	 * @return the action creating the window settings
@@ -689,7 +689,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	}
 
 	/**
-	 * Add the snapshot button to the toolbar
+	 * Create the snapshot button for the toolbar
 	 * 
 	 * @return the action taking a snapshot
 	 */
@@ -709,6 +709,11 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		return takeSnapshot;
 	}
 
+	/**
+	 * Add the next zoom button in the toolbar
+	 * 
+	 * @return
+	 */
 	private Action createNextZoom() {
 		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/plus.png");
 		final Action nextZoom = new Action("Next zoom value", img) {
@@ -721,6 +726,11 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		return nextZoom;
 	}
 	
+	/**
+	 * Create the next zoom button for the toolbar
+	 * 
+	 * @return
+	 */
 	private Action createPrevZoom() {
 		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/minus.png");
 		final Action prevZoom = new Action("Previous zoom value", img) {
@@ -732,14 +742,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		prevZoom.setToolTipText("Go back to the previous zooming value.");
 		return prevZoom;
 	}
-
-	/*
-	 * private void enableActions(boolean enabled) { IActionBars actionBars =
-	 * getViewSite().getActionBars(); IToolBarManager toolBar =
-	 * actionBars.getToolBarManager(); for (IContributionItem item :
-	 * toolBar.getItems()) { if (item instanceof ActionContributionItem) {
-	 * ((ActionContributionItem) item).getAction().setEnabled(enabled); } } }
-	 */
 
 	private class TraceAdapter extends SelectionAdapter {
 		private Trace	trace;
@@ -817,9 +819,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonUp.notifyListeners(SWT.Selection, new Event());
 				break;
-			case SWT.SPACE:
-				statView.resizeDiagram();
-				break;
 			case SWT.KEYPAD_CR:
 			case SWT.CR:
 				if (!e.widget.isListening(e.type))
@@ -884,7 +883,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	 */
 	protected FramesocBusTopicList		topics			= null;
 
-	private ConfigViewManager			manager;
+	private ConfigViewManager			aggregationSettingsManager;
 	private Combo						comboStatistics;
 	private Button						buttonHome;
 	private Composite					statComposite;
@@ -1019,7 +1018,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		 				btnSettings.setToolTipText("Settings");
 		 				btnSettings.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
 		 				btnSettings.setFont(cantarell8);
-		 				btnSettings.addSelectionListener(new SettingsSelectionAdapter());
+		 				btnSettings.addSelectionListener(new AggregationSettingsSelectionAdapter());
 		 		
 		 				btnSaveDataCache = new Button(groupTraces, SWT.NONE);
 		 				btnSaveDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/save_edit.gif"));
@@ -1041,7 +1040,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		 				btnSettings2.setToolTipText("Settings");
 	 				btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
 						btnSettings2.setFont(cantarell8);
-						btnSettings2.addSelectionListener(new Settings2SelectionAdapter(this));
+						btnSettings2.addSelectionListener(new VisualizationSettingsSelectionAdapter(this));
 		
 		topBarScrollComposite.setContent(groupTraces);
 		topBarScrollComposite.setMinSize(groupTraces.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -1506,8 +1505,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		}
 
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
-		manager = new ConfigViewManager(this);
-		manager.init();
+		aggregationSettingsManager = new ConfigViewManager(this);
+		aggregationSettingsManager.init();
 	}
 
 	/**

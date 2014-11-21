@@ -47,10 +47,8 @@ public class ActionHistory {
 		if (checkForChanges()) {
 			// Are we at the end of the history
 			if (parameterHistory.size() - 1 != currentHistoryIndex) {
-				System.out.println("size be: " + parameterHistory.size());
 				// If not, we remove everything after this point
 				deleteOldHistory();
-				System.out.println("size af: " + parameterHistory.size());
 			}
 
 			// Add the current parameters to history
