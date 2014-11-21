@@ -753,6 +753,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			comboType.removeAll();
 			comboDimension.removeAll();
 			comboVisu.removeAll();
+			btnRun.setEnabled(false);
 			overView.reset();
 
 			final Job job = new Job(title) {
