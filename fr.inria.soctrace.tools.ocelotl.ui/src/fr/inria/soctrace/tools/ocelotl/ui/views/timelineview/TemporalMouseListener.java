@@ -143,7 +143,8 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			// max timestamp of the trace, we must check that we are not over it
 			long endTimeStamp = Math.min(aggregatedView.resetTime.getTimeStampEnd(), aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingSlice).getTimeRegion().getTimeStampEnd());
 			
-			aggregatedView.selectTime.setTimeStampStart(aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingSlice).getTimeRegion().getTimeStampStart());
+			// Since timestamps start and end of two adjacent time slice overlap, add 1 to the starting timestamp 
+			aggregatedView.selectTime.setTimeStampStart(aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingSlice).getTimeRegion().getTimeStampStart() + 1);
 			aggregatedView.selectTime.setTimeStampEnd(endTimeStamp);
 			
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);

@@ -79,6 +79,7 @@ public class Overview implements IFramesocBusListener {
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
 		topics.registerAll();
+		initSelectionFigure();
 	}
 
 	// When receiving a notification, redraw the overview with the new color
@@ -148,7 +149,6 @@ public class Overview implements IFramesocBusListener {
 			createDiagram();
 			displayedZone.draw(zoomedTimeRegion, true);
 		}
-		root.repaint();
 	}
 
 	/**
@@ -385,7 +385,6 @@ public class Overview implements IFramesocBusListener {
 			
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height - delta),
 					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), delta)));
-			root.repaint();
 		}
 
 		/**
@@ -394,8 +393,6 @@ public class Overview implements IFramesocBusListener {
 		public void delete() {
 			if (getParent() != null)
 				root.remove(this);
-
-			root.repaint();
 		}
 	}
 
@@ -454,7 +451,6 @@ public class Overview implements IFramesocBusListener {
 					public void run() {
 						createDiagram();
 						displayedZone.draw(time, true);
-						updateSelection(time);
 					}
 				});
 			    if (Thread.interrupted()) 
