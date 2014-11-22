@@ -741,7 +741,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	 * @return
 	 */
 	private Action createNextZoom() {
-		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/plus.png");
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/dlcl16/forward_nav.gif");
 		final Action nextZoom = new Action("Next zoom value", img) {
 			@Override
 			public void run() {
@@ -758,7 +758,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	 * @return
 	 */
 	private Action createPrevZoom() {
-		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/minus.png");
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/dlcl16/backward_nav.gif");
 		final Action prevZoom = new Action("Previous zoom value", img) {
 			@Override
 			public void run() {
@@ -1181,44 +1181,13 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		spinnerTSNumber.setFont(cantarell8);
 		spinnerTSNumber.setMaximum(OcelotlDefaultParameterConstants.maxTimeslice);
 		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-		new Label(groupTime, SWT.NONE);
-
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
 		textTimestampEnd.addModifyListener(new ConfModificationListener());
 		textTimestampStart.addModifyListener(new ConfModificationListener());
 		scrolledComposite.setContent(groupTime);
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashFormView.setWeights(new int[] {29, 420, 38});
+		sashFormView.setWeights(new int[] {29, 429, 29});
 
 		// Right column
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
