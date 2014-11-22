@@ -926,8 +926,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	private Combo						comboStatistics;
 	private Button						buttonHome;
 	private Composite					statComposite;
-	private Text						textDisplayedStart;
-	private Text						textDisplayedEnd;
+	private Label						textDisplayedStart;
+	private Label						textDisplayedEnd;
 	private Button						overViewParamUp;
 	private Button						overViewParamDown;
 
@@ -1115,9 +1115,37 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		groupTime.setFont(cantarell8);
 		groupTime.setLayout(new GridLayout(15, false));
 
+
+		
+		Label lblDisplayedStart = new Label(groupTime, SWT.NONE);
+		lblDisplayedStart.setFont(cantarell8);
+		lblDisplayedStart.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblDisplayedStart.setText("Time Bounds:");
+		
+		textDisplayedStart = new Label(groupTime, SWT.BORDER);
+		textDisplayedStart.setText("0");
+		final GridData gd_textDisplayedStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+		gd_textDisplayedStart.widthHint = 100;
+		textDisplayedStart.setFont(cantarell8);
+		textDisplayedStart.setLayoutData(gd_textDisplayedStart);
+		textDisplayedStart.setToolTipText("Starting timestamp of the current display");
+		
+		Label lblDisplayedEnd = new Label(groupTime, SWT.NONE);
+		lblDisplayedEnd.setFont(cantarell8);
+		lblDisplayedEnd.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblDisplayedEnd.setText("-");
+		
+		textDisplayedEnd = new Label(groupTime, SWT.BORDER);
+		textDisplayedEnd.setText("1");
+		final GridData gd_textDisplayedEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+		gd_textDisplayedEnd.widthHint = 100;
+		textDisplayedEnd.setFont(cantarell8);
+		textDisplayedEnd.setLayoutData(gd_textDisplayedEnd);
+		textDisplayedEnd.setToolTipText("Ending timestamp of the current display");
+		
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setFont(cantarell8);
-		lblStartTimestamp.setText("Start");
+		lblStartTimestamp.setText("Selection:");
 
 		textTimestampStart = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textTimestampStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
@@ -1128,7 +1156,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
 		lblEndTimestamp.setFont(cantarell8);
-		lblEndTimestamp.setText("End");
+		lblEndTimestamp.setText("-");
 
 		textTimestampEnd = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textTimestampEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
@@ -1141,33 +1169,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		btnReset.setToolTipText("Reset Timestamps");
 		btnReset.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/undo_edit.gif"));
 		
-		Label lblDisplayedStart = new Label(groupTime, SWT.NONE);
-		lblDisplayedStart.setFont(cantarell8);
-		lblDisplayedStart.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblDisplayedStart.setText("Displayed start");
-		
-		textDisplayedStart = new Text(groupTime, SWT.BORDER);
-		textDisplayedStart.setText("-");
-		final GridData gd_textDisplayedStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
-		gd_textDisplayedStart.widthHint = 100;
-		textDisplayedStart.setEditable(false);
-		textDisplayedStart.setFont(cantarell8);
-		textDisplayedStart.setLayoutData(gd_textDisplayedStart);
-		textDisplayedStart.setToolTipText("Starting timestamp of the current display");
-		
-		Label lblDisplayedEnd = new Label(groupTime, SWT.NONE);
-		lblDisplayedEnd.setFont(cantarell8);
-		lblDisplayedEnd.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblDisplayedEnd.setText("Displayed end");
-		
-		textDisplayedEnd = new Text(groupTime, SWT.BORDER);
-		textDisplayedEnd.setText("-");
-		final GridData gd_textDisplayedEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
-		gd_textDisplayedEnd.widthHint = 100;
-		textDisplayedEnd.setEditable(false);
-		textDisplayedEnd.setFont(cantarell8);
-		textDisplayedEnd.setLayoutData(gd_textDisplayedEnd);
-		textDisplayedEnd.setToolTipText("Ending timestamp of the current display");
 
 		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
 		lblTSNumber.setFont(cantarell8);
@@ -1195,6 +1196,21 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		new Label(groupTime, SWT.NONE);
 		new Label(groupTime, SWT.NONE);
 		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
 
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
@@ -1202,7 +1218,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		textTimestampStart.addModifyListener(new ConfModificationListener());
 		scrolledComposite.setContent(groupTime);
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashFormView.setWeights(new int[] { 27, 393, 25 });
+		sashFormView.setWeights(new int[] {29, 420, 38});
 
 		// Right column
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
@@ -1220,16 +1236,22 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		overView.init(compositeOverview);
 		
 		final SashForm buttonSashForm = new SashForm(overviewSashForm, SWT.BORDER | SWT.VERTICAL);
-		overViewParamDown = new Button(buttonSashForm, SWT.NONE);
-		overViewParamDown.setToolTipText("Decrease Overview Parameter");
-		overViewParamDown.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/minus.png"));
-		overViewParamDown.setFont(cantarell8);
-		overViewParamDown.addSelectionListener(new OverviewParameterDownAdapter());
+		buttonSashForm.setSashWidth(0);
 		overViewParamUp = new Button(buttonSashForm, SWT.NONE);
+		overViewParamUp.setText(">");
 		overViewParamUp.setToolTipText("Increase Overview Parameter");
-		overViewParamUp.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/plus.png"));
+		overViewParamUp.setImage(null);
 		overViewParamUp.setFont(cantarell8);
 		overViewParamUp.addSelectionListener(new OverviewParameterUpAdapter());
+		
+		
+		overViewParamDown = new Button(buttonSashForm, SWT.NONE);
+		overViewParamDown.setText("<");
+		overViewParamDown.setToolTipText("Decrease Overview Parameter");
+		overViewParamDown.setImage(null);
+		overViewParamDown.setFont(cantarell8);
+		overViewParamDown.addSelectionListener(new OverviewParameterDownAdapter());
+
 		overviewSashForm.setWeights(new int[] {95, 5});
 		
 		// Stat and legend
