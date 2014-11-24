@@ -60,25 +60,36 @@ public class SpatioTemporalAggregateView {
 	private String				label;
 	private Composite			compositeOverview;
 	private OcelotlView			ocelotlView;
+	private boolean 			visualAggregate;
 
-	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width) {
+	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width, boolean visualAggregate) {
 		super();
 		this.aggregateZone = aggregateZone;
 		this.eventProducerNode = eventProducerNode;
 		this.startingTimeSlice = startingTimeSlice;
 		this.endingTimeSlice = endingTimeSlice;
 		this.width = width;
+		this.visualAggregate=visualAggregate;
 		label = "Aggregate Content";
 	}
 
-	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width, String label) {
+	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width, String label, boolean visualAggregate) {
 		super();
 		this.aggregateZone = aggregateZone;
 		this.eventProducerNode = eventProducerNode;
 		this.startingTimeSlice = startingTimeSlice;
 		this.endingTimeSlice = endingTimeSlice;
 		this.width = width;
+		this.visualAggregate=visualAggregate;
 		this.label = label;
+	}
+
+	public boolean isVisualAggregate() {
+		return visualAggregate;
+	}
+
+	public void setVisualAggregate(boolean visualAggregate) {
+		this.visualAggregate = visualAggregate;
 	}
 
 	public Rectangle getAggregateZone() {
@@ -120,6 +131,8 @@ public class SpatioTemporalAggregateView {
 	 *            the current ocelotl view
 	 */
 	public void display(OcelotlView ocelotlview) {
+		if (!visualAggregate)
+			return;
 		this.ocelotlView = ocelotlview;
 		String name = ocelotlview.getOcelotlParameters().getVisuOperator();
 

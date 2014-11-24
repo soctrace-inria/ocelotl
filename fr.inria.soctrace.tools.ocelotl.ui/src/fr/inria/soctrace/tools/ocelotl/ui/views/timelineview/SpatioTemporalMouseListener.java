@@ -75,11 +75,11 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			EventProducerNode foundNode = findEventProducerNode(cornerY);
 			Point heights = getSpatialSelectionCoordinates(foundNode);
 			
-			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
-			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, false);
+			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.getPotentialSelectTime());
+			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.getPotentialSelectTime(), false);
 			aggregatedView.potentialSelectFigure.draw(aggregatedView.potentialSelectTime, heights.x(), heights.y());
 			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, originY, cornerY);
-			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
+			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.potentialSelectTime);
 		}
 
 	}
@@ -222,9 +222,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			}
 
 			// If none was found
-			if(selectedAggregate == null)
+			if(selectedAggregate == null||(!selectedAggregate.isVisualAggregate()))
 				return;
-			
 			// Compute highlight selection
 			Point heights = getSpatialSelectionCoordinates(selectedAggregate.getEventProducerNode());
 			aggregatedView.highLightAggregateFigure.draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y());

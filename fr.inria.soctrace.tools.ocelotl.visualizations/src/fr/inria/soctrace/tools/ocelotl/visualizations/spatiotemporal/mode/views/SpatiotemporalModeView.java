@@ -299,6 +299,8 @@ public class SpatiotemporalModeView extends MatrixView {
 			final RectangleFigure rectangle = new RectangleFigure();
 			MainState state = spatiotemporalMode.getMainState(epn, logicX,
 					logicX2);
+			String label = " " + epn.getMe().getName() + " ("
+					+ state.getState() + ", " + state.getAmplitude100() + "%) ";
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()
 					.getEventTypeColor(state.getState()).getSwtColor());
 			rectangle.setForegroundColor(FramesocColorManager.getInstance()
@@ -317,6 +319,9 @@ public class SpatiotemporalModeView extends MatrixView {
 			int yb = yendlist.get(logicY + sizeY);
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb,
 					yb)));
+			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(
+					new Point(xa, ya), new Point(xb, yb)), epn, logicX,
+					logicX2, xb - xa, label, false));
 		}
 
 		/**
@@ -371,7 +376,7 @@ public class SpatiotemporalModeView extends MatrixView {
 			
 			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(
 					new Point(xa, ya), new Point(xb, yb)), epn, logicX,
-					logicX2, xb - xa, label));
+					logicX2, xb - xa, label, true));
 			
 			if (!clean) {
 				drawTextureDirty(xa, xb, ya, yb, label);
