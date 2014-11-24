@@ -65,6 +65,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -75,8 +76,8 @@ import fr.inria.soctrace.framesoc.ui.model.GanttTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.HistogramTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.PieTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TableTraceIntervalAction;
+import fr.inria.soctrace.framesoc.ui.model.TraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
-import fr.inria.soctrace.framesoc.ui.perspective.FramesocPart;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
@@ -105,7 +106,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class OcelotlView extends FramesocPart implements IFramesocBusListener {
+public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 	private class SaveDataListener extends SelectionAdapter {
 
@@ -934,7 +935,42 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		super.dispose();
 	}
 
-	@Override
+	private TraceIntervalAction createTableAction() {
+		return new TableTraceIntervalAction() {
+			@Override
+			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
+				return getIntervalDescriptor();
+			}
+		};
+	}
+
+	private TraceIntervalAction createGanttAction() {
+		return new GanttTraceIntervalAction() {
+			@Override
+			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
+				return getIntervalDescriptor();
+			}
+		};
+	}
+
+	private TraceIntervalAction createPieAction() {
+		return new PieTraceIntervalAction() {
+			@Override
+			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
+				return getIntervalDescriptor();
+			}
+		};
+	}
+
+	private TraceIntervalAction createHistogramAction() {
+		return new HistogramTraceIntervalAction() {
+			@Override
+			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
+				return getIntervalDescriptor();
+			}
+		};
+	}
+
 	protected TraceIntervalDescriptor getIntervalDescriptor() {
 		if (confDataLoader.getCurrentTrace() == null)
 			return null;
@@ -1610,21 +1646,5 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	protected void createFramesocPartControl(Composite parent) {
-		createPartControl(parent);
-	}
-
-	@Override
-	public String getId() {
-		// TODO Auto-generated method stub
-		return "Toto";
-	}
-
-	@Override
-	public void showTrace(Trace trace, Object data) {
-		// TODO Auto-generated method stub
 	}
 }
