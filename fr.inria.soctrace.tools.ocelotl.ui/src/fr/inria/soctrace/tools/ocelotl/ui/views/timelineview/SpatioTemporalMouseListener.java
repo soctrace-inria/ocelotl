@@ -28,6 +28,12 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	AggregatedView				aggregatedView;
 	int							originY, cornerY;
 	boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
+	
+	int rootHeight;
+	int height;
+	double accurateLogicHeight;
+	SpaceTimeAggregation2Manager spatioTemporalManager; 
+	EventProducerHierarchy hierarchy;
 
 	public SpatioTemporalMouseListener(AggregatedView theview) {
 		super();
@@ -62,9 +68,15 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 				cornerY = arg0.y;
 			}
 			
+			// Compute current potential selection
+			Point timeslices = getTimeSlices(aggregatedView.selectTime);
+			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
+			EventProducerNode foundNode = findEventProducerNode(cornerY);
+			Point heights = getSpatialSelectionCoordinates(foundNode);
+			
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, false);
-			
+			aggregatedView.potentialSelectFigure.draw(aggregatedView.potentialSelectTime, heights.x(), heights.y());
 			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, originY, cornerY);
 			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
 		}
@@ -216,23 +228,28 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	
 	@Override
 	public void mouseDoubleClicked(final MouseEvent arg0) {
-		// If it is a spatiotemporal aggregate, select it
+		// If it is a spatiotemporal aggregate, select it, else do nothing
 		Point clickCoord = new Point(arg0.x, arg0.y);
 		SpatioTemporalAggregateView selectedAggregate = null;
-		
+
 		// Find the corresponding aggregate
 		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
 			if (aggreg.getAggregateZone().contains(clickCoord)) {
 				selectedAggregate = aggreg;
 			}
 		}
-
+		
 		// If none was found
 		if(selectedAggregate == null)
 			return;
 
 		// Select the aggregate
-		setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1);
+		aggregatedView.setSelectTime(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1));
+		Point heights = getSpatialSelectionCoordinates(selectedAggregate.getEventProducerNode());
+		
+		// Set the height points
+		originY = heights.x();
+		cornerY = heights.y();
 		setSpatialSelection(selectedAggregate.getEventProducerNode());
 
 		// Avoid trigger the mouse released event
@@ -253,6 +270,9 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		if ((arg0.button == 1 || state == MouseState.EXITED) && state != MouseState.RELEASED) {
 			// Reset to normal cursor
 			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+			
+			// Remove the potential selection figure
+			aggregatedView.potentialSelectFigure.delete();
 
 			if (state == MouseState.DRAG_LEFT_VERTICAL || state == MouseState.DRAG_LEFT_HORIZONTAL)
 				mouseDragged(arg0);
@@ -273,49 +293,27 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 				int startingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.selectTime.getTimeStampStart());
 				int endingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.selectTime.getTimeStampEnd());
 
-				setTemporalSelection(startingSlice, endingSlice);
+				aggregatedView.setSelectTime(setTemporalSelection(startingSlice, endingSlice));
 			}
 
 			// If we are performing an horizontal drag then don't change the
 			// selected hierarchy
 			if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
-
-				// Get the event producer hierarchy
-				SpaceTimeAggregation2Manager STManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
-				EventProducerHierarchy hierarchy = STManager.getHierarchy();
-
-				// Compute the selected spatiotemporal region
-				int y0, y1;
-				y0 = Math.min(originY, arg0.y);
-				y1 = Math.max(originY, arg0.y);
-
-				// Compute various height values
-				int rootHeight = aggregatedView.root.getSize().height;
-				int height = rootHeight - (2 * aggregatedView.aBorder);
-				double accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
-
-				// Remove the border margin and make sure we are within the boundary
-				y0 = Math.min(y0 - aggregatedView.aBorder, height - 1);
-				y1 = Math.min(y1 - aggregatedView.aBorder, height - 1);
+				EventProducerNode selectedNode = findEventProducerNode(arg0.y);
+				Point heights = getSpatialSelectionCoordinates(selectedNode);
 				
-				// Compute the boundaries of the event producer
-				// Round up to the nearest integer (multiply by 2.0, round then
-				// divide by 2)
-				double rounding = (((double) (y0)) / accurateLogicHeight) * 2.0;
-				int startingHeight = (int) (Math.round(rounding) / 2);
-				int endingHeight = (int) (((double) (y1)) / accurateLogicHeight);
-				// Might happen when selecting a unique point
-				if (startingHeight > endingHeight) {
-					startingHeight = endingHeight;
-				}
-
-				// Find the event producer node containing all the selected node
-				ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
-				EventProducerNode selectedNode = hierarchy.findSmallestContainingNode(currentProducers);
+				// Set the height points
+				originY = heights.x();
+				cornerY = heights.y();
 				
+				// Select producers
 				setSpatialSelection(selectedNode);
 			}
 
+			// Compute current potential selection
+			Point timeslices = getTimeSlices(aggregatedView.selectTime);
+			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
+			
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
 			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, originY, cornerY);
@@ -324,23 +322,16 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		}
 	}
 	
-	/**
-	 * Set the temporal selection to the time slices given in parameter
-	 * 
-	 * @param startingTimeSlice
-	 *            starting timeslice of the selection
-	 * @param endingTimeslice
-	 *            ending timeslice of the selection
-	 */
-	private void setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
-		// Since the timestamp of the last time slice goes further than the max
-		// timestamp of the trace, we must check that we are not over it
-		long endTimeStamp = Math.min(aggregatedView.resetTime.getTimeStampEnd(), aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
+	protected void updateMeasurements()
+	{
+		// Get the event producer hierarchy
+		spatioTemporalManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
+		hierarchy = spatioTemporalManager.getHierarchy();
 
-		// Since timestamps start and end of two adjacent time slice overlap,
-		// add 1 to the starting timestamp
-		aggregatedView.selectTime.setTimeStampStart(aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1);
-		aggregatedView.selectTime.setTimeStampEnd(endTimeStamp);
+		// Compute various height values
+		rootHeight = aggregatedView.root.getSize().height;
+		height = rootHeight - (2 * aggregatedView.aBorder);
+		accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
 	}
 	
 	/**
@@ -350,29 +341,6 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	 *            the selected even producer node
 	 */
 	private void setSpatialSelection(EventProducerNode selectedNode) {
-		// Get the event producer hierarchy
-		SpaceTimeAggregation2Manager STManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
-		EventProducerHierarchy hierarchy = STManager.getHierarchy();
-
-		// Compute various height values
-		int rootHeight = aggregatedView.root.getSize().height;
-		int height = rootHeight - (2 * aggregatedView.aBorder);
-		double accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
-
-		// Compute the selection bound for drawing (cf.
-		// SpatioTemporalModeView)
-		originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
-		cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
-
-		// If the selected producer is too small (1 pixel), take the
-		// parent node until the size is > 1 pixel
-		while ((cornerY - originY) <= 1) {
-			selectedNode = selectedNode.getParentNode();
-
-			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
-			cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
-		}
-
 		ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
 
 		// If only one producer is selected, then also add the parent
@@ -383,6 +351,96 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 		aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
 		aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
+	}
+	
+	protected Point getSpatialSelectionCoordinates(EventProducerNode selectedNode) {
+		updateMeasurements();
+
+		int y0 = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
+		int y1 = y0 + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+
+		// If the selected producer is too small (1 pixel), take the
+		// parent node until the size is > 1 pixel
+		while ((y1 - y0) <= 1) {
+			selectedNode = selectedNode.getParentNode();
+
+			y0 = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
+			y1 = y0 + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+		}
+
+		return new Point(y0, y1);
+	}
+	
+	/**
+	 * Find the currently selected event producer node
+	 * 
+	 * @param y
+	 *            the current y parameter tom compute the height with originY
+	 * @return the found event producer
+	 */
+	protected EventProducerNode findEventProducerNode(int y) {
+		updateMeasurements();
+		
+		// Compute the selected spatiotemporal region
+		int y0, y1;
+		y0 = Math.min(originY, y);
+		y1 = Math.max(originY, y);
+
+		// Remove the border margin and make sure we are within the boundary
+		y0 = Math.min(y0 - aggregatedView.aBorder, height - 1);
+		y1 = Math.min(y1 - aggregatedView.aBorder, height - 1);
+		
+		// Compute the boundaries of the event producer
+		// Round up to the nearest integer (multiply by 2.0, round then
+		// divide by 2)
+		double rounding = (((double) (y0)) / accurateLogicHeight) * 2.0;
+		int startingHeight = (int) (Math.round(rounding) / 2);
+		int endingHeight = (int) (((double) (y1)) / accurateLogicHeight);
+		// Might happen when selecting a unique point
+		if (startingHeight > endingHeight) {
+			startingHeight = endingHeight;
+		}
+
+		// Find the event producer node containing all the selected node
+		ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
+		
+		return hierarchy.findSmallestContainingNode(currentProducers);
+	}
+	
+	/**
+	 * Set the temporal selection to the time slices given in parameter
+	 * 
+	 * @param startingTimeSlice
+	 *            starting timeslice of the selection
+	 * @param endingTimeslice
+	 *            ending timeslice of the selection
+	 */
+	private TimeRegion setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
+		// Since timestamps start and end of two adjacent time slice overlap,
+		// add 1 to the starting timestamp
+		long startTimeStamp = aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
+
+		// Since the timestamp of the last time slice goes further than the max
+		// timestamp of the trace, we must check that we are not over it
+		long endTimeStamp = Math.min(aggregatedView.resetTime.getTimeStampEnd(), aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
+
+		return new TimeRegion(startTimeStamp, endTimeStamp);
+	}
+	
+	
+	/**
+	 * Given a timeRegion, find the starting and ending time slice containing
+	 * this region
+	 * 
+	 * @param aTimeRegion
+	 * @return a Point whose X is the starting time slice, and Y is the ending
+	 *         time slice
+	 */
+	protected Point getTimeSlices(TimeRegion aTimeRegion) {
+		int startingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampStart());
+		int endingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
+
+		return new Point(startingSlice, endingSlice);
 	}
 
 }

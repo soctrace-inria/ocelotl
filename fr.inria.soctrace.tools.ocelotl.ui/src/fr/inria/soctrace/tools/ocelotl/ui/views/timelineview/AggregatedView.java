@@ -62,11 +62,13 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected final List<RectangleFigure>			figures			= new ArrayList<RectangleFigure>();
 	protected TimeRegion							time;
 	protected TimeRegion							selectTime;
+	protected TimeRegion							potentialSelectTime;
 	protected TimeRegion							resetTime;
 	protected int									aBorder			= 10;
 	protected final int								space			= 3;
 	protected final OcelotlView						ocelotlView;
 	protected SelectFigure							selectFigure;
+	protected SelectFigure							potentialSelectFigure;
 	protected IVisuOperator							visuOperator	= null;
 	protected OcelotlMouseListener					mouse;
 	protected List<SpatioTemporalAggregateView>						aggregates;
@@ -85,6 +87,16 @@ abstract public class AggregatedView implements IAggregatedView {
 			setForegroundColor(selectColorFG);
 			setBackgroundColor(selectColorBG);
 			setAlpha(70);
+		}
+		
+		private SelectFigure(Color foreGround, Color backGround) {
+			super();
+			final ToolbarLayout layout = new ToolbarLayout();
+			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
+			setLayoutManager(layout);
+			setForegroundColor(foreGround);
+			setBackgroundColor(backGround);
+			setAlpha(50);
 		}
 
 		/**
@@ -116,10 +128,38 @@ abstract public class AggregatedView implements IAggregatedView {
 
 			if (y1 == -1)
 				y1 = 2;
-
+			
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
 					(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder - 1), y1)));
 			root.repaint();
+		}
+		
+		public void draw(final TimeRegion timeRegion, int y0, int y1) {
+			if (getParent() != root)
+				root.add(this);
+			
+			setLineWidth(2);
+			setAlpha(200);
+			setFill(false);
+
+			// Default values for selecting the height of the graph
+			if (y0 == -1)
+				y0 = root.getSize().height;
+
+			if (y1 == -1)
+				y1 = 2;
+					
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
+					(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder - 1), y1)));
+			root.repaint();
+		}
+		
+		/**
+		 * Remove the selection from display
+		 */
+		public void delete() {
+			if (getParent() != null)
+				root.remove(this);
 		}
 	}
 	
@@ -255,6 +295,18 @@ abstract public class AggregatedView implements IAggregatedView {
 		return selectTime;
 	}
 
+	public TimeRegion getPotentialSelectTime() {
+		return potentialSelectTime;
+	}
+
+	public void setPotentialSelectTime(TimeRegion potentialSelectTime) {
+		this.potentialSelectTime = potentialSelectTime;
+	}
+
+	public void setSelectTime(TimeRegion selectTime) {
+		this.selectTime = selectTime;
+	}
+
 	public int getSpace() {
 		return space;
 	}
@@ -308,6 +360,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseListener(mouse);
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
+		potentialSelectFigure = new SelectFigure(ColorConstants.black, ColorConstants.white);
 	}
 	
 	public void setBorder(final int border) {
