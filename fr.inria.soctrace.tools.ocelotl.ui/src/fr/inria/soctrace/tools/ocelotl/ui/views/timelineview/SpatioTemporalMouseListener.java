@@ -37,11 +37,6 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	}
 
 	@Override
-	public void mouseDoubleClicked(final MouseEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void mouseDragged(final MouseEvent arg0) {
 		// If we are in the current dragging state and we have make move greater than 10 pixels
 		if ((state == MouseState.PRESSED_LEFT || state == MouseState.DRAG_LEFT || state == MouseState.DRAG_LEFT_HORIZONTAL || state == MouseState.DRAG_LEFT_VERTICAL)
@@ -94,7 +89,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	@Override
 	public void mouseMoved(final MouseEvent arg0) {
 		// If there is a current selection
@@ -218,6 +213,37 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			selectedAggregate.display(aggregatedView.ocelotlView);
 		}
 	}
+	
+	@Override
+	public void mouseDoubleClicked(final MouseEvent arg0) {
+		// If it is a spatiotemporal aggregate, select it
+		Point clickCoord = new Point(arg0.x, arg0.y);
+		SpatioTemporalAggregateView selectedAggregate = null;
+		
+		// Find the corresponding aggregate
+		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
+			if (aggreg.getAggregateZone().contains(clickCoord)) {
+				selectedAggregate = aggreg;
+			}
+		}
+
+		// If none was found
+		if(selectedAggregate == null)
+			return;
+
+		// Select the aggregate
+		setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1);
+		setSpatialSelection(selectedAggregate.getEventProducerNode());
+
+		// Avoid trigger the mouse released event
+		state = MouseState.RELEASED;
+		
+		aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
+		aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
+		aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, originY, cornerY);
+		aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
+		aggregatedView.ocelotlView.getStatView().updateData();
+	}
 
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
@@ -247,14 +273,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 				int startingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.selectTime.getTimeStampStart());
 				int endingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.selectTime.getTimeStampEnd());
 
-				// Since the timestamp of the last time slice goes further than
-				// the max timestamp of the trace, we must check that we are not
-				// over it
-				long endTimeStamp = Math.min(aggregatedView.resetTime.getTimeStampEnd(), aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingSlice).getTimeRegion().getTimeStampEnd());
-
-				// Since timestamps start and end of two adjacent time slice overlap, add 1 to the starting timestamp 
-				aggregatedView.selectTime.setTimeStampStart(aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingSlice).getTimeRegion().getTimeStampStart() + 1);
-				aggregatedView.selectTime.setTimeStampEnd(endTimeStamp);
+				setTemporalSelection(startingSlice, endingSlice);
 			}
 
 			// If we are performing an horizontal drag then don't change the
@@ -293,30 +312,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 				// Find the event producer node containing all the selected node
 				ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
 				EventProducerNode selectedNode = hierarchy.findSmallestContainingNode(currentProducers);
-
-				// Compute the selection bound for drawing (cf.
-				// SpatioTemporalModeView)
-				originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
-				cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
 				
-				// If the selected producer is too small (1 pixel), take the
-				// parent node until the size is > 1 pixel
-				while ((cornerY - originY) <= 1) {
-					selectedNode = selectedNode.getParentNode();
-
-					originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
-					cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
-				}
-
-				ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
-
-				// If only one producer is selected, then also add the parent
-				// producer to avoid that the building of the micro model fails
-				if (selectedNode.getChildrenNodes().isEmpty()) {
-					selectedProducers.add(selectedNode.getParentNode().getMe());
-				}
-				aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
-				aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
+				setSpatialSelection(selectedNode);
 			}
 
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
@@ -325,6 +322,67 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
 			aggregatedView.ocelotlView.getStatView().updateData();
 		}
+	}
+	
+	/**
+	 * Set the temporal selection to the time slices given in parameter
+	 * 
+	 * @param startingTimeSlice
+	 *            starting timeslice of the selection
+	 * @param endingTimeslice
+	 *            ending timeslice of the selection
+	 */
+	private void setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
+		// Since the timestamp of the last time slice goes further than the max
+		// timestamp of the trace, we must check that we are not over it
+		long endTimeStamp = Math.min(aggregatedView.resetTime.getTimeStampEnd(), aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
+
+		// Since timestamps start and end of two adjacent time slice overlap,
+		// add 1 to the starting timestamp
+		aggregatedView.selectTime.setTimeStampStart(aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1);
+		aggregatedView.selectTime.setTimeStampEnd(endTimeStamp);
+	}
+	
+	/**
+	 * Set the spatial selection to the event producer node given in parameter
+	 * 
+	 * @param selectedNode
+	 *            the selected even producer node
+	 */
+	private void setSpatialSelection(EventProducerNode selectedNode) {
+		// Get the event producer hierarchy
+		SpaceTimeAggregation2Manager STManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
+		EventProducerHierarchy hierarchy = STManager.getHierarchy();
+
+		// Compute various height values
+		int rootHeight = aggregatedView.root.getSize().height;
+		int height = rootHeight - (2 * aggregatedView.aBorder);
+		double accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
+
+		// Compute the selection bound for drawing (cf.
+		// SpatioTemporalModeView)
+		originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
+		cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+
+		// If the selected producer is too small (1 pixel), take the
+		// parent node until the size is > 1 pixel
+		while ((cornerY - originY) <= 1) {
+			selectedNode = selectedNode.getParentNode();
+
+			originY = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
+			cornerY = originY + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+		}
+
+		ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
+
+		// If only one producer is selected, then also add the parent
+		// producer to avoid that the building of the micro model fails
+		if (selectedNode.getChildrenNodes().isEmpty()) {
+			selectedProducers.add(selectedNode.getParentNode().getMe());
+		}
+
+		aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
+		aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 	}
 
 }
