@@ -233,7 +233,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
         
         btnEdit = new Button(compositeButtons, SWT.NONE);
         btnEdit.setEnabled(false);
-        btnEdit.setToolTipText("Edit color");
+        btnEdit.setToolTipText("Edit Color");
         btnEdit.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
         btnEdit.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -256,7 +256,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
         
         btnReset = new Button(compositeButtons, SWT.NONE);
         btnReset.setEnabled(false);
-        btnReset.setToolTipText("Reload from configuration file");
+        btnReset.setToolTipText("Reload from Configuration File");
         btnReset.setImage(ResourceManager.getPluginImage(Activator.PLUGIN_ID, "icons/load.png"));
         btnReset.addSelectionListener(new SelectionAdapter() {
         	@Override

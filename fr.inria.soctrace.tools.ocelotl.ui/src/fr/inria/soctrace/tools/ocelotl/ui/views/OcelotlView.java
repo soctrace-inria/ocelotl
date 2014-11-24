@@ -710,7 +710,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				settingsView.openDialog();
 			}
 		};
-		showSettings.setToolTipText("Ocelotl settings.");
+		showSettings.setToolTipText("Ocelotl Settings");
 		return showSettings;
 	}
 
@@ -721,7 +721,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	 */
 	private Action createSnapshot() {
 		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/snapshot-icon.png");
-		final Action takeSnapshot = new Action("Ocelotl Settings", img) {
+		final Action takeSnapshot = new Action("Take Snapshot", img) {
 			@Override
 			public void run() {
 				if (confDataLoader.getCurrentTrace() == null || ocelotlParameters.getTrace() == null)
@@ -731,7 +731,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				playSound("/media/snapshot.wav");
 			}
 		};
-		takeSnapshot.setToolTipText("Take a snapshot of the current view.");
+		takeSnapshot.setToolTipText("Take a Snapshot of the Current View");
 		return takeSnapshot;
 	}
 
@@ -748,7 +748,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				history.restoreNextHistory();
 			}
 		};
-		nextZoom.setToolTipText("Go to the next zooming value.");
+		nextZoom.setToolTipText("Go to the Next Zooming Value");
 		return nextZoom;
 	}
 	
@@ -765,7 +765,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				history.restorePrevHistory();
 			}
 		};
-		prevZoom.setToolTipText("Go back to the previous zooming value.");
+		prevZoom.setToolTipText("Go back to the Previous Zooming Value");
 		return prevZoom;
 	}
 
@@ -1029,7 +1029,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		 				comboTraces.setLayoutData(gd_comboTraces);
 		 				comboTraces.setFont(cantarell8);
 		 				comboTraces.addSelectionListener(new TraceAdapter());
-		 				comboTraces.setToolTipText("Trace selection");
+		 				comboTraces.setToolTipText("Trace Selection");
 		 		
 		 				Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
 		 				btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
@@ -1045,7 +1045,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		 				comboType.add("Metric");
 		 				comboType.setText("Metric");
 		 				comboType.addSelectionListener(new ComboTypeSelectionAdapter());
-		 				comboType.setToolTipText("Metric selection");
+		 				comboType.setToolTipText("Metric Selection");
 		 		
 		 				comboDimension = new Combo(groupTraces, SWT.READ_ONLY);
 		 				final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
@@ -1055,7 +1055,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		 				comboDimension.add("Dimensions");
 		 				comboDimension.setText("Dimensions");
 		 				comboDimension.addSelectionListener(new ComboDimensionSelectionAdapter());
-		 				comboDimension.setToolTipText("Dimensions selection");
+		 				comboDimension.setToolTipText("Dimensions Selection");
 		 		
 		 				btnSettings = new Button(groupTraces, SWT.NONE);
 		 				btnSettings.setToolTipText("Settings");
@@ -1077,7 +1077,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		 				comboVisu.add("Visualization");
 		 				comboVisu.setText("Visualization");
 		 				comboVisu.addSelectionListener(new ComboVisuSelectionAdapter());
-		 				comboVisu.setToolTipText("Visualization selection");
+		 				comboVisu.setToolTipText("Visualization Selection");
 		 		
 		 				btnSettings2 = new Button(groupTraces, SWT.NONE);
 		 				btnSettings2.setToolTipText("Settings");
@@ -1128,7 +1128,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		gd_textDisplayedStart.widthHint = 100;
 		textDisplayedStart.setFont(cantarell8);
 		textDisplayedStart.setLayoutData(gd_textDisplayedStart);
-		textDisplayedStart.setToolTipText("Starting timestamp of the current display");
+		textDisplayedStart.setToolTipText("Starting Timestamp of the Current Display");
 		
 		Label lblDisplayedEnd = new Label(groupTime, SWT.NONE);
 		lblDisplayedEnd.setFont(cantarell8);
@@ -1141,7 +1141,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		gd_textDisplayedEnd.widthHint = 100;
 		textDisplayedEnd.setFont(cantarell8);
 		textDisplayedEnd.setLayoutData(gd_textDisplayedEnd);
-		textDisplayedEnd.setToolTipText("Ending timestamp of the current display");
+		textDisplayedEnd.setToolTipText("Ending Timestamp of the Current Display");
 		
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setFont(cantarell8);
@@ -1152,7 +1152,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		gd_textTimestampStart.widthHint = 100;
 		textTimestampStart.setLayoutData(gd_textTimestampStart);
 		textTimestampStart.setFont(cantarell8);
-		textTimestampStart.setToolTipText("Starting timestamp value");
+		textTimestampStart.setToolTipText("Starting Ttimestamp Value");
 
 		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
 		lblEndTimestamp.setFont(cantarell8);
@@ -1163,7 +1163,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		gd_textTimestampEnd.widthHint = 100;
 		textTimestampEnd.setLayoutData(gd_textTimestampEnd);
 		textTimestampEnd.setFont(cantarell8);
-		textTimestampEnd.setToolTipText("Ending timestamp value");
+		textTimestampEnd.setToolTipText("Ending Timestamp Value");
 
 		btnReset = new Button(groupTime, SWT.NONE);
 		btnReset.setToolTipText("Reset Timestamps");
@@ -1296,7 +1296,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		btnRun.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/ocelotl16.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
-		btnRun.setToolTipText("Launch an analysis");
+		btnRun.setToolTipText("Launch an Analysis");
 		btnRun.setText("RUN!");
 
 		btnRun.addSelectionListener(new GetAggregationAdapter());
@@ -1460,6 +1460,14 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 	public void setComboType(Combo comboType) {
 		this.comboType = comboType;
+	}
+	
+	public Label getTextDisplayedStart() {
+		return textDisplayedStart;
+	}
+
+	public Label getTextDisplayedEnd() {
+		return textDisplayedEnd;
 	}
 
 	private void refreshTraces() {

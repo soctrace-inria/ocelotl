@@ -387,7 +387,7 @@ public class OcelotlSettingsView extends Dialog {
 		Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
 		lblCacheTimeSlices.setText("Cache time slices:");
 		lblCacheTimeSlices.setFont(cantarell8);
-		lblCacheTimeSlices.setToolTipText("Number of time slices used when generating cache");
+		lblCacheTimeSlices.setToolTipText("Number of Time Slices Used When Generating Cache");
 
 		cacheTimeSliceValue = new Spinner(groupDataCacheSettings, SWT.BORDER);
 		cacheTimeSliceValue.setValues(0, 0, 99999999, 0, 1, 10);
