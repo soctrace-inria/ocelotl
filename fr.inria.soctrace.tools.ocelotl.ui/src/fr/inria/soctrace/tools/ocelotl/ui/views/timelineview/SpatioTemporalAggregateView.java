@@ -12,6 +12,8 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -57,6 +59,7 @@ public class SpatioTemporalAggregateView {
 	private Figure				root;
 	private String				label;
 	private Composite			compositeOverview;
+	private OcelotlView			ocelotlView;
 
 	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width) {
 		super();
@@ -117,6 +120,7 @@ public class SpatioTemporalAggregateView {
 	 *            the current ocelotl view
 	 */
 	public void display(OcelotlView ocelotlview) {
+		this.ocelotlView = ocelotlview;
 		String name = ocelotlview.getOcelotlParameters().getVisuOperator();
 
 		try {
@@ -157,10 +161,9 @@ public class SpatioTemporalAggregateView {
 			aggregationView.setRoot(root);
 			aggregationView.setCanvas(canvas);
 			dialog.addControlListener(new dialogControlListener());
+			dialog.addShellListener(new DialogShellListener());
 			
 			dialog.open();
-			aggregationView.setRoot(root);
-			aggregationView.setCanvas(canvas);
 			root.addMouseListener(new SpatioTemporalAggregateMouseListener());
 
 			// Trigger the display
@@ -188,4 +191,40 @@ public class SpatioTemporalAggregateView {
 		}
 	}
 	
+	private class DialogShellListener implements ShellListener {
+
+		@Override
+		public void shellActivated(ShellEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void shellClosed(ShellEvent e) {
+			// Remove the highlight rectangle
+			AggregatedView graphDisplayView = (AggregatedView) ocelotlView.getTimeLineView();
+
+			if (graphDisplayView.getHighLightAggregateFigure() != null)
+				graphDisplayView.getHighLightAggregateFigure().delete();
+		}
+
+		@Override
+		public void shellDeactivated(ShellEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void shellDeiconified(ShellEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void shellIconified(ShellEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
 }

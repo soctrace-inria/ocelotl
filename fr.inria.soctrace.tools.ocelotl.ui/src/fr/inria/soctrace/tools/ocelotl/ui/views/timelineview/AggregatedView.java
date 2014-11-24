@@ -68,6 +68,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected final int								space			= 3;
 	protected final OcelotlView						ocelotlView;
 	protected SelectFigure							selectFigure;
+	protected SelectFigure							highLightAggregateFigure;
 	protected SelectFigure							potentialSelectFigure;
 	protected IVisuOperator							visuOperator	= null;
 	protected OcelotlMouseListener					mouse;
@@ -96,7 +97,6 @@ abstract public class AggregatedView implements IAggregatedView {
 			setLayoutManager(layout);
 			setForegroundColor(foreGround);
 			setBackgroundColor(backGround);
-			setAlpha(50);
 		}
 
 		/**
@@ -115,10 +115,13 @@ abstract public class AggregatedView implements IAggregatedView {
 			if (active) {
 				setForegroundColor(activeColorFG);
 				setBackgroundColor(activeColorBG);
+				setFill(true);
 			} else {
 				setForegroundColor(selectColorFG);
 				setBackgroundColor(selectColorBG);
+				setFill(false);
 			}
+			
 			if (getParent() != root)
 				root.add(this);
 
@@ -138,10 +141,6 @@ abstract public class AggregatedView implements IAggregatedView {
 			if (getParent() != root)
 				root.add(this);
 			
-			setLineWidth(2);
-			setAlpha(200);
-			setFill(false);
-
 			// Default values for selecting the height of the graph
 			if (y0 == -1)
 				y0 = root.getSize().height;
@@ -307,6 +306,10 @@ abstract public class AggregatedView implements IAggregatedView {
 		this.selectTime = selectTime;
 	}
 
+	public SelectFigure getHighLightAggregateFigure() {
+		return highLightAggregateFigure;
+	}
+
 	public int getSpace() {
 		return space;
 	}
@@ -360,7 +363,16 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseListener(mouse);
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
-		potentialSelectFigure = new SelectFigure(ColorConstants.black, ColorConstants.white);
+		
+		potentialSelectFigure = new SelectFigure(ColorConstants.darkBlue, ColorConstants.darkBlue);
+		potentialSelectFigure.setLineWidth(3);
+		potentialSelectFigure.setAlpha(100);
+		potentialSelectFigure.setFill(true);
+		
+		highLightAggregateFigure = new SelectFigure(ColorConstants.black, ColorConstants.white);
+		highLightAggregateFigure.setLineWidth(2);
+		highLightAggregateFigure.setAlpha(255);
+		highLightAggregateFigure.setFill(false);
 	}
 	
 	public void setBorder(final int border) {

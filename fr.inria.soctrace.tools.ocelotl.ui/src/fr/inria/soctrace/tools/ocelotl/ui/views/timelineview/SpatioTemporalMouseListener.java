@@ -19,6 +19,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.Mous
 public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	private static final long	Threshold	= 5;
+	Boolean 					clickOnView = false;
 	MouseState					state		= MouseState.RELEASED;
 	MouseState					previous	= MouseState.RELEASED;
 	Point						currentPoint;
@@ -123,8 +124,10 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			state = MouseState.V_MOVE_END;
 			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZENS));
 		} else {
-			if (state != MouseState.PRESSED_LEFT)
+			if (state != MouseState.PRESSED_LEFT) {
 				state = MouseState.RELEASED;
+			}
+			
 			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 		}
 	}
@@ -167,6 +170,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	@Override
 	public void mousePressed(final MouseEvent arg0) {
 		if (arg0.button == 1 && aggregatedView.resetTime != null) {
+			clickOnView = true;
 			currentPoint = arg0.getLocation();
 			long p3 = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
 			// We are dragging horizontally by the left side
@@ -220,6 +224,10 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			// If none was found
 			if(selectedAggregate == null)
 				return;
+			
+			// Compute highlight selection
+			Point heights = getSpatialSelectionCoordinates(selectedAggregate.getEventProducerNode());
+			aggregatedView.highLightAggregateFigure.draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y());
 
 			// Trigger the display
 			selectedAggregate.display(aggregatedView.ocelotlView);
@@ -264,16 +272,17 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
-
+		
 		// If left click or arriving through an exit event
 		// and if the released correspond to an action actually started in the view
-		if ((arg0.button == 1 || state == MouseState.EXITED) && state != MouseState.RELEASED) {
+		if ((arg0.button == 1 || state == MouseState.EXITED) && clickOnView) {// && state != MouseState.RELEASED) {
 			// Reset to normal cursor
 			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+			clickOnView = false;
 			
 			// Remove the potential selection figure
 			aggregatedView.potentialSelectFigure.delete();
-
+			
 			if (state == MouseState.DRAG_LEFT_VERTICAL || state == MouseState.DRAG_LEFT_HORIZONTAL)
 				mouseDragged(arg0);
 
@@ -380,7 +389,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	 */
 	protected EventProducerNode findEventProducerNode(int y) {
 		updateMeasurements();
-		
+
 		// Compute the selected spatiotemporal region
 		int y0, y1;
 		y0 = Math.min(originY, y);
@@ -389,7 +398,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		// Remove the border margin and make sure we are within the boundary
 		y0 = Math.min(y0 - aggregatedView.aBorder, height - 1);
 		y1 = Math.min(y1 - aggregatedView.aBorder, height - 1);
-		
+
 		// Compute the boundaries of the event producer
 		// Round up to the nearest integer (multiply by 2.0, round then
 		// divide by 2)
@@ -403,10 +412,10 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 		// Find the event producer node containing all the selected node
 		ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(startingHeight, endingHeight);
-		
+
 		return hierarchy.findSmallestContainingNode(currentProducers);
 	}
-	
+
 	/**
 	 * Set the temporal selection to the time slices given in parameter
 	 * 
