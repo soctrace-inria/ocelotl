@@ -172,7 +172,9 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		if (arg0.button == 1 && aggregatedView.resetTime != null) {
 			clickOnView = true;
 			currentPoint = arg0.getLocation();
+			// Compute the timestamp on which we clicked
 			long p3 = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
+			
 			// We are dragging horizontally by the left side
 			if (state == MouseState.H_MOVE_START) {
 				originY = aggregatedView.selectFigure.getBounds().y();
@@ -211,19 +213,12 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		
 		// If right click
 		if(arg0.button == 3 && aggregatedView.resetTime != null) {
-			Point clickCoord = new Point(arg0.x, arg0.y);
-			SpatioTemporalAggregateView selectedAggregate = null;
-			
-			// Find the corresponding aggregate
-			for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
-				if (aggreg.getAggregateZone().contains(clickCoord)) {
-					selectedAggregate = aggreg;
-				}
-			}
+			SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
 
-			// If none was found
-			if(selectedAggregate == null||(!selectedAggregate.isVisualAggregate()))
+			// If none was found or if not a visual aggregate
+			if (selectedAggregate == null || (!selectedAggregate.isVisualAggregate()))
 				return;
+			
 			// Compute highlight selection
 			Point heights = getSpatialSelectionCoordinates(selectedAggregate.getEventProducerNode());
 			aggregatedView.highLightAggregateFigure.draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y());
@@ -236,8 +231,12 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		if(arg0.button == 2 && aggregatedView.resetTime != null) {
 			// Reset selected time region to displayed time region
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.ocelotlView.getOcelotlParameters().getTimeRegion());
-			// Remove the currently draw selection
+			
+			// Remove the currently drawn selections
 			aggregatedView.selectFigure.delete();
+			aggregatedView.ocelotlView.getTimeAxisView().resizeDiagram();
+			aggregatedView.ocelotlView.getOverView().deleteSelection();
+			
 			// Cancel potential spatialselection
 			aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
 			aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(aggregatedView.ocelotlView.getOcelotlParameters().getCurrentProducers());
@@ -246,16 +245,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	
 	@Override
 	public void mouseDoubleClicked(final MouseEvent arg0) {
-		// If it is a spatiotemporal aggregate, select it, else do nothing
-		Point clickCoord = new Point(arg0.x, arg0.y);
-		SpatioTemporalAggregateView selectedAggregate = null;
-
-		// Find the corresponding aggregate
-		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
-			if (aggreg.getAggregateZone().contains(clickCoord)) {
-				selectedAggregate = aggreg;
-			}
-		}
+		SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
 		
 		// If none was found
 		if(selectedAggregate == null)
@@ -270,8 +260,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		cornerY = heights.y();
 		setSpatialSelection(selectedAggregate.getEventProducerNode());
 
-		// Avoid trigger the mouse released event
-		state = MouseState.RELEASED;
+		// Avoid triggering the mouse released event
+		clickOnView = false;
 		
 		aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
 		aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
@@ -285,7 +275,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		
 		// If left click or arriving through an exit event
 		// and if the released correspond to an action actually started in the view
-		if ((arg0.button == 1 || state == MouseState.EXITED) && clickOnView) {// && state != MouseState.RELEASED) {
+		if ((arg0.button == 1 || state == MouseState.EXITED) && clickOnView) {
 			// Reset to normal cursor
 			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 			clickOnView = false;
@@ -318,15 +308,28 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			// If we are performing an horizontal drag then don't change the
 			// selected hierarchy
 			if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
-				EventProducerNode selectedNode = findEventProducerNode(arg0.y);
-				Point heights = getSpatialSelectionCoordinates(selectedNode);
+				EventProducerNode selectedNode;
+
+				// If it is a single click
+				if (arg0.x == currentPoint.x && arg0.y == originY) {
+					SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
+					if (selectedAggregate == null)
+						return;
+					else
+						selectedNode = selectedAggregate.getEventProducerNode();
+				} else { // it is a selection
+					selectedNode = findEventProducerNode(arg0.y);
+				}
 				
+				Point heights = getSpatialSelectionCoordinates(selectedNode);
+
 				// Set the height points
 				originY = heights.x();
 				cornerY = heights.y();
-				
+
 				// Select producers
 				setSpatialSelection(selectedNode);
+
 			}
 
 			// Compute current potential selection
@@ -471,5 +474,28 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 		return new Point(startingSlice, endingSlice);
 	}
+	
+	/**
+	 * Find the aggregate in the corresponding coordinate
+	 * 
+	 * @param x
+	 *            x coordinate
+	 * @param y
+	 *            y coordinate
+	 * @return the found aggregate, or null otherwise
+	 */
+	protected SpatioTemporalAggregateView findAggregate(int x, int y) {
+		Point clickCoord = new Point(x, y);
+		SpatioTemporalAggregateView selectedAggregate = null;
 
+		// Find the corresponding aggregate
+		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
+			if (aggreg.getAggregateZone().contains(clickCoord)) {
+				selectedAggregate = aggreg;
+				break;
+			}
+		}
+		
+		return selectedAggregate;
+	}
 }

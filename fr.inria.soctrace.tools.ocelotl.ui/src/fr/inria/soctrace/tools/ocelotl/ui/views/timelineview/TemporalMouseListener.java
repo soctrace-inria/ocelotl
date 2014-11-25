@@ -142,8 +142,11 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 		if(arg0.button == 2 && aggregatedView.resetTime != null) {
 			// Reset selected time region to displayed time region
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.ocelotlView.getOcelotlParameters().getTimeRegion());
-			// Remove the currently draw selection
+			
+			// Remove the currently drawn selections
 			aggregatedView.selectFigure.delete();
+			aggregatedView.ocelotlView.getTimeAxisView().resizeDiagram();
+			aggregatedView.ocelotlView.getOverView().deleteSelection();
 		}
 	}
 

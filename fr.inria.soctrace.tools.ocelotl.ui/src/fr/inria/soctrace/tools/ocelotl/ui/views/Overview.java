@@ -149,6 +149,7 @@ public class Overview implements IFramesocBusListener {
 		if (aggregManager != null && globalTimeRegion != null) {
 			createDiagram();
 			displayedZone.draw(zoomedTimeRegion, true);
+			drawSelection();
 		}
 	}
 
@@ -174,9 +175,23 @@ public class Overview implements IFramesocBusListener {
 		updateSelection(time);
 	}
 
+	/**
+	 * Update the selected region with the displayed region
+	 * 
+	 * @param time
+	 *            the new selected time region
+	 */
 	public void updateSelection(TimeRegion time) {
-		// Update the selected region with the displayed region
-		selectedZone.draw(time, false);
+		selectedTimeRegion = time;
+		drawSelection();
+	}
+	
+	/**
+	 * Draw the selection
+	 */
+	protected void drawSelection() {
+		if(selectedTimeRegion != null)
+			selectedZone.draw(selectedTimeRegion, false);
 	}
 
 	/**
@@ -184,6 +199,8 @@ public class Overview implements IFramesocBusListener {
 	 */
 	public void deleteSelection() {
 		selectedZone.delete();
+		// Avoid further redraw
+		selectedTimeRegion = globalTimeRegion;
 	}
 
 	public IAggregatedView getTimeLineView() {
@@ -336,7 +353,8 @@ public class Overview implements IFramesocBusListener {
 		visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
 		// Redraw
 		createDiagram();
-
+		displayedZone.draw(zoomedTimeRegion, true);
+		drawSelection();
 	}
 
 	/**

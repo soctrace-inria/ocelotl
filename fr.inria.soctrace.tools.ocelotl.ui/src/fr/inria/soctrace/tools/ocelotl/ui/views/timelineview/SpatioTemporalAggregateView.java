@@ -69,7 +69,7 @@ public class SpatioTemporalAggregateView {
 		this.startingTimeSlice = startingTimeSlice;
 		this.endingTimeSlice = endingTimeSlice;
 		this.width = width;
-		this.visualAggregate=visualAggregate;
+		this.visualAggregate = visualAggregate;
 		label = "Aggregate Content";
 	}
 
@@ -80,7 +80,7 @@ public class SpatioTemporalAggregateView {
 		this.startingTimeSlice = startingTimeSlice;
 		this.endingTimeSlice = endingTimeSlice;
 		this.width = width;
-		this.visualAggregate=visualAggregate;
+		this.visualAggregate = visualAggregate;
 		this.label = label;
 	}
 
@@ -133,6 +133,7 @@ public class SpatioTemporalAggregateView {
 	public void display(OcelotlView ocelotlview) {
 		if (!visualAggregate)
 			return;
+		
 		this.ocelotlView = ocelotlview;
 		String name = ocelotlview.getOcelotlParameters().getVisuOperator();
 
