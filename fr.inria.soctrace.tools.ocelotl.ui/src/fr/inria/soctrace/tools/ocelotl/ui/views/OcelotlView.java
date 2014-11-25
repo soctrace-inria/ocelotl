@@ -95,6 +95,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.IStatView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatViewWrapper;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
@@ -662,7 +663,36 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			}
 		}
 	}
+	
+	private class CancelSelectionListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			cancelSelection();
+		}
+	}
 
+	/**
+	 * Cancel the current selection
+	 */
+	public void cancelSelection() {
+		if (timeLineView != null) {
+			// Reset selected time region to displayed time region
+			setTimeRegion(getOcelotlParameters().getTimeRegion());
+
+			// Remove the currently drawn selections
+			((AggregatedView) timeLineView).deleteSelectFigure();
+			getTimeAxisView().resizeDiagram();
+			getOverView().deleteSelection();
+
+			// Cancel potential spatialselection
+			getOcelotlParameters().setSpatialSelection(true);
+			getOcelotlParameters().setSpatiallySelectedProducers(getOcelotlParameters().getCurrentProducers());
+			
+			// Update stats
+			statView.updateData();
+		}
+	}
+	
 	private class VisualizationSettingsSelectionAdapter extends SelectionAdapter {
 
 		private final OcelotlView	view;
@@ -930,6 +960,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	private Label						textDisplayedEnd;
 	private Button						overViewParamUp;
 	private Button						overViewParamDown;
+	private Button buttonCancelSelection;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1113,7 +1144,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		groupTime.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(cantarell8);
-		groupTime.setLayout(new GridLayout(15, false));
+		groupTime.setLayout(new GridLayout(16, false));
 
 
 		
@@ -1169,6 +1200,9 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		btnReset.setToolTipText("Reset Timestamps");
 		btnReset.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/undo_edit.gif"));
 		
+		buttonCancelSelection = new Button(groupTime, SWT.NONE);
+		buttonCancelSelection.setToolTipText("Cancel the Current Selection");
+		buttonCancelSelection.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/delete_edit.gif"));
 
 		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
 		lblTSNumber.setFont(cantarell8);
@@ -1183,6 +1217,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
 		spinnerTSNumber.addModifyListener(new ConfModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
+		buttonCancelSelection.addSelectionListener(new CancelSelectionListener());
 		textTimestampEnd.addModifyListener(new ConfModificationListener());
 		textTimestampStart.addModifyListener(new ConfModificationListener());
 		scrolledComposite.setContent(groupTime);
@@ -1512,7 +1547,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		ocelotlParameters.setThreadNumber(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
-
+		ocelotlParameters.updateCurrentProducers();
+		
 		setCachePolicy();
 		try {
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());

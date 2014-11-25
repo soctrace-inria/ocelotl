@@ -258,6 +258,10 @@ abstract public class AggregatedView implements IAggregatedView {
 		figures.clear();
 		root.repaint();
 	}
+	
+	public void deleteSelectFigure() {
+		selectFigure.delete();
+	}
 
 	public int getBorder() {
 		return aBorder;

@@ -172,7 +172,7 @@ public class Overview implements IFramesocBusListener {
 		}
 
 		displayedZone.draw(time, true);
-		updateSelection(time);
+		deleteSelection();
 	}
 
 	/**
