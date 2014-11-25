@@ -54,11 +54,11 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			Point timeslices = getTimeSlices(aggregatedView.selectTime);
 			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
 			
-			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
-			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, false);
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, -1, -1);
+			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.potentialSelectTime);
+			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.potentialSelectTime, false);	
 			aggregatedView.potentialSelectFigure.draw(aggregatedView.potentialSelectTime, -1, -1);
-			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
+			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, -1, -1);
+			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.potentialSelectTime);
 			
 			if (aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time)) {
 				aggregatedView.ocelotlView.getTimeAxisView().unselect();
@@ -130,12 +130,12 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			Point timeslices = getTimeSlices(aggregatedView.selectTime);
 			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
 						
-			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
-			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, false);
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, -1, -1);
+			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.potentialSelectTime);
+			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.potentialSelectTime, false);	
 			aggregatedView.potentialSelectFigure.draw(aggregatedView.potentialSelectTime, -1, -1);
-			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
-			aggregatedView.potentialSelectFigure.draw(aggregatedView.selectTime, -1, -1);
+			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, -1, -1);
+			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.potentialSelectTime);
+			//aggregatedView.potentialSelectFigure.draw(aggregatedView.selectTime, -1, -1);
 		}
 		
 		// If middle click, cancel selection

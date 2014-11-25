@@ -73,8 +73,10 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected IVisuOperator							visuOperator	= null;
 	protected OcelotlMouseListener					mouse;
 	protected List<SpatioTemporalAggregateView>						aggregates;
-	public final static Color						selectColorFG	= ColorConstants.darkBlue;
+	public final static Color						selectColorFG	= ColorConstants.white;
 	public final static Color						selectColorBG	= ColorConstants.darkBlue;
+	public final static Color						potentialColorFG	= ColorConstants.darkBlue;
+	public final static Color						potentialColorBG	= ColorConstants.darkBlue;
 	public final static Color						activeColorFG	= ColorConstants.black;
 	public final static Color						activeColorBG	= ColorConstants.black;
 	
@@ -87,7 +89,7 @@ abstract public class AggregatedView implements IAggregatedView {
 			setLayoutManager(layout);
 			setForegroundColor(selectColorFG);
 			setBackgroundColor(selectColorBG);
-			setAlpha(70);
+			setAlpha(120);
 		}
 		
 		private SelectFigure(Color foreGround, Color backGround) {
@@ -364,8 +366,8 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
 		
-		potentialSelectFigure = new SelectFigure(ColorConstants.darkBlue, ColorConstants.darkBlue);
-		potentialSelectFigure.setLineWidth(3);
+		potentialSelectFigure = new SelectFigure(potentialColorFG, potentialColorBG);
+		potentialSelectFigure.setLineWidth(1);
 		potentialSelectFigure.setAlpha(100);
 		potentialSelectFigure.setFill(true);
 		

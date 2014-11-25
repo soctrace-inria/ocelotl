@@ -109,8 +109,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 				if (((VisualAggregation) p.getData()).isAggregated())
 					drawStandardAggregate(p.getStartPart(), epn.getIndex(),
 							p.getEndPart(), epn.getWeight(),
-							((VisualAggregation) p.getData()).getValue(), epn
-									.getMe().getName());
+							((VisualAggregation) p.getData()).getValue(), epn);
 				else {
 					boolean aggy = false;
 					for (EventProducerNode ep : epn.getChildrenNodes()) {
@@ -212,18 +211,21 @@ public class SpatiotemporalPartitionView extends MatrixView {
 		}
 
 		protected void drawStandardAggregate(int logicX, int logicY, int logicX2,
-				int sizeY, int number, String name) {
+				int sizeY, int number, EventProducerNode epn) {
 			final RectangleFigure rectangle = new RectangleFigure();
 			rectangle.setBackgroundColor(colors.getColors().get(number).getBg());
 			rectangle.setForegroundColor(colors.getColors().get(number).getBg());
 			rectangle.setLineWidth(2);
 
-			rectangle.setToolTip(new Label(" " + name + " "));
+			rectangle.setToolTip(new Label(" " + epn.getMe() + " "));
 			int xa = (int) ((logicX * logicWidth + aBorder));
 			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
 			int xb = xendlist.get(logicX2);
 			int yb = (int) (ya + sizeY * logicHeight) - space;
 			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
+			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(
+					new Point(xa, ya), new Point(xb, yb)), epn, logicX,
+					logicX2, xb - xa, false));
 		}
 
 		protected void drawNotCleanVisualAggregate(int logicX, int logicY,
@@ -262,7 +264,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			
 			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(
 					new Point(xa, ya), new Point(xb, yb)), epn, logicX,
-					logicX2, xb - xa));
+					logicX2, xb - xa, true));
 		}
 
 		protected void drawCleanVisualAggregate(int logicX, int logicY, int logicX2,
@@ -296,7 +298,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 			
 			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(
 					new Point(xa, ya), new Point(xb, yb)), epn, logicX,
-					logicX2, xb - xa));
+					logicX2, xb - xa, true));
 		}
 	}
 	
@@ -359,8 +361,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 					drawStandardAggregate(p.getStartPart() - startingSlice,
 							epn.getIndex() - theNode.getIndex(), p.getEndPart()
 									- startingSlice, epn.getWeight(),
-							((VisualAggregation) p.getData()).getValue(), epn
-									.getMe().getName());
+							((VisualAggregation) p.getData()).getValue(), epn);
 				else {
 					boolean aggy = false;
 					for (EventProducerNode ep : epn.getChildrenNodes()) {
