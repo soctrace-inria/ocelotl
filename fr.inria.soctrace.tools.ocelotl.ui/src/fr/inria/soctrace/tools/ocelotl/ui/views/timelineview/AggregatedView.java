@@ -46,6 +46,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -56,29 +57,30 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 abstract public class AggregatedView implements IAggregatedView {
-	
-	protected Figure								root;
-	protected Canvas								canvas;
-	protected final List<RectangleFigure>			figures			= new ArrayList<RectangleFigure>();
-	protected TimeRegion							time;
-	protected TimeRegion							selectTime;
-	protected TimeRegion							potentialSelectTime;
-	protected TimeRegion							resetTime;
-	protected int									aBorder			= 10;
-	protected final int								space			= 3;
-	protected final OcelotlView						ocelotlView;
-	protected SelectFigure							selectFigure;
-	protected SelectFigure							highLightAggregateFigure;
-	protected SelectFigure							potentialSelectFigure;
-	protected IVisuOperator							visuOperator	= null;
-	protected OcelotlMouseListener					mouse;
-	protected List<SpatioTemporalAggregateView>						aggregates;
-	public final static Color						selectColorFG	= ColorConstants.white;
-	public final static Color						selectColorBG	= ColorConstants.darkBlue;
-	public final static Color						potentialColorFG	= ColorConstants.darkBlue;
-	public final static Color						potentialColorBG	= ColorConstants.darkBlue;
-	public final static Color						activeColorFG	= ColorConstants.black;
-	public final static Color						activeColorBG	= ColorConstants.black;
+
+	protected Figure							root;
+	protected Canvas							canvas;
+	protected final List<RectangleFigure>		figures				= new ArrayList<RectangleFigure>();
+	protected TimeRegion						time;
+	protected TimeRegion						selectTime;
+	protected TimeRegion						potentialSelectTime;
+	protected TimeRegion						resetTime;
+	protected int								aBorder				= 10;
+	protected final int							space				= 3;
+	protected final OcelotlView					ocelotlView;
+	protected SelectFigure						selectFigure;
+	protected SelectFigure						highLightAggregateFigure;
+	protected SelectFigure						potentialSelectFigure;
+	protected EventProducerNode					currentlySelectedNode;
+	protected IVisuOperator						visuOperator		= null;
+	protected OcelotlMouseListener				mouse;
+	protected List<SpatioTemporalAggregateView>	aggregates;
+	public final static Color					selectColorFG		= ColorConstants.white;
+	public final static Color					selectColorBG		= ColorConstants.blue;
+	public final static Color					potentialColorFG	= ColorConstants.darkBlue;
+	public final static Color					potentialColorBG	= ColorConstants.darkBlue;
+	public final static Color					activeColorFG		= ColorConstants.black;
+	public final static Color					activeColorBG		= ColorConstants.black;
 	
 	class SelectFigure extends RectangleFigure {
 
@@ -118,10 +120,12 @@ abstract public class AggregatedView implements IAggregatedView {
 				setForegroundColor(activeColorFG);
 				setBackgroundColor(activeColorBG);
 				setFill(true);
+				setAlpha(120);
 			} else {
 				setForegroundColor(selectColorFG);
 				setBackgroundColor(selectColorBG);
 				setFill(false);
+				setAlpha(250);
 			}
 			
 			if (getParent() != root)
@@ -135,7 +139,7 @@ abstract public class AggregatedView implements IAggregatedView {
 				y1 = 2;
 			
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
-					(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder - 1), y1)));
+					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
 			root.repaint();
 		}
 		
@@ -151,7 +155,7 @@ abstract public class AggregatedView implements IAggregatedView {
 				y1 = 2;
 					
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
-					(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder - 1), y1)));
+					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
 			root.repaint();
 		}
 		
@@ -259,8 +263,18 @@ abstract public class AggregatedView implements IAggregatedView {
 		root.repaint();
 	}
 	
+	@Override
+	public void drawSelection() {
+		if (selectTime != null) {
+			ocelotlView.getTimeAxisView().select(selectTime, true);
+			mouse.drawSelection();
+		}
+	}
+	
 	public void deleteSelectFigure() {
 		selectFigure.delete();
+		selectTime = null;
+		currentlySelectedNode = null;
 	}
 
 	public int getBorder() {

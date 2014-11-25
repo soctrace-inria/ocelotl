@@ -147,7 +147,7 @@ public class SpatioTemporalAggregateView {
 			dialog = new Shell(ocelotlview.getSite().getShell().getDisplay());
 			dialog.setText(label);
 			dialog.setSize(width + (aggregationView.getBorder() * 3), Height);
-			// Set location of the new window centered around the centered of the eclipse window
+			// Set location of the new window centered around the center of the eclipse window
 			dialog.setLocation(ocelotlview.getSite().getShell().getLocation().x + ocelotlview.getSite().getShell().getSize().x / 2 - width / 2, ocelotlview.getSite().getShell().getLocation().y + ocelotlview.getSite().getShell().getSize().y / 2 - Height / 2);
 			dialog.setLayout(new FillLayout());
 
@@ -155,7 +155,7 @@ public class SpatioTemporalAggregateView {
 			compositeOverview = new Composite(dialog, SWT.BORDER);
 			compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 			compositeOverview.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-			// Make sure we remove the title bar from the size in order not
+			// Make sure we remove the title bar from the size in order to
 			// display it fully
 			compositeOverview.setSize(dialog.getSize().x, dialog.getSize().y - (dialog.getSize().y - dialog.getClientArea().height));
 			compositeOverview.setLayout(new FillLayout());

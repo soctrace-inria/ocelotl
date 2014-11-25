@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
@@ -26,13 +27,15 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	Display						display		= Display.getCurrent();
 	Shell						shell		= display.getActiveShell();
 	long						fixed;
+	int 						minDrawThreshold = OcelotlConstants.MinimalHeightDrawingThreshold;
 	AggregatedView				aggregatedView;
 	int							originY, cornerY;
 	boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
 	
-	int rootHeight;
-	int height;
+	double rootHeight;
+	double height;
 	double accurateLogicHeight;
+	double logicHeight;
 	SpaceTimeAggregation2Manager spatioTemporalManager; 
 	EventProducerHierarchy hierarchy;
 
@@ -90,6 +93,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
+		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		
 		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.V_MOVE_END && state != MouseState.V_MOVE_START && state != MouseState.EXITED) {
 			previous = state;
 			state = MouseState.EXITED;
@@ -229,7 +234,6 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		
 		// If middle click, cancel selection
 		if (arg0.button == 2 && aggregatedView.resetTime != null) {
-			// Reset selected time region to displayed time region
 			aggregatedView.ocelotlView.cancelSelection();
 		}
 	}
@@ -274,9 +278,6 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			// Remove the potential selection figure
 			aggregatedView.potentialSelectFigure.delete();
 			
-			if (state == MouseState.DRAG_LEFT_VERTICAL || state == MouseState.DRAG_LEFT_HORIZONTAL)
-				mouseDragged(arg0);
-
 			// If we get here through a mouse exited event, do not update the previous state
 			if (state != MouseState.EXITED)
 				previous = state;
@@ -301,17 +302,12 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
 				EventProducerNode selectedNode;
 
-				// If it is a single click
-				if (arg0.x == currentPoint.x && arg0.y == originY) {
-					SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
-					if (selectedAggregate == null)
-						return;
+				SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
+					if (selectedAggregate == null || !selectedAggregate.isVisualAggregate())
+						selectedNode = findEventProducerNode(arg0.y);
 					else
 						selectedNode = selectedAggregate.getEventProducerNode();
-				} else { // it is a selection
-					selectedNode = findEventProducerNode(arg0.y);
-				}
-				
+
 				Point heights = getSpatialSelectionCoordinates(selectedNode);
 
 				// Set the height points
@@ -320,12 +316,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 				// Select producers
 				setSpatialSelection(selectedNode);
-
 			}
-
-			// Compute current potential selection
-			Point timeslices = getTimeSlices(aggregatedView.selectTime);
-			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
 			
 			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
 			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
@@ -347,6 +338,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		rootHeight = aggregatedView.root.getSize().height;
 		height = rootHeight - (2 * aggregatedView.aBorder);
 		accurateLogicHeight = height / (double) hierarchy.getRoot().getWeight();
+		logicHeight = height / hierarchy.getRoot().getWeight();
 	}
 	
 	/**
@@ -363,7 +355,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		if (selectedNode.getChildrenNodes().isEmpty()) {
 			selectedProducers.add(selectedNode.getParentNode().getMe());
 		}
-
+		
+		aggregatedView.currentlySelectedNode = selectedNode;
 		aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
 		aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 	}
@@ -382,10 +375,13 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		int y0 = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
 		int y1 = y0 + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
 
-		// If the selected producer is too small (1 pixel), take the
-		// parent node until the size is > 1 pixel
-		while ((y1 - y0) <= 1) {
-			selectedNode = selectedNode.getParentNode();
+		// If the selected producer is too small to be represented, take the
+		// parent node until the size is superior to the threshold
+		while ((selectedNode.getWeight() * logicHeight - aggregatedView.space) < minDrawThreshold) {
+			if (selectedNode.getParentNode() != null)
+				selectedNode = selectedNode.getParentNode();
+			else
+				break;
 
 			y0 = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.aBorder);
 			y1 = y0 + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
@@ -410,8 +406,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		y1 = Math.max(originY, y);
 
 		// Remove the border margin and make sure we are within the boundary
-		y0 = Math.min(y0 - aggregatedView.aBorder, height - 1);
-		y1 = Math.min(y1 - aggregatedView.aBorder, height - 1);
+		y0 = Math.min(y0 - aggregatedView.aBorder, (int) height - 1);
+		y1 = Math.min(y1 - aggregatedView.aBorder, (int) height - 1);
 
 		// Compute the boundaries of the event producer
 		// Round up to the nearest integer (multiply by 2.0, round then
@@ -486,7 +482,18 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 				break;
 			}
 		}
-		
+	
 		return selectedAggregate;
+	}
+
+	@Override
+	public void drawSelection() {
+		if (!aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time) && aggregatedView.selectTime != null && aggregatedView.currentlySelectedNode != null) {
+			Point newCoordinates = getSpatialSelectionCoordinates(aggregatedView.currentlySelectedNode);
+			originY = newCoordinates.x();
+			cornerY = newCoordinates.y();
+
+			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, originY, cornerY);
+		}
 	}
 }

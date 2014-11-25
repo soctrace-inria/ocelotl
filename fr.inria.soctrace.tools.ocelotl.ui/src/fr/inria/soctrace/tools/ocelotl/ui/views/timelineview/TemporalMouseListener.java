@@ -76,6 +76,7 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
+		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.EXITED) {
 			state = MouseState.EXITED;
 			mouseReleased(arg0);
@@ -135,7 +136,6 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			aggregatedView.potentialSelectFigure.draw(aggregatedView.potentialSelectTime, -1, -1);
 			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, -1, -1);
 			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.potentialSelectTime);
-			//aggregatedView.potentialSelectFigure.draw(aggregatedView.selectTime, -1, -1);
 		}
 		
 		// If middle click, cancel selection
@@ -177,7 +177,6 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 				aggregatedView.root.remove(aggregatedView.selectFigure);
 			aggregatedView.root.repaint();
 		}
-
 	}
 	
 	/**
@@ -214,5 +213,11 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 		int endingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
 
 		return new Point(startingSlice, endingSlice);
+	}
+
+	@Override
+	public void drawSelection() {
+		if (!aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time) && aggregatedView.selectTime != null) 
+			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, -1, 1);
 	}
 }

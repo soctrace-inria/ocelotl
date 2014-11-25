@@ -79,8 +79,16 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 
 	@Override
 	public void resizeDiagram() {
-		createDiagram(hierarchy, time);
+		root.removeAll();
+		figures.clear();
+		canvas.update();
+		if (hierarchy != null)
+			if (hierarchy.getRoot().getParts() != null) {
+				computeDiagram();
+			}
+
 		root.repaint();
+		drawSelection();
 	}
 
 	public void setHierarchy(final EventProducerHierarchy hierarchy) {

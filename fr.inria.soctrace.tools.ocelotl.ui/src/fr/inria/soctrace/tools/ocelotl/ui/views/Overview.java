@@ -190,7 +190,7 @@ public class Overview implements IFramesocBusListener {
 	 * Draw the selection
 	 */
 	protected void drawSelection() {
-		if(selectedTimeRegion != null)
+		if(selectedTimeRegion != null && globalTimeRegion != null)
 			selectedZone.draw(selectedTimeRegion, false);
 	}
 

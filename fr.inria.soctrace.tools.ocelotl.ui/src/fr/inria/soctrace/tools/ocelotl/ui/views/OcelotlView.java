@@ -648,14 +648,12 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	private class ResetListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
+			cancelSelection();
 			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
 
 			if (timeLineView != null) {
 				timeLineView.resizeDiagram();
-				timeAxisView.resizeDiagram();
-				overView.deleteSelection();
-				statView.updateData();
 
 				// Reset spatial selection
 				ocelotlParameters.setSpatialSelection(false);
