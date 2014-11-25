@@ -226,7 +226,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			
 			// Compute highlight selection
 			Point heights = getSpatialSelectionCoordinates(selectedAggregate.getEventProducerNode());
-			aggregatedView.highLightAggregateFigure.draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y());
+			aggregatedView.highLightAggregateFigure.draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y() - 1);
 
 			// Trigger the display
 			selectedAggregate.display(aggregatedView.ocelotlView);
