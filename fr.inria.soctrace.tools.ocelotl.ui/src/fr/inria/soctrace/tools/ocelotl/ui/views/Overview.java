@@ -56,6 +56,7 @@ public class Overview implements IFramesocBusListener {
 
 	private TimeRegion					globalTimeRegion;
 	private TimeRegion					zoomedTimeRegion;
+	private TimeRegion					selectedTimeRegion;
 
 	// Show the currently displayed zone
 	private SelectFigure				displayedZone;
@@ -335,6 +336,7 @@ public class Overview implements IFramesocBusListener {
 		visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
 		// Redraw
 		createDiagram();
+
 	}
 
 	/**

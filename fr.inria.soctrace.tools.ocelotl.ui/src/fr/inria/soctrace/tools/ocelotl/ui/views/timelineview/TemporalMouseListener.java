@@ -137,6 +137,14 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
 			aggregatedView.potentialSelectFigure.draw(aggregatedView.selectTime, -1, -1);
 		}
+		
+		// If middle click, cancel selection
+		if(arg0.button == 2 && aggregatedView.resetTime != null) {
+			// Reset selected time region to displayed time region
+			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.ocelotlView.getOcelotlParameters().getTimeRegion());
+			// Remove the currently draw selection
+			aggregatedView.selectFigure.delete();
+		}
 	}
 
 	@Override

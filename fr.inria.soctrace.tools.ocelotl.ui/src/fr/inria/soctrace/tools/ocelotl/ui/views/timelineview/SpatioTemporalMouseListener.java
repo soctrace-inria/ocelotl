@@ -232,6 +232,17 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			// Trigger the display
 			selectedAggregate.display(aggregatedView.ocelotlView);
 		}
+		
+		// If middle click, cancel selection
+		if(arg0.button == 2 && aggregatedView.resetTime != null) {
+			// Reset selected time region to displayed time region
+			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.ocelotlView.getOcelotlParameters().getTimeRegion());
+			// Remove the currently draw selection
+			aggregatedView.selectFigure.delete();
+			// Cancel potential spatialselection
+			aggregatedView.ocelotlView.getOcelotlParameters().setSpatialSelection(true);
+			aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(aggregatedView.ocelotlView.getOcelotlParameters().getCurrentProducers());
+		}
 	}
 	
 	@Override
@@ -331,8 +342,10 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		}
 	}
 	
-	protected void updateMeasurements()
-	{
+	/**
+	 * Set a bunch of variables necessary for computing spatial selection
+	 */
+	protected void updateMeasurements() {
 		// Get the event producer hierarchy
 		spatioTemporalManager = (SpaceTimeAggregation2Manager) aggregatedView.ocelotlView.getOcelotlCore().getLpaggregManager();
 		hierarchy = spatioTemporalManager.getHierarchy();
@@ -362,6 +375,14 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		aggregatedView.ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 	}
 	
+	/**
+	 * For a given producer node, compute the starting and ending vertical
+	 * coordinates
+	 * 
+	 * @param selectedNode
+	 *            the selected producer node
+	 * @return a Point containing the coordinate (x = yStart, y = yEnd)
+	 */
 	protected Point getSpatialSelectionCoordinates(EventProducerNode selectedNode) {
 		updateMeasurements();
 
@@ -379,7 +400,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 		return new Point(y0, y1);
 	}
-	
+
 	/**
 	 * Find the currently selected event producer node
 	 * 
