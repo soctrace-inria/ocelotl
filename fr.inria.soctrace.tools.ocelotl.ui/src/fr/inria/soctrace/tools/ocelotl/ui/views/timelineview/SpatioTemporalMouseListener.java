@@ -372,8 +372,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	protected Point getSpatialSelectionCoordinates(EventProducerNode selectedNode) {
 		updateMeasurements();
 
-		int y0 = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.getBorder());
-		int y1 = y0 + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+		int y0 = (int) (selectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
+		int y1 = y0 + (int) ((selectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
 
 		// If the selected producer is too small to be represented, take the
 		// parent node until the size is superior to the threshold
@@ -383,8 +383,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 			else
 				break;
 
-			y0 = (int) (selectedNode.getIndex() * accurateLogicHeight + aggregatedView.getBorder());
-			y1 = y0 + (int) ((selectedNode.getWeight()) * accurateLogicHeight) - 1;
+			y0 = (int) (selectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
+			y1 = y0 + (int) ((selectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
 		}
 
 		return new Point(y0, y1);
