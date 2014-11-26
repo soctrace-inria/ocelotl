@@ -22,7 +22,7 @@
 			param_win=""
 			metric_compatibility="STATE"
 			aggregator_compatibility="2D, 3D"
-			selection_priority="2"
+			selection_priority="4"
 			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
 		</statistic_operator>
 		<statistic_operator
@@ -32,7 +32,7 @@
 			param_win=""
 			metric_compatibility="STATE"
 			aggregator_compatibility="2D, 3D"
-			selection_priority="4"
+			selection_priority="2"
 			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
 		</statistic_operator>
 	</extension>

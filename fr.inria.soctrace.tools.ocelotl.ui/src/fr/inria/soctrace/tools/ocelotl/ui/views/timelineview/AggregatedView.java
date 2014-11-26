@@ -274,7 +274,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	public void deleteSelectFigure() {
 		selectFigure.delete();
 		selectTime = null;
-		currentlySelectedNode = null;
+		setCurrentlySelectedNode(null);
 	}
 
 	public int getBorder() {
@@ -355,6 +355,14 @@ abstract public class AggregatedView implements IAggregatedView {
 		this.aggregates = aggregateMapping;
 	}
 
+	public SelectFigure getPotentialSelectFigure() {
+		return potentialSelectFigure;
+	}
+
+	public void setPotentialSelectFigure(SelectFigure potentialSelectFigure) {
+		this.potentialSelectFigure = potentialSelectFigure;
+	}
+
 	@Override
 	public void init(final TimeLineViewWrapper wrapper) {
 		root = wrapper.getRoot();
@@ -409,6 +417,14 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public void setVisuOperator(final IVisuOperator visuOperator) {
 		this.visuOperator = visuOperator;
+	}
+
+	public EventProducerNode getCurrentlySelectedNode() {
+		return currentlySelectedNode;
+	}
+
+	public void setCurrentlySelectedNode(EventProducerNode currentlySelectedNode) {
+		this.currentlySelectedNode = currentlySelectedNode;
 	}
 
 }

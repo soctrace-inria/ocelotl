@@ -34,7 +34,6 @@ public class OcelotlSettings {
 	private double thresholdPrecision;
 	private boolean increasingQualities;
 
-	private String overviewVisuOperator;
 	private double overviewParameter;
 	private String overviewAggregOperator;
 	private int overviewTimesliceNumber;
@@ -66,7 +65,6 @@ public class OcelotlSettings {
 		normalizedCurve = OcelotlDefaultParameterConstants.Normalize;
 		thresholdPrecision = OcelotlDefaultParameterConstants.Threshold;
 		increasingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
-		overviewVisuOperator = OcelotlDefaultParameterConstants.OVERVIEW_VISU_OPERATOR;
 		overviewAggregOperator = OcelotlDefaultParameterConstants.OVERVIEW_AGGREG_OPERATOR;
 
 		// Check if a configuration file exists and if so, load the saved
@@ -326,17 +324,6 @@ public class OcelotlSettings {
 	public void setIncreasingQualities(boolean increasingQualities) {
 		if (this.increasingQualities != increasingQualities) {
 			this.increasingQualities = increasingQualities;
-			saveSettings();
-		}
-	}
-
-	public String getOverviewVisuOperator() {
-		return overviewVisuOperator;
-	}
-
-	public void setOverviewVisuOperator(String overviewVisuOperator) {
-		if (!this.overviewVisuOperator.equals(overviewVisuOperator)) {
-			this.overviewVisuOperator = overviewVisuOperator;
 			saveSettings();
 		}
 	}

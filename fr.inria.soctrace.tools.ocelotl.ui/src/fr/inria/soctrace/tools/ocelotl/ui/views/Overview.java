@@ -45,6 +45,7 @@ public class Overview implements IFramesocBusListener {
 	private IDataAggregationOperator	aggregOperator;
 	private IDataAggregManager			aggregManager;
 	private IVisuOperator				visuOperator;
+	private String						visuOperatorName;
 	private OcelotlParameters			overviewParameters;
 
 	private Figure						root;
@@ -243,6 +244,14 @@ public class Overview implements IFramesocBusListener {
 		this.visuOperator = visuOperator;
 	}
 
+	public String getVisuOperatorName() {
+		return visuOperatorName;
+	}
+
+	public void setVisuOperatorName(String visuOperatorName) {
+		this.visuOperatorName = visuOperatorName;
+	}
+
 	/**
 	 * Initialize the visualization operator and perform additional init
 	 * operation
@@ -253,12 +262,13 @@ public class Overview implements IFramesocBusListener {
 	public void initVisuOperator(String name) {
 		// Instantiate the chosen visu operator
 		visuOperator = ocelotlView.getOcelotlCore().getVisuOperators().instantiateOperator(name);
-
-		final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getBundle());
+		visuOperatorName = name;
+		
+		final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getOperatorResource(name).getBundle());
 
 		// Instantiate the actual view
 		try {
-			this.timeLineView = (AggregatedView) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+			this.timeLineView = (AggregatedView) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

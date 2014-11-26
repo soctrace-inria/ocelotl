@@ -36,35 +36,35 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	@Override
 	public void mouseDragged(final MouseEvent arg0) {
 		if ((state == MouseState.PRESSED_LEFT || state == MouseState.DRAG_LEFT || state == MouseState.DRAG_LEFT_START) && arg0.getLocation().getDistance(currentPoint) > 10) {
-			long moved = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
+			long moved = (long) ((double) ((arg0.x - aggregatedView.getBorder()) * aggregatedView.getResetTime().getTimeDuration()) / (aggregatedView.getRoot().getSize().width() - 2 * aggregatedView.getBorder())) + aggregatedView.getResetTime().getTimeStampStart();
 			if (state != MouseState.DRAG_LEFT_START)
 				state = MouseState.DRAG_LEFT;
 			
-			moved = Math.max(moved, aggregatedView.resetTime.getTimeStampStart());
-			moved = Math.min(moved, aggregatedView.resetTime.getTimeStampEnd());
-			fixed = Math.max(fixed, aggregatedView.resetTime.getTimeStampStart());
-			fixed = Math.min(fixed, aggregatedView.resetTime.getTimeStampEnd());
+			moved = Math.max(moved, aggregatedView.getResetTime().getTimeStampStart());
+			moved = Math.min(moved, aggregatedView.getResetTime().getTimeStampEnd());
+			fixed = Math.max(fixed, aggregatedView.getResetTime().getTimeStampStart());
+			fixed = Math.min(fixed, aggregatedView.getResetTime().getTimeStampEnd());
 			
 			if (fixed < moved)
-				aggregatedView.selectTime = new TimeRegion(fixed, moved);
+				aggregatedView.setSelectTime(new TimeRegion(fixed, moved));
 			else
-				aggregatedView.selectTime = new TimeRegion(moved, fixed);
+				aggregatedView.setSelectTime(new TimeRegion(moved, fixed));
 			
 			// Compute current potential selection
-			Point timeslices = getTimeSlices(aggregatedView.selectTime);
+			Point timeslices = getTimeSlices(aggregatedView.getSelectTime());
 			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
 			
-			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.potentialSelectTime);
-			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.potentialSelectTime, false);	
-			aggregatedView.potentialSelectFigure.draw(aggregatedView.potentialSelectTime, -1, -1);
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, -1, -1);
-			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.potentialSelectTime);
+			aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getPotentialSelectTime());
+			aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getPotentialSelectTime(), false);	
+			aggregatedView.getPotentialSelectFigure().draw(aggregatedView.getPotentialSelectTime(), -1, -1);
+			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), false, -1, -1);
+			aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getPotentialSelectTime());
 			
-			if (aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time)) {
-				aggregatedView.ocelotlView.getTimeAxisView().unselect();
-				if (aggregatedView.selectFigure.getParent() != null)
-					aggregatedView.root.remove(aggregatedView.selectFigure);
-				aggregatedView.root.repaint();
+			if (aggregatedView.getOcelotlView().getTimeRegion().compareTimeRegion(aggregatedView.time)) {
+				aggregatedView.getOcelotlView().getTimeAxisView().unselect();
+				if (aggregatedView.getSelectFigure().getParent() != null)
+					aggregatedView.getRoot().remove(aggregatedView.getSelectFigure());
+				aggregatedView.getRoot().repaint();
 			}
 		}
 
@@ -91,11 +91,11 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseMoved(final MouseEvent arg0) {
-		if (aggregatedView.selectFigure != null && aggregatedView.root.getChildren().contains(aggregatedView.selectFigure))
-			if (Math.abs(aggregatedView.selectFigure.getBounds().x - arg0.x) < Threshold) {
+		if (aggregatedView.getSelectFigure() != null && aggregatedView.getRoot().getChildren().contains(aggregatedView.getSelectFigure()))
+			if (Math.abs(aggregatedView.getSelectFigure().getBounds().x - arg0.x) < Threshold) {
 				state = MouseState.H_MOVE_START;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
-			} else if (Math.abs(aggregatedView.selectFigure.getBounds().x + aggregatedView.selectFigure.getBounds().width - arg0.x) < Threshold) {
+			} else if (Math.abs(aggregatedView.getSelectFigure().getBounds().x + aggregatedView.getSelectFigure().getBounds().width - arg0.x) < Threshold) {
 				state = MouseState.H_MOVE_END;
 				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
 			} else {
@@ -106,42 +106,42 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mousePressed(final MouseEvent arg0) {
-		if (arg0.button == 1 && aggregatedView.resetTime != null) {
+		if (arg0.button == 1 && aggregatedView.getResetTime() != null) {
 			currentPoint = arg0.getLocation();
-			long p3 = (long) ((double) ((arg0.x - aggregatedView.aBorder) * aggregatedView.resetTime.getTimeDuration()) / (aggregatedView.root.getSize().width() - 2 * aggregatedView.aBorder)) + aggregatedView.resetTime.getTimeStampStart();
+			long p3 = (long) ((double) ((arg0.x - aggregatedView.getBorder()) * aggregatedView.getResetTime().getTimeDuration()) / (aggregatedView.getRoot().getSize().width() - 2 * aggregatedView.getBorder())) + aggregatedView.getResetTime().getTimeStampStart();
 			if (state == MouseState.H_MOVE_START) {
-				p3 = aggregatedView.selectTime.getTimeStampStart();
-				fixed = aggregatedView.selectTime.getTimeStampEnd();
+				p3 = aggregatedView.getSelectTime().getTimeStampStart();
+				fixed = aggregatedView.getSelectTime().getTimeStampEnd();
 				state = MouseState.DRAG_LEFT_START;
 			} else if (state == MouseState.H_MOVE_END) {
-				p3 = aggregatedView.selectTime.getTimeStampEnd();
-				fixed = aggregatedView.selectTime.getTimeStampStart();
+				p3 = aggregatedView.getSelectTime().getTimeStampEnd();
+				fixed = aggregatedView.getSelectTime().getTimeStampStart();
 				state = MouseState.DRAG_LEFT;
 			} else {
 				state = MouseState.PRESSED_LEFT;
-				p3 = Math.max(p3, aggregatedView.resetTime.getTimeStampStart());
-				p3 = Math.min(p3, aggregatedView.resetTime.getTimeStampEnd());
-				aggregatedView.selectTime = new TimeRegion(aggregatedView.resetTime);
-				aggregatedView.selectTime.setTimeStampStart(p3);
-				aggregatedView.selectTime.setTimeStampEnd(p3);
+				p3 = Math.max(p3, aggregatedView.getResetTime().getTimeStampStart());
+				p3 = Math.min(p3, aggregatedView.getResetTime().getTimeStampEnd());
+				aggregatedView.setSelectTime(new TimeRegion(aggregatedView.getResetTime()));
+				aggregatedView.getSelectTime().setTimeStampStart(p3);
+				aggregatedView.getSelectTime().setTimeStampEnd(p3);
 				fixed = p3;
 			}
 			
 			// Compute current potential selection
-			Point timeslices = getTimeSlices(aggregatedView.selectTime);
+			Point timeslices = getTimeSlices(aggregatedView.getSelectTime());
 			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
 						
-			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.potentialSelectTime);
-			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.potentialSelectTime, false);	
-			aggregatedView.potentialSelectFigure.draw(aggregatedView.potentialSelectTime, -1, -1);
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, false, -1, -1);
-			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.potentialSelectTime);
+			aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getPotentialSelectTime());
+			aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getPotentialSelectTime(), false);	
+			aggregatedView.getPotentialSelectFigure().draw(aggregatedView.getPotentialSelectTime(), -1, -1);
+			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), false, -1, -1);
+			aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getPotentialSelectTime());
 		}
 		
 		// If middle click, cancel selection
-		if(arg0.button == 2 && aggregatedView.resetTime != null) {
+		if(arg0.button == 2 && aggregatedView.getResetTime() != null) {
 			// Reset selected time region to displayed time region
-			aggregatedView.ocelotlView.cancelSelection();
+			aggregatedView.getOcelotlView().cancelSelection();
 		}
 	}
 
@@ -153,29 +153,29 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			mouseDragged(arg0);
 		
 		state = MouseState.RELEASED;
-		aggregatedView.potentialSelectFigure.delete();
+		aggregatedView.getPotentialSelectFigure().delete();
 		
 		if (aggregatedView.time == null)
 			return;
 
 		// If the selection is different than the whole region
-		if (!aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time)) {
+		if (!aggregatedView.getOcelotlView().getTimeRegion().compareTimeRegion(aggregatedView.time)) {
 			
 			// Get time slice numbers from the time slice manager
-			Point timeslices = getTimeSlices(aggregatedView.selectTime);
+			Point timeslices = getTimeSlices(aggregatedView.getSelectTime());
 			aggregatedView.setSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
 			
-			aggregatedView.ocelotlView.getTimeAxisView().select(aggregatedView.selectTime, true);
-			aggregatedView.ocelotlView.setTimeRegion(aggregatedView.selectTime);
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, -1, 1);
-			aggregatedView.ocelotlView.getOverView().updateSelection(aggregatedView.selectTime);
-			aggregatedView.ocelotlView.getStatView().updateData();
+			aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getSelectTime(), true);
+			aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getSelectTime());
+			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, 1);
+			aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getSelectTime());
+			aggregatedView.getOcelotlView().getStatView().updateData();
 		} else {
-			aggregatedView.ocelotlView.getTimeAxisView().resizeDiagram();
-			aggregatedView.ocelotlView.getOverView().deleteSelection();
-			if (aggregatedView.selectFigure.getParent() != null)
-				aggregatedView.root.remove(aggregatedView.selectFigure);
-			aggregatedView.root.repaint();
+			aggregatedView.getOcelotlView().getTimeAxisView().resizeDiagram();
+			aggregatedView.getOcelotlView().getOverView().deleteSelection();
+			if (aggregatedView.getSelectFigure().getParent() != null)
+				aggregatedView.getRoot().remove(aggregatedView.getSelectFigure());
+			aggregatedView.getRoot().repaint();
 		}
 	}
 	
@@ -191,11 +191,11 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	private TimeRegion setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
 		// Since timestamps start and end of two adjacent time slice overlap,
 		// add 1 to the starting timestamp
-		long startTimeStamp = aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
+		long startTimeStamp = aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
 
 		// Since the timestamp of the last time slice goes further than the max
 		// timestamp of the trace, we must check that we are not over it
-		long endTimeStamp = Math.min(aggregatedView.resetTime.getTimeStampEnd(), aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
+		long endTimeStamp = Math.min(aggregatedView.getResetTime().getTimeStampEnd(), aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
 
 		return new TimeRegion(startTimeStamp, endTimeStamp);
 	}
@@ -209,15 +209,15 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	 *         time slice
 	 */
 	protected Point getTimeSlices(TimeRegion aTimeRegion) {
-		int startingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampStart());
-		int endingSlice = (int) aggregatedView.ocelotlView.getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
+		int startingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampStart());
+		int endingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
 
 		return new Point(startingSlice, endingSlice);
 	}
 
 	@Override
 	public void drawSelection() {
-		if (!aggregatedView.ocelotlView.getTimeRegion().compareTimeRegion(aggregatedView.time) && aggregatedView.selectTime != null) 
-			aggregatedView.selectFigure.draw(aggregatedView.selectTime, true, -1, 1);
+		if (!aggregatedView.getOcelotlView().getTimeRegion().compareTimeRegion(aggregatedView.time) && aggregatedView.getSelectTime() != null) 
+			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, 1);
 	}
 }

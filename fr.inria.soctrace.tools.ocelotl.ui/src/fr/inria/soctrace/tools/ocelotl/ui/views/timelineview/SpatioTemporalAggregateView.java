@@ -138,10 +138,10 @@ public class SpatioTemporalAggregateView {
 		String name = ocelotlview.getOcelotlParameters().getVisuOperator();
 
 		try {
-			final Bundle mybundle = Platform.getBundle(ocelotlview.getCore().getVisuOperators().getSelectedOperatorResource(name).getBundle());
+			final Bundle mybundle = Platform.getBundle(ocelotlview.getCore().getVisuOperators().getOperatorResource(name).getBundle());
 
 			// Instantiate the actual view
-			aggregationView = (MatrixView) mybundle.loadClass(ocelotlview.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlview);
+			aggregationView = (MatrixView) mybundle.loadClass(ocelotlview.getCore().getVisuOperators().getOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlview);
 
 			// New window
 			dialog = new Shell(ocelotlview.getSite().getShell().getDisplay());

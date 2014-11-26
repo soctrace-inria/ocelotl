@@ -35,14 +35,15 @@ public class VisuOperatorResource {
 	String visualization;
 	String bundle;
 	int selectionPriority;
+	String overviewVisualization;
 
 	public VisuOperatorResource() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public VisuOperatorResource(final String operatorClass,
-			final String name, final List<String> timeCompatibility,
-			final String visualization, String paramWinClass,
+	public VisuOperatorResource(final String operatorClass, final String name,
+			final List<String> timeCompatibility, final String visualization,
+			String paramWinClass, final String overviewVisualization,
 			String paramConfig, final int selectionPriority, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
@@ -52,6 +53,7 @@ public class VisuOperatorResource {
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
 		this.selectionPriority = selectionPriority;
+		this.overviewVisualization = overviewVisualization;
 		this.bundle = bundle;
 	}
 
@@ -129,6 +131,14 @@ public class VisuOperatorResource {
 
 	public void setSelectionPriority(int selectionPriority) {
 		this.selectionPriority = selectionPriority;
+	}
+
+	public String getOverviewVisualization() {
+		return overviewVisualization;
+	}
+
+	public void setOverviewVisualization(String overviewVisualization) {
+		this.overviewVisualization = overviewVisualization;
 	}
 	
 }

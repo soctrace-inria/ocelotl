@@ -58,7 +58,8 @@ public class VisuOperatorManager {
 	private static final String OP_METRIC_COMPATIBILITY = "metric_compatibility"; //$NON-NLS-1$
 	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
 	private static final String OP_AGGREGATOR_COMPATIBILITY = "aggregator_compatibility"; //$NON-NLS-1$
-
+	private static final String OP_OVERVIEW_VISUALIZATION = "overview_visualization"; //$NON-NLS-1$
+	
 	public VisuOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
 		this.ocelotlCore = ocelotlCore;
@@ -159,8 +160,7 @@ public class VisuOperatorManager {
 		return operatorList.get(selectedOperatorName);
 	}
 
-	public VisuOperatorResource getSelectedOperatorResource(
-			String anOperatorName) {
+	public VisuOperatorResource getOperatorResource(String anOperatorName) {
 		return operatorList.get(anOperatorName);
 	}
 
@@ -188,6 +188,7 @@ public class VisuOperatorManager {
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
 			resource.setVisualization(e.getAttribute(OP_VISUALIZATION));
+			resource.setOverviewVisualization(e.getAttribute(OP_OVERVIEW_VISUALIZATION));
 			resource.setSelectionPriority(Integer.parseInt(e
 					.getAttribute(OP_SELECTION_PRIORITY)));
 			resource.setBundle(e.getContributor().getName());

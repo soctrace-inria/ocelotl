@@ -528,7 +528,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			setDefaultDescriptionSettings();
 			
 			// Init the overview
-			overView.initVisuOperator(ocelotlParameters.getOcelotlSettings().getOverviewVisuOperator());
+			overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
 		}
 	}
 
@@ -544,6 +544,10 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			ocelotlCore.getVisuOperators().setSelectedOperator(comboVisu.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
+			
+			// If the overview visu operator is different, then redraw it
+			if (!ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization().equals(overView.getVisuOperatorName()))
+				overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
 		}
 	}
 
