@@ -45,14 +45,14 @@ public class Overview implements IFramesocBusListener {
 	private IDataAggregationOperator	aggregOperator;
 	private IDataAggregManager			aggregManager;
 	private IVisuOperator				visuOperator;
-	private String						visuOperatorName = "";
+	private String						visuOperatorName	= "";
 	private OcelotlParameters			overviewParameters;
 
 	private Figure						root;
 	private Canvas						canvas;
 	private AggregatedView				timeLineView;
 	private boolean						redrawOverview;
-	private double						parameter		= 0.0;
+	private double						parameter			= 0.0;
 	private int							timeSlice;
 
 	private TimeRegion					displayedTimeRegion;
@@ -60,12 +60,17 @@ public class Overview implements IFramesocBusListener {
 	private TimeRegion					zoomedTimeRegion;
 	private TimeRegion					selectedTimeRegion;
 
+	private Color						displayFGColor		= ColorConstants.white;
+	private Color						displayBGColor		= ColorConstants.white;
+	private Color						selectFGColor		= ColorConstants.white;
+	private Color						selectBGColor		= ColorConstants.black;
+
 	// Show the currently displayed zone
 	private SelectFigure				displayedZone;
 	// Show the currently selected zone
 	private SelectFigure				selectedZone;
-	private int							Border			= 3;
-	private OverviewThread				overviewThread	= null;
+	private int							Border				= 3;
+	private OverviewThread				overviewThread		= null;
 
 	/**
 	 * Followed topics
@@ -308,8 +313,8 @@ public class Overview implements IFramesocBusListener {
 	}
 	
 	public void initSelectionFigure() {
-		selectedZone = new SelectFigure(ColorConstants.black, ColorConstants.black);
-		displayedZone = new SelectFigure(ColorConstants.black, ColorConstants.darkBlue);
+		selectedZone = new SelectFigure(selectFGColor, selectBGColor);
+		displayedZone = new SelectFigure(displayFGColor, displayBGColor);
 	}
 
 	public void reset() {
@@ -373,9 +378,10 @@ public class Overview implements IFramesocBusListener {
 	 */
 	private class SelectFigure extends RectangleFigure {
 
-		Color	foreground;
-		Color	background;
-
+		private Color	foreground;
+		private Color	background;
+		public final static int alphaValue = 110;
+		
 		// Init with a given color set
 		public SelectFigure(Color foreGround, Color backGround) {
 			super();
@@ -386,7 +392,7 @@ public class Overview implements IFramesocBusListener {
 			this.background = backGround;
 			setForegroundColor(this.foreground);
 			setBackgroundColor(this.background);
-			setAlpha(90);
+			setAlpha(alphaValue);
 		}
 
 		/**
