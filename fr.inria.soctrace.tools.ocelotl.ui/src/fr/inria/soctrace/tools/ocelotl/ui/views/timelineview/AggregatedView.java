@@ -266,7 +266,6 @@ abstract public class AggregatedView implements IAggregatedView {
 	@Override
 	public void drawSelection() {
 		if (selectTime != null) {
-			ocelotlView.getTimeAxisView().select(selectTime, true);
 			mouse.drawSelection();
 		}
 	}

@@ -683,7 +683,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 			// Remove the currently drawn selections
 			((AggregatedView) timeLineView).deleteSelectFigure();
-			getTimeAxisView().resizeDiagram();
+			getTimeAxisView().unselect();
 			getOverView().deleteSelection();
 
 			// Cancel potential spatialselection
