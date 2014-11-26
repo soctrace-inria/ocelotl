@@ -45,7 +45,7 @@ public class Overview implements IFramesocBusListener {
 	private IDataAggregationOperator	aggregOperator;
 	private IDataAggregManager			aggregManager;
 	private IVisuOperator				visuOperator;
-	private String						visuOperatorName;
+	private String						visuOperatorName = "";
 	private OcelotlParameters			overviewParameters;
 
 	private Figure						root;
@@ -55,6 +55,7 @@ public class Overview implements IFramesocBusListener {
 	private double						parameter		= 0.0;
 	private int							timeSlice;
 
+	private TimeRegion					displayedTimeRegion;
 	private TimeRegion					globalTimeRegion;
 	private TimeRegion					zoomedTimeRegion;
 	private TimeRegion					selectedTimeRegion;
@@ -75,7 +76,7 @@ public class Overview implements IFramesocBusListener {
 		super();
 		ocelotlView = aView;
 		redrawOverview = true;
-		globalTimeRegion = null;
+		displayedTimeRegion = null;
 		
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
@@ -136,9 +137,9 @@ public class Overview implements IFramesocBusListener {
 	 * @param time
 	 */
 	public void createDiagram() {
-		globalTimeRegion = new TimeRegion(overviewParameters.getTimeRegion());
+		displayedTimeRegion = new TimeRegion(overviewParameters.getTimeRegion());
 		timeLineView.setBorder(Border);
-		timeLineView.createDiagram(aggregManager, globalTimeRegion, visuOperator);
+		timeLineView.createDiagram(aggregManager, displayedTimeRegion, visuOperator);
 	}
 
 	/**
@@ -147,7 +148,7 @@ public class Overview implements IFramesocBusListener {
 	public void resizeDiagram() {
 		root.removeAll();
 		canvas.update();
-		if (aggregManager != null && globalTimeRegion != null) {
+		if (aggregManager != null && displayedTimeRegion != null) {
 			createDiagram();
 			displayedZone.draw(zoomedTimeRegion, true);
 			drawSelection();
@@ -191,7 +192,7 @@ public class Overview implements IFramesocBusListener {
 	 * Draw the selection
 	 */
 	protected void drawSelection() {
-		if(selectedTimeRegion != null && globalTimeRegion != null)
+		if(selectedTimeRegion != null && displayedTimeRegion != null)
 			selectedZone.draw(selectedTimeRegion, false);
 	}
 
@@ -201,7 +202,7 @@ public class Overview implements IFramesocBusListener {
 	public void deleteSelection() {
 		selectedZone.delete();
 		// Avoid further redraw
-		selectedTimeRegion = globalTimeRegion;
+		selectedTimeRegion = displayedTimeRegion;
 	}
 
 	public IAggregatedView getTimeLineView() {
@@ -283,7 +284,7 @@ public class Overview implements IFramesocBusListener {
 		redrawOverview = true;
 
 		// Init other stuff
-		globalTimeRegion = new TimeRegion(ocelotlView.getTimeRegion());
+		displayedTimeRegion = new TimeRegion(ocelotlView.getTimeRegion());
 		initSelectionFigure();
 		parameter = 0.0;
 	}
@@ -318,7 +319,7 @@ public class Overview implements IFramesocBusListener {
 			
 		overviewThread = null;
 		aggregManager = null;
-		globalTimeRegion = null;
+		displayedTimeRegion = null;
 	}
 	
 	/**
@@ -399,7 +400,7 @@ public class Overview implements IFramesocBusListener {
 		 */
 		public void draw(final TimeRegion timeRegion, boolean displayed) {
 			// If there is no zoom, don't show indicator
-			if (timeRegion.compareTimeRegion(globalTimeRegion)) {
+			if (timeRegion.compareTimeRegion(displayedTimeRegion)) {
 				delete();
 				return;
 			}
@@ -413,8 +414,8 @@ public class Overview implements IFramesocBusListener {
 				delta = 2;
 			}
 			
-			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height - delta),
-					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), delta)));
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - displayedTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / displayedTimeRegion.getTimeDuration() + Border), root.getSize().height - delta),
+					new Point((int) ((timeRegion.getTimeStampEnd() - displayedTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / displayedTimeRegion.getTimeDuration() + Border), delta)));
 		}
 
 		/**

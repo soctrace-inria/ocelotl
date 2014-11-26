@@ -51,7 +51,7 @@ public class StateSummaryStat extends SummaryStat {
 		int nbProducers;
 		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
 			nbProducers = ocelotlview.getOcelotlParameters()
-					.getCurrentProducers().size();
+					.getSpatiallySelectedProducers().size();
 			
 			if (nbProducers == 2)
 				// Since we add the parent producers when only one producer is
