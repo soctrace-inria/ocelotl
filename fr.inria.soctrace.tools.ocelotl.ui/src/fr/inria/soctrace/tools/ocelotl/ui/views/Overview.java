@@ -60,8 +60,8 @@ public class Overview implements IFramesocBusListener {
 	private TimeRegion					zoomedTimeRegion;
 	private TimeRegion					selectedTimeRegion;
 
-	private Color						displayFGColor		= ColorConstants.white;
-	private Color						displayBGColor		= ColorConstants.darkBlue;
+	private Color						displayFGColor		= ColorConstants.black;
+	private Color						displayBGColor		= ColorConstants.red;
 	private Color						selectFGColor		= ColorConstants.white;
 	private Color						selectBGColor		= ColorConstants.black;
 
