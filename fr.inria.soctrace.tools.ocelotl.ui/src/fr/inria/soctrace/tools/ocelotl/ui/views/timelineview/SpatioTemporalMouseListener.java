@@ -6,8 +6,6 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
@@ -17,18 +15,10 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTim
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.MouseState;
 
-public class SpatioTemporalMouseListener extends OcelotlMouseListener {
+public class SpatioTemporalMouseListener extends TemporalMouseListener {
 
-	private static final long	Threshold	= 5;
 	Boolean 					clickOnView = false;
-	MouseState					state		= MouseState.RELEASED;
-	MouseState					previous	= MouseState.RELEASED;
-	Point						currentPoint;
-	Display						display		= Display.getCurrent();
-	Shell						shell		= display.getActiveShell();
-	long						fixed;
 	int 						minDrawThreshold = OcelotlConstants.MinimalHeightDrawingThreshold;
-	AggregatedView				aggregatedView;
 	int							originY, cornerY;
 	boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
 	
@@ -39,11 +29,8 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	SpaceTimeAggregation2Manager spatioTemporalManager; 
 	EventProducerHierarchy hierarchy;
 
-	public SpatioTemporalMouseListener(AggregatedView theview) {
-		super();
-		display = Display.getCurrent();
-		shell = display.getActiveShell();
-		aggregatedView = theview;
+	public SpatioTemporalMouseListener(AggregatedView theView) {
+		super(theView);
 	}
 
 	@Override
@@ -88,10 +75,6 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 	}
 
 	@Override
-	public void mouseEntered(final MouseEvent arg0) {
-	}
-
-	@Override
 	public void mouseExited(final MouseEvent arg0) {
 		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 		
@@ -102,12 +85,6 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		}
 	}
 
-	@Override
-	public void mouseHover(final MouseEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-	
 	@Override
 	public void mouseMoved(final MouseEvent arg0) {
 		// If there is a current selection
@@ -426,42 +403,6 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 		return hierarchy.findSmallestContainingNode(currentProducers);
 	}
 
-	/**
-	 * Set the temporal selection to the time slices given in parameter
-	 * 
-	 * @param startingTimeSlice
-	 *            starting timeslice of the selection
-	 * @param endingTimeslice
-	 *            ending timeslice of the selection
-	 */
-	private TimeRegion setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
-		// Since timestamps start and end of two adjacent time slice overlap,
-		// add 1 to the starting timestamp
-		long startTimeStamp = aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
-
-		// Since the timestamp of the last time slice goes further than the max
-		// timestamp of the trace, we must check that we are not over it
-		long endTimeStamp = Math.min(aggregatedView.getResetTime().getTimeStampEnd(), aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
-
-		return new TimeRegion(startTimeStamp, endTimeStamp);
-	}
-	
-	
-	/**
-	 * Given a timeRegion, find the starting and ending time slice containing
-	 * this region
-	 * 
-	 * @param aTimeRegion
-	 * @return a Point whose X is the starting time slice, and Y is the ending
-	 *         time slice
-	 */
-	protected Point getTimeSlices(TimeRegion aTimeRegion) {
-		int startingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampStart());
-		int endingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
-
-		return new Point(startingSlice, endingSlice);
-	}
-	
 	/**
 	 * Find the aggregate in the corresponding coordinate
 	 * 

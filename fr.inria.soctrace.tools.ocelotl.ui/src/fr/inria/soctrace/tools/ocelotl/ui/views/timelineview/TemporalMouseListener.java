@@ -5,21 +5,12 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.MouseState;
 
 public class TemporalMouseListener extends OcelotlMouseListener {
 
-	private static final long	Threshold	= 5;
-	MouseState					state		= MouseState.RELEASED;
-	MouseState					previous	= MouseState.RELEASED;
-	Point						currentPoint;
-	Display						display		= Display.getCurrent();
-	Shell						shell		= display.getActiveShell();
-	long						fixed;
-	AggregatedView				aggregatedView;
 
 	public TemporalMouseListener(AggregatedView theview) {
 		super();
@@ -167,7 +158,7 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			
 			aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getSelectTime(), true);
 			aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getSelectTime());
-			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, 1);
+			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, -1);
 			aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getSelectTime());
 			aggregatedView.getOcelotlView().getStatView().updateData();
 		} else {
@@ -188,7 +179,7 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	 * @return a TimeRegion starting at the found starting timeslice, and
 	 *         finishing at the ending time slice
 	 */
-	private TimeRegion setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
+	protected TimeRegion setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
 		// Since timestamps start and end of two adjacent time slice overlap,
 		// add 1 to the starting timestamp
 		long startTimeStamp = aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
@@ -218,6 +209,6 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	@Override
 	public void drawSelection() {
 		if (!aggregatedView.getOcelotlView().getTimeRegion().compareTimeRegion(aggregatedView.time) && aggregatedView.getSelectTime() != null) 
-			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, 1);
+			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, -1);
 	}
 }

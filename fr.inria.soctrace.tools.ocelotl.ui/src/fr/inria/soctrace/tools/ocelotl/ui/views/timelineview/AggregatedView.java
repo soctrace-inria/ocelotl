@@ -133,7 +133,7 @@ abstract public class AggregatedView implements IAggregatedView {
 
 			// Default values for selecting the height of the graph
 			if (y0 == -1)
-				y0 = root.getSize().height;
+				y0 = root.getSize().height - 1;
 
 			if (y1 == -1)
 				y1 = 2;
@@ -149,7 +149,7 @@ abstract public class AggregatedView implements IAggregatedView {
 			
 			// Default values for selecting the height of the graph
 			if (y0 == -1)
-				y0 = root.getSize().height;
+				y0 = root.getSize().height - 1;
 
 			if (y1 == -1)
 				y1 = 2;
