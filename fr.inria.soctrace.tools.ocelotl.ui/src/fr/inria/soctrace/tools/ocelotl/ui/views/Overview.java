@@ -56,7 +56,6 @@ public class Overview implements IFramesocBusListener {
 	private int							timeSlice;
 
 	private TimeRegion					displayedTimeRegion;
-	private TimeRegion					globalTimeRegion;
 	private TimeRegion					zoomedTimeRegion;
 	private TimeRegion					selectedTimeRegion;
 

@@ -50,7 +50,7 @@ public class SpatiotemporalModeView extends MatrixView {
 		protected double width;
 		protected double logicWidth;
 		protected double logicHeight;
-		protected int minLogicWeight = OcelotlConstants.MinimalHeightDrawingThreshold;;
+		protected int minLogicWeight = OcelotlConstants.MinimalHeightDrawingThreshold;
 		protected List<Integer> xendlist;
 		protected List<Integer> yendlist;
 

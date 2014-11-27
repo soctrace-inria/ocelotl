@@ -4,7 +4,7 @@ public class MainState {
 
 	private String state;
 	private double amplitude;
-	private final static double Offset = 100.0;
+	private final static double Offset = 30.0;
 
 	public String getState() {
 		return state;

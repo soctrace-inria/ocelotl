@@ -35,6 +35,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.Aggregation;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
@@ -53,7 +54,7 @@ public class SpatiotemporalPartitionView extends MatrixView {
 		protected double width;
 		protected double logicWidth;
 		protected double logicHeight;
-		protected int minLogicWeight = 3;
+		protected int minLogicWeight = OcelotlConstants.MinimalHeightDrawingThreshold;
 		protected PartitionColorManager colors;
 		protected List<Integer> xendlist;
 

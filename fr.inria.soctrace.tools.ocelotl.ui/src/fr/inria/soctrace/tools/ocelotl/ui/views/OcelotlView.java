@@ -252,11 +252,12 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		}
 	}
 
-	private class ConfModificationListener implements ModifyListener {
+	private class TimestampModificationListener implements ModifyListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			hasChanged = HasChanged.ALL;
+			timestampHasChanged = true;
+			
 			if (confDataLoader.getCurrentTrace() == null || textTimestampStart.getText().isEmpty() || textTimestampEnd.getText().isEmpty())
 				return;
 
@@ -284,6 +285,14 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 			else
 				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+		}
+	}
+	
+	private class TimeSliceModificationListener implements ModifyListener {
+
+		@Override
+		public void modifyText(final ModifyEvent e) {
+			hasChanged = HasChanged.ALL; 
 		}
 	}
 
@@ -322,11 +331,12 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				running = true;
 			}
 
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER) {
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER)
 				hasChanged = HasChanged.PARAMETER;
-			} else {
-				textRun.setText("1.0");
-			}
+			
+			if(timestampHasChanged == true)
+				hasChanged = HasChanged.ALL;
+				
 			setConfiguration();
 			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
@@ -383,9 +393,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							return Status.CANCEL_STATUS;
 						}
 						monitor.setTaskName("Compute Parts");
-						// if (hasChanged == HasChanged.ALL || hasChanged ==
-						// HasChanged.NORMALIZE || hasChanged ==
-						// HasChanged.PARAMETER)
 
 						ocelotlCore.computeParts();
 						monitor.worked(1);
@@ -433,6 +440,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							}
 							
 							history.saveHistory();
+							timestampHasChanged = false;
 						}
 					});
 					
@@ -662,6 +670,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				// Reset spatial selection
 				ocelotlParameters.setSpatialSelection(false);
 				ocelotlParameters.setCurrentProducers(ocelotlParameters.getEventProducers());
+				
+				timestampHasChanged = true;
 			}
 		}
 	}
@@ -692,6 +702,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			
 			// Update stats
 			statView.updateData();
+			
+			timestampHasChanged = false;
 		}
 	}
 	
@@ -924,9 +936,9 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	private Text						textTimestampEnd;
 	private Text						textTimestampStart;
 	final Map<Integer, Trace>			traceMap		= new HashMap<Integer, Trace>();
-
+	private boolean						timestampHasChanged = true;
+	
 	private Button						buttonDown;
-
 	private Button						buttonUp;
 	private Button						btnSaveDataCache;
 	private Combo						comboVisu;
@@ -943,10 +955,10 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	private Font						cantarell8;
 	private Overview					overView;
 	private TabFolder					tabFolder;
-	private Action 						settings;
-	private Action 						snapshotAction;
-	private Action 						nextZoom;
-	private Action 						prevZoom;
+	private Action						settings;
+	private Action						snapshotAction;
+	private Action						nextZoom;
+	private Action						prevZoom;
 	private ActionHistory				history;
 
 	/**
@@ -1217,11 +1229,11 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		spinnerTSNumber.setFont(cantarell8);
 		spinnerTSNumber.setMaximum(OcelotlDefaultParameterConstants.maxTimeslice);
 		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
-		spinnerTSNumber.addModifyListener(new ConfModificationListener());
+		spinnerTSNumber.addModifyListener(new TimeSliceModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
 		buttonCancelSelection.addSelectionListener(new CancelSelectionListener());
-		textTimestampEnd.addModifyListener(new ConfModificationListener());
-		textTimestampStart.addModifyListener(new ConfModificationListener());
+		textTimestampEnd.addModifyListener(new TimestampModificationListener());
+		textTimestampStart.addModifyListener(new TimestampModificationListener());
 		scrolledComposite.setContent(groupTime);
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		sashFormView.setWeights(new int[] {29, 429, 29});

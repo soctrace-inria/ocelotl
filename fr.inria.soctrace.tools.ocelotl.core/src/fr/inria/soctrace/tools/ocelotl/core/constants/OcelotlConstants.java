@@ -23,8 +23,7 @@ public class OcelotlConstants {
 
 	/**
 	 * States of the state machine
-	 * ALL: 
-	 * TS: number of time slices has changed
+	 * ALL: need to recompute everything
 	 * NORMALIZE: quality curve normalization has changed 
 	 * PARAMETER: parameter has changed
 	 * NOTHING: nothing has changed

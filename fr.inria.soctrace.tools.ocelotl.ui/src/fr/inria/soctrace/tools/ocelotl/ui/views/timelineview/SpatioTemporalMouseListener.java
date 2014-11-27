@@ -374,7 +374,7 @@ public class SpatioTemporalMouseListener extends OcelotlMouseListener {
 
 		int y0 = (int) (selectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
 		int y1 = y0 + (int) ((selectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
-
+		
 		// If the selected producer is too small to be represented, take the
 		// parent node until the size is superior to the threshold
 		while ((selectedNode.getWeight() * logicHeight - aggregatedView.getSpace()) < minDrawThreshold) {
