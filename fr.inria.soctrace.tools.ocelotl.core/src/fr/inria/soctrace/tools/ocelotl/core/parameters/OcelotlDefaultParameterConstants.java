@@ -79,11 +79,6 @@ public class OcelotlDefaultParameterConstants {
 	public static final int NUMBER_OF_THREADS = 8;
 	
 	/**
-	 * Visualization operator for the overview
-	 */
-	public static final String OVERVIEW_VISU_OPERATOR = "Temporal Mode";
-	
-	/**
 	 * Aggregation Operator for the overview
 	 */
 	public static final String OVERVIEW_AGGREG_OPERATOR = "Temporal Aggregation";

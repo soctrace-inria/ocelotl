@@ -12,6 +12,8 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -57,25 +59,37 @@ public class SpatioTemporalAggregateView {
 	private Figure				root;
 	private String				label;
 	private Composite			compositeOverview;
+	private OcelotlView			ocelotlView;
+	private boolean 			visualAggregate;
 
-	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width) {
+	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width, boolean visualAggregate) {
 		super();
 		this.aggregateZone = aggregateZone;
 		this.eventProducerNode = eventProducerNode;
 		this.startingTimeSlice = startingTimeSlice;
 		this.endingTimeSlice = endingTimeSlice;
 		this.width = width;
+		this.visualAggregate = visualAggregate;
 		label = "Aggregate Content";
 	}
 
-	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width, String label) {
+	public SpatioTemporalAggregateView(Rectangle aggregateZone, EventProducerNode eventProducerNode, int startingTimeSlice, int endingTimeSlice, int width, String label, boolean visualAggregate) {
 		super();
 		this.aggregateZone = aggregateZone;
 		this.eventProducerNode = eventProducerNode;
 		this.startingTimeSlice = startingTimeSlice;
 		this.endingTimeSlice = endingTimeSlice;
 		this.width = width;
+		this.visualAggregate = visualAggregate;
 		this.label = label;
+	}
+
+	public boolean isVisualAggregate() {
+		return visualAggregate;
+	}
+
+	public void setVisualAggregate(boolean visualAggregate) {
+		this.visualAggregate = visualAggregate;
 	}
 
 	public Rectangle getAggregateZone() {
@@ -117,19 +131,23 @@ public class SpatioTemporalAggregateView {
 	 *            the current ocelotl view
 	 */
 	public void display(OcelotlView ocelotlview) {
+		if (!visualAggregate)
+			return;
+		
+		this.ocelotlView = ocelotlview;
 		String name = ocelotlview.getOcelotlParameters().getVisuOperator();
 
 		try {
-			final Bundle mybundle = Platform.getBundle(ocelotlview.getCore().getVisuOperators().getSelectedOperatorResource(name).getBundle());
+			final Bundle mybundle = Platform.getBundle(ocelotlview.getCore().getVisuOperators().getOperatorResource(name).getBundle());
 
 			// Instantiate the actual view
-			aggregationView = (MatrixView) mybundle.loadClass(ocelotlview.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlview);
+			aggregationView = (MatrixView) mybundle.loadClass(ocelotlview.getCore().getVisuOperators().getOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlview);
 
 			// New window
 			dialog = new Shell(ocelotlview.getSite().getShell().getDisplay());
 			dialog.setText(label);
 			dialog.setSize(width + (aggregationView.getBorder() * 3), Height);
-			// Set location of the new window centered around the centered of the eclipse window
+			// Set location of the new window centered around the center of the eclipse window
 			dialog.setLocation(ocelotlview.getSite().getShell().getLocation().x + ocelotlview.getSite().getShell().getSize().x / 2 - width / 2, ocelotlview.getSite().getShell().getLocation().y + ocelotlview.getSite().getShell().getSize().y / 2 - Height / 2);
 			dialog.setLayout(new FillLayout());
 
@@ -137,7 +155,7 @@ public class SpatioTemporalAggregateView {
 			compositeOverview = new Composite(dialog, SWT.BORDER);
 			compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 			compositeOverview.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-			// Make sure we remove the title bar from the size in order not
+			// Make sure we remove the title bar from the size in order to
 			// display it fully
 			compositeOverview.setSize(dialog.getSize().x, dialog.getSize().y - (dialog.getSize().y - dialog.getClientArea().height));
 			compositeOverview.setLayout(new FillLayout());
@@ -157,10 +175,9 @@ public class SpatioTemporalAggregateView {
 			aggregationView.setRoot(root);
 			aggregationView.setCanvas(canvas);
 			dialog.addControlListener(new dialogControlListener());
+			dialog.addShellListener(new DialogShellListener());
 			
 			dialog.open();
-			aggregationView.setRoot(root);
-			aggregationView.setCanvas(canvas);
 			root.addMouseListener(new SpatioTemporalAggregateMouseListener());
 
 			// Trigger the display
@@ -188,4 +205,40 @@ public class SpatioTemporalAggregateView {
 		}
 	}
 	
+	private class DialogShellListener implements ShellListener {
+
+		@Override
+		public void shellActivated(ShellEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void shellClosed(ShellEvent e) {
+			// Remove the highlight rectangle
+			AggregatedView graphDisplayView = (AggregatedView) ocelotlView.getTimeLineView();
+
+			if (graphDisplayView.getHighLightAggregateFigure() != null)
+				graphDisplayView.getHighLightAggregateFigure().delete();
+		}
+
+		@Override
+		public void shellDeactivated(ShellEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void shellDeiconified(ShellEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void shellIconified(ShellEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
 }

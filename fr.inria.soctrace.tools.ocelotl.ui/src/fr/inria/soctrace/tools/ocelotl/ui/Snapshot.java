@@ -138,10 +138,14 @@ public class Snapshot {
 		output.append(theView.getOcelotlParameters().getTrace().getAlias());
 		output.append("\nNumber of slices: ");
 		output.append(theView.getOcelotlParameters().getTimeSlicesNumber());
-		output.append("\nStart timestamp: ");
-		output.append(theView.getOcelotlParameters().getTimeRegion().getTimeStampStart());
-		output.append("\nEnd timestamp: ");
-		output.append(theView.getOcelotlParameters().getTimeRegion().getTimeStampEnd());
+		output.append("\nDisplayed Start timestamp: ");
+		output.append(theView.getTextDisplayedStart().getText());
+		output.append("\nDisplayed End timestamp: ");
+		output.append(theView.getTextDisplayedEnd().getText());
+		output.append("\nSelected Start timestamp: ");
+		output.append(theView.getTextTimestampStart().getText());
+		output.append("\nSelected End timestamp: ");
+		output.append(theView.getTextTimestampEnd().getText());
 		output.append("\nMetric type: ");
 		output.append(theView.getOcelotlParameters().getMicroModelType());
 		output.append("\nAggregation Operator: ");

@@ -70,8 +70,15 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 
 	@Override
 	public void resizeDiagram() {
-		createDiagram(parts, time);
+		root.removeAll();
+		figures.clear();
+		canvas.update();
+		if (parts != null) {
+			computeDiagram();
+		}
+		
 		root.repaint();
+		drawSelection();
 	}
 
 }

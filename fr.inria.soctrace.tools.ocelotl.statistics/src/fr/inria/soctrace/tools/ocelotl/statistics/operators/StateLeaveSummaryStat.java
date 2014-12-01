@@ -89,7 +89,7 @@ public class StateLeaveSummaryStat extends SummaryStat{
 		for (SimpleEventProducerNode anSepn : ocelotlview
 				.getOcelotlParameters().getEventProducerHierarchy().getLeaves()
 				.values())
-			if (ocelotlview.getOcelotlParameters().getCurrentProducers()
+			if (ocelotlview.getOcelotlParameters().getSpatiallySelectedProducers()
 					.contains(anSepn.getMe()))
 				numberOfLeaves++;
 

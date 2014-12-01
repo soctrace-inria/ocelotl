@@ -23,8 +23,7 @@ public class OcelotlConstants {
 
 	/**
 	 * States of the state machine
-	 * ALL: 
-	 * TS: number of time slices has changed
+	 * ALL: need to recompute everything
 	 * NORMALIZE: quality curve normalization has changed 
 	 * PARAMETER: parameter has changed
 	 * NOTHING: nothing has changed
@@ -79,4 +78,6 @@ public class OcelotlConstants {
 	static final public int CONFIGURATION_NORMAL_SIZE = 12;
 
 	public static final String MultipleValueExtensionSeparator = ", ";
+	
+	public static final int MinimalHeightDrawingThreshold = 1;
 }

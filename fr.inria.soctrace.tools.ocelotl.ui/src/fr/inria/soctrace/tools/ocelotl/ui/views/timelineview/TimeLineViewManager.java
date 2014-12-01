@@ -51,8 +51,8 @@ public class TimeLineViewManager {
 	public IAggregatedView create(String aVisualization) {
 		IAggregatedView timeLineView = null;
 		try {
-			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(aVisualization).getBundle());
-			timeLineView = (IAggregatedView) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(aVisualization).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+			final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getOperatorResource(aVisualization).getBundle());
+			timeLineView = (IAggregatedView) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getOperatorResource(aVisualization).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

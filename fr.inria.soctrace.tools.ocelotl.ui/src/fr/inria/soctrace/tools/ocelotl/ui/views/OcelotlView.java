@@ -96,6 +96,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.IStatView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatViewWrapper;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
@@ -221,6 +222,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									// Set the corresponding parameters
 									textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 									textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+									textDisplayedStart.setText(textTimestampStart.getText());
+									textDisplayedEnd.setText(textTimestampEnd.getText());
 
 									// And launch the display
 									btnRun.notifyListeners(SWT.Selection, new Event());
@@ -250,11 +253,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 
-	private class ConfModificationListener implements ModifyListener {
+	private class TimestampModificationListener implements ModifyListener {
 
 		@Override
 		public void modifyText(final ModifyEvent e) {
-			hasChanged = HasChanged.ALL;
+			timestampHasChanged = true;
+			
 			if (confDataLoader.getCurrentTrace() == null || textTimestampStart.getText().isEmpty() || textTimestampEnd.getText().isEmpty())
 				return;
 
@@ -282,6 +286,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 			else
 				textTimestampEnd.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+		}
+	}
+	
+	private class TimeSliceModificationListener implements ModifyListener {
+
+		@Override
+		public void modifyText(final ModifyEvent e) {
+			hasChanged = HasChanged.ALL; 
 		}
 	}
 
@@ -320,11 +332,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				running = true;
 			}
 
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER) {
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER)
 				hasChanged = HasChanged.PARAMETER;
-			} else {
-				textRun.setText("1.0");
-			}
+			
+			if(timestampHasChanged == true)
+				hasChanged = HasChanged.ALL;
+				
 			setConfiguration();
 			final String title = "Computing Aggregated View";
 			final Job job = new Job(title) {
@@ -381,9 +394,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							return Status.CANCEL_STATUS;
 						}
 						monitor.setTaskName("Compute Parts");
-						// if (hasChanged == HasChanged.ALL || hasChanged ==
-						// HasChanged.NORMALIZE || hasChanged ==
-						// HasChanged.PARAMETER)
 
 						ocelotlCore.computeParts();
 						monitor.worked(1);
@@ -417,6 +427,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							statView.createDiagram();
 							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 							snapshotAction.setEnabled(true);
+							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
+							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							
 							try {
 								overView.updateDiagram(ocelotlParameters.getTimeRegion());
@@ -429,6 +441,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 							
 							history.saveHistory();
+							timestampHasChanged = false;
 						}
 					});
 					
@@ -524,7 +537,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			setDefaultDescriptionSettings();
 			
 			// Init the overview
-			overView.initVisuOperator(ocelotlParameters.getOcelotlSettings().getOverviewVisuOperator());
+			overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
 		}
 	}
 
@@ -540,6 +553,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlCore.getVisuOperators().setSelectedOperator(comboVisu.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
+			
+			// If the overview visu operator is different, then redraw it
+			if (!ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization().equals(overView.getVisuOperatorName()))
+				overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
 		}
 	}
 
@@ -610,6 +627,25 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			}
 		}
 	}
+	
+	private class OverviewParameterUpAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (overView != null)
+				overView.modifyParameterUp();
+		}
+	}
+
+	private class OverviewParameterDownAdapter extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+
+			if (overView != null)
+				overView.modifyParameterDown();
+		}
+	}
 
 	private class DefaultParameterAdapter extends SelectionAdapter {
 
@@ -625,21 +661,53 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private class ResetListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
+			cancelSelection();
 			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
+
 			if (timeLineView != null) {
 				timeLineView.resizeDiagram();
-				timeAxisView.resizeDiagram();
-				overView.deleteSelection();
-				statView.updateData();
 
 				// Reset spatial selection
 				ocelotlParameters.setSpatialSelection(false);
 				ocelotlParameters.setCurrentProducers(ocelotlParameters.getEventProducers());
+				
+				timestampHasChanged = true;
 			}
 		}
 	}
+	
+	private class CancelSelectionListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			cancelSelection();
+		}
+	}
 
+	/**
+	 * Cancel the current selection
+	 */
+	public void cancelSelection() {
+		if (timeLineView != null) {
+			// Reset selected time region to displayed time region
+			setTimeRegion(getOcelotlParameters().getTimeRegion());
+
+			// Remove the currently drawn selections
+			((AggregatedView) timeLineView).deleteSelectFigure();
+			getTimeAxisView().unselect();
+			getOverView().deleteSelection();
+
+			// Cancel potential spatialselection
+			getOcelotlParameters().setSpatialSelection(true);
+			getOcelotlParameters().setSpatiallySelectedProducers(getOcelotlParameters().getCurrentProducers());
+			
+			// Update stats
+			statView.updateData();
+			
+			timestampHasChanged = false;
+		}
+	}
+	
 	private class VisualizationSettingsSelectionAdapter extends SelectionAdapter {
 
 		private final OcelotlView	view;
@@ -667,6 +735,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 			hasChanged = HasChanged.ALL;
 			aggregationSettingsManager.openConfigWindows();
+			// Set the redraw of the overview
+			overView.setRedrawOverview(true);
 		}
 	}
 
@@ -685,7 +755,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				settingsView.openDialog();
 			}
 		};
-		showSettings.setToolTipText("Ocelotl settings.");
+		showSettings.setToolTipText("Ocelotl Settings");
 		return showSettings;
 	}
 
@@ -696,7 +766,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	 */
 	private Action createSnapshot() {
 		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/snapshot-icon.png");
-		final Action takeSnapshot = new Action("Ocelotl Settings", img) {
+		final Action takeSnapshot = new Action("Take Snapshot", img) {
 			@Override
 			public void run() {
 				if (confDataLoader.getCurrentTrace() == null || ocelotlParameters.getTrace() == null)
@@ -706,7 +776,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				playSound("/media/snapshot.wav");
 			}
 		};
-		takeSnapshot.setToolTipText("Take a snapshot of the current view.");
+		takeSnapshot.setToolTipText("Take a Snapshot of the Current View");
 		return takeSnapshot;
 	}
 
@@ -716,14 +786,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	 * @return
 	 */
 	private Action createNextZoom() {
-		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/plus.png");
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/dlcl16/forward_nav.gif");
 		final Action nextZoom = new Action("Next zoom value", img) {
 			@Override
 			public void run() {
 				history.restoreNextHistory();
 			}
 		};
-		nextZoom.setToolTipText("Go to the next zooming value.");
+		nextZoom.setToolTipText("Go to the Next Zooming Value");
 		return nextZoom;
 	}
 	
@@ -733,14 +803,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	 * @return
 	 */
 	private Action createPrevZoom() {
-		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/minus.png");
+		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/dlcl16/backward_nav.gif");
 		final Action prevZoom = new Action("Previous zoom value", img) {
 			@Override
 			public void run() {
 				history.restorePrevHistory();
 			}
 		};
-		prevZoom.setToolTipText("Go back to the previous zooming value.");
+		prevZoom.setToolTipText("Go back to the Previous Zooming Value");
 		return prevZoom;
 	}
 
@@ -777,6 +847,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							public void run() {
 								textTimestampStart.setText(String.valueOf(confDataLoader.getMinTimestamp()));
 								textTimestampEnd.setText(String.valueOf(confDataLoader.getMaxTimestamp()));
+								textDisplayedStart.setText(textTimestampStart.getText());
+								textDisplayedEnd.setText(textTimestampEnd.getText());
 								comboType.setEnabled(true);
 								comboType.removeAll();
 								for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
@@ -820,6 +892,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 				// Make sure we are not in an editable field
 				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
 					buttonUp.notifyListeners(SWT.Selection, new Event());
+				break;	
+			case 117:// Letter u
+				// Make sure we are not in an editable field
+				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					overViewParamDown.notifyListeners(SWT.Selection, new Event());
+				break;
+			case 105:// Letter i
+				// Make sure we are not in an editable field
+				if (!(e.widget.getClass().getSimpleName().equals("Text") || e.widget.getClass().getSimpleName().equals("Spinner")))
+					overViewParamUp.notifyListeners(SWT.Selection, new Event());
 				break;
 			case SWT.KEYPAD_CR:
 			case SWT.CR:
@@ -855,9 +937,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Text						textTimestampEnd;
 	private Text						textTimestampStart;
 	final Map<Integer, Trace>			traceMap		= new HashMap<Integer, Trace>();
-
+	private boolean						timestampHasChanged = true;
+	
 	private Button						buttonDown;
-
 	private Button						buttonUp;
 	private Button						btnSaveDataCache;
 	private Combo						comboVisu;
@@ -874,10 +956,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Font						cantarell8;
 	private Overview					overView;
 	private TabFolder					tabFolder;
-	private Action 						settings;
-	private Action 						snapshotAction;
-	private Action 						nextZoom;
-	private Action 						prevZoom;
+	private Action						settings;
+	private Action						snapshotAction;
+	private Action						nextZoom;
+	private Action						prevZoom;
 	private ActionHistory				history;
 
 	/**
@@ -889,6 +971,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Combo						comboStatistics;
 	private Button						buttonHome;
 	private Composite					statComposite;
+	private Label						textDisplayedStart;
+	private Label						textDisplayedEnd;
+	private Button						overViewParamUp;
+	private Button						overViewParamDown;
+	private Button buttonCancelSelection;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1023,7 +1110,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		 				comboTraces.setLayoutData(gd_comboTraces);
 		 				comboTraces.setFont(cantarell8);
 		 				comboTraces.addSelectionListener(new TraceAdapter());
-		 				comboTraces.setToolTipText("Trace selection");
+		 				comboTraces.setToolTipText("Trace Selection");
 		 		
 		 				Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
 		 				btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
@@ -1039,7 +1126,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		 				comboType.add("Metric");
 		 				comboType.setText("Metric");
 		 				comboType.addSelectionListener(new ComboTypeSelectionAdapter());
-		 				comboType.setToolTipText("Metric selection");
+		 				comboType.setToolTipText("Metric Selection");
 		 		
 		 				comboDimension = new Combo(groupTraces, SWT.READ_ONLY);
 		 				final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
@@ -1049,7 +1136,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		 				comboDimension.add("Dimensions");
 		 				comboDimension.setText("Dimensions");
 		 				comboDimension.addSelectionListener(new ComboDimensionSelectionAdapter());
-		 				comboDimension.setToolTipText("Dimensions selection");
+		 				comboDimension.setToolTipText("Dimensions Selection");
 		 		
 		 				btnSettings = new Button(groupTraces, SWT.NONE);
 		 				btnSettings.setToolTipText("Settings");
@@ -1071,7 +1158,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		 				comboVisu.add("Visualization");
 		 				comboVisu.setText("Visualization");
 		 				comboVisu.addSelectionListener(new ComboVisuSelectionAdapter());
-		 				comboVisu.setToolTipText("Visualization selection");
+		 				comboVisu.setToolTipText("Visualization Selection");
 		 		
 		 				btnSettings2 = new Button(groupTraces, SWT.NONE);
 		 				btnSettings2.setToolTipText("Settings");
@@ -1107,34 +1194,65 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		groupTime.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(cantarell8);
-		groupTime.setLayout(new GridLayout(11, false));
+		groupTime.setLayout(new GridLayout(16, false));
 
+
+		
+		Label lblDisplayedStart = new Label(groupTime, SWT.NONE);
+		lblDisplayedStart.setFont(cantarell8);
+		lblDisplayedStart.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblDisplayedStart.setText("Time Bounds:");
+		
+		textDisplayedStart = new Label(groupTime, SWT.BORDER);
+		textDisplayedStart.setText("0");
+		final GridData gd_textDisplayedStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+		gd_textDisplayedStart.widthHint = 100;
+		textDisplayedStart.setFont(cantarell8);
+		textDisplayedStart.setLayoutData(gd_textDisplayedStart);
+		textDisplayedStart.setToolTipText("Starting Timestamp of the Current Display");
+		
+		Label lblDisplayedEnd = new Label(groupTime, SWT.NONE);
+		lblDisplayedEnd.setFont(cantarell8);
+		lblDisplayedEnd.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblDisplayedEnd.setText("-");
+		
+		textDisplayedEnd = new Label(groupTime, SWT.BORDER);
+		textDisplayedEnd.setText("1");
+		final GridData gd_textDisplayedEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+		gd_textDisplayedEnd.widthHint = 100;
+		textDisplayedEnd.setFont(cantarell8);
+		textDisplayedEnd.setLayoutData(gd_textDisplayedEnd);
+		textDisplayedEnd.setToolTipText("Ending Timestamp of the Current Display");
+		
 		final Label lblStartTimestamp = new Label(groupTime, SWT.NONE);
 		lblStartTimestamp.setFont(cantarell8);
-		lblStartTimestamp.setText("Start");
+		lblStartTimestamp.setText("Selection:");
 
 		textTimestampStart = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textTimestampStart = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
-		gd_textTimestampStart.widthHint = 150;
+		gd_textTimestampStart.widthHint = 100;
 		textTimestampStart.setLayoutData(gd_textTimestampStart);
 		textTimestampStart.setFont(cantarell8);
-		textTimestampStart.setToolTipText("Starting timestamp value");
+		textTimestampStart.setToolTipText("Starting Ttimestamp Value");
 
 		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
-		lblEndTimestamp.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		lblEndTimestamp.setFont(cantarell8);
-		lblEndTimestamp.setText("End");
+		lblEndTimestamp.setText("-");
 
 		textTimestampEnd = new Text(groupTime, SWT.BORDER);
 		final GridData gd_textTimestampEnd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
-		gd_textTimestampEnd.widthHint = 150;
+		gd_textTimestampEnd.widthHint = 100;
 		textTimestampEnd.setLayoutData(gd_textTimestampEnd);
 		textTimestampEnd.setFont(cantarell8);
-		textTimestampEnd.setToolTipText("Ending timestamp value");
+		textTimestampEnd.setToolTipText("Ending Timestamp Value");
 
 		btnReset = new Button(groupTime, SWT.NONE);
 		btnReset.setToolTipText("Reset Timestamps");
 		btnReset.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/undo_edit.gif"));
+		
+		buttonCancelSelection = new Button(groupTime, SWT.NONE);
+		buttonCancelSelection.setToolTipText("Cancel the Current Selection");
+		buttonCancelSelection.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/delete_edit.gif"));
 
 		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
 		lblTSNumber.setFont(cantarell8);
@@ -1142,32 +1260,54 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
 		final GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_spinnerTSNumber.widthHint = 100;
+		gd_spinnerTSNumber.widthHint = 55;
 		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
 		spinnerTSNumber.setFont(cantarell8);
 		spinnerTSNumber.setMaximum(OcelotlDefaultParameterConstants.maxTimeslice);
 		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
-
-		spinnerTSNumber.addModifyListener(new ConfModificationListener());
+		spinnerTSNumber.addModifyListener(new TimeSliceModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
-		textTimestampEnd.addModifyListener(new ConfModificationListener());
-		textTimestampStart.addModifyListener(new ConfModificationListener());
+		buttonCancelSelection.addSelectionListener(new CancelSelectionListener());
+		textTimestampEnd.addModifyListener(new TimestampModificationListener());
+		textTimestampStart.addModifyListener(new TimestampModificationListener());
 		scrolledComposite.setContent(groupTime);
 		scrolledComposite.setMinSize(groupTime.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sashFormView.setWeights(new int[] { 27, 393, 25 });
+		sashFormView.setWeights(new int[] {29, 429, 29});
 
 		// Right column
 		final SashForm sashForm = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
 		sashForm.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
 
 		// Overview
-		final SashForm overviewSashForm = new SashForm(sashForm, SWT.BORDER | SWT.VERTICAL);
-		final Composite compositeOverview = new Composite(overviewSashForm, SWT.BORDER);
+		final SashForm overviewSashForm = new SashForm(sashForm, SWT.BORDER | SWT.HORIZONTAL);
+		overviewSashForm.setLayout(new GridLayout(2, false));
+		
+		final Composite compositeOverview = new Composite(overviewSashForm, SWT.FILL);
 		compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeOverview.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		compositeOverview.setLayout(new FillLayout(SWT.HORIZONTAL));
+		compositeOverview.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2));
+		compositeOverview.setLayout(new FillLayout(SWT.FILL));
 		overView.init(compositeOverview);
+		
+		final SashForm buttonSashForm = new SashForm(overviewSashForm, SWT.BORDER | SWT.VERTICAL);
+		buttonSashForm.setSashWidth(0);
+		overViewParamUp = new Button(buttonSashForm, SWT.NONE);
+		overViewParamUp.setText(">");
+		overViewParamUp.setToolTipText("Increase Overview Parameter");
+		overViewParamUp.setImage(null);
+		overViewParamUp.setFont(cantarell8);
+		overViewParamUp.addSelectionListener(new OverviewParameterUpAdapter());
+		
+		
+		overViewParamDown = new Button(buttonSashForm, SWT.NONE);
+		overViewParamDown.setText("<");
+		overViewParamDown.setToolTipText("Decrease Overview Parameter");
+		overViewParamDown.setImage(null);
+		overViewParamDown.setFont(cantarell8);
+		overViewParamDown.addSelectionListener(new OverviewParameterDownAdapter());
 
+		overviewSashForm.setWeights(new int[] {95, 5});
+		
 		// Stat and legend
 		tabFolder = new TabFolder(sashForm, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
@@ -1241,7 +1381,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		btnRun.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		btnRun.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/ocelotl16.png"));
 		btnRun.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.BOLD));
-		btnRun.setToolTipText("Launch an analysis");
+		btnRun.setToolTipText("Launch an Analysis");
 		btnRun.setText("RUN!");
 
 		btnRun.addSelectionListener(new GetAggregationAdapter());
@@ -1406,6 +1546,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	public void setComboType(Combo comboType) {
 		this.comboType = comboType;
 	}
+	
+	public Label getTextDisplayedStart() {
+		return textDisplayedStart;
+	}
+
+	public Label getTextDisplayedEnd() {
+		return textDisplayedEnd;
+	}
 
 	private void refreshTraces() {
 		try {
@@ -1449,7 +1597,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setThreadNumber(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
-
+		ocelotlParameters.updateCurrentProducers();
+		
 		setCachePolicy();
 		try {
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());

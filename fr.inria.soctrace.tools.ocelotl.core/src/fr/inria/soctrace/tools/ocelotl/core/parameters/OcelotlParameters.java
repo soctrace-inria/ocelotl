@@ -180,7 +180,6 @@ public class OcelotlParameters {
 
 	public void setEventProducers(final List<EventProducer> eventProducers) {
 		this.eventProducers = eventProducers;
-		updateCurrentProducers();
 	}
 
 	public void setGrowingQualities(final boolean growingQualities) {
@@ -403,8 +402,6 @@ public class OcelotlParameters {
 		// Make sure we make a deep copy
 		this.spatiallySelectedProducers = new ArrayList<EventProducer>();
 		this.spatiallySelectedProducers.addAll(spatiallySelectedProducers);
-		
-		updateCurrentProducers();
 	}
 
 	public boolean isSpatialSelection() {

@@ -64,8 +64,8 @@ public class TimeAxisView {
 				setForegroundColor(AggregatedView.activeColorFG);
 				setBackgroundColor(AggregatedView.activeColorBG);
 			} else {
-				setForegroundColor(AggregatedView.selectColorFG);
-				setBackgroundColor(AggregatedView.selectColorBG);
+				setForegroundColor(AggregatedView.potentialColorFG);
+				setBackgroundColor(AggregatedView.potentialColorBG);
 			}
 			root.add(this,
 					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height - 2), new Point(
@@ -77,6 +77,7 @@ public class TimeAxisView {
 	Figure				root;
 	Canvas				canvas;
 	TimeRegion			time;
+	TimeRegion			selectTime;
 	final static int	Height				= 100;
 	final static int	Border				= 10;
 	final static int	TimeAxisWidth		= 1;
@@ -115,7 +116,10 @@ public class TimeAxisView {
 		if (time != null) {
 			drawMainLine();
 			drawGrads();
-			selectFigure.draw(timeRegion, active);
+			if (timeRegion != null) {
+				selectTime = timeRegion;
+				selectFigure.draw(timeRegion, active);
+			}
 		}
 		canvas.update();
 	}
@@ -227,7 +231,7 @@ public class TimeAxisView {
 	}
 
 	public void resizeDiagram() {
-		createDiagram(time);
+		createDiagram(time, selectTime, false);
 		root.repaint();
 	}
 
@@ -237,6 +241,7 @@ public class TimeAxisView {
 	}
 
 	public void unselect() {
+		selectTime = null;
 		resizeDiagram();
 	}
 

@@ -13,6 +13,7 @@
             metric_compatibility="PARTS"
             aggregator_compatibility="2D"
             selection_priority="4"
+            overview_visualization="Temporal Mode"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.TemporalPartitionView">
       </visualization_operator>
       <visualization_operator
@@ -23,6 +24,7 @@
             metric_compatibility="PROPORTIONS"
             aggregator_compatibility="2D"
             selection_priority="3"
+            overview_visualization="Temporal Mode"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.TemporalProportionView">
       </visualization_operator>
       <visualization_operator
@@ -33,6 +35,7 @@
             param_win=""
             aggregator_compatibility="3D"
             selection_priority="2"
+            overview_visualization="Temporal Mode"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.views.SpatiotemporalPartitionView">
       </visualization_operator>
       <visualization_operator
@@ -43,6 +46,7 @@
             metric_compatibility="MODE"
             aggregator_compatibility="3D"
             selection_priority="1"
+            overview_visualization="Temporal Mode"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views.SpatiotemporalModeView">
       </visualization_operator>
   	  <visualization_operator
@@ -53,6 +57,7 @@
   			metric_compatibility="MODE"
             aggregator_compatibility="2D"
             selection_priority="5"
+            overview_visualization="Temporal Mode"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.views.TemporalModeView">
       </visualization_operator>
    </extension>

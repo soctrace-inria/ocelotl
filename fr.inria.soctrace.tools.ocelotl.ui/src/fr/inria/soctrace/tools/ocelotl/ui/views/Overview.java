@@ -14,6 +14,8 @@ import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -43,35 +45,42 @@ public class Overview implements IFramesocBusListener {
 	private IDataAggregationOperator	aggregOperator;
 	private IDataAggregManager			aggregManager;
 	private IVisuOperator				visuOperator;
+	private String						visuOperatorName	= "";
 	private OcelotlParameters			overviewParameters;
-	
+
 	private Figure						root;
 	private Canvas						canvas;
 	private AggregatedView				timeLineView;
 	private boolean						redrawOverview;
-	private double						parameter	= 0.0;
+	private double						parameter			= 0.0;
 	private int							timeSlice;
 
-	private TimeRegion					globalTimeRegion;
+	private TimeRegion					displayedTimeRegion;
 	private TimeRegion					zoomedTimeRegion;
+	private TimeRegion					selectedTimeRegion;
+
+	private Color						displayFGColor		= ColorConstants.black;
+	private Color						displayBGColor		= ColorConstants.red;
+	private Color						selectFGColor		= ColorConstants.white;
+	private Color						selectBGColor		= ColorConstants.black;
 
 	// Show the currently displayed zone
 	private SelectFigure				displayedZone;
 	// Show the currently selected zone
 	private SelectFigure				selectedZone;
-	private int							Border		= 3;
-	private OverviewThread              overviewThread = null;
+	private int							Border				= 3;
+	private OverviewThread				overviewThread		= null;
 
 	/**
 	 * Followed topics
 	 */
-	protected FramesocBusTopicList		topics		= null;
+	protected FramesocBusTopicList		topics			= null;
 
 	public Overview(OcelotlView aView) {
 		super();
 		ocelotlView = aView;
 		redrawOverview = true;
-		globalTimeRegion = null;
+		displayedTimeRegion = null;
 		
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
@@ -80,7 +89,7 @@ public class Overview implements IFramesocBusListener {
 		initSelectionFigure();
 	}
 
-	// When receiving a notification, update the trace list
+	// When receiving a notification, redraw the overview with the new color
 	@Override
 	public void handle(FramesocBusTopic topic, Object data) {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED) && aggregManager != null) {
@@ -105,6 +114,22 @@ public class Overview implements IFramesocBusListener {
 		final LightweightSystem lws = new LightweightSystem(canvas);
 		lws.setContents(root);
 		lws.setControl(canvas);
+		canvas.addControlListener(new ControlListener() {
+
+			@Override
+			public void controlMoved(final ControlEvent arg0) {
+				canvas.redraw();
+				root.repaint();
+				resizeDiagram();
+			}
+
+			@Override
+			public void controlResized(final ControlEvent arg0) {
+				canvas.redraw();
+				root.repaint();
+				resizeDiagram();
+			}
+		});
 		root.setFont(SWTResourceManager.getFont("Cantarell", 24, SWT.NORMAL));
 		root.setSize(parent.getSize().x, parent.getSize().y);
 		return canvas;
@@ -116,9 +141,9 @@ public class Overview implements IFramesocBusListener {
 	 * @param time
 	 */
 	public void createDiagram() {
-		globalTimeRegion = new TimeRegion(overviewParameters.getTimeRegion());
+		displayedTimeRegion = new TimeRegion(overviewParameters.getTimeRegion());
 		timeLineView.setBorder(Border);
-		timeLineView.createDiagram(aggregManager, globalTimeRegion, visuOperator);
+		timeLineView.createDiagram(aggregManager, displayedTimeRegion, visuOperator);
 	}
 
 	/**
@@ -127,9 +152,10 @@ public class Overview implements IFramesocBusListener {
 	public void resizeDiagram() {
 		root.removeAll();
 		canvas.update();
-		if (aggregManager != null && globalTimeRegion != null) {
+		if (aggregManager != null && displayedTimeRegion != null) {
 			createDiagram();
 			displayedZone.draw(zoomedTimeRegion, true);
+			drawSelection();
 		}
 	}
 
@@ -145,19 +171,33 @@ public class Overview implements IFramesocBusListener {
 
 		zoomedTimeRegion = new TimeRegion(time);
 
-		// is it necessary to change completely the computed model
+		// Is it necessary to change completely the computed model
 		if (redrawOverview) {
 			overviewThread = new OverviewThread(time);
 			return;
 		}
 
 		displayedZone.draw(time, true);
-		updateSelection(time);
+		deleteSelection();
 	}
 
+	/**
+	 * Update the selected region with the displayed region
+	 * 
+	 * @param time
+	 *            the new selected time region
+	 */
 	public void updateSelection(TimeRegion time) {
-		// Update the selected region with the displayed region
-		selectedZone.draw(time, false);
+		selectedTimeRegion = time;
+		drawSelection();
+	}
+	
+	/**
+	 * Draw the selection
+	 */
+	protected void drawSelection() {
+		if(selectedTimeRegion != null && displayedTimeRegion != null)
+			selectedZone.draw(selectedTimeRegion, false);
 	}
 
 	/**
@@ -165,6 +205,8 @@ public class Overview implements IFramesocBusListener {
 	 */
 	public void deleteSelection() {
 		selectedZone.delete();
+		// Avoid further redraw
+		selectedTimeRegion = displayedTimeRegion;
 	}
 
 	public IAggregatedView getTimeLineView() {
@@ -207,6 +249,14 @@ public class Overview implements IFramesocBusListener {
 		this.visuOperator = visuOperator;
 	}
 
+	public String getVisuOperatorName() {
+		return visuOperatorName;
+	}
+
+	public void setVisuOperatorName(String visuOperatorName) {
+		this.visuOperatorName = visuOperatorName;
+	}
+
 	/**
 	 * Initialize the visualization operator and perform additional init
 	 * operation
@@ -217,12 +267,13 @@ public class Overview implements IFramesocBusListener {
 	public void initVisuOperator(String name) {
 		// Instantiate the chosen visu operator
 		visuOperator = ocelotlView.getOcelotlCore().getVisuOperators().instantiateOperator(name);
-
-		final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getBundle());
+		visuOperatorName = name;
+		
+		final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getOperatorResource(name).getBundle());
 
 		// Instantiate the actual view
 		try {
-			this.timeLineView = (AggregatedView) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getSelectedOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
+			this.timeLineView = (AggregatedView) mybundle.loadClass(ocelotlView.getCore().getVisuOperators().getOperatorResource(name).getVisualization()).getDeclaredConstructor(OcelotlView.class).newInstance(ocelotlView);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -235,15 +286,21 @@ public class Overview implements IFramesocBusListener {
 		timeLineView.setRoot(root);
 		timeLineView.setCanvas(canvas);
 		redrawOverview = true;
-		timeSlice = ocelotlView.getOcelotlCore().getAggregOperators().getSelectedOperatorResource().getTs();
 
 		// Init other stuff
-		globalTimeRegion = new TimeRegion(ocelotlView.getTimeRegion());
+		displayedTimeRegion = new TimeRegion(ocelotlView.getTimeRegion());
+		initSelectionFigure();
+		parameter = 0.0;
 	}
 
-	// Set the overview parameters with the current ocelotlParameters
+	/**
+	 * Set the overview parameters with a set of ocelotlParameters
+	 * 
+	 * @param ocelotlParameters
+	 *            the parameters used to perform the update
+	 */
 	public void updateOverviewParameters(OcelotlParameters ocelotlParameters) {
-		// Copy the current ocelotl parameters
+		// Copy the given parameters
 		overviewParameters = new OcelotlParameters(ocelotlView.getOcelotlParameters());
 		
 		// Set the time slice number at the current value for overview
@@ -255,8 +312,8 @@ public class Overview implements IFramesocBusListener {
 	}
 	
 	public void initSelectionFigure() {
-		selectedZone = new SelectFigure(ColorConstants.black, ColorConstants.black);
-		displayedZone = new SelectFigure(ColorConstants.black, ColorConstants.darkBlue);
+		selectedZone = new SelectFigure(selectFGColor, selectBGColor);
+		displayedZone = new SelectFigure(displayFGColor, displayBGColor);
 	}
 
 	public void reset() {
@@ -266,7 +323,53 @@ public class Overview implements IFramesocBusListener {
 			
 		overviewThread = null;
 		aggregManager = null;
-		globalTimeRegion = null;
+		displayedTimeRegion = null;
+	}
+	
+	/**
+	 * Look for the next smaller parameter value
+	 */
+	public void modifyParameterDown()
+	{
+		if (aggregManager != null) {
+			for (final double aParam : aggregManager.getParameters()) {
+				if (aParam > parameter) {
+					parameter = aParam;
+					changeParameter();
+					break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Look for the next greater parameter value
+	 */
+	public void modifyParameterUp()
+	{
+		if (aggregManager != null) {
+			for (int aParam = aggregManager.getParameters().size() - 1; aParam >= 0; aParam--) {
+				if (aggregManager.getParameters().get(aParam) < parameter) {
+					parameter = aggregManager.getParameters().get(aParam);
+					changeParameter();
+					break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * If the parameter value has changed then recompute parts and redraw
+	 */
+	public void changeParameter() {
+		// Recompute the parts
+		aggregManager.computeParts(parameter);
+		// Idem in the view
+		visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
+		// Redraw
+		createDiagram();
+		displayedZone.draw(zoomedTimeRegion, true);
+		drawSelection();
 	}
 
 	/**
@@ -274,9 +377,10 @@ public class Overview implements IFramesocBusListener {
 	 */
 	private class SelectFigure extends RectangleFigure {
 
-		Color	foreground;
-		Color	background;
-
+		private Color	foreground;
+		private Color	background;
+		public final static int alphaValue = 110;
+		
 		// Init with a given color set
 		public SelectFigure(Color foreGround, Color backGround) {
 			super();
@@ -287,7 +391,7 @@ public class Overview implements IFramesocBusListener {
 			this.background = backGround;
 			setForegroundColor(this.foreground);
 			setBackgroundColor(this.background);
-			setAlpha(90);
+			setAlpha(alphaValue);
 		}
 
 		/**
@@ -295,11 +399,13 @@ public class Overview implements IFramesocBusListener {
 		 * 
 		 * @param timeRegion
 		 *            the time region (time boundaries of the region)
-		 * @param b
+		 * @param displayed
+		 *            flag to distinguish between the display and the selection
+		 *            figure
 		 */
 		public void draw(final TimeRegion timeRegion, boolean displayed) {
 			// If there is no zoom, don't show indicator
-			if (timeRegion.compareTimeRegion(globalTimeRegion)) {
+			if (timeRegion.compareTimeRegion(displayedTimeRegion)) {
 				delete();
 				return;
 			}
@@ -307,12 +413,14 @@ public class Overview implements IFramesocBusListener {
 			if (getParent() != root)
 				root.add(this);
 
+			// Use to embed the selection figure within the display figure
 			int delta = 0;
 			if (!displayed) {
 				delta = 2;
 			}
-			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), root.getSize().height - delta),
-					new Point((int) ((timeRegion.getTimeStampEnd() - globalTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / globalTimeRegion.getTimeDuration() + Border), delta)));
+			
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - displayedTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / displayedTimeRegion.getTimeDuration() + Border), root.getSize().height - delta),
+					new Point((int) ((timeRegion.getTimeStampEnd() - displayedTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / displayedTimeRegion.getTimeDuration() + Border), delta)));
 		}
 
 		/**
@@ -324,7 +432,9 @@ public class Overview implements IFramesocBusListener {
 		}
 	}
 
-	
+	/**
+	 * Thread use to compute the display of an overview
+	 */
 	class OverviewThread extends Thread {
 		TimeRegion	time;
 
@@ -336,8 +446,12 @@ public class Overview implements IFramesocBusListener {
 		@Override
 		public void run() {
 			try {
-				updateOverviewParameters(ocelotlView.getOcelotlParameters());
+				// Get the number of time slice for the current overview aggregation operator
+				timeSlice = ocelotlView.getOcelotlCore().getAggregOperators().getOperatorResource(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator()).getTs();
 
+				//Set the overview parameters with the current ocelotlParameters
+				updateOverviewParameters(ocelotlView.getOcelotlParameters());
+		
 				// Get a new micro model
 				microModel = ocelotlView.getOcelotlCore().getMicromodelTypes().instantiateMicroModel(overviewParameters.getMicroModelType());
 

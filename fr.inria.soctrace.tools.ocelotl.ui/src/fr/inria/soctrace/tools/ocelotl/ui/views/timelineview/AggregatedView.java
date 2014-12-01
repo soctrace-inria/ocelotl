@@ -46,6 +46,7 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -56,24 +57,30 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 abstract public class AggregatedView implements IAggregatedView {
-	
-	protected Figure								root;
-	protected Canvas								canvas;
-	protected final List<RectangleFigure>			figures			= new ArrayList<RectangleFigure>();
-	protected TimeRegion							time;
-	protected TimeRegion							selectTime;
-	protected TimeRegion							resetTime;
-	protected int									aBorder			= 10;
-	protected final int								space			= 3;
-	protected final OcelotlView						ocelotlView;
-	protected SelectFigure							selectFigure;
-	protected IVisuOperator							visuOperator	= null;
-	protected OcelotlMouseListener					mouse;
-	protected List<SpatioTemporalAggregateView>						aggregates;
-	public final static Color						selectColorFG	= ColorConstants.darkBlue;
-	public final static Color						selectColorBG	= ColorConstants.darkBlue;
-	public final static Color						activeColorFG	= ColorConstants.black;
-	public final static Color						activeColorBG	= ColorConstants.black;
+
+	protected Figure							root;
+	protected Canvas							canvas;
+	protected final List<RectangleFigure>		figures				= new ArrayList<RectangleFigure>();
+	protected TimeRegion						time;
+	protected TimeRegion						selectTime;
+	protected TimeRegion						potentialSelectTime;
+	protected TimeRegion						resetTime;
+	protected int								aBorder				= 10;
+	protected final int							space				= 3;
+	protected final OcelotlView					ocelotlView;
+	protected SelectFigure						selectFigure;
+	protected SelectFigure						highLightAggregateFigure;
+	protected SelectFigure						potentialSelectFigure;
+	protected EventProducerNode					currentlySelectedNode;
+	protected IVisuOperator						visuOperator		= null;
+	protected OcelotlMouseListener				mouse;
+	protected List<SpatioTemporalAggregateView>	aggregates;
+	public final static Color					selectColorFG		= ColorConstants.white;
+	public final static Color					selectColorBG		= ColorConstants.blue;
+	public final static Color					potentialColorFG	= ColorConstants.darkBlue;
+	public final static Color					potentialColorBG	= ColorConstants.darkBlue;
+	public final static Color					activeColorFG		= ColorConstants.black;
+	public final static Color					activeColorBG		= ColorConstants.black;
 	
 	class SelectFigure extends RectangleFigure {
 
@@ -84,7 +91,16 @@ abstract public class AggregatedView implements IAggregatedView {
 			setLayoutManager(layout);
 			setForegroundColor(selectColorFG);
 			setBackgroundColor(selectColorBG);
-			setAlpha(70);
+			setAlpha(120);
+		}
+		
+		private SelectFigure(Color foreGround, Color backGround) {
+			super();
+			final ToolbarLayout layout = new ToolbarLayout();
+			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
+			setLayoutManager(layout);
+			setForegroundColor(foreGround);
+			setBackgroundColor(backGround);
 		}
 
 		/**
@@ -103,23 +119,52 @@ abstract public class AggregatedView implements IAggregatedView {
 			if (active) {
 				setForegroundColor(activeColorFG);
 				setBackgroundColor(activeColorBG);
+				setFill(true);
+				setAlpha(120);
 			} else {
 				setForegroundColor(selectColorFG);
 				setBackgroundColor(selectColorBG);
+				setFill(false);
+				setAlpha(250);
 			}
+			
 			if (getParent() != root)
 				root.add(this);
 
 			// Default values for selecting the height of the graph
 			if (y0 == -1)
-				y0 = root.getSize().height;
+				y0 = root.getSize().height - 1;
 
 			if (y1 == -1)
 				y1 = 2;
-
+			
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
-					(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder - 1), y1)));
+					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
 			root.repaint();
+		}
+		
+		public void draw(final TimeRegion timeRegion, int y0, int y1) {
+			if (getParent() != root)
+				root.add(this);
+			
+			// Default values for selecting the height of the graph
+			if (y0 == -1)
+				y0 = root.getSize().height - 1;
+
+			if (y1 == -1)
+				y1 = 2;
+					
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
+					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
+			root.repaint();
+		}
+		
+		/**
+		 * Remove the selection from display
+		 */
+		public void delete() {
+			if (getParent() != null)
+				root.remove(this);
 		}
 	}
 	
@@ -217,6 +262,19 @@ abstract public class AggregatedView implements IAggregatedView {
 		figures.clear();
 		root.repaint();
 	}
+	
+	@Override
+	public void drawSelection() {
+		if (selectTime != null) {
+			mouse.drawSelection();
+		}
+	}
+	
+	public void deleteSelectFigure() {
+		selectFigure.delete();
+		selectTime = null;
+		setCurrentlySelectedNode(null);
+	}
 
 	public int getBorder() {
 		return aBorder;
@@ -255,6 +313,22 @@ abstract public class AggregatedView implements IAggregatedView {
 		return selectTime;
 	}
 
+	public TimeRegion getPotentialSelectTime() {
+		return potentialSelectTime;
+	}
+
+	public void setPotentialSelectTime(TimeRegion potentialSelectTime) {
+		this.potentialSelectTime = potentialSelectTime;
+	}
+
+	public void setSelectTime(TimeRegion selectTime) {
+		this.selectTime = selectTime;
+	}
+
+	public SelectFigure getHighLightAggregateFigure() {
+		return highLightAggregateFigure;
+	}
+
 	public int getSpace() {
 		return space;
 	}
@@ -280,6 +354,14 @@ abstract public class AggregatedView implements IAggregatedView {
 		this.aggregates = aggregateMapping;
 	}
 
+	public SelectFigure getPotentialSelectFigure() {
+		return potentialSelectFigure;
+	}
+
+	public void setPotentialSelectFigure(SelectFigure potentialSelectFigure) {
+		this.potentialSelectFigure = potentialSelectFigure;
+	}
+
 	@Override
 	public void init(final TimeLineViewWrapper wrapper) {
 		root = wrapper.getRoot();
@@ -291,14 +373,12 @@ abstract public class AggregatedView implements IAggregatedView {
 			public void controlMoved(final ControlEvent arg0) {
 				canvas.redraw();
 				resizeDiagram();
-				ocelotlView.getOverView().resizeDiagram();
 			}
 
 			@Override
 			public void controlResized(final ControlEvent arg0) {
 				canvas.redraw();
 				resizeDiagram();
-				ocelotlView.getOverView().resizeDiagram();
 			}
 		});
 
@@ -310,6 +390,16 @@ abstract public class AggregatedView implements IAggregatedView {
 		wrapper.addMouseListener(mouse);
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
+		
+		potentialSelectFigure = new SelectFigure(potentialColorFG, potentialColorBG);
+		potentialSelectFigure.setLineWidth(1);
+		potentialSelectFigure.setAlpha(100);
+		potentialSelectFigure.setFill(true);
+		
+		highLightAggregateFigure = new SelectFigure(ColorConstants.black, ColorConstants.white);
+		highLightAggregateFigure.setLineWidth(2);
+		highLightAggregateFigure.setAlpha(255);
+		highLightAggregateFigure.setFill(false);
 	}
 	
 	public void setBorder(final int border) {
@@ -326,6 +416,14 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public void setVisuOperator(final IVisuOperator visuOperator) {
 		this.visuOperator = visuOperator;
+	}
+
+	public EventProducerNode getCurrentlySelectedNode() {
+		return currentlySelectedNode;
+	}
+
+	public void setCurrentlySelectedNode(EventProducerNode currentlySelectedNode) {
+		this.currentlySelectedNode = currentlySelectedNode;
 	}
 
 }
