@@ -7,7 +7,9 @@ import java.util.List;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
@@ -16,6 +18,7 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventPro
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.MatrixView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.SpatioTemporalAggregateView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.VisualAggregation;
 
 public abstract class SpatioTemporalView extends MatrixView {
@@ -94,9 +97,9 @@ public abstract class SpatioTemporalView extends MatrixView {
 			for (Part p : parts) {
 				// If p is an aggregation
 				if (((VisualAggregation) p.getData()).isAggregated())
-					drawStandardAggregate(p.getStartPart(), epn.getIndex(),
+					drawAggregate(p.getStartPart(), epn.getIndex(),
 							p.getEndPart(), epn.getWeight(),
-							((VisualAggregation) p.getData()).getValue(), epn);
+							((VisualAggregation) p.getData()).getValue(), epn, false, false);
 				else {
 					// Check for each child that we have enough vertical space
 					// to display them
@@ -122,20 +125,87 @@ public abstract class SpatioTemporalView extends MatrixView {
 							// cut
 							boolean hasNoCut = ((VisualAggregation) pagg
 									.getData()).isNoCutInside();
-							drawVisualAggregate(pagg.getStartPart(),
+							drawAggregate(pagg.getStartPart(),
 									epn.getIndex(), pagg.getEndPart(),
-									epn.getWeight(), epn, hasNoCut);
+									epn.getWeight(), ((VisualAggregation) p.getData()).getValue(), epn, true, hasNoCut);
 						}
 					}
 				}
 			}
 		}
-		
-		abstract protected void drawStandardAggregate(int logicX, int logicY, int logicX2,
-				int sizeY, int number, EventProducerNode epn);
-		
-		abstract protected void drawVisualAggregate(int logicX, int logicY, int logicX2,
-				int sizeY, EventProducerNode epn, boolean clean);
+
+		/**
+		 * Set the drawn rectangle's characteristics and its label
+		 * 
+		 * @param epn
+		 *            the event producer
+		 * @param startTimeSlice
+		 *            use to get the mainstate in mode view
+		 * @param endTimeSlice
+		 *            use to get the mainstate in mode view
+		 * @param isVisualAggregate
+		 *            use to set the color in partition view
+		 * @param number
+		 *            use to set the color in partition view
+		 * @return the created rectanglefigure
+		 */
+		abstract protected RectangleFigure setRectangle(EventProducerNode epn,
+				int startTimeSlice, int endTimeSlice,
+				boolean isVisualAggregate, int number);
+
+		/**
+		 * Draw the aggregate
+		 * 
+		 * @param logicX
+		 *            starting time slice of the aggregate
+		 * @param logicY
+		 *            starting height (event producer) of the aggregate
+		 * @param logicX2
+		 *            end time slice of the aggregate
+		 * @param sizeY
+		 *            ending height (event producer) of the aggregate
+		 * @param number
+		 *            value of the aggregate (use to set the color in partition
+		 *            view)
+		 * @param epn
+		 *            the event producer node of the aggregate
+		 * @param isVisualAggregate
+		 *            is the aggregate a visual aggregate (i.e. an aggregation
+		 *            when the resolution is too small to print all the cuts).
+		 * @param clean
+		 *            is the visual aggregate clean (i.e. does is contains
+		 *            temporal cut)
+		 */
+		protected void drawAggregate(int logicX, int logicY, int logicX2,
+				int sizeY, int number, EventProducerNode epn,
+				boolean isVisualAggregate, boolean clean) {
+
+			// Set the rectangle characteristics
+			final RectangleFigure rectangle = setRectangle(epn, logicX,
+					logicX2, isVisualAggregate, number);
+
+			String label = rectangle.getToolTip().toString();
+
+			// Draw the rectangle
+			int xa = (int) ((logicX * logicWidth + aBorder));
+			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
+			int xb = xendlist.get(logicX2);
+			int yb = yendlist.get(logicY + sizeY);
+			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb,
+					yb)));
+
+			// Save it in the index if necessary
+			saveAggregate(xa, xb, ya, yb, epn, logicX, logicX2, label,
+					isVisualAggregate);
+
+			if (isVisualAggregate) {
+				if (!clean) {
+					drawTextureDirty(xa, xb, ya, yb, label);
+				} else {
+					drawTextureClean(xa, xb, ya, yb, label);
+				}
+			}
+		}
 		
 		/**
 		 * Compute the temporal parts for a given EventProducerNode
@@ -284,6 +354,8 @@ public abstract class SpatioTemporalView extends MatrixView {
 		}
 		
 		/**
+		 * Draw the texture for visual aggregate (add left to right lines) that
+		 * do not contains temporal cut (i.e. clean)
 		 * 
 		 * @param xa
 		 * @param xb
@@ -316,6 +388,8 @@ public abstract class SpatioTemporalView extends MatrixView {
 		}
 
 		/**
+		 * Draw the texture for visual aggregate (add right to left lines) that
+		 * contains temporal cut (i.e. dirty)
 		 * 
 		 * @param xa
 		 * @param xb
@@ -354,6 +428,26 @@ public abstract class SpatioTemporalView extends MatrixView {
 				line.setToolTip(new Label(label));
 				root.add(line);
 			}
+		}
+		
+		/**
+		 * Save the aggregate with its characteristics in the index 
+		 * @param xa
+		 * @param xb
+		 * @param ya
+		 * @param yb
+		 * @param epn
+		 * @param start
+		 * @param end
+		 * @param label
+		 * @param isVisualAggregate
+		 */
+		protected void saveAggregate(int xa, int xb, int ya, int yb,
+				EventProducerNode epn, int start, int end, String label,
+				boolean isVisualAggregate) {
+			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(
+					new Point(xa, ya), new Point(xb, yb)), epn, start, end, xb
+					- xa, label, isVisualAggregate));
 		}
 	}
 }

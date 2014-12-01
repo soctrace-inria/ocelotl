@@ -26,10 +26,7 @@ import java.util.List;
 import org.eclipse.draw2d.BorderLayout;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.geometry.Point;
-import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -53,57 +50,32 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 			aggregates = new ArrayList<SpatioTemporalAggregateView>();
 		}
 
-		protected void drawStandardAggregate(int logicX, int logicY, int logicX2,
-				int sizeY, int number, EventProducerNode epn) {
-			final RectangleFigure rectangle = new RectangleFigure();
-			rectangle.setBackgroundColor(colors.getColors().get(number).getBg());
-			rectangle.setForegroundColor(colors.getColors().get(number).getBg());
-			rectangle.setLineWidth(2);
+		@Override
+		protected RectangleFigure setRectangle(EventProducerNode epn,
+				int startTimeSlice, int endTimeSlice,
+				boolean isVisualAggregate, int number) {
+			RectangleFigure rectangle = new RectangleFigure();
 
-			rectangle.setToolTip(new Label(" " + epn.getMe() + " "));
-			int xa = (int) ((logicX * logicWidth + aBorder));
-			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
-			int xb = xendlist.get(logicX2);
-			int yb = yendlist.get(logicY + sizeY);
-			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
-			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(
-					new Point(xa, ya), new Point(xb, yb)), epn, logicX,
-					logicX2, xb - xa, false));
-		}
-
-		protected void drawVisualAggregate(int logicX, int logicY, int logicX2,
-				int sizeY, EventProducerNode epn, boolean clean) {
-			final RectangleFigure rectangle = new RectangleFigure();
-			rectangle.setBackgroundColor(ColorConstants.black);
-			rectangle.setForegroundColor(ColorConstants.black);
+			if (!isVisualAggregate) {
+				rectangle.setBackgroundColor(colors.getColors().get(number)
+						.getBg());
+				rectangle.setForegroundColor(colors.getColors().get(number)
+						.getBg());
+			} else {
+				rectangle.setBackgroundColor(ColorConstants.black);
+				rectangle.setForegroundColor(ColorConstants.black);
+			}
 
 			rectangle.setLineWidth(2);
 
-			String labelContent = " " + epn.getMe().getName() + " ";
+			String labelContent =  " " + epn.getMe().getName() + " ";
 			rectangle.setToolTip(new Label(labelContent));
 			rectangle.setLayoutManager(new BorderLayout());
 			rectangle.setPreferredSize(1000, 1000);
-			Label lab = new Label("?");
-			lab.setTextAlignment(PositionConstants.CENTER);
-			lab.setLabelAlignment(SWT.CENTER);
-			lab.setForegroundColor(ColorConstants.black);
 			rectangle
-					.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
-			int xa = (int) ((logicX * logicWidth + aBorder));
-			int ya = (int) (rootHeight - height + logicY * logicHeight - aBorder);
-			int xb = xendlist.get(logicX2);
-			int yb = yendlist.get(logicY + sizeY);
-			root.add(rectangle, new Rectangle(new Point(xa, ya), new Point(xb, yb)));
+			.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.BOLD));
 			
-			aggregates.add(new SpatioTemporalAggregateView(new Rectangle(
-					new Point(xa, ya), new Point(xb, yb)), epn, logicX,
-					logicX2, xb - xa, true));
-			
-			if (!clean) {
-				drawTextureDirty(xa, xb, ya, yb, labelContent);
-			} else {
-				drawTextureClean(xa, xb, ya, yb, labelContent);
-			}
+			return rectangle;
 		}
 	}
 	
@@ -158,10 +130,10 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 			List<Part> parts = computeParts(epn, start, end);
 			for (Part p : parts) {
 				if (((VisualAggregation) p.getData()).isAggregated())
-					drawStandardAggregate(p.getStartPart() - startingSlice,
+					drawAggregate(p.getStartPart() - startingSlice,
 							epn.getIndex() - theNode.getIndex(), p.getEndPart()
 									- startingSlice, epn.getWeight(),
-							((VisualAggregation) p.getData()).getValue(), epn);
+							((VisualAggregation) p.getData()).getValue(), epn, false, false);
 				else {
 					boolean aggy = false;
 					for (EventProducerNode ep : epn.getChildrenNodes()) {
@@ -176,11 +148,12 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 						List<Part> aggParts = computeCommonCuts(epn,
 								p.getStartPart(), p.getEndPart());
 						for (Part pagg : aggParts) {
-							drawVisualAggregate(pagg.getStartPart()
-									- startingSlice,
+							drawAggregate(pagg.getStartPart() - startingSlice,
 									epn.getIndex() - theNode.getIndex(),
 									pagg.getEndPart() - startingSlice,
-									epn.getWeight(), epn,
+									epn.getWeight(),
+									((VisualAggregation) p.getData())
+											.getValue(), epn, true,
 									((VisualAggregation) pagg.getData())
 											.isNoCutInside());
 						}
