@@ -16,7 +16,7 @@ Then, install Ocelotl in Eclipse using the following procedure: Go to _Help > In
 
 http://soctrace-inria.github.io/updatesite/
 
-and press Enter. The Framesoc and Ocelotl tools should then be available. If Framesoc is not already installed in your Eclipse, select both tools. Then click on _Next_, _Next_, accept the license agreement and click on _Finish_.
+and press Enter. Select all the available tools. Then click on _Next_, _Next_, accept the license agreement and click on _Finish_.
 
 ### Download the Sources
 
