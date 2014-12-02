@@ -19,33 +19,20 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.SWTGraphics;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Display;
-
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -207,55 +194,6 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	abstract protected void computeDiagram();
 
-	private byte[] createImage(final Figure figure, final int format) {
-
-		final Device device = Display.getCurrent();
-		final Rectangle r = figure.getBounds();
-
-		final ByteArrayOutputStream result = new ByteArrayOutputStream();
-
-		Image image = null;
-		GC gc = null;
-		Graphics g = null;
-		try {
-			image = new Image(device, r.width, r.height);
-			gc = new GC(image);
-			g = new SWTGraphics(gc);
-			g.translate(r.x * -1, r.y * -1);
-
-			figure.paint(g);
-
-			final ImageLoader imageLoader = new ImageLoader();
-			imageLoader.data = new ImageData[] { image.getImageData() };
-			imageLoader.save(result, format);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (g != null)
-				g.dispose();
-			if (gc != null)
-				gc.dispose();
-			if (image != null)
-				image.dispose();
-		}
-		return result.toByteArray();
-	}
-
-	// TODO take resolution into account (given as a parameter)
-	@Override
-	public void createSnapshotFor(final String fileName) {
-		final byte[] imageBytes = createImage(root, SWT.IMAGE_PNG);
-
-		try {
-			final FileOutputStream out = new FileOutputStream(fileName);
-			out.write(imageBytes);
-			out.flush();
-			out.close();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public void deleteDiagram() {
 		root.removeAll();
@@ -301,6 +239,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		return resetTime;
 	}
 
+	@Override
 	public Figure getRoot() {
 		return root;
 	}

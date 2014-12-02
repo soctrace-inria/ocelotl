@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.ui;
+package fr.inria.soctrace.tools.ocelotl.ui.snpashot;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,6 +36,7 @@ public class Snapshot {
 	// Directory where all the snapshots are saved
 	private String				snapshotDirectory;
 	private OcelotlView			theView;
+	private SnapshotView		snapshotView;
 
 	public Snapshot(String directory, OcelotlView aView) {
 		snapshotDirectory = directory;
@@ -55,7 +56,7 @@ public class Snapshot {
 	 * Call all the methods that create a snapshot of the current state of Ocelotl
 	 */
 	public void takeSnapShot() {
-		// Create directory
+		// Create and set directory
 		String currentDirPath = createDirectory();
 
 		// Save the currently displayed diagram as an image
@@ -64,7 +65,7 @@ public class Snapshot {
 		snapShotQualityCurve(currentDirPath);
 		// Save the the current parameters in a text file
 		saveConfig(currentDirPath);
-		
+
 		// Create a symbolic link to the trace file
 		// createSymLink(currentDirPath);
 	}
@@ -74,7 +75,9 @@ public class Snapshot {
 	 * @param dirPath
 	 */
 	public void snapShotDiagram(String dirPath) {
-		theView.getTimeLineView().createSnapshotFor(dirPath + "/diagram.png");
+		snapshotView = new SnapshotView();
+		snapshotView.createView(theView);
+		createSnapshotFor(snapshotView.getAggregationView().getRoot(), dirPath + "/diagram.png");
 	}
 
 	/**
@@ -201,7 +204,6 @@ public class Snapshot {
 	 * @param aDirPath
 	 */
 	public void createSymLink(String aDirPath) {
-		// TODO create symbolic link
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec("ln -s " + aDirPath + "/A\\ Link\\ to\\ the\\ trace");

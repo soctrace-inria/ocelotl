@@ -33,7 +33,9 @@ public class OcelotlSettings {
 	private boolean normalizedCurve;
 	private double thresholdPrecision;
 	private boolean increasingQualities;
-
+	private int snapshotXResolution;
+	private int snapshotYResolution;
+	
 	private double overviewParameter;
 	private String overviewAggregOperator;
 	private int overviewTimesliceNumber;
@@ -66,6 +68,9 @@ public class OcelotlSettings {
 		thresholdPrecision = OcelotlDefaultParameterConstants.Threshold;
 		increasingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
 		overviewAggregOperator = OcelotlDefaultParameterConstants.OVERVIEW_AGGREG_OPERATOR;
+		
+		snapshotXResolution = OcelotlDefaultParameterConstants.SNAPSHOT_DEFAULT_X_RESOLUTION;
+		snapshotYResolution = OcelotlDefaultParameterConstants.SNAPSHOT_DEFAULT_Y_RESOLUTION;
 
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -114,6 +119,8 @@ public class OcelotlSettings {
 						setNormalizedCurve(Boolean.valueOf(config[9]));
 						setThresholdPrecision(Double.valueOf(config[10]));
 						setIncreasingQualities(Boolean.valueOf(config[11]));
+						setSnapshotXResolution(Integer.valueOf(config[12]));
+						setSnapshotYResolution(Integer.valueOf(config[13]));
 					} else {
 						logger.debug("Invalid configuration file: Default values will be used");
 					}
@@ -178,7 +185,11 @@ public class OcelotlSettings {
 		output.append(thresholdPrecision);
 		output.append(";");
 		output.append(increasingQualities);
-
+		output.append(";");
+		output.append(snapshotXResolution);
+		output.append(";");
+		output.append(snapshotYResolution);
+		
 		String newSettings = output.toString();
 
 		PrintWriter writer;
@@ -358,6 +369,28 @@ public class OcelotlSettings {
 		this.overviewAggregOperator = overviewAggregOperator;
 		if (!this.overviewAggregOperator.equals(overviewAggregOperator)) {
 			this.overviewAggregOperator = overviewAggregOperator;
+			saveSettings();
+		}
+	}
+
+	public int getSnapshotYResolution() {
+		return snapshotYResolution;
+	}
+
+	public void setSnapshotYResolution(int snapshotYResolution) {
+		if (this.snapshotYResolution != snapshotYResolution) {
+			this.snapshotYResolution = snapshotYResolution;
+			saveSettings();
+		}
+	}
+
+	public int getSnapshotXResolution() {
+		return snapshotXResolution;
+	}
+
+	public void setSnapshotXResolution(int snapshotXResolution) {
+		if (this.snapshotXResolution != snapshotXResolution) {
+			this.snapshotXResolution = snapshotXResolution;
 			saveSettings();
 		}
 	}

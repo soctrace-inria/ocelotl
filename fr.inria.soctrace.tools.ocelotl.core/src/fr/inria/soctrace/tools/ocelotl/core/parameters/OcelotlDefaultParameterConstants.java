@@ -96,4 +96,7 @@ public class OcelotlDefaultParameterConstants {
 	public static final int MIN_EVENT_PRODUCERS_PER_QUERY = 0;
 	public static final int MAX_EVENT_PRODUCERS_PER_QUERY = 1000000;
 	
+	public static final int SNAPSHOT_DEFAULT_X_RESOLUTION = 1920;
+	public static final int SNAPSHOT_DEFAULT_Y_RESOLUTION = 1080;
+	
 }

@@ -19,6 +19,8 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
+import org.eclipse.draw2d.Figure;
+
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -32,12 +34,12 @@ public interface IAggregatedView {
 	public long getEnd();
 
 	public long getStart();
+	
+	public Figure getRoot();
 
 	public void init(TimeLineViewWrapper wrapper);
 
 	public void resizeDiagram();
 	
 	public void drawSelection();
-
-	public void createSnapshotFor(String fileName);
 }
