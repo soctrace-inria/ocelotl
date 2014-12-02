@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.lpaggreg,
  fr.inria.soctrace.framesoc.ui,
- fr.inria.soctrace.tools.ocelotl.slf4j;bundle-version="1.0.0"
+ fr.inria.soctrace.tools.ocelotl.slf4j;bundle-version="1.0.0",
+ org.eclipse.swt
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: fr.inria.soctrace.framesoc.ui.model,

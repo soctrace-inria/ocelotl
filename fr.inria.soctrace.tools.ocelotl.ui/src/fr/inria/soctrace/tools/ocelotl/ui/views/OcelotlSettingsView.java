@@ -10,6 +10,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
@@ -60,6 +62,8 @@ public class OcelotlSettingsView extends Dialog {
 	private Button								btnChangeSnapshotDirectory;
 	private DatacachePolicy						currentSelectedDatacachePolicy;
 	private String								currentDatacacheDir;
+	private Text								snapshotWidth;
+	private Text								snapshotHeight;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -247,6 +251,37 @@ public class OcelotlSettingsView extends Dialog {
 		}
 	}
 
+	/**
+	 * Make sure that the entered number is a positive integer
+	 *
+	 */
+	private class NumericTextFieldVerifyListener implements VerifyListener {
+
+		@Override
+		public void verifyText(VerifyEvent e) {
+
+			Text text = (Text) e.getSource();
+
+			// Get old text and create new text by using the VerifyEvent.text
+			final String oldS = text.getText();
+			String newS = oldS.substring(0, e.start) + e.text + oldS.substring(e.end);
+
+			boolean isValid = true;
+			try {
+				int res = Integer.parseInt(newS);
+				if (res <= 0) {
+					isValid = false;
+				}
+			} catch (NumberFormatException ex) {
+				isValid = false;
+			}
+			
+			// If not valid do not update the text
+			if (!isValid)
+				e.doit = false;
+		}
+	}
+	
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite all = (Composite) super.createDialogArea(parent);
@@ -489,9 +524,9 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerThread.setSelection(settings.getNumberOfThread());
 		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1 });
 
-		// Miscellaneous settings	
+		// Snapshot settings	
 		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
-		tbtMiscSettings.setText("Misc.");
+		tbtMiscSettings.setText("Snapshot");
 
 		final SashForm sashFormMiscSettings = new SashForm(tabFolder, SWT.VERTICAL);
 		sashFormMiscSettings.setFont(cantarell8);
@@ -499,12 +534,12 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Group groupMiscSettings = new Group(sashFormMiscSettings, SWT.NONE);
 		groupMiscSettings.setFont(cantarell8);
-		groupMiscSettings.setText("Misc. Settings");
+		groupMiscSettings.setText("Snapshot Settings");
 		groupMiscSettings.setLayout(new GridLayout(3, false));
 
 		final Label lblSnapshotDirectory = new Label(groupMiscSettings, SWT.NONE);
 		lblSnapshotDirectory.setFont(cantarell8);
-		lblSnapshotDirectory.setText("Snapshot directory:");
+		lblSnapshotDirectory.setText("Snapshot Directory:");
 
 		final GridData gd_MiscDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_MiscDir.widthHint = 100;
@@ -520,6 +555,28 @@ public class OcelotlSettingsView extends Dialog {
 		btnChangeSnapshotDirectory.setToolTipText("Change Snapshot Directory");
 		btnChangeSnapshotDirectory.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/fldr_obj.gif"));
 		btnChangeSnapshotDirectory.setFont(cantarell8);
+	
+		
+		Label lblsnapshotWidth = new Label(groupMiscSettings, SWT.NONE);
+		lblsnapshotWidth.setFont(cantarell8);
+		lblsnapshotWidth.setText("Snapshot Width");
+		
+		snapshotWidth = new Text(groupMiscSettings, SWT.BORDER);
+		snapshotWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		snapshotWidth.setText(String.valueOf(settings.getSnapshotXResolution()));
+		snapshotWidth.addVerifyListener(new NumericTextFieldVerifyListener());
+		new Label(groupMiscSettings, SWT.NONE);
+		
+		Label lblsnapshotHeight = new Label(groupMiscSettings, SWT.NONE);
+		lblsnapshotHeight.setFont(cantarell8);
+		lblsnapshotHeight.setText("Snapshot Height");
+		
+		snapshotHeight = new Text(groupMiscSettings, SWT.BORDER);
+		snapshotHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		snapshotHeight.setText(String.valueOf(settings.getSnapshotYResolution()));
+		snapshotHeight.addVerifyListener(new NumericTextFieldVerifyListener());
+		new Label(groupMiscSettings, SWT.NONE);
+
 		btnChangeSnapshotDirectory.addSelectionListener(new ModifySnapshotDirectory());
 		
 		return sashFormGlobal;
@@ -563,6 +620,8 @@ public class OcelotlSettingsView extends Dialog {
 		
 		//Misc.
 		modifySnapshotDir();
+		settings.setSnapshotXResolution(Integer.valueOf(snapshotWidth.getText()));
+		settings.setSnapshotYResolution(Integer.valueOf(snapshotHeight.getText()));
 	}
 
 	@Override
