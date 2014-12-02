@@ -14,10 +14,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
@@ -189,6 +192,8 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		table.setHeaderVisible(true);
 		table.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		tableViewer.getTable().addListener(SWT.Resize, new ResizeListener());
+		
 		// Default sorting of the table
 		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(1));
 		tableViewer.getTable().setSortDirection(SWT.UP);
@@ -245,6 +250,25 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	public void dispose() {
 		for (Control c : ocelotlView.getStatComposite().getChildren())
 			c.dispose();
+	}
+	
+	/**
+	 * Resize the columns dynamically
+	 */
+	private class ResizeListener implements Listener {
+
+		@Override
+		public void handleEvent(Event event) {
+			Table table = (Table) event.widget;
+			int columnCount = table.getColumnCount();
+			if (columnCount == 0)
+				return;
+			int totalAreaWdith = table.getClientArea().width;
+			int newWidth = totalAreaWdith / columnCount;
+			for (TableColumn column : table.getColumns()) {
+				column.setWidth(newWidth);
+			}
+		}
 	}
 
 	/**
