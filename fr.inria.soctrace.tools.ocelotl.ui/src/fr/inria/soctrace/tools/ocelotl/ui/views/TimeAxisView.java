@@ -231,7 +231,7 @@ public class TimeAxisView {
 	}
 
 	public void resizeDiagram() {
-		createDiagram(time, selectTime, false);
+		createDiagram(time, selectTime, true);
 		root.repaint();
 	}
 

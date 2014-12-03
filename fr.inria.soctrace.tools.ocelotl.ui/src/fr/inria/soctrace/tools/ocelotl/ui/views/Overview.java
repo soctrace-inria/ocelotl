@@ -82,6 +82,12 @@ public class Overview implements IFramesocBusListener {
 		redrawOverview = true;
 		displayedTimeRegion = null;
 		
+		// Set colors according to the settings
+		displayFGColor = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewDisplayFgColor();
+		displayBGColor = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewDisplayBgColor();
+		selectFGColor = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewSelectionFgColor();
+		selectBGColor = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewSelectionBgColor();
+	
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
@@ -255,6 +261,56 @@ public class Overview implements IFramesocBusListener {
 
 	public void setVisuOperatorName(String visuOperatorName) {
 		this.visuOperatorName = visuOperatorName;
+	}
+
+	public Color getDisplayFGColor() {
+		return displayFGColor;
+	}
+
+	public void setDisplayFGColor(Color displayFGColor) {
+		this.displayFGColor = displayFGColor;
+		if (displayedZone != null) {
+			displayedZone.setForegroundColor(displayFGColor);
+			if(zoomedTimeRegion != null)
+				displayedZone.draw(zoomedTimeRegion, true);
+		}
+	}
+
+	public Color getDisplayBGColor() {
+		return displayBGColor;
+	}
+
+	public void setDisplayBGColor(Color displayBGColor) {
+		this.displayBGColor = displayBGColor;
+		if (displayedZone != null) {
+			displayedZone.setBackgroundColor(displayBGColor);
+			if(zoomedTimeRegion != null)
+				displayedZone.draw(zoomedTimeRegion, true);
+		}
+	}
+
+	public Color getSelectFGColor() {
+		return selectFGColor;
+	}
+
+	public void setSelectFGColor(Color selectFGColor) {
+		this.selectFGColor = selectFGColor;
+		if (selectedZone != null) {
+			selectedZone.setForegroundColor(selectFGColor);
+			drawSelection();
+		}
+	}
+
+	public Color getSelectBGColor() {
+		return selectBGColor;
+	}
+
+	public void setSelectBGColor(Color selectBGColor) {
+		this.selectBGColor = selectBGColor;
+		if (selectedZone != null) {
+			selectedZone.setBackgroundColor(selectBGColor);
+			drawSelection();
+		}
 	}
 
 	/**

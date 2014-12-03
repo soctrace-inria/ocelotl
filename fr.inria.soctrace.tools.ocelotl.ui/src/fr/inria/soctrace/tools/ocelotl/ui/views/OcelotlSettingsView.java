@@ -1,7 +1,6 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.util.HashMap;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -12,10 +11,14 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.ColorDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -64,6 +67,11 @@ public class OcelotlSettingsView extends Dialog {
 	private String								currentDatacacheDir;
 	private Text								snapshotWidth;
 	private Text								snapshotHeight;
+	private Button								btnEditBgDisplay;
+	private Button								btnEditFgDisplay;
+	private Button								btnEditBgSelected;
+	private Button								btnEditFgSelected;
+	private HashMap<Button, Color>				btnColorMap;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -71,6 +79,7 @@ public class OcelotlSettingsView extends Dialog {
 		settings = ocelotlView.getOcelotlParameters().getOcelotlSettings();
 		currentSelectedDatacachePolicy = settings.getCachePolicy();
 		currentDatacacheDir = "";
+		btnColorMap = new HashMap<Button, Color>();
 	}
 
 	public void openDialog() {
@@ -141,7 +150,7 @@ public class OcelotlSettingsView extends Dialog {
 			}
 		}
 	}
-	
+
 	/**
 	 * If necessary, update the snapshot directory
 	 */
@@ -151,7 +160,7 @@ public class OcelotlSettingsView extends Dialog {
 			// If so, update the current datacache path
 			ocelotlView.getSnapshot().setSnapshotDirectory(snapshotDirectory.getText());
 	}
-	
+
 	private class ModifyDatacacheDirectory extends SelectionAdapter {
 
 		@Override
@@ -172,7 +181,6 @@ public class OcelotlSettingsView extends Dialog {
 			}
 		}
 	}
-
 
 	/**
 	 * If necessary, update the cache directory
@@ -198,6 +206,24 @@ public class OcelotlSettingsView extends Dialog {
 			btnRadioButton_3.setEnabled(cacheActivation);
 			cacheTimeSliceValue.setEnabled(cacheActivation);
 			dataCacheSize.setEnabled(cacheActivation);
+		}
+	}
+
+	private class EditColorSelection extends SelectionAdapter {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			if (btnColorMap.containsKey(e.getSource())) {
+				// Get the currently saved color in the map
+				Color c = btnColorMap.get(e.getSource());
+				ColorDialog colorDialog = new ColorDialog(getShell());
+				// Set the default color of the color dialog to the current color
+				colorDialog.setRGB(new RGB(c.getRed(), c.getGreen(), c.getBlue()));
+				RGB rgb = colorDialog.open();
+				// If a color was selected
+				if (rgb != null)
+					// Save the color in the map
+					btnColorMap.put((Button) e.getSource(), new Color(Display.getDefault(), rgb.red, rgb.green, rgb.blue));
+			}
 		}
 	}
 
@@ -238,7 +264,6 @@ public class OcelotlSettingsView extends Dialog {
 		if (settings.getIncreasingQualities() != btnIncreasingQualities.getSelection()) {
 			ocelotlView.getOcelotlParameters().setGrowingQualities(btnIncreasingQualities.getSelection());
 			settings.setIncreasingQualities(btnIncreasingQualities.getSelection());
-			// qualityView.createDiagram();
 		}
 	}
 
@@ -252,8 +277,17 @@ public class OcelotlSettingsView extends Dialog {
 	}
 
 	/**
+	 * Update the overview selection colors
+	 */
+	public void updateOverviewColors() {
+		ocelotlView.getOverView().setDisplayBGColor(btnColorMap.get(btnEditBgDisplay));
+		ocelotlView.getOverView().setDisplayFGColor(btnColorMap.get(btnEditFgDisplay));
+		ocelotlView.getOverView().setSelectFGColor(btnColorMap.get(btnEditFgSelected));
+		ocelotlView.getOverView().setSelectBGColor(btnColorMap.get(btnEditBgSelected));
+	}
+
+	/**
 	 * Make sure that the entered number is a positive integer
-	 *
 	 */
 	private class NumericTextFieldVerifyListener implements VerifyListener {
 
@@ -275,13 +309,13 @@ public class OcelotlSettingsView extends Dialog {
 			} catch (NumberFormatException ex) {
 				isValid = false;
 			}
-			
+
 			// If not valid do not update the text
 			if (!isValid)
 				e.doit = false;
 		}
 	}
-	
+
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite all = (Composite) super.createDialogArea(parent);
@@ -524,13 +558,13 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerThread.setSelection(settings.getNumberOfThread());
 		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1 });
 
-		// Snapshot settings	
+		// Snapshot settings
 		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtMiscSettings.setText("Snapshot");
 
 		final SashForm sashFormMiscSettings = new SashForm(tabFolder, SWT.VERTICAL);
-		sashFormMiscSettings.setFont(cantarell8);
 		tbtMiscSettings.setControl(sashFormMiscSettings);
+		sashFormMiscSettings.setFont(cantarell8);
 
 		final Group groupMiscSettings = new Group(sashFormMiscSettings, SWT.NONE);
 		groupMiscSettings.setFont(cantarell8);
@@ -555,22 +589,21 @@ public class OcelotlSettingsView extends Dialog {
 		btnChangeSnapshotDirectory.setToolTipText("Change Snapshot Directory");
 		btnChangeSnapshotDirectory.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/fldr_obj.gif"));
 		btnChangeSnapshotDirectory.setFont(cantarell8);
-	
-		
+
 		Label lblsnapshotWidth = new Label(groupMiscSettings, SWT.NONE);
 		lblsnapshotWidth.setFont(cantarell8);
 		lblsnapshotWidth.setText("Snapshot Width");
-		
+
 		snapshotWidth = new Text(groupMiscSettings, SWT.BORDER);
 		snapshotWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		snapshotWidth.setText(String.valueOf(settings.getSnapshotXResolution()));
 		snapshotWidth.addVerifyListener(new NumericTextFieldVerifyListener());
 		new Label(groupMiscSettings, SWT.NONE);
-		
+
 		Label lblsnapshotHeight = new Label(groupMiscSettings, SWT.NONE);
 		lblsnapshotHeight.setFont(cantarell8);
 		lblsnapshotHeight.setText("Snapshot Height");
-		
+
 		snapshotHeight = new Text(groupMiscSettings, SWT.BORDER);
 		snapshotHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		snapshotHeight.setText(String.valueOf(settings.getSnapshotYResolution()));
@@ -578,7 +611,61 @@ public class OcelotlSettingsView extends Dialog {
 		new Label(groupMiscSettings, SWT.NONE);
 
 		btnChangeSnapshotDirectory.addSelectionListener(new ModifySnapshotDirectory());
+
+		// Overview settings
+		final TabItem tbtOverviewSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtOverviewSettings.setText("Overview");
+
+		final SashForm sashFormOverviewSettings = new SashForm(tabFolder, SWT.VERTICAL);
+		sashFormOverviewSettings.setFont(cantarell8);
+		tbtOverviewSettings.setControl(sashFormOverviewSettings);
+
+
+		final Group groupOverviewSettings = new Group(sashFormOverviewSettings, SWT.NONE);
+		groupOverviewSettings.setFont(cantarell8);
+		groupOverviewSettings.setText("Snapshot Settings");
+		groupOverviewSettings.setLayout(new GridLayout(2, false));
 		
+		final Label lblBgDisplay = new Label(groupOverviewSettings, SWT.NONE);
+		lblBgDisplay.setFont(cantarell8);
+		lblBgDisplay.setText("Display Background:");
+
+		btnEditBgDisplay = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditBgDisplay.setToolTipText("Edit Color");
+		btnEditBgDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgDisplay, settings.getOverviewDisplayBgColor());
+
+		final Label lblFgDisplay = new Label(groupOverviewSettings, SWT.NONE);
+		lblFgDisplay.setFont(cantarell8);
+		lblFgDisplay.setText("Display Foreground:");
+
+		btnEditFgDisplay = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditFgDisplay.setToolTipText("Edit Color");
+		btnEditFgDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgDisplay, settings.getOverviewDisplayFgColor());
+		
+		final Label lblBgSelect = new Label(groupOverviewSettings, SWT.NONE);
+		lblBgSelect.setFont(cantarell8);
+		lblBgSelect.setText("Selection Background:");
+
+		btnEditBgSelected = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditBgSelected.setToolTipText("Edit Color");
+		btnEditBgSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgSelected, settings.getOverviewSelectionBgColor());
+		
+		final Label lblFgSelect = new Label(groupOverviewSettings, SWT.NONE);
+		lblFgSelect.setFont(cantarell8);
+		lblFgSelect.setText("Selection Foreground:");
+
+		btnEditFgSelected = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditFgSelected.setToolTipText("Edit Color");
+		btnEditFgSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgSelected, settings.getOverviewSelectionFgColor());
+
 		return sashFormGlobal;
 	}
 
@@ -617,11 +704,18 @@ public class OcelotlSettingsView extends Dialog {
 		modifyThreshold();
 		modifyNormalize();
 		modifyIncreasingQuality();
-		
-		//Misc.
+
+		// Misc.
 		modifySnapshotDir();
 		settings.setSnapshotXResolution(Integer.valueOf(snapshotWidth.getText()));
 		settings.setSnapshotYResolution(Integer.valueOf(snapshotHeight.getText()));
+		
+		//Overview colors
+		settings.setOverviewDisplayBgColor(btnColorMap.get(btnEditBgDisplay));
+		settings.setOverviewDisplayFgColor(btnColorMap.get(btnEditFgDisplay));
+		settings.setOverviewSelectionBgColor(btnColorMap.get(btnEditBgSelected));
+		settings.setOverviewSelectionFgColor(btnColorMap.get(btnEditFgSelected));
+		updateOverviewColors();
 	}
 
 	@Override

@@ -14,7 +14,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -95,7 +94,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	public void handle(FramesocBusTopic topic, Object data) {
 		// If color has changed
 		if ((topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED))) {
-			if (statProvider != null && tableViewer != null) {
+			if (statProvider != null && statProvider.getTableData() != null && tableViewer != null) {
 				// Get rid of the cached images
 				disposeImages();
 				// Update colors and the table

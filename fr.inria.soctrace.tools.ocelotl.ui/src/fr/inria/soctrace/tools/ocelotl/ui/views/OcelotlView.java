@@ -92,7 +92,7 @@ import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
-import fr.inria.soctrace.tools.ocelotl.ui.snpashot.Snapshot;
+import fr.inria.soctrace.tools.ocelotl.ui.snapshot.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.IStatView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatViewWrapper;

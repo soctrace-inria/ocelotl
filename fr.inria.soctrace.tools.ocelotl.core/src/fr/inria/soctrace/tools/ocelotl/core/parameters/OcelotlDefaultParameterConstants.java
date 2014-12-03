@@ -1,5 +1,8 @@
 package fr.inria.soctrace.tools.ocelotl.core.parameters;
 
+import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.swt.graphics.Color;
+
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 
 /*
@@ -83,6 +86,14 @@ public class OcelotlDefaultParameterConstants {
 	 */
 	public static final String OVERVIEW_AGGREG_OPERATOR = "Temporal Aggregation";
 	
+	/**
+	 * Colors for the overview
+	 */
+	public static final Color OVERVIEW_DISPLAY_FG_COLOR = ColorConstants.black;
+	public static final Color OVERVIEW_DISPLAY_BG_COLOR = ColorConstants.red;
+	public static final Color OVERVIEW_SELECT_FG_COLOR = ColorConstants.white;
+	public static final Color OVERVIEW_SELECT_BG_COLOR = ColorConstants.black;
+
 	/**
 	 * Number of events loaded by thread
 	 */

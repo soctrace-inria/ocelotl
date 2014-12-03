@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.ui.snpashot;
+package fr.inria.soctrace.tools.ocelotl.ui.snapshot;
 
 import java.lang.reflect.InvocationTargetException;
 

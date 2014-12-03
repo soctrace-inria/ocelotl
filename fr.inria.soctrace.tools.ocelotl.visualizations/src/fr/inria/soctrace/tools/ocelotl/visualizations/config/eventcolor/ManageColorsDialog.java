@@ -135,7 +135,6 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 	/**
 	 * Constructor
 	 * @param parentShell shell
-	 * @param tools tools map: it will be copied
 	 */
 	public ManageColorsDialog(Shell parentShell) {
 		super(parentShell);

@@ -75,9 +75,33 @@ public class OcelotlConstants {
 	/**
 	 * Size of the configuration file
 	 */
-	static final public int CONFIGURATION_NORMAL_SIZE = 14;
-
 	public static final String MultipleValueExtensionSeparator = ", ";
 	
 	public static final int MinimalHeightDrawingThreshold = 1;
+	
+	/**
+	 * JSON Config constants
+	 */
+	public static final String JSONCacheActivated = "cacheActivated";
+	public static final String JSONCacheDirectory = "cacheDirectory";
+	public static final String JSONCacheSize = "cacheSize";
+	public static final String JSONSnapShotDirectory = "snapShotDirectory";
+	public static final String JSONCachePolicy = "cachePolicy";
+	public static final String JSONCacheTimeSliceNumber = "cacheTimeSliceNumber";
+	public static final String JSONEventsPerThread = "eventsPerThread";
+	public static final String JSONMaxEventProducersPerQuery = "maxEventProducersPerQuery";
+	public static final String JSONNumberOfThread = "numberOfThread";
+	public static final String JSONNormalizedCurve = "normalizedCurve";
+	public static final String JSONThresholdPrecision = "thresholdPrecision";
+	public static final String JSONIncreasingQualities = "increasingQualities";
+	public static final String JSONSnapshotXResolution = "snapshotXResolution";
+	public static final String JSONSnapshotYResolution = "snapshotYResolution";
+
+	public static final String JSONOverviewAggregOperator = "overviewAggregOperator";
+	public static final String JSONOverviewTimesliceNumber = "overviewTimesliceNumber";
+	public static final String JSONOverviewSelectionFgColor = "overviewSelectionFgColor";
+	public static final String JSONOverviewSelectionBgColor = "overviewSelectionBgColor";
+	public static final String JSONOverviewDisplayFgColor = "overviewDisplayFgColor";
+	public static final String JSONOverviewDisplayBgColor = "overviewDisplayBgColor";
+	
 }

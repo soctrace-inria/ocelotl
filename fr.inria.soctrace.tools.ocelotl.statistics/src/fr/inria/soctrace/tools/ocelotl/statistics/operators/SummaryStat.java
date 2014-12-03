@@ -123,7 +123,6 @@ public class SummaryStat extends StatisticsProvider {
 		for (ITableRow aRow : statData) {
 			SummaryStatModel aStat = (SummaryStatModel) aRow;
 			try {
-
 				aStat.setColor(FramesocColorManager
 						.getInstance()
 						.getEventTypeColor(
