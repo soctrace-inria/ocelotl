@@ -158,7 +158,10 @@ public class SummaryStat extends StatisticsProvider {
 				double aProportion, Color aColor) {
 			this.fields.put(OcelotlStatisticsTableColumn.NAME, aName);
 
-			NumberFormat occurenceFormatter = new DecimalFormat("#0.00E00");
+			NumberFormat occurenceFormatter = new DecimalFormat("#0.00E0");
+			// Set the maximum number of digit to 3 to get the engineering
+			// notation
+			occurenceFormatter.setMaximumIntegerDigits(3);
 			this.fields.put(OcelotlStatisticsTableColumn.OCCURRENCES,
 					occurenceFormatter.format(aValue));
 

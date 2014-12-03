@@ -129,6 +129,7 @@ public class TimeAxisView {
 		NumberFormat formatter = null;
 		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
 		formatter = new DecimalFormat("0.00E0");
+		formatter.setMaximumIntegerDigits(3);
 		final int linePosition = root.getSize().height() - TextHeight / 2 - TextPositionOffset - Border;
 		for (int i = 0; i < (int) GradNumber + 1; i++) {
 			final RectangleFigure rectangle = new RectangleFigure();

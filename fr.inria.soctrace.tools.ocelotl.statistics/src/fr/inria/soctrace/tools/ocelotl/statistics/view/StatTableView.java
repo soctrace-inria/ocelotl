@@ -302,7 +302,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			int rc = 0;
 			try {
 				if (this.col.equals(OcelotlStatisticsTableColumn.OCCURRENCES)) {
-					// number comparison
+					// Number comparison
 					// If using a decimal separator, then parse with the local
 					// separator (dot or comma)
 					NumberFormat format = NumberFormat.getInstance();
