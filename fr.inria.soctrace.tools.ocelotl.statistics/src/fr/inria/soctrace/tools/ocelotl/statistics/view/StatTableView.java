@@ -194,8 +194,8 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		tableViewer.getTable().addListener(SWT.Resize, new ResizeListener());
 		
 		// Default sorting of the table
-		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(1));
-		tableViewer.getTable().setSortDirection(SWT.UP);
+		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(2));
+		tableViewer.getTable().setSortDirection(SWT.DOWN);
 	}
 
 	private void createColumns() {
@@ -275,7 +275,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	 * framesoc)
 	 */
 	public class OcelotlStatisticsColumnComparator extends ViewerComparator {
-		private OcelotlStatisticsTableColumn col = OcelotlStatisticsTableColumn.PERCENTAGE;
+		private OcelotlStatisticsTableColumn col = OcelotlStatisticsTableColumn.OCCURRENCES;
 		private int direction = SWT.DOWN;
 
 		public int getDirection() {
