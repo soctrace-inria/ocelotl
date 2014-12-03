@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.lib.utils,
  fr.inria.lpaggreg,
  fr.inria.soctrace.tools.ocelotl.slf4j;bundle-version="1.0.0",
- com.google.gson
+ fr.inria.soctrace.tools.ocelotl.json;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.ocelotl.core,
