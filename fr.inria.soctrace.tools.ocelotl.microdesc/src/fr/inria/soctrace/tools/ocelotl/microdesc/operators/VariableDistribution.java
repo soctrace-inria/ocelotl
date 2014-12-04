@@ -84,12 +84,13 @@ public class VariableDistribution extends Microscopic3DDescription {
 
 		@Override
 		public void run() {
-			while (true) {
-				final List<Event> events = getEvents(size, monitor);
-				if (events.size() == 0)
-					break;
-				if (monitor.isCanceled())
-					return;
+				EventProducer currentEP=null;
+				while (true) {
+					final List<Event> events = getEvents(size, monitor);
+					if (events.size() == 0)
+						break;
+					if (monitor.isCanceled())
+						return;
 				
 				IVariable variable;
 				for (final Event event : events) {
@@ -98,10 +99,13 @@ public class VariableDistribution extends Microscopic3DDescription {
 							.getTimeSlicesDistribution();
 					matrixUpdate(variable, event.getEventProducer(), distrib);
 					
+					if (currentEP==null || currentEP.getId() != event.getEventProducer().getId()){
+						currentEP=event.getEventProducer();
 					// If the event producer is not in the active producers list
-					if (!localActiveEventProducers.contains(event.getEventProducer())) {
-						// Add it
-						localActiveEventProducers.add(event.getEventProducer());
+						if (!localActiveEventProducers.contains(event.getEventProducer())) {
+							// Add it
+							localActiveEventProducers.add(event.getEventProducer());
+						}
 					}
 					if (monitor.isCanceled())
 						return;
