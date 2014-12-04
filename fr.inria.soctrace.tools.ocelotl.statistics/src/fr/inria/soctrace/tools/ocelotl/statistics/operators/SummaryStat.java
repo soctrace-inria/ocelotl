@@ -71,15 +71,16 @@ public class SummaryStat extends StatisticsProvider {
 		statData = new ArrayList<ITableRow>();
 
 		// Create the data objects for the table
-		for (String ep : data.keySet()) {
+		for (String et : data.keySet()) {
 			double proportion = 0.0;
-			// If there was no value in the selected zone, let proportion at 0
+			// If there was no value in the selected zone, let the proportion
+			// value at 0
 			if (total != 0)
-				proportion = (data.get(ep) / total) * 100;
-			
-			statData.add(new SummaryStatModel(ep, data.get(ep),
+				proportion = (data.get(et) / total) * 100;
+
+			statData.add(new SummaryStatModel(et, data.get(et),
 					proportion, FramesocColorManager
-							.getInstance().getEventTypeColor(ep).getSwtColor()));
+							.getInstance().getEventTypeColor(et).getSwtColor()));
 		}
 	}
 

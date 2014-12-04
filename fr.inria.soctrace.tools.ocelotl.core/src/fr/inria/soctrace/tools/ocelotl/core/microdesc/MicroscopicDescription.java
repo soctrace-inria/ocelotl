@@ -38,6 +38,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected DataCache dataCache;
 	protected DeltaManagerOcelotl dm;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
+	protected ArrayList<EventProducer> inactiveProducers = new ArrayList<EventProducer>();
 	protected OcelotlParameters parameters;
 
 	protected EventIterator eventIterator;
@@ -51,6 +52,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			.getLogger(MicroscopicDescription.class);
 
 	public MicroscopicDescription() {
+		
 	}
 
 	public MicroscopicDescription(OcelotlParameters param) {
@@ -762,6 +764,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			InterruptedException, OcelotlException {
 
 		initVectors();
+		inactiveProducers.addAll(parameters.getCurrentProducers());
 
 		// If the cache is enabled
 		if (parameters.getOcelotlSettings().isCacheActivated()) {
@@ -870,6 +873,14 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 	public void setEventsNumber(int eventsNumber) {
 		this.eventsNumber = eventsNumber;
+	}
+
+	public ArrayList<EventProducer> getInactiveProducers() {
+		return inactiveProducers;
+	}
+
+	public void setInactiveProducers(ArrayList<EventProducer> inactiveProducers) {
+		this.inactiveProducers = inactiveProducers;
 	}
 
 	public OcelotlParameters getOcelotlParameters() {

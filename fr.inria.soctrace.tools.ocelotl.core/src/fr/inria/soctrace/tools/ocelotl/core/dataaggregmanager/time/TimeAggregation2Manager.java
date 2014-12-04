@@ -20,9 +20,11 @@
 package fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+
 import fr.inria.lpaggreg.time.JNITimeAggregation2;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic2DDescription;
@@ -35,6 +37,7 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 	public TimeAggregation2Manager(final MicroscopicDescription matrix, IProgressMonitor monitor) {
 		super(matrix.getOcelotlParameters());
 		this.matrix = (Microscopic2DDescription) matrix;
+		simplifyMatrix();
 		reset(monitor);
 	}
 
@@ -63,5 +66,33 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 	public void reset(IProgressMonitor monitor) {
 		timeAggregation = new JNITimeAggregation2();
 		fillVectors(monitor);
+	}
+
+	/**
+	 * Remove event producers that do not produce any event (better
+	 * performances)
+	 */
+	protected void simplifyMatrix() {
+
+		// Get all the inactive producers
+		// For each slice
+		for (final HashMap<EventProducer, Double> it : matrix.getMatrix()) {
+			// For each event producer
+			for (final EventProducer ep : it.keySet()) {
+				if (it.get(ep) != 0)
+					matrix.getInactiveProducers().remove(ep);
+			}
+		}
+
+		if (matrix.getInactiveProducers().size() == 0)
+			return;
+
+		// Remove the inactive producers
+		for (final HashMap<EventProducer, Double> it : matrix.getMatrix()) {
+			// For each inactive event producer
+			for (final EventProducer ep : matrix.getInactiveProducers()) {
+				it.remove(ep);
+			}
+		}
 	}
 }

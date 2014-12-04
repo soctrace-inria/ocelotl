@@ -597,6 +597,7 @@ public class OcelotlSettingsView extends Dialog {
 		snapshotWidth = new Text(groupMiscSettings, SWT.BORDER);
 		snapshotWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		snapshotWidth.setFont(cantarell8);
+		snapshotWidth.setToolTipText("Width of the Generated Image in Pixels");
 		snapshotWidth.setText(String.valueOf(settings.getSnapshotXResolution()));
 		snapshotWidth.addVerifyListener(new NumericTextFieldVerifyListener());
 		new Label(groupMiscSettings, SWT.NONE);
@@ -609,6 +610,7 @@ public class OcelotlSettingsView extends Dialog {
 		snapshotHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		snapshotHeight.setText(String.valueOf(settings.getSnapshotYResolution()));
 		snapshotHeight.setFont(cantarell8);
+		snapshotHeight.setToolTipText("Height of the Generated Image in Pixels");
 		snapshotHeight.addVerifyListener(new NumericTextFieldVerifyListener());
 		new Label(groupMiscSettings, SWT.NONE);
 
