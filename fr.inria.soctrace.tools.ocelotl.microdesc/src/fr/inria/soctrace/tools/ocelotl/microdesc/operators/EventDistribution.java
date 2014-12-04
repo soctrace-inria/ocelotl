@@ -113,7 +113,7 @@ public class EventDistribution extends Microscopic3DDescription {
 					// state.getTimeSlicesDistribution();
 					matrixUpdate(event, event.getEventProducer());
 					
-					if (currentEP==null || currentEP.getId() != event.getEventProducer().getId()){
+					if (currentEP != event.getEventProducer()){
 						currentEP=event.getEventProducer();
 					// If the event producer is not in the active producers list
 						if (!localActiveEventProducers.contains(event.getEventProducer())) {

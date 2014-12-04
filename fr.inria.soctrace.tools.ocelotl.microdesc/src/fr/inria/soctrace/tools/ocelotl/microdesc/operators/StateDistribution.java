@@ -110,7 +110,7 @@ public class StateDistribution extends Microscopic3DDescription {
 					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
 					matrixUpdate(state, event.getEventProducer(), distrib);
-					if (currentEP==null || currentEP.getId() != event.getEventProducer().getId()){
+					if (currentEP != event.getEventProducer()){
 						currentEP=event.getEventProducer();
 					// If the event producer is not in the active producers list
 						if (!localActiveEventProducers.contains(event.getEventProducer())) {

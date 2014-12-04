@@ -99,7 +99,7 @@ public class VariableDistribution extends Microscopic3DDescription {
 							.getTimeSlicesDistribution();
 					matrixUpdate(variable, event.getEventProducer(), distrib);
 					
-					if (currentEP==null || currentEP.getId() != event.getEventProducer().getId()){
+					if (currentEP != event.getEventProducer()){
 						currentEP=event.getEventProducer();
 					// If the event producer is not in the active producers list
 						if (!localActiveEventProducers.contains(event.getEventProducer())) {
