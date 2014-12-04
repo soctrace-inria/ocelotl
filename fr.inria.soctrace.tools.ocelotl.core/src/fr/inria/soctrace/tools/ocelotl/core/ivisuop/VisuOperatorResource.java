@@ -36,6 +36,7 @@ public class VisuOperatorResource {
 	String bundle;
 	int selectionPriority;
 	String overviewVisualization;
+	String yAxisView;
 
 	public VisuOperatorResource() {
 		// TODO Auto-generated constructor stub
@@ -139,6 +140,14 @@ public class VisuOperatorResource {
 
 	public void setOverviewVisualization(String overviewVisualization) {
 		this.overviewVisualization = overviewVisualization;
+	}
+
+	public String getYAxisView() {
+		return yAxisView;
+	}
+
+	public void setYAxisView(String yAxisView) {
+		this.yAxisView = yAxisView;
 	}
 	
 }

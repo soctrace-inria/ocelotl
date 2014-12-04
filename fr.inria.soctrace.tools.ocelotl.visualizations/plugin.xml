@@ -14,6 +14,7 @@
             aggregator_compatibility="2D"
             selection_priority="4"
             overview_visualization="Temporal Mode"
+            unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.ProportionAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.TemporalPartitionView">
       </visualization_operator>
       <visualization_operator
@@ -25,6 +26,7 @@
             aggregator_compatibility="2D"
             selection_priority="3"
             overview_visualization="Temporal Mode"
+            unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.ProportionAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.TemporalProportionView">
       </visualization_operator>
       <visualization_operator
@@ -36,6 +38,7 @@
             aggregator_compatibility="3D"
             selection_priority="2"
             overview_visualization="Temporal Mode"
+            unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.views.HierarchyAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.views.SpatiotemporalPartitionView">
       </visualization_operator>
       <visualization_operator
@@ -47,6 +50,7 @@
             aggregator_compatibility="3D"
             selection_priority="1"
             overview_visualization="Temporal Mode"
+            unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.views.HierarchyAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views.SpatiotemporalModeView">
       </visualization_operator>
   	  <visualization_operator
@@ -58,6 +62,7 @@
             aggregator_compatibility="2D"
             selection_priority="5"
             overview_visualization="Temporal Mode"
+            unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.ProportionAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.views.TemporalModeView">
       </visualization_operator>
    </extension>

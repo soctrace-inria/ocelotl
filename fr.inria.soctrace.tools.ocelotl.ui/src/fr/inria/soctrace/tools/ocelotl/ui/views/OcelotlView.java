@@ -100,6 +100,9 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
+import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewManager;
+import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewWrapper;
 
 /**
  * Main view for Ocelotl
@@ -429,6 +432,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							snapshotAction.setEnabled(true);
 							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+							unitAxisView.deleteDiagram();
+							unitAxisView.createDiagram(ocelotlCore.getVisuOperator());
 							
 							try {
 								overView.updateDiagram(ocelotlParameters.getTimeRegion());
@@ -553,6 +558,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			ocelotlCore.getVisuOperators().setSelectedOperator(comboVisu.getText());
 			timeLineView = timeLineViewManager.create();
 			timeLineViewWrapper.setView(timeLineView);
+			unitAxisView = unitAxisViewManager.create();
+			unitAxisViewWrapper.setView(unitAxisView);
 			
 			// If the overview visu operator is different, then redraw it
 			if (!ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization().equals(overView.getVisuOperatorName()))
@@ -934,6 +941,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private QualityView					qualityView;
 	private Spinner						spinnerTSNumber;
 	private TimeAxisView				timeAxisView;
+	private UnitAxisView				unitAxisView;
 	private Text						textTimestampEnd;
 	private Text						textTimestampStart;
 	final Map<Integer, Trace>			traceMap		= new HashMap<Integer, Trace>();
@@ -944,9 +952,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button						btnSaveDataCache;
 	private Combo						comboVisu;
 	private final TimeLineViewManager	timeLineViewManager;
+	private final UnitAxisViewManager	unitAxisViewManager;
 	private Composite					compositeMatrixView;
 	private SashForm					sashFormView;
 	private TimeLineViewWrapper			timeLineViewWrapper;
+	private UnitAxisViewWrapper			unitAxisViewWrapper;
 	private StatViewManager				statViewManager;
 	private StatViewWrapper				statViewWrapper;
 	private Button						btnSettings2;
@@ -989,6 +999,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlCore = new OcelotlCore(ocelotlParameters);
 		timeLineViewManager = new TimeLineViewManager(this);
 		statViewManager = new StatViewManager(this);
+		unitAxisViewManager = new UnitAxisViewManager(this);
 
 		try {
 			ocelotlParameters.getDataCache().setSettings(ocelotlParameters.getOcelotlSettings());
@@ -1080,6 +1091,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		qualityView = new QualityView(this);
 		timeLineViewWrapper = new TimeLineViewWrapper(this);
 		statViewWrapper = new StatViewWrapper(this);
+		unitAxisViewWrapper = new UnitAxisViewWrapper(this);
 		overView = new Overview(this);
 		cantarell8 = new Font(sashFormGlobal.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
 
@@ -1171,12 +1183,30 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		// Display of aggregation results
 		final SashForm sashForm_4 = new SashForm(sashFormView, SWT.BORDER | SWT.VERTICAL);
-		compositeMatrixView = new Composite(sashForm_4, SWT.BORDER);
+		final Composite subComposite = new Composite(sashForm_4, SWT.BORDER);
+		subComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		subComposite.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
+		subComposite.setSize(500, 500);
+		subComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		final SashForm sashForm_5 = new SashForm(subComposite, SWT.BORDER | SWT.HORIZONTAL);
+		
+		// Set unit axis
+		final Composite compositeUnitAxisView = new Composite(sashForm_5, SWT.BORDER);
+		compositeUnitAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		unitAxisViewWrapper.init(compositeUnitAxisView);
+		final FillLayout fl_compositeUnitAxisView = new FillLayout(SWT.VERTICAL);
+		compositeUnitAxisView.setLayout(fl_compositeUnitAxisView);
+		
+		compositeMatrixView = new Composite(sashForm_5, SWT.BORDER);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
 		timeLineViewWrapper.init(compositeMatrixView);
 		compositeMatrixView.setLayout(new FillLayout(SWT.HORIZONTAL));
+		
+		sashForm_5.setWeights(new int[] {24, 388});
+
+		// Time axis 
 		final Composite compositeTimeAxisView = new Composite(sashForm_4, SWT.BORDER);
 		compositeTimeAxisView.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		timeAxisView.initDiagram(compositeTimeAxisView);

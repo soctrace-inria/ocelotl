@@ -182,7 +182,9 @@ public class OcelotlSettings {
 				e.printStackTrace();
 			} catch (JsonParseException e) {
 				e.printStackTrace();
-				logger.error("Invalid JSON configuration file: default values will be used ");
+				logger.error("Invalid JSON configuration file: default values will be used");
+				// Regenerate the configuration file with the default settings
+				saveSettings();
 			}
 		}
 	}
