@@ -72,6 +72,7 @@ public class EventDistribution extends Microscopic3DDescription {
 		}
 
 		private void matrixUpdate(final Event event, final EventProducer ep) {
+			// Mutex
 			synchronized (getMatrix()) {
 				// If the event type is not in the matrix yet
 				if (!getMatrix().get(0).get(ep)
@@ -91,6 +92,12 @@ public class EventDistribution extends Microscopic3DDescription {
 				final long slice = getTimeSliceManager().getTimeSlice(event
 						.getTimestamp());
 				matrixWrite(slice, ep, event.getType().getName());
+				
+				// If the event producer is still flag as inactive
+				if (getInactiveProducers().contains(ep)) {
+					// Remove it
+					getInactiveProducers().remove(ep);
+				}
 			}
 		}
 

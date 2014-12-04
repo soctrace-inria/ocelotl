@@ -73,17 +73,6 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 	 * performances)
 	 */
 	protected void simplifyMatrix() {
-
-		// Get all the inactive producers
-		// For each slice
-		for (final HashMap<EventProducer, Double> it : matrix.getMatrix()) {
-			// For each event producer
-			for (final EventProducer ep : it.keySet()) {
-				if (it.get(ep) != 0)
-					matrix.getInactiveProducers().remove(ep);
-			}
-		}
-
 		if (matrix.getInactiveProducers().size() == 0)
 			return;
 

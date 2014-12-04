@@ -71,6 +71,7 @@ public class StateDistribution extends Microscopic3DDescription {
 
 		protected void matrixUpdate(final IState state, final EventProducer ep,
 				final Map<Long, Double> distrib) {
+			// Mutex
 			synchronized (getMatrix()) {
 				// If the event type is not in the matrix yet
 				if (!getMatrix().get(0).get(ep)
@@ -85,6 +86,12 @@ public class StateDistribution extends Microscopic3DDescription {
 				}
 				for (final long it : distrib.keySet())
 					matrixWrite(it, ep, state.getType(), distrib);
+				
+				// If the event producer is still flag as inactive
+				if (getInactiveProducers().contains(ep)) {
+					// Remove it
+					getInactiveProducers().remove(ep);
+				}
 			}
 		}
 		
