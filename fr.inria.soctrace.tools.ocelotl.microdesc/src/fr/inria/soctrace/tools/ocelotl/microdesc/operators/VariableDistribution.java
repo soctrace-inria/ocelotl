@@ -46,7 +46,7 @@ public class VariableDistribution extends Microscopic3DDescription {
 	
 	class OcelotlThread extends Thread {
 
-		List<EventProducer> eventProducers;
+		List<EventProducer> localActiveEventProducers;
 		int threadNumber;
 		int thread;
 		int size;
@@ -59,7 +59,8 @@ public class VariableDistribution extends Microscopic3DDescription {
 			this.thread = thread;
 			this.size = size;
 			this.monitor = monitor;
-
+			localActiveEventProducers = new ArrayList<EventProducer>();
+			
 			start();
 		}
 
@@ -78,12 +79,6 @@ public class VariableDistribution extends Microscopic3DDescription {
 				}
 				for (final long it : distrib.keySet())
 					matrixWrite(it, ep, variable.getType(), distrib);
-				
-				// If the event producer is still flag as inactive
-				if (getInactiveProducers().contains(ep)) {
-					// Remove it
-					getInactiveProducers().remove(ep);
-				}
 			}
 		}
 
@@ -102,8 +97,21 @@ public class VariableDistribution extends Microscopic3DDescription {
 					final Map<Long, Double> distrib = variable
 							.getTimeSlicesDistribution();
 					matrixUpdate(variable, event.getEventProducer(), distrib);
+					
+					// If the event producer is not in the active producers list
+					if (!localActiveEventProducers.contains(event.getEventProducer())) {
+						// Add it
+						localActiveEventProducers.add(event.getEventProducer());
+					}
 					if (monitor.isCanceled())
 						return;
+				}
+			}
+			// Merge local active event producers to the global one
+			synchronized (activeProducers) {
+				for (EventProducer ep : localActiveEventProducers) {
+					if (!activeProducers.contains(ep))
+						activeProducers.add(ep);
 				}
 			}
 		}
