@@ -39,6 +39,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected DeltaManagerOcelotl dm;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
 	protected ArrayList<EventProducer> inactiveProducers = new ArrayList<EventProducer>();
+	protected ArrayList<EventProducer> activeProducers = new ArrayList<EventProducer>();
 	protected OcelotlParameters parameters;
 
 	protected EventIterator eventIterator;
@@ -808,6 +809,17 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		} else {
 			buildNormalMatrix(monitor);
 		}
+		computeActiveProducers();
+	}
+	
+	/**
+	 * Set a list of active (i.e.producing events) producers, by making the
+	 * difference between the current producers and the inactive ones
+	 */
+	public void computeActiveProducers() {
+		for (EventProducer ep : parameters.getCurrentProducers())
+			if (!inactiveProducers.contains(ep))
+				activeProducers.add(ep);
 	}
 
 	public void total(final int rows) {
@@ -881,6 +893,14 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 	public void setInactiveProducers(ArrayList<EventProducer> inactiveProducers) {
 		this.inactiveProducers = inactiveProducers;
+	}
+
+	public ArrayList<EventProducer> getActiveProducers() {
+		return activeProducers;
+	}
+
+	public void setActiveProducers(ArrayList<EventProducer> activeProducers) {
+		this.activeProducers = activeProducers;
 	}
 
 	public OcelotlParameters getOcelotlParameters() {

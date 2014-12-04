@@ -65,6 +65,7 @@ public class VariableDistribution extends Microscopic3DDescription {
 
 		private void matrixUpdate(final IVariable variable, final EventProducer ep,
 				final Map<Long, Double> distrib) {
+			// Mutex
 			synchronized (getMatrix()) {
 				if (!getMatrix().get(0).get(ep).containsKey(variable.getType())) {
 					logger.debug("Adding " + variable.getType()
@@ -77,6 +78,12 @@ public class VariableDistribution extends Microscopic3DDescription {
 				}
 				for (final long it : distrib.keySet())
 					matrixWrite(it, ep, variable.getType(), distrib);
+				
+				// If the event producer is still flag as inactive
+				if (getInactiveProducers().contains(ep)) {
+					// Remove it
+					getInactiveProducers().remove(ep);
+				}
 			}
 		}
 
