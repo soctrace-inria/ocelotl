@@ -115,6 +115,10 @@ public class EventProducerHierarchy {
 				parentNode = eventProducerNodes.get(me.getParentId());
 				parentNode.addChild(this);
 				hierarchyLevel = parentNode.getHierarchyLevel() + 1;
+				
+				if(hierarchyLevel > maxHierarchyLevel)
+					maxHierarchyLevel = hierarchyLevel;
+				
 				orphans.remove(id);
 			} catch (NullPointerException e) {
 				parentNode = null;
@@ -350,6 +354,7 @@ public class EventProducerHierarchy {
 	private Map<Integer, EventProducerNode> leaves = new HashMap<Integer, EventProducerNode>();
 	private Map<Integer, EventProducer> eventProducers = new HashMap<Integer, EventProducer>();
 	private EventProducerNode root = null;
+	protected int maxHierarchyLevel;
 
 	public EventProducerHierarchy(List<EventProducer> eventProducers) throws OcelotlException {
 		super();
@@ -357,6 +362,7 @@ public class EventProducerHierarchy {
 			this.eventProducers.put(ep.getId(), ep);
 		}
 		root = null;
+		maxHierarchyLevel = 0;
 		setHierarchy();
 	}
 
@@ -432,7 +438,33 @@ public class EventProducerHierarchy {
 	public Object getValues(int id) {
 		return eventProducerNodes.get(id).getValues();
 	}
-	
+
+	public int getMaxHierarchyLevel() {
+		return maxHierarchyLevel;
+	}
+
+	public void setMaxHierarchyLevel(int maxHierarchyLevel) {
+		this.maxHierarchyLevel = maxHierarchyLevel;
+	}
+
+	/**
+	 * Get all the producer nodes of a given level of hierarchy
+	 * 
+	 * @param hierarchyLevel
+	 *            the wanted hierarchy level
+	 * @return the list of corresponding event producer nodes
+	 */
+	public ArrayList<EventProducerNode> getEventProducerNodesFromHierarchyLevel(
+			int hierarchyLevel) {
+		ArrayList<EventProducerNode> selectedEpn = new ArrayList<EventProducerNode>();
+
+		for (EventProducerNode epn : eventProducerNodes.values()) {
+			if (epn.getHierarchyLevel() == hierarchyLevel)
+				selectedEpn.add(epn);
+		}
+		return selectedEpn;
+	}
+
 	/**
 	 * Find the node the lowest in the hierarchy that contains all the event
 	 * producer nodes given as arguments

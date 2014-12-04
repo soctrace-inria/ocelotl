@@ -71,7 +71,7 @@ public class OcelotlParameters {
 	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
 	private DataCache dataCache = new DataCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
-	private OcelotlSettings	ocelotlSettings = new OcelotlSettings();
+	private OcelotlSettings	ocelotlSettings;
 	private Integer	timeSliceFactor = 1;
 	
 	private TimeSliceManager timeSliceManager;
@@ -83,6 +83,7 @@ public class OcelotlParameters {
 
 	public OcelotlParameters() {
 		super();
+		ocelotlSettings = new OcelotlSettings();
 	}
 	
 	public OcelotlParameters(OcelotlParameters op) {
