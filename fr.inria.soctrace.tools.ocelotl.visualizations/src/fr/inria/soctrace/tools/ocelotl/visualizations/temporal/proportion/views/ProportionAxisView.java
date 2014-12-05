@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Collection;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
@@ -41,8 +42,8 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
-import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.TemporalProportion;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 
 /**
  * Time Axis View : part representation, according to LP algorithm result
@@ -76,6 +77,7 @@ public class ProportionAxisView extends UnitAxisView {
 	}
 
 	protected double maxValue;
+	protected int axisHeight;
 	protected final static int width = 30;
 	// Margin from the frame
 	protected final static int border = 10;
@@ -86,7 +88,7 @@ public class ProportionAxisView extends UnitAxisView {
 	// Value of a grad
 	protected double gradDuration = 10.0;
 	// Width of a graduation
-	protected double gradWidth = 10;
+	protected int gradWidth = 10;
 
 	protected final static long gradHeightMin = 20;
 	protected double gradHeight = 20;
@@ -97,6 +99,7 @@ public class ProportionAxisView extends UnitAxisView {
 	protected final static int miniGradWidth = 4;
 	protected final static int textPositionOffset = 15;
 	protected int areaWidth = 0;
+	protected int mainLinePosition;
 	protected SelectFigure selectFigure;
 
 	public ProportionAxisView() {
@@ -119,10 +122,9 @@ public class ProportionAxisView extends UnitAxisView {
 		root.removeAll();
 		TemporalProportion propOperator = (TemporalProportion) manager;
 		this.maxValue = propOperator.getMax();
-		if (maxValue >= 0) {
+		if (maxValue >= 0.0) {
 			drawMainLine();
 			drawGrads();
-			;
 		}
 		canvas.update();
 	}
@@ -131,10 +133,11 @@ public class ProportionAxisView extends UnitAxisView {
 		NumberFormat formatter = null;
 		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
 		formatter = new DecimalFormat("0.00E0");
-		final int linePosition = root.getSize().width() - border;
-
+		formatter.setMaximumIntegerDigits(3);
+		
+		axisHeight = root.getSize().height() - 2* border ;
 		areaWidth = root.getClientArea().width();
-		textWidth = areaWidth - (areaWidth - linePosition - 2)
+		textWidth = areaWidth - (areaWidth - mainLinePosition - 2)
 				- textPositionOffset;
 		computeGradMeasure();
 
@@ -144,29 +147,29 @@ public class ProportionAxisView extends UnitAxisView {
 			final PolylineConnection line = new PolylineConnection();
 			line.setForegroundColor(SWTResourceManager
 					.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-			line.setLineWidth(1);
-			line.setEndpoints(new Point((int) (linePosition - gradWidth),
-					(int) (i * gradHeight) + border), new Point(linePosition,
-					(int) (i * gradHeight) + border));
+			line.setLineWidth(2);
+			line.setEndpoints(new Point(mainLinePosition,
+					axisHeight - (int) (i * gradHeight) + border), new Point(mainLinePosition + gradWidth,
+							axisHeight - (int) (i * gradHeight) + border));
 			root.add(line);
 
 			// Draw the legend
-			final double value = (double) (maxValue - i * gradDuration);
+			final double value = (double) (i * gradDuration);
 			final String text = formatter.format(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(PositionConstants.RIGHT);
 			label.setForegroundColor(SWTResourceManager
 					.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			label.setFont(SWTResourceManager.getFont("Cantarell",
-					textHeight / 2, SWT.NORMAL));
+					8, SWT.NORMAL));
 			label.setToolTip(new Label(text));
 			label.setSize(textWidth, textHeight);
 
 			root.add(label,
-					new Rectangle(new Point(linePosition - textPositionOffset
-							- textWidth, (int) (i * gradHeight) + unitAxisWidth
-							+ textHeight), new Point(new Point(linePosition
-							- textPositionOffset, (int) (i * gradHeight)))));
+					new Rectangle(new Point(mainLinePosition - textPositionOffset
+							- textWidth, axisHeight - (int) (i * gradHeight) + unitAxisWidth
+							+ textHeight), new Point(new Point(mainLinePosition
+							- textPositionOffset, axisHeight - (int) (i * gradHeight)))));
 
 			// Draw the mini graduations
 			for (int j = 1; j < 5; j++) {
@@ -180,11 +183,11 @@ public class ProportionAxisView extends UnitAxisView {
 						.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 				line2.setLineWidth(1);
 				line2.setEndpoints(new Point(
-						(int) (linePosition - miniGradWidth),
-						(int) (i * gradHeight) + border
+						mainLinePosition,
+						axisHeight - (int) (i * gradHeight) + border
 								+ (int) (j * gradHeight / miniDivide)),
-						new Point(new Point(linePosition,
-								(int) (i * gradHeight) + border
+						new Point(new Point(mainLinePosition + miniGradWidth,
+								axisHeight -	(int) (i * gradHeight) + border
 										+ (int) (j * gradHeight / miniDivide))));
 				root.add(line2);
 			}
@@ -195,13 +198,13 @@ public class ProportionAxisView extends UnitAxisView {
 	 * Draw the main line of the axis
 	 */
 	public void drawMainLine() {
-		final int linePosition = root.getClientArea().width() - border;
+		mainLinePosition = root.getClientArea().width() - border - gradWidth;
 		final PolylineConnection line = new PolylineConnection();
 		line.setForegroundColor(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-		line.setLineWidth(1);
-		line.setEndpoints(new Point(linePosition, root.getSize().height()
-				- border), new Point(linePosition, border));
+		line.setLineWidth(2);
+		line.setEndpoints(new Point(mainLinePosition, root.getSize().height()
+				- border), new Point(mainLinePosition, border));
 		root.add(line);
 	}
 
@@ -219,7 +222,7 @@ public class ProportionAxisView extends UnitAxisView {
 		final double factor = temp < 6 ? divide : temp;
 		for (int j = 1; j < i; j++)
 			temp *= 10;
-		gradDuration = (double) temp / (double) factor;
+		gradDuration = duration / 8; //(double) temp / (double) factor;
 		gradNumber = duration / gradDuration;
 		gradHeight = (root.getClientArea().height - 2 * border - 1) / gradNumber;
 		while (gradHeight < gradHeightMin && gradNumber > 6) {
@@ -257,5 +260,4 @@ public class ProportionAxisView extends UnitAxisView {
 	public void unselect() {
 		resizeDiagram();
 	}
-
 }

@@ -746,6 +746,22 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			overView.setRedrawOverview(true);
 		}
 	}
+	
+	private class ResizeTimeAxisListener implements Listener {
+
+		@Override
+		public void handleEvent(Event event) {
+			mainViewTopSashform.setWeights(mainViewBottomSashform.getWeights());
+		}
+	}
+	
+	private class ResizeMainViewListener implements Listener {
+
+		@Override
+		public void handleEvent(Event event) {
+			mainViewBottomSashform.setWeights(mainViewTopSashform.getWeights());
+		}
+	}
 
 	/**
 	 * Create the settings button for the toolbar
@@ -985,7 +1001,10 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Label						textDisplayedEnd;
 	private Button						overViewParamUp;
 	private Button						overViewParamDown;
-	private Button buttonCancelSelection;
+	private Button						buttonCancelSelection;
+	private SashForm					mainViewTopSashform;
+	private SashForm					mainViewBottomSashform;
+	private Composite	compositeTimeAxisView;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1096,11 +1115,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		cantarell8 = new Font(sashFormGlobal.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
 
 		final SashForm sashForm_1 = new SashForm(sashFormGlobal, SWT.BORDER);
-		sashForm_1.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		sashForm_1.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		// Central view
 		sashFormView = new SashForm(sashForm_1, SWT.BORDER | SWT.VERTICAL);
-		sashFormView.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		sashFormView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
 		// Top bar of the central view
 		// Trace settings
@@ -1110,8 +1129,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		final Group groupTraces = new Group(topBarScrollComposite, SWT.NONE);
 		groupTraces.setSize(422, 100);
-		groupTraces.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		groupTraces.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		groupTraces.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		groupTraces.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTraces.setFont(cantarell8);
 		groupTraces.setLayout(new GridLayout(8, false));
 		
@@ -1188,31 +1207,38 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		subComposite.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		subComposite.setSize(500, 500);
 		subComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-		final SashForm sashForm_5 = new SashForm(subComposite, SWT.BORDER | SWT.HORIZONTAL);
+		mainViewTopSashform = new SashForm(subComposite, SWT.BORDER | SWT.HORIZONTAL);
 		
 		// Set unit axis
-		final Composite compositeUnitAxisView = new Composite(sashForm_5, SWT.BORDER);
+		final Composite compositeUnitAxisView = new Composite(mainViewTopSashform, SWT.BORDER);
 		compositeUnitAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		unitAxisViewWrapper.init(compositeUnitAxisView);
 		final FillLayout fl_compositeUnitAxisView = new FillLayout(SWT.VERTICAL);
 		compositeUnitAxisView.setLayout(fl_compositeUnitAxisView);
 		
-		compositeMatrixView = new Composite(sashForm_5, SWT.BORDER);
+		compositeMatrixView = new Composite(mainViewTopSashform, SWT.BORDER);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
 		timeLineViewWrapper.init(compositeMatrixView);
 		compositeMatrixView.setLayout(new FillLayout(SWT.HORIZONTAL));
+		compositeMatrixView.addListener(SWT.Resize, new ResizeMainViewListener());
 		
-		sashForm_5.setWeights(new int[] {24, 388});
-
+		mainViewTopSashform.setWeights(new int[] {24, 388});
+		
+		mainViewBottomSashform = new SashForm(sashForm_4, SWT.BORDER | SWT.HORIZONTAL);
+		final Composite compositeBlank = new Composite(mainViewBottomSashform, SWT.BORDER);
+		
 		// Time axis 
-		final Composite compositeTimeAxisView = new Composite(sashForm_4, SWT.BORDER);
-		compositeTimeAxisView.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		compositeTimeAxisView = new Composite(mainViewBottomSashform, SWT.BORDER);
+		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		timeAxisView.initDiagram(compositeTimeAxisView);
 		final FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
 		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
-		sashForm_4.setWeights(new int[] { 388, 24 });
+		compositeTimeAxisView.addListener(SWT.Resize, new ResizeTimeAxisListener());
+		mainViewBottomSashform.setWeights(new int[] {24, 388});
+		
+		sashForm_4.setWeights(new int[] {388, 24});
 
 		// Bottom bar of the central view
 		final ScrolledComposite scrolledComposite = new ScrolledComposite(sashFormView, SWT.BORDER | SWT.H_SCROLL);
@@ -1221,13 +1247,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		final Group groupTime = new Group(scrolledComposite, SWT.NONE);
 		groupTime.setSize(422, 110);
-		groupTime.setForeground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		groupTime.setBackground(org.eclipse.wb.swt.SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		groupTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		groupTime.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(cantarell8);
 		groupTime.setLayout(new GridLayout(16, false));
 
-
-		
 		Label lblDisplayedStart = new Label(groupTime, SWT.NONE);
 		lblDisplayedStart.setFont(cantarell8);
 		lblDisplayedStart.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));

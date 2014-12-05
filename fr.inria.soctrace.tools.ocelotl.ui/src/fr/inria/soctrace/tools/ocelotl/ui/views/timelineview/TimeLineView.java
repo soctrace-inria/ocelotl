@@ -27,6 +27,7 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
+
 /**
  * Matrix View : part representation, according to LP algorithm result
  * 

@@ -57,11 +57,11 @@ public class TemporalProportionView extends TimeLineView {
 		private IconManager iconManager;
 		//Minimum value to consider a color too light
 		private static final int Light = 225;
-
+		
 		public EventStack(final int index, final int space) {
 			super();
 			setIndex(index);
-			this.stackSpace = space/2;
+			this.stackSpace = space / 2;
 			this.iconManager = new IconManager();
 		}
 
@@ -104,8 +104,6 @@ public class TemporalProportionView extends TimeLineView {
 				final double value = ((PartMap) distribution.getPart(index)
 						.getData()).getElements().get(state);
 				if (value > 0) {
-					// System.out.println("Part " + index + " " + state + " " +
-					// value);
 					final RectangleFigure rect = new RectangleFigure();
 					rect.setBackgroundColor(ColorConstants.white);
 					rect.setBackgroundColor(FramesocColorManager.getInstance()
@@ -150,8 +148,6 @@ public class TemporalProportionView extends TimeLineView {
 				}
 			}
 			if (agg != 0) {
-				// System.out.println("Part " + index + " " + "Aggregate" + " " +
-				// agg);
 				final ImageFigure icon = new ImageFigure();
 				final RectangleFigure rectangle = new RectangleFigure();
 				icon.setBackgroundColor(ColorConstants.black);

@@ -189,7 +189,6 @@ abstract public class AggregatedView implements IAggregatedView {
 	public AggregatedView(final OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
-
 	}
 
 	abstract protected void computeDiagram();

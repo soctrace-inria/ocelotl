@@ -103,7 +103,7 @@ public class HierarchyAxisView extends UnitAxisView {
 	protected double gradHeight;
 	protected int textWidth;
 	protected int textHeight = 15;
-
+	protected int mainLinePosition;
 	protected final static double textHeightMin = 16.0;
 	protected final static int textPositionOffset = 15;
 	protected int areaWidth = 0;
@@ -148,8 +148,7 @@ public class HierarchyAxisView extends UnitAxisView {
 		computeGradMeasure();
 
 		areaWidth = root.getClientArea().width();
-		final int linePosition = areaWidth - border;
-		textWidth = areaWidth - (areaWidth - linePosition) - textPositionOffset;
+		textWidth = areaWidth - (areaWidth - mainLinePosition) - textPositionOffset;
 
 		// Draw the graduations
 		for (int i = 0; i < gradNumber; i++) {
@@ -157,9 +156,9 @@ public class HierarchyAxisView extends UnitAxisView {
 			line.setForegroundColor(SWTResourceManager
 					.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			line.setLineWidth(1);
-			line.setEndpoints(new Point((int) (linePosition - gradWidth),
+			line.setEndpoints(new Point((int) (mainLinePosition - gradWidth),
 					(int) (i * gradHeight + verticalOffset) + border),
-					new Point(linePosition,
+					new Point(mainLinePosition,
 							(int) (i * gradHeight + verticalOffset) + border));
 			root.add(line);
 
@@ -179,10 +178,10 @@ public class HierarchyAxisView extends UnitAxisView {
 				label.setToolTip(new Label(text));
 				label.setSize(textWidth, textHeight);
 
-				root.add(label, new Rectangle(new Point(linePosition
+				root.add(label, new Rectangle(new Point(mainLinePosition
 						- textPositionOffset - textWidth,
 						(int) (i * gradHeight + textHeight) + border),
-						new Point(linePosition - textPositionOffset,
+						new Point(mainLinePosition - textPositionOffset,
 								(int) (i * gradHeight) + border)));
 			}
 		}
@@ -191,9 +190,9 @@ public class HierarchyAxisView extends UnitAxisView {
 		line.setForegroundColor(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		line.setLineWidth(1);
-		line.setEndpoints(new Point((int) (linePosition - gradWidth),
+		line.setEndpoints(new Point((int) (mainLinePosition - gradWidth),
 				(int) (gradNumber * gradHeight + verticalOffset) + border),
-				new Point(linePosition,
+				new Point(mainLinePosition,
 						(int) (gradNumber * gradHeight + verticalOffset) + border));
 		root.add(line);
 	}
@@ -202,13 +201,13 @@ public class HierarchyAxisView extends UnitAxisView {
 	 * Draw the main line of the axis
 	 */
 	public void drawMainLine() {
-		final int linePosition = root.getClientArea().width() - border;
+		mainLinePosition = root.getClientArea().width() - border;
 		final PolylineConnection line = new PolylineConnection();
 		line.setForegroundColor(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 		line.setLineWidth(1);
-		line.setEndpoints(new Point(linePosition, root.getSize().height()
-				- border), new Point(linePosition, border));
+		line.setEndpoints(new Point(mainLinePosition, root.getSize().height()
+				- border), new Point(mainLinePosition, border));
 		root.add(line);
 	}
 

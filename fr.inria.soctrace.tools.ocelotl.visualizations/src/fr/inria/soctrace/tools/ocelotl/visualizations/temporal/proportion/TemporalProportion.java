@@ -19,6 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion;
 
+
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
@@ -32,7 +33,7 @@ public class TemporalProportion extends VisuTOperator {
 
 	private List<String>		states;
 	private double				max;
-
+	
 	public TemporalProportion() {
 		super();
 		// TODO Auto-generated constructor stub
