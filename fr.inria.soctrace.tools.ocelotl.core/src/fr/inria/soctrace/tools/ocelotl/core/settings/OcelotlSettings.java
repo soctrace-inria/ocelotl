@@ -50,9 +50,11 @@ public class OcelotlSettings {
 	private int overviewTimesliceNumber;
 	private Color overviewSelectionFgColor;
 	private Color overviewSelectionBgColor;
+	private int overviewSelectionAlphaValue;
 	private Color overviewDisplayFgColor;
 	private Color overviewDisplayBgColor;
-
+	private int overviewDisplayAlphaValue;
+	
 	// Default directory where the config file is
 	private String defaultConfigFile;
 
@@ -87,9 +89,11 @@ public class OcelotlSettings {
 
 		overviewSelectionBgColor = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_BG_COLOR;
 		overviewSelectionFgColor = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_FG_COLOR;
+		overviewSelectionAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_ALPHA;
 		overviewDisplayBgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_BG_COLOR;
 		overviewDisplayFgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_FG_COLOR;
-
+		overviewDisplayAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_ALPHA;
+		
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
 		loadConfigurationFile();
@@ -98,7 +102,7 @@ public class OcelotlSettings {
 	/**
 	 * Load a previously saved configuration file
 	 */
-	private void loadConfigurationFile() {
+	public void loadConfigurationFile() {
 
 		defaultConfigFile = ResourcesPlugin.getWorkspace().getRoot()
 				.getLocation().toString()
@@ -165,6 +169,12 @@ public class OcelotlSettings {
 				setOverviewSelectionFgColor(loadColor(theConf.get(
 						OcelotlConstants.JSONOverviewSelectionFgColor)
 						.getAsString()));
+				setOverviewSelectionAlphaValue(theConf.get(
+						OcelotlConstants.JSONOverviewSelectionAlpha)
+						.getAsInt());
+				setOverviewDisplayAlphaValue(theConf.get(
+						OcelotlConstants.JSONOverviewDisplayAlpha)
+						.getAsInt());
 
 				logger.debug("Settings values:\n");
 				logger.debug("Cache activated: " + cacheActivated);
@@ -180,9 +190,11 @@ public class OcelotlSettings {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (JsonParseException e) {
+			} catch (JsonParseException | NullPointerException e) {
 				e.printStackTrace();
-				logger.error("Invalid JSON configuration file: default values will be used ");
+				logger.error("Incomplete or invalid JSON configuration file: default values will be used ");
+				//Regenerate the configuration file with the default values
+				saveSettings();
 			}
 		}
 	}
@@ -232,10 +244,14 @@ public class OcelotlSettings {
 				saveColor(overviewSelectionBgColor));
 		theConfig.addProperty(OcelotlConstants.JSONOverviewSelectionFgColor,
 				saveColor(overviewSelectionFgColor));
+		theConfig.addProperty(OcelotlConstants.JSONOverviewSelectionAlpha,
+				overviewSelectionAlphaValue);
 		theConfig.addProperty(OcelotlConstants.JSONOverviewDisplayBgColor,
 				saveColor(overviewDisplayBgColor));
 		theConfig.addProperty(OcelotlConstants.JSONOverviewDisplayFgColor,
 				saveColor(overviewDisplayFgColor));
+		theConfig.addProperty(OcelotlConstants.JSONOverviewDisplayAlpha,
+				overviewDisplayAlphaValue);
 
 		String newSettings = gson.toJson(theConfig);
 
@@ -511,6 +527,28 @@ public class OcelotlSettings {
 	public void setOverviewDisplayBgColor(Color overviewDisplayBgColor) {
 		if (this.overviewDisplayBgColor != overviewDisplayBgColor) {
 			this.overviewDisplayBgColor = overviewDisplayBgColor;
+			saveSettings();
+		}
+	}
+
+	public int getOverviewSelectionAlphaValue() {
+		return overviewSelectionAlphaValue;
+	}
+
+	public void setOverviewSelectionAlphaValue(int overviewSelectionAlphaValue) {
+		if (this.overviewSelectionAlphaValue != overviewSelectionAlphaValue) {
+			this.overviewSelectionAlphaValue = overviewSelectionAlphaValue;
+			saveSettings();
+		}
+	}
+
+	public int getOverviewDisplayAlphaValue() {
+		return overviewDisplayAlphaValue;
+	}
+
+	public void setOverviewDisplayAlphaValue(int overviewDisplayAlphaValue) {
+		if (this.overviewDisplayAlphaValue != overviewDisplayAlphaValue) {
+			this.overviewDisplayAlphaValue = overviewDisplayAlphaValue;
 			saveSettings();
 		}
 	}

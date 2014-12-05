@@ -1,6 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.util.HashMap;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -72,6 +73,8 @@ public class OcelotlSettingsView extends Dialog {
 	private Button								btnEditBgSelected;
 	private Button								btnEditFgSelected;
 	private HashMap<Button, Color>				btnColorMap;
+	private Spinner								textDisplayAlpha;
+	private Spinner								textSelectionAlpha;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -240,7 +243,7 @@ public class OcelotlSettingsView extends Dialog {
 			}
 		}
 	}
-
+	
 	public void modifyThreshold() {
 
 		double textThresholdValue = Double.parseDouble(textThreshold.getText());
@@ -282,8 +285,10 @@ public class OcelotlSettingsView extends Dialog {
 	public void updateOverviewColors() {
 		ocelotlView.getOverView().setDisplayBGColor(btnColorMap.get(btnEditBgDisplay));
 		ocelotlView.getOverView().setDisplayFGColor(btnColorMap.get(btnEditFgDisplay));
+		ocelotlView.getOverView().setDisplayAlphaValue(settings.getOverviewDisplayAlphaValue());
 		ocelotlView.getOverView().setSelectFGColor(btnColorMap.get(btnEditFgSelected));
 		ocelotlView.getOverView().setSelectBGColor(btnColorMap.get(btnEditBgSelected));
+		ocelotlView.getOverView().setSelectAlphaValue(settings.getOverviewSelectionAlphaValue());
 	}
 
 	/**
@@ -632,7 +637,7 @@ public class OcelotlSettingsView extends Dialog {
 		
 		final Label lblBgDisplay = new Label(groupOverviewSettings, SWT.NONE);
 		lblBgDisplay.setFont(cantarell8);
-		lblBgDisplay.setText("Display Background:");
+		lblBgDisplay.setText("Display Background");
 
 		btnEditBgDisplay = new Button(groupOverviewSettings, SWT.NONE);
 		btnEditBgDisplay.setToolTipText("Edit Color");
@@ -642,7 +647,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Label lblFgDisplay = new Label(groupOverviewSettings, SWT.NONE);
 		lblFgDisplay.setFont(cantarell8);
-		lblFgDisplay.setText("Display Foreground:");
+		lblFgDisplay.setText("Display Foreground");
 
 		btnEditFgDisplay = new Button(groupOverviewSettings, SWT.NONE);
 		btnEditFgDisplay.setToolTipText("Edit Color");
@@ -650,9 +655,21 @@ public class OcelotlSettingsView extends Dialog {
 		btnEditFgDisplay.addSelectionListener(new EditColorSelection());
 		btnColorMap.put(btnEditFgDisplay, settings.getOverviewDisplayFgColor());
 		
+		final Label lblDisplayAlpha = new Label(groupOverviewSettings, SWT.NONE);
+		lblDisplayAlpha.setFont(cantarell8);
+		lblDisplayAlpha.setText("Display Transparency");
+
+		textDisplayAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
+		textDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textDisplayAlpha.setIncrement(1);
+		textDisplayAlpha.setMaximum(255);
+		textDisplayAlpha.setMinimum(0);
+		textDisplayAlpha.setSelection(settings.getOverviewDisplayAlphaValue());
+		textDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
+	
 		final Label lblBgSelect = new Label(groupOverviewSettings, SWT.NONE);
 		lblBgSelect.setFont(cantarell8);
-		lblBgSelect.setText("Selection Background:");
+		lblBgSelect.setText("Selection Background");
 
 		btnEditBgSelected = new Button(groupOverviewSettings, SWT.NONE);
 		btnEditBgSelected.setToolTipText("Edit Color");
@@ -662,13 +679,25 @@ public class OcelotlSettingsView extends Dialog {
 		
 		final Label lblFgSelect = new Label(groupOverviewSettings, SWT.NONE);
 		lblFgSelect.setFont(cantarell8);
-		lblFgSelect.setText("Selection Foreground:");
+		lblFgSelect.setText("Selection Foreground");
 
 		btnEditFgSelected = new Button(groupOverviewSettings, SWT.NONE);
 		btnEditFgSelected.setToolTipText("Edit Color");
 		btnEditFgSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
 		btnEditFgSelected.addSelectionListener(new EditColorSelection());
 		btnColorMap.put(btnEditFgSelected, settings.getOverviewSelectionFgColor());
+		
+		final Label lblSelectionAlpha = new Label(groupOverviewSettings, SWT.NONE);
+		lblSelectionAlpha.setFont(cantarell8);
+		lblSelectionAlpha.setText("Selection Transparency");
+
+		textSelectionAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
+		textSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textSelectionAlpha.setIncrement(1);
+		textSelectionAlpha.setMaximum(255);
+		textSelectionAlpha.setMinimum(0);
+		textSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
+		textSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
 
 		return sashFormGlobal;
 	}
@@ -717,8 +746,10 @@ public class OcelotlSettingsView extends Dialog {
 		//Overview colors
 		settings.setOverviewDisplayBgColor(btnColorMap.get(btnEditBgDisplay));
 		settings.setOverviewDisplayFgColor(btnColorMap.get(btnEditFgDisplay));
+		settings.setOverviewDisplayAlphaValue(Integer.valueOf(textDisplayAlpha.getText()));
 		settings.setOverviewSelectionBgColor(btnColorMap.get(btnEditBgSelected));
 		settings.setOverviewSelectionFgColor(btnColorMap.get(btnEditFgSelected));
+		settings.setOverviewSelectionAlphaValue(Integer.valueOf(textSelectionAlpha.getText()));
 		updateOverviewColors();
 	}
 
