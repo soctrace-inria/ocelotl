@@ -6,7 +6,6 @@ import java.util.HashMap;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class StateActiveProducerSummaryStat extends SummaryStat{

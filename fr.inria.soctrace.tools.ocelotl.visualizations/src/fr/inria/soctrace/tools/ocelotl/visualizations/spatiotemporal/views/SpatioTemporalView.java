@@ -1,4 +1,4 @@
-package fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views;
+package fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views;
 
 import java.util.ArrayList;
 import java.util.HashMap;
