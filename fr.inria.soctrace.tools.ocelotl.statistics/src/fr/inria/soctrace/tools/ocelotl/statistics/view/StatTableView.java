@@ -131,7 +131,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	 * If data has changed
 	 */
 	public void updateTableData() {
-		if (tableViewer != null) {
+		if (tableViewer != null && !tableViewer.getTable().isDisposed()) {
 			tableViewer.setInput(statProvider);
 			tableViewer.refresh();
 		}
