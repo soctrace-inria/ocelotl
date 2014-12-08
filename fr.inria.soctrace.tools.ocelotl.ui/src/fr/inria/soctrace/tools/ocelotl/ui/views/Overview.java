@@ -40,7 +40,6 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.IAggregatedView;
 public class Overview implements IFramesocBusListener {
 
 	private OcelotlView					ocelotlView;
-
 	private MicroscopicDescription		microModel;
 	private IDataAggregationOperator	aggregOperator;
 	private IDataAggregManager			aggregManager;
@@ -61,8 +60,11 @@ public class Overview implements IFramesocBusListener {
 
 	private Color						displayFGColor		= ColorConstants.black;
 	private Color						displayBGColor		= ColorConstants.red;
+	private int							displayAlphaValue	= 110;
+	
 	private Color						selectFGColor		= ColorConstants.white;
 	private Color						selectBGColor		= ColorConstants.black;
+	private int							selectAlphaValue	= 110;
 
 	// Show the currently displayed zone
 	private SelectFigure				displayedZone;
@@ -85,9 +87,11 @@ public class Overview implements IFramesocBusListener {
 		// Set colors according to the settings
 		displayFGColor = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewDisplayFgColor();
 		displayBGColor = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewDisplayBgColor();
+		displayAlphaValue = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewDisplayAlphaValue();
 		selectFGColor = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewSelectionFgColor();
 		selectBGColor = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewSelectionBgColor();
-	
+		selectAlphaValue = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewSelectionAlphaValue();
+		
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
@@ -313,6 +317,31 @@ public class Overview implements IFramesocBusListener {
 		}
 	}
 
+	public int getDisplayAlphaValue() {
+		return displayAlphaValue;
+	}
+
+	public void setDisplayAlphaValue(int displayAlphaValue) {
+		this.displayAlphaValue = displayAlphaValue;
+		if (displayedZone != null) {
+			displayedZone.setAlpha(displayAlphaValue);
+			if (zoomedTimeRegion != null)
+				displayedZone.draw(zoomedTimeRegion, true);
+		}
+	}
+
+	public int getSelectAlphaValue() {
+		return selectAlphaValue;
+	}
+
+	public void setSelectAlphaValue(int selectAlphaValue) {
+		this.selectAlphaValue = selectAlphaValue;
+		if (selectedZone != null) {
+			selectedZone.setAlpha(selectAlphaValue);
+			drawSelection();
+		}
+	}
+
 	/**
 	 * Initialize the visualization operator and perform additional init
 	 * operation
@@ -368,8 +397,8 @@ public class Overview implements IFramesocBusListener {
 	}
 	
 	public void initSelectionFigure() {
-		selectedZone = new SelectFigure(selectFGColor, selectBGColor);
-		displayedZone = new SelectFigure(displayFGColor, displayBGColor);
+		selectedZone = new SelectFigure(selectFGColor, selectBGColor, selectAlphaValue);
+		displayedZone = new SelectFigure(displayFGColor, displayBGColor, displayAlphaValue);
 	}
 
 	public void reset() {
@@ -435,10 +464,9 @@ public class Overview implements IFramesocBusListener {
 
 		private Color	foreground;
 		private Color	background;
-		public final static int alphaValue = 110;
 		
 		// Init with a given color set
-		public SelectFigure(Color foreGround, Color backGround) {
+		public SelectFigure(Color foreGround, Color backGround, int alphaValue) {
 			super();
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
@@ -475,8 +503,8 @@ public class Overview implements IFramesocBusListener {
 				delta = 2;
 			}
 			
-			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - displayedTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / displayedTimeRegion.getTimeDuration() + Border), root.getSize().height - delta),
-					new Point((int) ((timeRegion.getTimeStampEnd() - displayedTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / displayedTimeRegion.getTimeDuration() + Border), delta)));
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - displayedTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / displayedTimeRegion.getTimeDuration() + Border), root.getSize().height
+					- delta), new Point((int) ((timeRegion.getTimeStampEnd() - displayedTimeRegion.getTimeStampStart()) * (root.getSize().width - 2 * Border) / displayedTimeRegion.getTimeDuration() + Border), delta)));
 		}
 
 		/**

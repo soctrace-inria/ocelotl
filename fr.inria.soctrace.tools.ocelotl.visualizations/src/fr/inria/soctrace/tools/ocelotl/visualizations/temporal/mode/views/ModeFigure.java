@@ -23,7 +23,7 @@ public class ModeFigure extends RectangleFigure {
 		roundedRectangle.setLayoutManager(roundedLayout);
 		roundedRectangle.setPreferredSize(1000, 1000);
 		this.add(roundedRectangle);
-		final Label label = new Label(" " + mainState.getState() + ": " + mainState.getAmplitude());
+		final Label label = new Label(" " + mainState.getState() + ": " + mainState.getAmplitude()+" ");
 		roundedRectangle.setToolTip(label);
 		final ToolbarLayout layout = new ToolbarLayout();
 		layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);

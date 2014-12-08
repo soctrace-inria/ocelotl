@@ -47,9 +47,9 @@ public abstract class Microscopic2DDescription extends MicroscopicDescription {
 		double value = Double.parseDouble(values[2]);
 		
 		// If the event producer is still flag as inactive
-		if (getInactiveProducers().contains(ep)) {
+		if (!getActiveProducers().contains(ep)) {
 			// Remove it
-			getInactiveProducers().remove(ep);
+			getActiveProducers().add(ep);
 		}
 
 		// If the number of time slice is a multiple of the cached time
@@ -85,9 +85,9 @@ public abstract class Microscopic2DDescription extends MicroscopicDescription {
 			return;
 
 		// If the event producer is still flag as inactive
-		if (getInactiveProducers().contains(ep)) {
+		if (!getActiveProducers().contains(ep)) {
 			// Remove it
-			getInactiveProducers().remove(ep);
+			getActiveProducers().add(ep);
 		}
 		
 		// Compute a value proportional to the time ratio spent in the slice

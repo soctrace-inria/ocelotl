@@ -54,9 +54,9 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 			return;
 
 		// If the event producer is flag as inactive
-		if (getInactiveProducers().contains(ep)) {
+		if (!getActiveProducers().contains(ep)) {
 			// Remove it
-			getInactiveProducers().remove(ep);
+			getActiveProducers().add(ep);
 		}
 		
 		int slice = Integer.parseInt(values[0]);
@@ -87,9 +87,9 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 			return;
 		
 		// If the event producer is flag as inactive
-		if (getInactiveProducers().contains(ep)) {
+		if (!getActiveProducers().contains(ep)) {
 			// Remove it
-			getInactiveProducers().remove(ep);
+			getActiveProducers().add(ep);
 		}
 
 		// Compute a value proportional to the time ratio spent in the slice

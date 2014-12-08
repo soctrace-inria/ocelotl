@@ -765,7 +765,6 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			InterruptedException, OcelotlException {
 
 		initVectors();
-		inactiveProducers.addAll(parameters.getCurrentProducers());
 
 		// If the cache is enabled
 		if (parameters.getOcelotlSettings().isCacheActivated()) {
@@ -809,17 +808,17 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		} else {
 			buildNormalMatrix(monitor);
 		}
-		computeActiveProducers();
+		computeInactiveProducers();
 	}
 	
 	/**
-	 * Set a list of active (i.e.producing events) producers, by making the
-	 * difference between the current producers and the inactive ones
+	 * Set a list of inactive (i.e. not producing events) producers, by making the
+	 * difference between the current producers and the active ones
 	 */
-	public void computeActiveProducers() {
+	public void computeInactiveProducers() {
 		for (EventProducer ep : parameters.getCurrentProducers())
-			if (!inactiveProducers.contains(ep))
-				activeProducers.add(ep);
+			if (!activeProducers.contains(ep))
+				inactiveProducers.add(ep);
 	}
 
 	public void total(final int rows) {

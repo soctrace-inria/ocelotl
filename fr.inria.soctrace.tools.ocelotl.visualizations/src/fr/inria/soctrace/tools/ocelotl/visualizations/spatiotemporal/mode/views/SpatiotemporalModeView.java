@@ -17,6 +17,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.SpatioTemporalAggre
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainState;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.SpatiotemporalMode;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.VisualAggregation;
+import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views.SpatioTemporalView;
 
 public class SpatiotemporalModeView extends SpatioTemporalView {
 

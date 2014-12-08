@@ -34,8 +34,8 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventPro
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.SpatioTemporalAggregateView;
-import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views.SpatioTemporalView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.VisualAggregation;
+import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views.SpatioTemporalView;
 import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.PartitionColorManager;
 
 public class SpatiotemporalPartitionView extends SpatioTemporalView {

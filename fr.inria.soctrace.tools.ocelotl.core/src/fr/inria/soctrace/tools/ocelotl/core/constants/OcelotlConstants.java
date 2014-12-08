@@ -101,7 +101,8 @@ public class OcelotlConstants {
 	public static final String JSONOverviewTimesliceNumber = "overviewTimesliceNumber";
 	public static final String JSONOverviewSelectionFgColor = "overviewSelectionFgColor";
 	public static final String JSONOverviewSelectionBgColor = "overviewSelectionBgColor";
+	public static final String JSONOverviewSelectionAlpha = "overviewSelectionAlpha";
 	public static final String JSONOverviewDisplayFgColor = "overviewDisplayFgColor";
 	public static final String JSONOverviewDisplayBgColor = "overviewDisplayBgColor";
-	
+	public static final String JSONOverviewDisplayAlpha = "overviewDisplayAlpha";	
 }
