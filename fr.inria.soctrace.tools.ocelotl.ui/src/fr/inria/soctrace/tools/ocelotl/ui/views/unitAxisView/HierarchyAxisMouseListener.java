@@ -41,24 +41,19 @@ public class HierarchyAxisMouseListener extends YAxisMouseListener {
 
 	@Override
 	public void mouseDoubleClicked(MouseEvent arg0) {
-			EventProducerNode selectedEpn = findProducer(arg0.x, arg0.y);
-
-			// If none was found
-			if (selectedEpn == null)
-				return;
-			
-			
 	}
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		// If left click
 		if (arg0.button == 1) {
-			EventProducerNode selectedEpn = findProducer(arg0.x, arg0.y);
-
+			Rectangle selectedZone = findProducer(arg0.x, arg0.y);
+			
 			// If none was found
-			if (selectedEpn == null)
+			if (selectedZone == null)
 				return;
+			
+			EventProducerNode selectedEpn = unitAxisView.getFigures().get(selectedZone);
 
 			// Set the spatial selection to the selected epn
 			((AggregatedView) unitAxisView.ocelotlView.getTimeLineView()).setSpatialSelection(selectedEpn);
@@ -68,14 +63,19 @@ public class HierarchyAxisMouseListener extends YAxisMouseListener {
 
 		// If right click
 		if (arg0.button == 3) {
-			HierarchyView seletedView = findHierarchy(arg0.x, arg0.y);
-
+			Rectangle selectedZone = findProducer(arg0.x, arg0.y);
+			
 			// If none was found
-			if (seletedView == null)
+			if (selectedZone == null)
 				return;
+			
+			EventProducerNode selectedEpn = unitAxisView.getFigures().get(selectedZone);
+			
+			// Draw highlight selection
+			unitAxisView.getHighLightDisplayedProducer().draw(selectedZone.x, selectedZone.y, selectedZone.x() + selectedZone.width(), selectedZone.y() + selectedZone.height());
 
 			// Trigger the display of the hierarchy
-			seletedView.display(unitAxisView.getOcelotlView());
+			new HierarchyView(selectedEpn).display(unitAxisView.getOcelotlView());
 		}
 	}
 
@@ -84,34 +84,27 @@ public class HierarchyAxisMouseListener extends YAxisMouseListener {
 		// TODO Auto-generated method stub
 	}
 
-	protected EventProducerNode findProducer(int x, int y) {
+	/**
+	 * Find the clicked producer
+	 * 
+	 * @param x
+	 *            the x coordinate value of the click
+	 * @param y
+	 *            the y coordinate value of the click
+	 * @return the clicked zone
+	 */
+	protected Rectangle findProducer(int x, int y) {
 		Point clickCoord = new Point(x, y);
-		EventProducerNode selectedEpn = null;
-
+		Rectangle selectedZone = null;
 		// Find the corresponding epn
 		for (Rectangle aZone : unitAxisView.getFigures().keySet()) {
 			if (aZone.contains(clickCoord)) {
-				selectedEpn = unitAxisView.getFigures().get(aZone);
+				selectedZone = aZone;
 				break;
 			}
 		}
 
-		return selectedEpn;
-	}
-	
-	protected HierarchyView findHierarchy(int x, int y) {
-		Point clickCoord = new Point(x, y);
-		HierarchyView selectedHierarchy = null;
-
-		// Find the corresponding epn
-		for (HierarchyView aHierarchy : unitAxisView.getSubHierarchies()) {
-			if (aHierarchy.getAggregateZone().contains(clickCoord)) {
-				selectedHierarchy = aHierarchy;
-				break;
-			}
-		}
-
-		return selectedHierarchy;
+		return selectedZone;
 	}
 
 }

@@ -3,8 +3,9 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.XYLayout;
-import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Shell;
@@ -19,25 +20,17 @@ public class HierarchyView {
 
 	public final static int		Height	= 700;
 	public final static int		Width	= 500;
-	private Rectangle			aggregateZone;
 	private EventProducerNode	eventProducerNode;
 	private Shell				dialog;
 	private Canvas				canvas;
 	private Figure				root;
 	private Tree				tree;
+	private OcelotlView			ocelotlView;
 
-	public HierarchyView(Rectangle aggregateZone, EventProducerNode eventProducerNode) {
+	
+	public HierarchyView(EventProducerNode eventProducerNode) {
 		super();
-		this.aggregateZone = aggregateZone;
 		this.eventProducerNode = eventProducerNode;
-	}
-
-	public Rectangle getAggregateZone() {
-		return aggregateZone;
-	}
-
-	public void setAggregateZone(Rectangle aggregateZone) {
-		this.aggregateZone = aggregateZone;
 	}
 
 	public EventProducerNode getEventProducerNode() {
@@ -55,15 +48,16 @@ public class HierarchyView {
 	 *            the current ocelotl view
 	 */
 	public void display(OcelotlView ocelotlview) {
-
+		this.ocelotlView = ocelotlview;
+		
 		try {
 			// New window
-			dialog = new Shell(ocelotlview.getSite().getShell().getDisplay());
+			dialog = new Shell(ocelotlView.getSite().getShell().getDisplay());
 			dialog.setText(eventProducerNode.getMe().getName());
 			dialog.setSize(Width, Height);
 			// Set location of the new window centered around the center of the
 			// eclipse window
-			dialog.setLocation(ocelotlview.getSite().getShell().getLocation().x + ocelotlview.getSite().getShell().getSize().x / 2 - Width / 2, ocelotlview.getSite().getShell().getLocation().y + ocelotlview.getSite().getShell().getSize().y / 2 - Height / 2);
+			dialog.setLocation(ocelotlView.getSite().getShell().getLocation().x + ocelotlView.getSite().getShell().getSize().x / 2 - Width / 2, ocelotlview.getSite().getShell().getLocation().y + ocelotlview.getSite().getShell().getSize().y / 2 - Height / 2);
 			dialog.setLayout(new FillLayout());
 
 			// Init the tree
@@ -83,7 +77,7 @@ public class HierarchyView {
 			root.setFont(SWTResourceManager.getFont("Cantarell", 24, SWT.NORMAL));
 			root.setSize(tree.getSize().x, tree.getSize().y);
 
-			//dialog.addShellListener(new DialogShellListener());
+			dialog.addShellListener(new DialogShellListener());
 
 			// Init tree content
 			buildTree();
@@ -124,7 +118,7 @@ public class HierarchyView {
 		}
 	}
 
-	/*private class DialogShellListener implements ShellListener {
+	private class DialogShellListener implements ShellListener {
 
 		@Override
 		public void shellActivated(ShellEvent e) {
@@ -134,7 +128,11 @@ public class HierarchyView {
 
 		@Override
 		public void shellClosed(ShellEvent e) {
+			// Remove the highlight rectangle
+			UnitAxisView graphDisplayView = ocelotlView.getUnitAxisView();
 
+			if (graphDisplayView.getHighLightDisplayedProducer() != null)
+				graphDisplayView.getHighLightDisplayedProducer().delete();
 		}
 
 		@Override
@@ -155,5 +153,5 @@ public class HierarchyView {
 
 		}
 
-	}*/
+	}
 }

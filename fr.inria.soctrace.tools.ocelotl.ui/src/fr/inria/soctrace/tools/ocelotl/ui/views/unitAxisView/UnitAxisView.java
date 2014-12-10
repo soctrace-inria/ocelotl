@@ -20,17 +20,23 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView;
 
 import java.util.HashMap;
-import java.util.List;
 
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.OrderedLayout;
+import org.eclipse.draw2d.RectangleFigure;
+import org.eclipse.draw2d.ToolbarLayout;
+import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 
 /**
  * Unit Axis View : show a Y axis on the side
@@ -43,7 +49,7 @@ abstract public class UnitAxisView {
 	protected Canvas				canvas;
 	protected OcelotlView			ocelotlView;
 	protected YAxisMouseListener	mouse;
-	protected List<HierarchyView>	subHierarchies;
+	protected SelectFigure			highLightDisplayedProducer;
 	protected HashMap<Rectangle, EventProducerNode>	figures;
 
 	public UnitAxisView() {
@@ -59,20 +65,20 @@ abstract public class UnitAxisView {
 		this.figures = figures;
 	}
 
-	public List<HierarchyView> getSubHierarchies() {
-		return subHierarchies;
-	}
-
-	public void setSubHierarchies(List<HierarchyView> subHierarchies) {
-		this.subHierarchies = subHierarchies;
-	}
-
 	public OcelotlView getOcelotlView() {
 		return ocelotlView;
 	}
 
 	public void setOcelotlView(OcelotlView ocelotlView) {
 		this.ocelotlView = ocelotlView;
+	}
+
+	public SelectFigure getHighLightDisplayedProducer() {
+		return highLightDisplayedProducer;
+	}
+
+	public void setHighLightDisplayedProducer(SelectFigure highLightDisplayedProducer) {
+		this.highLightDisplayedProducer = highLightDisplayedProducer;
 	}
 
 	public abstract void createDiagram(final IVisuOperator manager);
@@ -90,6 +96,11 @@ abstract public class UnitAxisView {
 		canvas = wrapper.getCanvas();
 		ocelotlView = wrapper.getOcelotlView();
 		initDiagram();
+		
+		highLightDisplayedProducer = new SelectFigure(ColorConstants.black, ColorConstants.white, 110);
+		highLightDisplayedProducer.setLineWidth(2);
+		highLightDisplayedProducer.setAlpha(255);
+		highLightDisplayedProducer.setFill(false);
 		
 		wrapper.cleanMouseListeners();
 		wrapper.cleanMouseMotionListeners();
@@ -120,4 +131,50 @@ abstract public class UnitAxisView {
 		root.repaint();
 	}
 
+	protected class SelectFigure extends RectangleFigure {
+
+		public SelectFigure() {
+			super();
+			final ToolbarLayout layout = new ToolbarLayout();
+			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
+			setLayoutManager(layout);
+			setAlpha(50);
+		}
+
+		public SelectFigure(Color foreGround, Color backGround, int alphaValue) {
+			super();
+			final ToolbarLayout layout = new ToolbarLayout();
+			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
+			setLayoutManager(layout);
+			setForegroundColor(foreGround);
+			setBackgroundColor(backGround);
+			setAlpha(alphaValue);
+		}
+
+		public void draw(int originY, int cornerY, final boolean active) {
+			if (active) {
+				setForegroundColor(AggregatedView.activeColorFG);
+				setBackgroundColor(AggregatedView.activeColorBG);
+			} else {
+				setForegroundColor(AggregatedView.selectColorBG);
+				setBackgroundColor(AggregatedView.selectColorBG);
+			}
+			root.add(this,
+					new Rectangle(new Point(0, originY), new Point(root.getClientArea().width,
+							cornerY)));
+		}
+
+		public void draw(int originX, int originY, int cornerX, int cornerY) {
+			root.add(this, new Rectangle(new Point(originX, originY),
+					new Point(cornerX, cornerY)));
+		}
+		
+		/**
+		 * Remove the selection from display
+		 */
+		public void delete() {
+			if (getParent() != null)
+				root.remove(this);
+		}
+	}
 }

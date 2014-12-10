@@ -27,10 +27,8 @@ import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
@@ -40,9 +38,7 @@ import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
-import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.HierarchyAxisMouseListener;
-import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.HierarchyView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuSTOperator;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
@@ -54,30 +50,6 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
 public class HierarchyAxisView extends UnitAxisView {
-
-	private class SelectFigure extends RectangleFigure {
-
-		public SelectFigure() {
-			super();
-			final ToolbarLayout layout = new ToolbarLayout();
-			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			setLayoutManager(layout);
-			setAlpha(50);
-		}
-
-		public void draw(int originY, int cornerY, final boolean active) {
-			if (active) {
-				setForegroundColor(AggregatedView.activeColorFG);
-				setBackgroundColor(AggregatedView.activeColorBG);
-			} else {
-				setForegroundColor(AggregatedView.selectColorFG);
-				setBackgroundColor(AggregatedView.selectColorBG);
-			}
-			root.add(this,
-					new Rectangle(new Point(0, originY), new Point(root.getClientArea().width,
-							cornerY)));
-		}
-	}
 
 	protected EventProducerHierarchy hierarchy;
 	protected ArrayList<EventProducerNode> producers;
@@ -106,13 +78,13 @@ public class HierarchyAxisView extends UnitAxisView {
 	protected int minLogicWeight = OcelotlConstants.MinimalHeightDrawingThreshold;
 	
 	protected SelectFigure selectFigure;
+	protected SelectFigure highLightAggregateFigure;
 	protected int originY;
 	protected int cornerY;
 	
 	public HierarchyAxisView() {
 		super();
 		selectFigure = new SelectFigure();
-		subHierarchies = new ArrayList<HierarchyView>();
 		mouse = new HierarchyAxisMouseListener(this);
 		xendlist = new ArrayList<Integer>();
 		yendlist = new ArrayList<Integer>();
@@ -176,7 +148,7 @@ public class HierarchyAxisView extends UnitAxisView {
 			printChildren(epn);
 		} else if (epn.getHierarchyLevel() + 1 <= smallestDisplayableHierarchyLevel) {
 			// draw with dirty texture
-			drawProd(epn, newHierarchy.get(epn.getHierarchyLevel()+1), true);
+			drawProd(epn, newHierarchy.get(epn.getHierarchyLevel() + 1), true);
 		}
 	}
 
@@ -217,12 +189,9 @@ public class HierarchyAxisView extends UnitAxisView {
 		Rectangle boundrect =  new Rectangle(new Point(xa, ya), new Point(xb, yb));
 		root.add(rectangle, boundrect);
 
-		if (dirty) {
+		if (dirty) 
 			drawTextureDirty(xa, xb, ya, yb, label.getText());
-			// Save aggregate in a collection
-			subHierarchies.add(new HierarchyView(boundrect, epn));
-		}
-		
+				
 		// Save the rectangle in a map
 		figures.put(boundrect, epn);
 	}
@@ -232,7 +201,6 @@ public class HierarchyAxisView extends UnitAxisView {
 	 */
 	public void drawHierarchy() {
 		figures.clear();
-		subHierarchies.clear();
 		hierarchyLevel = 0;
 		smallestDisplayableHierarchyLevel = 0;
 		areaWidth = root.getClientArea().width();
