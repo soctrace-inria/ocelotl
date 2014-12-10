@@ -217,7 +217,6 @@ public class TimeAxisView {
 				canvas.redraw();
 				root.repaint();
 				resizeDiagram();
-
 			}
 
 			@Override

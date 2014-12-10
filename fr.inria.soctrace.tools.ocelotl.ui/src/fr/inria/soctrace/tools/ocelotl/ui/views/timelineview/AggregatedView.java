@@ -207,6 +207,10 @@ abstract public class AggregatedView implements IAggregatedView {
 		}
 	}
 	
+	public void setSpatialSelection(EventProducerNode epn) {
+		mouse.setSpatialSelection(epn);
+	}
+	
 	public void deleteSelectFigure() {
 		selectFigure.delete();
 		selectTime = null;
@@ -298,6 +302,14 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public void setPotentialSelectFigure(SelectFigure potentialSelectFigure) {
 		this.potentialSelectFigure = potentialSelectFigure;
+	}
+
+	public OcelotlMouseListener getMouse() {
+		return mouse;
+	}
+
+	public void setMouse(OcelotlMouseListener mouse) {
+		this.mouse = mouse;
 	}
 
 	@Override

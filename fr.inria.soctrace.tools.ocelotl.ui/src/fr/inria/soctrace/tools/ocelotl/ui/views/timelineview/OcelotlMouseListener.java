@@ -6,6 +6,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.MouseState;
 
 public abstract class OcelotlMouseListener implements MouseListener, MouseMotionListener {
@@ -20,4 +21,6 @@ public abstract class OcelotlMouseListener implements MouseListener, MouseMotion
 	protected long				fixed;
 
 	public abstract void drawSelection();
+	
+	public void setSpatialSelection(EventProducerNode selectedNode) {}
 }

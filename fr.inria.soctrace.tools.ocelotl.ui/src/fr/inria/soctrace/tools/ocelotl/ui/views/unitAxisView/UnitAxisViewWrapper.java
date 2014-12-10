@@ -25,6 +25,8 @@ import java.util.List;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlListener;
@@ -46,7 +48,9 @@ public class UnitAxisViewWrapper {
 	private final OcelotlView				ocelotlView;
 	private UnitAxisView					view;
 	private final List<ControlListener>		controlListeners		= new ArrayList<ControlListener>();
-	
+	private final List<MouseListener>		mouseListeners			= new ArrayList<MouseListener>();
+	private final List<MouseMotionListener>	mouseMotionListeners	= new ArrayList<MouseMotionListener>();
+
 	public UnitAxisViewWrapper(final OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
@@ -55,7 +59,6 @@ public class UnitAxisViewWrapper {
 	public void addControlListener(final ControlListener controlListener) {
 		controlListeners.add(controlListener);
 		canvas.addControlListener(controlListener);
-
 	}
 	
 	public void cleanControlListeners() {
@@ -78,6 +81,28 @@ public class UnitAxisViewWrapper {
 
 	public UnitAxisView getView() {
 		return view;
+	}
+	
+	public void addMouseListener(final MouseListener mouse) {
+		mouseListeners.add(mouse);
+		root.addMouseListener(mouse);
+	}
+
+	public void addMouseMotionListener(final MouseMotionListener mouse) {
+		mouseMotionListeners.add(mouse);
+		root.addMouseMotionListener(mouse);
+	}
+	
+	public void cleanMouseListeners() {
+		for (final MouseListener m : mouseListeners)
+			root.removeMouseListener(m);
+		mouseListeners.clear();
+	}
+
+	public void cleanMouseMotionListeners() {
+		for (final MouseMotionListener m : mouseMotionListeners)
+			root.removeMouseMotionListener(m);
+		mouseMotionListeners.clear();
 	}
 
 	public Canvas init(final Composite parent) {

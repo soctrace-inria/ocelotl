@@ -22,22 +22,18 @@ package fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.PositionConstants;
-import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.YAxisMouseListener;
 import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.TemporalProportion;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 
 /**
@@ -72,6 +68,7 @@ public class ProportionAxisView extends UnitAxisView {
 
 	public ProportionAxisView() {
 		super();
+		mouse = new YAxisMouseListener(this);
 	}
 
 	public void createDiagram(final double maxValue) {
@@ -191,24 +188,21 @@ public class ProportionAxisView extends UnitAxisView {
 		}
 	}
 
-	public Canvas initDiagram(final Composite parent) {
-		root = new Figure();
-		root.setFont(parent.getFont());
-		final XYLayout layout = new XYLayout();
-		root.setLayoutManager(layout);
-		canvas = new Canvas(parent, SWT.DOUBLE_BUFFERED);
-		canvas.setBackground(ColorConstants.gray);
-		canvas.setSize(parent.getSize());
-		final LightweightSystem lws = new LightweightSystem(canvas);
-		lws.setContents(root);
-		lws.setControl(canvas);
-		root.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		root.setSize(parent.getSize().x, parent.getSize().y);
-		return canvas;
+	public void initDiagram() {
+		ocelotlView.getMainViewTopSashform().setWeights(
+				OcelotlConstants.yAxisDefaultWeight);
 	}
 
 	public void resizeDiagram() {
 		createDiagram(maxValue);
 		root.repaint();
+	}
+
+	@Override
+	public void select(int y0, int y1, boolean active) {
+	}
+
+	@Override
+	public void unselect() {
 	}
 }

@@ -72,12 +72,11 @@ public class OcelotlConstants {
 		CACHEPOLICY_FAST, CACHEPOLICY_SLOW, CACHEPOLICY_AUTO, CACHEPOLICY_ASK
 	}
 	
-	/**
-	 * Size of the configuration file
-	 */
 	public static final String MultipleValueExtensionSeparator = ", ";
 	
 	public static final int MinimalHeightDrawingThreshold = 1;
+	
+	public static final int[] yAxisDefaultWeight = {24, 388};
 	
 	/**
 	 * JSON Config constants

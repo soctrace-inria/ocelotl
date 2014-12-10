@@ -17,20 +17,36 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView.Mous
 
 public class SpatioTemporalMouseListener extends TemporalMouseListener {
 
-	Boolean 					clickOnView = false;
-	int 						minDrawThreshold = OcelotlConstants.MinimalHeightDrawingThreshold;
-	int							originY, cornerY;
-	boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
-	
-	double rootHeight;
-	double height;
-	double accurateLogicHeight;
-	double logicHeight;
-	SpaceTimeAggregation2Manager spatioTemporalManager; 
-	EventProducerHierarchy hierarchy;
+	protected Boolean						clickOnView			= false;
+	protected int							minDrawThreshold	= OcelotlConstants.MinimalHeightDrawingThreshold;
+	protected int							originY, cornerY;
+	protected boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
+
+	protected double						rootHeight;
+	protected double						height;
+	protected double						accurateLogicHeight;
+	protected double						logicHeight;
+	protected SpaceTimeAggregation2Manager	spatioTemporalManager;
+	protected EventProducerHierarchy		hierarchy;
 
 	public SpatioTemporalMouseListener(AggregatedView theView) {
 		super(theView);
+	}
+
+	public int getOriginY() {
+		return originY;
+	}
+
+	public void setOriginY(int originY) {
+		this.originY = originY;
+	}
+
+	public int getCornerY() {
+		return cornerY;
+	}
+
+	public void setCornerY(int cornerY) {
+		this.cornerY = cornerY;
 	}
 
 	@Override
@@ -65,11 +81,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			EventProducerNode foundNode = findEventProducerNode(cornerY);
 			Point heights = getSpatialSelectionCoordinates(foundNode);
 			
-			aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getPotentialSelectTime());
-			aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getPotentialSelectTime(), false);
+			updateEverything(heights.x(),  heights.y(), false, aggregatedView.getPotentialSelectTime());
 			aggregatedView.getPotentialSelectFigure().draw(aggregatedView.getPotentialSelectTime(), heights.x(), heights.y());
-			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), false, originY, cornerY);
-			aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getPotentialSelectTime());
 		}
 
 	}
@@ -187,10 +200,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 				fixed = p3;
 			}
 			
-			aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getSelectTime());
-			aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getSelectTime(), false);
-			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), false, originY, cornerY);
-			aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getSelectTime());
+			updateEverything(originY, cornerY, false, aggregatedView.getSelectTime());
 		}
 		
 		// If right click
@@ -235,10 +245,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		// Avoid triggering the mouse released event
 		clickOnView = false;
 		
-		aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getSelectTime(), true);
-		aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getSelectTime());
-		aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, originY, cornerY);
-		aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getSelectTime());
+		updateEverything(originY, cornerY, true, aggregatedView.getSelectTime());
 		aggregatedView.getOcelotlView().getStatView().updateData();
 	}
 
@@ -295,10 +302,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 				setSpatialSelection(selectedNode);
 			}
 			
-			aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getSelectTime(), true);
-			aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getSelectTime());
-			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, originY, cornerY);
-			aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getSelectTime());
+			updateEverything(originY, cornerY, true, aggregatedView.getSelectTime());
 			aggregatedView.getOcelotlView().getStatView().updateData();
 		}
 	}
@@ -324,7 +328,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 * @param selectedNode
 	 *            the selected even producer node
 	 */
-	private void setSpatialSelection(EventProducerNode selectedNode) {
+	public void setSpatialSelection(EventProducerNode selectedNode) {
 		ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
 
 		// If only one producer is selected, then also add the parent
@@ -392,6 +396,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		double rounding = (((double) (y0)) / accurateLogicHeight) * 2.0;
 		int startingHeight = (int) (Math.round(rounding) / 2);
 		int endingHeight = (int) (((double) (y1)) / accurateLogicHeight);
+		
 		// Might happen when selecting a unique point
 		if (startingHeight > endingHeight) {
 			startingHeight = endingHeight;
@@ -427,14 +432,23 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		return selectedAggregate;
 	}
 
+	public void updateEverything(int y0, int y1, boolean active, TimeRegion aTimeRegion) {
+		aggregatedView.getOcelotlView().setTimeRegion(aTimeRegion);
+		aggregatedView.getOcelotlView().getTimeAxisView().select(aTimeRegion, active);
+		aggregatedView.getOcelotlView().getUnitAxisView().select(y0, y1, active);
+		aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), active, originY, cornerY);
+		aggregatedView.getOcelotlView().getOverView().updateSelection(aTimeRegion);
+	}
+	
 	@Override
 	public void drawSelection() {
-		if (!aggregatedView.getOcelotlView().getTimeRegion().compareTimeRegion(aggregatedView.time) && aggregatedView.getSelectTime() != null && aggregatedView.getCurrentlySelectedNode() != null) {
+		if (aggregatedView.getSelectTime() != null && aggregatedView.getCurrentlySelectedNode() != null) {
 			Point newCoordinates = getSpatialSelectionCoordinates(aggregatedView.getCurrentlySelectedNode());
 			originY = newCoordinates.x();
 			cornerY = newCoordinates.y();
 
-			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, originY, cornerY);
+			updateEverything(originY, cornerY, true, aggregatedView.getSelectTime());
+			aggregatedView.getOcelotlView().getStatView().updateData();
 		}
 	}
 }

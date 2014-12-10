@@ -53,12 +53,12 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			
 			if (aggregatedView.getOcelotlView().getTimeRegion().compareTimeRegion(aggregatedView.time)) {
 				aggregatedView.getOcelotlView().getTimeAxisView().unselect();
+				aggregatedView.getOcelotlView().getUnitAxisView().unselect();
 				if (aggregatedView.getSelectFigure().getParent() != null)
 					aggregatedView.getRoot().remove(aggregatedView.getSelectFigure());
 				aggregatedView.getRoot().repaint();
 			}
 		}
-
 	}
 
 	@Override
@@ -77,7 +77,6 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	@Override
 	public void mouseHover(final MouseEvent arg0) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -208,7 +207,7 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void drawSelection() {
-		if (!aggregatedView.getOcelotlView().getTimeRegion().compareTimeRegion(aggregatedView.time) && aggregatedView.getSelectTime() != null) 
+		if (!aggregatedView.getOcelotlView().getTimeRegion().compareTimeRegion(aggregatedView.time) && aggregatedView.getSelectTime() != null)
 			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, -1);
 	}
 }

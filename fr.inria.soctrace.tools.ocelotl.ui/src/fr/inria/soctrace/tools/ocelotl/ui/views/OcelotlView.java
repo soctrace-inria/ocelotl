@@ -81,6 +81,7 @@ import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -702,6 +703,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			// Remove the currently drawn selections
 			((AggregatedView) timeLineView).deleteSelectFigure();
 			getTimeAxisView().unselect();
+			getUnitAxisView().unselect();
 			getOverView().deleteSelection();
 
 			// Cancel potential spatialselection
@@ -751,7 +753,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void handleEvent(Event event) {
-			mainViewTopSashform.setWeights(mainViewBottomSashform.getWeights());
+			getMainViewTopSashform().setWeights(mainViewBottomSashform.getWeights());
 		}
 	}
 	
@@ -759,7 +761,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void handleEvent(Event event) {
-			mainViewBottomSashform.setWeights(mainViewTopSashform.getWeights());
+			mainViewBottomSashform.setWeights(getMainViewTopSashform().getWeights());
 		}
 	}
 
@@ -1207,16 +1209,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		subComposite.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		subComposite.setSize(500, 500);
 		subComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-		mainViewTopSashform = new SashForm(subComposite, SWT.BORDER | SWT.HORIZONTAL);
+		setMainViewTopSashform(new SashForm(subComposite, SWT.BORDER | SWT.HORIZONTAL));
 		
 		// Set unit axis
-		final Composite compositeUnitAxisView = new Composite(mainViewTopSashform, SWT.BORDER);
+		final Composite compositeUnitAxisView = new Composite(getMainViewTopSashform(), SWT.BORDER);
 		compositeUnitAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
 		unitAxisViewWrapper.init(compositeUnitAxisView);
 		final FillLayout fl_compositeUnitAxisView = new FillLayout(SWT.VERTICAL);
 		compositeUnitAxisView.setLayout(fl_compositeUnitAxisView);
 		
-		compositeMatrixView = new Composite(mainViewTopSashform, SWT.BORDER);
+		compositeMatrixView = new Composite(getMainViewTopSashform(), SWT.BORDER);
 		compositeMatrixView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		compositeMatrixView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeMatrixView.setSize(500, 500);
@@ -1224,10 +1226,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		compositeMatrixView.setLayout(new FillLayout(SWT.HORIZONTAL));
 		compositeMatrixView.addListener(SWT.Resize, new ResizeMainViewListener());
 		
-		mainViewTopSashform.setWeights(new int[] {24, 388});
+		getMainViewTopSashform().setWeights(OcelotlConstants.yAxisDefaultWeight);
 		
 		mainViewBottomSashform = new SashForm(sashForm_4, SWT.BORDER | SWT.HORIZONTAL);
 		final Composite compositeBlank = new Composite(mainViewBottomSashform, SWT.BORDER);
+		compositeBlank.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		
 		// Time axis 
 		compositeTimeAxisView = new Composite(mainViewBottomSashform, SWT.BORDER);
@@ -1236,7 +1239,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		final FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
 		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
 		compositeTimeAxisView.addListener(SWT.Resize, new ResizeTimeAxisListener());
-		mainViewBottomSashform.setWeights(new int[] {24, 388});
+		mainViewBottomSashform.setWeights(OcelotlConstants.yAxisDefaultWeight);
 		
 		sashForm_4.setWeights(new int[] {388, 24});
 
@@ -1607,6 +1610,22 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 	public Label getTextDisplayedEnd() {
 		return textDisplayedEnd;
+	}
+
+	public UnitAxisView getUnitAxisView() {
+		return unitAxisView;
+	}
+
+	public void setUnitAxisView(UnitAxisView unitAxisView) {
+		this.unitAxisView = unitAxisView;
+	}
+
+	public SashForm getMainViewTopSashform() {
+		return mainViewTopSashform;
+	}
+
+	public void setMainViewTopSashform(SashForm mainViewTopSashform) {
+		this.mainViewTopSashform = mainViewTopSashform;
 	}
 
 	private void refreshTraces() {
