@@ -28,7 +28,9 @@ import java.util.List;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
+import org.eclipse.draw2d.Triangle;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
@@ -168,12 +170,7 @@ public class HierarchyAxisView extends UnitAxisView {
 		
 		final Label label = new Label(" " + text + " ");
 		label.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		RectangleFigure rectangle = new RectangleFigure();
-		rectangle.setBackgroundColor(FramesocColorManager.getInstance()
-				.getEventProducerColor(epn.getMe().getName()).getSwtColor());
-		rectangle.setForegroundColor(FramesocColorManager.getInstance()
-				.getEventProducerColor(epn.getMe().getName()).getSwtColor());
-		rectangle.setToolTip(label);
+
 
 		int xa = (int) (areaWidth - horizontalBorder - levelWidth * (hierarchyLevel - currentHierarchyLevel + 1));
 		int ya = (int) (rootHeight - height + epn.getIndex() * logicHeight - verticalBorder);
@@ -181,7 +178,29 @@ public class HierarchyAxisView extends UnitAxisView {
 		int yb = yendlist.get(epn.getIndex() + epn.getWeight());
 
 		Rectangle boundrect =  new Rectangle(new Point(xa, ya), new Point(xb, yb));
-		root.add(rectangle, boundrect);
+		
+		// Is the node a leaf
+		if (epn.getChildrenNodes().isEmpty()) {
+			Triangle triangle = new Triangle();
+			triangle.setBackgroundColor(FramesocColorManager.getInstance()
+					.getEventProducerColor(epn.getMe().getName()).getSwtColor());
+			triangle.setForegroundColor(FramesocColorManager.getInstance()
+					.getEventProducerColor(epn.getMe().getName()).getSwtColor());
+			triangle.setDirection(PositionConstants.EAST);
+			root.add(triangle, boundrect);
+		} else {
+			RectangleFigure rectangle = new RectangleFigure();
+			rectangle
+					.setBackgroundColor(FramesocColorManager.getInstance()
+							.getEventProducerColor(epn.getMe().getName())
+							.getSwtColor());
+			rectangle
+					.setForegroundColor(FramesocColorManager.getInstance()
+							.getEventProducerColor(epn.getMe().getName())
+							.getSwtColor());
+			rectangle.setToolTip(label);
+			root.add(rectangle, boundrect);
+		}
 
 		if (dirty) 
 			drawTextureDirty(xa, xb, ya, yb, label.getText());
