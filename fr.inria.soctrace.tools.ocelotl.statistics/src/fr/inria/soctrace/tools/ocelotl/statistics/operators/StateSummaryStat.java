@@ -58,7 +58,8 @@ public class StateSummaryStat extends SummaryStat {
 				// selected, we remove it to have correct data
 				nbProducers = 1;
 		} else {
-			nbProducers = microModel.getMatrix().get(0).keySet().size();
+			nbProducers = microModel.getActiveProducers().size()
+					+ microModel.getInactiveProducers().size();
 		}
 		
 		total = timeRegion.getTimeDuration() * nbProducers;

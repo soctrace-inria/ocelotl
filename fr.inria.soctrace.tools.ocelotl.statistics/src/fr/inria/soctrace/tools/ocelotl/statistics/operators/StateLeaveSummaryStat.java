@@ -53,8 +53,12 @@ public class StateLeaveSummaryStat extends SummaryStat{
 		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
 			nbProducers = numberOfSelectedLeaves();
 		} else {
-			nbProducers = ocelotlview.getOcelotlParameters()
-					.getEventProducerHierarchy().getLeaves().values().size();
+			nbProducers = 0;
+			for (SimpleEventProducerNode anSepn : ocelotlview
+					.getOcelotlParameters().getEventProducerHierarchy()
+					.getLeaves().values())
+				if (microModel.getActiveProducers().contains(anSepn.getMe()))
+					nbProducers++;
 		}
 		
 		total = timeRegion.getTimeDuration() * nbProducers;
@@ -89,8 +93,9 @@ public class StateLeaveSummaryStat extends SummaryStat{
 		for (SimpleEventProducerNode anSepn : ocelotlview
 				.getOcelotlParameters().getEventProducerHierarchy().getLeaves()
 				.values())
-			if (ocelotlview.getOcelotlParameters().getSpatiallySelectedProducers()
-					.contains(anSepn.getMe()))
+			if (ocelotlview.getOcelotlParameters()
+					.getSpatiallySelectedProducers().contains(anSepn.getMe())
+					&& microModel.getActiveProducers().contains(anSepn.getMe()))
 				numberOfLeaves++;
 
 		return numberOfLeaves;

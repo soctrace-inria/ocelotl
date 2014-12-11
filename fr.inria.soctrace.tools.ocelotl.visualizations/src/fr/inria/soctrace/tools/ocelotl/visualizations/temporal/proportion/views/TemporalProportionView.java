@@ -79,6 +79,7 @@ public class TemporalProportionView extends TimeLineView {
 		//Draw the proportion visualization of the aggregates
 		public void init() {
 			DecimalFormat valueFormat = new DecimalFormat("0.00E0");
+			valueFormat.setMaximumIntegerDigits(3);
 			double total = 0;
 			
 			//Height of the drawing area

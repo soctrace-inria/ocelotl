@@ -269,7 +269,7 @@ public class HierarchyAxisView extends UnitAxisView {
 		}
 
 		// Compute the width of a hierarchy level
-		levelWidth = (areaWidth - horizontalBorder)
+		levelWidth = (areaWidth - horizontalBorder * 2)
 				/ newHierarchy.keySet().size();
 
 		// If smaller than the min
@@ -288,7 +288,7 @@ public class HierarchyAxisView extends UnitAxisView {
 			}
 			
 			// Recompute the width
-			levelWidth = (areaWidth - horizontalBorder)
+			levelWidth = (areaWidth - horizontalBorder * 2)
 					/ newHierarchy.keySet().size();
 
 			if (levelWidth < MinLevelWidth && newHierarchy.keySet().size() > 1) {
@@ -314,7 +314,7 @@ public class HierarchyAxisView extends UnitAxisView {
 		}
 		
 		// Recompute width
-		levelWidth = (areaWidth - horizontalBorder)
+		levelWidth = (areaWidth - horizontalBorder * 2)
 				/ newHierarchy.keySet().size();
 		
 		//Still too small ?
