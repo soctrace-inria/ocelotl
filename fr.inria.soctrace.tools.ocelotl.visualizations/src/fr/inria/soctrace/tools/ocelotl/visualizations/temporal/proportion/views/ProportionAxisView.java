@@ -189,8 +189,11 @@ public class ProportionAxisView extends UnitAxisView {
 	}
 
 	public void initDiagram() {
-		ocelotlView.getMainViewTopSashform().setWeights(
-				OcelotlConstants.yAxisDefaultWeight);
+		if (ocelotlView.getMainViewTopSashform().getWeights()[0] == 0) {
+			ocelotlView.getMainViewTopSashform().setWeights(
+					OcelotlConstants.yAxisDefaultWeight);
+			ocelotlView.getMainViewTopSashform().layout();
+		}
 	}
 
 	public void resizeDiagram() {

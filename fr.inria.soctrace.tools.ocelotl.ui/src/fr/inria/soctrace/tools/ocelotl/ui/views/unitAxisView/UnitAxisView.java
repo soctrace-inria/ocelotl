@@ -45,24 +45,45 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
  */
 abstract public class UnitAxisView {
 
-	protected Figure				root;
-	protected Canvas				canvas;
-	protected OcelotlView			ocelotlView;
-	protected YAxisMouseListener	mouse;
-	protected SelectFigure			highLightDisplayedProducer;
-	protected HashMap<Rectangle, EventProducerNode>	figures;
+	protected Figure								root;
+	protected Canvas								canvas;
+	protected OcelotlView							ocelotlView;
+	protected YAxisMouseListener					mouse;
+	protected SelectFigure							highLightDisplayedProducer;
+	protected SelectFigure							highLightSelectedProducer;
+	protected EventProducerNode						currentlySelectedEpn	= null;
+	
+	protected HashMap<EventProducerNode, Rectangle>	eventProdToFigures;
+	protected HashMap<Rectangle, EventProducerNode>	figuresToEventProd;
 
 	public UnitAxisView() {
 		super();
-		figures = new HashMap<Rectangle, EventProducerNode>();
+		eventProdToFigures = new HashMap<EventProducerNode, Rectangle>();
+		figuresToEventProd = new HashMap<Rectangle, EventProducerNode>();
 	}
 
-	public HashMap<Rectangle, EventProducerNode> getFigures() {
-		return figures;
+	public HashMap<EventProducerNode, Rectangle> getEventProdToFigures() {
+		return eventProdToFigures;
 	}
 
-	public void setFigures(HashMap<Rectangle, EventProducerNode> figures) {
-		this.figures = figures;
+	public void setEventProdToFigures(HashMap<EventProducerNode, Rectangle> figures) {
+		this.eventProdToFigures = figures;
+	}
+
+	public HashMap<Rectangle, EventProducerNode> getFiguresToEventProd() {
+		return figuresToEventProd;
+	}
+
+	public void setFiguresToEventProd(HashMap<Rectangle, EventProducerNode> figuresToEventProd) {
+		this.figuresToEventProd = figuresToEventProd;
+	}
+
+	public EventProducerNode getCurrentlySelectedEpn() {
+		return currentlySelectedEpn;
+	}
+
+	public void setCurrentlySelectedEpn(EventProducerNode currentlySelectedEpn) {
+		this.currentlySelectedEpn = currentlySelectedEpn;
 	}
 
 	public OcelotlView getOcelotlView() {
@@ -79,6 +100,14 @@ abstract public class UnitAxisView {
 
 	public void setHighLightDisplayedProducer(SelectFigure highLightDisplayedProducer) {
 		this.highLightDisplayedProducer = highLightDisplayedProducer;
+	}
+	
+	public SelectFigure getHighLightSelectedProducer() {
+		return highLightSelectedProducer;
+	}
+
+	public void setHighLightSelectedProducer(SelectFigure highLightSelectedProducer) {
+		this.highLightSelectedProducer = highLightSelectedProducer;
 	}
 
 	public abstract void createDiagram(final IVisuOperator manager);
@@ -97,10 +126,15 @@ abstract public class UnitAxisView {
 		ocelotlView = wrapper.getOcelotlView();
 		initDiagram();
 		
-		highLightDisplayedProducer = new SelectFigure(ColorConstants.black, ColorConstants.white, 110);
+		highLightDisplayedProducer = new SelectFigure(ColorConstants.black, ColorConstants.white, 255);
 		highLightDisplayedProducer.setLineWidth(2);
-		highLightDisplayedProducer.setAlpha(255);
 		highLightDisplayedProducer.setFill(false);
+		
+		highLightSelectedProducer = new SelectFigure(ColorConstants.red, ColorConstants.white, 255);
+		highLightSelectedProducer.setLineWidth(2);
+		highLightSelectedProducer.setFill(false);
+		
+		currentlySelectedEpn = null;
 		
 		wrapper.cleanMouseListeners();
 		wrapper.cleanMouseMotionListeners();
@@ -169,6 +203,11 @@ abstract public class UnitAxisView {
 					new Point(cornerX, cornerY)));
 		}
 		
+		public void draw(EventProducerNode epn) {
+			Rectangle selectedZone = eventProdToFigures.get(epn);
+			draw(selectedZone.x, selectedZone.y, selectedZone.x() + selectedZone.width(), selectedZone.y() + selectedZone.height());
+		}
+
 		/**
 		 * Remove the selection from display
 		 */

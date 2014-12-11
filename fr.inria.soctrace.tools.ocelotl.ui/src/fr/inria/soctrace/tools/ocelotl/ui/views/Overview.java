@@ -555,7 +555,7 @@ public class Overview implements IFramesocBusListener {
 			    if (Thread.interrupted()) 
 			        return;
 			     
-				parameter = ocelotlView.getOcelotlCore().computeInitialParameter(aggregManager);
+				parameter = ocelotlView.getParameterPPolicy().computeInitialParameter(aggregManager, ocelotlView.getOcelotlParameters().getParameterPPolicy());
 
 				// Compute the view according to the new parameter value
 				aggregManager.computeParts(parameter);

@@ -199,6 +199,9 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 				aggregatedView.getSelectTime().setTimeStampEnd(p3);
 				fixed = p3;
 			}
+
+			// If there was a selected event producer in the hierarchy, delete it
+			aggregatedView.getOcelotlView().getUnitAxisView().setCurrentlySelectedEpn(null);
 			
 			updateEverything(originY, cornerY, false, aggregatedView.getSelectTime());
 		}

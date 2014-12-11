@@ -81,6 +81,7 @@ import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.ParameterStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
@@ -387,7 +388,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							}
 
 							// Compute the parameter value
-							ocelotlParameters.setParameter(ocelotlCore.computeInitialParameter(ocelotlCore.getLpaggregManager()));
+							ocelotlParameters.setParameter(parameterPPolicy.computeInitialParameter(ocelotlCore.getLpaggregManager(), ocelotlParameters.getParameterPPolicy()));
 						}
 
 						hasChanged = HasChanged.PARAMETER;
@@ -660,7 +661,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			if (ocelotlCore.getLpaggregManager() != null) {
-				textRun.setText(Double.toString(ocelotlCore.computeInitialParameter(ocelotlCore.getLpaggregManager())));
+				textRun.setText(Double.toString(parameterPPolicy.computeInitialParameter(ocelotlCore.getLpaggregManager(), ocelotlParameters.getParameterPPolicy())));
 				btnRun.notifyListeners(SWT.Selection, new Event());
 			}
 		}
@@ -979,15 +980,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private StatViewWrapper				statViewWrapper;
 	private Button						btnSettings2;
 	private Button						btnReset;
-
-	private Snapshot					snapshot;
-	private Font						cantarell8;
-	private Overview					overView;
 	private TabFolder					tabFolder;
 	private Action						settings;
 	private Action						snapshotAction;
 	private Action						nextZoom;
 	private Action						prevZoom;
+	
+	private Snapshot					snapshot;
+	private Font						cantarell8;
+	private Overview					overView;
+	private ParameterStrategy			parameterPPolicy;
 	private ActionHistory				history;
 
 	/**
@@ -1114,6 +1116,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		statViewWrapper = new StatViewWrapper(this);
 		unitAxisViewWrapper = new UnitAxisViewWrapper(this);
 		overView = new Overview(this);
+		parameterPPolicy = new ParameterStrategy();
 		cantarell8 = new Font(sashFormGlobal.getDisplay(), new FontData("Cantarell", 8, SWT.NORMAL));
 
 		final SashForm sashForm_1 = new SashForm(sashFormGlobal, SWT.BORDER);
@@ -1628,6 +1631,14 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		this.mainViewTopSashform = mainViewTopSashform;
 	}
 
+	public ParameterStrategy getParameterPPolicy() {
+		return parameterPPolicy;
+	}
+
+	public void setParameterPPolicy(ParameterStrategy parameterPPolicy) {
+		this.parameterPPolicy = parameterPPolicy;
+	}
+
 	private void refreshTraces() {
 		try {
 			confDataLoader.loadTraces();
@@ -1671,6 +1682,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
 		ocelotlParameters.updateCurrentProducers();
+		ocelotlParameters.setParameterPPolicy(ocelotlParameters.getOcelotlSettings().getParameterPPolicy());
 		
 		setCachePolicy();
 		try {

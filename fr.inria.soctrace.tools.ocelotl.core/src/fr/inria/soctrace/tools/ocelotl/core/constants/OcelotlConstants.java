@@ -72,6 +72,13 @@ public class OcelotlConstants {
 		CACHEPOLICY_FAST, CACHEPOLICY_SLOW, CACHEPOLICY_AUTO, CACHEPOLICY_ASK
 	}
 	
+	/**
+	 * Possible parameter p chose strategy
+	 */
+	static public enum ParameterPPolicy {
+		PARAMETERP_STRATEGY_ONE, PARAMETERP_STRATEGY_ZERO, PARAMETERP_STRATEGY_LARGEST_DIFF, PARAMETERP_STRATEGY_LARGEST_SUM_DIFF
+	}
+	
 	public static final String MultipleValueExtensionSeparator = ", ";
 	
 	public static final int MinimalHeightDrawingThreshold = 1;
@@ -104,4 +111,5 @@ public class OcelotlConstants {
 	public static final String JSONOverviewDisplayFgColor = "overviewDisplayFgColor";
 	public static final String JSONOverviewDisplayBgColor = "overviewDisplayBgColor";
 	public static final String JSONOverviewDisplayAlpha = "overviewDisplayAlpha";	
+	public static final String JSONParameterPPolicy = "parameterPPolicy";	
 }

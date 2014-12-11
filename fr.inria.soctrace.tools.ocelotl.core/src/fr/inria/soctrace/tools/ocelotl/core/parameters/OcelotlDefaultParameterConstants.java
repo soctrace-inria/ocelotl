@@ -4,6 +4,7 @@ import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
 
 /*
  * Class for the constants defining the default parameters in Ocelotl
@@ -70,6 +71,12 @@ public class OcelotlDefaultParameterConstants {
 	 * Default cache policy
 	 */
 	public static final DatacachePolicy DEFAULT_CACHE_POLICY = DatacachePolicy.CACHEPOLICY_FAST;
+	
+	/**
+	 * Default parameter choice policy
+	 */
+	public static final ParameterPPolicy DEFAULT_PARAMETERP_POLICY = ParameterPPolicy.PARAMETERP_STRATEGY_LARGEST_SUM_DIFF;
+	
 
 	/**
 	 * Default number of time slices used when generating a cache

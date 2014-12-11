@@ -23,6 +23,7 @@ import com.google.gson.JsonParser;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
 
 public class OcelotlSettings {
@@ -54,6 +55,7 @@ public class OcelotlSettings {
 	private Color overviewDisplayFgColor;
 	private Color overviewDisplayBgColor;
 	private int overviewDisplayAlphaValue;
+	private ParameterPPolicy parameterPPolicy;
 	
 	// Default directory where the config file is
 	private String defaultConfigFile;
@@ -93,6 +95,7 @@ public class OcelotlSettings {
 		overviewDisplayBgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_BG_COLOR;
 		overviewDisplayFgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_FG_COLOR;
 		overviewDisplayAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_ALPHA;
+		parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
 		
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -175,6 +178,8 @@ public class OcelotlSettings {
 				setOverviewDisplayAlphaValue(theConf.get(
 						OcelotlConstants.JSONOverviewDisplayAlpha)
 						.getAsInt());
+				setParameterPPolicy(ParameterPPolicy.valueOf(theConf.get(
+						OcelotlConstants.JSONParameterPPolicy).getAsString()));
 
 				logger.debug("Settings values:\n");
 				logger.debug("Cache activated: " + cacheActivated);
@@ -252,6 +257,8 @@ public class OcelotlSettings {
 				saveColor(overviewDisplayFgColor));
 		theConfig.addProperty(OcelotlConstants.JSONOverviewDisplayAlpha,
 				overviewDisplayAlphaValue);
+		theConfig.addProperty(OcelotlConstants.JSONParameterPPolicy,
+				parameterPPolicy.toString());
 
 		String newSettings = gson.toJson(theConfig);
 
@@ -553,4 +560,14 @@ public class OcelotlSettings {
 		}
 	}
 
+	public ParameterPPolicy getParameterPPolicy() {
+		return parameterPPolicy;
+	}
+
+	public void setParameterPPolicy(ParameterPPolicy parameterPPolicy) {
+		if (this.parameterPPolicy != parameterPPolicy) {
+			this.parameterPPolicy = parameterPPolicy;
+			saveSettings();
+		}
+	}
 }

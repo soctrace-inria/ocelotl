@@ -29,6 +29,7 @@ import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
@@ -71,6 +72,7 @@ public class OcelotlParameters {
 	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
 	private DataCache dataCache = new DataCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
+	private ParameterPPolicy parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
 	private OcelotlSettings	ocelotlSettings;
 	private Integer	timeSliceFactor = 1;
 	
@@ -374,6 +376,14 @@ public class OcelotlParameters {
 
 	public void setStatisticOperatorConfig(IStatisticOperatorConfig statisticOperatorConfig) {
 		this.statisticOperatorConfig = statisticOperatorConfig;
+	}
+
+	public ParameterPPolicy getParameterPPolicy() {
+		return parameterPPolicy;
+	}
+
+	public void setParameterPPolicy(ParameterPPolicy parameterPPolicy) {
+		this.parameterPPolicy = parameterPPolicy;
 	}
 
 	public String getStatOperator() {

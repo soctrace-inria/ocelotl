@@ -47,29 +47,33 @@ public class HierarchyAxisMouseListener extends YAxisMouseListener {
 	public void mousePressed(MouseEvent arg0) {
 		// If left click
 		if (arg0.button == 1) {
-			Rectangle selectedZone = findProducer(arg0.x, arg0.y);
+			Rectangle selectedZone = findZone(arg0.x, arg0.y);
 			
 			// If none was found
 			if (selectedZone == null)
 				return;
 			
-			EventProducerNode selectedEpn = unitAxisView.getFigures().get(selectedZone);
+			EventProducerNode selectedEpn = unitAxisView.getFiguresToEventProd().get(selectedZone);
+			unitAxisView.setCurrentlySelectedEpn(selectedEpn);
 
 			// Set the spatial selection to the selected epn
 			((AggregatedView) unitAxisView.ocelotlView.getTimeLineView()).setSpatialSelection(selectedEpn);
 			((AggregatedView) unitAxisView.ocelotlView.getTimeLineView()).setSelectTime(unitAxisView.ocelotlView.getOcelotlParameters().getTimeRegion());
 			((AggregatedView) unitAxisView.ocelotlView.getTimeLineView()).drawSelection();
+			
+			// Draw highlight selection
+			unitAxisView.getHighLightSelectedProducer().draw(selectedZone.x, selectedZone.y, selectedZone.x() + selectedZone.width(), selectedZone.y() + selectedZone.height());
 		}
 
 		// If right click
 		if (arg0.button == 3) {
-			Rectangle selectedZone = findProducer(arg0.x, arg0.y);
+			Rectangle selectedZone = findZone(arg0.x, arg0.y);
 			
 			// If none was found
 			if (selectedZone == null)
 				return;
 			
-			EventProducerNode selectedEpn = unitAxisView.getFigures().get(selectedZone);
+			EventProducerNode selectedEpn = unitAxisView.getFiguresToEventProd().get(selectedZone);
 			
 			// Draw highlight selection
 			unitAxisView.getHighLightDisplayedProducer().draw(selectedZone.x, selectedZone.y, selectedZone.x() + selectedZone.width(), selectedZone.y() + selectedZone.height());
@@ -93,11 +97,11 @@ public class HierarchyAxisMouseListener extends YAxisMouseListener {
 	 *            the y coordinate value of the click
 	 * @return the clicked zone
 	 */
-	protected Rectangle findProducer(int x, int y) {
+	protected Rectangle findZone(int x, int y) {
 		Point clickCoord = new Point(x, y);
 		Rectangle selectedZone = null;
 		// Find the corresponding epn
-		for (Rectangle aZone : unitAxisView.getFigures().keySet()) {
+		for (Rectangle aZone : unitAxisView.getFiguresToEventProd().keySet()) {
 			if (aZone.contains(clickCoord)) {
 				selectedZone = aZone;
 				break;

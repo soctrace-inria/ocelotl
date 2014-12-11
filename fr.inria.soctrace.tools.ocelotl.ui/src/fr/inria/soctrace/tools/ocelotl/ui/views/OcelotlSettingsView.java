@@ -19,6 +19,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.ColorDialog;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Button;
@@ -35,6 +36,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.tools.ocelotl.core.ParameterStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -45,6 +47,7 @@ public class OcelotlSettingsView extends Dialog {
 
 	private OcelotlView							ocelotlView;
 	private OcelotlSettings						settings;
+	private Combo								parameterPStrategy;
 	private Button								btnDeleteDataCache;
 	private Text								datacacheDirectory;
 	private Button								btnChangeCacheDirectory;
@@ -334,15 +337,18 @@ public class OcelotlSettingsView extends Dialog {
 		tabFolder = new TabFolder(sashFormGlobal, SWT.NONE);
 		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
 
-		// Quality curves settings
+		// Aggregation settings
 		final TabItem tbtmAdvancedParameters = new TabItem(tabFolder, 0);
-		tbtmAdvancedParameters.setText("Quality curves");
+		tbtmAdvancedParameters.setText("Aggregation");
 
 		final SashForm sashFormAdvancedParameters = new SashForm(tabFolder, SWT.VERTICAL);
 		sashFormAdvancedParameters.setFont(cantarell8);
 		tbtmAdvancedParameters.setControl(sashFormAdvancedParameters);
+		
+		final SashForm sashFormQualityCurve = new SashForm(sashFormAdvancedParameters, SWT.VERTICAL);
+		sashFormQualityCurve.setFont(cantarell8);
 
-		final Group groupQualityCurveSettings = new Group(sashFormAdvancedParameters, SWT.NONE);
+		final Group groupQualityCurveSettings = new Group(sashFormQualityCurve, SWT.NONE);
 		groupQualityCurveSettings.setFont(cantarell8);
 		groupQualityCurveSettings.setText("Quality Curve Settings");
 		groupQualityCurveSettings.setLayout(new GridLayout(4, false));
@@ -391,8 +397,26 @@ public class OcelotlSettingsView extends Dialog {
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
-		sashFormAdvancedParameters.setWeights(new int[] { 1 });
+		final SashForm sashFormParameterP = new SashForm(sashFormAdvancedParameters, SWT.VERTICAL);
+		sashFormParameterP.setFont(cantarell8);
 
+		final Group groupParameterSettings = new Group(sashFormParameterP, SWT.NONE);
+		groupParameterSettings.setFont(cantarell8);
+		groupParameterSettings.setText("Parameter P Settings");
+		groupParameterSettings.setLayout(new GridLayout(2, false));
+		
+		final Label lblParameterPStrategy= new Label(groupParameterSettings, SWT.NONE);
+		lblParameterPStrategy.setFont(cantarell8);
+		lblParameterPStrategy.setText("Default Parameter Value:");
+		
+		parameterPStrategy = new Combo(groupParameterSettings, SWT.READ_ONLY);
+		GridData gd_parameterPStrategy = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		parameterPStrategy.setLayoutData(gd_parameterPStrategy);
+		parameterPStrategy.setFont(cantarell8);
+		parameterPStrategy.setToolTipText("Parameter Default vValue Strategy");
+			
+		sashFormAdvancedParameters.setWeights(new int[] { 2, 1 });
+		
 		// Datacache settings
 		final TabItem tbtmOcelotlSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtmOcelotlSettings.setText("Cache");
@@ -699,6 +723,8 @@ public class OcelotlSettingsView extends Dialog {
 		textSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
 		textSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
 
+		initSettings();
+		
 		return sashFormGlobal;
 	}
 
@@ -717,6 +743,14 @@ public class OcelotlSettingsView extends Dialog {
 		newShell.setText("Ocelotl Settings");
 	}
 
+	protected void initSettings() {
+		for(String strategyName: ParameterStrategy.availableStrategies.values())
+			parameterPStrategy.add(strategyName);
+		
+		// Set current value
+		parameterPStrategy.setText(ParameterStrategy.availableStrategies.get(ocelotlView.getOcelotlParameters().getOcelotlSettings().getParameterPPolicy()));
+	}
+	
 	/**
 	 * Save all the settings into the configuration file
 	 */
@@ -727,6 +761,9 @@ public class OcelotlSettingsView extends Dialog {
 		modifyDataCacheSize();
 		updateCacheDir();
 		settings.setCachePolicy(currentSelectedDatacachePolicy);
+		
+		// Parameter P strategy
+		settings.setParameterPPolicy(ocelotlView.getParameterPPolicy().getStrategy(parameterPStrategy.getText()));
 
 		// Advanced settings
 		settings.setNumberOfThread(Integer.valueOf(spinnerThread.getText()));

@@ -90,17 +90,17 @@ public class HierarchyAxisView extends UnitAxisView {
 		yendlist = new ArrayList<Integer>();
 	}
 
-	public void createDiagram(EventProducerHierarchy hierarchy, boolean activeSelection) {
+	public void createDiagram(EventProducerHierarchy hierarchy,
+			boolean activeSelection) {
 		root.removeAll();
 		this.hierarchy = hierarchy;
-		ocelotlView.getMainViewTopSashform().layout();	
 		if (hierarchy != null && !hierarchy.getEventProducerNodes().isEmpty()) {
 			drawHierarchy();
-			if(originY != -1 && cornerY != -1)
+			if (originY != -1 && cornerY != -1)
 				selectFigure.draw(originY, cornerY, activeSelection);
+			if(currentlySelectedEpn != null)
+				highLightSelectedProducer.draw(currentlySelectedEpn);
 		}
-		ocelotlView.getMainViewTopSashform().layout();
-		canvas.update();
 	}
 
 	@Override
@@ -108,17 +108,11 @@ public class HierarchyAxisView extends UnitAxisView {
 		root.removeAll();
 		VisuSTOperator propOperator = (VisuSTOperator) manager;
 		hierarchy = propOperator.getHierarchy();
-		ocelotlView.getMainViewTopSashform().layout();
-		canvas.update();
-		canvas.redraw();
-		root.repaint();
 		if (!hierarchy.getEventProducerNodes().isEmpty()) {
 			drawHierarchy();
 		}
-		canvas.update();
-		root.repaint();
 	}
-	
+
 	/**
 	 * Print the hierarchy for a given eventproducerNode
 	 * 
@@ -193,14 +187,16 @@ public class HierarchyAxisView extends UnitAxisView {
 			drawTextureDirty(xa, xb, ya, yb, label.getText());
 				
 		// Save the rectangle in a map
-		figures.put(boundrect, epn);
+		eventProdToFigures.put(epn, boundrect);
+		figuresToEventProd.put(boundrect, epn);
 	}
 	
 	/**
 	 * Draw the graduation and the name of the event producers
 	 */
 	public void drawHierarchy() {
-		figures.clear();
+		eventProdToFigures.clear();
+		figuresToEventProd.clear();
 		hierarchyLevel = 0;
 		smallestDisplayableHierarchyLevel = 0;
 		areaWidth = root.getClientArea().width();
@@ -208,9 +204,6 @@ public class HierarchyAxisView extends UnitAxisView {
 		computeGradMeasure();
 	
 		print(hierarchy.getRoot());
-		canvas.layout();
-		canvas.update();
-		root.repaint();
 	}
 	
 	/**
@@ -412,44 +405,49 @@ public class HierarchyAxisView extends UnitAxisView {
 	 * @param yb
 	 * @param label
 	 */
-	protected void drawTextureDirty(int xa, int xb, int ya, int yb,
-			String label) {
+	protected void drawTextureDirty(int xa, int xb, int ya, int yb, String label) {
 		int i = 0;
-		for (int x = xa + spaceDirty2; x < (xb + yb - ya); x = x
-				+ spaceDirty2 + 1) {
+		for (int x = xa + spaceDirty2; x < (xb + yb - ya); x = x + spaceDirty2
+				+ 1) {
 			i++;
+
 			if (i > iterationDirty - 1) {
 				i = 0;
 				x += spaceDirty;
 			}
-			if (x >= (xb + yb - ya)){
+
+			if (x >= (xb + yb - ya)) {
 				break;
 			}
+
 			final PolylineConnection line = new PolylineConnection();
 			int xinit = x;
 			int yinit = ya;
 			int xfinal = Math.max(xa, (xinit - (yb - ya)));
 			int yfinal = Math.min(yb, ya + xinit - xfinal);
+
 			if (xb < xinit) {
 				yinit = Math.min(yb, ya + xinit - xb);
 				xinit = xb;
 			}
+
 			line.setBackgroundColor(ColorConstants.white);
 			line.setForegroundColor(ColorConstants.white);
-			line.setEndpoints(new Point(xinit, yinit), new Point(xfinal,
-					yfinal));
+			line.setEndpoints(new Point(xinit, yinit),
+					new Point(xfinal, yfinal));
 			line.setLineWidth(1);
 			line.setAntialias(SWT.ON);
 			line.setToolTip(new Label(label));
 			root.add(line);
 		}
 	}
-	
-	public void initDiagram() {	
-		ocelotlView.getMainViewTopSashform().setWeights(OcelotlConstants.yAxisDefaultWeight);
-		ocelotlView.getMainViewTopSashform().layout();
-		canvas.update();
-		root.repaint();
+
+	public void initDiagram() {
+		if (ocelotlView.getMainViewTopSashform().getWeights()[0] == 0) {
+			ocelotlView.getMainViewTopSashform().setWeights(
+					OcelotlConstants.yAxisDefaultWeight);
+			ocelotlView.getMainViewTopSashform().layout();
+		}
 	}
 
 	public void resizeDiagram() {
@@ -467,6 +465,12 @@ public class HierarchyAxisView extends UnitAxisView {
 	public void unselect() {
 		originY = -1;
 		cornerY = -1;
+		currentlySelectedEpn = null;
+		
+		if (highLightSelectedProducer != null) {
+			highLightSelectedProducer.delete();
+		}
+			
 		resizeDiagram();
 	}
 
@@ -474,6 +478,7 @@ public class HierarchyAxisView extends UnitAxisView {
 	public void select(int y0, int y1, boolean active) {
 		originY = y0;
 		cornerY = y1;
+
 		resizeDiagram(active);
 	}
 }
