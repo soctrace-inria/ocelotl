@@ -8,9 +8,6 @@ import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 
 public class SpatiotemporalModeStates extends SpatiotemporalMode {
-
-	//protected HashMap<EventProducerNode, ArrayList<ArrayList<Double>>> amplitudeMax;
-	protected Double amplitudeMax;
 	
 	public SpatiotemporalModeStates() {
 		super();

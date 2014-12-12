@@ -9,13 +9,12 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventPro
 
 public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 
-	//protected HashMap<EventProducerNode, ArrayList<ArrayList<Double>>> amplitudeMax;
 	protected Double amplitudeMax;
-	
+
 	public SpatiotemporalModeEvents() {
 		super();
 	}
-	
+
 	public SpatiotemporalModeEvents(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
 	}
@@ -37,15 +36,18 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 		// If node is a leaf
 		if (node.getChildrenNodes().isEmpty()) {
 			for (int i = 0; i < node.getParts().size(); i++) {
-				for (String event : getEvents()){
+				double tempAmp = 0.0;
+				for (String event : getEvents()) {
 					// Add value (= value / time slice duration)
 					Double computedValue = ((List<HashMap<String, Double>>) node
 							.getValues()).get(i).get(event)
 							/ (Long.valueOf(timeSliceDuration).doubleValue());
-					if (computedValue > amplitudeMax) {
-						amplitudeMax = computedValue;
-					}
+					// Compute amplitude max
+					tempAmp += computedValue;
 					proportions.get(node).get(i).put(event, computedValue);
+				}
+				if (tempAmp > amplitudeMax) {
+					amplitudeMax = tempAmp;
 				}
 			}
 		} else {
@@ -53,21 +55,23 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 			for (EventProducerNode child : node.getChildrenNodes()) {
 				computeProportions(child);
 				for (int i = 0; i < node.getParts().size(); i++) {
+					double tempAmp = 0.0;
 					for (String event : getEvents()) {
 						Double computedValue = proportions.get(node).get(i)
 								.get(event)
 								+ proportions.get(child).get(i).get(event)
 								/ (node.getChildrenNodes().size());
-						if (computedValue > amplitudeMax) {
-							amplitudeMax = computedValue;
-						}
+						tempAmp += computedValue;
 						proportions.get(node).get(i).put(event, computedValue);
+					}
+					if (tempAmp > amplitudeMax) {
+						amplitudeMax = tempAmp;
 					}
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Compute the state that has the biggest proportion in the given time
 	 * region
@@ -91,14 +95,14 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 				amp += proportions.get(epn).get(i).get(event);
 
 			// Divide by duration
-			amp /= amplitudeMax * (end - start);
+			amp = (amp / (end - start)) / amplitudeMax;
 			if (amp > max) {
 				maj = new MainEvent(event, amp);
 				max = amp;
 			}
 		}
-		return maj;
 
+		return maj;
 	}
-	
+
 }

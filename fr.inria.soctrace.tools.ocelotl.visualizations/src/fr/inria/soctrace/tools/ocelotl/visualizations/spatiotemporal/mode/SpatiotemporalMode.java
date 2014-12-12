@@ -55,9 +55,9 @@ public abstract class SpatiotemporalMode extends VisuSTOperator {
 		return ((SpaceTimeAggregation2Manager) lpaggregManager).getKeys();
 	}
 
-	@SuppressWarnings("unchecked")
 	protected abstract void computeProportions(EventProducerNode node);
 
-	public abstract MainEvent getMainEvent(EventProducerNode epn, int start, int end);
+	public abstract MainEvent getMainEvent(EventProducerNode epn, int start,
+			int end);
 
 }
