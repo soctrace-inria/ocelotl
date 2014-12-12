@@ -30,14 +30,14 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 		for (int i = 0; i < node.getParts().size(); i++) {
 			proportions.get(node).add(new HashMap<String, Double>());
 			// And for each state of the part
-			for (String event : getStates())
+			for (String event : getEvents())
 				// Init to zero
 				proportions.get(node).get(i).put(event, 0.0);
 		}
 		// If node is a leaf
 		if (node.getChildrenNodes().isEmpty()) {
 			for (int i = 0; i < node.getParts().size(); i++) {
-				for (String event : getStates()){
+				for (String event : getEvents()){
 					// Add value (= value / time slice duration)
 					Double computedValue = ((List<HashMap<String, Double>>) node
 							.getValues()).get(i).get(event)
@@ -53,7 +53,7 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 			for (EventProducerNode child : node.getChildrenNodes()) {
 				computeProportions(child);
 				for (int i = 0; i < node.getParts().size(); i++) {
-					for (String event : getStates()) {
+					for (String event : getEvents()) {
 						Double computedValue = proportions.get(node).get(i)
 								.get(event)
 								+ proportions.get(child).get(i).get(event)
@@ -84,7 +84,7 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 	public MainEvent getMainEvent(EventProducerNode epn, int start, int end) {
 		double max = 0.0;
 		MainEvent maj = new MainEvent(Void, max);
-		for (String event : getStates()) {
+		for (String event : getEvents()) {
 			double amp = 0.0;
 			// Compute the total presence of the event
 			for (int i = start; i < end; i++)

@@ -51,7 +51,7 @@ public abstract class SpatiotemporalMode extends VisuSTOperator {
 		computeProportions(hierarchy.getRoot());
 	}
 
-	protected List<String> getStates() {
+	protected List<String> getEvents() {
 		return ((SpaceTimeAggregation2Manager) lpaggregManager).getKeys();
 	}
 
