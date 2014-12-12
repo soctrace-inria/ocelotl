@@ -13,7 +13,7 @@
             metric_compatibility="PARTS"
             aggregator_compatibility="2D"
             selection_priority="4"
-            overview_visualization="Temporal Mode"
+            overview_visualization="Temporal Partition"
             unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.PartitionAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.TemporalPartitionView">
       </visualization_operator>
@@ -37,7 +37,7 @@
             param_win=""
             aggregator_compatibility="3D"
             selection_priority="2"
-            overview_visualization="Temporal Mode"
+            overview_visualization="Temporal Partition"
             unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views.HierarchyAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.views.SpatiotemporalPartitionView">
       </visualization_operator>
