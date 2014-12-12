@@ -14,10 +14,11 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregati
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainEvent;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
 
-public class TemporalMode extends VisuTOperator {
+public abstract class TemporalMode extends VisuTOperator {
 
 	protected HashMap<Integer, MainEvent> mainEvents;
-	private List<String> states;
+	protected HashMap<Integer, Double> proportions;
+	protected List<String> states;
 	protected ITimeManager timeManager;
 
 	@Override
@@ -29,6 +30,11 @@ public class TemporalMode extends VisuTOperator {
 	public void setOcelotlCore(OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
 		timeManager = (ITimeManager) ocelotlCore.getLpaggregManager();
+		timeSliceNumber = ocelotlCore.getOcelotlParameters()
+				.getTimeSlicesNumber();
+		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()
+				.getTimeDuration()
+				/ timeSliceNumber;
 		computeParts();
 	}
 	
@@ -36,6 +42,11 @@ public class TemporalMode extends VisuTOperator {
 	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
 		this.ocelotlCore = ocelotlCore;
 		timeManager = (ITimeManager) aManager;
+		timeSliceNumber = ocelotlCore.getOcelotlParameters()
+				.getTimeSlicesNumber();
+		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()
+				.getTimeDuration()
+				/ timeSliceNumber;
 		computeParts();
 	}
 
@@ -99,28 +110,7 @@ public class TemporalMode extends VisuTOperator {
 	public List<String> getStates() {
 		return ((TimeAggregation3Manager) timeManager).getKeys();
 	}
-
-	public void computeMainStates() {
-		mainEvents = new HashMap<Integer, MainEvent>();
-		double max = 0.0;
-		double tempMax = 0.0;
-		MainEvent maj;
-		int index;
-
-		for (index = 0; index < parts.size(); index++) {
-			maj = new MainEvent("void", max);
-			tempMax = 0.0;
-			max = 0.0;
-			for (String state : states) {
-				tempMax = ((PartMap) parts.get(index).getData()).getElements()
-						.get(state);
-				if (tempMax > max) {
-					maj = new MainEvent(state, tempMax);
-					max = tempMax;
-				}
-			}
-			mainEvents.put(index, maj);
-		}
-	}
+	
+	public abstract void computeMainStates();
 
 }

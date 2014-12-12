@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 public class VisuOperatorManager {
@@ -45,7 +45,7 @@ public class VisuOperatorManager {
 	HashMap<String, VisuOperatorResource> operatorList;
 	IVisuOperator selectedOperator;
 	String selectedOperatorName;
-	ISpaceConfig selectedConfig;
+	IVisuConfig selectedConfig;
 	OcelotlParameters parameters;
 	OcelotlCore ocelotlCore;
 
@@ -213,9 +213,9 @@ public class VisuOperatorManager {
 			return;
 
 		try {
-			selectedConfig = (ISpaceConfig) mybundle.loadClass(paramClassName)
+			selectedConfig = (IVisuConfig) mybundle.loadClass(paramClassName)
 					.newInstance();
-			parameters.setSpaceConfig(selectedConfig);
+			parameters.setVisuConfig(selectedConfig);
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException | NullPointerException e) {
 		}

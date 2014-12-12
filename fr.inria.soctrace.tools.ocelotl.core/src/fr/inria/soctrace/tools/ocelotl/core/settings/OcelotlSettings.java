@@ -196,9 +196,8 @@ public class OcelotlSettings {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (JsonParseException | NullPointerException e) {
-				e.printStackTrace();
-				logger.error("Incomplete or invalid JSON configuration file: default values will be used ");
-				//Regenerate the configuration file with the default values
+				logger.error("Incomplete or invalid JSON configuration file: the file will be regenerated with default values will be used");
+				// Regenerate the configuration file with the default values
 				saveSettings();
 			}
 		}

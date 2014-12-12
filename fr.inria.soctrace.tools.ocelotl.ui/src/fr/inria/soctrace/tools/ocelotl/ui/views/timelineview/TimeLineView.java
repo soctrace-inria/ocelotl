@@ -77,7 +77,6 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 		if (parts != null) {
 			computeDiagram();
 		}
-		
 		root.repaint();
 		drawSelection();
 	}

@@ -70,7 +70,7 @@ import fr.inria.soctrace.framesoc.ui.colors.FramesocColor;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ColorsChangeDescriptor;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.ModelEntity;
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IVisualizationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -382,7 +382,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 	}
 
 	@Override
-	public void init(OcelotlView ocelotlView, ISpaceConfig config) {
+	public void init(OcelotlView ocelotlView, IVisuConfig config) {
 		this.ocelotlView = ocelotlView;
 		this.config = (ColorsConfig) config;
 		

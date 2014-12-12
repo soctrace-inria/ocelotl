@@ -36,8 +36,7 @@ public class TemporalPartitionView extends TimeLineView {
 
 	public TemporalPartitionView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
-		this.config = (PartitionConfig) ocelotlView.getOcelotlParameters().getSpaceConfig();
-		// TODO Auto-generated constructor stub
+		this.config = (PartitionConfig) ocelotlView.getOcelotlParameters().getVisuConfig();
 	}
 
 	@Override

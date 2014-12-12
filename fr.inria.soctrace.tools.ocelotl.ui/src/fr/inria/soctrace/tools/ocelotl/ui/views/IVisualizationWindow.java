@@ -19,11 +19,11 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 
 public interface IVisualizationWindow {
 
-	public void init(OcelotlView view, ISpaceConfig config);
+	public void init(OcelotlView view, IVisuConfig config);
 
 	public int open();
 

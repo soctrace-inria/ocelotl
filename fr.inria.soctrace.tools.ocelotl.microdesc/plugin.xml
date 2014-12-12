@@ -46,7 +46,7 @@
             operator="Temporal Aggregation"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.TypeDistributionView"
-            visual_compatibility="PARTS, PROPORTIONS, MODE"
+            visual_compatibility="PARTS, PROPORTIONS, STATEMODE, EVENTMODE"
             selection_priority="1"
             dimension="2D"
             ts_default_number="100">

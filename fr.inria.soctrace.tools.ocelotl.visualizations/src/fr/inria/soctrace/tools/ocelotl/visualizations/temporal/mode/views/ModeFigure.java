@@ -23,16 +23,18 @@ public class ModeFigure extends RectangleFigure {
 		roundedRectangle.setLayoutManager(roundedLayout);
 		roundedRectangle.setPreferredSize(1000, 1000);
 		this.add(roundedRectangle);
-		final Label label = new Label(" " + mainEvent.getState() + ": " + mainEvent.getAmplitude()+" ");
+		final Label label = new Label(" " + mainEvent.getState() + ": " + mainEvent.getAmplitude100()+"% ");
 		roundedRectangle.setToolTip(label);
 		final ToolbarLayout layout = new ToolbarLayout();
 		layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 		setConstraint(roundedRectangle, getBounds());
 		setLayoutManager(layout);
 		setLineWidth(0);
+		
 		setForegroundColor(FramesocColorManager.getInstance()
 				.getEventTypeColor(mainEvent.getState()).getSwtColor());
 		setBackgroundColor(FramesocColorManager.getInstance()
 				.getEventTypeColor(mainEvent.getState()).getSwtColor());
+		setAlpha(mainEvent.getAmplitude255Shifted());
 	}
 }

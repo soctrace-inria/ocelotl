@@ -19,6 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.config;
 
-public interface ISpaceConfig {
+public interface IVisuConfig {
 
 }

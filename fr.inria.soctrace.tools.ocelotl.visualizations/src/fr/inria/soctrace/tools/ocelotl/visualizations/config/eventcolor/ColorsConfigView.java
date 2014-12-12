@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IVisualizationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -146,7 +146,7 @@ public class ColorsConfigView extends Dialog implements IVisualizationWindow {
 	}
 
 	@Override
-	public void init(final OcelotlView ocelotlView, final ISpaceConfig config) {
+	public void init(final OcelotlView ocelotlView, final IVisuConfig config) {
 		this.ocelotlView = ocelotlView;
 		this.config = (ColorsConfig) config;
 	}

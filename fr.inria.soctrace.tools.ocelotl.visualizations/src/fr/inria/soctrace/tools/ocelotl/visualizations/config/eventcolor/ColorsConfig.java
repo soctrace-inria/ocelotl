@@ -24,10 +24,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventType;
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.EventColorManager;
 
-public class ColorsConfig implements ISpaceConfig {
+public class ColorsConfig implements IVisuConfig {
 
 	private List<EventType>	types	= new LinkedList<EventType>();
 	private EventColorManager colors;

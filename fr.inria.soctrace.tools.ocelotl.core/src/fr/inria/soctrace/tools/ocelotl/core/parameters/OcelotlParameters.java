@@ -26,7 +26,7 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
@@ -80,7 +80,7 @@ public class OcelotlParameters {
 
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
-	private ISpaceConfig iSpaceConfig;
+	private IVisuConfig iVisuConfig;
 	private IStatisticOperatorConfig statisticOperatorConfig;
 
 	public OcelotlParameters() {
@@ -120,7 +120,7 @@ public class OcelotlParameters {
 		this.ocelotlSettings = op.ocelotlSettings;
 		this.timeSliceManager = op.timeSliceManager;
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
-		this.iSpaceConfig = op.iSpaceConfig;
+		this.iVisuConfig = op.iVisuConfig;
 		this.statisticOperatorConfig = op.statisticOperatorConfig;
 		this.timeSliceFactor = op.timeSliceFactor;
 	}
@@ -245,12 +245,12 @@ public class OcelotlParameters {
 		OcelotlParameters.forceJava = forceJava;
 	}
 
-	public ISpaceConfig getSpaceConfig() {
-		return iSpaceConfig;
+	public IVisuConfig getVisuConfig() {
+		return iVisuConfig;
 	}
 
-	public void setSpaceConfig(ISpaceConfig iSpaceConfig) {
-		this.iSpaceConfig = iSpaceConfig;
+	public void setVisuConfig(IVisuConfig iVisuConfig) {
+		this.iVisuConfig = iVisuConfig;
 	}
 	
 	public DataCache getDataCache() {

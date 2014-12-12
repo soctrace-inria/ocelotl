@@ -25,7 +25,7 @@
             metric_compatibility="PROPORTIONS"
             aggregator_compatibility="2D"
             selection_priority="3"
-            overview_visualization="Temporal Mode"
+            overview_visualization="Temporal Mode State"
             unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.ProportionAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.TemporalProportionView">
       </visualization_operator>
@@ -33,8 +33,8 @@
             class="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.SpatiotemporalPartition"
             operator="Spatiotemporal Partition"
             metric_compatibility="PARTS"
-            param_config=""
-            param_win=""
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.temporalpartition.PartitionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.temporalpartition.PartitionConfigView"
             aggregator_compatibility="3D"
             selection_priority="2"
             overview_visualization="Temporal Partition"
@@ -49,7 +49,7 @@
             metric_compatibility="STATEMODE"
             aggregator_compatibility="3D"
             selection_priority="1"
-            overview_visualization="Temporal Mode"
+            overview_visualization="Temporal Mode State"
             unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views.HierarchyAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views.SpatiotemporalModeView">
       </visualization_operator>
@@ -61,19 +61,31 @@
             metric_compatibility="EVENTMODE"
             aggregator_compatibility="3D"
             selection_priority="1"
-            overview_visualization="Temporal Mode"
+            overview_visualization="Temporal Mode Event"
             unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views.HierarchyAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views.SpatiotemporalModeView">
       </visualization_operator>
   	  <visualization_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.TemporalMode"
-            operator="Temporal Mode"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.TemporalModeEvent"
+            operator="Temporal Mode Event"
             param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"
-  			metric_compatibility="MODE"
+  			metric_compatibility="EVENTMODE"
             aggregator_compatibility="2D"
             selection_priority="5"
-            overview_visualization="Temporal Mode"
+            overview_visualization="Temporal Mode Event"
+            unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.PartitionAxisView"
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.views.TemporalModeView">
+      </visualization_operator>
+      <visualization_operator
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.TemporalModeState"
+            operator="Temporal Mode State"
+            param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"
+  			metric_compatibility="STATEMODE"
+            aggregator_compatibility="2D"
+            selection_priority="5"
+            overview_visualization="Temporal Mode State"
             unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views.PartitionAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.views.TemporalModeView">
       </visualization_operator>

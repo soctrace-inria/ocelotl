@@ -19,9 +19,9 @@
 
 package fr.inria.soctrace.tools.ocelotl.visualizations.config.temporalpartition;
 
-import fr.inria.soctrace.tools.ocelotl.core.config.ISpaceConfig;
+import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 
-public class PartitionConfig implements ISpaceConfig {
+public class PartitionConfig implements IVisuConfig {
 
 	private boolean numbers = false;
 	private boolean aggregated = true;
