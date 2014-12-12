@@ -204,8 +204,10 @@ abstract public class UnitAxisView {
 		}
 		
 		public void draw(EventProducerNode epn) {
-			Rectangle selectedZone = eventProdToFigures.get(epn);
-			draw(selectedZone.x, selectedZone.y, selectedZone.x() + selectedZone.width(), selectedZone.y() + selectedZone.height());
+			if (eventProdToFigures.containsKey(epn)) {
+				Rectangle selectedZone = eventProdToFigures.get(epn);
+				draw(selectedZone.x, selectedZone.y, selectedZone.x() + selectedZone.width(), selectedZone.y() + selectedZone.height());
+			}
 		}
 
 		/**

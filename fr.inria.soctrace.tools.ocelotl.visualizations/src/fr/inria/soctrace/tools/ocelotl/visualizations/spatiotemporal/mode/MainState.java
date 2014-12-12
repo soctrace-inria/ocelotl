@@ -27,7 +27,7 @@ public class MainState {
 	}
 
 	public int getAmplitude255Shifted() {
-		return (int) (Offset+(Math.min(amplitude, 1.0)*(255.0-Offset)));
+		return (int) (Offset + (Math.min(amplitude, 1.0) * (255.0 - Offset)));
 	}
 
 	public int getAmplitude100() {

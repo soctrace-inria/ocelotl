@@ -211,7 +211,7 @@ public class HierarchyAxisView extends UnitAxisView {
 	 * represented, then do not show them
 	 * 
 	 * @param epn
-	 * the tested event producer node
+	 *            the tested event producer node
 	 */
 	public void findSmallestDisplayableHierarchy(EventProducerNode epn) {
 		// Check for each child that we have enough vertical space
@@ -452,7 +452,7 @@ public class HierarchyAxisView extends UnitAxisView {
 
 	public void resizeDiagram() {
 		root.removeAll();
-		createDiagram(hierarchy, false);
+		createDiagram(hierarchy, true);
 		root.repaint();
 	}
 	

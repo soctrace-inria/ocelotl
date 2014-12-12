@@ -51,12 +51,12 @@ public class SpatiotemporalMode extends VisuSTOperator {
 		computeProportions(hierarchy.getRoot());
 	}
 
-	private List<String> getStates() {
+	protected List<String> getStates() {
 		return ((SpaceTimeAggregation2Manager) lpaggregManager).getKeys();
 	}
 
 	@SuppressWarnings("unchecked")
-	private void computeProportions(EventProducerNode node) {
+	protected void computeProportions(EventProducerNode node) {
 		// Init for the current producer node
 		proportions.put(node, new ArrayList<HashMap<String, Double>>());
 		// Init for each part of the node

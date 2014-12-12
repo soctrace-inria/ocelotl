@@ -12,7 +12,7 @@
      		selection_priority = "2"
      		trace_formats="ALL"
      		generic="true"
-     		visual_compatibility="PARTS, PROPORTIONS, MODE"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, EVENTMODE"
             event_category="ALL">
       </microscopic_model>
       <microscopic_model
@@ -56,7 +56,7 @@
             operator="Spatiotemporal Aggregation"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
-            visual_compatibility="PARTS, STATEMODE"
+            visual_compatibility="PARTS, STATEMODE, EVENTMODE"
             selection_priority="2"
             dimension="3D"
             ts_default_number="30">
