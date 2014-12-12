@@ -7,62 +7,60 @@ import java.util.List;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 
-public class SpatiotemporalModeEvents extends SpatiotemporalMode {
+public class SpatiotemporalModeStates extends SpatiotemporalMode {
 
 	//protected HashMap<EventProducerNode, ArrayList<ArrayList<Double>>> amplitudeMax;
 	protected Double amplitudeMax;
 	
-	public SpatiotemporalModeEvents() {
+	public SpatiotemporalModeStates() {
 		super();
 	}
 	
-	public SpatiotemporalModeEvents(final OcelotlCore ocelotlCore) {
+	public SpatiotemporalModeStates(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	protected void computeProportions(EventProducerNode node) {
 		// Init for the current producer node
 		proportions.put(node, new ArrayList<HashMap<String, Double>>());
-		amplitudeMax = 0.0;
 		// Init for each part of the node
 		for (int i = 0; i < node.getParts().size(); i++) {
 			proportions.get(node).add(new HashMap<String, Double>());
 			// And for each state of the part
-			for (String event : getStates())
+			for (String state : getStates())
 				// Init to zero
-				proportions.get(node).get(i).put(event, 0.0);
+				proportions.get(node).get(i).put(state, 0.0);
 		}
 		// If node is a leaf
 		if (node.getChildrenNodes().isEmpty()) {
 			for (int i = 0; i < node.getParts().size(); i++) {
-				for (String event : getStates()){
+				for (String state : getStates())
 					// Add value (= value / time slice duration)
-					Double computedValue = ((List<HashMap<String, Double>>) node
-							.getValues()).get(i).get(event)
-							/ (Long.valueOf(timeSliceDuration).doubleValue());
-					if (computedValue > amplitudeMax) {
-						amplitudeMax = computedValue;
-					}
-					proportions.get(node).get(i).put(event, computedValue);
-				}
+					proportions
+							.get(node)
+							.get(i)
+							.put(state,
+									((List<HashMap<String, Double>>) node
+											.getValues()).get(i).get(state)
+											/ (Long.valueOf(timeSliceDuration)
+													.doubleValue()));
 			}
 		} else {
 			// Compute proportions recursively for each children node
 			for (EventProducerNode child : node.getChildrenNodes()) {
 				computeProportions(child);
 				for (int i = 0; i < node.getParts().size(); i++) {
-					for (String event : getStates()) {
-						Double computedValue = proportions.get(node).get(i)
-								.get(event)
-								+ proportions.get(child).get(i).get(event)
-								/ (node.getChildrenNodes().size());
-						if (computedValue > amplitudeMax) {
-							amplitudeMax = computedValue;
-						}
-						proportions.get(node).get(i).put(event, computedValue);
-					}
+					for (String state : getStates())
+						proportions
+								.get(node)
+								.get(i)
+								.put(state,
+										proportions.get(node).get(i).get(state)
+												+ proportions.get(child).get(i)
+														.get(state)
+												/ (node.getChildrenNodes()
+														.size()));
 				}
 			}
 		}
@@ -80,20 +78,19 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 	 *            the index of the ending slice
 	 * @return the state with the biggest proportion
 	 */
-	@Override
 	public MainEvent getMainEvent(EventProducerNode epn, int start, int end) {
 		double max = 0.0;
 		MainEvent maj = new MainEvent(Void, max);
-		for (String event : getStates()) {
+		for (String state : getStates()) {
 			double amp = 0.0;
-			// Compute the total presence of the event
+			// Compute the total presence of the state
 			for (int i = start; i < end; i++)
-				amp += proportions.get(epn).get(i).get(event);
+				amp += proportions.get(epn).get(i).get(state);
 
 			// Divide by duration
-			amp /= amplitudeMax * (end - start);
+			amp /= (end - start);
 			if (amp > max) {
-				maj = new MainEvent(event, amp);
+				maj = new MainEvent(state, amp);
 				max = amp;
 			}
 		}

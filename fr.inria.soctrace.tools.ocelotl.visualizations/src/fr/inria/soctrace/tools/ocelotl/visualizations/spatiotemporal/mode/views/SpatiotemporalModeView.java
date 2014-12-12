@@ -14,7 +14,7 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventPro
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.Part;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.SpatioTemporalAggregateView;
-import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainState;
+import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainEvent;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.SpatiotemporalMode;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.VisualAggregation;
 import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views.SpatioTemporalView;
@@ -34,9 +34,9 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 			aggregates = new ArrayList<SpatioTemporalAggregateView>();
 		}
 
-		protected MainState getMainState(EventProducerNode epn, int start,
+		protected MainEvent getMainState(EventProducerNode epn, int start,
 				int end) {
-			return spatiotemporalMode.getMainState(epn, start, end);
+			return spatiotemporalMode.getMainEvent(epn, start, end);
 		}
 		
 		@Override
@@ -45,7 +45,7 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 				boolean isVisualAggregate, int number) {
 			RectangleFigure rectangle = new RectangleFigure();
 
-			MainState state = getMainState(epn, startTimeSlice, endTimeSlice);
+			MainEvent state = getMainState(epn, startTimeSlice, endTimeSlice);
 			String label = " " + epn.getMe().getName() + " ("
 					+ state.getState() + ", " + state.getAmplitude100() + "%) ";
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()
@@ -169,9 +169,9 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 		}
 		
 		@Override
-		protected MainState getMainState(EventProducerNode epn, int start,
+		protected MainEvent getMainState(EventProducerNode epn, int start,
 				int end) {
-			return spatiotemporalMode.getMainState(epn, start + startingSlice,
+			return spatiotemporalMode.getMainEvent(epn, start + startingSlice,
 					end + startingSlice);
 		}
 

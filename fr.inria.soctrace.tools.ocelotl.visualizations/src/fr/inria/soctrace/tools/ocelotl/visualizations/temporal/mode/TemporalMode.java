@@ -11,12 +11,12 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.ITimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregation3Manager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainState;
+import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainEvent;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
 
 public class TemporalMode extends VisuTOperator {
 
-	protected HashMap<Integer, MainState> mainStates;
+	protected HashMap<Integer, MainEvent> mainEvents;
 	private List<String> states;
 	protected ITimeManager timeManager;
 
@@ -48,12 +48,12 @@ public class TemporalMode extends VisuTOperator {
 		super();
 	}
 
-	public HashMap<Integer, MainState> getMajStates() {
-		return mainStates;
+	public HashMap<Integer, MainEvent> getMajStates() {
+		return mainEvents;
 	}
 
-	public void setMajStates(HashMap<Integer, MainState> mainStates) {
-		this.mainStates = mainStates;
+	public void setMajStates(HashMap<Integer, MainEvent> mainEvents) {
+		this.mainEvents = mainEvents;
 	}
 	
 	@Override
@@ -101,25 +101,25 @@ public class TemporalMode extends VisuTOperator {
 	}
 
 	public void computeMainStates() {
-		mainStates = new HashMap<Integer, MainState>();
+		mainEvents = new HashMap<Integer, MainEvent>();
 		double max = 0.0;
 		double tempMax = 0.0;
-		MainState maj;
+		MainEvent maj;
 		int index;
 
 		for (index = 0; index < parts.size(); index++) {
-			maj = new MainState("void", max);
+			maj = new MainEvent("void", max);
 			tempMax = 0.0;
 			max = 0.0;
 			for (String state : states) {
 				tempMax = ((PartMap) parts.get(index).getData()).getElements()
 						.get(state);
 				if (tempMax > max) {
-					maj = new MainState(state, tempMax);
+					maj = new MainEvent(state, tempMax);
 					max = tempMax;
 				}
 			}
-			mainStates.put(index, maj);
+			mainEvents.put(index, maj);
 		}
 	}
 

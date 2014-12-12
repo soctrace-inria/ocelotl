@@ -42,7 +42,7 @@
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.partition.views.SpatiotemporalPartitionView">
       </visualization_operator>
       <visualization_operator
-            class="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.SpatiotemporalMode"
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.SpatiotemporalModeStates"
             operator="Spatiotemporal State Mode"
             param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ColorsConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor.ManageColorsDialog"

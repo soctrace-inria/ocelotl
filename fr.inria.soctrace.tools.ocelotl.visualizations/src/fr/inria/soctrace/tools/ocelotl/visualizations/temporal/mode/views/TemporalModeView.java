@@ -8,7 +8,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
-import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainState;
+import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainEvent;
 import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.TemporalMode;
 
 public class TemporalModeView extends TimeLineView {
@@ -37,7 +37,7 @@ public class TemporalModeView extends TimeLineView {
 							/ parts.size() - space + aBorder, aBorder)));
 			j = j + aggParts.get(i);
 			part.getUpdateManager().performUpdate();
-			MainState mState = ((TemporalMode) visuOperator).getMajStates().get(i);
+			MainEvent mState = ((TemporalMode) visuOperator).getMajStates().get(i);
 			part.draw(mState);
 		}
 	}

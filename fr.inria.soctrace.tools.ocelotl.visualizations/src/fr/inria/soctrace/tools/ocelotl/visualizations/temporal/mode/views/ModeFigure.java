@@ -6,7 +6,7 @@ import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.ToolbarLayout;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
-import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainState;
+import fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.MainEvent;
 
 public class ModeFigure extends RectangleFigure {
 
@@ -15,7 +15,7 @@ public class ModeFigure extends RectangleFigure {
 	}
 
 	// Draw the part visualization of the aggregates
-	public void draw(MainState mainState) {
+	public void draw(MainEvent mainEvent) {
 		removeAll();
 		final RectangleFigure roundedRectangle = new RectangleFigure();
 		roundedRectangle.setLineWidth(0);
@@ -23,7 +23,7 @@ public class ModeFigure extends RectangleFigure {
 		roundedRectangle.setLayoutManager(roundedLayout);
 		roundedRectangle.setPreferredSize(1000, 1000);
 		this.add(roundedRectangle);
-		final Label label = new Label(" " + mainState.getState() + ": " + mainState.getAmplitude()+" ");
+		final Label label = new Label(" " + mainEvent.getState() + ": " + mainEvent.getAmplitude()+" ");
 		roundedRectangle.setToolTip(label);
 		final ToolbarLayout layout = new ToolbarLayout();
 		layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
@@ -31,8 +31,8 @@ public class ModeFigure extends RectangleFigure {
 		setLayoutManager(layout);
 		setLineWidth(0);
 		setForegroundColor(FramesocColorManager.getInstance()
-				.getEventTypeColor(mainState.getState()).getSwtColor());
+				.getEventTypeColor(mainEvent.getState()).getSwtColor());
 		setBackgroundColor(FramesocColorManager.getInstance()
-				.getEventTypeColor(mainState.getState()).getSwtColor());
+				.getEventTypeColor(mainEvent.getState()).getSwtColor());
 	}
 }

@@ -1,17 +1,17 @@
 package fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode;
 
-public class MainState {
+public class MainEvent {
 
-	private String state;
+	private String event;
 	private double amplitude;
 	private final static double Offset = 30.0;
 
 	public String getState() {
-		return state;
+		return event;
 	}
 
 	public void setState(String state) {
-		this.state = state;
+		this.event = state;
 	}
 
 	public double getAmplitude() {
@@ -34,9 +34,9 @@ public class MainState {
 		return (int) (amplitude * 100.0);
 	}
 
-	public MainState(String state, double amplitude) {
+	public MainEvent(String state, double amplitude) {
 		super();
-		this.state = state;
+		this.event = state;
 		this.amplitude = amplitude;
 	}
 
