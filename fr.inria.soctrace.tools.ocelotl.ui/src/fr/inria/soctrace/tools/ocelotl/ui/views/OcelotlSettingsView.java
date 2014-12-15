@@ -1,5 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.text.Collator;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -403,7 +405,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Group groupParameterSettings = new Group(sashFormParameterP, SWT.NONE);
 		groupParameterSettings.setFont(cantarell8);
-		groupParameterSettings.setText("Parameter P Settings");
+		groupParameterSettings.setText("Parameter p Settings");
 		groupParameterSettings.setLayout(new GridLayout(2, false));
 		
 		final Label lblParameterPStrategy= new Label(groupParameterSettings, SWT.NONE);
@@ -753,7 +755,10 @@ public class OcelotlSettingsView extends Dialog {
 	}
 
 	protected void initSettings() {
-		for(String strategyName: ParameterStrategy.availableStrategies.values())
+		ArrayList<String> sortedStrategyName = new ArrayList<String>();
+		sortedStrategyName.addAll(ParameterStrategy.availableStrategies.values());
+		java.util.Collections.sort(sortedStrategyName, Collator.getInstance());
+		for(String strategyName: sortedStrategyName)
 			parameterPStrategy.add(strategyName);
 		
 		// Set current value
