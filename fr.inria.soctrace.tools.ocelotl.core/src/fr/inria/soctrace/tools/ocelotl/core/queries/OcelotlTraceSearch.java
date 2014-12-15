@@ -497,8 +497,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 		openTraceDBObject(t);
 		final IteratorQueries query = new IteratorQueries(traceDB);
 		ConditionManager conditionManager = new ConditionManager();
-		eventTypeConditionOPT(eventTypes, conditionManager, aCategory);
-		eventProducerConditionOPT(eventProducers, conditionManager);
+		eventTypeConditionNOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionNOPT(eventProducers, conditionManager);
 		timeConditionNOPT(intervals, conditionManager);
 		conditionManager.setWhere(query);
 		query.setLoadParameters(false);
