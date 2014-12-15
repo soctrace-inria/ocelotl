@@ -462,6 +462,7 @@ public class HierarchyAxisView extends UnitAxisView {
 		root.repaint();
 	}
 
+	@Override
 	public void unselect() {
 		originY = -1;
 		cornerY = -1;

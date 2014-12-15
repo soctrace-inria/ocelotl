@@ -39,7 +39,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 
 /**
- * Unit Axis View : show a Y axis on the side
+ * Unit Axis View: show a Y axis on the side
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
@@ -118,6 +118,9 @@ abstract public class UnitAxisView {
 	
 	public abstract void select(final int y0, final int y1, final boolean active);
 
+	/**
+	 * Remove selection display
+	 */
 	public abstract void unselect();
 
 	public void init(final UnitAxisViewWrapper wrapper) {

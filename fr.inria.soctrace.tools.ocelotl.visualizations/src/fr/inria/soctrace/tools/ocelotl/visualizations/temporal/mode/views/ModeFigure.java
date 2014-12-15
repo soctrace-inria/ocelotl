@@ -17,17 +17,11 @@ public class ModeFigure extends RectangleFigure {
 	// Draw the part visualization of the aggregates
 	public void draw(MainEvent mainEvent) {
 		removeAll();
-		final RectangleFigure roundedRectangle = new RectangleFigure();
-		roundedRectangle.setLineWidth(0);
-		final ToolbarLayout roundedLayout = new ToolbarLayout();
-		roundedRectangle.setLayoutManager(roundedLayout);
-		roundedRectangle.setPreferredSize(1000, 1000);
-		this.add(roundedRectangle);
+		setPreferredSize(1000, 1000);
 		final Label label = new Label(" " + mainEvent.getState() + ": " + mainEvent.getAmplitude100()+"% ");
-		roundedRectangle.setToolTip(label);
+		setToolTip(label);
 		final ToolbarLayout layout = new ToolbarLayout();
 		layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-		setConstraint(roundedRectangle, getBounds());
 		setLayoutManager(layout);
 		setLineWidth(0);
 		
