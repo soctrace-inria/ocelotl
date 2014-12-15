@@ -27,7 +27,7 @@
       </microscopic_model>
       <microscopic_model
       		name="States Query EP"
-      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionEP"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQueryEP"
       		unit="%TIME"
       		selection_priority = "3"
       		trace_formats="ALL"
@@ -37,7 +37,7 @@
       </microscopic_model>
             <microscopic_model
       		name="States Query EPET"
-      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionEPET"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQueryEPET"
       		unit="%TIME"
       		selection_priority = "3"
       		trace_formats="ALL"
@@ -47,7 +47,7 @@
       </microscopic_model>
             <microscopic_model
       		name="States Query ET"
-      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionET"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQueryET"
       		unit="%TIME"
       		selection_priority = "3"
       		trace_formats="ALL"
@@ -57,7 +57,7 @@
       </microscopic_model>
             <microscopic_model
       		name="States Query NOPT"
-      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionNOPT"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQueryNOPT"
       		unit="%TIME"
       		selection_priority = "3"
       		trace_formats="ALL"
@@ -67,7 +67,7 @@
       </microscopic_model>
                   <microscopic_model
       		name="States Query T"
-      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionT"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQueryT"
       		unit="%TIME"
       		selection_priority = "3"
       		trace_formats="ALL"
@@ -77,7 +77,7 @@
       </microscopic_model>
                   <microscopic_model
       		name="States Query TEP"
-      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionTEP"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQueryTEP"
       		unit="%TIME"
       		selection_priority = "3"
       		trace_formats="ALL"
@@ -87,7 +87,7 @@
       </microscopic_model>
                   <microscopic_model
       		name="States Query TET"
-      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionTET"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQueryTET"
       		unit="%TIME"
       		selection_priority = "3"
       		trace_formats="ALL"
