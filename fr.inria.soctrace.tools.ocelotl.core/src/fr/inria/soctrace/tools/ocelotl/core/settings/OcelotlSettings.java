@@ -46,6 +46,7 @@ public class OcelotlSettings {
 	private int snapshotXResolution;
 	private int snapshotYResolution;
 
+	private boolean enableOverview;
 	private double overviewParameter;
 	private String overviewAggregOperator;
 	private int overviewTimesliceNumber;
@@ -96,6 +97,7 @@ public class OcelotlSettings {
 		overviewDisplayFgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_FG_COLOR;
 		overviewDisplayAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_ALPHA;
 		parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
+		enableOverview = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
 		
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -180,6 +182,8 @@ public class OcelotlSettings {
 						.getAsInt());
 				setParameterPPolicy(ParameterPPolicy.valueOf(theConf.get(
 						OcelotlConstants.JSONParameterPPolicy).getAsString()));
+				setEnableOverview(theConf.get(
+						OcelotlConstants.JSONEnableOverview).getAsBoolean());
 
 				logger.debug("Settings values:\n");
 				logger.debug("Cache activated: " + cacheActivated);
@@ -258,7 +262,9 @@ public class OcelotlSettings {
 				overviewDisplayAlphaValue);
 		theConfig.addProperty(OcelotlConstants.JSONParameterPPolicy,
 				parameterPPolicy.toString());
-
+		theConfig.addProperty(OcelotlConstants.JSONEnableOverview,
+				enableOverview);
+		
 		String newSettings = gson.toJson(theConfig);
 
 		PrintWriter writer;
@@ -555,6 +561,17 @@ public class OcelotlSettings {
 	public void setOverviewDisplayAlphaValue(int overviewDisplayAlphaValue) {
 		if (this.overviewDisplayAlphaValue != overviewDisplayAlphaValue) {
 			this.overviewDisplayAlphaValue = overviewDisplayAlphaValue;
+			saveSettings();
+		}
+	}
+
+	public boolean isEnableOverview() {
+		return enableOverview;
+	}
+
+	public void setEnableOverview(boolean enableOverview) {
+		if (this.enableOverview != enableOverview) {
+			this.enableOverview = enableOverview;
 			saveSettings();
 		}
 	}

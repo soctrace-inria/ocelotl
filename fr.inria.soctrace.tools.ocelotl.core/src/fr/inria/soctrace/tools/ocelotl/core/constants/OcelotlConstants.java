@@ -76,7 +76,8 @@ public class OcelotlConstants {
 	 * Possible parameter p chose strategy
 	 */
 	static public enum ParameterPPolicy {
-		PARAMETERP_STRATEGY_ONE, PARAMETERP_STRATEGY_ZERO, PARAMETERP_STRATEGY_LARGEST_DIFF, PARAMETERP_STRATEGY_LARGEST_SUM_DIFF
+		PARAMETERP_STRATEGY_ONE, PARAMETERP_STRATEGY_ZERO, PARAMETERP_STRATEGY_LARGEST_DIFF, PARAMETERP_STRATEGY_LARGEST_SUM_DIFF,
+		PARAMETERP_STRATEGY_LARGEST_SUM_DIFF2
 	}
 	
 	public static final String MultipleValueExtensionSeparator = ", ";
@@ -104,7 +105,8 @@ public class OcelotlConstants {
 	public static final String JSONIncreasingQualities = "increasingQualities";
 	public static final String JSONSnapshotXResolution = "snapshotXResolution";
 	public static final String JSONSnapshotYResolution = "snapshotYResolution";
-
+	
+	public static final String JSONEnableOverview = "enableOverview";
 	public static final String JSONOverviewAggregOperator = "overviewAggregOperator";
 	public static final String JSONOverviewTimesliceNumber = "overviewTimesliceNumber";
 	public static final String JSONOverviewSelectionFgColor = "overviewSelectionFgColor";

@@ -1,5 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.text.Collator;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -78,6 +80,7 @@ public class OcelotlSettingsView extends Dialog {
 	private HashMap<Button, Color>				btnColorMap;
 	private Spinner								textDisplayAlpha;
 	private Spinner								textSelectionAlpha;
+	private Button								btnEnableOverview;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -402,7 +405,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Group groupParameterSettings = new Group(sashFormParameterP, SWT.NONE);
 		groupParameterSettings.setFont(cantarell8);
-		groupParameterSettings.setText("Parameter P Settings");
+		groupParameterSettings.setText("Parameter p Settings");
 		groupParameterSettings.setLayout(new GridLayout(2, false));
 		
 		final Label lblParameterPStrategy= new Label(groupParameterSettings, SWT.NONE);
@@ -659,6 +662,12 @@ public class OcelotlSettingsView extends Dialog {
 		groupOverviewSettings.setText("Snapshot Settings");
 		groupOverviewSettings.setLayout(new GridLayout(2, false));
 		
+		btnEnableOverview = new Button(groupOverviewSettings, SWT.CHECK);
+		btnEnableOverview.setFont(cantarell8);
+		btnEnableOverview.setSelection(settings.isEnableOverview());
+		btnEnableOverview.setText("Display Overview");
+		new Label(groupOverviewSettings, SWT.NONE);
+		
 		final Label lblBgDisplay = new Label(groupOverviewSettings, SWT.NONE);
 		lblBgDisplay.setFont(cantarell8);
 		lblBgDisplay.setText("Display Background");
@@ -688,6 +697,7 @@ public class OcelotlSettingsView extends Dialog {
 		textDisplayAlpha.setIncrement(1);
 		textDisplayAlpha.setMaximum(255);
 		textDisplayAlpha.setMinimum(0);
+		textDisplayAlpha.setFont(cantarell8);
 		textDisplayAlpha.setSelection(settings.getOverviewDisplayAlphaValue());
 		textDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
 	
@@ -720,6 +730,7 @@ public class OcelotlSettingsView extends Dialog {
 		textSelectionAlpha.setIncrement(1);
 		textSelectionAlpha.setMaximum(255);
 		textSelectionAlpha.setMinimum(0);
+		textSelectionAlpha.setFont(cantarell8);
 		textSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
 		textSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
 
@@ -744,7 +755,10 @@ public class OcelotlSettingsView extends Dialog {
 	}
 
 	protected void initSettings() {
-		for(String strategyName: ParameterStrategy.availableStrategies.values())
+		ArrayList<String> sortedStrategyName = new ArrayList<String>();
+		sortedStrategyName.addAll(ParameterStrategy.availableStrategies.values());
+		java.util.Collections.sort(sortedStrategyName, Collator.getInstance());
+		for(String strategyName: sortedStrategyName)
 			parameterPStrategy.add(strategyName);
 		
 		// Set current value
@@ -781,6 +795,7 @@ public class OcelotlSettingsView extends Dialog {
 		settings.setSnapshotYResolution(Integer.valueOf(snapshotHeight.getText()));
 		
 		//Overview colors
+		settings.setEnableOverview(btnEnableOverview.getSelection());
 		settings.setOverviewDisplayBgColor(btnColorMap.get(btnEditBgDisplay));
 		settings.setOverviewDisplayFgColor(btnColorMap.get(btnEditFgDisplay));
 		settings.setOverviewDisplayAlphaValue(Integer.valueOf(textDisplayAlpha.getText()));
