@@ -695,6 +695,7 @@ public class OcelotlSettingsView extends Dialog {
 		textDisplayAlpha.setIncrement(1);
 		textDisplayAlpha.setMaximum(255);
 		textDisplayAlpha.setMinimum(0);
+		textDisplayAlpha.setFont(cantarell8);
 		textDisplayAlpha.setSelection(settings.getOverviewDisplayAlphaValue());
 		textDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
 	
@@ -727,6 +728,7 @@ public class OcelotlSettingsView extends Dialog {
 		textSelectionAlpha.setIncrement(1);
 		textSelectionAlpha.setMaximum(255);
 		textSelectionAlpha.setMinimum(0);
+		textSelectionAlpha.setFont(cantarell8);
 		textSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
 		textSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
 
