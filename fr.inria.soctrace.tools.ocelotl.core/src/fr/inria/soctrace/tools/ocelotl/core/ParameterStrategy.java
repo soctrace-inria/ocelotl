@@ -22,7 +22,10 @@ public class ParameterStrategy {
 				"Largest Gap in Loss or Gain");
 		availableStrategies.put(
 				ParameterPPolicy.PARAMETERP_STRATEGY_LARGEST_SUM_DIFF,
-				"Largest Gap between Loss and Gain");
+				"Largest Gap between Loss and Gain (After)");
+		availableStrategies.put(
+				ParameterPPolicy.PARAMETERP_STRATEGY_LARGEST_SUM_DIFF2,
+				"Largest Gap between Loss and Gain (Before)");
 	}
 
 	/**
@@ -44,6 +47,8 @@ public class ParameterStrategy {
 			return 0.0;
 		case PARAMETERP_STRATEGY_LARGEST_SUM_DIFF:
 			return largestDiffOftheSum(aDataAggregManager);
+		case PARAMETERP_STRATEGY_LARGEST_SUM_DIFF2:
+			return largestDiffOftheSum2(aDataAggregManager);
 		case PARAMETERP_STRATEGY_LARGEST_DIFF:
 			return largestDiff(aDataAggregManager);
 		default:
@@ -114,6 +119,29 @@ public class ParameterStrategy {
 			}
 		}
 		return aDataAggregManager.getParameters().get(indexMaxQual + 1);
+	}
+	
+	public double largestDiffOftheSum2(IDataAggregManager aDataAggregManager) {
+		double diffG = 0.0, diffL = 0.0;
+		double sumDiff = 0.0;
+		double maxDiff = 0.0;
+		ArrayList<DLPQuality> qual = (ArrayList<DLPQuality>) aDataAggregManager.getQualities();
+		int indexMaxQual = qual.size()-1;
+		int i;
+		for (i = 0; i < qual.size()-1; i++) {
+			// Compute the difference for the gain and the loss
+			diffG = Math.abs(qual.get(i + 1).getGain() - qual.get(i).getGain());
+			diffL = Math.abs(qual.get(i + 1).getLoss() - qual.get(i).getLoss());
+
+			// Compute sum of both
+			sumDiff = Math.abs(diffG - diffL);
+
+			if (sumDiff > maxDiff) {
+				maxDiff = sumDiff;
+				indexMaxQual = i;
+			}
+		}
+			return aDataAggregManager.getParameters().get(indexMaxQual);
 	}
 	
 	public ParameterPPolicy getStrategy(String aStrategyName) {
