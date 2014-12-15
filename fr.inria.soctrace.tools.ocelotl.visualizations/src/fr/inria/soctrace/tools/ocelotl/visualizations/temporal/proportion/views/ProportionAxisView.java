@@ -28,6 +28,7 @@ import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView;
@@ -62,6 +63,8 @@ public class ProportionAxisView extends UnitAxisView {
 	protected int areaWidth = 0;
 	// X coordinate of the main axis line
 	protected int mainLineXPosition;
+	// Max size of a label
+	protected int labelMaxWidth;
 	
 	// Margin from the frame
 	protected final static int Border = 10;
@@ -69,8 +72,6 @@ public class ProportionAxisView extends UnitAxisView {
 	protected final static long GradHeightMin = 20;
 	// Height of the text
 	protected final static int TextHeight = 20;
-	// Number of subgraduations between graduations
-	protected final static long MiniDivide = 5;
 	// Width of a subgraduation
 	protected final static int MiniGradWidth = 4;
 	// Offset on X to draw the text 
@@ -78,8 +79,8 @@ public class ProportionAxisView extends UnitAxisView {
 	// Margin ratio for drawing (let a space on top of the drawing (coordination
 	// with proportion view)
 	private static final double DrawingMarginRatio = OcelotlConstants.TemporalProportionDrawingMarginRatio;
-	// The number of wanted graduation
-	private static final int WantedNumberOfGraduation = 10;
+	// The number of sub graduations per graduation
+	private static final int NumberOfSubGraduation = 5;
 
 
 	public ProportionAxisView() {
@@ -90,7 +91,7 @@ public class ProportionAxisView extends UnitAxisView {
 	public void createDiagram(final double maxValue) {
 		root.removeAll();
 		this.maxValue = maxValue;
-		if (maxValue >= 0) {
+		if (maxValue > 0.0) {
 			drawMainLine();
 			drawGrads();
 		}
@@ -102,9 +103,10 @@ public class ProportionAxisView extends UnitAxisView {
 		root.removeAll();
 		TemporalProportion propOperator = (TemporalProportion) manager;
 		this.maxValue = propOperator.getMax();
-		if (maxValue >= 0.0) {
+		if (maxValue > 0.0) {
 			drawMainLine();
 			drawGrads();
+			resizeAxis();
 		}
 		canvas.update();
 	}
@@ -143,6 +145,13 @@ public class ProportionAxisView extends UnitAxisView {
 					8, SWT.NORMAL));
 			label.setToolTip(new Label(text));
 			label.setSize(textWidth, TextHeight);
+			
+			// Compute label width
+			GC gc = new GC(canvas);
+			gc.setFont(label.getFont());
+			int labelWidth = gc.textExtent(label.getText()).x;
+			if (labelWidth > labelMaxWidth)
+				labelMaxWidth = labelWidth;
 
 			root.add(label, new Rectangle(new Point(mainLineXPosition
 					- TextPositionOffset - textWidth, axisHeight
@@ -151,10 +160,10 @@ public class ProportionAxisView extends UnitAxisView {
 							axisHeight - (int) (i * gradHeight) - Border))));
 
 			// Draw the mini graduations
-			for (int j = 1; j < 5; j++) {
+			for (int j = 1; j < NumberOfSubGraduation; j++) {
 				final PolylineConnection line2 = new PolylineConnection();
 				if (axisHeight - (int) (i * gradHeight) - Border
-						+ (int) (j * gradHeight / MiniDivide) > root.getSize()
+						+ (int) (j * gradHeight / NumberOfSubGraduation) > root.getSize()
 						.height() - Border)
 					break;
 
@@ -164,11 +173,34 @@ public class ProportionAxisView extends UnitAxisView {
 				line2.setEndpoints(new Point(
 						mainLineXPosition,
 						axisHeight - (int) (i * gradHeight)
-								+ (int) (j * gradHeight / MiniDivide)),
+								+ (int) (j * gradHeight / NumberOfSubGraduation)),
 						new Point(new Point(mainLineXPosition + MiniGradWidth,
 								axisHeight -	(int) (i * gradHeight)
-										+ (int) (j * gradHeight / MiniDivide))));
+										+ (int) (j * gradHeight / NumberOfSubGraduation))));
 				root.add(line2);
+			}
+		}
+		
+		// Draw additional subgraduations, if necessary
+		int yPositionOfLastGraduation = (int) ((int) (gradNumber) * gradHeight);
+		if (drawingHeight > yPositionOfLastGraduation) {
+			int j = 0;
+			while (yPositionOfLastGraduation
+					+ (int) (j * gradHeight / NumberOfSubGraduation) < drawingHeight) {
+				final PolylineConnection line2 = new PolylineConnection();
+				line2.setForegroundColor(SWTResourceManager
+						.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+				line2.setLineWidth(1);
+				line2.setEndpoints(new Point(mainLineXPosition,
+						(int) axisHeight
+								- (yPositionOfLastGraduation + (int) (j
+										* gradHeight / NumberOfSubGraduation))),
+						new Point(new Point(mainLineXPosition + MiniGradWidth,
+								axisHeight
+										- (yPositionOfLastGraduation + (int) (j
+												* gradHeight / NumberOfSubGraduation)))));
+				root.add(line2);
+				j++;
 			}
 		}
 	}
@@ -194,21 +226,43 @@ public class ProportionAxisView extends UnitAxisView {
 	public void computeMeasurements() {
 		axisHeight = (int) (root.getSize().height() - Border);
 		drawingHeight = DrawingMarginRatio * axisHeight;
-		
+
 		areaWidth = root.getClientArea().width();
 		textWidth = areaWidth - (areaWidth - mainLineXPosition - 2)
 				- TextPositionOffset;
-		
-		gradDuration = maxValue / WantedNumberOfGraduation;
+
+		// Try to divide the axis to have round number
+		double temp = maxValue;
+		int i;
+		for (i = 1; temp > 10; i++)
+			temp /= 10;
+		final double factor = temp < 6.0 ? 10.0 : temp;
+		for (int j = 1; j < i; j++)
+			temp *= 10;
+		gradDuration = temp / factor;
 		gradNumber = maxValue / gradDuration;
 		gradHeight = drawingHeight / gradNumber;
-		
+
 		// If the graduation height is smaller than the minimum, reduce the
 		// number of graduations
 		while (gradHeight < GradHeightMin && gradNumber > 6) {
 			gradNumber /= 2;
 			gradHeight *= 2;
 			gradDuration *= 2;
+		}
+	}
+
+	/**
+	 * After the first run, resize the axis to display the labels
+	 */
+	protected void resizeAxis() {
+		int minSize = labelMaxWidth + TextPositionOffset + Border;
+		if (minSize > areaWidth) {
+			ocelotlView.getMainViewTopSashform().setWeights(
+					new int[] {
+							minSize,
+							ocelotlView.getMainViewTopSashform().getSize().y
+									- minSize });
 		}
 	}
 
