@@ -88,7 +88,7 @@ public class OcelotlQueries {
 
 		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
 				ocelotlParameters).initialize();
-		return traceSearch.getStateIterator(ocelotlParameters.getTrace(),
+		return traceSearch.getStateIteratorOPT(ocelotlParameters.getTrace(),
 				ocelotlParameters.getTraceTypeConfig().getTypes(), time,
 				eventProducers, monitor);
 	}

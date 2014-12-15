@@ -175,21 +175,8 @@ public class OcelotlTraceSearch extends TraceSearch {
 		query.setLoadParameters(false);
 		return query.getIterator(monitor);
 	}
-
-	public EventIterator getCategorySpecificIterator(final Trace t,
-			final List<EventType> eventTypes,
-			final List<IntervalDesc> intervals,
-			final List<EventProducer> eventProducers, int aCategory,
-			IProgressMonitor monitor) throws SoCTraceException,
-			OcelotlException {
-		openTraceDBObject(t);
-		final IteratorQueries query = new IteratorQueries(traceDB);
-		ConditionManager conditionManager = new ConditionManager();
-		// final LogicalCondition and = new
-		// LogicalCondition(LogicalOperation.AND);
-		final LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
-
-		// types
+	
+	private void eventTypeConditionOPT(final List<EventType> eventTypes, ConditionManager conditionManager, int aCategory) throws OcelotlException{
 		if (eventTypes != null) {
 			if (eventTypes.size() == 0)
 				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
@@ -209,23 +196,55 @@ public class OcelotlTraceSearch extends TraceSearch {
 				}
 			}
 		}
-
-		// eventProducers
-		if (eventProducers != null) {
-			if (eventProducers.size() == 0)
-				throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
-			if (eventProducers.size() != parameters.getAllEventProducers()
-					.size()) {
-				final ValueListString vls = new ValueListString();
-				for (final EventProducer ep : eventProducers)
-					vls.addValue(String.valueOf(ep.getId()));
-				conditionManager.addCondition(new SimpleCondition(
-						"EVENT_PRODUCER_ID", ComparisonOperation.IN, vls
-								.getValueString()));
+	}
+	
+	private void eventTypeConditionNOPT(final List<EventType> eventTypes, ConditionManager conditionManager, int aCategory) throws OcelotlException{
+		if (eventTypes != null) {
+			if (eventTypes.size() == 0)
+				throw new OcelotlException(OcelotlException.NO_EVENT_TYPE);
+					final ValueListString vls = new ValueListString();
+					for (final EventType et : eventTypes)
+						vls.addValue(String.valueOf(et.getId()));
+					conditionManager.addCondition(new SimpleCondition(
+							"EVENT_TYPE_ID", ComparisonOperation.IN, vls
+									.getValueString()));
+				
 			}
+	}
+	
+	
+	private void eventProducerConditionOPT(final List<EventProducer> eventProducers, ConditionManager conditionManager) throws OcelotlException{
+	if (eventProducers != null) {
+		if (eventProducers.size() == 0)
+			throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
+		if (eventProducers.size() != parameters.getAllEventProducers()
+				.size()) {
+			final ValueListString vls = new ValueListString();
+			for (final EventProducer ep : eventProducers)
+				vls.addValue(String.valueOf(ep.getId()));
+			conditionManager.addCondition(new SimpleCondition(
+					"EVENT_PRODUCER_ID", ComparisonOperation.IN, vls
+							.getValueString()));
 		}
-
-		// intervals
+	}
+	}
+	
+	private void eventProducerConditionNOPT(final List<EventProducer> eventProducers, ConditionManager conditionManager) throws OcelotlException{
+	if (eventProducers != null) {
+		if (eventProducers.size() == 0)
+			throw new OcelotlException(OcelotlException.NO_EVENT_PRODUCER);
+			final ValueListString vls = new ValueListString();
+			for (final EventProducer ep : eventProducers)
+				vls.addValue(String.valueOf(ep.getId()));
+			conditionManager.addCondition(new SimpleCondition(
+					"EVENT_PRODUCER_ID", ComparisonOperation.IN, vls
+							.getValueString()));
+		
+	}
+	}
+	
+	private void timeConditionOPT(final List<IntervalDesc> intervals, ConditionManager conditionManager) throws OcelotlException{
+		final LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
 		if (!intervals.isEmpty()) {
 			long min = parameters.getTrace().getMinTimestamp();
 			long max = parameters.getTrace().getMaxTimestamp();
@@ -295,17 +314,265 @@ public class OcelotlTraceSearch extends TraceSearch {
 				conditionManager.addCondition(or);
 			}
 		}
+	}
+	
+	private void timeConditionNOPT(final List<IntervalDesc> intervals, ConditionManager conditionManager) throws OcelotlException{
+		final LogicalCondition or = new LogicalCondition(LogicalOperation.OR);
+		if (!intervals.isEmpty()) {
+
+			// For each timestamp intervals
+			for (IntervalDesc anInterval : intervals) {
+
+				SimpleCondition t1 = null;
+				SimpleCondition t2 = null;
+				SimpleCondition d1 = null;
+				SimpleCondition d2 = null;
+
+				TimeRegion aRegion = new TimeRegion(anInterval.t1,
+						anInterval.t2);
+				final LogicalCondition ort = new LogicalCondition(
+						LogicalOperation.OR);
+				final LogicalCondition andt = new LogicalCondition(
+						LogicalOperation.AND);
+				final LogicalCondition andd = new LogicalCondition(
+						LogicalOperation.AND);
+
+					t2 = new SimpleCondition("TIMESTAMP",
+							ComparisonOperation.LE, Long.toString(aRegion
+									.getTimeStampEnd()));
+				// If the state ends after the start date select it also
+					t1 = new SimpleCondition("TIMESTAMP",
+							ComparisonOperation.GE, Long.toString(aRegion
+									.getTimeStampStart()));
+					d1 = new SimpleCondition("TIMESTAMP",
+							ComparisonOperation.LT, Long.toString(aRegion
+									.getTimeStampStart()));
+					d2 = new SimpleCondition("LPAR", ComparisonOperation.GE,
+							Long.toString(aRegion.getTimeStampStart()));
+					andt.addCondition(t1);
+					andt.addCondition(t2);
+					ort.addCondition(andt);
+					andd.addCondition(d1);
+					andd.addCondition(d2);
+					ort.addCondition(andd);
+					if (intervals.size() == 1)
+						conditionManager.addCondition(ort);
+					else
+						or.addCondition(ort);
+			}
+			if (or.getNumberOfConditions() > 1) {
+				conditionManager.addCondition(or);
+			}
+		}
+	}
+	
+	
+	
+
+	public EventIterator getCategorySpecificIteratorOPT(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		ConditionManager conditionManager = new ConditionManager();
+		eventTypeConditionOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionOPT(eventProducers, conditionManager);
+		timeConditionOPT(intervals, conditionManager);
+		conditionManager.setWhere(query);
+		query.setLoadParameters(false);
+		return query.getIterator(monitor);
+	}
+	
+	public EventIterator getCategorySpecificIteratorT(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		ConditionManager conditionManager = new ConditionManager();
+		eventTypeConditionNOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionNOPT(eventProducers, conditionManager);
+		timeConditionOPT(intervals, conditionManager);
+		conditionManager.setWhere(query);
+		query.setLoadParameters(false);
+		return query.getIterator(monitor);
+	}
+	
+	public EventIterator getCategorySpecificIteratorEP(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		ConditionManager conditionManager = new ConditionManager();
+		eventTypeConditionNOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionOPT(eventProducers, conditionManager);
+		timeConditionNOPT(intervals, conditionManager);
+		conditionManager.setWhere(query);
+		query.setLoadParameters(false);
+		return query.getIterator(monitor);
+	}
+	
+	public EventIterator getCategorySpecificIteratorET(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		ConditionManager conditionManager = new ConditionManager();
+		eventTypeConditionOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionNOPT(eventProducers, conditionManager);
+		timeConditionNOPT(intervals, conditionManager);
+		conditionManager.setWhere(query);
+		query.setLoadParameters(false);
+		return query.getIterator(monitor);
+	}
+	
+	public EventIterator getCategorySpecificIteratorTEP(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		ConditionManager conditionManager = new ConditionManager();
+		eventTypeConditionNOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionOPT(eventProducers, conditionManager);
+		timeConditionOPT(intervals, conditionManager);
+		conditionManager.setWhere(query);
+		query.setLoadParameters(false);
+		return query.getIterator(monitor);
+	}
+	
+	public EventIterator getCategorySpecificIteratorTET(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		ConditionManager conditionManager = new ConditionManager();
+		eventTypeConditionOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionNOPT(eventProducers, conditionManager);
+		timeConditionOPT(intervals, conditionManager);
+		conditionManager.setWhere(query);
+		query.setLoadParameters(false);
+		return query.getIterator(monitor);
+	}
+	
+	public EventIterator getCategorySpecificIteratorEPET(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		ConditionManager conditionManager = new ConditionManager();
+		eventTypeConditionOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionOPT(eventProducers, conditionManager);
+		timeConditionNOPT(intervals, conditionManager);
+		conditionManager.setWhere(query);
+		query.setLoadParameters(false);
+		return query.getIterator(monitor);
+	}
+	
+	public EventIterator getCategorySpecificIteratorNOPT(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, int aCategory,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		openTraceDBObject(t);
+		final IteratorQueries query = new IteratorQueries(traceDB);
+		ConditionManager conditionManager = new ConditionManager();
+		eventTypeConditionOPT(eventTypes, conditionManager, aCategory);
+		eventProducerConditionOPT(eventProducers, conditionManager);
+		timeConditionNOPT(intervals, conditionManager);
 		conditionManager.setWhere(query);
 		query.setLoadParameters(false);
 		return query.getIterator(monitor);
 	}
 
-	public EventIterator getStateIterator(final Trace t,
+	public EventIterator getStateIteratorOPT(final Trace t,
 			final List<EventType> eventTypes,
 			final List<IntervalDesc> intervals,
 			final List<EventProducer> eventProducers, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
-		return getCategorySpecificIterator(t, eventTypes, intervals,
+		return getCategorySpecificIteratorOPT(t, eventTypes, intervals,
+				eventProducers, EventCategory.STATE, monitor);
+	}
+	public EventIterator getStateIteratorT(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
+		return getCategorySpecificIteratorT(t, eventTypes, intervals,
+				eventProducers, EventCategory.STATE, monitor);
+	}
+	
+	public EventIterator getStateIteratorET(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
+		return getCategorySpecificIteratorET(t, eventTypes, intervals,
+				eventProducers, EventCategory.STATE, monitor);
+	}
+	
+	public EventIterator getStateIteratorEP(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
+		return getCategorySpecificIteratorEP(t, eventTypes, intervals,
+				eventProducers, EventCategory.STATE, monitor);
+	}
+	
+	public EventIterator getStateIteratorTEP(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
+		return getCategorySpecificIteratorTEP(t, eventTypes, intervals,
+				eventProducers, EventCategory.STATE, monitor);
+	}
+	
+	public EventIterator getStateIteratorTET(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
+		return getCategorySpecificIteratorTET(t, eventTypes, intervals,
+				eventProducers, EventCategory.STATE, monitor);
+	}
+	
+	public EventIterator getStateIteratorEPET(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
+		return getCategorySpecificIteratorEPET(t, eventTypes, intervals,
+				eventProducers, EventCategory.STATE, monitor);
+	}
+	
+	public EventIterator getStateIteratorNOPT(final Trace t,
+			final List<EventType> eventTypes,
+			final List<IntervalDesc> intervals,
+			final List<EventProducer> eventProducers, IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
+		return getCategorySpecificIteratorNOPT(t, eventTypes, intervals,
 				eventProducers, EventCategory.STATE, monitor);
 	}
 
@@ -314,7 +581,7 @@ public class OcelotlTraceSearch extends TraceSearch {
 			final List<IntervalDesc> intervals,
 			final List<EventProducer> eventProducers, IProgressMonitor monitor)
 			throws SoCTraceException, OcelotlException {
-		return getCategorySpecificIterator(t, eventTypes, intervals,
+		return getCategorySpecificIteratorOPT(t, eventTypes, intervals,
 				eventProducers, EventCategory.VARIABLE, monitor);
 	}
 
