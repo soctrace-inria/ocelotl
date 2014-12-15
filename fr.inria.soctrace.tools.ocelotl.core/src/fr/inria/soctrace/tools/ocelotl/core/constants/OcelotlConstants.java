@@ -85,6 +85,8 @@ public class OcelotlConstants {
 	
 	public static final int[] yAxisDefaultWeight = {24, 388};
 	
+	public static final double TemporalProportionDrawingMarginRatio = 0.9;
+	
 	/**
 	 * JSON Config constants
 	 */

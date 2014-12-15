@@ -36,6 +36,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.PartMap;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineView;
@@ -53,6 +54,7 @@ public class TemporalProportionView extends TimeLineView {
 		//Minimal size of the icon to be displayed
 		private static final int IconMin = 6;
 		private static final int IconMax = 32;
+		private static final double DrawingMarginRatio = OcelotlConstants.TemporalProportionDrawingMarginRatio;
 		private int stackSpace = 2;
 		private IconManager iconManager;
 		//Minimum value to consider a color too light
@@ -84,7 +86,7 @@ public class TemporalProportionView extends TimeLineView {
 			
 			//Height of the drawing area
 			final double y0 = root.getSize().height - aBorder;
-			final double y1 = 9.0 / 10.0 * root.getSize().height - aBorder;
+			final double y1 = DrawingMarginRatio * root.getSize().height - aBorder;
 			//Width of the drawing area
 			final double x0 = root.getSize().width - 2 * aBorder;
 			final double d = distribution.getSliceNumber();
@@ -213,7 +215,6 @@ public class TemporalProportionView extends TimeLineView {
 				}
 				label.getUpdateManager().performUpdate();
 				icon.getUpdateManager().performUpdate();
-
 			}
 		}
 
