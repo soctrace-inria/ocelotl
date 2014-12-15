@@ -78,6 +78,7 @@ public class OcelotlSettingsView extends Dialog {
 	private HashMap<Button, Color>				btnColorMap;
 	private Spinner								textDisplayAlpha;
 	private Spinner								textSelectionAlpha;
+	private Button								btnEnableOverview;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -659,6 +660,12 @@ public class OcelotlSettingsView extends Dialog {
 		groupOverviewSettings.setText("Snapshot Settings");
 		groupOverviewSettings.setLayout(new GridLayout(2, false));
 		
+		btnEnableOverview = new Button(groupOverviewSettings, SWT.CHECK);
+		btnEnableOverview.setFont(cantarell8);
+		btnEnableOverview.setSelection(settings.isEnableOverview());
+		btnEnableOverview.setText("Display Overview");
+		new Label(groupOverviewSettings, SWT.NONE);
+		
 		final Label lblBgDisplay = new Label(groupOverviewSettings, SWT.NONE);
 		lblBgDisplay.setFont(cantarell8);
 		lblBgDisplay.setText("Display Background");
@@ -781,6 +788,7 @@ public class OcelotlSettingsView extends Dialog {
 		settings.setSnapshotYResolution(Integer.valueOf(snapshotHeight.getText()));
 		
 		//Overview colors
+		settings.setEnableOverview(btnEnableOverview.getSelection());
 		settings.setOverviewDisplayBgColor(btnColorMap.get(btnEditBgDisplay));
 		settings.setOverviewDisplayFgColor(btnColorMap.get(btnEditFgDisplay));
 		settings.setOverviewDisplayAlphaValue(Integer.valueOf(textDisplayAlpha.getText()));

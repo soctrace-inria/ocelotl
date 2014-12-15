@@ -437,14 +437,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							unitAxisView.deleteDiagram();
 							unitAxisView.createDiagram(ocelotlCore.getVisuOperator());
 							
-							try {
-								overView.updateDiagram(ocelotlParameters.getTimeRegion());
-								// Do we need to compute everything
-								if(overView.isRedrawOverview())
-									overView.getOverviewThread().start();
-								
-							} catch (OcelotlException e) {
-								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+							if (ocelotlParameters.isOvervieweEnable()) {
+								try {
+									overView.updateDiagram(ocelotlParameters.getTimeRegion());
+									// Do we need to compute everything
+									if (overView.isRedrawOverview())
+										overView.getOverviewThread().start();
+
+								} catch (OcelotlException e) {
+									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+								}
 							}
 							
 							history.saveHistory();
@@ -554,18 +556,25 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		public void widgetSelected(final SelectionEvent e) {
 			if (confDataLoader.getCurrentTrace() == null)
 				return;
-			if (hasChanged == HasChanged.NOTHING)
-				hasChanged = HasChanged.PARAMETER;
-			btnRun.setEnabled(true);
-			ocelotlCore.getVisuOperators().setSelectedOperator(comboVisu.getText());
-			timeLineView = timeLineViewManager.create();
-			timeLineViewWrapper.setView(timeLineView);
-			unitAxisView = unitAxisViewManager.create();
-			unitAxisViewWrapper.setView(unitAxisView);
-			
-			// If the overview visu operator is different, then redraw it
-			if (!ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization().equals(overView.getVisuOperatorName()))
-				overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
+
+			if (hasChanged != HasChanged.NOTHING || !ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getName().equals(ocelotlParameters.getVisuOperator())) {
+				if (hasChanged == HasChanged.NOTHING)
+					hasChanged = HasChanged.PARAMETER;
+
+				btnRun.setEnabled(true);
+				ocelotlCore.getVisuOperators().setSelectedOperator(comboVisu.getText());
+				timeLineView = timeLineViewManager.create();
+				timeLineViewWrapper.setView(timeLineView);
+				unitAxisView = unitAxisViewManager.create();
+				unitAxisViewWrapper.setView(unitAxisView);
+
+				if (hasChanged == HasChanged.PARAMETER) {
+					btnRun.notifyListeners(SWT.Selection, new Event());
+				} else
+				// If the overview visu operator is different, then redraw it
+				if (!ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization().equals(overView.getVisuOperatorName()))
+					overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
+			}
 		}
 	}
 
@@ -1683,6 +1692,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
 		ocelotlParameters.updateCurrentProducers();
 		ocelotlParameters.setParameterPPolicy(ocelotlParameters.getOcelotlSettings().getParameterPPolicy());
+		ocelotlParameters.setOvervieweEnable(ocelotlParameters.getOcelotlSettings().isEnableOverview());
 		
 		setCachePolicy();
 		try {

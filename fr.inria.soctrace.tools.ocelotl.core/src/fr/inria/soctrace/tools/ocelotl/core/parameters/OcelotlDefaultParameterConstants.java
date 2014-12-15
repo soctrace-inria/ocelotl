@@ -102,6 +102,11 @@ public class OcelotlDefaultParameterConstants {
 	public static final Color OVERVIEW_SELECT_FG_COLOR = ColorConstants.white;
 	public static final Color OVERVIEW_SELECT_BG_COLOR = ColorConstants.black;
 	public static final int OVERVIEW_SELECT_ALPHA = 110;
+	
+	/*
+	 * Is the overview enable
+	 */
+	public static final boolean OVERVIEW_ENABLE = true;
 
 	/**
 	 * Number of events loaded by thread

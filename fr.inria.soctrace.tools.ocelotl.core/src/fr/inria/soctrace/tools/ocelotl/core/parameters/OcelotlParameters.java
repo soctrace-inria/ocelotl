@@ -75,6 +75,7 @@ public class OcelotlParameters {
 	private ParameterPPolicy parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
 	private OcelotlSettings	ocelotlSettings;
 	private Integer	timeSliceFactor = 1;
+	private boolean overvieweEnable = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
 	
 	private TimeSliceManager timeSliceManager;
 
@@ -392,6 +393,14 @@ public class OcelotlParameters {
 
 	public void setStatOperator(String statOperator) {
 		this.statOperator = statOperator;
+	}
+
+	public boolean isOvervieweEnable() {
+		return overvieweEnable;
+	}
+
+	public void setOvervieweEnable(boolean overvieweEnable) {
+		this.overvieweEnable = overvieweEnable;
 	}
 
 	public List<EventProducer> getCurrentProducers() {
