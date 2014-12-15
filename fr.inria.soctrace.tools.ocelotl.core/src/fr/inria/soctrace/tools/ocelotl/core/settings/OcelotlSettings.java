@@ -570,7 +570,7 @@ public class OcelotlSettings {
 	}
 
 	public void setEnableOverview(boolean enableOverview) {
-		if (this.enableOverview = enableOverview) {
+		if (this.enableOverview != enableOverview) {
 			this.enableOverview = enableOverview;
 			saveSettings();
 		}
