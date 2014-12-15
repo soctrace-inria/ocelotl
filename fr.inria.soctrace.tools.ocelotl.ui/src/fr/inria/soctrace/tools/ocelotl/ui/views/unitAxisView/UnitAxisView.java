@@ -127,7 +127,6 @@ abstract public class UnitAxisView {
 		root = wrapper.getRoot();
 		canvas = wrapper.getCanvas();
 		ocelotlView = wrapper.getOcelotlView();
-		initDiagram();
 		
 		highLightDisplayedProducer = new SelectFigure(ColorConstants.black, ColorConstants.white, 255);
 		highLightDisplayedProducer.setLineWidth(2);
@@ -143,7 +142,6 @@ abstract public class UnitAxisView {
 		wrapper.cleanMouseMotionListeners();
 		wrapper.addMouseListener(mouse);
 		wrapper.addMouseMotionListener(mouse);
-		
 		wrapper.cleanControlListeners();
 		wrapper.addControlListener(new ControlListener() {
 
@@ -161,6 +159,7 @@ abstract public class UnitAxisView {
 				resizeDiagram();
 			}
 		});
+		initDiagram();
 	}
 	
 	public void deleteDiagram() {
