@@ -16,10 +16,80 @@
             event_category="ALL">
       </microscopic_model>
       <microscopic_model
-      		name="States"
+      		name="States Query OPT"
       		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistribution"
       		unit="%TIME"
       		selection_priority = "1"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+      <microscopic_model
+      		name="States Query EP"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionEP"
+      		unit="%TIME"
+      		selection_priority = "3"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+            <microscopic_model
+      		name="States Query EPET"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionEPET"
+      		unit="%TIME"
+      		selection_priority = "3"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+            <microscopic_model
+      		name="States Query ET"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionET"
+      		unit="%TIME"
+      		selection_priority = "3"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+            <microscopic_model
+      		name="States Query NOPT"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionNOPT"
+      		unit="%TIME"
+      		selection_priority = "3"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+                  <microscopic_model
+      		name="States Query T"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionT"
+      		unit="%TIME"
+      		selection_priority = "3"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+                  <microscopic_model
+      		name="States Query TEP"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionTEP"
+      		unit="%TIME"
+      		selection_priority = "3"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+                  <microscopic_model
+      		name="States Query TET"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionTET"
+      		unit="%TIME"
+      		selection_priority = "3"
       		trace_formats="ALL"
      		generic="true"
      		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
