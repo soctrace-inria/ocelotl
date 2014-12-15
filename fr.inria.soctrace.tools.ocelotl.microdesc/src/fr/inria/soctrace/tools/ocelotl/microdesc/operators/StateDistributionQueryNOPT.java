@@ -143,7 +143,7 @@ public class StateDistributionQueryNOPT extends Microscopic3DDescription {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		monitor.subTask("Query states");
-		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
+		eventIterator = ocelotlQueries.getStateIteratorNOPT(eventProducers, time,
 				monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
