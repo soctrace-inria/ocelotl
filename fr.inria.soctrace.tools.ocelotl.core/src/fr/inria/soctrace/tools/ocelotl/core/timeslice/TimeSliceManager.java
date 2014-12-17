@@ -25,7 +25,7 @@ public class TimeSliceManager {
 		this.slicesNumber = slicesNumber;
 		// duration + 1 to make sure that no extra time slice is created to
 		// cover the last unit of time
-		sliceDuration = ((double) timeRegion.getTimeDuration() + 1.0)
+		sliceDuration = ((double) timeRegion.getTimeDuration())
 				/ (double) slicesNumber;
 		timeSlicesInit();
 	}
@@ -93,16 +93,14 @@ public class TimeSliceManager {
 	}
 
 	public void timeSlicesInit() {
-		int i = 0;
 		double currentTime = timeRegion.getTimeStampStart();
-		while (currentTime < timeRegion.getTimeStampEnd()) {
+		for (int i=0; i<slicesNumber-1; i++){
 			timeSlices.add(new TimeSlice(new TimeRegion((long) currentTime,
 					(long) (currentTime + sliceDuration)), i));
 			currentTime += sliceDuration;
-			i++;
 		}
-
-		slicesNumber = i;
+		timeSlices.add(new TimeSlice(new TimeRegion((long) currentTime,
+				(long) timeRegion.getTimeStampEnd()), slicesNumber-1));
 	}
 
 }
