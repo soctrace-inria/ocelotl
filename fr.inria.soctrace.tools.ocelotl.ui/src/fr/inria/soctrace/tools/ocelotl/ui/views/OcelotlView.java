@@ -1216,12 +1216,20 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		// Display of aggregation results
 		final SashForm sashForm_4 = new SashForm(sashFormView, SWT.BORDER | SWT.VERTICAL);
-		final Composite subComposite = new Composite(sashForm_4, SWT.BORDER);
-		subComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		subComposite.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		subComposite.setSize(500, 500);
-		subComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-		setMainViewTopSashform(new SashForm(subComposite, SWT.BORDER | SWT.HORIZONTAL));
+		setMainViewTopSashform(new SashForm(sashForm_4, SWT.BORDER | SWT.HORIZONTAL));
+		mainViewBottomSashform = new SashForm(sashForm_4, SWT.BORDER | SWT.HORIZONTAL);
+		final Composite compositeBlank = new Composite(mainViewBottomSashform, SWT.BORDER);
+		compositeBlank.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		
+		// Time axis 
+		compositeTimeAxisView = new Composite(mainViewBottomSashform, SWT.BORDER);
+		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		timeAxisView.initDiagram(compositeTimeAxisView);
+		final FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
+		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
+		compositeTimeAxisView.addListener(SWT.Resize, new ResizeTimeAxisListener());
+		mainViewBottomSashform.setWeights(OcelotlConstants.yAxisDefaultWeight);
+		
 		
 		// Set unit axis
 		final Composite compositeUnitAxisView = new Composite(getMainViewTopSashform(), SWT.BORDER);
@@ -1240,20 +1248,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		
 		getMainViewTopSashform().setWeights(OcelotlConstants.yAxisDefaultWeight);
 		
-		mainViewBottomSashform = new SashForm(sashForm_4, SWT.BORDER | SWT.HORIZONTAL);
-		final Composite compositeBlank = new Composite(mainViewBottomSashform, SWT.BORDER);
-		compositeBlank.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		
-		// Time axis 
-		compositeTimeAxisView = new Composite(mainViewBottomSashform, SWT.BORDER);
-		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
-		timeAxisView.initDiagram(compositeTimeAxisView);
-		final FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
-		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
-		compositeTimeAxisView.addListener(SWT.Resize, new ResizeTimeAxisListener());
-		mainViewBottomSashform.setWeights(OcelotlConstants.yAxisDefaultWeight);
-		
-		sashForm_4.setWeights(new int[] {388, 24});
+		sashForm_4.setWeights(new int[] {206, 16});
 
 		// Bottom bar of the central view
 		final ScrolledComposite scrolledComposite = new ScrolledComposite(sashFormView, SWT.BORDER | SWT.H_SCROLL);
