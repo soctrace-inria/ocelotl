@@ -23,8 +23,6 @@ public class TimeSliceManager {
 		super();
 		this.timeRegion = timeRegion;
 		this.slicesNumber = slicesNumber;
-		// duration + 1 to make sure that no extra time slice is created to
-		// cover the last unit of time
 		sliceDuration = ((double) timeRegion.getTimeDuration())
 				/ (double) slicesNumber;
 		timeSlicesInit();
