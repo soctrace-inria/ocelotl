@@ -159,7 +159,7 @@ public class IteratorQueries extends EventQuery {
 			if (isLimitSet())
 				eventQuery.append(" LIMIT " + getLimit());
 
-			String query = eventQuery.toString();
+			final String query = eventQuery.toString();
 			logger.debug(query);
 
 			mystm = dbObj.getConnection().createStatement();

@@ -95,6 +95,7 @@ public class PartManager {
 				+ " - " + traceRegion.getTimeStampEnd() + "] - duration: "
 				+ traceRegion.getTimeDuration());
 		logger.info("Time slice number: " + timeSliceNumber);
+		//logger.info("Time slice duration: " + lpaggregCore.getOcelotlParameters().getTimeSliceManager().getSliceDuration());
 		logger.info("Aggregation timeOperator: "
 				+ lpaggregCore.getOcelotlParameters().getDataAggOperator());
 		logger.info("Gain/Loss parameter p: "

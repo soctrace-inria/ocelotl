@@ -51,6 +51,18 @@ public class Snapshot {
 		this.snapshotDirectory = snapshotDirectory;
 		theView.getOcelotlParameters().getOcelotlSettings().setSnapShotDirectory(this.snapshotDirectory);
 	}
+	
+	public void snapShotDiagramWithName(String dir) {
+		setSnapshotDirectory(dir);
+		String currentDirPath = createDirectory();
+
+		// Save the currently displayed diagram as an image
+		snapShotDiagram(currentDirPath);
+		// Save the currently displayed quality curves as an image
+		snapShotQualityCurve(currentDirPath);
+		// Save the the current parameters in a text file
+		saveConfig(currentDirPath);
+	}
 
 	/**
 	 * Call all the methods that create a snapshot of the current state of Ocelotl
@@ -204,6 +216,7 @@ public class Snapshot {
 	 * @param aDirPath
 	 */
 	public void createSymLink(String aDirPath) {
+		// TODO create symbolic link
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec("ln -s " + aDirPath + "/A\\ Link\\ to\\ the\\ trace");

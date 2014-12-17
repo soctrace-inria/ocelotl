@@ -40,7 +40,7 @@ public class OcelotlConstants {
 	/**
 	 * Number of field in the header of a cache file 
 	 */
-	static public final int CACHE_HEADER_NORMAL_SIZE = 9;
+	static public final int CACHE_HEADER_NORMAL_SIZE = 10;
 	
 	/**
 	 * Maximum size of the data cache in bytes.
@@ -84,7 +84,7 @@ public class OcelotlConstants {
 	
 	public static final int MinimalHeightDrawingThreshold = 1;
 	
-	public static final int[] yAxisDefaultWeight = {24, 388};
+	public static final int[] yAxisDefaultWeight = {30, 388};
 	
 	public static final double TemporalProportionDrawingMarginRatio = 0.9;
 	

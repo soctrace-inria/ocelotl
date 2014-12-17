@@ -230,11 +230,12 @@ public class TemporalProportionView extends TimeLineView {
 
 	@Override
 	protected void computeDiagram() {
-		distribution = (TemporalProportion) ocelotlView.getCore().getVisuOperator();
-			for (int i = 0; i < distribution.getPartNumber(); i++) {
-				final EventStack part = new EventStack(i, space);
-				part.init();
-			}
+		distribution = (TemporalProportion) ocelotlView.getCore()
+				.getVisuOperator();
+		for (int i = 0; i < distribution.getPartNumber(); i++) {
+			final EventStack part = new EventStack(i, space);
+			part.init();
+		}
 	}
 
 }

@@ -105,6 +105,7 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 	@Override
 	public String matrixToCSV() {
 		StringBuffer stringBuf = new StringBuffer();
+		long nbEvents = 0;
 		int slice = 0;
 		// For each slice
 		for (final HashMap<EventProducer, HashMap<String, Double>> it : matrix) {
@@ -117,10 +118,14 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 								+ ep.getId() + OcelotlConstants.CSVDelimiter
 								+ evtType + OcelotlConstants.CSVDelimiter
 								+ it.get(ep).get(evtType) + "\n");
+					nbEvents++;
 				}
 			}
 			slice++;
 		}
+	density = ((double) nbEvents / (double) (matrix.size()
+				* matrix.get(0).size() * matrix.get(0).get(matrix.get(0).keySet().iterator().next())
+				.size()));
 		return stringBuf.toString();
 	}
 

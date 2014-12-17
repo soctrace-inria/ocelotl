@@ -120,8 +120,8 @@ public class QualityView {
 		super();
 		ocelotlView = lpaggregView;
 	}
-	
-	public Figure getRoot() {
+
+public Figure getRoot() {
 		return root;
 	}
 
@@ -388,5 +388,5 @@ public class QualityView {
 			qualityWidth *= 2;
 		}
 	}
-	
+
 }

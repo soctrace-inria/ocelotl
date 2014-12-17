@@ -48,12 +48,12 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected int eventsNumber;
 	protected OcelotlQueries ocelotlQueries;
 	protected TimeSliceManager timeSliceManager;
+	double density;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MicroscopicDescription.class);
 
 	public MicroscopicDescription() {
-		
 	}
 
 	public MicroscopicDescription(OcelotlParameters param) {
@@ -927,5 +927,5 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 		buildMicroscopicModel(parameters, monitor);
 	}
-	
+
 }

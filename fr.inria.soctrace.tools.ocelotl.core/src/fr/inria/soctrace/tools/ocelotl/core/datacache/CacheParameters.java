@@ -16,7 +16,7 @@ public class CacheParameters {
 		private String microModelType;
 		private String spaceAggOperator;
 
-		CacheParameters() {
+		public CacheParameters() {
 			traceName = "";
 			traceID = -1;
 			startTimestamp = 0L;

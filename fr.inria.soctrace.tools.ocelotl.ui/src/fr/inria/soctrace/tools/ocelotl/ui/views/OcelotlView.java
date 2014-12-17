@@ -19,6 +19,10 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -78,8 +82,10 @@ import fr.inria.soctrace.framesoc.ui.model.PieTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TableTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.ParameterStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
@@ -93,6 +99,11 @@ import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.Activator;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench2;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench3;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench4;
+import fr.inria.soctrace.tools.ocelotl.ui.TestParameters;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.snapshot.Snapshot;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.IStatView;
@@ -114,6 +125,194 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewWrapper
  */
 public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
+	public Trace aTestTrace;
+
+	public void loadFromParam(TestParameters someParams, boolean activeCache) {
+		final TestParameters testParams = someParams;
+		comboType.removeAll();
+		comboDimension.removeAll();
+		comboVisu.removeAll();
+		
+		ocelotlParameters.getOcelotlSettings().setCacheActivated(activeCache);
+
+		final Job job = new Job("Loading trace from micro description") {
+
+			@Override
+			protected IStatus run(final IProgressMonitor monitor) {
+				monitor.beginTask("Gathering data from trace...", IProgressMonitor.UNKNOWN);
+				try {
+					aTestTrace = null;
+					testParams.loadDataTest(ocelotlParameters);
+
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+
+							// Look for the correct trace among the
+							// available traces
+							for (int aTraceIndex : traceMap.keySet()) {
+								if (traceMap.get(aTraceIndex).getId() == testParams.getTraceID()) {
+									comboTraces.select(aTraceIndex);
+									aTestTrace = traceMap.get(comboTraces.getSelectionIndex());
+									break;
+								}
+							}
+						}
+					});
+
+					// If no trace was found
+					if (aTestTrace == null)
+						throw new OcelotlException(OcelotlException.INVALID_CACHED_TRACE);
+
+					// Load the trace
+					confDataLoader.load(aTestTrace);
+					ocelotlParameters.setEventProducerHierarchy(new SimpleEventProducerHierarchy(confDataLoader.getProducers()));
+
+					monitor.beginTask("Loading cached data...", IProgressMonitor.UNKNOWN);
+
+					Display.getDefault().syncExec(new Runnable() {
+
+						@Override
+						public void run() {
+							// Load the aggregation operators
+							for (final String op : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
+								comboType.add(op);
+							}
+
+							comboType.setText("");
+
+							// Search for the corresponding operator
+							for (int i = 0; i < comboType.getItemCount(); i++) {
+								if (comboType.getItem(i).equals(ocelotlParameters.getMicroModelType())) {
+									comboType.select(i);
+									comboType.notifyListeners(SWT.Selection, new Event());
+									break;
+								}
+							}
+
+							// If no operator was found
+							if (comboType.getText().isEmpty())
+								try {
+									throw new OcelotlException(OcelotlException.INVALID_CACHED_OPERATOR);
+								} catch (OcelotlException e) {
+									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+									return;
+								}
+
+							// Set the corresponding parameters
+							spinnerTSNumber.setSelection(ocelotlParameters.getTimeSlicesNumber());
+							textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
+							textTimestampEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+							ocelotlParameters.getDataCache().setBuildingStrategy(testParams.getDatacacheStrat());
+							
+							// If no number of event producers was specified,
+							// then take all of them
+							if (testParams.getNbEventProd() <= 0) {
+								ocelotlParameters.setEventProducers(ocelotlParameters.getAllEventProducers());
+							} else {
+								ArrayList<EventProducer> evProd = new ArrayList<EventProducer>();
+								int i;
+								for (i = 0; i < testParams.getNbEventProd(); i++) {
+									evProd.add(ocelotlParameters.getAllEventProducers().get(i));
+								}
+								ocelotlParameters.setEventProducers(evProd);
+							}
+
+							hasChanged = HasChanged.ALL;
+							
+							for(Double aParamValue: testParams.getParameters())
+							{
+								textRun.setText(String.valueOf(aParamValue));
+				
+								// And launch the display
+								btnRun.notifyListeners(SWT.Selection, new Event());
+								
+								String spaceLess = testParams.toString().replace(" ", "_");
+								spaceLess = spaceLess + "_" + aParamValue;
+								
+								/*if (ocelotlParameters.getOcelotlSettings().isCacheActivated()) {
+									snapshot.snapShotDiagramWithName(testParams.getDirectory() + "/" + spaceLess + ".png");
+								} else {
+									snapshot.snapShotDiagramWithName(testParams.getDirectory() + "/" + spaceLess + "_noCache.png");
+								}*/
+
+								hasChanged = HasChanged.PARAMETER;
+							}
+						}
+					});
+				} catch (final OcelotlException exception) {
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							// If inputs are wrong, display the reason
+							MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
+						}
+					});
+					return Status.CANCEL_STATUS;
+				} catch (SoCTraceException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+
+		job.setUser(true);
+		job.schedule();
+
+		try {
+			job.join();
+		} catch (InterruptedException e5) {
+			// TODO Auto-generated catch block
+			e5.printStackTrace();
+		}
+	}
+
+	private class BenchListener extends SelectionAdapter {
+
+		private final OcelotlView	view;
+
+		public BenchListener(final OcelotlView view) {
+			this.view = view;
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			FileDialog dialog = new FileDialog(getSite().getShell(), SWT.OPEN);
+			String loadCachefile = dialog.open();
+
+			if (loadCachefile != null) {
+				BufferedReader bufFileReader;
+				try {
+					bufFileReader = new BufferedReader(new FileReader(loadCachefile));
+					String line;
+					TestBench aTest;
+
+					// Get header
+					line = bufFileReader.readLine();
+					if (line.equals("v2")) {
+						aTest = new TestBench2(loadCachefile, view);
+					} else if (line.equals("v3")) {
+						aTest = new TestBench3(loadCachefile, view);
+					} else if (line.equals("v4")) {
+						aTest = new TestBench4(loadCachefile, view);
+					} else {
+						aTest = new TestBench(loadCachefile, view);
+					}
+					aTest.parseFile();
+					aTest.launchTest();
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+
+			}
+		}
+	}
+	
 	private class SaveDataListener extends SelectionAdapter {
 
 		@Override
@@ -309,7 +508,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		private Object	lock	= new Object();
 		// Global flag signaling that a job is already running
 		private boolean	running	= false;
-
+		DeltaManager aDm = new DeltaManager();
+		
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			// Check that inputs are valid
@@ -360,8 +560,15 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									return Status.CANCEL_STATUS;
 								}
 								monitor.setTaskName("Initializing Aggregation Operator");
+								aDm.start();
 								ocelotlCore.initAggregOperator(monitor);
+								aDm.end("Total Time for Microscopic Rebuilding");
 								monitor.worked(1);
+								// We don't want to go farther than the reconstruction
+								synchronized (lock) {
+									running = false;
+								}
+								return Status.OK_STATUS;
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
 								if (monitor.isCanceled()) {
@@ -372,7 +579,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								}
 								monitor.setTaskName("Compute Qualities");
 								monitor.subTask("");
+								aDm.start();
 								ocelotlCore.computeQualities();
+								aDm.end("Compute qualities");
 								monitor.worked(1);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
@@ -383,7 +592,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									return Status.CANCEL_STATUS;
 								}
 								monitor.setTaskName("Compute Dichotomy");
+								aDm.start();
 								ocelotlCore.computeDichotomy();
+								aDm.end("Compute Dichotomy");
 								monitor.worked(1);
 							}
 
@@ -399,7 +610,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							return Status.CANCEL_STATUS;
 						}
 						monitor.setTaskName("Compute Parts");
-
+aDm.start();
 						ocelotlCore.computeParts();
 						monitor.worked(1);
 
@@ -442,7 +653,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 									overView.updateDiagram(ocelotlParameters.getTimeRegion());
 									// Do we need to compute everything
 									if (overView.isRedrawOverview())
-										overView.getOverviewThread().start();
+										overView.getOverviewThread().start();aDm.end("Compute parts and display");
 
 								} catch (OcelotlException e) {
 									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
@@ -463,6 +674,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			job.setUser(true);
 			job.schedule();
 
+            try {
+				job.join();
+			} catch (InterruptedException e5) {
+				// TODO Auto-generated catch block
+				e5.printStackTrace();
+			}
 		}
 	}
 
@@ -1173,6 +1390,11 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		 				comboType.addSelectionListener(new ComboTypeSelectionAdapter());
 		 				comboType.setToolTipText("Metric Selection");
 		 		
+						Button btnLoadBench = new Button(groupTraces, SWT.NONE);
+						btnLoadBench.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
+						btnLoadBench.addSelectionListener(new BenchListener(this));
+						btnLoadBench.setText("Load Bench");
+		 				
 		 				comboDimension = new Combo(groupTraces, SWT.READ_ONLY);
 		 				final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		 				gd_comboAggregationOperator.widthHint = 150;
@@ -1216,12 +1438,20 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		// Display of aggregation results
 		final SashForm sashForm_4 = new SashForm(sashFormView, SWT.BORDER | SWT.VERTICAL);
-		final Composite subComposite = new Composite(sashForm_4, SWT.BORDER);
-		subComposite.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		subComposite.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
-		subComposite.setSize(500, 500);
-		subComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
-		setMainViewTopSashform(new SashForm(subComposite, SWT.BORDER | SWT.HORIZONTAL));
+		setMainViewTopSashform(new SashForm(sashForm_4, SWT.BORDER | SWT.HORIZONTAL));
+		mainViewBottomSashform = new SashForm(sashForm_4, SWT.BORDER | SWT.HORIZONTAL);
+		final Composite compositeBlank = new Composite(mainViewBottomSashform, SWT.BORDER);
+		compositeBlank.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		
+		// Time axis 
+		compositeTimeAxisView = new Composite(mainViewBottomSashform, SWT.BORDER);
+		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+		timeAxisView.initDiagram(compositeTimeAxisView);
+		final FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
+		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
+		compositeTimeAxisView.addListener(SWT.Resize, new ResizeTimeAxisListener());
+		mainViewBottomSashform.setWeights(OcelotlConstants.yAxisDefaultWeight);
+		
 		
 		// Set unit axis
 		final Composite compositeUnitAxisView = new Composite(getMainViewTopSashform(), SWT.BORDER);
@@ -1240,20 +1470,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		
 		getMainViewTopSashform().setWeights(OcelotlConstants.yAxisDefaultWeight);
 		
-		mainViewBottomSashform = new SashForm(sashForm_4, SWT.BORDER | SWT.HORIZONTAL);
-		final Composite compositeBlank = new Composite(mainViewBottomSashform, SWT.BORDER);
-		compositeBlank.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		
-		// Time axis 
-		compositeTimeAxisView = new Composite(mainViewBottomSashform, SWT.BORDER);
-		compositeTimeAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
-		timeAxisView.initDiagram(compositeTimeAxisView);
-		final FillLayout fl_compositeTimeAxisView = new FillLayout(SWT.HORIZONTAL);
-		compositeTimeAxisView.setLayout(fl_compositeTimeAxisView);
-		compositeTimeAxisView.addListener(SWT.Resize, new ResizeTimeAxisListener());
-		mainViewBottomSashform.setWeights(OcelotlConstants.yAxisDefaultWeight);
-		
-		sashForm_4.setWeights(new int[] {388, 24});
+		sashForm_4.setWeights(new int[] {206, 16});
 
 		// Bottom bar of the central view
 		final ScrolledComposite scrolledComposite = new ScrolledComposite(sashFormView, SWT.BORDER | SWT.H_SCROLL);
