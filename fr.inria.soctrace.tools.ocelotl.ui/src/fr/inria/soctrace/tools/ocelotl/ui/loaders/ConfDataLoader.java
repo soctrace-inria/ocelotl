@@ -252,6 +252,7 @@ public class ConfDataLoader {
 	
 	public List<EventType> getTypes (String cat){
 		ArrayList<String> str = new ArrayList<String>();
+		str.add(cat);
 		return getTypes(str);
 	}
 

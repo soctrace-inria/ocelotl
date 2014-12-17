@@ -1,6 +1,10 @@
 package fr.inria.soctrace.tools.ocelotl.core.parameters;
 
+import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.swt.graphics.Color;
+
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
 
 /*
  * Class for the constants defining the default parameters in Ocelotl
@@ -31,7 +35,7 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Should the curves show increasing quality ?
 	 */
-	public static final boolean GrowingQualities = true;
+	public static final boolean IncreasingQualities = true;
 
 	/**
 	 * Number of time slices
@@ -67,6 +71,12 @@ public class OcelotlDefaultParameterConstants {
 	 * Default cache policy
 	 */
 	public static final DatacachePolicy DEFAULT_CACHE_POLICY = DatacachePolicy.CACHEPOLICY_FAST;
+	
+	/**
+	 * Default parameter choice policy
+	 */
+	public static final ParameterPPolicy DEFAULT_PARAMETERP_POLICY = ParameterPPolicy.PARAMETERP_STRATEGY_LARGEST_SUM_DIFF;
+	
 
 	/**
 	 * Default number of time slices used when generating a cache
@@ -79,6 +89,26 @@ public class OcelotlDefaultParameterConstants {
 	public static final int NUMBER_OF_THREADS = 8;
 	
 	/**
+	 * Aggregation Operator for the overview
+	 */
+	public static final String OVERVIEW_AGGREG_OPERATOR = "Temporal Aggregation";
+	
+	/**
+	 * Colors for the overview
+	 */
+	public static final Color OVERVIEW_DISPLAY_FG_COLOR = ColorConstants.black;
+	public static final Color OVERVIEW_DISPLAY_BG_COLOR = ColorConstants.red;
+	public static final int OVERVIEW_DISPLAY_ALPHA = 110;
+	public static final Color OVERVIEW_SELECT_FG_COLOR = ColorConstants.white;
+	public static final Color OVERVIEW_SELECT_BG_COLOR = ColorConstants.black;
+	public static final int OVERVIEW_SELECT_ALPHA = 110;
+	
+	/*
+	 * Is the overview enable
+	 */
+	public static final boolean OVERVIEW_ENABLE = true;
+
+	/**
 	 * Number of events loaded by thread
 	 */
 	public static final int EVENTS_PER_THREAD = 10000;
@@ -90,5 +120,8 @@ public class OcelotlDefaultParameterConstants {
 	
 	public static final int MIN_EVENT_PRODUCERS_PER_QUERY = 0;
 	public static final int MAX_EVENT_PRODUCERS_PER_QUERY = 1000000;
+	
+	public static final int SNAPSHOT_DEFAULT_X_RESOLUTION = 1920;
+	public static final int SNAPSHOT_DEFAULT_Y_RESOLUTION = 1080;
 	
 }

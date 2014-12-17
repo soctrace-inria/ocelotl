@@ -45,11 +45,10 @@ public class StateDistribution extends Microscopic3DDescription {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(StateDistribution.class);
-	private TimeSliceStateManager timeSliceManager;
 
 	class OcelotlThread extends Thread {
 
-		List<EventProducer> eventProducers;
+		List<EventProducer> localActiveEventProducers;
 		int threadNumber;
 		int thread;
 		int size;
@@ -66,12 +65,14 @@ public class StateDistribution extends Microscopic3DDescription {
 			this.thread = thread;
 			this.size = size;
 			this.monitor = monitor;
-
+			localActiveEventProducers = new ArrayList<EventProducer>();
+			
 			start();
 		}
 
 		protected void matrixUpdate(final IState state, final EventProducer ep,
 				final Map<Long, Double> distrib) {
+			// Mutex
 			synchronized (getMatrix()) {
 				// If the event type is not in the matrix yet
 				if (!getMatrix().get(0).get(ep)
@@ -92,6 +93,7 @@ public class StateDistribution extends Microscopic3DDescription {
 
 		@Override
 		public void run() {
+			EventProducer currentEP=null;
 			while (true) {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
@@ -103,14 +105,28 @@ public class StateDistribution extends Microscopic3DDescription {
 				// For each event
 				for (final Event event : events) {
 					// Convert to state
-					state = new GenericState(event, timeSliceManager);
+					state = new GenericState(event, (TimeSliceStateManager) timeSliceManager);
 					// Get duration of the state for every time slice it is in
 					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
 					matrixUpdate(state, event.getEventProducer(), distrib);
-
+					if (currentEP != event.getEventProducer()){
+						currentEP=event.getEventProducer();
+					// If the event producer is not in the active producers list
+						if (!localActiveEventProducers.contains(event.getEventProducer())) {
+							// Add it
+							localActiveEventProducers.add(event.getEventProducer());
+						}
+					}
 					if (monitor.isCanceled())
 						return;
+				}
+			}
+			// Merge local active event producers to the global one
+			synchronized (activeProducers) {
+				for (EventProducer ep : localActiveEventProducers) {
+					if (!activeProducers.contains(ep))
+						activeProducers.add(ep);
 				}
 			}
 		}
@@ -133,8 +149,9 @@ public class StateDistribution extends Microscopic3DDescription {
 			ocelotlQueries.closeIterator();
 			return;
 		}
-		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		
+		setTimeSliceManager(new TimeSliceStateManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)

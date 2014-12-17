@@ -5,6 +5,6 @@ Bundle-SymbolicName: fr.inria.lpaggreg.win32
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: fr.inria.lpaggreg;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-NativeCode: liblpaggregjni.dll;selection-filter=
- "(osgi.os=win32)"
-Eclipse-PlatformFilter: (osgi.os=win32)
+Bundle-NativeCode: lpaggregjni.dll;selection-filter=
+ "(& (osgi.os=win32)(osgi.arch=x86))"
+Eclipse-PlatformFilter: (& (osgi.os=win32)(osgi.arch=x86))

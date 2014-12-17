@@ -22,7 +22,7 @@ package fr.inria.soctrace.tools.ocelotl.core;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.PartManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.idataaggregop.IDataAggregationOperator;
@@ -32,6 +32,8 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuOperatorManager;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescriptionTypeManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
+import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperator;
+import fr.inria.soctrace.tools.ocelotl.core.statistics.StatisticOperatorManager;
 
 public class OcelotlCore {
 
@@ -47,7 +49,7 @@ public class OcelotlCore {
 	}
 
 	OcelotlParameters ocelotlParameters;
-	IMicroDescManager lpaggregManager;
+	IDataAggregManager lpaggregManager;
 	PartManager partManager;
 	MicroscopicDescriptionTypeManager microModelTypeManager;
 	MicroscopicDescription microModel;
@@ -55,6 +57,8 @@ public class OcelotlCore {
 	IDataAggregationOperator aggregOperator;
 	VisuOperatorManager visuOperators;
 	IVisuOperator visuOperator;
+	StatisticOperatorManager statOperators;
+	IStatisticOperator statOperator;
 
 	public OcelotlCore() {
 		super();
@@ -73,10 +77,14 @@ public class OcelotlCore {
 		if (monitor.isCanceled())
 			return;
 		try {
+			// Build microscopic description
 			microModel.setOcelotlParameters(ocelotlParameters, monitor);
-			lpaggregManager = aggregOperator.createManager(microModel, monitor);
+			
 			if (monitor.isCanceled())
 				return;
+			
+			// Instantiate the aggregation operator
+			lpaggregManager = aggregOperator.createManager(microModel, monitor);
 		} catch (UnsatisfiedLinkError e) {
 			throw new OcelotlException(OcelotlException.JNI);
 		} catch (SoCTraceException e) {
@@ -98,13 +106,30 @@ public class OcelotlCore {
 	}
 
 	public void computeParts() {
-		lpaggregManager.computeParts();
+		lpaggregManager.computeParts(ocelotlParameters.getParameter());
 		// lpaggregManager.printParts();
 		setVisuOperator();
 		lpaggregManager.print(this);
 	}
+	
+	/**
+	 * Instantiate the managers for the elements of the core (Microscopic
+	 * description, data aggregation and visualization operator)
+	 * 
+	 * @param ocelotlParameters
+	 *            the parameters
+	 * @throws SoCTraceException
+	 */
+	public void init(final OcelotlParameters ocelotlParameters)
+			throws SoCTraceException {
+		setOcelotlParameters(ocelotlParameters);
+		microModelTypeManager = new MicroscopicDescriptionTypeManager();
+		aggregOperators = new DataAggregationOperatorManager(ocelotlParameters);
+		visuOperators = new VisuOperatorManager(this);
+		statOperators = new StatisticOperatorManager(this);
+	}
 
-	public IMicroDescManager getLpaggregManager() {
+	public IDataAggregManager getLpaggregManager() {
 		return lpaggregManager;
 	}
 
@@ -116,8 +141,12 @@ public class OcelotlCore {
 		return partManager;
 	}
 
-	public PartManager getPartsManager() {
-		return partManager;
+	public MicroscopicDescription getMicroModel() {
+		return microModel;
+	}
+
+	public void setMicroModel(MicroscopicDescription microModel) {
+		this.microModel = microModel;
 	}
 
 	public IVisuOperator getVisuOperator() {
@@ -126,6 +155,14 @@ public class OcelotlCore {
 
 	public VisuOperatorManager getVisuOperators() {
 		return visuOperators;
+	}
+
+	public StatisticOperatorManager getStatOperators() {
+		return statOperators;
+	}
+
+	public IStatisticOperator getStatOperator() {
+		return statOperator;
 	}
 
 	public IDataAggregationOperator getAggregOperator() {
@@ -140,14 +177,6 @@ public class OcelotlCore {
 		return microModelTypeManager;
 	}
 
-	public void init(final OcelotlParameters ocelotlParameters)
-			throws SoCTraceException {
-		setOcelotlParameters(ocelotlParameters);
-		aggregOperators = new DataAggregationOperatorManager(ocelotlParameters);
-		visuOperators = new VisuOperatorManager(this);
-		microModelTypeManager = new MicroscopicDescriptionTypeManager();
-	}
-
 	public void setOcelotlParameters(final OcelotlParameters ocelotlParameters) {
 		this.ocelotlParameters = ocelotlParameters;
 	}
@@ -155,6 +184,11 @@ public class OcelotlCore {
 	public void setVisuOperator() {
 		visuOperators.activateSelectedOperator();
 		visuOperator = visuOperators.getSelectedOperator();
+	}
+	
+	public void setStatOperator() {
+		statOperators.activateSelectedOperator();
+		statOperator = statOperators.getSelectedOperator();
 	}
 
 	public void setAggregOperator(IProgressMonitor monitor)
@@ -167,5 +201,4 @@ public class OcelotlCore {
 		microModelTypeManager.activateSelectedMicroModel(ocelotlParameters);
 		microModel = microModelTypeManager.getSelectedMicroModel();
 	}
-
 }

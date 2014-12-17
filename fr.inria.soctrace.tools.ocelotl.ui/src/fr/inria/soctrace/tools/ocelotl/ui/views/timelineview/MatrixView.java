@@ -19,9 +19,11 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IMicroDescManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregationManager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -33,21 +35,14 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 abstract public class MatrixView extends AggregatedView implements IAggregatedView {
 
 	protected EventProducerHierarchy	hierarchy;
-	protected int						space;
 
 	public MatrixView(final OcelotlView ocelotlView) {
 		super(ocelotlView);
-
+		mouse = new SpatioTemporalMouseListener(this);
 	}
 
 	@Override
 	abstract protected void computeDiagram();
-
-	private void computeSpace() {
-		space = Space;
-		while ((root.getSize().width - 2 * Border) / hierarchy.getRoot().getParts().size() - space < space && space > 0)
-			space = space - 1;
-	}
 
 	public void createDiagram(final EventProducerHierarchy hierarchy, final TimeRegion time) {
 		root.removeAll();
@@ -61,13 +56,20 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 		}
 		if (hierarchy != null)
 			if (hierarchy.getRoot().getParts() != null) {
-				computeSpace();
 				computeDiagram();
 			}
 	}
-
+	
+	public void createDiagram(EventProducerNode aNode, int start, int end) {
+		root.removeAll();
+		figures.clear();
+		canvas.update();
+		computeDiagram(aNode, start, end);
+	}
+	
 	@Override
-	public void createDiagram(final IMicroDescManager manager, final TimeRegion time) {
+	public void createDiagram(final IDataAggregManager manager, final TimeRegion time, IVisuOperator aVisuOperator) {
+		setVisuOperator(aVisuOperator);
 		createDiagram(((SpaceTimeAggregationManager) manager).getHierarchy(), time);
 	}
 
@@ -77,12 +79,21 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 
 	@Override
 	public void resizeDiagram() {
-		createDiagram(hierarchy, time);
+		root.removeAll();
+		figures.clear();
+		canvas.update();
+		if (hierarchy != null)
+			if (hierarchy.getRoot().getParts() != null) {
+				computeDiagram();
+			}
+
 		root.repaint();
+		drawSelection();
 	}
 
 	public void setHierarchy(final EventProducerHierarchy hierarchy) {
 		this.hierarchy = hierarchy;
 	}
 
+	protected abstract void computeDiagram(EventProducerNode aNode, int start, int end);
 }

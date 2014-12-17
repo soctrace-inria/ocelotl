@@ -19,38 +19,22 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.SWTGraphics;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -61,189 +45,129 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  */
 abstract public class AggregatedView implements IAggregatedView {
 
-	private class SelectFigure extends RectangleFigure {
+	protected Figure							root;
+	protected Canvas							canvas;
+	protected final List<RectangleFigure>		figures				= new ArrayList<RectangleFigure>();
+	protected TimeRegion						time;
+	protected TimeRegion						selectTime;
+	protected TimeRegion						potentialSelectTime;
+	protected TimeRegion						resetTime;
+	protected int								aBorder				= 10;
+	protected final int							space				= 3;
+	protected final OcelotlView					ocelotlView;
+	protected SelectFigure						selectFigure;
+	protected SelectFigure						highLightAggregateFigure;
+	protected SelectFigure						potentialSelectFigure;
+	protected EventProducerNode					currentlySelectedNode;
+	protected IVisuOperator						visuOperator		= null;
+	protected OcelotlMouseListener				mouse;
+	protected List<SpatioTemporalAggregateView>	aggregates;
+	public final static Color					selectColorFG		= ColorConstants.white;
+	public final static Color					selectColorBG		= ColorConstants.blue;
+	public final static Color					potentialColorFG	= ColorConstants.darkBlue;
+	public final static Color					potentialColorBG	= ColorConstants.darkBlue;
+	public final static Color					activeColorFG		= ColorConstants.black;
+	public final static Color					activeColorBG		= ColorConstants.black;
+	
+	class SelectFigure extends RectangleFigure {
 
-		public SelectFigure() {
+		private SelectFigure() {
 			super();
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 			setLayoutManager(layout);
-			setForegroundColor(ColorConstants.blue);
-			setBackgroundColor(ColorConstants.lightGray);
-			setAlpha(50);
+			setForegroundColor(selectColorFG);
+			setBackgroundColor(selectColorBG);
+			setAlpha(120);
+		}
+		
+		private SelectFigure(Color foreGround, Color backGround) {
+			super();
+			final ToolbarLayout layout = new ToolbarLayout();
+			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
+			setLayoutManager(layout);
+			setForegroundColor(foreGround);
+			setBackgroundColor(backGround);
 		}
 
-		public void draw(final TimeRegion timeRegion, final boolean active) {
+		/**
+		 * Draw the current select figure
+		 * 
+		 * @param timeRegion
+		 *            selected time region
+		 * @param active
+		 *            Is the selection currently active
+		 * @param y0
+		 *            origin height
+		 * @param y1
+		 *            corner height
+		 */
+		public void draw(final TimeRegion timeRegion, final boolean active, int y0, int y1) {
 			if (active) {
 				setForegroundColor(activeColorFG);
 				setBackgroundColor(activeColorBG);
+				setFill(true);
+				setAlpha(120);
 			} else {
 				setForegroundColor(selectColorFG);
 				setBackgroundColor(selectColorBG);
+				setFill(false);
+				setAlpha(250);
 			}
+			
 			if (getParent() != root)
 				root.add(this);
-			root.setConstraint(this,
-					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height), new Point(
-							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), 2)));
+
+			// Default values for selecting the height of the graph
+			if (y0 == -1)
+				y0 = root.getSize().height - 1;
+
+			if (y1 == -1)
+				y1 = 2;
+			
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
+					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
 			root.repaint();
 		}
+		
+		public void draw(final TimeRegion timeRegion, int y0, int y1) {
+			if (getParent() != root)
+				root.add(this);
+			
+			// Default values for selecting the height of the graph
+			if (y0 == -1)
+				y0 = root.getSize().height - 1;
+
+			if (y1 == -1)
+				y1 = 2;
+					
+			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
+					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
+			root.repaint();
+		}
+		
+		/**
+		 * Remove the selection from display
+		 */
+		public void delete() {
+			if (getParent() != null)
+				root.remove(this);
+		}
 	}
-
-	static public enum State {
-		PRESSED_D, DRAG_D, PRESSED_G, DRAG_G, DRAG_G_START, RELEASED, MOVE_START, MOVE_END, EXITED;
-	}
-
-	class TimeMouseListener implements MouseListener, MouseMotionListener {
-
-		private static final long	Threshold	= 5;
-		State						state		= State.RELEASED;
-		State						previous	= State.RELEASED;
-		Point						currentPoint;
-		Display						display		= Display.getCurrent();
-		Shell						shell		= display.getActiveShell();
-		long						fixed;
-
-		public TimeMouseListener() {
-			super();
-			display = Display.getCurrent();
-			shell = display.getActiveShell();
-
-		}
-
-		@Override
-		public void mouseDoubleClicked(final MouseEvent arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void mouseDragged(final MouseEvent arg0) {
-			if ((state == State.PRESSED_G || state == State.DRAG_G || state == State.DRAG_G_START) && arg0.getLocation().getDistance(currentPoint) > 10) {
-				long moved = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
-				if (state != State.DRAG_G_START) {
-					state = State.DRAG_G;
-				}
-				moved = Math.max(moved, resetTime.getTimeStampStart());
-				moved = Math.min(moved, resetTime.getTimeStampEnd());
-				fixed = Math.max(fixed, resetTime.getTimeStampStart());
-				fixed = Math.min(fixed, resetTime.getTimeStampEnd());
-				if (fixed < moved) {
-					selectTime = new TimeRegion(fixed, moved);
-				} else
-					selectTime = new TimeRegion(moved, fixed);
-				ocelotlView.setTimeRegion(selectTime);
-				ocelotlView.getTimeAxisView().select(selectTime, false);
-				selectFigure.draw(selectTime, false);
-				if (ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-					ocelotlView.getTimeAxisView().unselect();
-					if (selectFigure.getParent() != null)
-						root.remove(selectFigure);
-					root.repaint();
-				}
-			}
-
-		}
-
-		@Override
-		public void mouseEntered(final MouseEvent arg0) {
-		}
-
-		@Override
-		public void mouseExited(final MouseEvent arg0) {
-			if (state != State.RELEASED && state != State.MOVE_START && state != State.MOVE_END && state != State.EXITED) {
-				state = State.EXITED;
-				mouseReleased(arg0);
-			}
-		}
-
-		@Override
-		public void mouseHover(final MouseEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void mouseMoved(final MouseEvent arg0) {
-			if (selectFigure != null && root.getChildren().contains(selectFigure)) {
-				if (Math.abs(selectFigure.getBounds().x - arg0.x) < Threshold) {
-					state = State.MOVE_START;
-					shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
-				} else if (Math.abs(selectFigure.getBounds().x + selectFigure.getBounds().width - arg0.x) < Threshold) {
-					state = State.MOVE_END;
-					shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
-				} else {
-					state = State.RELEASED;
-					shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
-				}
-			}
-
-		}
-
-		@Override
-		public void mousePressed(final MouseEvent arg0) {
-			if (arg0.button == 1 && resetTime != null) {
-				currentPoint = arg0.getLocation();
-				long p3 = (long) ((double) ((arg0.x - Border) * resetTime.getTimeDuration()) / (root.getSize().width() - 2 * Border)) + resetTime.getTimeStampStart();
-				if (state == State.MOVE_START) {
-					p3 = selectTime.getTimeStampStart();
-					fixed = selectTime.getTimeStampEnd();
-					state = State.DRAG_G_START;
-				} else if (state == State.MOVE_END) {
-					p3 = selectTime.getTimeStampEnd();
-					fixed = selectTime.getTimeStampStart();
-					state = State.DRAG_G;
-				} else {
-					state = State.PRESSED_G;
-					p3 = Math.max(p3, resetTime.getTimeStampStart());
-					p3 = Math.min(p3, resetTime.getTimeStampEnd());
-					selectTime = new TimeRegion(resetTime);
-					selectTime.setTimeStampStart(p3);
-					selectTime.setTimeStampEnd(p3);
-					fixed = p3;
-				}
-				ocelotlView.setTimeRegion(selectTime);
-				ocelotlView.getTimeAxisView().select(selectTime, false);
-				selectFigure.draw(selectTime, false);
-
-			}
-		}
-
-		@Override
-		public void mouseReleased(final MouseEvent arg0) {
-
-			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
-			if (state == State.DRAG_G || state == State.DRAG_G_START) {
-				mouseDragged(arg0);
-			}
-			state = State.RELEASED;
-			if (time == null)
-				return;
-
-			if (!ocelotlView.getTimeRegion().compareTimeRegion(time)) {
-				double sliceSize = (double) resetTime.getTimeDuration() / (double) ocelotlView.getTimeSliceNumber();
-				int i = 0;
-				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++) {
-					if ((selectTime.getTimeStampStart() >= ((long) ((sliceSize * i) + resetTime.getTimeStampStart()))) && (selectTime.getTimeStampStart() < ((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart())))) {
-						selectTime.setTimeStampStart((long) ((sliceSize * i) + resetTime.getTimeStampStart()));
-						break;
-					}
-				}
-				for (i = 0; i < ocelotlView.getTimeSliceNumber(); i++) {
-					if ((selectTime.getTimeStampEnd() > ((long) ((sliceSize * i) + resetTime.getTimeStampStart()))) && (selectTime.getTimeStampEnd() <= ((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart())))) {
-						selectTime.setTimeStampEnd((long) ((sliceSize * (i + 1)) + resetTime.getTimeStampStart()));
-						break;
-					}
-				}
-				ocelotlView.getTimeAxisView().select(selectTime, true);
-				ocelotlView.setTimeRegion(selectTime);
-				selectFigure.draw(selectTime, true);
-			} else {
-				ocelotlView.getTimeAxisView().resizeDiagram();
-				if (selectFigure.getParent() != null)
-					root.remove(selectFigure);
-				root.repaint();
-			}
-		}
+	
+	/**
+	 * States of the mouse
+	 * 
+	 * PRESSED_LEFT: Left button pressed
+	 * DRAG_LEFT_VERTICAL/DRAG_LEFT_HORIZONTAL: dragging of the mouse with the left button on the vertical axis (horizontal resp.)
+	 * RELEASED: Button is released
+	 * EXITED: Cursor out of the zone
+	 * H/V_MOVE_START/END: starting a horizontal/vertical (H/V) dragging move from one side (left, right, up or bottom)
+	 */
+	static public enum MouseState {
+		PRESSED_D, DRAG_D, PRESSED_LEFT, DRAG_LEFT, DRAG_LEFT_START, 
+		DRAG_LEFT_VERTICAL, DRAG_LEFT_HORIZONTAL,
+		RELEASED, H_MOVE_START, H_MOVE_END, V_MOVE_START, V_MOVE_END, EXITED;
 	}
 
 	public static Color getActivecolorbg() {
@@ -252,37 +176,6 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public static Color getActivecolorfg() {
 		return activeColorFG;
-	}
-
-	protected Figure						root;
-
-	protected Canvas						canvas;
-
-	protected final List<RectangleFigure>	figures			= new ArrayList<RectangleFigure>();
-
-	protected TimeRegion					time;
-
-	protected TimeRegion					selectTime;
-
-	protected TimeRegion					resetTime;
-
-	public final static int					Border			= 10;
-
-	protected final int						Space			= 3;
-	protected final OcelotlView				ocelotlView;
-
-	private SelectFigure					selectFigure;
-
-	public final static Color				selectColorFG	= ColorConstants.blue;
-
-	public final static Color				selectColorBG	= ColorConstants.lightGray;
-
-	public final static Color				activeColorFG	= ColorConstants.black;
-
-	public final static Color				activeColorBG	= ColorConstants.darkBlue;
-
-	public static int getBorder() {
-		return Border;
 	}
 
 	public static Color getSelectcolorbg() {
@@ -296,7 +189,6 @@ abstract public class AggregatedView implements IAggregatedView {
 	public AggregatedView(final OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
-
 	}
 
 	abstract protected void computeDiagram();
@@ -306,6 +198,27 @@ abstract public class AggregatedView implements IAggregatedView {
 		root.removeAll();
 		figures.clear();
 		root.repaint();
+	}
+	
+	@Override
+	public void drawSelection() {
+		if (selectTime != null) {
+			mouse.drawSelection();
+		}
+	}
+	
+	public void setSpatialSelection(EventProducerNode epn) {
+		mouse.setSpatialSelection(epn);
+	}
+	
+	public void deleteSelectFigure() {
+		selectFigure.delete();
+		selectTime = null;
+		setCurrentlySelectedNode(null);
+	}
+
+	public int getBorder() {
+		return aBorder;
 	}
 
 	public Canvas getCanvas() {
@@ -329,6 +242,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		return resetTime;
 	}
 
+	@Override
 	public Figure getRoot() {
 		return root;
 	}
@@ -341,8 +255,24 @@ abstract public class AggregatedView implements IAggregatedView {
 		return selectTime;
 	}
 
+	public TimeRegion getPotentialSelectTime() {
+		return potentialSelectTime;
+	}
+
+	public void setPotentialSelectTime(TimeRegion potentialSelectTime) {
+		this.potentialSelectTime = potentialSelectTime;
+	}
+
+	public void setSelectTime(TimeRegion selectTime) {
+		this.selectTime = selectTime;
+	}
+
+	public SelectFigure getHighLightAggregateFigure() {
+		return highLightAggregateFigure;
+	}
+
 	public int getSpace() {
-		return Space;
+		return space;
 	}
 
 	@Override
@@ -352,6 +282,34 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public TimeRegion getTime() {
 		return time;
+	}
+
+	public IVisuOperator getVisuOperator() {
+		return visuOperator;
+	}
+
+	public List<SpatioTemporalAggregateView> getAggregates() {
+		return aggregates;
+	}
+
+	public void setAggregates(ArrayList<SpatioTemporalAggregateView> aggregateMapping) {
+		this.aggregates = aggregateMapping;
+	}
+
+	public SelectFigure getPotentialSelectFigure() {
+		return potentialSelectFigure;
+	}
+
+	public void setPotentialSelectFigure(SelectFigure potentialSelectFigure) {
+		this.potentialSelectFigure = potentialSelectFigure;
+	}
+
+	public OcelotlMouseListener getMouse() {
+		return mouse;
+	}
+
+	public void setMouse(OcelotlMouseListener mouse) {
+		this.mouse = mouse;
 	}
 
 	@Override
@@ -374,62 +332,48 @@ abstract public class AggregatedView implements IAggregatedView {
 			}
 		});
 
-		final TimeMouseListener mouse = new TimeMouseListener();
+		// Reset the spatial selection flag
+		ocelotlView.getOcelotlParameters().setSpatialSelection(false);
+		
 		wrapper.cleanMouseListeners();
 		wrapper.cleanMouseMotionListeners();
 		wrapper.addMouseListener(mouse);
 		wrapper.addMouseMotionListener(mouse);
 		selectFigure = new SelectFigure();
+		
+		potentialSelectFigure = new SelectFigure(potentialColorFG, potentialColorBG);
+		potentialSelectFigure.setLineWidth(1);
+		potentialSelectFigure.setAlpha(100);
+		potentialSelectFigure.setFill(true);
+		
+		highLightAggregateFigure = new SelectFigure(ColorConstants.black, ColorConstants.white);
+		highLightAggregateFigure.setLineWidth(2);
+		highLightAggregateFigure.setAlpha(255);
+		highLightAggregateFigure.setFill(false);
 	}
 	
-	public void createSnapshotFor(String fileName) {
-		byte[] imageBytes = createImage(root, SWT.IMAGE_PNG);
-
-		try {
-			FileOutputStream out = new FileOutputStream(fileName);
-			out.write(imageBytes);
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void setBorder(final int border) {
+		this.aBorder = border;
 	}
 
-	private byte[] createImage(Figure figure, int format) {
+	public void setCanvas(final Canvas canvas) {
+		this.canvas = canvas;
+	}
 
-		Device device = Display.getCurrent();
-		Rectangle r = figure.getBounds();
+	public void setRoot(final Figure root) {
+		this.root = root;
+	}
 
-		ByteArrayOutputStream result = new ByteArrayOutputStream();
+	public void setVisuOperator(final IVisuOperator visuOperator) {
+		this.visuOperator = visuOperator;
+	}
 
-		Image image = null;
-		GC gc = null;
-		Graphics g = null;
-		try {
-			image = new Image(device, r.width, r.height);
-			gc = new GC(image);
-			g = new SWTGraphics(gc);
-			g.translate(r.x * -1, r.y * -1);
+	public EventProducerNode getCurrentlySelectedNode() {
+		return currentlySelectedNode;
+	}
 
-			figure.paint(g);
-
-			ImageLoader imageLoader = new ImageLoader();
-			imageLoader.data = new ImageData[] { image.getImageData() };
-			imageLoader.save(result, format);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (g != null) {
-				g.dispose();
-			}
-			if (gc != null) {
-				gc.dispose();
-			}
-			if (image != null) {
-				image.dispose();
-			}
-		}
-		return result.toByteArray();
+	public void setCurrentlySelectedNode(EventProducerNode currentlySelectedNode) {
+		this.currentlySelectedNode = currentlySelectedNode;
 	}
 
 }

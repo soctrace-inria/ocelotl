@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.ui,
  fr.inria.soctrace.lib.search,
  fr.inria.soctrace.lib.utils,
  fr.inria.lpaggreg,
- fr.inria.soctrace.tools.ocelotl.slf4j;bundle-version="1.0.0"
+ fr.inria.soctrace.tools.ocelotl.slf4j;bundle-version="1.0.0",
+ fr.inria.soctrace.tools.ocelotl.json;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.ocelotl.core,
@@ -34,7 +35,11 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.soctrace.tools.ocelotl.core.queries.eventproxy,
  fr.inria.soctrace.tools.ocelotl.core.queries.reducedevent,
  fr.inria.soctrace.tools.ocelotl.core.settings,
+ fr.inria.soctrace.tools.ocelotl.core.statistics,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
  fr.inria.soctrace.tools.ocelotl.core.timeslice,
  fr.inria.soctrace.tools.ocelotl.core.utils
-Import-Package: org.eclipse.core.resources
+Import-Package: com.google.gson,
+ fr.inria.soctrace.framesoc.ui.model,
+ org.eclipse.core.resources,
+ org.eclipse.draw2d

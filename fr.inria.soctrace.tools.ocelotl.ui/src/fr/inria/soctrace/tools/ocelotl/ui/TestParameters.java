@@ -14,8 +14,10 @@ public class TestParameters {
 	private long endTimestamp;
 	private int nbTimeSlice;
 	private ArrayList<Integer> timeSlicesCollection;
+	private ArrayList<Integer> timeSlicesNumber;
 	private int nbEventProd;
 	private String timeAggOperator;
+	private String dataAggOperator;
 	private String spaceAggOperator;
 	private ArrayList<Double> parameters;
 	private DatacacheStrategy datacacheStrat;
@@ -38,6 +40,7 @@ public class TestParameters {
 		setNumberOfRepetition(1);
 		setActivateCache(false);
 		timeSlicesCollection =  new ArrayList<Integer>();
+		timeSlicesNumber = new ArrayList<Integer>();
 	}
 
 	/**
@@ -53,16 +56,23 @@ public class TestParameters {
 		startTimestamp = oParam.getTimeRegion().getTimeStampStart();
 		endTimestamp = oParam.getTimeRegion().getTimeStampEnd();
 		nbTimeSlice = oParam.getTimeSlicesNumber();
-		if (oParam.getTimeAggOperator() == null) {
+		if (oParam.getMicroModelType() == null) {
 			timeAggOperator = "null";
 		} else {
-			timeAggOperator = oParam.getTimeAggOperator();
+			timeAggOperator = oParam.getMicroModelType();
+		}
+		
+		if (oParam.getDataAggOperator() == null) {
+			dataAggOperator = "null";
+		} else {
+			dataAggOperator = oParam.getDataAggOperator();
 		}
 
-		if (oParam.getSpaceAggOperator() == null) {
+
+		if (oParam.getVisuOperator() == null) {
 			spaceAggOperator = "null";
 		} else {
-			spaceAggOperator = oParam.getSpaceAggOperator();
+			spaceAggOperator = oParam.getVisuOperator();
 		}
 	}
 
@@ -122,6 +132,14 @@ public class TestParameters {
 		this.spaceAggOperator = spaceAggOperator;
 	}
 
+	public String getDataAggOperator() {
+		return dataAggOperator;
+	}
+
+	public void setDataAggOperator(String dataAggOperator) {
+		this.dataAggOperator = dataAggOperator;
+	}
+
 	public ArrayList<Double> getParameters() {
 		return parameters;
 	}
@@ -154,6 +172,14 @@ public class TestParameters {
 		this.numberOfRepetition = numberOfRepetition;
 	}
 
+	public ArrayList<Integer> getTimeSlicesNumber() {
+		return timeSlicesNumber;
+	}
+
+	public void setTimeSlicesNumber(ArrayList<Integer> timeSlicesNumber) {
+		this.timeSlicesNumber = timeSlicesNumber;
+	}
+
 	public boolean isActivateCache() {
 		return activateCache;
 	}
@@ -180,11 +206,15 @@ public class TestParameters {
 			oParam.setParameter(getParameters().get(0));
 
 			if (!getTimeAggOperator().equals("null")) {
-				oParam.setTimeAggOperator(getTimeAggOperator());
+				oParam.setMicroModelType(getTimeAggOperator());
+			}
+			
+			if (!getDataAggOperator().equals("null")) {
+				oParam.setDataAggOperator(getDataAggOperator());
 			}
 
 			if (!getSpaceAggOperator().equals("null")) {
-				oParam.setSpaceAggOperator(getSpaceAggOperator());
+				oParam.setVisuOperator(getSpaceAggOperator());
 			}
 
 			oParam.getDataCache().setBuildingStrategy(getDatacacheStrat());

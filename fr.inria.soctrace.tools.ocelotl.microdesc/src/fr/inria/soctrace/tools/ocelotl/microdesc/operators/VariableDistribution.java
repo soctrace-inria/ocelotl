@@ -42,12 +42,12 @@ import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericVariable;
 
 public class VariableDistribution extends Microscopic3DDescription {
 
-	private static final Logger logger = LoggerFactory.getLogger(VariableDistribution.class);
-	
-	
+	private static final Logger logger = LoggerFactory
+			.getLogger(VariableDistribution.class);
+
 	class OcelotlThread extends Thread {
 
-		List<EventProducer> eventProducers;
+		List<EventProducer> localActiveEventProducers;
 		int threadNumber;
 		int thread;
 		int size;
@@ -60,16 +60,17 @@ public class VariableDistribution extends Microscopic3DDescription {
 			this.thread = thread;
 			this.size = size;
 			this.monitor = monitor;
+			localActiveEventProducers = new ArrayList<EventProducer>();
 
 			start();
 		}
 
-		private void matrixUpdate(final IVariable variable, final EventProducer ep,
-				final Map<Long, Double> distrib) {
+		private void matrixUpdate(final IVariable variable,
+				final EventProducer ep, final Map<Long, Double> distrib) {
+			// Mutex
 			synchronized (getMatrix()) {
 				if (!getMatrix().get(0).get(ep).containsKey(variable.getType())) {
-					logger.debug("Adding " + variable.getType()
-							+ " variable");
+					logger.debug("Adding " + variable.getType() + " variable");
 
 					for (int incr = 0; incr < getMatrix().size(); incr++)
 						for (final EventProducer epset : getMatrix().get(incr)
@@ -83,32 +84,51 @@ public class VariableDistribution extends Microscopic3DDescription {
 
 		@Override
 		public void run() {
+			EventProducer currentEP = null;
 			while (true) {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
 				if (monitor.isCanceled())
 					return;
-				
+
 				IVariable variable;
 				for (final Event event : events) {
-					variable = new GenericVariable(event, timeSliceManager);
+					variable = new GenericVariable(event,
+							(TimeSliceVariableManager) timeSliceManager);
 					final Map<Long, Double> distrib = variable
 							.getTimeSlicesDistribution();
 					matrixUpdate(variable, event.getEventProducer(), distrib);
+
+					if (currentEP != event.getEventProducer()) {
+						currentEP = event.getEventProducer();
+						// If the event producer is not in the active producers
+						// list
+						if (!localActiveEventProducers.contains(event
+								.getEventProducer())) {
+							// Add it
+							localActiveEventProducers.add(event
+									.getEventProducer());
+						}
+					}
 					if (monitor.isCanceled())
 						return;
+				}
+			}
+			// Merge local active event producers to the global one
+			synchronized (activeProducers) {
+				for (EventProducer ep : localActiveEventProducers) {
+					if (!activeProducers.contains(ep))
+						activeProducers.add(ep);
 				}
 			}
 		}
 	}
 
-	private TimeSliceVariableManager timeSliceManager;
-
 	public VariableDistribution() {
 		super();
 	}
-	
+
 	@Override
 	public void computeSubMatrix(List<EventProducer> eventProducers,
 			List<IntervalDesc> time, IProgressMonitor monitor)
@@ -122,8 +142,9 @@ public class VariableDistribution extends Microscopic3DDescription {
 			ocelotlQueries.closeIterator();
 			return;
 		}
-		timeSliceManager = new TimeSliceVariableManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+
+		setTimeSliceManager(new TimeSliceVariableManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
@@ -135,6 +156,65 @@ public class VariableDistribution extends Microscopic3DDescription {
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+
+	@Override
+	public void rebuildMatrix(String[] values, EventProducer ep,
+			int sliceMultiple) {
+
+		String evType = values[2];
+
+		// If the event type is filtered out
+		if (!typeNames.contains(evType))
+			return;
+
+		// If the event producer is flag as inactive
+		if (!getActiveProducers().contains(ep)) {
+			// Remove it
+			getActiveProducers().add(ep);
+		}
+		
+		int slice = Integer.parseInt(values[0]);
+		double value = Double.parseDouble(values[3]);
+
+		// If the number of time slice is a multiple of the cached time
+		// slice number
+		if (sliceMultiple > 1) {
+			// Compute the correct slice number
+			slice = slice / sliceMultiple;
+
+			// And add the value to the one already in the matrix
+			if (matrix.get(slice).get(ep).get(evType) != null)
+				value = matrix.get(slice).get(ep).get(evType) + (value / sliceMultiple);
+		}
+
+		matrix.get(slice).get(ep).put(evType, value);
+	}
+	
+	@Override
+	public void rebuildMatrixFromDirtyCache(String[] values, EventProducer ep,
+			int slice, double factor) {
+
+		String evType = values[2];
+
+		// If the event type is filtered out
+		if (!typeNames.contains(evType))
+			return;
+		
+		// If the event producer is flag as inactive
+		if (!getActiveProducers().contains(ep)) {
+			// Remove it
+			getActiveProducers().add(ep);
+		}
+
+		// Compute a value proportional to the time ratio spent in the slice
+		double value = Double.parseDouble(values[3]) * factor;
+
+		// Add the value to the one potentially already in the matrix
+		if (matrix.get(slice).get(ep).get(evType) != null)
+			value = matrix.get(slice).get(ep).get(evType) + value / parameters.getTimeSliceFactor();
+
+		matrix.get(slice).get(ep).put(evType, value);
 	}
 	
 	@Override

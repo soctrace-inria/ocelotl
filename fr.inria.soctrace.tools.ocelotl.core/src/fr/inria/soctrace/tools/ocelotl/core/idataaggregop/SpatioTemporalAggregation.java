@@ -26,7 +26,7 @@ import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 
 public class SpatioTemporalAggregation implements IDataAggregationOperator {
-
+	
 	@Override
 	public SpaceTimeAggregation2Manager createManager(
 			MicroscopicDescription microMod, IProgressMonitor monitor)

@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,6 +37,7 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 	public TimeAggregation2Manager(final MicroscopicDescription matrix, IProgressMonitor monitor) {
 		super(matrix.getOcelotlParameters());
 		this.matrix = (Microscopic2DDescription) matrix;
+		simplifyMatrix();
 		reset(monitor);
 	}
 
@@ -66,4 +68,20 @@ public class TimeAggregation2Manager extends TimeAggregationManager {
 		fillVectors(monitor);
 	}
 
+	/**
+	 * Remove event producers that do not produce any event (better
+	 * performances)
+	 */
+	protected void simplifyMatrix() {
+		if (matrix.getInactiveProducers().size() == 0)
+			return;
+
+		// Remove the inactive producers
+		for (final HashMap<EventProducer, Double> it : matrix.getMatrix()) {
+			// For each inactive event producer
+			for (final EventProducer ep : matrix.getInactiveProducers()) {
+				it.remove(ep);
+			}
+		}
+	}
 }

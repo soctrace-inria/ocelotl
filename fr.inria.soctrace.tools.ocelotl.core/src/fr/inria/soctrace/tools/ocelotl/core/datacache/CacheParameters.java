@@ -40,16 +40,16 @@ public class CacheParameters {
 			startTimestamp = oParam.getTimeRegion().getTimeStampStart();
 			endTimestamp = oParam.getTimeRegion().getTimeStampEnd();
 			nbTimeSlice = oParam.getTimeSlicesNumber();
-			if (oParam.getTimeAggOperator() == null) {
+			if (oParam.getDataAggOperator() == null) {
 				timeAggOperator = "null";
 			} else {
-				timeAggOperator = oParam.getTimeAggOperator();
+				timeAggOperator = oParam.getDataAggOperator();
 			}
 
-			if (oParam.getSpaceAggOperator() == null) {
+			if (oParam.getVisuOperator() == null) {
 				spaceAggOperator = "null";
 			} else {
-				spaceAggOperator = oParam.getSpaceAggOperator();
+				spaceAggOperator = oParam.getVisuOperator();
 			}
 			
 			if (oParam.getMicroModelType() == null) {

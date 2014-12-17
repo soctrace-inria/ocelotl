@@ -89,11 +89,6 @@ public class DataCache {
 	 */
 	protected boolean rebuildDirty;
 
-	/**
-	 * Set whether the cache is active or not
-	 */
-	protected boolean cacheActive = true;
-
 	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
 
 	protected DatacacheStrategy buildingStrategy;
@@ -117,15 +112,6 @@ public class DataCache {
 	public void setTimeSliceMapping(
 			HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping) {
 		this.timeSliceMapping = timeSliceMapping;
-	}
-
-	public boolean isCacheActive() {
-		return cacheActive;
-	}
-
-	public void setCacheActive(boolean cacheActive) {
-		this.cacheActive = cacheActive;
-		settings.setCacheActivated(this.cacheActive);
 	}
 
 	public boolean isRebuildDirty() {
@@ -160,44 +146,7 @@ public class DataCache {
 	public void setCacheDirectory(String cacheDirectory) {
 
 		if (!this.cacheDirectory.equals(cacheDirectory)) {
-			// Check the existence of the cache directory
-			File dir = new File(cacheDirectory);
-			if (!dir.exists()) {
-				logger.debug("Cache directory (" + cacheDirectory
-						+ ") does not exist and will be created now.");
-
-				// Create the directory
-				if (!dir.mkdirs()) {
-					logger.error("Failed to create cache directory: "
-							+ cacheDirectory + ".");
-
-					if (this.cacheDirectory.isEmpty()) {
-						logger.error("The current cache directory is still: "
-								+ this.cacheDirectory);
-					} else {
-						validDirectory = false;
-						logger.error("The cache will be turned off.");
-					}
-					return;
-				}
-			}
-
-			// Check that we have at least the reading rights
-			if (!dir.canRead()) {
-				logger.error("The application does not have the rights to read in the given directory: "
-						+ cacheDirectory + ".");
-
-				if (this.cacheDirectory.isEmpty()) {
-					validDirectory = false;
-					logger.error("The cache will be turned off.");
-				} else {
-					logger.error("The current cache directory is still: "
-							+ this.cacheDirectory);
-				}
-				return;
-			}
-
-			validDirectory = true;
+			validDirectory = checkCacheDirectoryValidity(cacheDirectory);
 
 			// Everything's OK, set the cache directory
 			this.cacheDirectory = cacheDirectory;
@@ -208,6 +157,56 @@ public class DataCache {
 			// Search the directory for existing cache files
 			readCachedData();
 		}
+	}
+	
+	/**
+	 * Check that the cache directory is a valid one, i.e. does it exist and can
+	 * it be read
+	 * 
+	 * @param cacheDirectory
+	 *            path to the cache directory
+	 * @return true if valid, false otherwise
+	 */
+	public boolean checkCacheDirectoryValidity(String cacheDirectory) {
+		
+		// Check the existence of the cache directory
+		File dir = new File(cacheDirectory);
+		if (!dir.exists()) {
+			logger.debug("Cache directory (" + cacheDirectory
+					+ ") does not exist and will be created now.");
+
+			// Create the directory
+			if (!dir.mkdirs()) {
+				logger.error("Failed to create cache directory: "
+						+ cacheDirectory + ".");
+
+				if (this.cacheDirectory.isEmpty()) {
+					logger.error("The current cache directory is still: "
+							+ this.cacheDirectory);
+				} else {
+					validDirectory = false;
+					logger.error("The cache will be turned off.");
+				}
+				return false;
+			}
+		}
+
+		// Check that we have at least the reading rights
+		if (!dir.canRead()) {
+			logger.error("The application does not have the rights to read in the given directory: "
+					+ cacheDirectory + ".");
+
+			if (this.cacheDirectory.isEmpty()) {
+				validDirectory = false;
+				logger.error("The cache will be turned off.");
+			} else {
+				logger.error("The current cache directory is still: "
+						+ this.cacheDirectory);
+			}
+			return false;
+		}
+		
+		return true;
 	}
 
 	public int getTimeSliceFactor() {
@@ -295,9 +294,9 @@ public class DataCache {
 			return null;
 		} else {
 			similarParameters(cParam, cache);
+			parameters.setTimeSliceFactor(timeSliceFactor);
 			return cachedData.get(cache);
 		}
-			
 	}
 
 	/**
@@ -756,11 +755,11 @@ public class DataCache {
 			}
 
 			if (!params.getTimeAggOperator().equals("null")) {
-				oParam.setTimeAggOperator(params.getTimeAggOperator());
+				oParam.setDataAggOperator(params.getTimeAggOperator());
 			}
 
 			if (!params.getSpaceAggOperator().equals("null")) {
-				oParam.setSpaceAggOperator(params.getSpaceAggOperator());
+				oParam.setVisuOperator(params.getSpaceAggOperator());
 			}
 		}
 
@@ -794,8 +793,7 @@ public class DataCache {
 		}
 
 		logger.debug("Size of the current cache is: " + currentCacheSize
-				+ " bytes.");
-	}
+				+ " bytes (" + currentCacheSize / 1000000 + " MB).");	 }
 
 	/**
 	 * Remove a cache file. The used policy is to suppress the file which has

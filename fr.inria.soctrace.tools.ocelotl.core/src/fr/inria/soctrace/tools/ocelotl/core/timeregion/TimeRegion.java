@@ -40,17 +40,31 @@ public class TimeRegion {
 		setTimeStampEnd(time.getTimeStampEnd());
 	}
 
+	/**
+	 * Check if two time regions represent the time period
+	 * 
+	 * @param timeRegion
+	 *            The TimeRegion to compare with
+	 * @return true if the time regions are identical
+	 */
 	public boolean compareTimeRegion(final TimeRegion timeRegion) {
 		return getTimeStampStart() == timeRegion.getTimeStampStart()
 				&& getTimeStampEnd() == timeRegion.getTimeStampEnd();
 	}
 
+	/**
+	 * Does the time region contains the provided timestamp
+	 * 
+	 * @param timeStamp
+	 *            the tested timestamp
+	 * @return true if it contains the time stamp, false otherwise
+	 */
 	public boolean containsTimeStamp(final long timeStamp) {
 		if (timeStamp < timeStampStart || timeStamp > timeStampEnd)
 			return false;
 		return true;
 	}
-	
+
 	/**
 	 * Test if a time region is contained within another
 	 * 

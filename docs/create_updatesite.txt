@@ -1,0 +1,20 @@
+==========================================================================================
+Create an update site
+==========================================================================================
+
+If no update site project exists yet:
+	1) Create one by going into File->New->Project->Plug-in Development->Update Site Project
+	2) Click next
+	3) Provide a name and click finish
+	4) A site.xml file should be generated, double-click on it
+	5) Create a new category and provide a name and an ID 
+	6) Click on add feature and add all the features you want to be available in your update site
+	7) Click on Build All
+	8) and voilà!
+
+For an already existing update site project, (for Oceltol, get into the package fr.inria.soctrace.tools.ocelotl.updatesite):
+	1) Remove all the existing files in the project repository, except site.xml (otherwise there will be multiple versions of your features)
+	2) Double-click on site.xml
+	3) Go to 7) above
+
+

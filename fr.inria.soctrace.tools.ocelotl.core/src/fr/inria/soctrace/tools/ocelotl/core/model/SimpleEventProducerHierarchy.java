@@ -175,4 +175,19 @@ public class SimpleEventProducerHierarchy {
 	public int getParentID(int id) {
 		return eventProducerNodes.get(id).getParentNode().getID();
 	}
+	
+	/**
+	 * Check if an event producer is a leaf
+	 * 
+	 * @param ep
+	 *            the tested event producer
+	 * @return true if it is a leaf, false otherwise
+	 */
+	public boolean isLeaf(EventProducer ep) {
+		for (SimpleEventProducerNode sepn : leaves.values())
+			if (sepn.getMe().getId() == ep.getId())
+				return true;
+
+		return false;
+	}
 }

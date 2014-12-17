@@ -22,24 +22,29 @@ package fr.inria.soctrace.tools.ocelotl.core.ivisuop;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
+
 public class VisuOperatorResource {
 
 	String operatorClass;
 	String name;
 	List<String> timeCompatibility = new ArrayList<String>();
+	List<String> aggregatorCompatibility = new ArrayList<String>();
 	String paramWinClass;
 	String paramConfig;
 	String visualization;
 	String bundle;
 	int selectionPriority;
+	String overviewVisualization;
+	String yAxisView;
 
 	public VisuOperatorResource() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public VisuOperatorResource(final String operatorClass,
-			final String name, final List<String> timeCompatibility,
-			final String visualization, String paramWinClass,
+	public VisuOperatorResource(final String operatorClass, final String name,
+			final List<String> timeCompatibility, final String visualization,
+			String paramWinClass, final String overviewVisualization,
 			String paramConfig, final int selectionPriority, final String bundle) {
 		super();
 		this.operatorClass = operatorClass;
@@ -49,6 +54,7 @@ public class VisuOperatorResource {
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
 		this.selectionPriority = selectionPriority;
+		this.overviewVisualization = overviewVisualization;
 		this.bundle = bundle;
 	}
 
@@ -66,6 +72,10 @@ public class VisuOperatorResource {
 
 	public List<String> getTimeCompatibility() {
 		return timeCompatibility;
+	}
+	
+	public List<String> getAggregatorCompatibility() {
+		return aggregatorCompatibility;
 	}
 
 	public String getVisualization() {
@@ -93,9 +103,15 @@ public class VisuOperatorResource {
 	}
 
 	public void setTimeCompatibility(final String string) {
-		final String[] tmp = string.split(", ");
+		final String[] tmp = string.split(OcelotlConstants.MultipleValueExtensionSeparator);
 		for (final String s : tmp)
 			timeCompatibility.add(s);
+	}
+	
+	public void setAggregatorCompatibility(final String string) {
+		final String[] tmp = string.split(OcelotlConstants.MultipleValueExtensionSeparator);
+		for (final String s : tmp)
+			aggregatorCompatibility.add(s);
 	}
 
 	public void setVisualization(final String visualization) {
@@ -116,6 +132,22 @@ public class VisuOperatorResource {
 
 	public void setSelectionPriority(int selectionPriority) {
 		this.selectionPriority = selectionPriority;
+	}
+
+	public String getOverviewVisualization() {
+		return overviewVisualization;
+	}
+
+	public void setOverviewVisualization(String overviewVisualization) {
+		this.overviewVisualization = overviewVisualization;
+	}
+
+	public String getYAxisView() {
+		return yAxisView;
+	}
+
+	public void setYAxisView(String yAxisView) {
+		this.yAxisView = yAxisView;
 	}
 	
 }

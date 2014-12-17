@@ -50,16 +50,12 @@ public class DataAggregationOperatorManager {
 	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.timeaggregator"; //$NON-NLS-1$
 	private static final String OP_NAME = "operator"; //$NON-NLS-1$
 	private static final String OP_CLASS = "class"; //$NON-NLS-1$
-	private static final String OP_TRACE_FORMATS = "trace_formats"; //$NON-NLS-1$
 	private static final String OP_PARAM_WIN = "param_win"; //$NON-NLS-1$
-	private static final String OP_SPATIAL_COMPATIBILITY = "spatial_compatibility"; //$NON-NLS-1$
+	private static final String OP_VISUALIZATION_COMPATIBILITY = "visual_compatibility"; //$NON-NLS-1$
 	private static final String OP_PARAM_CONFIG = "param_config"; //$NON-NLS-1$
-	private static final String OP_GENERIC = "generic"; //$NON-NLS-1$
-	private static final String OP_EVENT_CATEGORY = "event_category"; //$NON-NLS-1$
-	private static final String OP_UNIT = "unit"; //$NON-NLS-1$
 	private static final String OP_TS = "ts_default_number"; //$NON-NLS-1$
-	private static final String OP_VALUE_TYPE = "value_type"; //$NON-NLS-1$
-
+	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
+	private static final String OP_DIMENSION = "dimension"; //$NON-NLS-1$
 	private static final Logger logger = LoggerFactory
 			.getLogger(DataAggregationOperatorManager.class);
 
@@ -88,24 +84,22 @@ public class DataAggregationOperatorManager {
 		logger.debug("Comparing Time Operator trace format with " + traceType);
 		final List<String> op = new ArrayList<String>();
 		for (final DataAggregationOperatorResource r : operatorList.values()) {
-			StringBuffer buff = new StringBuffer();
-			buff.append(r.getTraceFormats());
-			logger.debug(buff.toString());
-			if (r.isGeneric() || r.getTraceFormats().contains(traceType)) {
-				for (String cat : category) {
-					if (r.getEventCategory().contains(cat)) {
-						op.add(r.getName());
-						break;
-					}
-				}
-			}
+			op.add(r.getName());
 		}
 		// Sort in alphabetical order
 		Collections.sort(op, new Comparator<String>() {
 
 			@Override
 			public int compare(final String arg0, final String arg1) {
-				return arg0.compareTo(arg1);
+				int diff = operatorList.get(arg0).getSelectionPriority()
+						- operatorList.get(arg1).getSelectionPriority();
+
+				// If the two operators have the same priority
+				if (diff == 0) {
+					// Sort them alphabetically
+					return arg0.compareTo(arg1);
+				}
+				return diff;
 			}
 
 		});
@@ -123,6 +117,10 @@ public class DataAggregationOperatorManager {
 	public DataAggregationOperatorResource getSelectedOperatorResource() {
 		return operatorList.get(selectedOperatorName);
 	}
+	
+	public DataAggregationOperatorResource getOperatorResource(String anOperator) {
+		return operatorList.get(anOperator);
+	}
 
 	private void init() throws SoCTraceException {
 		operatorList = new HashMap<String, DataAggregationOperatorResource>();
@@ -130,26 +128,23 @@ public class DataAggregationOperatorManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " Time aggregation operators detected:");
+		logger.debug(config.length + " Data aggregation operators detected:");
 
 		for (final IConfigurationElement e : config) {
 			final DataAggregationOperatorResource resource = new DataAggregationOperatorResource();
 			resource.setOperatorClass(e.getAttribute(OP_CLASS));
 			resource.setName(e.getAttribute(OP_NAME));
-			resource.setGeneric(e.getAttribute(OP_GENERIC).contains("true"));
-			resource.setTraceFormats(e.getAttribute(OP_TRACE_FORMATS));
-			resource.setSpaceCompatibility(e
-					.getAttribute(OP_SPATIAL_COMPATIBILITY));
+			resource.setVisuCompatibility(e
+					.getAttribute(OP_VISUALIZATION_COMPATIBILITY));
 			resource.setParamWinClass(e.getAttribute(OP_PARAM_WIN));
 			resource.setParamConfig(e.getAttribute(OP_PARAM_CONFIG));
-			resource.setEventCategory(e.getAttribute(OP_EVENT_CATEGORY));
 			resource.setBundle(e.getContributor().getName());
-			resource.setUnit(e.getAttribute(OP_UNIT));
 			resource.setTs(e.getAttribute(OP_TS));
-			resource.setValueType(e.getAttribute(OP_VALUE_TYPE));
+			resource.setDimension(e.getAttribute(OP_DIMENSION));
+			resource.setSelectionPriority(e.getAttribute(OP_SELECTION_PRIORITY));
 			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
-					+ resource.getTraceFormats());
+					+ resource.getVisuCompatibility() + resource.getDimension());
 		}
 	}
 
@@ -174,6 +169,29 @@ public class DataAggregationOperatorManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Instantiate an aggregation operator
+	 * 
+	 * @param name
+	 *            name of the aggregation operator to instantiate
+	 * @return the instantiated operator if successful, null otherwise
+	 */
+	public IDataAggregationOperator instantiateOperator(final String name) {
+		IDataAggregationOperator instantiateOperator = null;
+		final Bundle mybundle = Platform.getBundle(operatorList.get(name)
+				.getBundle());
+		try {
+			instantiateOperator = (IDataAggregationOperator) mybundle
+					.loadClass(operatorList.get(name).getOperatorClass())
+					.newInstance();
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return instantiateOperator;
 	}
 
 	public HashMap<String, DataAggregationOperatorResource> getOperatorList() {

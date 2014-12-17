@@ -86,8 +86,6 @@ public class PartManager {
 	}
 
 	public void print() {
-	
-
 		logger.info("");
 		logger.info("*******************");
 		logger.info("AGGREGATION RESULTS");
@@ -99,7 +97,7 @@ public class PartManager {
 		logger.info("Time slice number: " + timeSliceNumber);
 		//logger.info("Time slice duration: " + lpaggregCore.getOcelotlParameters().getTimeSliceManager().getSliceDuration());
 		logger.info("Aggregation timeOperator: "
-				+ lpaggregCore.getOcelotlParameters().getTimeAggOperator());
+				+ lpaggregCore.getOcelotlParameters().getDataAggOperator());
 		logger.info("Gain/Loss parameter p: "
 				+ lpaggregCore.getOcelotlParameters().getParameter());
 		logger.info("*******************");
@@ -112,7 +110,6 @@ public class PartManager {
 				.getTimeStampEnd());
 		logger.info(buff.toString());
 		logger.info("");
-
 	}
 
 	public void setLpaggregCore(final OcelotlCore lpaggregCore) {

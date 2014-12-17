@@ -27,8 +27,14 @@ public class MicroscopicDescriptionTypeManager {
 	private static final String POINT_ID = "fr.inria.soctrace.tools.ocelotl.core.microscopicmodel"; //$NON-NLS-1$
 	private static final String OP_NAME = "name"; //$NON-NLS-1$
 	private static final String OP_CLASS = "class"; //$NON-NLS-1$
-	private static final String OP_TYPE = "type"; //$NON-NLS-1$
-
+	private static final String OP_EVENT_CATEGORY = "event_category"; //$NON-NLS-1$
+	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
+	private static final String OP_VISUALIZATION_COMPATIBILITY = "visual_compatibility"; //$NON-NLS-1$
+	private static final String OP_TRACE_FORMATS = "trace_formats"; //$NON-NLS-1$
+	private static final String OP_GENERIC = "generic"; //$NON-NLS-1$
+	private static final String OP_UNIT = "unit"; //$NON-NLS-1$
+	private static final String OP_VALUE_TYPE = "value_type"; //$NON-NLS-1$
+	
 	private static final Logger logger = LoggerFactory
 			.getLogger(DataAggregationOperatorManager.class);
 
@@ -51,10 +57,15 @@ public class MicroscopicDescriptionTypeManager {
 		logger.debug("Comparing microscopic model format with " + traceType);
 		final List<String> op = new ArrayList<String>();
 		for (final MicroscopicDescriptionTypeResource resource : typeList.values()) {
-			for (String cat : category) {
-				if (resource.getType().contains(cat)) {
-					op.add(resource.getName());
-					break;
+			StringBuffer buff = new StringBuffer();
+			buff.append(resource.getTraceFormats());
+			logger.debug(buff.toString());
+			if (resource.isGeneric() || resource.getTraceFormats().contains(traceType)) {
+				for (String cat : category) {
+					if (resource.getEventCategory().contains(cat)) {
+						op.add(resource.getName());
+						break;
+					}
 				}
 			}
 		}
@@ -63,7 +74,15 @@ public class MicroscopicDescriptionTypeManager {
 
 			@Override
 			public int compare(final String arg0, final String arg1) {
-				return arg0.compareTo(arg1);
+				int diff = typeList.get(arg0).getSelectionPriority()
+						- typeList.get(arg1).getSelectionPriority();
+
+				// If the two operators have the same priority
+				if (diff == 0) {
+					// Sort them alphabetically
+					return arg0.compareTo(arg1);
+				}
+				return diff;
 			}
 
 		});
@@ -76,16 +95,25 @@ public class MicroscopicDescriptionTypeManager {
 		final IExtensionRegistry reg = Platform.getExtensionRegistry();
 		final IConfigurationElement[] config = reg
 				.getConfigurationElementsFor(POINT_ID);
-		logger.debug(config.length + " Microscopic model types detected:");
+		logger.debug(config.length + " Metrics detected:");
 
 		for (final IConfigurationElement e : config) {
 			final MicroscopicDescriptionTypeResource resource = new MicroscopicDescriptionTypeResource();
 			resource.setName(e.getAttribute(OP_NAME));
 			resource.setMicroModelClass(e.getAttribute(OP_CLASS));
 			resource.setBundle(e.getContributor().getName());
-			resource.setType(e.getAttribute(OP_TYPE));
+			resource.setType(e.getAttribute(OP_EVENT_CATEGORY));
+			resource.setSelectionPriority(Integer.parseInt(e.getAttribute(OP_SELECTION_PRIORITY)));
+			resource.setGeneric(e.getAttribute(OP_GENERIC).contains("true"));
+			resource.setTraceFormats(e.getAttribute(OP_TRACE_FORMATS));
+			resource.setEventCategory(e.getAttribute(OP_EVENT_CATEGORY));
+			resource.setUnit(e.getAttribute(OP_UNIT));
+			resource.setValueType(e.getAttribute(OP_VALUE_TYPE));
+			resource.setVisuCompatibility(e
+					.getAttribute(OP_VISUALIZATION_COMPATIBILITY));
 			typeList.put(resource.getName(), resource);
-			logger.debug("    " + resource.getName());
+			logger.debug("    " + resource.getName() + " "
+					+ resource.getTraceFormats() + " " + resource.getVisuCompatibility());
 		}
 	}
 
@@ -106,18 +134,25 @@ public class MicroscopicDescriptionTypeManager {
 	}
 
 	public void setSelectedMicroModel(final String name) {
+		selectedMicroModel = instantiateMicroModel(name);
+		selectedType = name;
+	}
+	
+	public MicroscopicDescription instantiateMicroModel(final String name) {
+		MicroscopicDescription aNewMicromodel = null;
+
 		final Bundle mybundle = Platform.getBundle(typeList.get(name)
 				.getBundle());
-	
 		try {
-			selectedMicroModel = (MicroscopicDescription) mybundle.loadClass(
+			aNewMicromodel = (MicroscopicDescription) mybundle.loadClass(
 					typeList.get(name).getMicroModelClass()).newInstance();
-			selectedType = name;
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+
+		return aNewMicromodel;
 	}
 	
 	public HashMap<String, MicroscopicDescriptionTypeResource> getTypeList() {
@@ -128,4 +163,5 @@ public class MicroscopicDescriptionTypeManager {
 			HashMap<String, MicroscopicDescriptionTypeResource> typeList) {
 		this.typeList = typeList;
 	}
+	
 }

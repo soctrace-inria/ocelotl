@@ -25,11 +25,10 @@ import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.TimeAggregati
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.MicroscopicDescription;
 
 public class TemporalAggregation implements IDataAggregationOperator {
-
+	
 	@Override
 	public TimeAggregation3Manager createManager(
 			MicroscopicDescription microMod, IProgressMonitor monitor) {
 		return new TimeAggregation3Manager(microMod, monitor);
 	}
-
 }

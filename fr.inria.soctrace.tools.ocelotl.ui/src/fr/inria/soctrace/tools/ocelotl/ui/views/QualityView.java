@@ -192,7 +192,7 @@ public Figure getRoot() {
 			double ngain = qualities.get(qualities.size() - 1).getGain() - qualities.get(i - 1).getGain();
 			double closs = qualities.get(qualities.size() - 1).getLoss() - qualities.get(i).getLoss();
 			double nloss = qualities.get(qualities.size() - 1).getLoss() - qualities.get(i - 1).getLoss();
-			if (!ocelotlView.getParams().isGrowingQualities()) {
+			if (!ocelotlView.getOcelotlParameters().isGrowingQualities()) {
 				cgain = qualities.get(i).getGain();
 				ngain = qualities.get(i - 1).getGain();
 				closs = qualities.get(i).getLoss();

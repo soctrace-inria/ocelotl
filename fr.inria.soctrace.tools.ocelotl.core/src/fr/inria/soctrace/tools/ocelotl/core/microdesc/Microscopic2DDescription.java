@@ -31,7 +31,7 @@ public abstract class Microscopic2DDescription extends MicroscopicDescription {
 	@Override
 	public void initVectors() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<EventProducer, Double>>();
-		final List<EventProducer> producers = parameters.getEventProducers();
+		final List<EventProducer> producers = parameters.getCurrentProducers();
 		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
 			matrix.add(new HashMap<EventProducer, Double>());
 
@@ -45,6 +45,12 @@ public abstract class Microscopic2DDescription extends MicroscopicDescription {
 			int sliceMultiple) {
 		int slice = Integer.parseInt(values[0]);
 		double value = Double.parseDouble(values[2]);
+		
+		// If the event producer is still flag as inactive
+		if (!getActiveProducers().contains(ep)) {
+			// Remove it
+			getActiveProducers().add(ep);
+		}
 
 		// If the number of time slice is a multiple of the cached time
 		// slice number
@@ -78,6 +84,12 @@ public abstract class Microscopic2DDescription extends MicroscopicDescription {
 		if (!typeNames.contains(evType))
 			return;
 
+		// If the event producer is still flag as inactive
+		if (!getActiveProducers().contains(ep)) {
+			// Remove it
+			getActiveProducers().add(ep);
+		}
+		
 		// Compute a value proportional to the time ratio spent in the slice
 		double value = Double.parseDouble(values[3]) * factor;
 
@@ -120,16 +132,16 @@ public abstract class Microscopic2DDescription extends MicroscopicDescription {
 		eventsNumber = 0;
 		final DeltaManager dmt = new DeltaManagerOcelotl();
 		dmt.start();
-		final int epsize = getOcelotlParameters().getEventProducers().size();
+		final int epsize = getOcelotlParameters().getCurrentProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0
 				|| epsize < getOcelotlParameters().getMaxEventProducers())
-			computeSubMatrix(getOcelotlParameters().getEventProducers(),
+			computeSubMatrix(getOcelotlParameters().getCurrentProducers(),
 					monitor);
 		else {
 			final List<EventProducer> producers = getOcelotlParameters()
-					.getEventProducers().size() == 0 ? ocelotlQueries
+					.getCurrentProducers().size() == 0 ? ocelotlQueries
 					.getAllEventProducers() : getOcelotlParameters()
-					.getEventProducers();
+					.getCurrentProducers();
 			for (int i = 0; i < epsize; i = i
 					+ getOcelotlParameters().getMaxEventProducers())
 				computeSubMatrix(

@@ -23,15 +23,13 @@ public class OcelotlConstants {
 
 	/**
 	 * States of the state machine
-	 * ALL: 
-	 * TS: number of time slices has changed
+	 * ALL: need to recompute everything
 	 * NORMALIZE: quality curve normalization has changed 
 	 * PARAMETER: parameter has changed
-	 * EQ: 
 	 * NOTHING: nothing has changed
 	 */
 	static public enum HasChanged {
-		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, EQ, NOTHING
+		ALL, TS, NORMALIZE, THRESHOLD, PARAMETER, NOTHING
 	}
 	
 	/**
@@ -75,7 +73,47 @@ public class OcelotlConstants {
 	}
 	
 	/**
-	 * Size of the configuration file
+	 * Possible parameter p chose strategy
 	 */
-	static final public int CONFIGURATION_NORMAL_SIZE = 9;
+	static public enum ParameterPPolicy {
+		PARAMETERP_STRATEGY_ONE, PARAMETERP_STRATEGY_ZERO, PARAMETERP_STRATEGY_LARGEST_DIFF, PARAMETERP_STRATEGY_LARGEST_SUM_DIFF,
+		PARAMETERP_STRATEGY_LARGEST_SUM_DIFF2
+	}
+	
+	public static final String MultipleValueExtensionSeparator = ", ";
+	
+	public static final int MinimalHeightDrawingThreshold = 1;
+	
+	public static final int[] yAxisDefaultWeight = {24, 388};
+	
+	public static final double TemporalProportionDrawingMarginRatio = 0.9;
+	
+	/**
+	 * JSON Config constants
+	 */
+	public static final String JSONCacheActivated = "cacheActivated";
+	public static final String JSONCacheDirectory = "cacheDirectory";
+	public static final String JSONCacheSize = "cacheSize";
+	public static final String JSONSnapShotDirectory = "snapShotDirectory";
+	public static final String JSONCachePolicy = "cachePolicy";
+	public static final String JSONCacheTimeSliceNumber = "cacheTimeSliceNumber";
+	public static final String JSONEventsPerThread = "eventsPerThread";
+	public static final String JSONMaxEventProducersPerQuery = "maxEventProducersPerQuery";
+	public static final String JSONNumberOfThread = "numberOfThread";
+	public static final String JSONNormalizedCurve = "normalizedCurve";
+	public static final String JSONThresholdPrecision = "thresholdPrecision";
+	public static final String JSONIncreasingQualities = "increasingQualities";
+	public static final String JSONSnapshotXResolution = "snapshotXResolution";
+	public static final String JSONSnapshotYResolution = "snapshotYResolution";
+	
+	public static final String JSONEnableOverview = "enableOverview";
+	public static final String JSONOverviewAggregOperator = "overviewAggregOperator";
+	public static final String JSONOverviewTimesliceNumber = "overviewTimesliceNumber";
+	public static final String JSONOverviewSelectionFgColor = "overviewSelectionFgColor";
+	public static final String JSONOverviewSelectionBgColor = "overviewSelectionBgColor";
+	public static final String JSONOverviewSelectionAlpha = "overviewSelectionAlpha";
+	public static final String JSONOverviewDisplayFgColor = "overviewDisplayFgColor";
+	public static final String JSONOverviewDisplayBgColor = "overviewDisplayBgColor";
+	public static final String JSONOverviewDisplayAlpha = "overviewDisplayAlpha";	
+	public static final String JSONParameterPPolicy = "parameterPPolicy";	
 }

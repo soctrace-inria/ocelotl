@@ -19,7 +19,10 @@
 
 package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,17 +35,16 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public class EventDistribution extends Microscopic3DDescription {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventDistribution.class);
-	private TimeSliceStateManager timeSliceManager;
 	
 	class OcelotlThread extends Thread {
 
-		List<EventProducer> eventProducers;
+		List<EventProducer> localActiveEventProducers;
 		int threadNumber;
 		int thread;
 		int size;
@@ -55,6 +57,7 @@ public class EventDistribution extends Microscopic3DDescription {
 			this.thread = thread;
 			this.size = size;
 			this.monitor = monitor;
+			localActiveEventProducers = new ArrayList<EventProducer>();
 			
 			start();
 		}
@@ -70,6 +73,7 @@ public class EventDistribution extends Microscopic3DDescription {
 		}
 
 		private void matrixUpdate(final Event event, final EventProducer ep) {
+			// Mutex
 			synchronized (getMatrix()) {
 				// If the event type is not in the matrix yet
 				if (!getMatrix().get(0).get(ep)
@@ -86,7 +90,7 @@ public class EventDistribution extends Microscopic3DDescription {
 				}
 				
 				// Get the time slice number of the event
-				final long slice = timeSliceManager.getTimeSlice(event
+				final long slice = getTimeSliceManager().getTimeSlice(event
 						.getTimestamp());
 				matrixWrite(slice, ep, event.getType().getName());
 			}
@@ -94,10 +98,13 @@ public class EventDistribution extends Microscopic3DDescription {
 
 		@Override
 		public void run() {
-			while (true) {
-				final List<Event> events = getEvents(size, monitor);
-				if (monitor.isCanceled())
-					return;
+				EventProducer currentEP=null;
+				while (true) {
+					final List<Event> events = getEvents(size, monitor);
+					if (events.size() == 0)
+						break;
+					if (monitor.isCanceled())
+						return;
 
 				if (events.size() == 0)
 					break;
@@ -105,9 +112,24 @@ public class EventDistribution extends Microscopic3DDescription {
 					// final Map<Long, Long> distrib =
 					// state.getTimeSlicesDistribution();
 					matrixUpdate(event, event.getEventProducer());
-
+					
+					if (currentEP != event.getEventProducer()){
+						currentEP=event.getEventProducer();
+					// If the event producer is not in the active producers list
+						if (!localActiveEventProducers.contains(event.getEventProducer())) {
+							// Add it
+							localActiveEventProducers.add(event.getEventProducer());
+						}
+					}
 					if (monitor.isCanceled())
 						return;
+				}
+			}
+			// Merge local active event producers to the global one
+			synchronized (activeProducers) {
+				for (EventProducer ep : localActiveEventProducers) {
+					if (!activeProducers.contains(ep))
+						activeProducers.add(ep);
 				}
 			}
 		}
@@ -131,8 +153,8 @@ public class EventDistribution extends Microscopic3DDescription {
 			return;
 		}
 
-		timeSliceManager = new TimeSliceStateManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber());
+		setTimeSliceManager(new TimeSliceManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Fill the matrix");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
@@ -144,6 +166,14 @@ public class EventDistribution extends Microscopic3DDescription {
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+	
+	@Override
+	public void rebuildDirty(File aCacheFile,
+			HashMap<String, EventProducer> eventProducers,
+			IProgressMonitor monitor) throws IOException, SoCTraceException,
+			InterruptedException, OcelotlException {
+		buildNormalMatrix(monitor);
 	}
 
 }

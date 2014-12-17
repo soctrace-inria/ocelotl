@@ -16,13 +16,14 @@ import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
 public abstract class Microscopic3DDescription extends MicroscopicDescription {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(Microscopic3DDescription.class);
-
+	
 	protected List<HashMap<EventProducer, HashMap<String, Double>>> matrix;
 
 	public Microscopic3DDescription() {
@@ -31,6 +32,8 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 	}
 
 	public void initToZero(Collection<EventProducer> eventProducers) {
+		setTimeSliceManager(new TimeSliceManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		for (int slice = 0; slice < parameters.getTimeSlicesNumber(); slice++) {
 			for (EventProducer ep : eventProducers) {
 				for (String evType : typeNames) {
@@ -50,6 +53,12 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 		if (!typeNames.contains(evType))
 			return;
 
+		// If the event producer is flag as inactive
+		if (!getActiveProducers().contains(ep)) {
+			// Remove it
+			getActiveProducers().add(ep);
+		}
+		
 		int slice = Integer.parseInt(values[0]);
 		double value = Double.parseDouble(values[3]);
 
@@ -76,6 +85,12 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 		// If the event type is filtered out
 		if (!typeNames.contains(evType))
 			return;
+		
+		// If the event producer is flag as inactive
+		if (!getActiveProducers().contains(ep)) {
+			// Remove it
+			getActiveProducers().add(ep);
+		}
 
 		// Compute a value proportional to the time ratio spent in the slice
 		double value = Double.parseDouble(values[3]) * factor;
@@ -126,7 +141,7 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 	@Override
 	public void initVectors() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
-		final List<EventProducer> producers = parameters.getEventProducers();
+		final List<EventProducer> producers = parameters.getCurrentProducers();
 		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
 			matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
 
@@ -151,16 +166,16 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 		eventsNumber = 0;
 		final DeltaManager dm = new DeltaManagerOcelotl();
 		dm.start();
-		final int epsize = getOcelotlParameters().getEventProducers().size();
+		final int epsize = getOcelotlParameters().getCurrentProducers().size();
 		if (getOcelotlParameters().getMaxEventProducers() == 0
 				|| epsize < getOcelotlParameters().getMaxEventProducers())
-			computeSubMatrix(getOcelotlParameters().getEventProducers(),
+			computeSubMatrix(getOcelotlParameters().getCurrentProducers(),
 					monitor);
 		else {
 			final List<EventProducer> producers = getOcelotlParameters()
-					.getEventProducers().size() == 0 ? ocelotlQueries
+					.getCurrentProducers().size() == 0 ? ocelotlQueries
 					.getAllEventProducers() : getOcelotlParameters()
-					.getEventProducers();
+					.getCurrentProducers();
 			for (int i = 0; i < epsize; i = i
 					+ getOcelotlParameters().getMaxEventProducers())
 				computeSubMatrix(
@@ -209,4 +224,9 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 				logger.debug(ep.getName() + " = " + it.get(ep));
 		}
 	}
+
+	public TimeSliceManager getTimeSliceManager() {
+		return timeSliceManager;
+	}
+
 }

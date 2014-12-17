@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -29,12 +30,16 @@ import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
+import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
+import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 
 public abstract class MicroscopicDescription implements IMicroscopicDescription {
 	protected DataCache dataCache;
 	protected DeltaManagerOcelotl dm;
 	protected ArrayList<String> typeNames = new ArrayList<String>();
+	protected ArrayList<EventProducer> inactiveProducers = new ArrayList<EventProducer>();
+	protected ArrayList<EventProducer> activeProducers = new ArrayList<EventProducer>();
 	protected OcelotlParameters parameters;
 
 	protected EventIterator eventIterator;
@@ -42,6 +47,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected int epit = 0;
 	protected int eventsNumber;
 	protected OcelotlQueries ocelotlQueries;
+	protected TimeSliceManager timeSliceManager;
 	double density;
 
 	private static final Logger logger = LoggerFactory
@@ -95,6 +101,14 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		this.dataCache = dataCache;
 	}
 
+	public TimeSliceManager getTimeSliceManager() {
+		return timeSliceManager;
+	}
+
+	public void setTimeSliceManager(TimeSliceManager timeSliceManager) {
+		this.timeSliceManager = timeSliceManager;
+	}
+
 	/**
 	 * Fill the matrix with values from the cache multiplied by the factor
 	 * corresponding to the proportional amount of the cached timeslice in the
@@ -128,7 +142,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			dm.start();
 
 			HashMap<String, EventProducer> eventProducers = new HashMap<String, EventProducer>();
-			for (EventProducer ep : parameters.getEventProducers()) {
+			for (EventProducer ep : parameters.getCurrentProducers()) {
 				eventProducers.put(String.valueOf(ep.getId()), ep);
 			}
 
@@ -432,6 +446,9 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		bufFileReader.close();
 	}
 
+	/**
+	 * Rebuild the matrix from the cache with no problem detected 
+	 */
 	public void rebuildClean(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException {
@@ -454,7 +471,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			if (eventProducers.containsKey(values[1])) {
 				// Fill the matrix
 				rebuildMatrix(values, eventProducers.get(values[1]),
-						getDataCache().getTimeSliceFactor());
+						parameters.getTimeSliceFactor());
 			}
 
 			if (monitor.isCanceled()) {
@@ -561,17 +578,27 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void saveMatrix() {
 		// Check that no event type or event producer was filtered out which
 		// would result in an incomplete datacache
-		if (!parameters.getDataCache().isCacheActive() || !noFiltering()
+		if (!parameters.getOcelotlSettings().isCacheActivated() || !noFiltering()
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
-		Date convertedDate = new Date(System.currentTimeMillis());
+		Date theDate = new Date(System.currentTimeMillis());
 
-		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
-				+ parameters.getTrace().getAlias() + "_"
+		// Reformat the date to remove unsupported characters in file name (e.g.
+		// ":" on windows)
+		String convertedDate = new SimpleDateFormat("dd-MM-yyyy HHmmss z")
+				.format(theDate);
+		
+		String fileName = parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
 				+ parameters.getMicroModelType() + "_" + convertedDate;
-
+		
+		fileName = FilenameValidator.checkNameValidity(fileName);
+			
+		
+		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
+				+ fileName;
+		
 		// Write to file,
 		try {
 			PrintWriter writer = new PrintWriter(filePath, "UTF-8");
@@ -585,7 +612,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getMicroModelType()
 					+ OcelotlConstants.CSVDelimiter
-					+ parameters.getSpaceAggOperator()
+					+ parameters.getVisuOperator()
 					+ OcelotlConstants.CSVDelimiter
 					+ parameters.getTimeRegion().getTimeStampStart()
 					+ OcelotlConstants.CSVDelimiter
@@ -621,7 +648,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	 * @return true if nothing is filtered out, false otherwise
 	 */
 	public boolean noFiltering() {
-		if (parameters.getEventProducers().size() != parameters
+		if (parameters.getCurrentProducers().size() != parameters
 				.getEventProducerHierarchy().getEventProducers().size()) {
 			logger.debug("At least one event producer is filtered: cache will not be generated.");
 			return false;
@@ -652,7 +679,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				.getTimeRegion().getTimeStampEnd())
 			return false;
 
-		if (parameters.getDataCache().isCacheActive()) {
+		if (parameters.getOcelotlSettings().isCacheActivated()) {
 			try {
 				// Set the number of time slices for the generated cache
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
@@ -740,7 +767,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		initVectors();
 
 		// If the cache is enabled
-		if (parameters.getDataCache().isCacheActive()) {
+		if (parameters.getOcelotlSettings().isCacheActivated()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
 			// If a cache was found
@@ -781,6 +808,17 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		} else {
 			buildNormalMatrix(monitor);
 		}
+		computeInactiveProducers();
+	}
+	
+	/**
+	 * Set a list of inactive (i.e. not producing events) producers, by making the
+	 * difference between the current producers and the active ones
+	 */
+	public void computeInactiveProducers() {
+		for (EventProducer ep : parameters.getCurrentProducers())
+			if (!activeProducers.contains(ep))
+				inactiveProducers.add(ep);
 	}
 
 	public void total(final int rows) {
@@ -846,6 +884,22 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 	public void setEventsNumber(int eventsNumber) {
 		this.eventsNumber = eventsNumber;
+	}
+
+	public ArrayList<EventProducer> getInactiveProducers() {
+		return inactiveProducers;
+	}
+
+	public void setInactiveProducers(ArrayList<EventProducer> inactiveProducers) {
+		this.inactiveProducers = inactiveProducers;
+	}
+
+	public ArrayList<EventProducer> getActiveProducers() {
+		return activeProducers;
+	}
+
+	public void setActiveProducers(ArrayList<EventProducer> activeProducers) {
+		this.activeProducers = activeProducers;
 	}
 
 	public OcelotlParameters getOcelotlParameters() {

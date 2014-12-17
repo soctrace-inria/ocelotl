@@ -44,7 +44,7 @@ public class VisuConfigViewManager {
 			// e.printStackTrace();
 			return;
 		}
-		window.init(ocelotlView, ocelotlView.getCore().getOcelotlParameters().getSpaceConfig());
+		window.init(ocelotlView, ocelotlView.getCore().getOcelotlParameters().getVisuConfig());
 		window.open();
 
 	}
