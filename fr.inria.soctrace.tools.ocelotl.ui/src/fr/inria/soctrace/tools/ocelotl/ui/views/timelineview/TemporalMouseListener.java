@@ -67,7 +67,9 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		if (shell != null)
+			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		
 		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.EXITED) {
 			state = MouseState.EXITED;
 			mouseReleased(arg0);
@@ -84,12 +86,15 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 		if (aggregatedView.getSelectFigure() != null && aggregatedView.getRoot().getChildren().contains(aggregatedView.getSelectFigure()))
 			if (Math.abs(aggregatedView.getSelectFigure().getBounds().x - arg0.x) < Threshold) {
 				state = MouseState.H_MOVE_START;
+				if (shell != null)
 				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
 			} else if (Math.abs(aggregatedView.getSelectFigure().getBounds().x + aggregatedView.getSelectFigure().getBounds().width - arg0.x) < Threshold) {
 				state = MouseState.H_MOVE_END;
+				if (shell != null)
 				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
 			} else {
 				state = MouseState.RELEASED;
+				if (shell != null)
 				shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 			}
 	}
@@ -137,8 +142,8 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
-
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		if (shell != null)
+			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
 		if (state == MouseState.DRAG_LEFT || state == MouseState.DRAG_LEFT_START)
 			mouseDragged(arg0);
 		

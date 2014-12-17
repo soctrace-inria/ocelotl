@@ -15,6 +15,7 @@ public class TestParameters {
 	private int nbTimeSlice;
 	private ArrayList<Integer> timeSlicesCollection;
 	private ArrayList<Integer> timeSlicesNumber;
+	private ArrayList<String> typeQuery;
 	private int nbEventProd;
 	private String timeAggOperator;
 	private String dataAggOperator;
@@ -24,6 +25,7 @@ public class TestParameters {
 	private String directory;
 	private int numberOfRepetition;
 	private boolean activateCache;
+	private long traceSize;
 
 	public TestParameters() {
 		traceName = "";
@@ -41,6 +43,8 @@ public class TestParameters {
 		setActivateCache(false);
 		timeSlicesCollection =  new ArrayList<Integer>();
 		timeSlicesNumber = new ArrayList<Integer>();
+		typeQuery = new ArrayList<String>();
+		traceSize = 0;
 	}
 
 	/**
@@ -178,6 +182,22 @@ public class TestParameters {
 
 	public void setTimeSlicesNumber(ArrayList<Integer> timeSlicesNumber) {
 		this.timeSlicesNumber = timeSlicesNumber;
+	}
+
+	public ArrayList<String> getTypeQuery() {
+		return typeQuery;
+	}
+
+	public void setTypeQuery(ArrayList<String> typeQuery) {
+		this.typeQuery = typeQuery;
+	}
+
+	public long getTraceSize() {
+		return traceSize;
+	}
+
+	public void setTraceSize(long traceSize) {
+		this.traceSize = traceSize;
 	}
 
 	public boolean isActivateCache() {

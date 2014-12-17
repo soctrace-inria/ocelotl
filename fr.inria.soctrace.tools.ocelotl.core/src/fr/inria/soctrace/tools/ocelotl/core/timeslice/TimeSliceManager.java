@@ -92,13 +92,13 @@ public class TimeSliceManager {
 
 	public void timeSlicesInit() {
 		double currentTime = timeRegion.getTimeStampStart();
-		for (int i=0; i<slicesNumber-1; i++){
+		for (int i = 0; i < slicesNumber - 1; i++) {
 			timeSlices.add(new TimeSlice(new TimeRegion((long) currentTime,
 					(long) (currentTime + sliceDuration)), i));
 			currentTime += sliceDuration;
 		}
 		timeSlices.add(new TimeSlice(new TimeRegion((long) currentTime,
-				(long) timeRegion.getTimeStampEnd()), slicesNumber-1));
+				(long) timeRegion.getTimeStampEnd()), slicesNumber - 1));
 	}
 
 }

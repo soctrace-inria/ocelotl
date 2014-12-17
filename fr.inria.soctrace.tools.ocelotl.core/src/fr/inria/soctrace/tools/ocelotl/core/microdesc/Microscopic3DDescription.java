@@ -123,9 +123,9 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 			}
 			slice++;
 		}
-	density = ((double) nbEvents / (double) (matrix.size()
-				* matrix.get(0).size() * matrix.get(0).get(matrix.get(0).keySet().iterator().next())
-				.size()));
+		density = ((double) nbEvents / (double) (matrix.size()
+				* matrix.get(0).size() * matrix.get(0)
+				.get(matrix.get(0).keySet().iterator().next()).size()));
 		return stringBuf.toString();
 	}
 

@@ -141,6 +141,7 @@ public class StateDistributionQueryNOPT extends Microscopic3DDescription {
 			List<IntervalDesc> time, IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
+		DeltaManagerOcelotl micromodDM = new DeltaManagerOcelotl();
 		dm.start();
 		monitor.subTask("Query states");
 		eventIterator = ocelotlQueries.getStateIteratorNOPT(eventProducers, time,
@@ -154,6 +155,7 @@ public class StateDistributionQueryNOPT extends Microscopic3DDescription {
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Fill the matrix");
+		micromodDM.start();
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()
@@ -161,6 +163,7 @@ public class StateDistributionQueryNOPT extends Microscopic3DDescription {
 		for (final Thread thread : threadlist)
 			thread.join();
 		ocelotlQueries.closeIterator();
+		micromodDM.end("MICROSCOPIC MODEL REBUILDING");
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
 	}

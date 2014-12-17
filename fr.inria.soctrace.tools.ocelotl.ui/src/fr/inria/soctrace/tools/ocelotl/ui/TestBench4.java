@@ -6,10 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
@@ -24,18 +21,21 @@ public class TestBench4 extends TestBench {
 	public final int	TraceNamePos			= 0;
 	public final int	TraceIDPos				= 1;
 	public final int	CacheActivatedPos		= 2;
+	public final int	TimeAggregatorPos		= 3;
+	public final int	TraceSizePos			= 4;
+	public final int	NumberOfTimeSlicePos	= 5;
 
-	public final int	NumberOfTimeSlicePos	= 4;
 	public final int	StartTimestampPos		= 5;
 	public final int	EndTimeStampPos			= 6;
-	public final int	TimeAggregatorPos		= 3;
 	public final int	NumberOfRepetetionPos	= 8;
 	public final int	ParameterPos			= 9;
 	public final int	testbenchHeaderSize		= 10;
 
 	public TestBench4(String aFilePath, OcelotlView aView) {
 		super(aFilePath, aView);
-
+		// Make sure we have the right settings
+		theView.getOcelotlParameters().getOcelotlSettings().setEventsPerThread(100000);
+		theView.getOcelotlParameters().getOcelotlSettings().setNumberOfThread(4);
 	}
 
 	// Header: "TRACE", "PRODUCERS", "LEAVES", "START", "END", "EVENTS",
@@ -44,7 +44,6 @@ public class TestBench4 extends TestBench {
 	@Override
 	public void parseFile() {
 		File aFile = new File(aConfFile);
-		List<TestParameters> tmpParams = new ArrayList<TestParameters>();
 
 		if (aFile.canRead() && aFile.isFile()) {
 			BufferedReader bufFileReader;
@@ -53,8 +52,7 @@ public class TestBench4 extends TestBench {
 				bufFileReader = new BufferedReader(new FileReader(aFile));
 
 				String line;
-				int traceID = -1;
-				String traceName = "";
+				String[] queryTypes = new String[]{"States Query OPT", "States Query EP", "States Query EPET", "States Query ET", "States Query NOPT", "States Query T", "States Query TEP", "States Query TET"};
 
 				// Get header
 				line = bufFileReader.readLine();
@@ -74,13 +72,17 @@ public class TestBench4 extends TestBench {
 					params.setActivateCache(Boolean.parseBoolean(header[CacheActivatedPos]));
 					// Time Aggregation Operator
 					params.setTimeAggOperator(header[TimeAggregatorPos]);
+					params.setTraceSize(Long.parseLong(header[TraceSizePos]));
 					// Number of time Slices
 					params.getTimeSlicesNumber().add(Integer.parseInt(header[NumberOfTimeSlicePos]));
+					
+					for (String aQueryType : queryTypes)
+						params.getTypeQuery().add(aQueryType);
 
-					if (header.length > 5) {
-						for (int i = 5; i < header.length; i++)
+					/*if (header.length > 6) {
+						for (int i = 6; i < header.length; i++)
 							params.getTimeSlicesNumber().add(Integer.parseInt(header[i]));
-					}
+					}*/
 
 					testParams.add(params);
 				}
@@ -98,7 +100,7 @@ public class TestBench4 extends TestBench {
 	public void launchTest() {
 
 		if (!testParams.isEmpty()) {
-			statData = "TRACE; PRODUCERS; LEAVES; START; END; EVENTS; TRACESIZE; TS; QUERY; MICROMODEL; QUERY_TIME; MICROMODEL_TIME; TOTAL_TIME\n";
+			statData = "TRACE; PRODUCERS; LEAVES; START; END; EVENTS; TRACESIZE; TS; QUERY_TYPE; QUERY; MICROMODEL; TOTAL_TIME\n";
 			String fileDir = aConfFile.substring(0, aConfFile.lastIndexOf("/") + 1);
 			Date aDate = new Date(System.currentTimeMillis());
 			String dirName = testParams.get(0).getTraceName() + "_" + aDate.toString();
@@ -126,11 +128,14 @@ public class TestBench4 extends TestBench {
 				aTest.setSpaceAggOperator("null");
 				aTest.setDatacacheStrat(DatacacheStrategy.DATACACHE_PROPORTIONAL);
 
-				for (int i = 0; i < aTest.getTimeSlicesNumber().size(); i++) {
-					aTest.setNbTimeSlice(aTest.getTimeSlicesNumber().get(i));
-					theView.loadFromParam(aTest, false);
-					statData = statData + getStatData();
-					writeStat();
+				for (int j = 0; j < aTest.getTypeQuery().size(); j++) {
+					aTest.setTimeAggOperator(aTest.getTypeQuery().get(j));
+					for (int i = 0; i < aTest.getTimeSlicesNumber().size(); i++) {
+						aTest.setNbTimeSlice(aTest.getTimeSlicesNumber().get(i));
+						theView.loadFromParam(aTest, false);
+						statData = statData + getStatData(aTest.getTraceSize());
+						writeStat();
+					}
 				}
 			}
 
@@ -152,7 +157,7 @@ public class TestBench4 extends TestBench {
 	/**
 	 * Write the stat data for the current test
 	 */
-	public String getStatData() {
+	public String getStatData(long aTracesize) {
 		String stat = "";
 		BufferedReader bufFileReader;
 		String line;
@@ -171,6 +176,11 @@ public class TestBench4 extends TestBench {
 					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
 					queryTime = Integer.valueOf(computation);
 				}
+				
+				if (line.contains("[MICROSCOPIC MODEL REBUILDING]")) {
+					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
+					buildingMicroModelTime = Integer.valueOf(computation);
+				}
 
 				if (line.contains("[TOTAL (QUERIES + COMPUTATION)")) {
 					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
@@ -181,7 +191,7 @@ public class TestBench4 extends TestBench {
 			// QUERY; MICROMODEL
 			stat = theView.aTestTrace.getAlias() + ";" + theView.getOcelotlParameters().getEventProducers().size() + ";" + theView.getOcelotlParameters().getEventProducerHierarchy().getLeaves().size() + ";"
 					+ theView.getOcelotlParameters().getTimeRegion().getTimeStampStart() + ";" + theView.getOcelotlParameters().getTimeRegion().getTimeStampEnd() + ";" + theView.aTestTrace.getNumberOfEvents() + ";"
-					+ theView.getOcelotlParameters().getTimeSlicesNumber() + ";" + theView.getOcelotlParameters().getMicroModelType() + ";" + queryTime + ";" + buildingMicroModelTime + "; " + firstStepTime + "\n";
+					+ aTracesize + ";" + theView.getOcelotlParameters().getTimeSlicesNumber() + ";" + theView.getOcelotlParameters().getMicroModelType() + ";" + queryTime + ";" + buildingMicroModelTime + "; " + firstStepTime + "\n";
 
 			bufFileReader.close();
 
