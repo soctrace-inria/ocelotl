@@ -84,7 +84,7 @@ public class OcelotlConstants {
 	
 	public static final int MinimalHeightDrawingThreshold = 1;
 	
-	public static final int[] yAxisDefaultWeight = {24, 388};
+	public static final int[] yAxisDefaultWeight = {30, 388};
 	
 	public static final double TemporalProportionDrawingMarginRatio = 0.9;
 	

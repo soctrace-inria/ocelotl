@@ -79,7 +79,7 @@ public class TestBench4 extends TestBench {
 
 					if (header.length > 5) {
 						for (int i = 5; i < header.length; i++)
-							params.getTimeSlicesNumber().add(Integer.parseInt(header[NumberOfTimeSlicePos]));
+							params.getTimeSlicesNumber().add(Integer.parseInt(header[i]));
 					}
 
 					testParams.add(params);
@@ -98,7 +98,7 @@ public class TestBench4 extends TestBench {
 	public void launchTest() {
 
 		if (!testParams.isEmpty()) {
-			statData = "TRACE; PRODUCERS; LEAVES; START; END; EVENTS; TRACESIZE; TS; QUERY; MICROMODEL\n";
+			statData = "TRACE; PRODUCERS; LEAVES; START; END; EVENTS; TRACESIZE; TS; QUERY; MICROMODEL; QUERY_TIME; MICROMODEL_TIME; TOTAL_TIME\n";
 			String fileDir = aConfFile.substring(0, aConfFile.lastIndexOf("/") + 1);
 			Date aDate = new Date(System.currentTimeMillis());
 			String dirName = testParams.get(0).getTraceName() + "_" + aDate.toString();
@@ -167,17 +167,21 @@ public class TestBench4 extends TestBench {
 				if (line.isEmpty())
 					continue;
 
+				if (line.contains("[Execute Query]")) {
+					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
+					queryTime = Integer.valueOf(computation);
+				}
+
 				if (line.contains("[TOTAL (QUERIES + COMPUTATION)")) {
 					String computation = line.substring(line.indexOf("Delta: ") + 7, line.indexOf(" ms"));
 					firstStepTime = Integer.valueOf(computation);
-					noCacheTime = firstStepTime;
 				}
 			}
 			// TRACE; PRODUCERS; LEAVES; START; END; EVENTS; TRACESIZE; TS;
 			// QUERY; MICROMODEL
-			stat = theView.aTestTrace.getAlias() + ";" + theView.getOcelotlParameters().getEventProducers().size() + ";" + theView.getOcelotlParameters().getEventProducerHierarchy().getLeaves().size() + ";" +
+			stat = theView.aTestTrace.getAlias() + ";" + theView.getOcelotlParameters().getEventProducers().size() + ";" + theView.getOcelotlParameters().getEventProducerHierarchy().getLeaves().size() + ";"
 					+ theView.getOcelotlParameters().getTimeRegion().getTimeStampStart() + ";" + theView.getOcelotlParameters().getTimeRegion().getTimeStampEnd() + ";" + theView.aTestTrace.getNumberOfEvents() + ";"
-					+ theView.getOcelotlParameters().getTimeSlicesNumber() + ";" + queryTime + ";" + buildingMicroModelTime + "\n";
+					+ theView.getOcelotlParameters().getTimeSlicesNumber() + ";" + theView.getOcelotlParameters().getMicroModelType() + ";" + queryTime + ";" + buildingMicroModelTime + "; " + firstStepTime + "\n";
 
 			bufFileReader.close();
 
