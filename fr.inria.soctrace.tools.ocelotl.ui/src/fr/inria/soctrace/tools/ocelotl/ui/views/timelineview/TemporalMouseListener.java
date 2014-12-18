@@ -67,7 +67,9 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		if (shell != null)
+			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		
 		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.EXITED) {
 			state = MouseState.EXITED;
 			mouseReleased(arg0);

@@ -26,6 +26,16 @@
             event_category="STATE">
       </microscopic_model>
       <microscopic_model
+      		name="States Average"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateAverageDistribution"
+      		unit="%TIME"
+      		selection_priority = "1"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+      <microscopic_model
      		name="Variables"
      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.VariableDistribution"
      		unit="%UNKNOWN"

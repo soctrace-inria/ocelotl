@@ -21,6 +21,7 @@ public class TemporalModeView extends TimeLineView {
 	protected void computeDiagram() {
 		int i;
 		final List<Integer> aggParts = new ArrayList<Integer>();
+		final int drawingAreaWidth = root.getSize().width - 2 * aBorder;
 		for (i = 0; i <= parts.get(parts.size() - 1); i++)
 			aggParts.add(0);
 		for (i = 0; i < parts.size(); i++)
@@ -33,11 +34,11 @@ public class TemporalModeView extends TimeLineView {
 			MainEvent mState = ((TemporalMode) visuOperator).getMajStates().get(i);
 			part.draw(mState);
 			figures.add(part);
-			root.add(part, new Rectangle(new Point(j
-					* (root.getSize().width - 2 * aBorder) / parts.size()
-					+ aBorder, root.getSize().height - aBorder), new Point(
-					(j + aggParts.get(i)) * (root.getSize().width - 2 * aBorder)
-							/ parts.size() - space + aBorder, aBorder)));
+			root.add(part,
+					new Rectangle(new Point(j * drawingAreaWidth / parts.size()
+							+ aBorder, root.getSize().height - aBorder),
+							new Point((j + aggParts.get(i)) * drawingAreaWidth
+									/ parts.size() - space + aBorder, aBorder)));
 			j = j + aggParts.get(i);
 		}
 	}

@@ -31,6 +31,14 @@ public class TimeSliceStateManager extends TimeSliceManager {
 		super(timeRegion, slicesNumber);
 	}
 
+	/**
+	 * Set the length of the state in each time slice
+	 * 
+	 * @param testedTimeRegion
+	 *            the start and end value of the state (i.e. its duration
+	 * @return a hashmap, with the time slice number oas the key and the
+	 *         duration of the state in teh time slice as the value
+	 */
 	public Map<Long, Double> getStateDistribution(
 			final TimeRegion testedTimeRegion) {
 		final Map<Long, Double> timeSlicesDistribution = new HashMap<Long, Double>();

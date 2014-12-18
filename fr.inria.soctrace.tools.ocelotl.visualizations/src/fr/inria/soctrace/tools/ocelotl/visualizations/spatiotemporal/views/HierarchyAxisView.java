@@ -52,7 +52,6 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 public class HierarchyAxisView extends UnitAxisView {
 
 	protected EventProducerHierarchy hierarchy;
-	protected ArrayList<EventProducerNode> producers;
 
 	// Level of hierarchy to display
 	protected int hierarchyLevel;
@@ -352,7 +351,7 @@ public class HierarchyAxisView extends UnitAxisView {
 	/**
 	 * Sort event producer based on their id
 	 */
-	public void sortPorducers() {
+	public void sortPorducers(List<EventProducerNode> producers) {
 		Collections.sort(producers,
 				new Comparator<EventProducerHierarchy.EventProducerNode>() {
 

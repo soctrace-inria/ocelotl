@@ -256,7 +256,7 @@ public class ProportionAxisView extends UnitAxisView {
 	 * After the first run, resize the axis to display the labels
 	 */
 	protected void resizeAxis() {
-		int minSize = labelMaxWidth + TextPositionOffset + Border;
+		int minSize = labelMaxWidth + TextPositionOffset + (areaWidth - mainLineXPosition);
 		if (minSize > areaWidth) {
 			ocelotlView.getMainViewTopSashform().setWeights(
 					new int[] {
