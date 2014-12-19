@@ -97,35 +97,35 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          id="fr.inria.soctrace.tools.ocelotl.core"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.microdesc"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.ui"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.visualizations"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="fr.inria.lpaggreg"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
@@ -134,7 +134,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          fragment="true"
          unpack="false"/>
 
@@ -144,7 +144,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          arch="x86"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          fragment="true"
          unpack="false"/>
 
@@ -154,7 +154,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          arch="x86"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          fragment="true"
          unpack="false"/>
 
@@ -162,20 +162,20 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          id="fr.inria.soctrace.tools.ocelotl.slf4j"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.brand"
          download-size="0"
          install-size="0"
-         version="1.1.3"/>
+         version="0.0.0"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.statistics"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
@@ -184,7 +184,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="1.1.3"
+         version="0.0.0"
          fragment="true"
          unpack="false"/>
 
@@ -192,6 +192,6 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          id="fr.inria.soctrace.tools.ocelotl.json"
          download-size="0"
          install-size="0"
-         version="1.1.3"/>
+         version="0.0.0"/>
 
 </feature>

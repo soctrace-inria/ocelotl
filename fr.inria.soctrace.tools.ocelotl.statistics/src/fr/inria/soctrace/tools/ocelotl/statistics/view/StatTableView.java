@@ -80,13 +80,13 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	 */
 	public StatTableView(OcelotlView theView) {
 		super(theView);
-
+		dispose();
+		
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
 		topics.registerAll();
 		
-		dispose();
 		createPartControl(ocelotlView.getStatComposite());
 	}
 	
@@ -247,6 +247,9 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	 * Delete the old widgets
 	 */
 	public void dispose() {
+		if (topics != null)
+			topics.unregisterAll();
+
 		for (Control c : ocelotlView.getStatComposite().getChildren())
 			c.dispose();
 	}
