@@ -1,7 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>fr.inria.soctrace.tools.ocelotl.slf4j</artifactId>
+  <groupId>fr.inria.soctrace.tools.ocelotl.statistics</groupId>
+  <artifactId>fr.inria.soctrace.tools.ocelotl.statistics</artifactId>
   <build>
+    <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -20,5 +22,4 @@
   	<relativePath>../fr.inria.soctrace.tools.ocelotl.maven.master</relativePath>
   </parent>
   <packaging>eclipse-plugin</packaging>
-  <groupId>fr.inria.soctrace.tools.ocelotl.slf4j</groupId>
 </project>
