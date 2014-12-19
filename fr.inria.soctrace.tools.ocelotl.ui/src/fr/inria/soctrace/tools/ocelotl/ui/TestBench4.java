@@ -79,10 +79,10 @@ public class TestBench4 extends TestBench {
 					for (String aQueryType : queryTypes)
 						params.getTypeQuery().add(aQueryType);
 
-					/*if (header.length > 6) {
+					if (header.length > 6) {
 						for (int i = 6; i < header.length; i++)
 							params.getTimeSlicesNumber().add(Integer.parseInt(header[i]));
-					}*/
+					}
 
 					testParams.add(params);
 				}
