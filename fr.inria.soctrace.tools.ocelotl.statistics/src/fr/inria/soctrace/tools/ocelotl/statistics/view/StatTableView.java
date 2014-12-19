@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
@@ -35,6 +34,7 @@ import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.statistics.operators.StatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatView;
+
 
 public class StatTableView extends StatView implements IFramesocBusListener {
 
@@ -52,16 +52,6 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	 * Provide the stat data
 	 */
 	private StatisticsProvider statProvider;
-
-	/**
-	 * Filter text for table
-	 */
-	private Text textFilter;
-
-	/**
-	 * Filter for table
-	 */
-	private OcelotlStatisticsTableRowFilter nameFilter;
 
 	/**
 	 * Column comparator
