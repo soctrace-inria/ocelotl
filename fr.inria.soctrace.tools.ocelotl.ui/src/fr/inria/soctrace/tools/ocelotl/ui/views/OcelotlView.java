@@ -610,7 +610,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							return Status.CANCEL_STATUS;
 						}
 						monitor.setTaskName("Compute Parts");
-aDm.start();
+						aDm.start();
 						ocelotlCore.computeParts();
 						monitor.worked(1);
 
@@ -741,10 +741,10 @@ aDm.start();
 				comboVisu.add(op);
 			}
 
-			for (final String op : ocelotlCore.getStatOperators().getOperators(ocelotlCore.getMicromodelTypes().getSelectedOperatorResource().getEventCategory(), ocelotlCore.getAggregOperators().getSelectedOperatorResource().getDimension())) {
+		/*	for (final String op : ocelotlCore.getStatOperators().getOperators(ocelotlCore.getMicromodelTypes().getSelectedOperatorResource().getEventCategory(), ocelotlCore.getAggregOperators().getSelectedOperatorResource().getDimension())) {
 				comboStatistics.add(op);
 			}
-
+*/
 			// Since the operators are sorted by priority, set the default
 			// choice to the first item
 			if (comboVisu.getItems().length != 0) {
@@ -753,11 +753,11 @@ aDm.start();
 				comboVisu.notifyListeners(SWT.Selection, new Event());
 			}
 
-			if (comboStatistics.getItems().length != 0) {
+			/*if (comboStatistics.getItems().length != 0) {
 				comboStatistics.setText(comboStatistics.getItem(0));
 				// Set the selected operator as operator in Ocelotl
 				comboStatistics.notifyListeners(SWT.Selection, new Event());
-			}
+			}*/
 
 			// Set default settings
 			setDefaultDescriptionSettings();
@@ -1260,12 +1260,12 @@ aDm.start();
 		history = new ActionHistory(this);
 		
 		// Register update to synchronize traces
-		topics = new FramesocBusTopicList(this);
+		/*topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
-		topics.registerAll();
+		topics.registerAll();*/
 	}
 
 	private void cleanAll() {

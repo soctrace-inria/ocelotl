@@ -93,9 +93,9 @@ public class Overview implements IFramesocBusListener {
 		selectAlphaValue = ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewSelectionAlphaValue();
 		
 		// Register update to synchronize traces
-		topics = new FramesocBusTopicList(this);
+		/*topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
-		topics.registerAll();
+		topics.registerAll();*/
 		initSelectionFigure();
 	}
 

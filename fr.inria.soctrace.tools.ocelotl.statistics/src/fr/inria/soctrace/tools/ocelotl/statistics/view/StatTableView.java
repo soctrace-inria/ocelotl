@@ -82,10 +82,10 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		super(theView);
 
 		// Register update to synchronize traces
-		topics = new FramesocBusTopicList(this);
+	/*	topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
 		topics.registerAll();
-		
+		*/
 		dispose();
 		createPartControl(ocelotlView.getStatComposite());
 	}
