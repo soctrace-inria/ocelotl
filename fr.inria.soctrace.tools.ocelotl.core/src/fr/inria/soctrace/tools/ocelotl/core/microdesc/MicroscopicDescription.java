@@ -169,10 +169,12 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			if (parameters.getDataCache().isRebuildDirty()) {
 				switch (parameters.getDataCache().getBuildingStrategy()) {
 				case DATACACHE_DATABASE:
+					logger.debug("Rebuilding micromodel with precise datacache strategy");
 					rebuildDirty(aCacheFile, eventProducers, monitor);
 					break;
 
 				case DATACACHE_PROPORTIONAL:
+					logger.debug("Rebuilding micromodel with approximate datacache strategy");
 					rebuildApproximate(aCacheFile, eventProducers, monitor);
 					break;
 
@@ -183,6 +185,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				dm.end("Load matrix from cache (dirty)");
 			} else {
 				monitor.setTaskName("Rebuilding with cache data");
+				logger.debug("Rebuilding micromodel with clean datacache");
 				rebuildClean(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache");
 			}
@@ -806,6 +809,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				}
 			}
 		} else {
+			logger.debug("Cache not activated");
 			buildNormalMatrix(monitor);
 		}
 		computeInactiveProducers();
