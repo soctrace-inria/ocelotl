@@ -108,15 +108,13 @@ public class TemporalProportionView extends TimeLineView {
 						.getData()).getElements().get(state);
 				if (value > 0) {
 					final RectangleFigure rect = new RectangleFigure();
-					rect.setBackgroundColor(ColorConstants.white);
 					rect.setBackgroundColor(FramesocColorManager.getInstance()
 							.getEventTypeColor(state).getSwtColor());
 					rect.setForegroundColor(ColorConstants.white);
 					rect.setLineWidth(1);
-					//If the color is too light add a border
+					//If the color is too light, add a border
 					if (isTooLight(rect.getBackgroundColor())) {
 						rect.setForegroundColor(ColorConstants.black);
-						rect.setLineWidth(1);
 					}
 					final Label label = new Label(" " + state + ": "
 							+ valueFormat.format(value) + " ");
@@ -138,7 +136,7 @@ public class TemporalProportionView extends TimeLineView {
 										.getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
 								(int) (y0 - y1 * total / maxValue)), new Point(
 								(int) (distribution.getPart(index).getEndPart()
-										* drawingAreaWidth / numberOfTimeSlice - stackSpace + aBorder), (int) (y0
+										* drawingAreaWidth / numberOfTimeSlice - space + aBorder), (int) (y0
 										+ stackSpace - y1 * (total + value) / maxValue))));
 						}
 						total += value;
@@ -230,11 +228,12 @@ public class TemporalProportionView extends TimeLineView {
 
 	@Override
 	protected void computeDiagram() {
-		distribution = (TemporalProportion) ocelotlView.getCore().getVisuOperator();
-			for (int i = 0; i < distribution.getPartNumber(); i++) {
-				final EventStack part = new EventStack(i, space);
-				part.init();
-			}
+		distribution = (TemporalProportion) ocelotlView.getCore()
+				.getVisuOperator();
+		for (int i = 0; i < distribution.getPartNumber(); i++) {
+			final EventStack part = new EventStack(i, space);
+			part.init();
+		}
 	}
 
 }
