@@ -1,26 +1,5 @@
-/* =====================================================================
- * Ocelotl Visualization Tool
- * =====================================================================
- * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
- * overview by using aggregation techniques
- *
- * (C) Copyright 2013 INRIA
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Damien Dosimont <damien.dosimont@imag.fr>
- *     Generoso Pagano <generoso.pagano@inria.fr>
- */
-
 package fr.inria.soctrace.tools.ocelotl.microdesc.operators;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,15 +15,77 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.events.IState;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
-import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 import fr.inria.soctrace.tools.ocelotl.microdesc.genericevents.GenericState;
 
-public class StateDistribution extends Microscopic3DDescription {
+public class StateAverageDistribution extends StateDistribution {
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(StateDistribution.class);
+			.getLogger(StateAverageDistribution.class);
+	protected List<HashMap<EventProducer, HashMap<String, Integer>>> stateCounter;
+	
+	public StateAverageDistribution() {
+		super();
+		stateCounter = new ArrayList<HashMap<EventProducer, HashMap<String, Integer>>>();
+	}
+
+	@Override
+	public void computeSubMatrix(final List<EventProducer> eventProducers,
+			List<IntervalDesc> time, IProgressMonitor monitor)
+			throws SoCTraceException, InterruptedException, OcelotlException {
+		dm = new DeltaManagerOcelotl();
+		dm.start();
+		monitor.subTask("Query states");
+		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
+				monitor);
+		if (monitor.isCanceled()) {
+			ocelotlQueries.closeIterator();
+			return;
+		}
+		
+		setTimeSliceManager(new TimeSliceStateManager(getOcelotlParameters()
+				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
+		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
+		monitor.subTask("Fill the matrix");
+		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
+			threadlist.add(new OcelotlThread(getOcelotlParameters()
+					.getThreadNumber(), t, getOcelotlParameters()
+					.getEventsPerThread(), monitor));
+		for (final Thread thread : threadlist)
+			thread.join();
+		
+		computeAverage();
+		
+		ocelotlQueries.closeIterator();
+		dm.end("VECTORS COMPUTATION: "
+				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
+	}
+	
+	/**
+	 * Compute the average duration of a state for each time slice
+	 */
+	private void computeAverage() {
+		// For each time slice
+		for (int i = 0; i < matrix.size(); i++) {
+			// For each event producer
+			for (final EventProducer ep : matrix.get(i).keySet()) {
+				// For each state
+				for (String aState : matrix.get(i).get(ep).keySet()) {
+					if (stateCounter.get(i).get(ep).get(aState) != 0)
+
+						// Divide the current value by the number of state in
+						// the time slice
+						matrix.get(i)
+								.get(ep)
+								.put(aState,
+										matrix.get(i).get(ep).get(aState)
+												/ stateCounter.get(i).get(ep)
+														.get(aState));
+				}
+			}
+		}
+	}
 
 	class OcelotlThread extends Thread {
 
@@ -81,12 +122,22 @@ public class StateDistribution extends Microscopic3DDescription {
 
 					// Add the type for each slice and ep and init to zero
 					for (int incr = 0; incr < getMatrix().size(); incr++)
-						for (final EventProducer epset : getMatrix()
-								.get(incr).keySet())
+						for (final EventProducer epset : getMatrix().get(incr)
+								.keySet()) {
 							matrixPushType(incr, epset, state.getType());
+							stateCounter.get(incr).get(epset)
+									.put(state.getType(), 0);
+						}
 				}
-				for (final long it : distrib.keySet())
+				for (final long it : distrib.keySet()) {
 					matrixWrite(it, ep, state.getType(), distrib);
+					stateCounter
+							.get((int) it)
+							.get(ep)
+							.put(state.getType(),
+									(stateCounter.get((int) it).get(ep)
+											.get(state.getType())) + 1);
+				}
 			}
 		}
 
@@ -111,6 +162,7 @@ public class StateDistribution extends Microscopic3DDescription {
 					matrixUpdate(state, event.getEventProducer(), distrib);
 					if (currentEP != event.getEventProducer()) {
 						currentEP = event.getEventProducer();
+
 						// If the event producer is not in the active producers list
 						if (!localActiveEventProducers.contains(event.getEventProducer())) {
 							// Add it
@@ -130,46 +182,23 @@ public class StateDistribution extends Microscopic3DDescription {
 			}
 		}
 	}
-
-	public StateDistribution() {
-		super();
-	}
 	
 	@Override
-	public void computeSubMatrix(final List<EventProducer> eventProducers,
-			List<IntervalDesc> time, IProgressMonitor monitor)
-			throws SoCTraceException, InterruptedException, OcelotlException {
-		dm = new DeltaManagerOcelotl();
-		dm.start();
-		monitor.subTask("Query states");
-		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
-				monitor);
-		if (monitor.isCanceled()) {
-			ocelotlQueries.closeIterator();
-			return;
-		}
-		
-		setTimeSliceManager(new TimeSliceStateManager(getOcelotlParameters()
-				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
-		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		monitor.subTask("Fill the matrix");
-		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
-			threadlist.add(new OcelotlThread(getOcelotlParameters()
-					.getThreadNumber(), t, getOcelotlParameters()
-					.getEventsPerThread(), monitor));
-		for (final Thread thread : threadlist)
-			thread.join();
-		ocelotlQueries.closeIterator();
-		dm.end("VECTORS COMPUTATION: "
-				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
-	}
+	public void initVectors() throws SoCTraceException {
+		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
+		final List<EventProducer> producers = parameters.getCurrentProducers();
 
-	@Override
-	public void rebuildDirty(File aCacheFile,
-			HashMap<String, EventProducer> eventProducers,
-			IProgressMonitor monitor) throws IOException, SoCTraceException,
-			InterruptedException, OcelotlException {
-		buildNormalMatrix(monitor);
+		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
+			matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
+			stateCounter
+					.add(new HashMap<EventProducer, HashMap<String, Integer>>());
+
+			for (final EventProducer ep : producers) {
+				matrix.get((int) i).put(ep, new HashMap<String, Double>());
+				stateCounter.get((int) i).put(ep,
+						new HashMap<String, Integer>());
+			}
+		}
 	}
 
 }
