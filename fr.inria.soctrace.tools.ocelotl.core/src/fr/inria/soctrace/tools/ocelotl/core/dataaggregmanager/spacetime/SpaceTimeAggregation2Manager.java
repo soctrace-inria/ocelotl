@@ -113,7 +113,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	}
 
 	private void setHierarchy() throws OcelotlException {
-		hierarchy = new EventProducerHierarchy(getEventProducers());
+		hierarchy = new EventProducerHierarchy(getEventProducers(), matrix);
 	}
 
 }

@@ -134,14 +134,15 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 	}
 
 	@Override
-	public void initVectors() throws SoCTraceException {
+	public void initMatrix() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
 		final List<EventProducer> producers = parameters.getCurrentProducers();
 		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
 			matrix.add(new HashMap<EventProducer, HashMap<String, Double>>());
 
 			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep, new HashMap<String, Double>());
+				if(!aggregatedProducers.containsKey(ep))
+					matrix.get((int) i).put(ep, new HashMap<String, Double>());
 		}
 	}
 

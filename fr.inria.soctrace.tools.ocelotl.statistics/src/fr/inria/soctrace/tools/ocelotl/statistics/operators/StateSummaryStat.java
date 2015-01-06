@@ -52,14 +52,28 @@ public class StateSummaryStat extends SummaryStat {
 		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
 			nbProducers = ocelotlview.getOcelotlParameters()
 					.getSpatiallySelectedProducers().size();
-			
+
 			if (nbProducers == 2)
 				// Since we add the parent producers when only one producer is
 				// selected, we remove it to have correct data
 				nbProducers = 1;
+			
+			for (EventProducer anEP : ocelotlview.getOcelotlParameters()
+					.getAggregatedLeavesIndex().keySet())
+				if (ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers().contains(anEP))
+					nbProducers = nbProducers
+							+ ocelotlview.getOcelotlParameters()
+									.getAggregatedLeavesIndex().get(anEP);
 		} else {
 			nbProducers = microModel.getActiveProducers().size()
 					+ microModel.getInactiveProducers().size();
+			
+			for (EventProducer anEP : ocelotlview.getOcelotlParameters()
+					.getAggregatedLeavesIndex().keySet())
+					nbProducers = nbProducers
+							+ ocelotlview.getOcelotlParameters()
+									.getAggregatedLeavesIndex().get(anEP);
 		}
 		
 		total = timeRegion.getTimeDuration() * nbProducers;

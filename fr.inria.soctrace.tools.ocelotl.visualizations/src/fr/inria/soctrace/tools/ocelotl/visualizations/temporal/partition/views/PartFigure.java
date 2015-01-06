@@ -19,7 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views;
 
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;

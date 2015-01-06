@@ -57,6 +57,8 @@ public class OcelotlSettings {
 	private Color overviewDisplayBgColor;
 	private int overviewDisplayAlphaValue;
 	private ParameterPPolicy parameterPPolicy;
+	private boolean aggregateLeaves;
+	private int maxNumberOfLeaves;
 	
 	// Default directory where the config file is
 	private String defaultConfigFile;
@@ -98,6 +100,8 @@ public class OcelotlSettings {
 		overviewDisplayAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_ALPHA;
 		parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
 		enableOverview = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
+		aggregateLeaves = OcelotlDefaultParameterConstants.AGGREGATE_LEAVES;
+		maxNumberOfLeaves = OcelotlDefaultParameterConstants.MAX_NUMBER_OF_LEAVES;
 		
 		// Check if a configuration file exists and if so, load the saved
 		// configuration
@@ -184,7 +188,11 @@ public class OcelotlSettings {
 						OcelotlConstants.JSONParameterPPolicy).getAsString()));
 				setEnableOverview(theConf.get(
 						OcelotlConstants.JSONEnableOverview).getAsBoolean());
-
+				setAggregateLeaves(theConf.get(
+						OcelotlConstants.JSONAggregateLeaves).getAsBoolean());
+				setMaxNumberOfLeaves(theConf.get(
+						OcelotlConstants.JSONMaxNumberOfLeaves).getAsInt());
+			
 				logger.debug("Settings values:\n");
 				logger.debug("Cache activated: " + cacheActivated);
 				logger.debug("Cache directory: " + cacheDirectory);
@@ -264,6 +272,10 @@ public class OcelotlSettings {
 				parameterPPolicy.toString());
 		theConfig.addProperty(OcelotlConstants.JSONEnableOverview,
 				enableOverview);
+		theConfig.addProperty(OcelotlConstants.JSONAggregateLeaves,
+				aggregateLeaves);
+		theConfig.addProperty(OcelotlConstants.JSONMaxNumberOfLeaves,
+				maxNumberOfLeaves);
 		
 		String newSettings = gson.toJson(theConfig);
 
@@ -583,6 +595,28 @@ public class OcelotlSettings {
 	public void setParameterPPolicy(ParameterPPolicy parameterPPolicy) {
 		if (this.parameterPPolicy != parameterPPolicy) {
 			this.parameterPPolicy = parameterPPolicy;
+			saveSettings();
+		}
+	}
+
+	public boolean isAggregateLeaves() {
+		return aggregateLeaves;
+	}
+
+	public void setAggregateLeaves(boolean aggregateLeaves) {
+		if (this.aggregateLeaves != aggregateLeaves) {
+			this.aggregateLeaves = aggregateLeaves;
+			saveSettings();
+		}
+	}
+
+	public int getMaxNumberOfLeaves() {
+		return maxNumberOfLeaves;
+	}
+
+	public void setMaxNumberOfLeaves(int maxNumberOfLeaves) {
+		if (this.maxNumberOfLeaves != maxNumberOfLeaves) {
+			this.maxNumberOfLeaves = maxNumberOfLeaves;
 			saveSettings();
 		}
 	}

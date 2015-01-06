@@ -10,6 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,8 @@ import fr.inria.soctrace.lib.search.utils.IntervalDesc;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
@@ -48,6 +52,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected int eventsNumber;
 	protected OcelotlQueries ocelotlQueries;
 	protected TimeSliceManager timeSliceManager;
+	protected HashMap<EventProducer, EventProducer> aggregatedProducers = new HashMap<EventProducer, EventProducer>();
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MicroscopicDescription.class);
@@ -61,7 +66,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		dataCache = parameters.getDataCache();
 	}
 
-	public abstract void initVectors() throws SoCTraceException;
+	public abstract void initMatrix() throws SoCTraceException;
 
 	/**
 	 * Convert the matrix values in one String formatted in CSV
@@ -99,6 +104,15 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 	public void setDataCache(DataCache dataCache) {
 		this.dataCache = dataCache;
+	}
+
+	public HashMap<EventProducer, EventProducer> getAggregatedProducers() {
+		return aggregatedProducers;
+	}
+
+	public void setAggregatedProducers(
+			HashMap<EventProducer, EventProducer> aggregatedProducers) {
+		this.aggregatedProducers = aggregatedProducers;
 	}
 
 	public TimeSliceManager getTimeSliceManager() {
@@ -752,7 +766,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			throws SoCTraceException, InterruptedException, OcelotlException {
 
 		monitor.setTaskName("Fetching data from database");
-		initVectors();
+		initMatrix();
 		initQueries();
 		computeMatrix(monitor);
 
@@ -764,7 +778,13 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException {
 
-		initVectors();
+		parameters.setAggregatedLeavesIndex(new HashMap<EventProducer, Integer>());
+		
+		if(parameters.getOcelotlSettings().isAggregateLeaves())
+			if(parameters.getEventProducerHierarchy().getLeaves().size() > parameters.getOcelotlSettings().getMaxNumberOfLeaves())
+				aggregateLeaveHierarchy();
+		
+		initMatrix();
 
 		// If the cache is enabled
 		if (parameters.getOcelotlSettings().isCacheActivated()) {
@@ -799,7 +819,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 					File aCacheFile = parameters.getDataCache().checkCache(
 							parameters);
 
-					initVectors();
+					initMatrix();
 
 					monitor.subTask("Loading from the newly generated cache");
 					loadFromCache(aCacheFile, monitor);
@@ -926,6 +946,67 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			return;
 
 		buildMicroscopicModel(parameters, monitor);
+	}
+	
+	/**
+	 * Aggregate the leave of an event producer in order to reduce the memory
+	 * footprint of the matrix
+	 */
+	public void aggregateLeaveHierarchy() {
+		SimpleEventProducerHierarchy fullHierarchy = parameters
+				.getEventProducerHierarchy();
+		int limit = fullHierarchy.getLeaves().size()
+				- parameters.getOcelotlSettings().getMaxNumberOfLeaves();
+
+		// Get all the nodes that are the direct parent of a leaf
+		ArrayList<SimpleEventProducerNode> nodes = fullHierarchy
+				.getEventProducerNodesFromHierarchyLevel(fullHierarchy
+						.getMaxHierarchyLevel() - 1);
+
+		// Sort the nodes in decreasing order of children nodes size
+		Comparator<SimpleEventProducerNode> comparator = new Comparator<SimpleEventProducerNode>() {
+			public int compare(SimpleEventProducerNode c1,
+					SimpleEventProducerNode c2) {
+				return c2.getChildrenNodes().size()
+						- c1.getChildrenNodes().size();
+			}
+		};
+
+		Collections.sort(nodes, comparator);
+
+		// Aggregate the leaves until we are under the limit
+		for (SimpleEventProducerNode aNode : nodes) {
+			for (SimpleEventProducerNode aChildNode : aNode.getChildrenNodes()) {
+				aggregatedProducers.put(aChildNode.getMe(), aNode.getMe());
+			}
+			logger.debug("The children nodes of the following operator were aggregated: "
+					+ aNode.getName() + " (" + aNode.getID() + ")");
+			parameters.getAggregatedLeavesIndex().put(aNode.getMe(), aNode.getChildrenNodes().size());
+
+			limit = limit - (aNode.getChildrenNodes().size() - 1);
+			if (limit <= 0)
+				break;
+		}
+
+		if (limit > 0) {
+			logger.error("Error: Could not aggregate enough leave nodes to go under the minimum");
+		}
+	}
+
+	/**
+	 * Check whether an event producer is an aggregated leave
+	 * 
+	 * @param anEP
+	 *            the tested event producer
+	 * @return true if it is aggregated leaf, false otherwise
+	 */
+	public boolean isAggretedLeave(EventProducer anEP) {
+
+		for (EventProducer aggEP : aggregatedProducers.values())
+			if (aggEP == anEP)
+				return true;
+
+		return false;
 	}
 	
 }

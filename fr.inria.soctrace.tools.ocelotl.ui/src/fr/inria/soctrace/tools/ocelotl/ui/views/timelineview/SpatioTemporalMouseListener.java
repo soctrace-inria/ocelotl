@@ -290,10 +290,10 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 				EventProducerNode selectedNode;
 
 				SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
-					if (selectedAggregate == null || !selectedAggregate.isVisualAggregate())
-						selectedNode = findEventProducerNode(arg0.y);
-					else
-						selectedNode = selectedAggregate.getEventProducerNode();
+				if (selectedAggregate == null || !selectedAggregate.isVisualAggregate())
+					selectedNode = findEventProducerNode(arg0.y);
+				else
+					selectedNode = selectedAggregate.getEventProducerNode();
 
 				Point heights = getSpatialSelectionCoordinates(selectedNode);
 
@@ -368,7 +368,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 				break;
 
 			y0 = (int) (selectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
-			y1 = y0 + (int) ((selectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
+			y1 = y0 + (int) (selectedNode.getWeight() * logicHeight) - aggregatedView.getSpace();
 		}
 
 		return new Point(y0, y1);

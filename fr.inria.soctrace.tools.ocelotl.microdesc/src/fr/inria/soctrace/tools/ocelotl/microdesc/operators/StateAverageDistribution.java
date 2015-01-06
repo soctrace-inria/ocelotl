@@ -158,15 +158,21 @@ public class StateAverageDistribution extends StateDistribution {
 					state = new GenericState(event, (TimeSliceStateManager) timeSliceManager);
 					// Get duration of the state for every time slice it is in
 					final Map<Long, Double> distrib = state
-							.getTimeSlicesDistribution();
-					matrixUpdate(state, event.getEventProducer(), distrib);
-					if (currentEP != event.getEventProducer()) {
-						currentEP = event.getEventProducer();
+							.getTimeSlicesDistribution();		
+					EventProducer eventEP = event.getEventProducer();
+					
+					if(aggregatedProducers.containsKey(event.getEventProducer()))
+						eventEP = aggregatedProducers.get(event.getEventProducer());
+					
+					
+					matrixUpdate(state, eventEP, distrib);
+					if (currentEP != eventEP) {
+						currentEP = eventEP;
 
 						// If the event producer is not in the active producers list
-						if (!localActiveEventProducers.contains(event.getEventProducer())) {
+						if (!localActiveEventProducers.contains(eventEP)) {
 							// Add it
-							localActiveEventProducers.add(event.getEventProducer());
+							localActiveEventProducers.add(eventEP);
 						}
 					}
 					if (monitor.isCanceled())
@@ -184,7 +190,7 @@ public class StateAverageDistribution extends StateDistribution {
 	}
 	
 	@Override
-	public void initVectors() throws SoCTraceException {
+	public void initMatrix() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<EventProducer, HashMap<String, Double>>>();
 		final List<EventProducer> producers = parameters.getCurrentProducers();
 
@@ -194,9 +200,11 @@ public class StateAverageDistribution extends StateDistribution {
 					.add(new HashMap<EventProducer, HashMap<String, Integer>>());
 
 			for (final EventProducer ep : producers) {
-				matrix.get((int) i).put(ep, new HashMap<String, Double>());
-				stateCounter.get((int) i).put(ep,
-						new HashMap<String, Integer>());
+				if (!aggregatedProducers.containsKey(ep)) {
+					matrix.get((int) i).put(ep, new HashMap<String, Double>());
+					stateCounter.get((int) i).put(ep,
+							new HashMap<String, Integer>());
+				}
 			}
 		}
 	}

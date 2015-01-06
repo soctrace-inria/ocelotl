@@ -108,13 +108,18 @@ public class StateDistribution extends Microscopic3DDescription {
 					// Get duration of the state for every time slice it is in
 					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
-					matrixUpdate(state, event.getEventProducer(), distrib);
-					if (currentEP != event.getEventProducer()) {
-						currentEP = event.getEventProducer();
+					EventProducer eventEP = event.getEventProducer();
+					
+					if(aggregatedProducers.containsKey(event.getEventProducer()))
+						eventEP = aggregatedProducers.get(event.getEventProducer());
+					
+					matrixUpdate(state, eventEP, distrib);
+					if (currentEP != eventEP) {
+						currentEP = eventEP;
 						// If the event producer is not in the active producers list
-						if (!localActiveEventProducers.contains(event.getEventProducer())) {
+						if (!localActiveEventProducers.contains(eventEP)) {
 							// Add it
-							localActiveEventProducers.add(event.getEventProducer());
+							localActiveEventProducers.add(eventEP);
 						}
 					}
 					if (monitor.isCanceled())

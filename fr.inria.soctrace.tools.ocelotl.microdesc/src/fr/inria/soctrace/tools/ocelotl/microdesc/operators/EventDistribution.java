@@ -111,14 +111,19 @@ public class EventDistribution extends Microscopic3DDescription {
 				for (final Event event : events) {
 					// final Map<Long, Long> distrib =
 					// state.getTimeSlicesDistribution();
-					matrixUpdate(event, event.getEventProducer());
+					EventProducer eventEP = event.getEventProducer();
 					
-					if (currentEP != event.getEventProducer()) {
-						currentEP = event.getEventProducer();
+					if(aggregatedProducers.containsKey(event.getEventProducer()))
+						eventEP = aggregatedProducers.get(event.getEventProducer());
+					
+					matrixUpdate(event, eventEP);
+					
+					if (currentEP != eventEP) {
+						currentEP = eventEP;
 						// If the event producer is not in the active producers list
-						if (!localActiveEventProducers.contains(event.getEventProducer())) {
+						if (!localActiveEventProducers.contains(eventEP)) {
 							// Add it
-							localActiveEventProducers.add(event.getEventProducer());
+							localActiveEventProducers.add(eventEP);
 						}
 					}
 					if (monitor.isCanceled())
@@ -175,5 +180,5 @@ public class EventDistribution extends Microscopic3DDescription {
 			InterruptedException, OcelotlException {
 		buildNormalMatrix(monitor);
 	}
-
+	
 }

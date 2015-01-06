@@ -41,7 +41,8 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 					// Add value (= value / time slice duration)
 					Double computedValue = ((List<HashMap<String, Double>>) node
 							.getValues()).get(i).get(event)
-							/ (Long.valueOf(timeSliceDuration).doubleValue());
+							/ ((Long.valueOf(timeSliceDuration).doubleValue() * node
+									.getWeight()));
 					// Compute amplitude max
 					tempAmp += computedValue;
 					proportions.get(node).get(i).put(event, computedValue);

@@ -98,17 +98,20 @@ public class VariableDistribution extends Microscopic3DDescription {
 							(TimeSliceVariableManager) timeSliceManager);
 					final Map<Long, Double> distrib = variable
 							.getTimeSlicesDistribution();
-					matrixUpdate(variable, event.getEventProducer(), distrib);
+					EventProducer eventEP = event.getEventProducer();
+					
+					if(aggregatedProducers.containsKey(event.getEventProducer()))
+						eventEP = aggregatedProducers.get(event.getEventProducer());
+					
+					matrixUpdate(variable, eventEP, distrib);
 
-					if (currentEP != event.getEventProducer()) {
-						currentEP = event.getEventProducer();
+					if (currentEP != eventEP) {
+						currentEP = eventEP;
 						// If the event producer is not in the active producers
 						// list
-						if (!localActiveEventProducers.contains(event
-								.getEventProducer())) {
+						if (!localActiveEventProducers.contains(eventEP)) {
 							// Add it
-							localActiveEventProducers.add(event
-									.getEventProducer());
+							localActiveEventProducers.add(eventEP);
 						}
 					}
 					if (monitor.isCanceled())

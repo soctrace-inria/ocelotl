@@ -18,13 +18,16 @@ public class SimpleEventProducerHierarchy {
 		private EventProducer me;
 		private SimpleEventProducerNode parentNode;
 		private List<SimpleEventProducerNode> childrenNodes = new ArrayList<SimpleEventProducerNode>();
-
+		// Depth in the hierarchy level of the node (the smaller, the higher
+		// in the hierarchy)
+		private int hierarchyLevel;
+		
 		public SimpleEventProducerNode() {
 			me = null;
 			id = -1;
 			name = "abstractRootNode";
+			hierarchyLevel = 0;
 		}
-
 		
 		public SimpleEventProducerNode(EventProducer ep) {
 			me = ep;
@@ -54,9 +57,14 @@ public class SimpleEventProducerHierarchy {
 					return;
 				}
 			}
+			
 			parentNode = eventProducerNodes.get(me.getParentId());
 			parentNode.addChild(this);
 			orphans.remove(id);
+			hierarchyLevel = parentNode.getHierarchyLevel() + 1;
+			
+			if(hierarchyLevel > maxHierarchyLevel)
+				maxHierarchyLevel = hierarchyLevel;
 		}
 
 		public void addChild(SimpleEventProducerNode child) {
@@ -83,6 +91,14 @@ public class SimpleEventProducerHierarchy {
 
 		public void setName(String name) {
 			this.name = name;
+		}
+		
+		public int getHierarchyLevel() {
+			return hierarchyLevel;
+		}
+
+		public void setHierarchyLevel(int hierarchyLevel) {
+			this.hierarchyLevel = hierarchyLevel;
 		}
 
 		public void sortChildrenNodes() {
@@ -117,6 +133,7 @@ public class SimpleEventProducerHierarchy {
 	private Map<Integer, SimpleEventProducerNode> orphans = new HashMap<Integer, SimpleEventProducerNode>();
 	private Map<Integer, SimpleEventProducerNode> leaves = new HashMap<Integer, SimpleEventProducerNode>();
 	private Map<Integer, EventProducer> eventProducers = new HashMap<Integer, EventProducer>();
+	protected int maxHierarchyLevel;
 	
 	/**
 	 * Used as an abstract root node since the hierarchy might have several top-level node
@@ -129,6 +146,7 @@ public class SimpleEventProducerHierarchy {
 			this.eventProducers.put(ep.getId(), ep);
 		}
 		root = new SimpleEventProducerNode();
+		maxHierarchyLevel = 0;
 		setHierarchy();
 	}
 
@@ -171,6 +189,14 @@ public class SimpleEventProducerHierarchy {
 	public SimpleEventProducerNode getRoot() {
 		return root;
 	}
+	
+	public int getMaxHierarchyLevel() {
+		return maxHierarchyLevel;
+	}
+
+	public void setMaxHierarchyLevel(int maxHierarchyLevel) {
+		this.maxHierarchyLevel = maxHierarchyLevel;
+	}
 
 	public int getParentID(int id) {
 		return eventProducerNodes.get(id).getParentNode().getID();
@@ -189,5 +215,23 @@ public class SimpleEventProducerHierarchy {
 				return true;
 
 		return false;
+	}
+	
+	/**
+	 * Get all the producer nodes of a given level of hierarchy
+	 * 
+	 * @param hierarchyLevel
+	 *            the wanted hierarchy level
+	 * @return the list of corresponding event producer nodes
+	 */
+	public ArrayList<SimpleEventProducerNode> getEventProducerNodesFromHierarchyLevel(
+			int hierarchyLevel) {
+		ArrayList<SimpleEventProducerNode> selectedEpn = new ArrayList<SimpleEventProducerNode>();
+
+		for (SimpleEventProducerNode epn : eventProducerNodes.values()) {
+			if (epn.getHierarchyLevel() == hierarchyLevel)
+				selectedEpn.add(epn);
+		}
+		return selectedEpn;
 	}
 }

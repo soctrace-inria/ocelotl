@@ -28,6 +28,7 @@ import java.util.Map;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
 
 public class EventProducerHierarchy {
 
@@ -36,7 +37,6 @@ public class EventProducerHierarchy {
 	}
 
 	public class EventProducerNode {
-
 		private int id;
 		private EventProducer me;
 		private EventProducerNode parentNode;
@@ -202,10 +202,25 @@ public class EventProducerHierarchy {
 		 * @return the newly computed weight
 		 */
 		public int setWeight() {
-			if (childrenNodes.isEmpty())
+			if (childrenNodes.isEmpty()) {
+				// If it is an aggregated leave
+				if (microModel3D.getAggregatedProducers()
+						.containsValue(me)) {
+					weight = 0;
+					// Add the weight of the aggregated leaves
+					for (EventProducer anEP : microModel3D
+							.getAggregatedProducers().keySet())
+						if (microModel3D
+								.getAggregatedProducers().get(anEP) == me)
+							weight++;
+					
+					aggLeaves.add(this);
+				}
+
 				return weight;
-			else
+			} else
 				weight = 0;
+
 			for (EventProducerNode epn : childrenNodes) {
 				weight += epn.setWeight();
 			}
@@ -353,15 +368,18 @@ public class EventProducerHierarchy {
 	private Map<Integer, EventProducerNode> orphans = new HashMap<Integer, EventProducerNode>();
 	private Map<Integer, EventProducerNode> leaves = new HashMap<Integer, EventProducerNode>();
 	private Map<Integer, EventProducer> eventProducers = new HashMap<Integer, EventProducer>();
+	private ArrayList<EventProducerNode> aggLeaves = new ArrayList<EventProducerNode>();
 	private EventProducerNode root = null;
 	protected int maxHierarchyLevel;
+	protected Microscopic3DDescription microModel3D;
 
-	public EventProducerHierarchy(List<EventProducer> eventProducers) throws OcelotlException {
+	public EventProducerHierarchy(List<EventProducer> eventProducers, Microscopic3DDescription microModel3D) throws OcelotlException {
 		super();
 		for (EventProducer ep : eventProducers) {
 			this.eventProducers.put(ep.getId(), ep);
 		}
 		root = null;
+		this.microModel3D = microModel3D;
 		maxHierarchyLevel = 0;
 		setHierarchy();
 	}
@@ -374,12 +392,7 @@ public class EventProducerHierarchy {
 		
 		// If there are some node with no parent
 		if (!orphans.isEmpty()) {
-		//	System.err.println("Careful: hierarchy is incomplete and some elements will be destroyed!");
 			throw new OcelotlException(OcelotlException.INCOMPLETE_HIERARCHY);
-//			for (Integer orphan : orphans.keySet()) {
-//				if (orphans.containsKey(orphan))
-//					orphans.get(orphan).destroy();
-//			}
 		}
 		root.setWeight();
 		root.setChildIndex();
@@ -504,7 +517,8 @@ public class EventProducerHierarchy {
 		
 		for (EventProducerNode epn : leaves.values()) {
 			if ((epn.index + epn.weight > start && epn.index + epn.weight < end)
-					|| (epn.index >= start && epn.index <= end))
+					|| (epn.index >= start && epn.index <= end)
+					|| (start >= epn.index && end <= epn.index + epn.weight))
 				containedEpn.add(epn);
 		}
 		return containedEpn;

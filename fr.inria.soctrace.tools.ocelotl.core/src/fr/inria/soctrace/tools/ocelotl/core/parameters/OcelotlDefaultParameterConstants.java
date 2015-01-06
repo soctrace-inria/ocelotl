@@ -107,6 +107,9 @@ public class OcelotlDefaultParameterConstants {
 	 * Is the overview enable
 	 */
 	public static final boolean OVERVIEW_ENABLE = true;
+	
+	public static final boolean AGGREGATE_LEAVES = false;
+	public static final int MAX_NUMBER_OF_LEAVES = 10000;
 
 	/**
 	 * Number of events loaded by thread
@@ -117,6 +120,9 @@ public class OcelotlDefaultParameterConstants {
 	
 	public static final int MIN_NUMBER_OF_THREAD = 1;
 	public static final int MAX_NUMBER_OF_THREAD = 1000000;
+	
+	public static final int MIN_NUMBER_OF_AGGLEAVES = 100;
+	public static final int MAX_NUMBER_OF_AGGLEAVES = 100000000;
 	
 	public static final int MIN_EVENT_PRODUCERS_PER_QUERY = 0;
 	public static final int MAX_EVENT_PRODUCERS_PER_QUERY = 1000000;

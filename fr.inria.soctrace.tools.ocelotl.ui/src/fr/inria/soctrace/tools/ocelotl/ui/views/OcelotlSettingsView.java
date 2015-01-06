@@ -81,6 +81,8 @@ public class OcelotlSettingsView extends Dialog {
 	private Spinner								textDisplayAlpha;
 	private Spinner								textSelectionAlpha;
 	private Button								btnEnableOverview;
+	private Spinner								spinnerMaxAggLeaves;
+	private Button								btnEnableLeavesAgg;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -535,7 +537,7 @@ public class OcelotlSettingsView extends Dialog {
 		sashFormSettings.setWeights(new int[] { 1 });
 		btnCacheEnabled.notifyListeners(SWT.Selection, new Event());
 
-		// Thread settings
+		// Advanced settings
 		final TabItem tbtmAdvancedSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtmAdvancedSettings.setText("Advanced");
 
@@ -588,7 +590,29 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerThread.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_THREAD);
 		spinnerThread.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_THREAD);
 		spinnerThread.setSelection(settings.getNumberOfThread());
-		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1 });
+		
+		final Group grpAggregateLeaves = new Group(advancedSettingsSashForm, SWT.NONE);
+		grpAggregateLeaves.setFont(cantarell8);
+		grpAggregateLeaves.setText("Leaves Aggregation");
+		grpAggregateLeaves.setLayout(new GridLayout(2, false));
+		
+		btnEnableLeavesAgg = new Button(grpAggregateLeaves, SWT.CHECK);
+		btnEnableLeavesAgg.setFont(cantarell8);
+		btnEnableLeavesAgg.setSelection(settings.isAggregateLeaves());
+		btnEnableLeavesAgg.setText("Enable Leaves Aggregation");
+		new Label(grpAggregateLeaves, SWT.NONE);
+
+		final Label lblAggLeaves = new Label(grpAggregateLeaves, SWT.NONE);
+		lblAggLeaves.setFont(cantarell8);
+		lblAggLeaves.setText("Max. Number of Leaves");
+
+		spinnerMaxAggLeaves = new Spinner(grpAggregateLeaves, SWT.BORDER);
+		spinnerMaxAggLeaves.setFont(cantarell8);
+		spinnerMaxAggLeaves.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		spinnerMaxAggLeaves.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_AGGLEAVES);
+		spinnerMaxAggLeaves.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_AGGLEAVES);
+		spinnerMaxAggLeaves.setSelection(settings.getMaxNumberOfLeaves());
+		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1, 1 });
 
 		// Snapshot settings
 		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
@@ -783,7 +807,9 @@ public class OcelotlSettingsView extends Dialog {
 		settings.setNumberOfThread(Integer.valueOf(spinnerThread.getText()));
 		settings.setMaxEventProducersPerQuery(Integer.valueOf(spinnerDivideDbQuery.getText()));
 		settings.setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
-
+		settings.setAggregateLeaves(btnEnableLeavesAgg.getSelection());
+		settings.setMaxNumberOfLeaves(Integer.valueOf(spinnerMaxAggLeaves.getText()));
+		
 		// Curve settings
 		modifyThreshold();
 		modifyNormalize();

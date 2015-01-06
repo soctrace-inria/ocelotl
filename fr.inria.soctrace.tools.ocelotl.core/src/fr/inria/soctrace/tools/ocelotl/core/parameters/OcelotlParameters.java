@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.parameters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -76,6 +77,7 @@ public class OcelotlParameters {
 	private OcelotlSettings	ocelotlSettings;
 	private Integer	timeSliceFactor = 1;
 	private boolean overvieweEnable = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
+	private HashMap<EventProducer, Integer> aggregatedLeavesIndex = new HashMap<EventProducer, Integer>();
 	
 	private TimeSliceManager timeSliceManager;
 
@@ -401,6 +403,15 @@ public class OcelotlParameters {
 
 	public void setOvervieweEnable(boolean overvieweEnable) {
 		this.overvieweEnable = overvieweEnable;
+	}
+
+	public HashMap<EventProducer, Integer> getAggregatedLeavesIndex() {
+		return aggregatedLeavesIndex;
+	}
+
+	public void setAggregatedLeavesIndex(
+			HashMap<EventProducer, Integer> aggregatedLeavesIndex) {
+		this.aggregatedLeavesIndex = aggregatedLeavesIndex;
 	}
 
 	public List<EventProducer> getCurrentProducers() {

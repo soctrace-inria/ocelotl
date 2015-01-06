@@ -58,7 +58,14 @@ public class StateLeaveSummaryStat extends SummaryStat{
 					.getOcelotlParameters().getEventProducerHierarchy()
 					.getLeaves().values())
 				if (microModel.getActiveProducers().contains(anSepn.getMe()))
-					nbProducers++;
+					if (ocelotlview.getOcelotlParameters()
+							.getAggregatedLeavesIndex().keySet()
+							.contains(anSepn))
+						nbProducers = nbProducers
+								+ ocelotlview.getOcelotlParameters()
+										.getAggregatedLeavesIndex().get(anSepn);
+					else
+						nbProducers++;
 		}
 		
 		total = timeRegion.getTimeDuration() * nbProducers;
@@ -77,9 +84,17 @@ public class StateLeaveSummaryStat extends SummaryStat{
 		}
 	}
 	
+	/**
+	 * Check whether or not an event producer is a leaf in the EP hierarchy
+	 * 
+	 * @param ep
+	 * @return
+	 */
 	protected boolean isLeaf(EventProducer ep) {
 		return ocelotlview.getOcelotlParameters().getEventProducerHierarchy()
-				.isLeaf(ep);
+				.isLeaf(ep)
+				|| ocelotlview.getOcelotlParameters()
+						.getAggregatedLeavesIndex().keySet().contains(ep);
 	}
 	
 	/**
@@ -96,7 +111,7 @@ public class StateLeaveSummaryStat extends SummaryStat{
 			if (ocelotlview.getOcelotlParameters()
 					.getSpatiallySelectedProducers().contains(anSepn.getMe())
 					&& microModel.getActiveProducers().contains(anSepn.getMe()))
-				numberOfLeaves++;
+					numberOfLeaves++;
 
 		return numberOfLeaves;
 	}

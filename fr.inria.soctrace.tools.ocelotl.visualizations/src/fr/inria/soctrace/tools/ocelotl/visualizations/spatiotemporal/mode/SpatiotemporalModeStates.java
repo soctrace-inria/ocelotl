@@ -40,8 +40,8 @@ public class SpatiotemporalModeStates extends SpatiotemporalMode {
 							.put(state,
 									((List<HashMap<String, Double>>) node
 											.getValues()).get(i).get(state)
-											/ (Long.valueOf(timeSliceDuration)
-													.doubleValue()));
+											/ ((Long.valueOf(timeSliceDuration)
+													.doubleValue() * node.getWeight())));
 			}
 		} else {
 			// Compute proportions recursively for each children node
