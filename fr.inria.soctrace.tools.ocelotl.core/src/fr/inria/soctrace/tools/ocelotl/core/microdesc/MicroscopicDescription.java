@@ -689,6 +689,10 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				.getTimeRegion().getTimeStampStart())
 			return false;
 
+		// If there is some leaves aggregated, do not generate a cache
+		if (parameters.isHasLeaveAggregated())
+			return false;
+		
 		if (parameters.getTrace().getMaxTimestamp() != parameters
 				.getTimeRegion().getTimeStampEnd())
 			return false;
@@ -777,13 +781,17 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void buildMicroscopicModel(final OcelotlParameters parameters,
 			IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException {
-
+		// Reset the aggregation index
 		parameters.setAggregatedLeavesIndex(new HashMap<EventProducer, Integer>());
+		parameters.setAggregatedEventProducers(new ArrayList<EventProducer>());
+		parameters.checkLeaveAggregation();
 		
-		if(parameters.getOcelotlSettings().isAggregateLeaves())
-			if(parameters.getEventProducerHierarchy().getLeaves().size() > parameters.getOcelotlSettings().getMaxNumberOfLeaves())
-				aggregateLeaveHierarchy();
-		
+		// Check whether we should aggregate the leaves of the event producers
+		// hierarchy
+		if (parameters.isHasLeaveAggregated()) {
+			aggregateLeaveHierarchy();
+		}
+
 		initMatrix();
 
 		// If the cache is enabled
@@ -828,6 +836,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		} else {
 			buildNormalMatrix(monitor);
 		}
+		// Get the list of inactive producers
 		computeInactiveProducers();
 	}
 	
@@ -978,6 +987,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		for (SimpleEventProducerNode aNode : nodes) {
 			for (SimpleEventProducerNode aChildNode : aNode.getChildrenNodes()) {
 				aggregatedProducers.put(aChildNode.getMe(), aNode.getMe());
+				parameters.getAggregatedEventProducers().add(aChildNode.getMe());
 			}
 			logger.debug("The children nodes of the following operator were aggregated: "
 					+ aNode.getName() + " (" + aNode.getID() + ")");
@@ -1001,7 +1011,6 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	 * @return true if it is aggregated leaf, false otherwise
 	 */
 	public boolean isAggretedLeave(EventProducer anEP) {
-
 		for (EventProducer aggEP : aggregatedProducers.values())
 			if (aggEP == anEP)
 				return true;

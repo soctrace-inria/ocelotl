@@ -571,16 +571,17 @@ public abstract class DistributionBaseView extends Dialog implements
 	/**
 	 * Initialize settings values
 	 */
-	public void initSettings()
-	{
+	public void initSettings() {
 		oldEventTypes = new ArrayList<EventType>(config.getTypes());
-		oldProducer = new LinkedList<EventProducer>(params.getEventProducers());
-		
-		producers = new LinkedList<EventProducer>();
-		for(EventProducer ep: params.getEventProducers())
-			producers.add(ep); 
+		oldProducer = new LinkedList<EventProducer>(
+				params.getUnfilteredEventProducers());
 
-		treeViewerEventProducer.setInput(params.getEventProducerHierarchy().getRoot());
+		producers = new LinkedList<EventProducer>();
+		for (EventProducer ep : params.getUnfilteredEventProducers())
+			producers.add(ep);
+
+		treeViewerEventProducer.setInput(params.getEventProducerHierarchy()
+				.getRoot());
 		setParameters();
 		listViewerEventTypes.setInput(config.getTypes());
 		updateTreeStatus();
@@ -597,14 +598,14 @@ public abstract class DistributionBaseView extends Dialog implements
 
 	@Override
 	protected void okPressed() {
-		params.setEventProducers(producers);
+		params.setUnfilteredEventProducers(producers);
 		super.okPressed();
 	}
 
 	@Override
 	protected void cancelPressed() {
 		config.setTypes(oldEventTypes);
-		params.setEventProducers(oldProducer);
+		params.setUnfilteredEventProducers(oldProducer);
 		super.cancelPressed();
 	}
 
@@ -699,7 +700,7 @@ public abstract class DistributionBaseView extends Dialog implements
 	 */
 	private void checkElementAndSubtree(Object element) {
 		checkElement(element);
-
+		
 		for (Object child : new FilterTreeContentProvider()
 				.getChildren(element)) {
 			checkElementAndSubtree(child);
@@ -714,7 +715,7 @@ public abstract class DistributionBaseView extends Dialog implements
 	 */
 	private void uncheckElementAndSubtree(Object element) {
 		uncheckElement(element);
-
+		
 		for (Object child : new FilterTreeContentProvider()
 				.getChildren(element)) {
 			uncheckElementAndSubtree(child);

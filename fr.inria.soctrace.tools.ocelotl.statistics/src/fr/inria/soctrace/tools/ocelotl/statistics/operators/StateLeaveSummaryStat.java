@@ -2,6 +2,8 @@ package fr.inria.soctrace.tools.ocelotl.statistics.operators;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
@@ -49,24 +51,7 @@ public class StateLeaveSummaryStat extends SummaryStat{
 			}
 		}
 
-		int nbProducers;
-		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
-			nbProducers = numberOfSelectedLeaves();
-		} else {
-			nbProducers = 0;
-			for (SimpleEventProducerNode anSepn : ocelotlview
-					.getOcelotlParameters().getEventProducerHierarchy()
-					.getLeaves().values())
-				if (microModel.getActiveProducers().contains(anSepn.getMe()))
-					if (ocelotlview.getOcelotlParameters()
-							.getAggregatedLeavesIndex().keySet()
-							.contains(anSepn))
-						nbProducers = nbProducers
-								+ ocelotlview.getOcelotlParameters()
-										.getAggregatedLeavesIndex().get(anSepn);
-					else
-						nbProducers++;
-		}
+		int nbProducers = numberOfSelectedLeaves();
 		
 		total = timeRegion.getTimeDuration() * nbProducers;
 		statData = new ArrayList<ITableRow>();
@@ -104,14 +89,56 @@ public class StateLeaveSummaryStat extends SummaryStat{
 	 */
 	public Integer numberOfSelectedLeaves() {
 		int numberOfLeaves = 0;
+		Set<EventProducer> aggregatedProd = new HashSet<EventProducer>();
 
-		for (SimpleEventProducerNode anSepn : ocelotlview
-				.getOcelotlParameters().getEventProducerHierarchy().getLeaves()
-				.values())
-			if (ocelotlview.getOcelotlParameters()
-					.getSpatiallySelectedProducers().contains(anSepn.getMe())
-					&& microModel.getActiveProducers().contains(anSepn.getMe()))
+		// If there is a spatial selection
+		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
+			// Check for all leave producers (non-aggregated)
+			for (SimpleEventProducerNode anSepn : ocelotlview
+					.getOcelotlParameters().getEventProducerHierarchy()
+					.getLeaves().values()) {
+				// That it is part of the selection and active
+				if (ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers()
+						.contains(anSepn.getMe())
+						&& microModel.getActiveProducers().contains(
+								anSepn.getMe()))
 					numberOfLeaves++;
+
+				// If its parent is selected and active then add it (case where
+				// there is aggregation)
+				if (ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers()
+						.contains(anSepn.getParentNode().getMe())
+						&& microModel.getActiveProducers().contains(
+								anSepn.getParentNode().getMe()))
+					aggregatedProd.add(anSepn.getParentNode().getMe());
+			}
+
+			// For all prod that are aggregation of leaves, add the
+			// corresponding number of aggregated leaves
+			for (EventProducer anEp : aggregatedProd)
+				numberOfLeaves = numberOfLeaves
+						+ ocelotlview.getOcelotlParameters()
+								.getAggregatedLeavesIndex().get(anEp);
+		} else {
+			// Same thing as above without caring about spatial selection
+			for (SimpleEventProducerNode anSepn : ocelotlview
+					.getOcelotlParameters().getEventProducerHierarchy()
+					.getLeaves().values()) {
+				if (microModel.getActiveProducers().contains(anSepn.getMe()))
+					numberOfLeaves++;
+
+				if (microModel.getActiveProducers().contains(
+						anSepn.getParentNode().getMe()))
+					aggregatedProd.add(anSepn.getParentNode().getMe());
+			}
+
+			for (EventProducer anEp : aggregatedProd)
+				numberOfLeaves = numberOfLeaves
+						+ ocelotlview.getOcelotlParameters()
+								.getAggregatedLeavesIndex().get(anEp);
+		}
 
 		return numberOfLeaves;
 	}

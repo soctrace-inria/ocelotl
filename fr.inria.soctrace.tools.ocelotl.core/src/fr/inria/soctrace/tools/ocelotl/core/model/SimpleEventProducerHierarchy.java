@@ -32,6 +32,7 @@ public class SimpleEventProducerHierarchy {
 		public SimpleEventProducerNode(EventProducer ep) {
 			me = ep;
 			id = me.getId();
+			epnIndex.put(ep, this);
 			name = me.getName();
 			orphans.put(id, this);
 			leaves.put(id, this);
@@ -130,6 +131,7 @@ public class SimpleEventProducerHierarchy {
 	}
 
 	private Map<Integer, SimpleEventProducerNode> eventProducerNodes = new HashMap<Integer, SimpleEventProducerNode>();
+	private Map<EventProducer, SimpleEventProducerNode> epnIndex = new HashMap<EventProducer, SimpleEventProducerNode>();
 	private Map<Integer, SimpleEventProducerNode> orphans = new HashMap<Integer, SimpleEventProducerNode>();
 	private Map<Integer, SimpleEventProducerNode> leaves = new HashMap<Integer, SimpleEventProducerNode>();
 	private Map<Integer, EventProducer> eventProducers = new HashMap<Integer, EventProducer>();
@@ -196,6 +198,14 @@ public class SimpleEventProducerHierarchy {
 
 	public void setMaxHierarchyLevel(int maxHierarchyLevel) {
 		this.maxHierarchyLevel = maxHierarchyLevel;
+	}
+
+	public Map<EventProducer, SimpleEventProducerNode> getEpnIndex() {
+		return epnIndex;
+	}
+
+	public void setEpnIndex(Map<EventProducer, SimpleEventProducerNode> epnIndex) {
+		this.epnIndex = epnIndex;
 	}
 
 	public int getParentID(int id) {

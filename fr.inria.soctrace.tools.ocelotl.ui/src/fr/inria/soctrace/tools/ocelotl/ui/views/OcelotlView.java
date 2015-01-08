@@ -198,7 +198,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 								@Override
 								public void run() {
-
+									
 									// Load the type operators
 									for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 										comboType.add(type);
@@ -473,7 +473,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			if (confDataLoader.getCurrentTrace() == null)
 				return;
 			hasChanged = HasChanged.ALL;
-			ocelotlParameters.getEventProducers().clear();
+			ocelotlParameters.getUnfilteredEventProducers().clear();
 
 			// Get the available aggregation operators
 			comboDimension.setEnabled(true);
@@ -500,7 +500,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			if (confDataLoader.getCurrentTrace() == null)
 				return;
 			hasChanged = HasChanged.ALL;
-			ocelotlParameters.getEventProducers().clear();
+			ocelotlParameters.getUnfilteredEventProducers().clear();
 			history.reset();
 			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
 			ocelotlCore.getAggregOperators().setSelectedOperator(comboDimension.getText());
@@ -659,7 +659,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-
 			if (overView != null)
 				overView.modifyParameterDown();
 		}
@@ -688,7 +687,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 				// Reset spatial selection
 				ocelotlParameters.setSpatialSelection(false);
-				ocelotlParameters.setCurrentProducers(ocelotlParameters.getEventProducers());
+				ocelotlParameters.updateCurrentProducers();
 				
 				timestampHasChanged = true;
 			}
@@ -1017,7 +1016,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Button						buttonCancelSelection;
 	private SashForm					mainViewTopSashform;
 	private SashForm					mainViewBottomSashform;
-	private Composite	compositeTimeAxisView;
+	private Composite					compositeTimeAxisView;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1207,7 +1206,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		 		
 		 				btnSettings2 = new Button(groupTraces, SWT.NONE);
 		 				btnSettings2.setToolTipText("Settings");
-	 				btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
+		 				btnSettings2.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/management.png"));
 						btnSettings2.setFont(cantarell8);
 						btnSettings2.addSelectionListener(new VisualizationSettingsSelectionAdapter(this));
 		
@@ -1771,12 +1770,13 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getMicromodelTypes().getSelectedOperatorResource().getType()));
 		// Init operator specific configuration
 		ocelotlParameters.setAllEventProducers(confDataLoader.getProducers());
-		if (ocelotlParameters.getEventProducers().isEmpty()) {
-			ocelotlParameters.getEventProducers().addAll(confDataLoader.getProducers());
+		
+		if (ocelotlParameters.getUnfilteredEventProducers().isEmpty()) {
+			ocelotlParameters.getUnfilteredEventProducers().addAll(confDataLoader.getProducers());
 			// If there is no current spatial selection
 			if (!ocelotlParameters.isSpatialSelection()) {
 				// The selected producers are the current producers
-				ocelotlParameters.setCurrentProducers(ocelotlParameters.getEventProducers());
+				ocelotlParameters.setCurrentProducers(ocelotlParameters.getUnfilteredEventProducers());
 			}
 		}
 

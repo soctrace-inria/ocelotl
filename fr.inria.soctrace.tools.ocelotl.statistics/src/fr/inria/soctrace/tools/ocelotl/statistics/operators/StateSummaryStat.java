@@ -48,33 +48,7 @@ public class StateSummaryStat extends SummaryStat {
 			}
 		}
 
-		int nbProducers;
-		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
-			nbProducers = ocelotlview.getOcelotlParameters()
-					.getSpatiallySelectedProducers().size();
-
-			if (nbProducers == 2)
-				// Since we add the parent producers when only one producer is
-				// selected, we remove it to have correct data
-				nbProducers = 1;
-			
-			for (EventProducer anEP : ocelotlview.getOcelotlParameters()
-					.getAggregatedLeavesIndex().keySet())
-				if (ocelotlview.getOcelotlParameters()
-						.getSpatiallySelectedProducers().contains(anEP))
-					nbProducers = nbProducers
-							+ ocelotlview.getOcelotlParameters()
-									.getAggregatedLeavesIndex().get(anEP);
-		} else {
-			nbProducers = microModel.getActiveProducers().size()
-					+ microModel.getInactiveProducers().size();
-			
-			for (EventProducer anEP : ocelotlview.getOcelotlParameters()
-					.getAggregatedLeavesIndex().keySet())
-					nbProducers = nbProducers
-							+ ocelotlview.getOcelotlParameters()
-									.getAggregatedLeavesIndex().get(anEP);
-		}
+		int nbProducers = getNumberOfProducers();
 		
 		total = timeRegion.getTimeDuration() * nbProducers;
 		statData = new ArrayList<ITableRow>();
@@ -90,6 +64,57 @@ public class StateSummaryStat extends SummaryStat {
 					proportion, FramesocColorManager
 							.getInstance().getEventTypeColor(ep).getSwtColor()));
 		}
+	}
+	
+	/**
+	 * Get the number of producers
+	 * @return
+	 */
+	public int getNumberOfProducers()
+	{
+		int nbProducers = 0;
+		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
+			ArrayList<EventProducer> currentSelection = new ArrayList<EventProducer>();
+
+			// Make the intersection of the selected producers and the filtered
+			// ones && remove the one that were aggregated
+			for (EventProducer anEP : ocelotlview.getOcelotlParameters()
+					.getUnfilteredEventProducers()) {
+				if (ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers().contains(anEP)
+						&& (!ocelotlview.getOcelotlParameters()
+								.getOcelotlSettings().isAggregateLeaves() || (ocelotlview.getOcelotlParameters()
+								.getOcelotlSettings().isAggregateLeaves() && !ocelotlview
+								.getOcelotlParameters()
+								.getAggregatedEventProducers().contains(anEP)))) {
+					currentSelection.add(anEP);
+				}
+			}
+			
+			nbProducers = currentSelection.size();
+
+			if (nbProducers == 2)
+				// Since we add the parent producers when only one producer is
+				// selected, we remove it to have correct data
+				nbProducers = 1;
+			
+			// Add the corresponding number of aggregated producers
+			for (EventProducer anEP : ocelotlview.getOcelotlParameters()
+					.getAggregatedLeavesIndex().keySet())
+				if (ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers().contains(anEP))
+					nbProducers = nbProducers
+							+ ocelotlview.getOcelotlParameters()
+									.getAggregatedLeavesIndex().get(anEP);
+			
+			System.err.println("state + selecy " + nbProducers);
+		} else {
+			nbProducers = microModel.getActiveProducers().size()
+					+ microModel.getInactiveProducers().size();
+			
+			System.err.println("state + all " + nbProducers);
+		}
+		return nbProducers;
 	}
 	
 }

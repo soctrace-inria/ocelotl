@@ -13,6 +13,7 @@
 			metric_compatibility="ALL, VARIABLE"
 			aggregator_compatibility="2D, 3D"
 			selection_priority="1"
+			leave_aggregation_compatiblity="true"
 			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
 		</statistic_operator>
 		<statistic_operator
@@ -23,6 +24,7 @@
 			metric_compatibility="STATE"
 			aggregator_compatibility="2D, 3D"
 			selection_priority="3"
+			leave_aggregation_compatiblity="true"
 			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
 		</statistic_operator>
 		<statistic_operator
@@ -33,6 +35,7 @@
 			metric_compatibility="STATE"
 			aggregator_compatibility="2D, 3D"
 			selection_priority="2"
+			leave_aggregation_compatiblity="true"
 			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
 		</statistic_operator>
 		<statistic_operator
@@ -43,6 +46,7 @@
 			metric_compatibility="STATE"
 			aggregator_compatibility="2D, 3D"
 			selection_priority="4"
+			leave_aggregation_compatiblity="false"
 			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
 		</statistic_operator>
 	</extension>

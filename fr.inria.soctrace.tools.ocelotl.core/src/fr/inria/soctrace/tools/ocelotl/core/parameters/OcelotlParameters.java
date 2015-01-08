@@ -49,10 +49,17 @@ public class OcelotlParameters {
 	private List<EventProducer> currentProducers = new ArrayList<EventProducer>();
 	// List of the event producers selected through a spatial selection 
 	private List<EventProducer> spatiallySelectedProducers = new ArrayList<EventProducer>();
+	// List of all the event producers present in the trace
+	private List<EventProducer> allEventProducers = new ArrayList<EventProducer>();
+	// List of all the event producers that are not filtered out
+	private List<EventProducer> unfilteredEventProducers = new ArrayList<EventProducer>();
+	// List of all the event producers that are aggregated 
+	private List<EventProducer> aggregatedEventProducers = new ArrayList<EventProducer>();
+	
 	private List<EventType> eventTypes = new LinkedList<EventType>();
 	private List<EventType> allEventTypes;
 	private List<EventType> operatorEventTypes;
-	private List<EventProducer> allEventProducers;
+
 	private List<List<EventType>> catEventTypes;
 	// Hierarchy to display the event producer in the settings windows
     private SimpleEventProducerHierarchy eventProducerHierarchy;
@@ -78,6 +85,7 @@ public class OcelotlParameters {
 	private Integer	timeSliceFactor = 1;
 	private boolean overvieweEnable = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
 	private HashMap<EventProducer, Integer> aggregatedLeavesIndex = new HashMap<EventProducer, Integer>();
+	private boolean hasLeaveAggregated = false;
 	
 	private TimeSliceManager timeSliceManager;
 
@@ -97,6 +105,9 @@ public class OcelotlParameters {
 		this.currentProducers = op.currentProducers;
 		// Make a deep copy
 		this.spatiallySelectedProducers = new ArrayList<EventProducer>(op.spatiallySelectedProducers);
+		this.unfilteredEventProducers = new ArrayList<EventProducer>(op.unfilteredEventProducers);
+		this.aggregatedEventProducers = new ArrayList<EventProducer>(op.aggregatedEventProducers);
+		this.currentProducers = op.currentProducers;
 		this.eventTypes = op.eventTypes;
 		this.allEventTypes = op.allEventTypes;
 		this.operatorEventTypes = op.operatorEventTypes;
@@ -126,6 +137,7 @@ public class OcelotlParameters {
 		this.iVisuConfig = op.iVisuConfig;
 		this.statisticOperatorConfig = op.statisticOperatorConfig;
 		this.timeSliceFactor = op.timeSliceFactor;
+		this.hasLeaveAggregated = op.hasLeaveAggregated;
 	}
 	
 	public List<EventProducer> getEventProducers() {
@@ -271,6 +283,7 @@ public class OcelotlParameters {
 	public void setEventProducerHierarchy(
 			SimpleEventProducerHierarchy eventProducerHierarchy) {
 		this.eventProducerHierarchy = eventProducerHierarchy;
+		checkLeaveAggregation();
 	}
 
 	public TimeSliceManager getTimeSliceManager() {
@@ -405,6 +418,14 @@ public class OcelotlParameters {
 		this.overvieweEnable = overvieweEnable;
 	}
 
+	public boolean isHasLeaveAggregated() {
+		return hasLeaveAggregated;
+	}
+
+	public void setHasLeaveAggregated(boolean hasLeaveAggregated) {
+		this.hasLeaveAggregated = hasLeaveAggregated;
+	}
+
 	public HashMap<EventProducer, Integer> getAggregatedLeavesIndex() {
 		return aggregatedLeavesIndex;
 	}
@@ -424,6 +445,24 @@ public class OcelotlParameters {
 		this.currentProducers.addAll(selectedEventProducers);
 	}
 	
+	public List<EventProducer> getUnfilteredEventProducers() {
+		return unfilteredEventProducers;
+	}
+
+	public void setUnfilteredEventProducers(
+			List<EventProducer> unfilteredEventProducers) {
+		this.unfilteredEventProducers = unfilteredEventProducers;
+	}
+
+	public List<EventProducer> getAggregatedEventProducers() {
+		return aggregatedEventProducers;
+	}
+
+	public void setAggregatedEventProducers(
+			List<EventProducer> aggregatedEventProducers) {
+		this.aggregatedEventProducers = aggregatedEventProducers;
+	}
+
 	public List<EventProducer> getSpatiallySelectedProducers() {
 		return spatiallySelectedProducers;
 	}
@@ -451,13 +490,14 @@ public class OcelotlParameters {
 		// If there is no current spatial selection
 		if (spatialSelection == false) {
 			// Then selectedProducer is identical to eventProducers
-			setCurrentProducers(eventProducers);
+			setCurrentProducers(unfilteredEventProducers);
+			// }
 		} else {
 			ArrayList<EventProducer> currentSelection = new ArrayList<EventProducer>();
 
 			// Make the intersection of the selected producers and the filtered
 			// ones
-			for (EventProducer anEP : eventProducers) {
+			for (EventProducer anEP : unfilteredEventProducers) {
 				if (spatiallySelectedProducers.contains(anEP)) {
 					currentSelection.add(anEP);
 				}
@@ -467,4 +507,14 @@ public class OcelotlParameters {
 		}
 	}
 
+	/**
+	 * Check if there will be leave aggregation
+	 */
+	public void checkLeaveAggregation() {
+		setHasLeaveAggregated(false);
+		if (getOcelotlSettings().isAggregateLeaves())
+			if (getEventProducerHierarchy().getLeaves().size() > getOcelotlSettings()
+					.getMaxNumberOfLeaves())
+				setHasLeaveAggregated(true);
+	}
 }
