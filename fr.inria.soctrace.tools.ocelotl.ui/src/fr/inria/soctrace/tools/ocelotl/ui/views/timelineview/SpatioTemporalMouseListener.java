@@ -69,9 +69,10 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 					aggregatedView.setSelectTime(new TimeRegion(moved, fixed));
 			}
 			
-			// If we are not performing an horizontal drag 
+			// If we are not performing an horizontal drag
 			if (!(state == MouseState.DRAG_LEFT_HORIZONTAL)) {
-				// Update the height coordinate with the current one of the mouse
+				// Update the height coordinate with the current one of the
+				// mouse
 				cornerY = arg0.y;
 			}
 			
@@ -80,11 +81,10 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
 			EventProducerNode foundNode = findEventProducerNode(cornerY);
 			Point heights = getSpatialSelectionCoordinates(foundNode);
-			
-			updateEverything(heights.x(),  heights.y(), false, aggregatedView.getPotentialSelectTime());
+
+			updateEverything(heights.x(), heights.y(), false, aggregatedView.getPotentialSelectTime());
 			aggregatedView.getPotentialSelectFigure().draw(aggregatedView.getPotentialSelectTime(), heights.x(), heights.y());
 		}
-
 	}
 
 	@Override

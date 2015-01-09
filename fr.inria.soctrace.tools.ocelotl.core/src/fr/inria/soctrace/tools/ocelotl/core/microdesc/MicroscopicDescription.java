@@ -785,6 +785,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		parameters.setAggregatedLeavesIndex(new HashMap<EventProducer, Integer>());
 		parameters.setAggregatedEventProducers(new ArrayList<EventProducer>());
 		parameters.checkLeaveAggregation();
+		activeProducers = new ArrayList<EventProducer>();
+		aggregatedProducers = new HashMap<EventProducer, EventProducer>(); 
 		
 		// Check whether we should aggregate the leaves of the event producers
 		// hierarchy
@@ -845,6 +847,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	 * difference between the current producers and the active ones
 	 */
 	public void computeInactiveProducers() {
+		inactiveProducers = new ArrayList<EventProducer>();
 		for (EventProducer ep : parameters.getCurrentProducers())
 			if (!activeProducers.contains(ep))
 				inactiveProducers.add(ep);
@@ -985,15 +988,28 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 		// Aggregate the leaves until we are under the limit
 		for (SimpleEventProducerNode aNode : nodes) {
-			for (SimpleEventProducerNode aChildNode : aNode.getChildrenNodes()) {
-				aggregatedProducers.put(aChildNode.getMe(), aNode.getMe());
-				parameters.getAggregatedEventProducers().add(aChildNode.getMe());
-			}
-			logger.debug("The children nodes of the following operator were aggregated: "
-					+ aNode.getName() + " (" + aNode.getID() + ")");
-			parameters.getAggregatedLeavesIndex().put(aNode.getMe(), aNode.getChildrenNodes().size());
+			if (!parameters.getCurrentProducers().contains(aNode.getMe()))
+				continue;
 
-			limit = limit - (aNode.getChildrenNodes().size() - 1);
+			int numberOfAggregatedLeaves = 0;
+			for (SimpleEventProducerNode aChildNode : aNode.getChildrenNodes()) {
+				if (!parameters.getCurrentProducers().contains(
+						aChildNode.getMe()))
+					continue;
+
+				aggregatedProducers.put(aChildNode.getMe(), aNode.getMe());
+				parameters.getAggregatedEventProducers()
+						.add(aChildNode.getMe());
+				numberOfAggregatedLeaves++;
+			}
+			logger.debug(numberOfAggregatedLeaves
+					+ " children nodes of the following operator were aggregated: "
+					+ aNode.getName() + " (" + aNode.getID() + ")");
+			parameters.getAggregatedLeavesIndex().put(aNode.getMe(),
+					numberOfAggregatedLeaves);
+
+			// -1 because the parent node becomes a leaf
+			limit = limit - (numberOfAggregatedLeaves - 1);
 			if (limit <= 0)
 				break;
 		}

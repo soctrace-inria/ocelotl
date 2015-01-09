@@ -1685,6 +1685,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
 		ocelotlParameters.updateCurrentProducers();
+		
+		// If there are aggregated leave, then it is necessary to update the
+		// spatial selection
+		if (ocelotlParameters.isSpatialSelection())
+			ocelotlParameters.setSpatiallySelectedProducers(ocelotlParameters.getCurrentProducers());
+	
 		ocelotlParameters.setParameterPPolicy(ocelotlParameters.getOcelotlSettings().getParameterPPolicy());
 		ocelotlParameters.setOvervieweEnable(ocelotlParameters.getOcelotlSettings().isEnableOverview());
 		

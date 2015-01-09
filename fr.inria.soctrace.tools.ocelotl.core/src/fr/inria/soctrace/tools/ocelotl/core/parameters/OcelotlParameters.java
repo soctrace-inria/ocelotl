@@ -491,7 +491,6 @@ public class OcelotlParameters {
 		if (spatialSelection == false) {
 			// Then selectedProducer is identical to eventProducers
 			setCurrentProducers(unfilteredEventProducers);
-			// }
 		} else {
 			ArrayList<EventProducer> currentSelection = new ArrayList<EventProducer>();
 
@@ -500,6 +499,16 @@ public class OcelotlParameters {
 			for (EventProducer anEP : unfilteredEventProducers) {
 				if (spatiallySelectedProducers.contains(anEP)) {
 					currentSelection.add(anEP);
+
+					// If there are aggregated leaves then add them to the selection
+					if (aggregatedLeavesIndex.containsKey(anEP)) {
+						for (EventProducer anAggregEP : aggregatedEventProducers) {
+							if (eventProducerHierarchy.getEventProducerNodes()
+									.get(anAggregEP.getId()).getParentNode()
+									.getMe().equals(anEP))
+								currentSelection.add(anAggregEP);
+						}
+					}
 				}
 			}
 
@@ -512,9 +521,16 @@ public class OcelotlParameters {
 	 */
 	public void checkLeaveAggregation() {
 		setHasLeaveAggregated(false);
+		int numberOfLeaves = 0;
+
+		// Get the current number of leaves
 		if (getOcelotlSettings().isAggregateLeaves())
-			if (getEventProducerHierarchy().getLeaves().size() > getOcelotlSettings()
-					.getMaxNumberOfLeaves())
-				setHasLeaveAggregated(true);
+			for (EventProducer anEP : currentProducers)
+				if (getEventProducerHierarchy().getLeaves().keySet()
+						.contains(anEP.getId()))
+					numberOfLeaves++;
+		
+		if (numberOfLeaves > getOcelotlSettings().getMaxNumberOfLeaves())
+			setHasLeaveAggregated(true);
 	}
 }

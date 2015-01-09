@@ -107,12 +107,13 @@ public class StateLeaveSummaryStat extends SummaryStat{
 
 				// If its parent is selected and active then add it (case where
 				// there is aggregation)
-				if (ocelotlview.getOcelotlParameters()
-						.getSpatiallySelectedProducers()
-						.contains(anSepn.getParentNode().getMe())
-						&& microModel.getActiveProducers().contains(
-								anSepn.getParentNode().getMe()))
-					aggregatedProd.add(anSepn.getParentNode().getMe());
+				if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
+					if (ocelotlview.getOcelotlParameters()
+							.getSpatiallySelectedProducers()
+							.contains(anSepn.getParentNode().getMe())
+							&& microModel.getActiveProducers().contains(
+									anSepn.getParentNode().getMe()))
+						aggregatedProd.add(anSepn.getParentNode().getMe());
 			}
 
 			// For all prod that are aggregation of leaves, add the

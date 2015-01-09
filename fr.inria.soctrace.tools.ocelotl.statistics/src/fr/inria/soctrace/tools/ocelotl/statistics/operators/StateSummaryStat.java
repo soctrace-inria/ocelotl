@@ -70,8 +70,7 @@ public class StateSummaryStat extends SummaryStat {
 	 * Get the number of producers
 	 * @return
 	 */
-	public int getNumberOfProducers()
-	{
+	public int getNumberOfProducers() {
 		int nbProducers = 0;
 		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
 			ArrayList<EventProducer> currentSelection = new ArrayList<EventProducer>();
