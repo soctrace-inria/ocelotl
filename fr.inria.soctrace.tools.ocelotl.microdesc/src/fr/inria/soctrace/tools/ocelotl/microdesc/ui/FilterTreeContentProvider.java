@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 
 /**
@@ -52,6 +51,7 @@ public class FilterTreeContentProvider implements ITreeContentProvider {
 			result.addAll(((SimpleEventProducerNode) parentElement)
 					.getChildrenNodes());
 		}
+
 		return result.toArray();
 	}
 

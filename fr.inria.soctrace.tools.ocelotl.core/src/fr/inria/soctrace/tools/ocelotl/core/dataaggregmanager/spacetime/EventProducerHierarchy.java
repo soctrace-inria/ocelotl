@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.inria.soctrace.framesoc.ui.utils.AlphanumComparator;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
@@ -154,12 +155,10 @@ public class EventProducerHierarchy {
 			Collections.sort(childrenNodes,
 					new Comparator<EventProducerNode>() {
 						@Override
-						public int compare(EventProducerNode arg0,
-								EventProducerNode arg1) {
-							return arg0
-									.getMe()
-									.getName()
-									.compareToIgnoreCase(arg1.getMe().getName());
+						public int compare(EventProducerNode o1,
+								EventProducerNode o2) {
+							return AlphanumComparator.compare(o1.getMe()
+									.getName(), o2.getMe().getName());
 						}
 					});
 		}
@@ -375,9 +374,11 @@ public class EventProducerHierarchy {
 
 	public EventProducerHierarchy(List<EventProducer> eventProducers, Microscopic3DDescription microModel3D) throws OcelotlException {
 		super();
+		
 		for (EventProducer ep : eventProducers) {
 			this.eventProducers.put(ep.getId(), ep);
 		}
+		
 		root = null;
 		this.microModel3D = microModel3D;
 		maxHierarchyLevel = 0;

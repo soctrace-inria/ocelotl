@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.inria.soctrace.framesoc.ui.utils.AlphanumComparator;
 import fr.inria.soctrace.lib.model.EventProducer;
 
 public class SimpleEventProducerHierarchy {
 
 	public class SimpleEventProducerNode {
-
 		private int id;
 		private String name;
 		private EventProducer me;
@@ -102,18 +105,22 @@ public class SimpleEventProducerHierarchy {
 			this.hierarchyLevel = hierarchyLevel;
 		}
 
+		/**
+		 * Sort the children node and all its children
+		 */
 		public void sortChildrenNodes() {
 			Collections.sort(childrenNodes,
 					new Comparator<SimpleEventProducerNode>() {
 						@Override
-						public int compare(SimpleEventProducerNode arg0,
-								SimpleEventProducerNode arg1) {
-							return arg0
-									.getMe()
-									.getName()
-									.compareToIgnoreCase(arg1.getMe().getName());
+						public int compare(SimpleEventProducerNode o1,
+								SimpleEventProducerNode o2) {
+							return AlphanumComparator.compare(o1.getMe()
+									.getName(), o2.getMe().getName());
 						}
 					});
+			for (SimpleEventProducerNode aChildNode : childrenNodes) {
+				aChildNode.sortChildrenNodes();
+			}
 		}
 
 		public void destroy() {
@@ -135,6 +142,7 @@ public class SimpleEventProducerHierarchy {
 	private Map<Integer, SimpleEventProducerNode> orphans = new HashMap<Integer, SimpleEventProducerNode>();
 	private Map<Integer, SimpleEventProducerNode> leaves = new HashMap<Integer, SimpleEventProducerNode>();
 	private Map<Integer, EventProducer> eventProducers = new HashMap<Integer, EventProducer>();
+	private static final Logger logger = LoggerFactory.getLogger(SimpleEventProducerHierarchy.class);
 	protected int maxHierarchyLevel;
 	
 	/**
@@ -157,9 +165,11 @@ public class SimpleEventProducerHierarchy {
 			if (!eventProducerNodes.containsKey(ep.getId()))
 				eventProducerNodes.put(ep.getId(), new SimpleEventProducerNode(ep));
 		}
+		
+		root.sortChildrenNodes();
+		
 		if (!orphans.isEmpty()) {
-			System.err
-					.println("Careful: hierarchy is incomplete and some elements will be destroyed!");
+			logger.error("Error: The event producer hierarchy contains elements without a parent.");
 			for (Integer orphan : orphans.keySet()) {
 				if (orphans.containsKey(orphan))
 					orphans.get(orphan).destroy();

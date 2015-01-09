@@ -55,6 +55,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.framesoc.ui.utils.AlphanumComparator;
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
@@ -463,6 +464,15 @@ public abstract class DistributionBaseView extends Dialog implements
 		treeViewerEventProducer.expandAll();
 		treeViewerEventProducer.setComparator(new ViewerComparator());
 		treeViewerEventProducer.addCheckStateListener(new CheckStateListener());
+		treeViewerEventProducer.setComparator(new ViewerComparator(
+				new Comparator<String>() {
+					@Override
+					public int compare(String o1,
+							String o2) {
+						return AlphanumComparator.compare(o1,
+								o2);
+					}
+				}));
 		
 		// Buttons
 		Composite buttonComposite = new Composite(groupEventProducers, SWT.RIGHT);
@@ -646,7 +656,6 @@ public abstract class DistributionBaseView extends Dialog implements
 			producers.add(anEPNode.getMe());
 		}
 	}
-
 
 	/**
 	 * Check an element
