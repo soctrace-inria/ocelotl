@@ -2,9 +2,6 @@ package fr.inria.soctrace.tools.ocelotl.statistics.view;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -13,7 +10,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -61,11 +57,6 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	private Composite compositeTable;
 
 	/**
-	 * Images
-	 */
-	private Map<String, Image> images = new HashMap<String, Image>();
-	
-	/**
 	 * Constructor
 	 */
 	public StatTableView(OcelotlView theView) {
@@ -85,8 +76,6 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		// If color has changed
 		if ((topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED))) {
 			if (statProvider != null && statProvider.getTableData() != null && tableViewer != null) {
-				// Get rid of the cached images
-				disposeImages();
 				// Update colors and the table
 				statProvider.updateColor();
 				updateTableData();
@@ -100,17 +89,6 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		updateData();
 	}
 	
-	/**
-	 * Delete cached images (square next to the event types)
-	 */
-	private void disposeImages() {
-		Iterator<Image> it = images.values().iterator();
-		while (it.hasNext()) {
-			it.next().dispose();
-		}
-		images.clear();
-	}
-
 	@Override
 	public void deleteDiagram() {
 		if (tableViewer != null)
@@ -204,7 +182,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				// the label provider also puts the image
 				elemsViewerCol
 						.setLabelProvider(new OcelotlStatisticsTableRowLabelProvider(
-								col, images));
+								col));
 			} else
 				elemsViewerCol.setLabelProvider(new TableRowLabelProvider(col));
 

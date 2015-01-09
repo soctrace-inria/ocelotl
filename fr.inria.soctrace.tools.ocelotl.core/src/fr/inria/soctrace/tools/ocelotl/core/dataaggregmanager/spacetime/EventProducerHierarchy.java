@@ -518,9 +518,16 @@ public class EventProducerHierarchy {
 		
 		for (EventProducerNode epn : leaves.values()) {
 			if ((epn.index + epn.weight > start && epn.index + epn.weight < end)
-					|| (epn.index >= start && epn.index <= end)
-					|| (start >= epn.index && end <= epn.index + epn.weight))
+					|| (epn.index >= start && epn.index <= end))
+					
 				containedEpn.add(epn);
+		}
+
+		if (containedEpn.isEmpty()) {
+			for (EventProducerNode epn : leaves.values()) {
+				if (start >= epn.index && end <= epn.index + epn.weight)
+					containedEpn.add(epn);
+			}
 		}
 		return containedEpn;
 	}
