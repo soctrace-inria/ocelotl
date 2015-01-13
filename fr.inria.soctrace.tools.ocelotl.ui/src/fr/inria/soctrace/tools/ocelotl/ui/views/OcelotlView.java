@@ -37,6 +37,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.StatusLineContributionItem;
+import org.eclipse.jface.action.SubStatusLineManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -48,6 +50,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -436,6 +439,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							unitAxisView.deleteDiagram();
 							unitAxisView.createDiagram(ocelotlCore.getVisuOperator());
+							updateStatus();
 							
 							if (ocelotlParameters.isOvervieweEnable()) {
 								try {
@@ -1017,6 +1021,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private SashForm					mainViewTopSashform;
 	private SashForm					mainViewBottomSashform;
 	private Composite					compositeTimeAxisView;
+	private SubStatusLineManager			statusLineManager;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1476,7 +1481,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		toolBar.add(snapshotAction);
 		toolBar.add(prevZoom);
 		toolBar.add(nextZoom);
-
+		
+		statusLineManager = (SubStatusLineManager) actionBars.getStatusLineManager();
+	
 		refreshTraces();
 
 		cleanAll();
@@ -1891,5 +1898,38 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Update the status bar
+	 */
+	private void updateStatus() {
+		final Image img = ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/warn_tsk.gif");
+		String message = "";
+		boolean messageToDisplay = false;
+		statusLineManager.removeAll();
+
+		if (getOcelotlParameters().isHasLeaveAggregated()) {
+			message = "Some event producers were aggregated. ";
+			messageToDisplay = true;
+		}
+
+		if (getOcelotlParameters().isApproximateRebuild()) {
+			message = message + "The aggregation was performed using an approximate version of the cache.";
+			messageToDisplay = true;
+		}
+
+		if (messageToDisplay) {
+			StatusLineContributionItem myImage = new StatusLineContributionItem("Warning");
+			myImage.setText(message);
+			statusLineManager.setMessage(img, message);
+			statusLineManager.setVisible(true);
+		}
+		else
+		{
+			statusLineManager.setVisible(false);
+		}
+		
+		statusLineManager.update(true);
 	}
 }

@@ -359,6 +359,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 		monitor.setTaskName("Rebuilding the matrix with the fast strategy");
 		monitor.subTask("Initializing");
+		
+		parameters.setApproximateRebuild(true);
 
 		// Contains the proportion factor for the dirty cached time slices
 		HashMap<TimeSlice, List<Double>> cachedSliceProportions = new HashMap<TimeSlice, List<Double>>();
@@ -787,6 +789,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		parameters.checkLeaveAggregation();
 		activeProducers = new ArrayList<EventProducer>();
 		aggregatedProducers = new HashMap<EventProducer, EventProducer>(); 
+		parameters.setApproximateRebuild(false);
 		
 		// Check whether we should aggregate the leaves of the event producers
 		// hierarchy

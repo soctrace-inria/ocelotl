@@ -86,6 +86,7 @@ public class OcelotlParameters {
 	private boolean overvieweEnable = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
 	private HashMap<EventProducer, Integer> aggregatedLeavesIndex = new HashMap<EventProducer, Integer>();
 	private boolean hasLeaveAggregated = false;
+	private boolean approximateRebuild = false;
 	
 	private TimeSliceManager timeSliceManager;
 
@@ -138,6 +139,7 @@ public class OcelotlParameters {
 		this.statisticOperatorConfig = op.statisticOperatorConfig;
 		this.timeSliceFactor = op.timeSliceFactor;
 		this.hasLeaveAggregated = op.hasLeaveAggregated;
+		this.approximateRebuild = op.approximateRebuild;
 	}
 	
 	public List<EventProducer> getEventProducers() {
@@ -482,6 +484,14 @@ public class OcelotlParameters {
 		this.spatialSelection = spatialSelection;
 	}
 	
+	public boolean isApproximateRebuild() {
+		return approximateRebuild;
+	}
+
+	public void setApproximateRebuild(boolean approximateRebuild) {
+		this.approximateRebuild = approximateRebuild;
+	}
+
 	/**
 	 * Update the selected producers when the filtered event producers has
 	 * changed
