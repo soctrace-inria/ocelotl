@@ -29,8 +29,8 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.
 
 public class ColorsConfig implements IVisuConfig {
 
-	private List<EventType>	types	= new LinkedList<EventType>();
-	private EventColorManager colors;
+	protected List<EventType>	types	= new LinkedList<EventType>();
+	protected EventColorManager colors;
 
 	public ColorsConfig() {
 		super();

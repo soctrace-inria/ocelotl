@@ -235,7 +235,6 @@ public abstract class DistributionBaseView extends Dialog implements
 			final Collection<?> c = (Collection<?>) viewer.getInput();
 			c.clear();
 			viewer.refresh(false);
-			// hasChanged = HasChanged.ALL;
 		}
 	}
 

@@ -24,9 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
-import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.ISpaceTimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuSTOperator;
+import fr.inria.soctrace.tools.ocelotl.visualizations.config.spatiotemporal.SpatioTemporalConfig;
 
 public abstract class SpatiotemporalMode extends VisuSTOperator {
 
@@ -52,7 +53,28 @@ public abstract class SpatiotemporalMode extends VisuSTOperator {
 	}
 
 	protected List<String> getEvents() {
-		return ((SpaceTimeAggregation2Manager) lpaggregManager).getKeys();
+		return ((SpatioTemporalConfig) ocelotlCore.getOcelotlParameters().getVisuConfig()).getTypeNames();
+	}
+	
+	@Override
+	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
+		this.ocelotlCore = ocelotlCore;
+		lpaggregManager = (ISpaceTimeManager) ocelotlCore.getLpaggregManager();
+		timeSliceNumber = ocelotlCore.getOcelotlParameters()
+				.getTimeSlicesNumber();
+		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()
+				.getTimeDuration()
+				/ timeSliceNumber;
+		hierarchy = lpaggregManager.getHierarchy();
+		
+		SpatioTemporalConfig config = ((SpatioTemporalConfig) ocelotlCore
+				.getOcelotlParameters().getVisuConfig());
+		if (config.getTypes().isEmpty())
+			config.getTypes().addAll(
+					ocelotlCore.getOcelotlParameters().getOperatorEventTypes());
+		
+		initParts();
+		computeParts();
 	}
 
 	protected abstract void computeProportions(EventProducerNode node);

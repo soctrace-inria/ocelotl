@@ -103,7 +103,6 @@ public class ColorsConfigView extends Dialog implements IVisualizationWindow {
 
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		// parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		Composite all = (Composite) super.createDialogArea(parent);
 		final SashForm sashFormGlobal = new SashForm(all, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));

@@ -1,29 +1,14 @@
-/* =====================================================================
- * Ocelotl Visualization Tool
- * =====================================================================
- * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
- * overview by using aggregation techniques
- *
- * (C) Copyright 2013 INRIA
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     Damien Dosimont <damien.dosimont@imag.fr>
- *     Generoso Pagano <generoso.pagano@inria.fr>
- */
-package fr.inria.soctrace.tools.ocelotl.visualizations.config.eventcolor;
+package fr.inria.soctrace.tools.ocelotl.visualizations.config.spatiotemporal;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -31,13 +16,19 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -57,11 +48,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.wb.swt.ResourceManager;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBus;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
@@ -69,51 +66,34 @@ import fr.inria.soctrace.framesoc.ui.Activator;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColor;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ColorsChangeDescriptor;
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.ModelEntity;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IVisualizationWindow;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-/**
- * Dialog to manage Framesoc colors
- * 
- * @author "Generoso Pagano <generoso.pagano@inria.fr>"
- */
-public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
+public class SpatioTemporalConfigView extends Dialog implements IVisualizationWindow {
 
-	/**
-	 * Model entity combo
-	 */
+	// Model entity combo
 	private Combo comboModelEntity;
 
-	/**
-	 * Filter text
-	 */
+	// Filter text
 	private Text textFilter;
 
-	/**
-	 * The viewer
-	 */
+	// The viewer
 	private TableViewer tableViewer;
-	
-	/**
-	 * Entity managed
-	 */
+
+	// Entity managed
 	private ModelEntity entity;
 
-	/**
-	 * Edit button
-	 */
+	// Edit button
 	private Button btnEdit;
-	
-	/**
-	 * Reset button
-	 */
-	protected Button btnReset;
 
-	/**
-	 * Color images
-	 */
+	// Reset button
+	protected Button btnReset;
+	private TabFolder tabFolder;
+
+	// Color images
 	private Map<String, Image> images;
 	
 	private class Entity  {
@@ -125,18 +105,23 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 		}
 	}
 	
+	@Override
+	protected void configureShell(final Shell newShell) {
+		super.configureShell(newShell);
+		newShell.setText("Spatiotemporal Visualization Settings");
+	}
+	
 	private Map<Integer, Entity> entities;
-
 	private OcelotlView ocelotlView;
-
-	private ColorsConfig config;
+	private SpatioTemporalConfig config;
 	private final static String ET_NAME = "Event Types";
+	protected ListViewer listViewerEventTypes;
 			
 	/**
 	 * Constructor
 	 * @param parentShell shell
 	 */
-	public ManageColorsDialog(Shell parentShell) {
+	public SpatioTemporalConfigView(Shell parentShell) {
 		super(parentShell);
 		this.images = new HashMap<String, Image>();
 		this.entities = new TreeMap<Integer, Entity>();
@@ -145,11 +130,24 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 	
     @Override
     protected Control createDialogArea(Composite parent) {
-
     	Composite all = (Composite) super.createDialogArea(parent);
     	config.setTypes(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
         
-        comboModelEntity = new Combo(all, SWT.READ_ONLY);
+		final SashForm sashFormGlobal = new SashForm(all, SWT.VERTICAL);
+		sashFormGlobal.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+		tabFolder = new TabFolder(sashFormGlobal, SWT.NONE);
+		tabFolder.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
+    	
+		// Aggregation settings
+		final TabItem tbtmColorParameters = new TabItem(tabFolder, 0);
+		tbtmColorParameters.setText("Set Colors");
+		
+		final SashForm sashFormAdvancedParameters = new SashForm(tabFolder, SWT.VERTICAL);
+		tbtmColorParameters.setControl(sashFormAdvancedParameters);
+		
+        comboModelEntity = new Combo(sashFormAdvancedParameters, SWT.READ_ONLY);
         comboModelEntity.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         Iterator<Entry<Integer, Entity>> it = entities.entrySet().iterator();
         while (it.hasNext()) {
@@ -170,7 +168,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
         	}
 		});
         
-        textFilter = new Text(all, SWT.BORDER);
+        textFilter = new Text(sashFormAdvancedParameters, SWT.BORDER);
         textFilter.addModifyListener(new ModifyListener() {
         	@Override
 			public void modifyText(ModifyEvent e) {
@@ -179,7 +177,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
         });
         textFilter.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
     	
-        Composite composite = new Composite(all, SWT.NONE);
+        Composite composite = new Composite(sashFormAdvancedParameters, SWT.NONE);
         GridLayout gl_composite = new GridLayout(2, false);
         gl_composite.verticalSpacing = 0;
         gl_composite.marginWidth = 0;
@@ -266,7 +264,80 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
         		tableViewer.refresh(true);
         	}
         });
+
+		sashFormAdvancedParameters.setWeights(new int[] { 1, 1, 10 });
         
+		// Event Type selection
+		final TabItem tbtmEventSelection = new TabItem(tabFolder, SWT.NONE);
+		tbtmEventSelection.setText("Event Type Selection");
+		
+		final Group groupEventTypes = new Group(tabFolder, SWT.NONE);
+		tbtmEventSelection.setControl(groupEventTypes);
+		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
+		groupEventTypes.setText("Set Event Types");
+		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
+		gl_groupEventTypes.horizontalSpacing = 0;
+		groupEventTypes.setLayout(gl_groupEventTypes);
+
+		listViewerEventTypes = new ListViewer(groupEventTypes, SWT.BORDER
+				| SWT.H_SCROLL | SWT.V_SCROLL);
+		listViewerEventTypes.setContentProvider(new ArrayContentProvider());
+		listViewerEventTypes.setLabelProvider(new EventTypeLabelProvider());
+		listViewerEventTypes.setComparator(new ViewerComparator());
+		final List listEventTypes = listViewerEventTypes.getList();
+		listEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
+		listEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+				true, 1, 1));
+
+		final ScrolledComposite scrCompositeEventTypeButtons = new ScrolledComposite(
+				groupEventTypes, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrCompositeEventTypeButtons.setLayoutData(new GridData(SWT.FILL,
+				SWT.FILL, false, false, 1, 1));
+		scrCompositeEventTypeButtons.setExpandHorizontal(true);
+		scrCompositeEventTypeButtons.setExpandVertical(true);
+
+		final Composite compositeEventTypeButtons = new Composite(
+				scrCompositeEventTypeButtons, SWT.NONE);
+		compositeEventTypeButtons.setLayout(new GridLayout(1, false));
+
+		final Button btnAddEventTypes = new Button(compositeEventTypeButtons,
+				SWT.NONE);
+		btnAddEventTypes.setText("Add");
+		btnAddEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
+		btnAddEventTypes.setImage(null);
+		btnAddEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 1, 1));
+		btnAddEventTypes.addSelectionListener(new TypesSelectionAdapter());
+
+		final Button btnRemoveEventTypes = new Button(
+				compositeEventTypeButtons, SWT.NONE);
+		btnRemoveEventTypes.setText("Remove");
+		btnRemoveEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
+		btnRemoveEventTypes.setImage(null);
+		btnRemoveEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+				true, false, 1, 1));
+		scrCompositeEventTypeButtons.setContent(compositeEventTypeButtons);
+		scrCompositeEventTypeButtons.setMinSize(compositeEventTypeButtons
+				.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		btnRemoveEventTypes.addSelectionListener(new RemoveSelectionAdapter(
+				listViewerEventTypes));
+		Button btnResetEventTypes = new Button(compositeEventTypeButtons,
+				SWT.NONE);
+		btnResetEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+				true, false, 1, 1));
+		btnResetEventTypes.setText("Reset");
+		btnResetEventTypes.addSelectionListener(new ResetSelectionAdapter(
+				listViewerEventTypes));
+		btnResetEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
+				SWT.NORMAL));
+		btnResetEventTypes.setImage(null);
+		
+		listViewerEventTypes.setInput(config.getTypes());
+		
         return composite;
     }	
     
@@ -283,12 +354,14 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
        	images.clear();
     }
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected void okPressed() {
     	saveColors();
     	ColorsChangeDescriptor des = new ColorsChangeDescriptor();
     	des.setEntity(entity);
     	FramesocBus.getInstance().send(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED, des);
+    	config.setTypes((java.util.List<EventType>) listViewerEventTypes.getInput());
     	super.okPressed();
     }
     
@@ -319,6 +392,7 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 	
 	private Collection<String> getNames() {
 			return config.getTypeNames();
+
 	}
    
     @Override
@@ -380,10 +454,92 @@ public class ManageColorsDialog extends Dialog implements IVisualizationWindow{
 		}
 	}
 
-	@Override
-	public void init(OcelotlView ocelotlView, IVisuConfig config) {
-		this.ocelotlView = ocelotlView;
-		this.config = (ColorsConfig) config;
-		
+	private class EventTypeLabelProvider extends LabelProvider {
+
+		@Override
+		public String getText(final Object element) {
+			return ((EventType) element).getName();
+		}
 	}
-} 
+
+	@Override
+	public void init(OcelotlView ocelotlView, IVisuConfig aConfig) {
+		this.ocelotlView = ocelotlView;
+		this.config = (SpatioTemporalConfig) aConfig;
+		if (config.getTypes().isEmpty())
+			config.getTypes().addAll(ocelotlView.getOcelotlParameters().getOperatorEventTypes());	
+	}
+	
+	private class TypesSelectionAdapter extends SelectionAdapter {
+		// allEvents - input
+		java.util.List<EventType> diff(final java.util.List<EventType> allEvents,
+				final java.util.List<EventType> input) {
+			final java.util.List<EventType> tmp = new ArrayList<>();
+			for (final EventType anET : allEvents)
+				tmp.add(anET);
+			tmp.removeAll(input);
+			Collections.sort(tmp, new Comparator<EventType>() {
+				@Override
+				public int compare(EventType arg0, EventType arg1) {
+					return arg0.getName().compareToIgnoreCase(arg1.getName());
+				}
+			});
+			return tmp;
+		}
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (ocelotlView.getConfDataLoader().getCurrentTrace() == null)
+				return;
+			final ListSelectionDialog dialog = new ListSelectionDialog(
+					getShell(), diff(getEventTypes(), config.getTypes()),
+					new ArrayContentProvider(), new EventTypeLabelProvider(),
+					"Select Event Types");
+			if (dialog.open() == Window.CANCEL)
+				return;
+			for (final Object o : dialog.getResult())
+				config.getTypes().add((EventType) o);
+			listViewerEventTypes.setInput(config.getTypes());
+		}
+	}
+	
+	protected java.util.List<EventType> getEventTypes() {
+		java.util.List<EventType> types = new ArrayList<EventType>();
+		types.addAll(ocelotlView.getOcelotlParameters().getOperatorEventTypes());	
+		return types;
+	}
+	
+	private class RemoveSelectionAdapter extends SelectionAdapter {
+		private final ListViewer viewer;
+
+		public RemoveSelectionAdapter(final ListViewer viewer) {
+			this.viewer = viewer;
+		}
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			final IStructuredSelection selection = (IStructuredSelection) viewer
+					.getSelection();
+			final Object obj = selection.getFirstElement();
+			final Collection<?> c = (Collection<?>) viewer.getInput();
+			c.remove(obj);
+			viewer.refresh(false);
+		}
+	}
+
+	private class ResetSelectionAdapter extends SelectionAdapter {
+		private final ListViewer viewer;
+
+		public ResetSelectionAdapter(final ListViewer viewer) {
+			this.viewer = viewer;
+		}
+
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			final Collection<?> c = (Collection<?>) viewer.getInput();
+			c.clear();
+			viewer.refresh(false);
+		}
+	}
+	
+}
