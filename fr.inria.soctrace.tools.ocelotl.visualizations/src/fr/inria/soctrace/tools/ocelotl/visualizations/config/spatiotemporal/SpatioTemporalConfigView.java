@@ -131,7 +131,6 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
     @Override
     protected Control createDialogArea(Composite parent) {
     	Composite all = (Composite) super.createDialogArea(parent);
-    	config.setTypes(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
         
 		final SashForm sashFormGlobal = new SashForm(all, SWT.VERTICAL);
 		sashFormGlobal.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -467,15 +466,17 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 		this.ocelotlView = ocelotlView;
 		this.config = (SpatioTemporalConfig) aConfig;
 		if (config.getTypes().isEmpty())
-			config.getTypes().addAll(ocelotlView.getOcelotlParameters().getOperatorEventTypes());	
+	    	config.getTypes().addAll(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
+
+		config.checkForFilteredType(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
 	}
 	
 	private class TypesSelectionAdapter extends SelectionAdapter {
-		// allEvents - input
-		java.util.List<EventType> diff(final java.util.List<EventType> allEvents,
+		// allUnfilteredEvents - input
+		java.util.List<EventType> diff(final java.util.List<EventType> allUnfilteredEvents,
 				final java.util.List<EventType> input) {
 			final java.util.List<EventType> tmp = new ArrayList<>();
-			for (final EventType anET : allEvents)
+			for (final EventType anET : allUnfilteredEvents)
 				tmp.add(anET);
 			tmp.removeAll(input);
 			Collections.sort(tmp, new Comparator<EventType>() {
@@ -505,7 +506,7 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 	
 	protected java.util.List<EventType> getEventTypes() {
 		java.util.List<EventType> types = new ArrayList<EventType>();
-		types.addAll(ocelotlView.getOcelotlParameters().getOperatorEventTypes());	
+		types.addAll(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());	
 		return types;
 	}
 	

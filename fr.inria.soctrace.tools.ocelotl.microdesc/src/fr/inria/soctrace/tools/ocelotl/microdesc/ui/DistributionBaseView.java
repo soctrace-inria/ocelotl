@@ -61,6 +61,7 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IAggregationWindow;
@@ -608,7 +609,32 @@ public abstract class DistributionBaseView extends Dialog implements
 	@Override
 	protected void okPressed() {
 		params.setUnfilteredEventProducers(producers);
+		
+		// Check if event types have been modified
+		if(checkEventTypesModified())
+			ocelotlView.setHasChanged(HasChanged.ALL);
+		
 		super.okPressed();
+	}
+
+	/**
+	 * Check if there were modifications on the event types
+	 * 
+	 * @return true if there were modifications, false otherwise
+	 */
+	private boolean checkEventTypesModified() {
+		if (config.getTypes().size() != oldEventTypes.size())
+			return true;
+
+		for (EventType anET : config.getTypes())
+			if (!oldEventTypes.contains(anET))
+				return true;
+
+		for (EventType anET : oldEventTypes)
+			if (!config.getTypes().contains(anET))
+				return true;
+
+		return false;
 	}
 
 	@Override

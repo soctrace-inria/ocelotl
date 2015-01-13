@@ -40,4 +40,21 @@ public class SpatioTemporalConfig implements IVisuConfig {
 	public void initColors() {
 		this.colors = new EventColorManager();
 	}
+	
+	/**
+	 * Check that the types contain in the config are not filtered out and if so
+	 * remove them
+	 * 
+	 * @param notFilteredTypes
+	 *            the event types that are not filtered
+	 */
+	public void checkForFilteredType(List<EventType> notFilteredTypes) {
+		ArrayList<EventType> typesToRemove = new ArrayList<EventType>();
+
+		for (EventType anET : types) {
+			if (!notFilteredTypes.contains(anET))
+				typesToRemove.add(anET);
+		}
+		types.removeAll(typesToRemove);
+	}
 }
