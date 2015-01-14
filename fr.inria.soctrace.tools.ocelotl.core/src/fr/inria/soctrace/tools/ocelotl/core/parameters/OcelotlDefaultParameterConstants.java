@@ -121,7 +121,7 @@ public class OcelotlDefaultParameterConstants {
 	public static final int MIN_NUMBER_OF_THREAD = 1;
 	public static final int MAX_NUMBER_OF_THREAD = 1000000;
 	
-	public static final int MIN_NUMBER_OF_AGGLEAVES = 100;
+	public static final int MIN_NUMBER_OF_AGGLEAVES = 10;
 	public static final int MAX_NUMBER_OF_AGGLEAVES = 100000000;
 	
 	public static final int MIN_EVENT_PRODUCERS_PER_QUERY = 0;

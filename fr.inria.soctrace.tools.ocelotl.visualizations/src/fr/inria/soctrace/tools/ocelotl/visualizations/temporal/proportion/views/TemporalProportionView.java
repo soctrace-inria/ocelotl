@@ -176,7 +176,7 @@ public class TemporalProportionView extends TimeLineView {
 							.getPart(index).getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
 							(int) (y0 - y1 * total / maxValue)), new Point(
 							(int) (distribution.getPart(index).getEndPart() * drawingAreaWidth
-									/ numberOfTimeSlice - stackSpace + aBorder), (int) (y0 + stackSpace - y1
+									/ numberOfTimeSlice - space + aBorder), (int) (y0 + stackSpace - y1
 									* (total + agg) / maxValue))));
 				} else { // else display as a dash line and an icon
 					int size = (int) Math.min(IconMax,
@@ -189,14 +189,15 @@ public class TemporalProportionView extends TimeLineView {
 										* drawingAreaWidth / numberOfTimeSlice + aBorder + 1), (int) (y0 - y1
 										* total / maxValue)), new Point(
 								(int) (distribution.getPart(index).getEndPart()
-										* drawingAreaWidth / numberOfTimeSlice - stackSpace - 1 + aBorder),
+										* drawingAreaWidth / numberOfTimeSlice - space - 1 + aBorder),
 								(int) (y0 - y1 * (total) / maxValue)));
 						root.add(lineDash);
 						root.add(icon, new Rectangle(new Point((int) (distribution
 								.getPart(index).getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
-								(int) (y0 - y1 * total / maxValue) - stackSpace), new Point(
+										(int) (y0 - y1 * total / maxValue)
+												- stackSpace), new Point(
 								(int) (distribution.getPart(index).getEndPart()
-										* drawingAreaWidth / numberOfTimeSlice - stackSpace + aBorder), (int) (y0 - y1
+										* drawingAreaWidth / numberOfTimeSlice - space + aBorder), (int) (y0 - y1
 										* (total) / maxValue)
 										- size - stackSpace)));
 					} else {
@@ -205,7 +206,7 @@ public class TemporalProportionView extends TimeLineView {
 										* drawingAreaWidth / numberOfTimeSlice + aBorder + 1), (int) (y0 - y1
 										* total / maxValue)), new Point(
 								(int) (distribution.getPart(index).getEndPart()
-										* drawingAreaWidth / numberOfTimeSlice - stackSpace - 1 + aBorder),
+										* drawingAreaWidth / numberOfTimeSlice - space - 1 + aBorder),
 								(int) (y0 - y1 * (total) / maxValue)));
 						root.add(lineDash);
 					}

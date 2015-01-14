@@ -49,7 +49,8 @@ public class SimpleEventProducerHierarchy {
 		private void setParent() {
 			if (!eventProducerNodes.containsKey(me.getParentId())) {
 				// If parent exists
-				if (eventProducers.containsKey(me.getParentId()) && me.getId() != me.getParentId()) {
+				if (eventProducers.containsKey(me.getParentId())
+						&& me.getId() != me.getParentId()) {
 					eventProducerNodes.put(
 							me.getParentId(),
 							new SimpleEventProducerNode(eventProducers.get(me
@@ -253,5 +254,48 @@ public class SimpleEventProducerHierarchy {
 				selectedEpn.add(epn);
 		}
 		return selectedEpn;
+	}
+	
+	/**
+	 * Get leaf producers that are under a given node in the hierarchy
+	 * 
+	 * @param aNode
+	 *            the node from which we want to get the leaves
+	 * @return the  leaves
+	 */
+	public ArrayList<SimpleEventProducerNode> getLeaves(
+			SimpleEventProducerNode aNode) {
+		ArrayList<SimpleEventProducerNode> theLeaves = new ArrayList<SimpleEventProducerNode>();
+
+		for (SimpleEventProducerNode aLeaf : leaves.values()) {
+			SimpleEventProducerNode parent = aLeaf.getParentNode();
+			while (parent != aNode && parent != root && parent != null) {
+				parent = parent.getParentNode();
+			}
+
+			if (parent == aNode)
+				theLeaves.add(aLeaf);
+		}
+
+		return theLeaves;
+	}
+	
+	/**
+	 * Recursively get all the children node (down to the leaves) of a node
+	 * 
+	 * @param aNode
+	 *            the node from which we want all children
+	 * @return a collection containing all the children of a node plus itself
+	 */
+	public ArrayList<SimpleEventProducerNode> getAllChildrenNodes(
+			SimpleEventProducerNode aNode) {
+		ArrayList<SimpleEventProducerNode> children = new ArrayList<SimpleEventProducerNode>();
+		children.add(aNode);
+
+		for (SimpleEventProducerNode aChild : aNode.getChildrenNodes()) {
+			children.addAll(getAllChildrenNodes(aChild));
+		}
+
+		return children;
 	}
 }

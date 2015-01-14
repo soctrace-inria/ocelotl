@@ -104,24 +104,16 @@ public class StateLeaveSummaryStat extends SummaryStat{
 						&& microModel.getActiveProducers().contains(
 								anSepn.getMe()))
 					numberOfLeaves++;
-
-				// If its parent is selected and active then add it (case where
-				// there is aggregation)
-				if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
-					if (ocelotlview.getOcelotlParameters()
-							.getSpatiallySelectedProducers()
-							.contains(anSepn.getParentNode().getMe())
-							&& microModel.getActiveProducers().contains(
-									anSepn.getParentNode().getMe()))
-						aggregatedProd.add(anSepn.getParentNode().getMe());
 			}
-
-			// For all prod that are aggregation of leaves, add the
-			// corresponding number of aggregated leaves
-			for (EventProducer anEp : aggregatedProd)
-				numberOfLeaves = numberOfLeaves
-						+ ocelotlview.getOcelotlParameters()
-								.getAggregatedLeavesIndex().get(anEp);
+			
+			// Search for selected producer that are aggregation of EP leaves
+			if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
+				for (EventProducer anEP : ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers())
+					if ((microModel.getAggregatedProducers()
+							.containsValue(anEP) && microModel
+							.getActiveProducers().contains(anEP)))
+						aggregatedProd.add(anEP);
 		} else {
 			// Same thing as above without caring about spatial selection
 			for (SimpleEventProducerNode anSepn : ocelotlview
@@ -135,12 +127,26 @@ public class StateLeaveSummaryStat extends SummaryStat{
 					aggregatedProd.add(anSepn.getParentNode().getMe());
 			}
 
-			for (EventProducer anEp : aggregatedProd)
-				numberOfLeaves = numberOfLeaves
-						+ ocelotlview.getOcelotlParameters()
-								.getAggregatedLeavesIndex().get(anEp);
+			if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
+				for (EventProducer anEP : microModel.getAggregatedProducers()
+						.values())
+					if (microModel.getActiveProducers().contains(anEP))
+						aggregatedProd.add(anEP);
 		}
 
+		// For all prod that are aggregation of leaves, add the
+		// corresponding number of aggregated leaves
+		for (EventProducer anEp : aggregatedProd)
+			numberOfLeaves = numberOfLeaves
+					+ ocelotlview
+							.getOcelotlParameters()
+							.getEventProducerHierarchy()
+							.getLeaves(
+									ocelotlview.getOcelotlParameters()
+											.getEventProducerHierarchy()
+											.getEventProducerNodes()
+											.get(anEp.getId())).size();
+		
 		return numberOfLeaves;
 	}
 }

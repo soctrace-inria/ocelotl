@@ -28,7 +28,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	protected double						logicHeight;
 	protected SpaceTimeAggregation2Manager	spatioTemporalManager;
 	protected EventProducerHierarchy		hierarchy;
-
+	protected EventProducerNode				selectedNode;
+	
 	public SpatioTemporalMouseListener(AggregatedView theView) {
 		super(theView);
 	}
@@ -287,8 +288,6 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			// If we are performing an horizontal drag then don't change the
 			// selected hierarchy
 			if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
-				EventProducerNode selectedNode;
-
 				SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
 				if (selectedAggregate == null || !selectedAggregate.isVisualAggregate())
 					selectedNode = findEventProducerNode(arg0.y);
@@ -349,27 +348,29 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 * For a given producer node, compute the starting and ending vertical
 	 * coordinates
 	 * 
-	 * @param selectedNode
+	 * @param theSelectedNode
 	 *            the selected producer node
 	 * @return a Point containing the coordinate (x = yStart, y = yEnd)
 	 */
-	protected Point getSpatialSelectionCoordinates(EventProducerNode selectedNode) {
+	protected Point getSpatialSelectionCoordinates(EventProducerNode theSelectedNode) {
 		updateMeasurements();
 
-		int y0 = (int) (selectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
-		int y1 = y0 + (int) ((selectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
+		int y0 = (int) (theSelectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
+		int y1 = y0 + (int) ((theSelectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
 		
 		// If the selected producer is too small to be represented, take the
 		// parent node until the size is superior to the threshold
-		while ((selectedNode.getWeight() * logicHeight - aggregatedView.getSpace()) < minDrawThreshold) {
-			if (selectedNode.getParentNode() != null)
-				selectedNode = selectedNode.getParentNode();
+		while ((theSelectedNode.getWeight() * logicHeight - aggregatedView.getSpace()) < minDrawThreshold) {
+			if (theSelectedNode.getParentNode() != null)
+				theSelectedNode = theSelectedNode.getParentNode();
 			else
 				break;
 
-			y0 = (int) (selectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
-			y1 = y0 + (int) (selectedNode.getWeight() * logicHeight) - aggregatedView.getSpace();
+			y0 = (int) (theSelectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
+			y1 = y0 + (int) (theSelectedNode.getWeight() * logicHeight) - aggregatedView.getSpace();
 		}
+		
+		selectedNode = theSelectedNode;
 
 		return new Point(y0, y1);
 	}

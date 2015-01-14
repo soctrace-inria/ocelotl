@@ -205,13 +205,14 @@ public class EventProducerHierarchy {
 				// If it is an aggregated leave
 				if (microModel3D.getAggregatedProducers()
 						.containsValue(me)) {
-					weight = 0;
-					// Add the weight of the aggregated leaves
-					for (EventProducer anEP : microModel3D
-							.getAggregatedProducers().keySet())
-						if (microModel3D
-								.getAggregatedProducers().get(anEP) == me)
-							weight++;
+					weight = microModel3D
+							.getOcelotlParameters()
+							.getEventProducerHierarchy()
+							.getLeaves(
+									microModel3D.getOcelotlParameters()
+											.getEventProducerHierarchy()
+											.getEventProducerNodes()
+											.get(this.getMe().getId())).size();
 					
 					aggLeaves.add(this);
 				}
@@ -223,6 +224,7 @@ public class EventProducerHierarchy {
 			for (EventProducerNode epn : childrenNodes) {
 				weight += epn.setWeight();
 			}
+			
 			return weight;
 		}
 
@@ -372,13 +374,14 @@ public class EventProducerHierarchy {
 	protected int maxHierarchyLevel;
 	protected Microscopic3DDescription microModel3D;
 
-	public EventProducerHierarchy(List<EventProducer> eventProducers, Microscopic3DDescription microModel3D) throws OcelotlException {
+	public EventProducerHierarchy(List<EventProducer> eventProducers,
+			Microscopic3DDescription microModel3D) throws OcelotlException {
 		super();
-		
+
 		for (EventProducer ep : eventProducers) {
 			this.eventProducers.put(ep.getId(), ep);
 		}
-		
+
 		root = null;
 		this.microModel3D = microModel3D;
 		maxHierarchyLevel = 0;
@@ -519,7 +522,6 @@ public class EventProducerHierarchy {
 		for (EventProducerNode epn : leaves.values()) {
 			if ((epn.index + epn.weight > start && epn.index + epn.weight < end)
 					|| (epn.index >= start && epn.index <= end))
-					
 				containedEpn.add(epn);
 		}
 
