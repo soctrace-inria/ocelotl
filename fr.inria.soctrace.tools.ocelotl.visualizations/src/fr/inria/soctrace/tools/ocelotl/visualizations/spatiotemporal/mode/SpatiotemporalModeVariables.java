@@ -7,18 +7,19 @@ import java.util.List;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 
-public class SpatiotemporalModeEvents extends SpatiotemporalMode {
+public class SpatiotemporalModeVariables extends SpatiotemporalMode {
 
 	protected Double amplitudeMax;
-
-	public SpatiotemporalModeEvents() {
+	
+	public SpatiotemporalModeVariables() {
 		super();
 	}
-
-	public SpatiotemporalModeEvents(final OcelotlCore ocelotlCore) {
+	
+	public SpatiotemporalModeVariables(final OcelotlCore ocelotlCore) {
 		super(ocelotlCore);
 	}
 
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void computeProportions(EventProducerNode node) {
@@ -73,18 +74,6 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 		}
 	}
 
-	/**
-	 * Compute the state that has the biggest proportion in the given time
-	 * region
-	 * 
-	 * @param epn
-	 *            The considered event producer node
-	 * @param start
-	 *            the index of the starting slice
-	 * @param end
-	 *            the index of the ending slice
-	 * @return the state with the biggest proportion
-	 */
 	@Override
 	public MainEvent getMainEvent(EventProducerNode epn, int start, int end) {
 		double max = 0.0;

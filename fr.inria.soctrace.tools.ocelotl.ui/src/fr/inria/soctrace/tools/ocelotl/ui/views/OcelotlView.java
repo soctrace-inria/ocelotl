@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.StatusLineContributionItem;
 import org.eclipse.jface.action.SubStatusLineManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -1919,17 +1918,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			messageToDisplay = true;
 		}
 
+		// If there is a message to display
 		if (messageToDisplay) {
-			StatusLineContributionItem myImage = new StatusLineContributionItem("Warning");
-			myImage.setText(message);
+			// Set a message and display it
 			statusLineManager.setMessage(img, message);
 			statusLineManager.setVisible(true);
-		}
-		else
-		{
+		} else {
+			// Hide the current status
 			statusLineManager.setVisible(false);
 		}
-		
+
 		statusLineManager.update(true);
 	}
 }

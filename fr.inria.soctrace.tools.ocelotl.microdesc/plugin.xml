@@ -42,7 +42,7 @@
      		trace_formats="ALL"
      		generic="true"
      		selection_priority = "3"
-     		visual_compatibility="PARTS, PROPORTIONS"
+     		visual_compatibility="PARTS, PROPORTIONS, VARIABLEMODE"
             event_category="VARIABLE">
       </microscopic_model>
    </extension>
@@ -56,7 +56,7 @@
             operator="Temporal Aggregation"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.TypeDistributionView"
-            visual_compatibility="PARTS, PROPORTIONS, STATEMODE, EVENTMODE"
+            visual_compatibility="PARTS, PROPORTIONS, STATEMODE, EVENTMODE, VARIABLEMODE"
             selection_priority="1"
             dimension="2D"
             ts_default_number="100">
@@ -66,7 +66,7 @@
             operator="Spatiotemporal Aggregation"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
-            visual_compatibility="PARTS, STATEMODE, EVENTMODE"
+            visual_compatibility="PARTS, STATEMODE, EVENTMODE, VARIABLEMODE"
             selection_priority="2"
             dimension="3D"
             ts_default_number="30">

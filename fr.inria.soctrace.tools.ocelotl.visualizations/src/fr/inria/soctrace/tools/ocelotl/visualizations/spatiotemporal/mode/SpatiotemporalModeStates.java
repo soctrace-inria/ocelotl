@@ -25,14 +25,14 @@ public class SpatiotemporalModeStates extends SpatiotemporalMode {
 		for (int i = 0; i < node.getParts().size(); i++) {
 			proportions.get(node).add(new HashMap<String, Double>());
 			// And for each state of the part
-			for (String state : getEvents())
+			for (String state : getAllEvents())
 				// Init to zero
 				proportions.get(node).get(i).put(state, 0.0);
 		}
 		// If node is a leaf
 		if (node.getChildrenNodes().isEmpty()) {
 			for (int i = 0; i < node.getParts().size(); i++) {
-				for (String state : getEvents())
+				for (String state : getAllEvents())
 					// Add value (= value / time slice duration)
 					proportions
 							.get(node)
@@ -48,7 +48,7 @@ public class SpatiotemporalModeStates extends SpatiotemporalMode {
 			for (EventProducerNode child : node.getChildrenNodes()) {
 				computeProportions(child);
 				for (int i = 0; i < node.getParts().size(); i++) {
-					for (String state : getEvents())
+					for (String state : getAllEvents())
 						proportions
 								.get(node)
 								.get(i)
@@ -92,7 +92,6 @@ public class SpatiotemporalModeStates extends SpatiotemporalMode {
 			}
 		}
 		return maj;
-
 	}
 	
 }

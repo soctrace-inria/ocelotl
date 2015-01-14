@@ -65,6 +65,18 @@
             unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views.HierarchyAxisView"
             visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views.SpatiotemporalModeView">
       </visualization_operator>
+      <visualization_operator
+            class="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.SpatiotemporalModeVariables"
+            operator="Spatiotemporal Variable Mode"
+  			param_config="fr.inria.soctrace.tools.ocelotl.visualizations.config.spatiotemporal.SpatioTemporalConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.visualizations.config.spatiotemporal.SpatioTemporalConfigView"
+            metric_compatibility="VARIABLEMODE"
+            aggregator_compatibility="3D"
+            selection_priority="1"
+            overview_visualization="Temporal Mode Event"
+            unit_axis_view="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views.HierarchyAxisView"
+            visualization="fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views.SpatiotemporalModeView">
+      </visualization_operator>
   	  <visualization_operator
             class="fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.TemporalModeEvent"
             operator="Temporal Mode Event"

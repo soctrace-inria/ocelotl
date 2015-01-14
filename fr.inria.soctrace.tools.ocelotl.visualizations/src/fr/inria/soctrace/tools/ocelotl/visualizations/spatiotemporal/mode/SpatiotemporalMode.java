@@ -26,6 +26,7 @@ import java.util.List;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.ISpaceTimeManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.SpaceTimeAggregation2Manager;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuSTOperator;
 import fr.inria.soctrace.tools.ocelotl.visualizations.config.spatiotemporal.SpatioTemporalConfig;
 
@@ -54,6 +55,10 @@ public abstract class SpatiotemporalMode extends VisuSTOperator {
 
 	protected List<String> getEvents() {
 		return ((SpatioTemporalConfig) ocelotlCore.getOcelotlParameters().getVisuConfig()).getTypeNames();
+	}
+	
+	protected List<String> getAllEvents() {
+		return ((SpaceTimeAggregation2Manager) lpaggregManager).getKeys();
 	}
 	
 	@Override
