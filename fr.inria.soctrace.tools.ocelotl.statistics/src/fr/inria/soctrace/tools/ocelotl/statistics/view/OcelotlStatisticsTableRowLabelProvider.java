@@ -1,43 +1,31 @@
 package fr.inria.soctrace.tools.ocelotl.statistics.view;
 
-import org.eclipse.swt.graphics.Color;
-
 import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
-import fr.inria.soctrace.framesoc.ui.model.ITableRow;
-import fr.inria.soctrace.framesoc.ui.providers.SquareIconLabelProvider;
-import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.tools.ocelotl.statistics.operators.SummaryStat.SummaryStatModel;
+import fr.inria.soctrace.framesoc.ui.providers.TableRowLabelProvider;
 
-public class OcelotlStatisticsTableRowLabelProvider extends SquareIconLabelProvider  {
+public class OcelotlStatisticsTableRowLabelProvider extends
+		TableRowLabelProvider {
 
-	/**
-	 * Managed column
-	 */
-	protected ITableColumn col;
-	
-	/**
-	 * Constructor
-	 * @param col ITableColumn the provider is related to.
-	 */
+	protected String toolTip;
+
 	public OcelotlStatisticsTableRowLabelProvider(ITableColumn col) {
-		super();
-		this.col = col;
-	}
-	
-	@Override
-	public String getText(Object element) {
-		String text = "";
-		try {
-			text = ((ITableRow) element).get(col);
-		} catch (SoCTraceException e) {
-			e.printStackTrace();
-		}
-		return text;
+		super(col);
+		toolTip = "";
 	}
 
+	/**
+	 * Provide the displayed tooltip
+	 */
 	@Override
-	public Color getColor(Object element) {
-		SummaryStatModel row = (SummaryStatModel)element;
-		return row.getColor();
+	public String getToolTipText(Object element) {
+		return toolTip;
+	}
+
+	public String getToolTip() {
+		return toolTip;
+	}
+
+	public void setToolTip(String toolTip) {
+		this.toolTip = toolTip;
 	}
 }

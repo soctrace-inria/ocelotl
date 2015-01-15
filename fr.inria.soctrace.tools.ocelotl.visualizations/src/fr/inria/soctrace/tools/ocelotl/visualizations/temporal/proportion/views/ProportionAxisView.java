@@ -175,7 +175,7 @@ public class ProportionAxisView extends UnitAxisView {
 						axisHeight - (int) (i * gradHeight)
 								+ (int) (j * gradHeight / NumberOfSubGraduation)),
 						new Point(new Point(mainLineXPosition + MiniGradWidth,
-								axisHeight -	(int) (i * gradHeight)
+								axisHeight - (int) (i * gradHeight)
 										+ (int) (j * gradHeight / NumberOfSubGraduation))));
 				root.add(line2);
 			}
@@ -203,12 +203,34 @@ public class ProportionAxisView extends UnitAxisView {
 				j++;
 			}
 		}
+		
+		// Add legend
+		String unit = ocelotlView.getOcelotlCore().getUnit(ocelotlView.getOcelotlCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
+		final Label label = new Label(unit);
+		label.setLabelAlignment(PositionConstants.RIGHT);
+		label.setForegroundColor(SWTResourceManager
+				.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+		label.setFont(SWTResourceManager.getFont("Cantarell",
+				6, SWT.NORMAL));
+		label.setToolTip(new Label(unit));
+		label.setSize(textWidth, TextHeight);
+		
+		// Compute label width
+		GC gc = new GC(canvas);
+		gc.setFont(label.getFont());
+		int labelWidth = gc.textExtent(label.getText()).x;
+		if (labelWidth > labelMaxWidth)
+			labelMaxWidth = labelWidth;
+
+		root.add(label, new Rectangle(new Point(0, 0), 
+				new Point(mainLineXPosition - TextPositionOffset,
+						TextHeight)));
 	}
 
 	/**
 	 * Draw the main line of the axis
 	 */
-	public void drawMainLine() {
+	public void drawMainLine() {		
 		mainLineXPosition = root.getClientArea().width() - Border - gradWidth;
 		final PolylineConnection line = new PolylineConnection();
 		line.setForegroundColor(SWTResourceManager

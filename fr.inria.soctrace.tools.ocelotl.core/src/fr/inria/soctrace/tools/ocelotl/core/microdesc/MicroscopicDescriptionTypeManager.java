@@ -163,5 +163,4 @@ public class MicroscopicDescriptionTypeManager {
 			HashMap<String, MicroscopicDescriptionTypeResource> typeList) {
 		this.typeList = typeList;
 	}
-	
 }

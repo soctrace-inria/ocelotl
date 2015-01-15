@@ -124,7 +124,6 @@ public class MicroscopicDescriptionTypeResource {
 		return visuCompatibility;
 	}
 
-
 	private List<String> decompose(List<String> list, String string) {
 		final String[] tmp = string
 				.split(OcelotlConstants.MultipleValueExtensionSeparator);
@@ -133,5 +132,5 @@ public class MicroscopicDescriptionTypeResource {
 			list.add(s);
 		return list;
 	}
-
+	
 }

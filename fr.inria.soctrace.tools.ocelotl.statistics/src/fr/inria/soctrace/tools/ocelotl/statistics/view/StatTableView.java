@@ -3,6 +3,7 @@ package fr.inria.soctrace.tools.ocelotl.statistics.view;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -24,7 +25,6 @@ import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
 import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
 import fr.inria.soctrace.framesoc.ui.model.TableRow;
-import fr.inria.soctrace.framesoc.ui.providers.TableRowLabelProvider;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.statistics.operators.StatisticsProvider;
@@ -150,6 +150,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		tableViewer = new TableViewer(compositeTable, SWT.FILL | SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		tableViewer.setContentProvider(new StatContentProvider());
+		ColumnViewerToolTipSupport.enableFor(tableViewer);
 		comparator = new OcelotlStatisticsColumnComparator();
 		tableViewer.setComparator(comparator);
 		createColumns();
@@ -172,19 +173,28 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				.values()) {
 			TableViewerColumn elemsViewerCol = new TableViewerColumn(
 					tableViewer, SWT.NONE);
-
 			// If it is the column name
 			if (col.equals(OcelotlStatisticsTableColumn.NAME)) {
 				// add a filter for this column
-				//nameFilter = new OcelotlStatisticsTableRowFilter(col);
-				//tableViewer.addFilter(nameFilter);
+				// nameFilter = new OcelotlStatisticsTableRowFilter(col);
+				// tableViewer.addFilter(nameFilter);
 
 				// the label provider also puts the image
 				elemsViewerCol
-						.setLabelProvider(new OcelotlStatisticsTableRowLabelProvider(
+						.setLabelProvider(new OcelotlStatisticsTableRowLabelImageProvider(
 								col));
-			} else
-				elemsViewerCol.setLabelProvider(new TableRowLabelProvider(col));
+			} else {
+				OcelotlStatisticsTableRowLabelProvider labelProvider = new OcelotlStatisticsTableRowLabelProvider(
+						col);
+				if (col.equals(OcelotlStatisticsTableColumn.OCCURRENCES))
+					labelProvider.setToolTip(ocelotlView.getOcelotlCore()
+							.getUnit(ocelotlView.getOcelotlCore()
+							.getMicromodelTypes().getSelectedOperatorResource()
+							.getUnit()));
+
+				elemsViewerCol.setLabelProvider(labelProvider);
+			}
+				
 
 			final TableColumn elemsTableCol = elemsViewerCol.getColumn();
 			elemsTableCol.setWidth(col.getWidth());

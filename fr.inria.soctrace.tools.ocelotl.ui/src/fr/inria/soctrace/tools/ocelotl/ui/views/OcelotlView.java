@@ -888,6 +888,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 								textDisplayedEnd.setText(textTimestampEnd.getText());
 								comboType.setEnabled(true);
 								comboType.removeAll();
+								ocelotlParameters.setTrace(confDataLoader.getCurrentTrace());
+								
 								for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 									comboType.add(type);
 								}
