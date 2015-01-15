@@ -1283,7 +1283,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 	@Override
 	public void dispose() {
-		topics.unregisterAll();
+		//topics.unregisterAll();
 		super.dispose();
 	}
 

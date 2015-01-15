@@ -40,7 +40,7 @@ public class OcelotlConstants {
 	/**
 	 * Number of field in the header of a cache file 
 	 */
-	static public final int CACHE_HEADER_NORMAL_SIZE = 10;
+	static public final int CACHE_HEADER_NORMAL_SIZE = 9;
 	
 	/**
 	 * Maximum size of the data cache in bytes.
