@@ -67,7 +67,6 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.ResourceManager;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -78,8 +77,8 @@ import fr.inria.soctrace.framesoc.ui.model.GanttTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.HistogramTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.PieTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TableTraceIntervalAction;
-import fr.inria.soctrace.framesoc.ui.model.TraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
+import fr.inria.soctrace.framesoc.ui.perspective.FramesocPart;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
@@ -114,7 +113,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewWrapper
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class OcelotlView extends ViewPart implements IFramesocBusListener {
+public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 	private class SaveDataListener extends SelectionAdapter {
 
@@ -844,6 +843,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			comboVisu.removeAll();
 			btnRun.setEnabled(false);
 			overView.reset();
+			
+			currentShownTrace = trace;
+			setFocus();
 
 			final Job job = new Job(title) {
 
@@ -859,6 +861,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 							e.printStackTrace();
 						}
 						monitor.done();
+
 						Display.getDefault().syncExec(new Runnable() {
 
 							@Override
@@ -1051,41 +1054,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		super.dispose();
 	}
 
-	private TraceIntervalAction createTableAction() {
-		return new TableTraceIntervalAction() {
-			@Override
-			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
-				return getIntervalDescriptor();
-			}
-		};
-	}
-
-	private TraceIntervalAction createGanttAction() {
-		return new GanttTraceIntervalAction() {
-			@Override
-			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
-				return getIntervalDescriptor();
-			}
-		};
-	}
-
-	private TraceIntervalAction createPieAction() {
-		return new PieTraceIntervalAction() {
-			@Override
-			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
-				return getIntervalDescriptor();
-			}
-		};
-	}
-
-	private TraceIntervalAction createHistogramAction() {
-		return new HistogramTraceIntervalAction() {
-			@Override
-			public TraceIntervalDescriptor getTraceIntervalDescriptor() {
-				return getIntervalDescriptor();
-			}
-		};
-	}
 
 	protected TraceIntervalDescriptor getIntervalDescriptor() {
 		if (confDataLoader.getCurrentTrace() == null)
@@ -1730,11 +1698,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 	}
 
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-	}
-
 	public void setTimeRegion(final TimeRegion time) {
 		textTimestampStart.setText(String.valueOf(time.getTimeStampStart()));
 		textTimestampEnd.setText(String.valueOf(time.getTimeStampEnd()));
@@ -1910,5 +1873,29 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		}
 
 		statusLineManager.update(true);
+	}
+
+	@Override
+	protected void createFramesocPartControl(Composite parent) {
+		createPartControl(parent);
+	}
+
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	@Override
+	public void showTrace(Trace trace, Object data) {
+		// Look for the correct trace among the
+		// available traces
+		for (int aTraceIndex : traceMap.keySet()) {
+			if (traceMap.get(aTraceIndex).getId() == trace.getId()) {
+				comboTraces.select(aTraceIndex);
+				break;
+			}
+		}
+
+		comboTraces.notifyListeners(SWT.Selection, new Event());
 	}
 }

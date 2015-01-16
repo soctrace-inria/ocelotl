@@ -25,5 +25,22 @@
             type="ANALYSIS">
       </tool>
    </extension>
-
+    <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="fr.inria.soctrace.tools.ocelotl.ui.handler.ShowOcelotlHandler"
+            id="fr.inria.soctrace.tools.ocelotl.ui.command.ShowOcelotl"
+            name="Show in Ocelotl">
+      </command>
+   </extension>
+   <extension
+         point="fr.inria.soctrace.framesoc.ui.perspective.part">
+      <part
+            icon="icons/ocelotl16.png"
+            launchCommand="fr.inria.soctrace.tools.ocelotl.ui.command.ShowOcelotl"
+            position="TOP_RIGHT"
+            priority="3"
+            viewId="fr.inria.soctrace.tools.ocelotl.ui.OcelotlView">
+      </part>
+   </extension>
 </plugin>
