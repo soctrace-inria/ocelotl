@@ -20,6 +20,7 @@
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import org.eclipse.draw2d.Figure;
+import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
@@ -42,4 +43,12 @@ public interface IAggregatedView {
 	public void resizeDiagram();
 	
 	public void drawSelection();
+	
+	public abstract void setActiveColorBG(Color activeColorBG);
+	public abstract void setActiveColorFG(Color activeColorFG);
+	public abstract void setActiveColorAlpha(int anAlphaValue);
+	public abstract void setPotentialColorBG(Color selectedColorBG);
+	public abstract void setPotentialColorFG(Color selectedColorFG);
+	public abstract void setPotentialColorAlpha(int anAlphaValue);
+		
 }

@@ -118,4 +118,11 @@ public class OcelotlConstants {
 	public static final String JSONOverviewDisplayBgColor = "overviewDisplayBgColor";
 	public static final String JSONOverviewDisplayAlpha = "overviewDisplayAlpha";	
 	public static final String JSONParameterPPolicy = "parameterPPolicy";	
+	
+	public static final String JSONMainSelectionFgColor = "mainSelectionFgColor";
+	public static final String JSONMainSelectionBgColor = "mainSelectionBgColor";
+	public static final String JSONMainSelectionAlpha = "mainSelectionAlpha";
+	public static final String JSONMainDisplayFgColor = "mainDisplayFgColor";
+	public static final String JSONMainDisplayBgColor = "mainDisplayBgColor";
+	public static final String JSONMainDisplayAlpha = "mainDisplayAlpha";	
 }

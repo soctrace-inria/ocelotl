@@ -56,6 +56,14 @@ public class OcelotlSettings {
 	private Color overviewDisplayFgColor;
 	private Color overviewDisplayBgColor;
 	private int overviewDisplayAlphaValue;
+	
+	private Color mainSelectionFgColor;
+	private Color mainSelectionBgColor;
+	private int mainSelectionAlphaValue;
+	private Color mainDisplayFgColor;
+	private Color mainDisplayBgColor;
+	private int mainDisplayAlphaValue;
+	
 	private ParameterPPolicy parameterPPolicy;
 	private boolean aggregateLeaves;
 	private int maxNumberOfLeaves;
@@ -65,6 +73,17 @@ public class OcelotlSettings {
 
 	public OcelotlSettings() {
 		// Init with default configuration
+		setDefaultValues();
+
+		// Check if a configuration file exists and if so, load the saved
+		// configuration
+		loadConfigurationFile();
+	}
+
+	/**
+	 * Set all settings to their default values
+	 */
+	public void setDefaultValues() {
 		cacheActivated = OcelotlDefaultParameterConstants.DEFAULT_CACHE_ACTIVATION;
 
 		// Default cache directory is the directory "ocelotlCache" in the
@@ -98,16 +117,20 @@ public class OcelotlSettings {
 		overviewDisplayBgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_BG_COLOR;
 		overviewDisplayFgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_FG_COLOR;
 		overviewDisplayAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_ALPHA;
+
+		mainSelectionBgColor = OcelotlDefaultParameterConstants.MAIN_SELECT_BG_COLOR;
+		mainSelectionFgColor = OcelotlDefaultParameterConstants.MAIN_SELECT_FG_COLOR;
+		mainSelectionAlphaValue = OcelotlDefaultParameterConstants.MAIN_SELECT_ALPHA;
+		mainDisplayBgColor = OcelotlDefaultParameterConstants.MAIN_DISPLAY_BG_COLOR;
+		mainDisplayFgColor = OcelotlDefaultParameterConstants.MAIN_DISPLAY_FG_COLOR;
+		mainDisplayAlphaValue = OcelotlDefaultParameterConstants.MAIN_DISPLAY_ALPHA;
+
 		parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
 		enableOverview = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
 		aggregateLeaves = OcelotlDefaultParameterConstants.AGGREGATE_LEAVES;
 		maxNumberOfLeaves = OcelotlDefaultParameterConstants.MAX_NUMBER_OF_LEAVES;
-		
-		// Check if a configuration file exists and if so, load the saved
-		// configuration
-		loadConfigurationFile();
 	}
-
+	
 	/**
 	 * Load a previously saved configuration file
 	 */
@@ -192,6 +215,24 @@ public class OcelotlSettings {
 						OcelotlConstants.JSONAggregateLeaves).getAsBoolean());
 				setMaxNumberOfLeaves(theConf.get(
 						OcelotlConstants.JSONMaxNumberOfLeaves).getAsInt());
+				setMainDisplayBgColor(loadColor(theConf.get(
+						OcelotlConstants.JSONMainDisplayBgColor)
+						.getAsString()));
+				setMainDisplayFgColor(loadColor(theConf.get(
+						OcelotlConstants.JSONMainDisplayFgColor)
+						.getAsString()));
+				setMainSelectionBgColor(loadColor(theConf.get(
+						OcelotlConstants.JSONMainSelectionBgColor)
+						.getAsString()));
+				setMainSelectionFgColor(loadColor(theConf.get(
+						OcelotlConstants.JSONMainSelectionFgColor)
+						.getAsString()));
+				setMainSelectionAlphaValue(theConf.get(
+						OcelotlConstants.JSONMainSelectionAlpha)
+						.getAsInt());
+				setMainDisplayAlphaValue(theConf.get(
+						OcelotlConstants.JSONMainDisplayAlpha)
+						.getAsInt());
 			
 				logger.debug("Settings values:\n");
 				logger.debug("Cache activated: " + cacheActivated);
@@ -276,6 +317,18 @@ public class OcelotlSettings {
 				aggregateLeaves);
 		theConfig.addProperty(OcelotlConstants.JSONMaxNumberOfLeaves,
 				maxNumberOfLeaves);
+		theConfig.addProperty(OcelotlConstants.JSONMainSelectionBgColor,
+				saveColor(mainSelectionBgColor));
+		theConfig.addProperty(OcelotlConstants.JSONMainSelectionFgColor,
+				saveColor(mainSelectionFgColor));
+		theConfig.addProperty(OcelotlConstants.JSONMainSelectionAlpha,
+				mainSelectionAlphaValue);
+		theConfig.addProperty(OcelotlConstants.JSONMainDisplayBgColor,
+				saveColor(mainDisplayBgColor));
+		theConfig.addProperty(OcelotlConstants.JSONMainDisplayFgColor,
+				saveColor(mainDisplayFgColor));
+		theConfig.addProperty(OcelotlConstants.JSONMainDisplayAlpha,
+				mainDisplayAlphaValue);
 		
 		String newSettings = gson.toJson(theConfig);
 
@@ -573,6 +626,72 @@ public class OcelotlSettings {
 	public void setOverviewDisplayAlphaValue(int overviewDisplayAlphaValue) {
 		if (this.overviewDisplayAlphaValue != overviewDisplayAlphaValue) {
 			this.overviewDisplayAlphaValue = overviewDisplayAlphaValue;
+			saveSettings();
+		}
+	}
+
+	public Color getMainSelectionFgColor() {
+		return mainSelectionFgColor;
+	}
+
+	public void setMainSelectionFgColor(Color mainSelectionFgColor) {
+		if (this.mainSelectionFgColor != mainSelectionFgColor) {
+			this.mainSelectionFgColor = mainSelectionFgColor;
+			saveSettings();
+		}
+	}
+
+	public Color getMainSelectionBgColor() {
+		return mainSelectionBgColor;
+	}
+
+	public void setMainSelectionBgColor(Color mainSelectionBgColor) {
+		if (this.mainSelectionBgColor != mainSelectionBgColor) {
+			this.mainSelectionBgColor = mainSelectionBgColor;
+			saveSettings();
+		}
+	}
+
+	public int getMainSelectionAlphaValue() {
+		return mainSelectionAlphaValue;
+	}
+
+	public void setMainSelectionAlphaValue(int mainSelectionAlphaValue) {
+		if (this.mainSelectionAlphaValue != mainSelectionAlphaValue) {
+			this.mainSelectionAlphaValue = mainSelectionAlphaValue;
+			saveSettings();
+		}
+	}
+
+	public Color getMainDisplayFgColor() {
+		return mainDisplayFgColor;
+	}
+
+	public void setMainDisplayFgColor(Color mainDisplayFgColor) {
+		if (this.mainDisplayFgColor != mainDisplayFgColor) {
+			this.mainDisplayFgColor = mainDisplayFgColor;
+			saveSettings();
+		}
+	}
+
+	public Color getMainDisplayBgColor() {
+		return mainDisplayBgColor;
+	}
+
+	public void setMainDisplayBgColor(Color mainDisplayBgColor) {
+		if (this.mainDisplayBgColor != mainDisplayBgColor) {
+			this.mainDisplayBgColor = mainDisplayBgColor;
+			saveSettings();
+		}
+	}
+
+	public int getMainDisplayAlphaValue() {
+		return mainDisplayAlphaValue;
+	}
+
+	public void setMainDisplayAlphaValue(int mainDisplayAlphaValue) {
+		if (this.mainDisplayAlphaValue != mainDisplayAlphaValue) {
+			this.mainDisplayAlphaValue = mainDisplayAlphaValue;
 			saveSettings();
 		}
 	}

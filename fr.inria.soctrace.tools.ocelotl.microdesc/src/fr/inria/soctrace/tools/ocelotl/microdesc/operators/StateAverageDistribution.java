@@ -73,7 +73,6 @@ public class StateAverageDistribution extends StateDistribution {
 				// For each state
 				for (String aState : matrix.get(i).get(ep).keySet()) {
 					if (stateCounter.get(i).get(ep).get(aState) != 0)
-
 						// Divide the current value by the number of state in
 						// the time slice
 						matrix.get(i)

@@ -73,16 +73,23 @@ public class OcelotlSettingsView extends Dialog {
 	private String								currentDatacacheDir;
 	private Text								snapshotWidth;
 	private Text								snapshotHeight;
-	private Button								btnEditBgDisplay;
-	private Button								btnEditFgDisplay;
-	private Button								btnEditBgSelected;
-	private Button								btnEditFgSelected;
+	private Button								btnEditBgOverviewDisplay;
+	private Button								btnEditFgOverviewDisplay;
+	private Button								btnEditBgOverviewSelected;
+	private Button								btnEditFgOverviewSelected;
 	private HashMap<Button, Color>				btnColorMap;
-	private Spinner								textDisplayAlpha;
-	private Spinner								textSelectionAlpha;
+	private Spinner								textOverviewDisplayAlpha;
+	private Spinner								textOverviewSelectionAlpha;
 	private Button								btnEnableOverview;
 	private Spinner								spinnerMaxAggLeaves;
 	private Button								btnEnableLeavesAgg;
+	
+	private Button								btnEditBgMainDisplay;
+	private Button								btnEditFgMainDisplay;
+	private Button								btnEditBgMainSelected;
+	private Button								btnEditFgMainSelected;
+	private Spinner								textMainDisplayAlpha;
+	private Spinner								textMainSelectionAlpha;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -291,12 +298,24 @@ public class OcelotlSettingsView extends Dialog {
 	 * Update the overview selection colors
 	 */
 	public void updateOverviewColors() {
-		ocelotlView.getOverView().setDisplayBGColor(btnColorMap.get(btnEditBgDisplay));
-		ocelotlView.getOverView().setDisplayFGColor(btnColorMap.get(btnEditFgDisplay));
+		ocelotlView.getOverView().setDisplayBGColor(btnColorMap.get(btnEditBgOverviewDisplay));
+		ocelotlView.getOverView().setDisplayFGColor(btnColorMap.get(btnEditFgOverviewDisplay));
 		ocelotlView.getOverView().setDisplayAlphaValue(settings.getOverviewDisplayAlphaValue());
-		ocelotlView.getOverView().setSelectFGColor(btnColorMap.get(btnEditFgSelected));
-		ocelotlView.getOverView().setSelectBGColor(btnColorMap.get(btnEditBgSelected));
+		ocelotlView.getOverView().setSelectFGColor(btnColorMap.get(btnEditFgOverviewSelected));
+		ocelotlView.getOverView().setSelectBGColor(btnColorMap.get(btnEditBgOverviewSelected));
 		ocelotlView.getOverView().setSelectAlphaValue(settings.getOverviewSelectionAlphaValue());
+	}
+	
+	/**
+	 * Update the main selection colors
+	 */
+	public void updateMainSelectionColors() {
+		ocelotlView.getTimeLineView().setActiveColorBG(btnColorMap.get(btnEditBgMainDisplay));
+		ocelotlView.getTimeLineView().setActiveColorFG(btnColorMap.get(btnEditFgMainDisplay));
+		ocelotlView.getTimeLineView().setActiveColorAlpha(settings.getMainDisplayAlphaValue());
+		ocelotlView.getTimeLineView().setPotentialColorBG(btnColorMap.get(btnEditBgMainSelected));
+		ocelotlView.getTimeLineView().setPotentialColorFG(btnColorMap.get(btnEditFgMainSelected));
+		ocelotlView.getTimeLineView().setPotentialColorAlpha(settings.getMainSelectionAlphaValue());
 	}
 
 	/**
@@ -683,7 +702,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Group groupOverviewSettings = new Group(sashFormOverviewSettings, SWT.NONE);
 		groupOverviewSettings.setFont(cantarell8);
-		groupOverviewSettings.setText("Snapshot Settings");
+		groupOverviewSettings.setText("Overview Settings");
 		groupOverviewSettings.setLayout(new GridLayout(2, false));
 		
 		btnEnableOverview = new Button(groupOverviewSettings, SWT.CHECK);
@@ -696,67 +715,146 @@ public class OcelotlSettingsView extends Dialog {
 		lblBgDisplay.setFont(cantarell8);
 		lblBgDisplay.setText("Display Background");
 
-		btnEditBgDisplay = new Button(groupOverviewSettings, SWT.NONE);
-		btnEditBgDisplay.setToolTipText("Edit Color");
-		btnEditBgDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditBgDisplay.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditBgDisplay, settings.getOverviewDisplayBgColor());
+		btnEditBgOverviewDisplay = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditBgOverviewDisplay.setToolTipText("Edit Color");
+		btnEditBgOverviewDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgOverviewDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgOverviewDisplay, settings.getOverviewDisplayBgColor());
 
 		final Label lblFgDisplay = new Label(groupOverviewSettings, SWT.NONE);
 		lblFgDisplay.setFont(cantarell8);
 		lblFgDisplay.setText("Display Foreground");
 
-		btnEditFgDisplay = new Button(groupOverviewSettings, SWT.NONE);
-		btnEditFgDisplay.setToolTipText("Edit Color");
-		btnEditFgDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditFgDisplay.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditFgDisplay, settings.getOverviewDisplayFgColor());
+		btnEditFgOverviewDisplay = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditFgOverviewDisplay.setToolTipText("Edit Color");
+		btnEditFgOverviewDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgOverviewDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgOverviewDisplay, settings.getOverviewDisplayFgColor());
 		
 		final Label lblDisplayAlpha = new Label(groupOverviewSettings, SWT.NONE);
 		lblDisplayAlpha.setFont(cantarell8);
 		lblDisplayAlpha.setText("Display Transparency");
 
-		textDisplayAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
-		textDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		textDisplayAlpha.setIncrement(1);
-		textDisplayAlpha.setMaximum(255);
-		textDisplayAlpha.setMinimum(0);
-		textDisplayAlpha.setFont(cantarell8);
-		textDisplayAlpha.setSelection(settings.getOverviewDisplayAlphaValue());
-		textDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
+		textOverviewDisplayAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
+		textOverviewDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textOverviewDisplayAlpha.setIncrement(1);
+		textOverviewDisplayAlpha.setMaximum(255);
+		textOverviewDisplayAlpha.setMinimum(0);
+		textOverviewDisplayAlpha.setFont(cantarell8);
+		textOverviewDisplayAlpha.setSelection(settings.getOverviewDisplayAlphaValue());
+		textOverviewDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
 	
 		final Label lblBgSelect = new Label(groupOverviewSettings, SWT.NONE);
 		lblBgSelect.setFont(cantarell8);
 		lblBgSelect.setText("Selection Background");
 
-		btnEditBgSelected = new Button(groupOverviewSettings, SWT.NONE);
-		btnEditBgSelected.setToolTipText("Edit Color");
-		btnEditBgSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditBgSelected.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditBgSelected, settings.getOverviewSelectionBgColor());
+		btnEditBgOverviewSelected = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditBgOverviewSelected.setToolTipText("Edit Color");
+		btnEditBgOverviewSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgOverviewSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgOverviewSelected, settings.getOverviewSelectionBgColor());
 		
 		final Label lblFgSelect = new Label(groupOverviewSettings, SWT.NONE);
 		lblFgSelect.setFont(cantarell8);
 		lblFgSelect.setText("Selection Foreground");
 
-		btnEditFgSelected = new Button(groupOverviewSettings, SWT.NONE);
-		btnEditFgSelected.setToolTipText("Edit Color");
-		btnEditFgSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditFgSelected.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditFgSelected, settings.getOverviewSelectionFgColor());
+		btnEditFgOverviewSelected = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditFgOverviewSelected.setToolTipText("Edit Color");
+		btnEditFgOverviewSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgOverviewSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgOverviewSelected, settings.getOverviewSelectionFgColor());
 		
-		final Label lblSelectionAlpha = new Label(groupOverviewSettings, SWT.NONE);
+		final Label lblOverviewSelectionAlpha = new Label(groupOverviewSettings, SWT.NONE);
+		lblOverviewSelectionAlpha.setFont(cantarell8);
+		lblOverviewSelectionAlpha.setText("Selection Transparency");
+
+		textOverviewSelectionAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
+		textOverviewSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textOverviewSelectionAlpha.setIncrement(1);
+		textOverviewSelectionAlpha.setMaximum(255);
+		textOverviewSelectionAlpha.setMinimum(0);
+		textOverviewSelectionAlpha.setFont(cantarell8);
+		textOverviewSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
+		textOverviewSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
+
+		// Overview settings
+		final TabItem tbtSelectionSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtSelectionSettings.setText("Selection");
+
+		final SashForm sashFormSelectionSettings = new SashForm(tabFolder, SWT.VERTICAL);
+		sashFormSelectionSettings.setFont(cantarell8);
+		tbtSelectionSettings.setControl(sashFormSelectionSettings);
+
+		final Group groupSelectionSettings = new Group(sashFormSelectionSettings, SWT.NONE);
+		groupSelectionSettings.setFont(cantarell8);
+		groupSelectionSettings.setText("Selection Settings");
+		groupSelectionSettings.setLayout(new GridLayout(2, false));
+		
+		final Label lblSelectionBgDisplay = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionBgDisplay.setFont(cantarell8);
+		lblSelectionBgDisplay.setText("Display Background");
+
+		btnEditBgMainDisplay = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditBgMainDisplay.setToolTipText("Edit Color");
+		btnEditBgMainDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgMainDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgMainDisplay, settings.getMainDisplayBgColor());
+
+		final Label lblSelectionFgDisplay = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionFgDisplay.setFont(cantarell8);
+		lblSelectionFgDisplay.setText("Display Foreground");
+
+		btnEditFgMainDisplay = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditFgMainDisplay.setToolTipText("Edit Color");
+		btnEditFgMainDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgMainDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgMainDisplay, settings.getMainDisplayFgColor());
+		
+		final Label lblSelectionDisplayAlpha = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionDisplayAlpha.setFont(cantarell8);
+		lblSelectionDisplayAlpha.setText("Display Transparency");
+
+		textMainDisplayAlpha = new Spinner(groupSelectionSettings, SWT.BORDER);
+		textMainDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textMainDisplayAlpha.setIncrement(1);
+		textMainDisplayAlpha.setMaximum(255);
+		textMainDisplayAlpha.setMinimum(0);
+		textMainDisplayAlpha.setFont(cantarell8);
+		textMainDisplayAlpha.setSelection(settings.getMainDisplayAlphaValue());
+		textMainDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
+	
+		final Label lblSelectionBgSelect = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionBgSelect.setFont(cantarell8);
+		lblSelectionBgSelect.setText("Selection Background");
+
+		btnEditBgMainSelected = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditBgMainSelected.setToolTipText("Edit Color");
+		btnEditBgMainSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgMainSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgMainSelected, settings.getMainSelectionBgColor());
+		
+		final Label lblSelectionFgSelect = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionFgSelect.setFont(cantarell8);
+		lblSelectionFgSelect.setText("Selection Foreground");
+
+		btnEditFgMainSelected = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditFgMainSelected.setToolTipText("Edit Color");
+		btnEditFgMainSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgMainSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgMainSelected, settings.getMainSelectionFgColor());
+		
+		final Label lblSelectionAlpha = new Label(groupSelectionSettings, SWT.NONE);
 		lblSelectionAlpha.setFont(cantarell8);
 		lblSelectionAlpha.setText("Selection Transparency");
 
-		textSelectionAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
-		textSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		textSelectionAlpha.setIncrement(1);
-		textSelectionAlpha.setMaximum(255);
-		textSelectionAlpha.setMinimum(0);
-		textSelectionAlpha.setFont(cantarell8);
-		textSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
-		textSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
+		textMainSelectionAlpha = new Spinner(groupSelectionSettings, SWT.BORDER);
+		textMainSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textMainSelectionAlpha.setIncrement(1);
+		textMainSelectionAlpha.setMaximum(255);
+		textMainSelectionAlpha.setMinimum(0);
+		textMainSelectionAlpha.setFont(cantarell8);
+		textMainSelectionAlpha.setSelection(settings.getMainSelectionAlphaValue());
+		textMainSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
 
 		initSettings();
 		
@@ -822,13 +920,22 @@ public class OcelotlSettingsView extends Dialog {
 		
 		//Overview colors
 		settings.setEnableOverview(btnEnableOverview.getSelection());
-		settings.setOverviewDisplayBgColor(btnColorMap.get(btnEditBgDisplay));
-		settings.setOverviewDisplayFgColor(btnColorMap.get(btnEditFgDisplay));
-		settings.setOverviewDisplayAlphaValue(Integer.valueOf(textDisplayAlpha.getText()));
-		settings.setOverviewSelectionBgColor(btnColorMap.get(btnEditBgSelected));
-		settings.setOverviewSelectionFgColor(btnColorMap.get(btnEditFgSelected));
-		settings.setOverviewSelectionAlphaValue(Integer.valueOf(textSelectionAlpha.getText()));
+		settings.setOverviewDisplayBgColor(btnColorMap.get(btnEditBgOverviewDisplay));
+		settings.setOverviewDisplayFgColor(btnColorMap.get(btnEditFgOverviewDisplay));
+		settings.setOverviewDisplayAlphaValue(Integer.valueOf(textOverviewDisplayAlpha.getText()));
+		settings.setOverviewSelectionBgColor(btnColorMap.get(btnEditBgOverviewSelected));
+		settings.setOverviewSelectionFgColor(btnColorMap.get(btnEditFgOverviewSelected));
+		settings.setOverviewSelectionAlphaValue(Integer.valueOf(textOverviewSelectionAlpha.getText()));
 		updateOverviewColors();
+		
+		// Main selection colors
+		settings.setMainDisplayBgColor(btnColorMap.get(btnEditBgMainDisplay));
+		settings.setMainDisplayFgColor(btnColorMap.get(btnEditFgMainDisplay));
+		settings.setMainDisplayAlphaValue(Integer.valueOf(textMainDisplayAlpha.getText()));
+		settings.setMainSelectionBgColor(btnColorMap.get(btnEditBgMainSelected));
+		settings.setMainSelectionFgColor(btnColorMap.get(btnEditFgMainSelected));
+		settings.setMainSelectionAlphaValue(Integer.valueOf(textMainSelectionAlpha.getText()));
+		updateMainSelectionColors();
 	}
 
 	@Override

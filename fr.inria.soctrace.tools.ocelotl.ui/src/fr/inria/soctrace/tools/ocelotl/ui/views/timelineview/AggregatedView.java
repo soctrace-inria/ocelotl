@@ -62,13 +62,16 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected IVisuOperator						visuOperator		= null;
 	protected OcelotlMouseListener				mouse;
 	protected List<SpatioTemporalAggregateView>	aggregates;
-	public final static Color					selectColorFG		= ColorConstants.white;
-	public final static Color					selectColorBG		= ColorConstants.blue;
-	public final static Color					potentialColorFG	= ColorConstants.darkBlue;
-	public final static Color					potentialColorBG	= ColorConstants.darkBlue;
-	public final static Color					activeColorFG		= ColorConstants.black;
-	public final static Color					activeColorBG		= ColorConstants.black;
-	
+	public static Color							selectColorFG		= ColorConstants.white;
+	public static Color							selectColorBG		= ColorConstants.blue;
+	public static Color							potentialColorFG	= ColorConstants.darkBlue;
+	public static Color							potentialColorBG	= ColorConstants.darkBlue;
+	public static Color							activeColorFG		= ColorConstants.black;
+	public static Color							activeColorBG		= ColorConstants.black;
+	public static int							potentialColorAlpha	= 120;
+	public static int							activeColorAlpha	= 120;
+	public static int							selectColorAlpha	= 250;
+		
 	class SelectFigure extends RectangleFigure {
 
 		private SelectFigure() {
@@ -78,7 +81,7 @@ abstract public class AggregatedView implements IAggregatedView {
 			setLayoutManager(layout);
 			setForegroundColor(selectColorFG);
 			setBackgroundColor(selectColorBG);
-			setAlpha(120);
+			setAlpha(potentialColorAlpha);
 		}
 		
 		private SelectFigure(Color foreGround, Color backGround) {
@@ -107,12 +110,12 @@ abstract public class AggregatedView implements IAggregatedView {
 				setForegroundColor(activeColorFG);
 				setBackgroundColor(activeColorBG);
 				setFill(true);
-				setAlpha(120);
+				setAlpha(activeColorAlpha);
 			} else {
 				setForegroundColor(selectColorFG);
 				setBackgroundColor(selectColorBG);
 				setFill(false);
-				setAlpha(250);
+				setAlpha(selectColorAlpha);
 			}
 			
 			if (getParent() != root)
@@ -133,19 +136,19 @@ abstract public class AggregatedView implements IAggregatedView {
 		public void draw(final TimeRegion timeRegion, int y0, int y1) {
 			if (getParent() != root)
 				root.add(this);
-			
+
 			// Default values for selecting the height of the graph
 			if (y0 == -1)
 				y0 = root.getSize().height - 1;
 
 			if (y1 == -1)
 				y1 = 2;
-					
+
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
 					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
 			root.repaint();
 		}
-		
+
 		/**
 		 * Remove the selection from display
 		 */
@@ -189,6 +192,14 @@ abstract public class AggregatedView implements IAggregatedView {
 	public AggregatedView(final OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
+
+		// Set colors according to the settings
+		activeColorFG = ocelotlView.getOcelotlParameters().getOcelotlSettings().getMainDisplayFgColor();
+		activeColorBG = ocelotlView.getOcelotlParameters().getOcelotlSettings().getMainDisplayBgColor();
+		activeColorAlpha = ocelotlView.getOcelotlParameters().getOcelotlSettings().getMainDisplayAlphaValue();
+		potentialColorFG = ocelotlView.getOcelotlParameters().getOcelotlSettings().getMainSelectionFgColor();
+		potentialColorBG = ocelotlView.getOcelotlParameters().getOcelotlSettings().getMainSelectionBgColor();
+		potentialColorAlpha = ocelotlView.getOcelotlParameters().getOcelotlSettings().getMainSelectionAlphaValue();
 	}
 
 	abstract protected void computeDiagram();
@@ -343,7 +354,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		
 		potentialSelectFigure = new SelectFigure(potentialColorFG, potentialColorBG);
 		potentialSelectFigure.setLineWidth(1);
-		potentialSelectFigure.setAlpha(100);
+		potentialSelectFigure.setAlpha(potentialColorAlpha);
 		potentialSelectFigure.setFill(true);
 		
 		highLightAggregateFigure = new SelectFigure(ColorConstants.black, ColorConstants.white);
@@ -374,6 +385,96 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public void setCurrentlySelectedNode(EventProducerNode currentlySelectedNode) {
 		this.currentlySelectedNode = currentlySelectedNode;
+	}
+
+	public static Color getSelectColorFG() {
+		return selectColorFG;
+	}
+
+	public void setSelectColorFG(Color selectColorFG) {
+		AggregatedView.selectColorFG = selectColorFG;
+	}
+
+	public static Color getSelectColorBG() {
+		return selectColorBG;
+	}
+
+	public void setSelectColorBG(Color selectColorBG) {
+		AggregatedView.selectColorBG = selectColorBG;
+	}
+
+	public static Color getPotentialColorFG() {
+		return potentialColorFG;
+	}
+
+	public void setPotentialColorFG(Color aPotentialColorFG) {
+		AggregatedView.potentialColorFG = aPotentialColorFG;
+		if (potentialSelectFigure != null) {
+			potentialSelectFigure.setForegroundColor(potentialColorFG);
+		}
+	}
+
+	public static Color getPotentialColorBG() {
+		return potentialColorBG;
+	}
+
+	public void setPotentialColorBG(Color aPotentialColorBG) {
+		AggregatedView.potentialColorBG = aPotentialColorBG;
+		if (potentialSelectFigure != null) {
+			potentialSelectFigure.setBackgroundColor(potentialColorBG);
+		}
+	}
+
+	public static Color getActiveColorFG() {
+		return activeColorFG;
+	}
+
+	public void setActiveColorFG(Color anActiveColorFG) {
+		AggregatedView.activeColorFG = anActiveColorFG;
+		if (selectFigure != null) {
+			selectFigure.setForegroundColor(activeColorFG);
+		}
+	}
+
+	public static Color getActiveColorBG() {
+		return activeColorBG;
+	}
+
+	public void setActiveColorBG(Color anActiveColorBG) {
+		AggregatedView.activeColorBG = anActiveColorBG;
+		if (selectFigure != null) {
+			selectFigure.setBackgroundColor(activeColorBG);
+		}
+	}
+
+	public static int getPotentialColorAlpha() {
+		return potentialColorAlpha;
+	}
+
+	public void setPotentialColorAlpha(int aPotentialColorAlpha) {
+		AggregatedView.potentialColorAlpha = aPotentialColorAlpha;
+		if (potentialSelectFigure != null) {
+			potentialSelectFigure.setAlpha(aPotentialColorAlpha);
+		}
+	}
+
+	public static int getActiveColorAlpha() {
+		return activeColorAlpha;
+	}
+
+	public void setActiveColorAlpha(int anActiveColorAlpha) {
+		AggregatedView.activeColorAlpha = anActiveColorAlpha;
+	}
+
+	public static int getSelectColorAlpha() {
+		return selectColorAlpha;
+	}
+
+	public void setSelectColorAlpha(int aSelectColorAlpha) {
+		AggregatedView.selectColorAlpha = aSelectColorAlpha;
+		if (selectFigure != null) {
+			selectFigure.setAlpha(selectColorAlpha);
+		}
 	}
 
 }

@@ -103,6 +103,16 @@ public class OcelotlDefaultParameterConstants {
 	public static final Color OVERVIEW_SELECT_BG_COLOR = ColorConstants.black;
 	public static final int OVERVIEW_SELECT_ALPHA = 110;
 	
+	/**
+	 * Colors for the main selection
+	 */
+	public static final Color MAIN_DISPLAY_FG_COLOR = ColorConstants.black;
+	public static final Color MAIN_DISPLAY_BG_COLOR = ColorConstants.black;
+	public static final int MAIN_DISPLAY_ALPHA = 120;
+	public static final Color MAIN_SELECT_FG_COLOR = ColorConstants.darkBlue;
+	public static final Color MAIN_SELECT_BG_COLOR = ColorConstants.darkBlue;
+	public static final int MAIN_SELECT_ALPHA = 120;
+	
 	/*
 	 * Is the overview enable
 	 */

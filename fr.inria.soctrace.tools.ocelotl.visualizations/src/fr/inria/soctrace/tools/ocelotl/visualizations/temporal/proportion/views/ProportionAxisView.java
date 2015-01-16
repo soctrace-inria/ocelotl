@@ -205,16 +205,17 @@ public class ProportionAxisView extends UnitAxisView {
 		}
 		
 		// Add legend
-		String unit = ocelotlView.getOcelotlCore().getUnit(ocelotlView.getOcelotlCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
+		String unit = ocelotlView.getOcelotlCore().getUnit(
+				ocelotlView.getOcelotlCore().getMicromodelTypes()
+						.getSelectedOperatorResource().getUnit());
 		final Label label = new Label(unit);
 		label.setLabelAlignment(PositionConstants.RIGHT);
 		label.setForegroundColor(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-		label.setFont(SWTResourceManager.getFont("Cantarell",
-				6, SWT.NORMAL));
+		label.setFont(SWTResourceManager.getFont("Cantarell", 6, SWT.NORMAL));
 		label.setToolTip(new Label(unit));
 		label.setSize(textWidth, TextHeight);
-		
+
 		// Compute label width
 		GC gc = new GC(canvas);
 		gc.setFont(label.getFont());
@@ -222,9 +223,8 @@ public class ProportionAxisView extends UnitAxisView {
 		if (labelWidth > labelMaxWidth)
 			labelMaxWidth = labelWidth;
 
-		root.add(label, new Rectangle(new Point(0, 0), 
-				new Point(mainLineXPosition - TextPositionOffset,
-						TextHeight)));
+		root.add(label, new Rectangle(new Point(0, 0), new Point(
+				mainLineXPosition - TextPositionOffset, TextHeight)));
 	}
 
 	/**

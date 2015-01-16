@@ -184,16 +184,18 @@ abstract public class UnitAxisView {
 			setLayoutManager(layout);
 			setForegroundColor(foreGround);
 			setBackgroundColor(backGround);
-			setAlpha(alphaValue);
+			setAlpha(AggregatedView.activeColorAlpha);
 		}
 
 		public void draw(int originY, int cornerY, final boolean active) {
 			if (active) {
 				setForegroundColor(AggregatedView.activeColorFG);
 				setBackgroundColor(AggregatedView.activeColorBG);
+				setAlpha(AggregatedView.activeColorAlpha);
 			} else {
-				setForegroundColor(AggregatedView.selectColorBG);
-				setBackgroundColor(AggregatedView.selectColorBG);
+				setForegroundColor(AggregatedView.potentialColorFG);
+				setBackgroundColor(AggregatedView.potentialColorBG);
+				setAlpha(AggregatedView.potentialColorAlpha);
 			}
 			root.add(this,
 					new Rectangle(new Point(0, originY), new Point(root.getClientArea().width,

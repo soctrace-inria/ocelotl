@@ -63,9 +63,11 @@ public class TimeAxisView {
 			if (active) {
 				setForegroundColor(AggregatedView.activeColorFG);
 				setBackgroundColor(AggregatedView.activeColorBG);
+				setAlpha(AggregatedView.activeColorAlpha);
 			} else {
 				setForegroundColor(AggregatedView.potentialColorFG);
 				setBackgroundColor(AggregatedView.potentialColorBG);
+				setAlpha(AggregatedView.potentialColorAlpha);
 			}
 			root.add(this,
 					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height - 2), new Point(
