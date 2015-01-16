@@ -722,21 +722,25 @@ public class OcelotlSettings {
 		return aggregateLeaves;
 	}
 
-	public void setAggregateLeaves(boolean aggregateLeaves) {
+	public boolean setAggregateLeaves(boolean aggregateLeaves) {
 		if (this.aggregateLeaves != aggregateLeaves) {
 			this.aggregateLeaves = aggregateLeaves;
 			saveSettings();
+			return true;
 		}
+		return false;
 	}
 
 	public int getMaxNumberOfLeaves() {
 		return maxNumberOfLeaves;
 	}
 
-	public void setMaxNumberOfLeaves(int maxNumberOfLeaves) {
+	public boolean setMaxNumberOfLeaves(int maxNumberOfLeaves) {
 		if (this.maxNumberOfLeaves != maxNumberOfLeaves) {
 			this.maxNumberOfLeaves = maxNumberOfLeaves;
 			saveSettings();
+			return true;
 		}
+		return false;
 	}
 }

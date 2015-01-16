@@ -703,6 +703,21 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 			cancelSelection();
 		}
 	}
+	
+	
+	private class NextZoomListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			history.restoreNextHistory();
+		}
+	}
+	
+	private class PrevZoomListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			history.restorePrevHistory();
+		}
+	}
 
 	/**
 	 * Cancel the current selection
@@ -815,40 +830,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		};
 		takeSnapshot.setToolTipText("Take a Snapshot of the Current View");
 		return takeSnapshot;
-	}
-
-	/**
-	 * Add the next zoom button in the toolbar
-	 * 
-	 * @return
-	 */
-	private Action createNextZoom() {
-		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/dlcl16/forward_nav.gif");
-		final Action nextZoom = new Action("Next zoom value", img) {
-			@Override
-			public void run() {
-				history.restoreNextHistory();
-			}
-		};
-		nextZoom.setToolTipText("Go to the Next Zooming Value");
-		return nextZoom;
-	}
-	
-	/**
-	 * Create the next zoom button for the toolbar
-	 * 
-	 * @return
-	 */
-	private Action createPrevZoom() {
-		final ImageDescriptor img = ResourceManager.getPluginImageDescriptor("fr.inria.soctrace.tools.ocelotl.ui", "icons/dlcl16/backward_nav.gif");
-		final Action prevZoom = new Action("Previous zoom value", img) {
-			@Override
-			public void run() {
-				history.restorePrevHistory();
-			}
-		};
-		prevZoom.setToolTipText("Go back to the Previous Zooming Value");
-		return prevZoom;
 	}
 
 	private class TraceAdapter extends SelectionAdapter {
@@ -993,22 +974,18 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private StatViewWrapper				statViewWrapper;
 	private Button						btnSettings2;
 	private Button						btnReset;
+	private Button						buttonCancelSelection;
+	private Button						btnNextZoom;
+	private Button						btnPrevZoom;
 	private TabFolder					tabFolder;
 	private Action						settings;
 	private Action						snapshotAction;
-	private Action						nextZoom;
-	private Action						prevZoom;
 	
 	private Snapshot					snapshot;
 	private Font						cantarell8;
 	private Overview					overView;
 	private ParameterStrategy			parameterPPolicy;
 	private ActionHistory				history;
-
-	/**
-	 * Followed topics
-	 */
-	protected FramesocBusTopicList		topics			= null;
 
 	private ConfigViewManager			aggregationSettingsManager;
 	private Combo						comboStatistics;
@@ -1018,11 +995,15 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 	private Label						textDisplayedEnd;
 	private Button						overViewParamUp;
 	private Button						overViewParamDown;
-	private Button						buttonCancelSelection;
 	private SashForm					mainViewTopSashform;
 	private SashForm					mainViewBottomSashform;
 	private Composite					compositeTimeAxisView;
-	private SubStatusLineManager			statusLineManager;
+	private SubStatusLineManager		statusLineManager;
+	
+	/**
+	 * Followed topics
+	 */
+	protected FramesocBusTopicList		topics			= null;
 
 	/** @throws SoCTraceException */
 	public OcelotlView() throws SoCTraceException {
@@ -1153,7 +1134,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		groupTraces.setFont(cantarell8);
 		groupTraces.setLayout(new GridLayout(8, false));
 		
-			
 		comboTraces = new Combo(groupTraces, SWT.READ_ONLY);
 		 				GridData gd_comboTraces = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		 				gd_comboTraces.widthHint = 170;
@@ -1235,7 +1215,6 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		compositeTimeAxisView.addListener(SWT.Resize, new ResizeTimeAxisListener());
 		mainViewBottomSashform.setWeights(OcelotlConstants.yAxisDefaultWeight);
 		
-		
 		// Set unit axis
 		final Composite compositeUnitAxisView = new Composite(getMainViewTopSashform(), SWT.BORDER);
 		compositeUnitAxisView.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
@@ -1265,7 +1244,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		groupTime.setForeground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		groupTime.setFont(cantarell8);
-		groupTime.setLayout(new GridLayout(16, false));
+		groupTime.setLayout(new GridLayout(20, false));
 
 		Label lblDisplayedStart = new Label(groupTime, SWT.NONE);
 		lblDisplayedStart.setFont(cantarell8);
@@ -1302,7 +1281,7 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		gd_textTimestampStart.widthHint = 100;
 		textTimestampStart.setLayoutData(gd_textTimestampStart);
 		textTimestampStart.setFont(cantarell8);
-		textTimestampStart.setToolTipText("Starting Ttimestamp Value");
+		textTimestampStart.setToolTipText("Starting Timestamp Value");
 
 		final Label lblEndTimestamp = new Label(groupTime, SWT.NONE);
 		lblEndTimestamp.setFont(cantarell8);
@@ -1323,6 +1302,16 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		buttonCancelSelection.setToolTipText("Cancel the Current Selection");
 		buttonCancelSelection.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/delete_edit.gif"));
 
+		btnPrevZoom = new Button(groupTime, SWT.NONE);
+		btnPrevZoom.setToolTipText("Go to the Previous Zooming Value");
+		btnPrevZoom.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/dlcl16/backward_nav.gif"));
+		btnPrevZoom.setEnabled(false);
+		
+		btnNextZoom = new Button(groupTime, SWT.NONE);
+		btnNextZoom.setToolTipText("Go to the Next Zooming Value");
+		btnNextZoom.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/dlcl16/forward_nav.gif"));
+		btnNextZoom.setEnabled(false);
+		
 		final Label lblTSNumber = new Label(groupTime, SWT.NONE);
 		lblTSNumber.setFont(cantarell8);
 		lblTSNumber.setText("Timeslice Number");
@@ -1337,6 +1326,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		spinnerTSNumber.addModifyListener(new TimeSliceModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
 		buttonCancelSelection.addSelectionListener(new CancelSelectionListener());
+		btnNextZoom.addSelectionListener(new NextZoomListener());
+		btnPrevZoom.addSelectionListener(new PrevZoomListener());
 		textTimestampEnd.addModifyListener(new TimestampModificationListener());
 		textTimestampStart.addModifyListener(new TimestampModificationListener());
 		scrolledComposite.setContent(groupTime);
@@ -1475,13 +1466,9 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 
 		settings = createSettingWindow(this);
 		snapshotAction = createSnapshot();
-		prevZoom = createPrevZoom();
-		nextZoom = createNextZoom();
 
 		toolBar.add(settings);
 		toolBar.add(snapshotAction);
-		toolBar.add(prevZoom);
-		toolBar.add(nextZoom);
 		
 		statusLineManager = (SubStatusLineManager) actionBars.getStatusLineManager();
 	
@@ -1594,20 +1581,12 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		this.statView = statView;
 	}
 
-	public Action getNextZoom() {
-		return nextZoom;
+	public Button getNextZoom() {
+		return btnNextZoom;
 	}
 
-	public void setNextZoom(Action nextZoom) {
-		this.nextZoom = nextZoom;
-	}
-
-	public Action getPrevZoom() {
-		return prevZoom;
-	}
-
-	public void setPrevZoom(Action prevZoom) {
-		this.prevZoom = prevZoom;
+	public Button getPrevZoom() {
+		return btnPrevZoom;
 	}
 
 	public Combo getComboType() {
@@ -1671,8 +1650,8 @@ public class OcelotlView extends ViewPart implements IFramesocBusListener {
 		comboStatistics.setEnabled(false);
 		btnRun.setEnabled(false);
 		snapshotAction.setEnabled(false);
-		nextZoom.setEnabled(false);
-		prevZoom.setEnabled(false);
+		btnNextZoom.setEnabled(false);
+		btnPrevZoom.setEnabled(false);
 		ocelotlParameters.getDataCache().buildDictionary(confDataLoader.getTraces());
 	}
 

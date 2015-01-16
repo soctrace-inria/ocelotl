@@ -633,64 +633,85 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerMaxAggLeaves.setSelection(settings.getMaxNumberOfLeaves());
 		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1, 1 });
 
-		// Snapshot settings
-		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
-		tbtMiscSettings.setText("Snapshot");
+		// Selection settings
+		final TabItem tbtSelectionSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtSelectionSettings.setText("Selection");
 
-		final SashForm sashFormMiscSettings = new SashForm(tabFolder, SWT.VERTICAL);
-		tbtMiscSettings.setControl(sashFormMiscSettings);
-		sashFormMiscSettings.setFont(cantarell8);
+		final SashForm sashFormSelectionSettings = new SashForm(tabFolder, SWT.VERTICAL);
+		sashFormSelectionSettings.setFont(cantarell8);
+		tbtSelectionSettings.setControl(sashFormSelectionSettings);
 
-		final Group groupMiscSettings = new Group(sashFormMiscSettings, SWT.NONE);
-		groupMiscSettings.setFont(cantarell8);
-		groupMiscSettings.setText("Snapshot Settings");
-		groupMiscSettings.setLayout(new GridLayout(3, false));
+		final Group groupSelectionSettings = new Group(sashFormSelectionSettings, SWT.NONE);
+		groupSelectionSettings.setFont(cantarell8);
+		groupSelectionSettings.setText("Selection Settings");
+		groupSelectionSettings.setLayout(new GridLayout(2, false));
+		
+		final Label lblSelectionBgDisplay = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionBgDisplay.setFont(cantarell8);
+		lblSelectionBgDisplay.setText("Display Background");
 
-		final Label lblSnapshotDirectory = new Label(groupMiscSettings, SWT.NONE);
-		lblSnapshotDirectory.setFont(cantarell8);
-		lblSnapshotDirectory.setText("Snapshot Directory:");
+		btnEditBgMainDisplay = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditBgMainDisplay.setToolTipText("Edit Color");
+		btnEditBgMainDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgMainDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgMainDisplay, settings.getMainDisplayBgColor());
 
-		final GridData gd_MiscDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_MiscDir.widthHint = 100;
+		final Label lblSelectionFgDisplay = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionFgDisplay.setFont(cantarell8);
+		lblSelectionFgDisplay.setText("Display Foreground");
 
-		snapshotDirectory = new Text(groupMiscSettings, SWT.BORDER);
-		snapshotDirectory.setLayoutData(gd_MiscDir);
-		snapshotDirectory.setFont(cantarell8);
-		snapshotDirectory.setEditable(false);
-		snapshotDirectory.setText(settings.getSnapShotDirectory());
+		btnEditFgMainDisplay = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditFgMainDisplay.setToolTipText("Edit Color");
+		btnEditFgMainDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgMainDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgMainDisplay, settings.getMainDisplayFgColor());
+		
+		final Label lblSelectionDisplayAlpha = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionDisplayAlpha.setFont(cantarell8);
+		lblSelectionDisplayAlpha.setText("Display Transparency");
 
-		btnChangeSnapshotDirectory = new Button(groupMiscSettings, SWT.PUSH);
-		btnChangeSnapshotDirectory.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
-		btnChangeSnapshotDirectory.setToolTipText("Change Snapshot Directory");
-		btnChangeSnapshotDirectory.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/fldr_obj.gif"));
-		btnChangeSnapshotDirectory.setFont(cantarell8);
+		textMainDisplayAlpha = new Spinner(groupSelectionSettings, SWT.BORDER);
+		textMainDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textMainDisplayAlpha.setIncrement(1);
+		textMainDisplayAlpha.setMaximum(255);
+		textMainDisplayAlpha.setMinimum(0);
+		textMainDisplayAlpha.setFont(cantarell8);
+		textMainDisplayAlpha.setSelection(settings.getMainDisplayAlphaValue());
+		textMainDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
+	
+		final Label lblSelectionBgSelect = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionBgSelect.setFont(cantarell8);
+		lblSelectionBgSelect.setText("Selection Background");
 
-		Label lblsnapshotWidth = new Label(groupMiscSettings, SWT.NONE);
-		lblsnapshotWidth.setFont(cantarell8);
-		lblsnapshotWidth.setText("Snapshot Width");
+		btnEditBgMainSelected = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditBgMainSelected.setToolTipText("Edit Color");
+		btnEditBgMainSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgMainSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgMainSelected, settings.getMainSelectionBgColor());
+		
+		final Label lblSelectionFgSelect = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionFgSelect.setFont(cantarell8);
+		lblSelectionFgSelect.setText("Selection Foreground");
 
-		snapshotWidth = new Text(groupMiscSettings, SWT.BORDER);
-		snapshotWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		snapshotWidth.setFont(cantarell8);
-		snapshotWidth.setToolTipText("Width of the Generated Image in Pixels");
-		snapshotWidth.setText(String.valueOf(settings.getSnapshotXResolution()));
-		snapshotWidth.addVerifyListener(new NumericTextFieldVerifyListener());
-		new Label(groupMiscSettings, SWT.NONE);
+		btnEditFgMainSelected = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditFgMainSelected.setToolTipText("Edit Color");
+		btnEditFgMainSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgMainSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgMainSelected, settings.getMainSelectionFgColor());
+		
+		final Label lblSelectionAlpha = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionAlpha.setFont(cantarell8);
+		lblSelectionAlpha.setText("Selection Transparency");
 
-		Label lblsnapshotHeight = new Label(groupMiscSettings, SWT.NONE);
-		lblsnapshotHeight.setFont(cantarell8);
-		lblsnapshotHeight.setText("Snapshot Height");
-
-		snapshotHeight = new Text(groupMiscSettings, SWT.BORDER);
-		snapshotHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		snapshotHeight.setText(String.valueOf(settings.getSnapshotYResolution()));
-		snapshotHeight.setFont(cantarell8);
-		snapshotHeight.setToolTipText("Height of the Generated Image in Pixels");
-		snapshotHeight.addVerifyListener(new NumericTextFieldVerifyListener());
-		new Label(groupMiscSettings, SWT.NONE);
-
-		btnChangeSnapshotDirectory.addSelectionListener(new ModifySnapshotDirectory());
-
+		textMainSelectionAlpha = new Spinner(groupSelectionSettings, SWT.BORDER);
+		textMainSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textMainSelectionAlpha.setIncrement(1);
+		textMainSelectionAlpha.setMaximum(255);
+		textMainSelectionAlpha.setMinimum(0);
+		textMainSelectionAlpha.setFont(cantarell8);
+		textMainSelectionAlpha.setSelection(settings.getMainSelectionAlphaValue());
+		textMainSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
+		
 		// Overview settings
 		final TabItem tbtOverviewSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtOverviewSettings.setText("Overview");
@@ -777,85 +798,65 @@ public class OcelotlSettingsView extends Dialog {
 		textOverviewSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
 		textOverviewSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
 
-		// Overview settings
-		final TabItem tbtSelectionSettings = new TabItem(tabFolder, SWT.NONE);
-		tbtSelectionSettings.setText("Selection");
+		// Snapshot settings
+		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtMiscSettings.setText("Snapshot");
 
-		final SashForm sashFormSelectionSettings = new SashForm(tabFolder, SWT.VERTICAL);
-		sashFormSelectionSettings.setFont(cantarell8);
-		tbtSelectionSettings.setControl(sashFormSelectionSettings);
+		final SashForm sashFormMiscSettings = new SashForm(tabFolder, SWT.VERTICAL);
+		tbtMiscSettings.setControl(sashFormMiscSettings);
+		sashFormMiscSettings.setFont(cantarell8);
 
-		final Group groupSelectionSettings = new Group(sashFormSelectionSettings, SWT.NONE);
-		groupSelectionSettings.setFont(cantarell8);
-		groupSelectionSettings.setText("Selection Settings");
-		groupSelectionSettings.setLayout(new GridLayout(2, false));
+		final Group groupMiscSettings = new Group(sashFormMiscSettings, SWT.NONE);
+		groupMiscSettings.setFont(cantarell8);
+		groupMiscSettings.setText("Snapshot Settings");
+		groupMiscSettings.setLayout(new GridLayout(3, false));
+
+		final Label lblSnapshotDirectory = new Label(groupMiscSettings, SWT.NONE);
+		lblSnapshotDirectory.setFont(cantarell8);
+		lblSnapshotDirectory.setText("Snapshot Directory:");
+
+		final GridData gd_MiscDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_MiscDir.widthHint = 100;
+
+		snapshotDirectory = new Text(groupMiscSettings, SWT.BORDER);
+		snapshotDirectory.setLayoutData(gd_MiscDir);
+		snapshotDirectory.setFont(cantarell8);
+		snapshotDirectory.setEditable(false);
+		snapshotDirectory.setText(settings.getSnapShotDirectory());
+
+		btnChangeSnapshotDirectory = new Button(groupMiscSettings, SWT.PUSH);
+		btnChangeSnapshotDirectory.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+		btnChangeSnapshotDirectory.setToolTipText("Change Snapshot Directory");
+		btnChangeSnapshotDirectory.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/fldr_obj.gif"));
+		btnChangeSnapshotDirectory.setFont(cantarell8);
+
+		Label lblsnapshotWidth = new Label(groupMiscSettings, SWT.NONE);
+		lblsnapshotWidth.setFont(cantarell8);
+		lblsnapshotWidth.setText("Snapshot Width");
+
+		snapshotWidth = new Text(groupMiscSettings, SWT.BORDER);
+		snapshotWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		snapshotWidth.setFont(cantarell8);
+		snapshotWidth.setToolTipText("Width of the Generated Image in Pixels");
+		snapshotWidth.setText(String.valueOf(settings.getSnapshotXResolution()));
+		snapshotWidth.addVerifyListener(new NumericTextFieldVerifyListener());
+		new Label(groupMiscSettings, SWT.NONE);
+
+		Label lblsnapshotHeight = new Label(groupMiscSettings, SWT.NONE);
+		lblsnapshotHeight.setFont(cantarell8);
+		lblsnapshotHeight.setText("Snapshot Height");
+
+		snapshotHeight = new Text(groupMiscSettings, SWT.BORDER);
+		snapshotHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		snapshotHeight.setText(String.valueOf(settings.getSnapshotYResolution()));
+		snapshotHeight.setFont(cantarell8);
+		snapshotHeight.setToolTipText("Height of the Generated Image in Pixels");
+		snapshotHeight.addVerifyListener(new NumericTextFieldVerifyListener());
+		new Label(groupMiscSettings, SWT.NONE);
+
+		btnChangeSnapshotDirectory.addSelectionListener(new ModifySnapshotDirectory());
+
 		
-		final Label lblSelectionBgDisplay = new Label(groupSelectionSettings, SWT.NONE);
-		lblSelectionBgDisplay.setFont(cantarell8);
-		lblSelectionBgDisplay.setText("Display Background");
-
-		btnEditBgMainDisplay = new Button(groupSelectionSettings, SWT.NONE);
-		btnEditBgMainDisplay.setToolTipText("Edit Color");
-		btnEditBgMainDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditBgMainDisplay.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditBgMainDisplay, settings.getMainDisplayBgColor());
-
-		final Label lblSelectionFgDisplay = new Label(groupSelectionSettings, SWT.NONE);
-		lblSelectionFgDisplay.setFont(cantarell8);
-		lblSelectionFgDisplay.setText("Display Foreground");
-
-		btnEditFgMainDisplay = new Button(groupSelectionSettings, SWT.NONE);
-		btnEditFgMainDisplay.setToolTipText("Edit Color");
-		btnEditFgMainDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditFgMainDisplay.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditFgMainDisplay, settings.getMainDisplayFgColor());
-		
-		final Label lblSelectionDisplayAlpha = new Label(groupSelectionSettings, SWT.NONE);
-		lblSelectionDisplayAlpha.setFont(cantarell8);
-		lblSelectionDisplayAlpha.setText("Display Transparency");
-
-		textMainDisplayAlpha = new Spinner(groupSelectionSettings, SWT.BORDER);
-		textMainDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		textMainDisplayAlpha.setIncrement(1);
-		textMainDisplayAlpha.setMaximum(255);
-		textMainDisplayAlpha.setMinimum(0);
-		textMainDisplayAlpha.setFont(cantarell8);
-		textMainDisplayAlpha.setSelection(settings.getMainDisplayAlphaValue());
-		textMainDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
-	
-		final Label lblSelectionBgSelect = new Label(groupSelectionSettings, SWT.NONE);
-		lblSelectionBgSelect.setFont(cantarell8);
-		lblSelectionBgSelect.setText("Selection Background");
-
-		btnEditBgMainSelected = new Button(groupSelectionSettings, SWT.NONE);
-		btnEditBgMainSelected.setToolTipText("Edit Color");
-		btnEditBgMainSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditBgMainSelected.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditBgMainSelected, settings.getMainSelectionBgColor());
-		
-		final Label lblSelectionFgSelect = new Label(groupSelectionSettings, SWT.NONE);
-		lblSelectionFgSelect.setFont(cantarell8);
-		lblSelectionFgSelect.setText("Selection Foreground");
-
-		btnEditFgMainSelected = new Button(groupSelectionSettings, SWT.NONE);
-		btnEditFgMainSelected.setToolTipText("Edit Color");
-		btnEditFgMainSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditFgMainSelected.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditFgMainSelected, settings.getMainSelectionFgColor());
-		
-		final Label lblSelectionAlpha = new Label(groupSelectionSettings, SWT.NONE);
-		lblSelectionAlpha.setFont(cantarell8);
-		lblSelectionAlpha.setText("Selection Transparency");
-
-		textMainSelectionAlpha = new Spinner(groupSelectionSettings, SWT.BORDER);
-		textMainSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		textMainSelectionAlpha.setIncrement(1);
-		textMainSelectionAlpha.setMaximum(255);
-		textMainSelectionAlpha.setMinimum(0);
-		textMainSelectionAlpha.setFont(cantarell8);
-		textMainSelectionAlpha.setSelection(settings.getMainSelectionAlphaValue());
-		textMainSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
-
 		initSettings();
 		
 		return sashFormGlobal;
@@ -897,7 +898,7 @@ public class OcelotlSettingsView extends Dialog {
 		modifyDataCacheSize();
 		updateCacheDir();
 		settings.setCachePolicy(currentSelectedDatacachePolicy);
-		
+
 		// Parameter P strategy
 		settings.setParameterPPolicy(ocelotlView.getParameterPPolicy().getStrategy(parameterPStrategy.getText()));
 
@@ -905,8 +906,16 @@ public class OcelotlSettingsView extends Dialog {
 		settings.setNumberOfThread(Integer.valueOf(spinnerThread.getText()));
 		settings.setMaxEventProducersPerQuery(Integer.valueOf(spinnerDivideDbQuery.getText()));
 		settings.setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
-		settings.setAggregateLeaves(btnEnableLeavesAgg.getSelection());
-		settings.setMaxNumberOfLeaves(Integer.valueOf(spinnerMaxAggLeaves.getText()));
+
+		boolean hasChangedAll = false;
+		if (settings.setAggregateLeaves(btnEnableLeavesAgg.getSelection()))
+			hasChangedAll = true;
+
+		if (settings.setMaxNumberOfLeaves(Integer.valueOf(spinnerMaxAggLeaves.getText())))
+			hasChangedAll = true;
+
+		if (hasChangedAll)
+			ocelotlView.setHasChanged(HasChanged.ALL);
 		
 		// Curve settings
 		modifyThreshold();

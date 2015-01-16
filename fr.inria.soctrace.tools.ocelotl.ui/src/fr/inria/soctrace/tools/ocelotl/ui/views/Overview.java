@@ -371,6 +371,7 @@ public class Overview implements IFramesocBusListener {
 		timeLineView.setRoot(root);
 		timeLineView.setCanvas(canvas);
 		redrawOverview = true;
+		aggregManager = null;
 
 		// Init other stuff
 		displayedTimeRegion = new TimeRegion(ocelotlView.getTimeRegion());

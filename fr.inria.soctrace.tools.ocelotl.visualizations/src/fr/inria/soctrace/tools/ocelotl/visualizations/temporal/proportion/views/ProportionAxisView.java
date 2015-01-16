@@ -212,7 +212,7 @@ public class ProportionAxisView extends UnitAxisView {
 		label.setLabelAlignment(PositionConstants.RIGHT);
 		label.setForegroundColor(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-		label.setFont(SWTResourceManager.getFont("Cantarell", 6, SWT.NORMAL));
+		label.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		label.setToolTip(new Label(unit));
 		label.setSize(textWidth, TextHeight);
 
