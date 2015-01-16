@@ -46,6 +46,9 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 			RectangleFigure rectangle = new RectangleFigure();
 
 			MainEvent state = getMainState(epn, startTimeSlice, endTimeSlice);
+			if(state.getState().equals(SpatiotemporalMode.Void))
+				return null;
+			
 			String label = " " + epn.getMe().getName() + " ("
 					+ state.getState() + ", " + state.getAmplitude100() + "%) ";
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()

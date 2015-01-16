@@ -33,7 +33,7 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.config.spatiotemporal.Spat
 public abstract class SpatiotemporalMode extends VisuSTOperator {
 
 	HashMap<EventProducerNode, ArrayList<HashMap<String, Double>>> proportions;
-	static final String Void = "void";
+	public static final String Void = "void";
 
 	public SpatiotemporalMode() {
 		super();

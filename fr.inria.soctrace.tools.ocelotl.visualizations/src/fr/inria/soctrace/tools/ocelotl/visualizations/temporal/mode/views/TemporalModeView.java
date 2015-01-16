@@ -31,14 +31,17 @@ public class TemporalModeView extends TimeLineView {
 		for (i = 0; i < aggParts.size(); i++) {
 			final ModeFigure part = new ModeFigure();
 			part.getUpdateManager().performUpdate();
-			MainEvent mState = ((TemporalMode) visuOperator).getMajStates().get(i);
-			part.draw(mState);
-			figures.add(part);
-			root.add(part,
-					new Rectangle(new Point(j * drawingAreaWidth / parts.size()
-							+ aBorder, root.getSize().height - aBorder),
-							new Point((j + aggParts.get(i)) * drawingAreaWidth
-									/ parts.size() - space + aBorder, aBorder)));
+			MainEvent mState = ((TemporalMode) visuOperator).getMajStates()
+					.get(i);
+			if (!mState.getState().equals("void")) {
+				part.draw(mState);
+				figures.add(part);
+				root.add(part, new Rectangle(new Point(j * drawingAreaWidth
+						/ parts.size() + aBorder, root.getSize().height
+						- aBorder), new Point((j + aggParts.get(i))
+						* drawingAreaWidth / parts.size() - space + aBorder,
+						aBorder)));
+			}
 			j = j + aggParts.get(i);
 		}
 	}

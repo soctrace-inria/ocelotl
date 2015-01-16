@@ -183,6 +183,10 @@ public abstract class SpatioTemporalView extends MatrixView {
 			// Set the rectangle characteristics
 			final RectangleFigure rectangle = setRectangle(epn, logicX,
 					logicX2, isVisualAggregate, number);
+			
+			// Void state
+			if(rectangle == null)
+				return;
 
 			String label = ((Label) rectangle.getToolTip()).getText();
 
