@@ -206,7 +206,7 @@ public class ProportionAxisView extends UnitAxisView {
 		
 		// Add legend
 		String unit = ocelotlView.getOcelotlParameters().getCurrentUnit();
-		final Label label = new Label(unit);
+		final Label label = new Label(" " + unit + " ");
 		label.setLabelAlignment(PositionConstants.RIGHT);
 		label.setForegroundColor(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_FOREGROUND));
