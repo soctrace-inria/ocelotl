@@ -91,7 +91,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	
 	@Override
 	public void deleteDiagram() {
-		if (tableViewer != null)
+		if (tableViewer != null) 
 			tableViewer.setInput(null);
 	}
 
@@ -107,10 +107,12 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	
 	@Override
 	public void updateData() {
-		statProvider.computeData();
-		updateTableData();
-		// Needed for correct redraw of the table
-		compositeTable.layout();
+		if (statProvider.getMicroMode() != null) {
+			statProvider.computeData();
+			updateTableData();
+			// Needed for correct redraw of the table
+			compositeTable.layout();
+		}
 	}
 
 	@Override

@@ -246,5 +246,11 @@ public class TimeAxisView {
 		selectTime = null;
 		resizeDiagram();
 	}
+	
+	public void deleteDiagram() {
+		root.removeAll();
+		root.repaint();
+		time = null;
+	}
 
 }

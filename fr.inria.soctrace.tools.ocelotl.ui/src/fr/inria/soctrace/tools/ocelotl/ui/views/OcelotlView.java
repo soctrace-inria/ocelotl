@@ -438,6 +438,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							unitAxisView.deleteDiagram();
 							unitAxisView.createDiagram(ocelotlCore.getVisuOperator());
 							updateStatus();
+							visuDisplayed = true;
 							
 							if (ocelotlParameters.isOvervieweEnable()) {
 								try {
@@ -510,6 +511,16 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			
 			// Set the number of time slice
 			spinnerTSNumber.setSelection(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getTs());
+			visuDisplayed = false;
+			
+			if (timeLineView != null) {
+				timeLineView.deleteDiagram();
+				unitAxisView.deleteDiagram();
+				timeAxisView.deleteDiagram();
+				qualityView.deleteDiagram();
+				statView.deleteDiagram();
+			}
+			
 			comboVisu.setEnabled(true);
 			comboVisu.removeAll();
 
@@ -594,7 +605,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			statViewWrapper.setView(statView);
 			
 			// If there is a diagram displayed then also update the stat table
-			if(ocelotlCore.getLpaggregManager() != null)
+			if(ocelotlCore.getLpaggregManager() != null && visuDisplayed == true)
 				statView.createDiagram();
 		}
 	}
@@ -1004,6 +1015,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	private SashForm					mainViewBottomSashform;
 	private Composite					compositeTimeAxisView;
 	private SubStatusLineManager		statusLineManager;
+	private boolean						visuDisplayed;
 	
 	/**
 	 * Followed topics
@@ -1327,7 +1339,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		overViewParamUp.setImage(null);
 		overViewParamUp.setFont(cantarell8);
 		overViewParamUp.addSelectionListener(new OverviewParameterUpAdapter());
-		
 		
 		overViewParamDown = new Button(buttonSashForm, SWT.NONE);
 		overViewParamDown.setText("<");
@@ -1707,7 +1718,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 	// When receiving a notification, update the trace list
 	@Override
-	public void handle(FramesocBusTopic topic, Object data) {
+	public void partHandle(FramesocBusTopic topic, Object data) {
 		if (topic.equals(FramesocBusTopic.TOPIC_UI_TRACES_SYNCHRONIZED) || topic.equals(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED) || topic.equals(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED)) {
 			refreshTraces();
 		}

@@ -180,4 +180,9 @@ public class SummaryStat extends StatisticsProvider {
 		}
 	}
 
+	@Override
+	public MicroscopicDescription getMicroMode() {
+		return microModel;
+	}
+
 }
