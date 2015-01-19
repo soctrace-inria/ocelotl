@@ -310,12 +310,14 @@ public class OcelotlSettingsView extends Dialog {
 	 * Update the main selection colors
 	 */
 	public void updateMainSelectionColors() {
-		ocelotlView.getTimeLineView().setActiveColorBG(btnColorMap.get(btnEditBgMainDisplay));
-		ocelotlView.getTimeLineView().setActiveColorFG(btnColorMap.get(btnEditFgMainDisplay));
-		ocelotlView.getTimeLineView().setActiveColorAlpha(settings.getMainDisplayAlphaValue());
-		ocelotlView.getTimeLineView().setPotentialColorBG(btnColorMap.get(btnEditBgMainSelected));
-		ocelotlView.getTimeLineView().setPotentialColorFG(btnColorMap.get(btnEditFgMainSelected));
-		ocelotlView.getTimeLineView().setPotentialColorAlpha(settings.getMainSelectionAlphaValue());
+		if (ocelotlView.getTimeLineView() != null) {
+			ocelotlView.getTimeLineView().setActiveColorBG(btnColorMap.get(btnEditBgMainDisplay));
+			ocelotlView.getTimeLineView().setActiveColorFG(btnColorMap.get(btnEditFgMainDisplay));
+			ocelotlView.getTimeLineView().setActiveColorAlpha(settings.getMainDisplayAlphaValue());
+			ocelotlView.getTimeLineView().setPotentialColorBG(btnColorMap.get(btnEditBgMainSelected));
+			ocelotlView.getTimeLineView().setPotentialColorFG(btnColorMap.get(btnEditFgMainSelected));
+			ocelotlView.getTimeLineView().setPotentialColorAlpha(settings.getMainSelectionAlphaValue());
+		}
 	}
 
 	/**

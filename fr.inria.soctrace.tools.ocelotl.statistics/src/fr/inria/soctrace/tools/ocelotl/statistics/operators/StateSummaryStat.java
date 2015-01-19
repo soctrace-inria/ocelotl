@@ -105,7 +105,6 @@ public class StateSummaryStat extends SummaryStat {
 					nbProducers = nbProducers
 							+ ocelotlview.getOcelotlParameters()
 									.getAggregatedLeavesIndex().get(anEP);
-			
 		} else {
 			nbProducers = microModel.getActiveProducers().size()
 					+ microModel.getInactiveProducers().size();

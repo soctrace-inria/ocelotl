@@ -206,13 +206,18 @@ public class EventProducerHierarchy {
 				if (microModel3D.getAggregatedProducers()
 						.containsValue(me)) {
 					weight = microModel3D
-							.getOcelotlParameters()
-							.getEventProducerHierarchy()
-							.getLeaves(
-									microModel3D.getOcelotlParameters()
+							.removeFilteredEP(
+									microModel3D
+											.getOcelotlParameters()
 											.getEventProducerHierarchy()
-											.getEventProducerNodes()
-											.get(this.getMe().getId())).size();
+											.getLeaves(
+													microModel3D
+															.getOcelotlParameters()
+															.getEventProducerHierarchy()
+															.getEventProducerNodes()
+															.get(this.getMe()
+																	.getId())))
+							.size();
 					
 					aggLeaves.add(this);
 				}

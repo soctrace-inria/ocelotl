@@ -138,14 +138,18 @@ public class StateLeaveSummaryStat extends SummaryStat{
 		// corresponding number of aggregated leaves
 		for (EventProducer anEp : aggregatedProd)
 			numberOfLeaves = numberOfLeaves
-					+ ocelotlview
-							.getOcelotlParameters()
-							.getEventProducerHierarchy()
-							.getLeaves(
-									ocelotlview.getOcelotlParameters()
+					+ microModel
+							.removeFilteredEP(
+									ocelotlview
+											.getOcelotlParameters()
 											.getEventProducerHierarchy()
-											.getEventProducerNodes()
-											.get(anEp.getId())).size();
+											.getLeaves(
+													ocelotlview
+															.getOcelotlParameters()
+															.getEventProducerHierarchy()
+															.getEventProducerNodes()
+															.get(anEp.getId())))
+							.size();
 		
 		return numberOfLeaves;
 	}

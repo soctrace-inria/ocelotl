@@ -10,8 +10,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -783,13 +781,14 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void buildMicroscopicModel(final OcelotlParameters parameters,
 			IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException {
+		activeProducers = new ArrayList<EventProducer>();
+		aggregatedProducers = new HashMap<EventProducer, EventProducer>(); 
+		parameters.setApproximateRebuild(false);
+		
 		// Reset the aggregation index
 		parameters.setAggregatedLeavesIndex(new HashMap<EventProducer, Integer>());
 		parameters.setAggregatedEventProducers(new ArrayList<EventProducer>());
 		parameters.checkLeaveAggregation();
-		activeProducers = new ArrayList<EventProducer>();
-		aggregatedProducers = new HashMap<EventProducer, EventProducer>(); 
-		parameters.setApproximateRebuild(false);
 		
 		// Check whether we should aggregate the leaves of the event producers
 		// hierarchy
@@ -970,84 +969,71 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void aggregateLeaveHierarchy() {
 		SimpleEventProducerHierarchy fullHierarchy = parameters
 				.getEventProducerHierarchy();
-		int limit = fullHierarchy.getLeaves().size()
-				- parameters.getOcelotlSettings().getMaxNumberOfLeaves();
 
-		// Get all the nodes that are the direct parent of a leaf
-		ArrayList<SimpleEventProducerNode> nodes = new ArrayList<SimpleEventProducerNode>(fullHierarchy
-				.getEventProducerNodes().values());
-		// .getEventProducerNodesFromHierarchyLevel(fullHierarchy
-		// .getMaxHierarchyLevel() - 1);
-
-		SimpleEventProducerNode bestFit = null;
-
-		// Sort the nodes in decreasing order of children nodes size
-		Comparator<SimpleEventProducerNode> comparator = new Comparator<SimpleEventProducerNode>() {
-			public int compare(SimpleEventProducerNode c1,
-					SimpleEventProducerNode c2) {
-				return c2.getChildrenNodes().size()
-						- c1.getChildrenNodes().size();
-			}
-		};
-
-		Collections.sort(nodes, comparator);
-		int bestDiff = -fullHierarchy.getLeaves().size();
-
-		// Find the smallest parent node that when aggregating its children, we
-		// fall under the limit
-		for (SimpleEventProducerNode aNode : nodes) {
-			if (!parameters.getCurrentProducers().contains(aNode.getMe()))
+		int maxHierarchyLevel = fullHierarchy.getMaxHierarchyLevel();
+		int acceptedHierarchyLevel = -1;
+	
+		for (int i = maxHierarchyLevel; i >= 0; i--) {
+		
+			if (removeFilteredEP(fullHierarchy.getEventProducerNodesFromHierarchyLevel(i)).size() > parameters
+					.getOcelotlSettings().getMaxNumberOfLeaves()) {
 				continue;
+			} else {
+				acceptedHierarchyLevel = i;
+				break;
+			}
+		}
 
+		for (SimpleEventProducerNode newLeafProducer : fullHierarchy
+				.getEventProducerNodesFromHierarchyLevel(acceptedHierarchyLevel)) {
 			int numberOfAggregatedLeaves = 0;
-			ArrayList<SimpleEventProducerNode> leafNodes = fullHierarchy
-					.getLeaves(aNode);
-			for (SimpleEventProducerNode aChildNode : leafNodes) {
+			ArrayList<SimpleEventProducerNode> childrenNodes = fullHierarchy
+					.getAllChildrenNodes(newLeafProducer);
+			childrenNodes.remove(newLeafProducer);
+
+			for (SimpleEventProducerNode aChildNode : childrenNodes) {
 				if (!parameters.getCurrentProducers().contains(
 						aChildNode.getMe()))
 					continue;
 
+				aggregatedProducers.put(aChildNode.getMe(),
+						newLeafProducer.getMe());
+				parameters.getAggregatedEventProducers()
+						.add(aChildNode.getMe());
 				numberOfAggregatedLeaves++;
 			}
 
-			// -1 because the parent node becomes a leaf
-			int diff = limit - (numberOfAggregatedLeaves - 1);
-			if (diff <= 0 && diff > bestDiff) {
-				bestDiff = diff;
-				bestFit = aNode;
-			}
+			logger.debug(numberOfAggregatedLeaves
+					+ " children nodes of the following operator were aggregated: "
+					+ newLeafProducer.getName() + " ("
+					+ newLeafProducer.getID() + ")");
 
-			// We found an optimal value
-			if (bestDiff == 0)
-				break;
+			parameters.getAggregatedLeavesIndex().put(newLeafProducer.getMe(),
+					numberOfAggregatedLeaves);
 		}
+	}
+	
+	/**
+	 * Remove the filtered EP from a given list of event producer nodes
+	 * 
+	 * @param listOfNodes
+	 *            the list of EPN to be checked
+	 * @return the filtered list of EPN
+	 */
+	public ArrayList<SimpleEventProducerNode> removeFilteredEP(
+			ArrayList<SimpleEventProducerNode> listOfNodes) {
+		ArrayList<SimpleEventProducerNode> unfilteredNodes = new ArrayList<SimpleEventProducerNode>();
 
-		if (bestFit == null) {
-			logger.error("Error: Could not aggregate enough leave nodes to go under the minimum - no aggregation will be performed");
-			return;
-		}
-
-		int numberOfAggregatedLeaves = 0;
-		ArrayList<SimpleEventProducerNode> childrenNodes = fullHierarchy
-				.getAllChildrenNodes(bestFit);
-		childrenNodes.remove(bestFit);
-		
-		for (SimpleEventProducerNode aChildNode : childrenNodes) {
-			if (!parameters.getCurrentProducers().contains(aChildNode.getMe()))
+		for (SimpleEventProducerNode aSEPN : listOfNodes) {
+			if (!parameters.getCurrentProducers().contains(aSEPN.getMe()))
 				continue;
 
-			aggregatedProducers.put(aChildNode.getMe(), bestFit.getMe());
-			parameters.getAggregatedEventProducers().add(aChildNode.getMe());
-			numberOfAggregatedLeaves++;
+			unfilteredNodes.add(aSEPN);
 		}
 
-		logger.debug(numberOfAggregatedLeaves
-				+ " children nodes of the following operator were aggregated: "
-				+ bestFit.getName() + " (" + bestFit.getID() + ")");
-		parameters.getAggregatedLeavesIndex().put(bestFit.getMe(),
-				numberOfAggregatedLeaves);
+		return unfilteredNodes;
 	}
-
+	
 	/**
 	 * Check whether an event producer is an aggregated leave
 	 * 

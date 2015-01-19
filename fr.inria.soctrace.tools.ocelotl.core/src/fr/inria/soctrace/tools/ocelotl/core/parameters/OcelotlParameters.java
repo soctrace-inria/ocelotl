@@ -32,6 +32,7 @@ import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperatorConfig;
@@ -512,11 +513,20 @@ public class OcelotlParameters {
 
 					// If there are aggregated leaves then add them to the selection
 					if (aggregatedLeavesIndex.containsKey(anEP)) {
-						for (EventProducer anAggregEP : aggregatedEventProducers) {
-							if (eventProducerHierarchy.getEventProducerNodes()
-									.get(anAggregEP.getId()).getParentNode()
-									.getMe().equals(anEP))
-								currentSelection.add(anAggregEP);
+						List<SimpleEventProducerNode> childNode = eventProducerHierarchy.getAllChildrenNodes(eventProducerHierarchy.getEventProducerNodes().get(anEP.getId()));
+						for (SimpleEventProducerNode anAggregEPN : childNode) {
+						//for (EventProducer anAggregEP : aggregatedEventProducers) {
+							if (aggregatedEventProducers.contains(anAggregEPN
+									.getMe())
+									&& unfilteredEventProducers
+											.contains(anAggregEPN.getMe()))
+								/*
+								 * if
+								 * (eventProducerHierarchy.getEventProducerNodes
+								 * () .get(anAggregEP.getId()).getParentNode()
+								 * .getMe().equals(anEP))
+								 */
+								currentSelection.add(anAggregEPN.getMe());
 						}
 					}
 				}
@@ -534,11 +544,14 @@ public class OcelotlParameters {
 		int numberOfLeaves = 0;
 
 		// Get the current number of leaves
-		if (getOcelotlSettings().isAggregateLeaves())
+		if (getOcelotlSettings().isAggregateLeaves()) {
 			for (EventProducer anEP : currentProducers)
 				if (getEventProducerHierarchy().getLeaves().keySet()
 						.contains(anEP.getId()))
 					numberOfLeaves++;
+		} else {
+			return;
+		}
 		
 		if (numberOfLeaves > getOcelotlSettings().getMaxNumberOfLeaves())
 			setHasLeaveAggregated(true);
