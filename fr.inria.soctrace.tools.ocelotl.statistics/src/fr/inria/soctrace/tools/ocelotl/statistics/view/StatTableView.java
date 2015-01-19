@@ -187,10 +187,8 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				OcelotlStatisticsTableRowLabelProvider labelProvider = new OcelotlStatisticsTableRowLabelProvider(
 						col);
 				if (col.equals(OcelotlStatisticsTableColumn.OCCURRENCES))
-					labelProvider.setToolTip(ocelotlView.getOcelotlCore()
-							.getUnit(ocelotlView.getOcelotlCore()
-							.getMicromodelTypes().getSelectedOperatorResource()
-							.getUnit()));
+					labelProvider.setToolTip(ocelotlView.getOcelotlParameters()
+							.getCurrentUnit());
 
 				elemsViewerCol.setLabelProvider(labelProvider);
 			}

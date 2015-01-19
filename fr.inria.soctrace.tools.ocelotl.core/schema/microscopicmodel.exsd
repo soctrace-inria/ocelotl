@@ -81,12 +81,6 @@
             </annotation>
             <simpleType>
                <restriction base="string">
-                  <enumeration value="%TIME">
-                  </enumeration>
-                  <enumeration value="events">
-                  </enumeration>
-                  <enumeration value="%UNKNOWN">
-                  </enumeration>
                </restriction>
             </simpleType>
          </attribute>

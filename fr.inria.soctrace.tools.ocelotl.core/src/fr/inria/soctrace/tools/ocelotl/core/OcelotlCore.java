@@ -22,7 +22,6 @@ package fr.inria.soctrace.tools.ocelotl.core;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
-import fr.inria.soctrace.lib.model.utils.ModelConstants.TimeUnit;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.IDataAggregManager;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time.PartManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -203,40 +202,4 @@ public class OcelotlCore {
 		microModel = microModelTypeManager.getSelectedMicroModel();
 	}
 	
-	
-	/**
-	 * Get the corresponding units
-	 * 
-	 * @param aUnitType
-	 *            the unit type provided by the extension point
-	 * @return the corresponding unit as String
-	 */
-	public String getUnit(String aUnitType) {
-		String unit = "";
-
-		switch (aUnitType) {
-		case "events":
-			unit = "Event Occurences";
-			break;
-
-		case "%TIME":
-			String timeUnit = "";
-			// Get the time unit of the trace
-			if (ocelotlParameters != null) {
-				timeUnit = " ("
-						+ TimeUnit.getLabel(
-								ocelotlParameters.getTrace()
-								.getTimeUnit()) + ")";
-			}
-
-			unit = "Duration" + timeUnit;
-			break;
-
-		case "%UNKNOWN":
-		default:
-			break;
-		}
-
-		return unit;
-	}
 }

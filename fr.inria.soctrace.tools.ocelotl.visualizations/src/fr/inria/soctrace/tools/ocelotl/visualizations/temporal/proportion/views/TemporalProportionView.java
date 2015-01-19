@@ -117,7 +117,7 @@ public class TemporalProportionView extends TimeLineView {
 						rect.setForegroundColor(ColorConstants.black);
 					}
 					final Label label = new Label(" " + state + ": "
-							+ valueFormat.format(value) + " ");
+							+ valueFormat.format(value) + " " + unit + " ");
 					rect.setToolTip(label);
 					//If the height of the state proportion is big enough
 					if (y1 * value / maxValue - stackSpace > MinHeight) {

@@ -61,6 +61,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected EventProducerNode					currentlySelectedNode;
 	protected IVisuOperator						visuOperator		= null;
 	protected OcelotlMouseListener				mouse;
+	protected String							unit;
 	protected List<SpatioTemporalAggregateView>	aggregates;
 	public static Color							selectColorFG		= ColorConstants.white;
 	public static Color							selectColorBG		= ColorConstants.blue;
@@ -361,6 +362,8 @@ abstract public class AggregatedView implements IAggregatedView {
 		highLightAggregateFigure.setLineWidth(2);
 		highLightAggregateFigure.setAlpha(255);
 		highLightAggregateFigure.setFill(false);
+		
+		unit = ocelotlView.getOcelotlParameters().getCurrentUnit();
 	}
 	
 	public void setBorder(final int border) {

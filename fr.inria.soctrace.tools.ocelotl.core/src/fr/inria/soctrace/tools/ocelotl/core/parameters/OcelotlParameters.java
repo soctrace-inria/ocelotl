@@ -27,6 +27,7 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
+import fr.inria.soctrace.lib.model.utils.ModelConstants.TimeUnit;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
@@ -88,7 +89,7 @@ public class OcelotlParameters {
 	private HashMap<EventProducer, Integer> aggregatedLeavesIndex = new HashMap<EventProducer, Integer>();
 	private boolean hasLeaveAggregated = false;
 	private boolean approximateRebuild = false;
-	
+	private String currentUnit = "";
 	private TimeSliceManager timeSliceManager;
 
 	private static boolean jniFlag = true;
@@ -141,6 +142,7 @@ public class OcelotlParameters {
 		this.timeSliceFactor = op.timeSliceFactor;
 		this.hasLeaveAggregated = op.hasLeaveAggregated;
 		this.approximateRebuild = op.approximateRebuild;
+		this.currentUnit = op.currentUnit;
 	}
 	
 	public List<EventProducer> getEventProducers() {
@@ -477,6 +479,14 @@ public class OcelotlParameters {
 		this.spatiallySelectedProducers.addAll(spatiallySelectedProducers);
 	}
 
+	public String getCurrentUnit() {
+		return currentUnit;
+	}
+
+	public void setCurrentUnit(String currentUnit) {
+		this.currentUnit = currentUnit;
+	}
+
 	public boolean isSpatialSelection() {
 		return spatialSelection;
 	}
@@ -555,5 +565,56 @@ public class OcelotlParameters {
 		
 		if (numberOfLeaves > getOcelotlSettings().getMaxNumberOfLeaves())
 			setHasLeaveAggregated(true);
+	}
+	
+	/**
+	 * Get the corresponding units
+	 * 
+	 * @param aUnitType
+	 *            the unit type provided by the extension point
+	 * @return the corresponding unit as String
+	 */
+	public String setUnit(String aUnitType) {
+		String unit = "";
+
+		String[] splitUnit = aUnitType.split(" ");
+		for (int i = 0; i < splitUnit.length; i++) {
+			String word = "";
+			if (splitUnit[i].startsWith("%"))
+				word = getUnitValue(splitUnit[i]);
+			else
+				word = splitUnit[i];
+
+			unit = unit + " " + word;
+		}
+
+		setCurrentUnit(unit);
+		return unit;
+	}
+
+	/**
+	 * Replace a specialized unit token by the current value
+	 * 
+	 * @param aUnitType
+	 *            the unit token
+	 * @return the corresponding value if found
+	 */
+	public String getUnitValue(String aUnitType) {
+		String res = "";
+		switch (aUnitType) {
+
+		case "%TIME":
+			// Get the time unit of the trace
+			String timeUnit = TimeUnit.getLabel(getTrace().getTimeUnit());
+
+			res = timeUnit;
+			break;
+
+		case "%UNKNOWN":
+		default:
+			break;
+		}
+
+		return res;
 	}
 }

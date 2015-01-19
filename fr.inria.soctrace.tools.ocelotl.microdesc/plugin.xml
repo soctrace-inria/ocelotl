@@ -8,7 +8,7 @@
      <microscopic_model
      		name="Events"
      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistribution"
-     		unit="events"
+     		unit="Events / time"
      		selection_priority = "2"
      		trace_formats="ALL"
      		generic="true"
@@ -18,7 +18,7 @@
       <microscopic_model
       		name="States"
       		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistribution"
-      		unit="%TIME"
+      		unit="Activity Ratio"
       		selection_priority = "1"
       		trace_formats="ALL"
      		generic="true"
@@ -28,7 +28,7 @@
       <microscopic_model
       		name="States Average"
       		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateAverageDistribution"
-      		unit="%TIME"
+      		unit="Event ^-1"
       		selection_priority = "1"
       		trace_formats="ALL"
      		generic="true"

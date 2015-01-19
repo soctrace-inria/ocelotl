@@ -205,26 +205,25 @@ public class ProportionAxisView extends UnitAxisView {
 		}
 		
 		// Add legend
-		String unit = ocelotlView.getOcelotlCore().getUnit(
-				ocelotlView.getOcelotlCore().getMicromodelTypes()
-						.getSelectedOperatorResource().getUnit());
+		String unit = ocelotlView.getOcelotlParameters().getCurrentUnit();
 		final Label label = new Label(unit);
 		label.setLabelAlignment(PositionConstants.RIGHT);
 		label.setForegroundColor(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-		label.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
-		label.setToolTip(new Label(unit));
+		label.setFont(SWTResourceManager.getFont("Cantarell", 9, SWT.NORMAL));
+		label.setToolTip(new Label(" " + unit + " "));
 		label.setSize(textWidth, TextHeight);
 
 		// Compute label width
 		GC gc = new GC(canvas);
 		gc.setFont(label.getFont());
 		int labelWidth = gc.textExtent(label.getText()).x;
-		if (labelWidth > labelMaxWidth)
-			labelMaxWidth = labelWidth;
+		// Since the label is not align with the other labels, remove the difference
+		if (labelWidth - (TextPositionOffset + (areaWidth - mainLineXPosition)) > labelMaxWidth)
+			labelMaxWidth = labelWidth - (TextPositionOffset + (areaWidth - mainLineXPosition));
 
-		root.add(label, new Rectangle(new Point(0, 0), new Point(
-				mainLineXPosition - TextPositionOffset, TextHeight)));
+		root.add(label, new Rectangle(new Point(areaWidth - labelWidth, 0), new Point(
+				areaWidth, TextHeight)));
 	}
 
 	/**
