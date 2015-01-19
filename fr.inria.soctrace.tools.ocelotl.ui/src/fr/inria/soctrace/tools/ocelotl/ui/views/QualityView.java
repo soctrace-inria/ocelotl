@@ -80,7 +80,8 @@ public class QualityView {
 		@Override
 		public void mouseReleased(final MouseEvent arg0) {
 			state = State.RELEASED;
-			ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
+			if (qualities != null)
+				ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
 		}
 
 	}
@@ -389,4 +390,9 @@ public class QualityView {
 		}
 	}
 	
+	public void deleteDiagram() {
+		root.removeAll();
+		qualities = null;
+		root.repaint();
+	}
 }

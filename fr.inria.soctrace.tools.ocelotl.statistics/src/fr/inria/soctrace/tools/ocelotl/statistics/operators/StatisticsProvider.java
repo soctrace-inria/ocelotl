@@ -28,6 +28,8 @@ public abstract class StatisticsProvider implements IStatisticsProvider {
 	public abstract void computeData();
 	
 	public abstract void setMicroMode(MicroscopicDescription microModel);
+	
+	public abstract MicroscopicDescription getMicroMode();
 
 	/**
 	 * Update the color of the event types

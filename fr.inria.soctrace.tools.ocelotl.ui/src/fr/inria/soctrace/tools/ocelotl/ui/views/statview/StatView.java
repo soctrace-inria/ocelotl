@@ -18,7 +18,6 @@ public abstract class StatView implements IStatView {
 
 	@Override
 	public void deleteDiagram() {
-
 	}
 
 	@Override

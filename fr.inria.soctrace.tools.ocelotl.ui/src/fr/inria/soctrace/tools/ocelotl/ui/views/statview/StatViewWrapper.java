@@ -46,7 +46,6 @@ public class StatViewWrapper {
 	}
 
 	public void init(final Composite parent) {
-
 	}
 
 	public void setView(final IStatView view) {
