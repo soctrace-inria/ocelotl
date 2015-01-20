@@ -23,6 +23,7 @@
             class="fr.inria.soctrace.tools.ocelotl.ui.OcelotlTool"
             doc="No launching arguments needed."
             name="Ocelotl"
+            id="fr.inria.soctrace.tools.ocelotl"
             type="ANALYSIS">
       </tool>
    </extension>
