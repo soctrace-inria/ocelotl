@@ -1,6 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.core.parameters;
 
 import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
@@ -112,6 +113,9 @@ public class OcelotlDefaultParameterConstants {
 	public static final Color MAIN_SELECT_FG_COLOR = ColorConstants.darkBlue;
 	public static final Color MAIN_SELECT_BG_COLOR = ColorConstants.darkBlue;
 	public static final int MAIN_SELECT_ALPHA = 120;
+	
+	public static final int SORT_TABLE_DEFAULT_COLUMN = 2;
+	public static final int SORT_TABLE_DEFAULT_ORDER = SWT.DOWN;
 	
 	/*
 	 * Is the overview enable

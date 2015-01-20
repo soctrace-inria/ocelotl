@@ -96,6 +96,7 @@ public class OcelotlParameters {
 	private ITraceTypeConfig iTraceTypeConfig;
 	private IVisuConfig iVisuConfig;
 	private IStatisticOperatorConfig statisticOperatorConfig;
+	private SortTableSettings sortTableSettings = new SortTableSettings();
 
 	public OcelotlParameters() {
 		super();
@@ -143,6 +144,7 @@ public class OcelotlParameters {
 		this.hasLeaveAggregated = op.hasLeaveAggregated;
 		this.approximateRebuild = op.approximateRebuild;
 		this.currentUnit = op.currentUnit;
+		this.sortTableSettings = op.sortTableSettings;
 	}
 	
 	public List<EventProducer> getEventProducers() {
@@ -485,6 +487,14 @@ public class OcelotlParameters {
 
 	public void setCurrentUnit(String currentUnit) {
 		this.currentUnit = currentUnit;
+	}
+
+	public SortTableSettings getSortTableSettings() {
+		return sortTableSettings;
+	}
+
+	public void setSortTableSettings(SortTableSettings sortTableSettings) {
+		this.sortTableSettings = sortTableSettings;
 	}
 
 	public boolean isSpatialSelection() {

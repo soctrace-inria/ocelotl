@@ -2,6 +2,7 @@ package fr.inria.soctrace.tools.ocelotl.statistics.view;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.HashMap;
 
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.TableViewer;
@@ -31,7 +32,6 @@ import fr.inria.soctrace.tools.ocelotl.statistics.operators.StatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatView;
 
-
 public class StatTableView extends StatView implements IFramesocBusListener {
 
 	/**
@@ -53,6 +53,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	 * Column comparator
 	 */
 	private OcelotlStatisticsColumnComparator comparator;
+	private HashMap<Integer, OcelotlStatisticsTableColumn> columnIndex = new HashMap<Integer, OcelotlStatisticsTableColumn>();
 
 	private Composite compositeTable;
 
@@ -67,7 +68,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
 		topics.registerAll();
-		
+			
 		createPartControl(ocelotlView.getStatComposite());
 	}
 	
@@ -153,9 +154,9 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		tableViewer.setContentProvider(new StatContentProvider());
 		ColumnViewerToolTipSupport.enableFor(tableViewer);
+		createColumns();
 		comparator = new OcelotlStatisticsColumnComparator();
 		tableViewer.setComparator(comparator);
-		createColumns();
 		
 		Table table = tableViewer.getTable();
 		table.setLinesVisible(true);
@@ -165,11 +166,14 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		tableViewer.getTable().addListener(SWT.Resize, new ResizeListener());
 		
 		// Default sorting of the table
-		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(2));
-		tableViewer.getTable().setSortDirection(SWT.DOWN);
+		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(ocelotlView.getOcelotlParameters().getSortTableSettings().getColumnNumber()));
+		tableViewer.getTable().setSortDirection(ocelotlView.getOcelotlParameters().getSortTableSettings().getDirection());
 	}
 
 	private void createColumns() {
+		int cpt = 0;
+		columnIndex = new HashMap<Integer, OcelotlStatisticsTableColumn>();
+
 		// For each column
 		for (final OcelotlStatisticsTableColumn col : OcelotlStatisticsTableColumn
 				.values()) {
@@ -194,7 +198,6 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 
 				elemsViewerCol.setLabelProvider(labelProvider);
 			}
-				
 
 			final TableColumn elemsTableCol = elemsViewerCol.getColumn();
 			elemsTableCol.setWidth(col.getWidth());
@@ -210,6 +213,8 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 					tableViewer.refresh();
 				}
 			});
+			columnIndex.put(cpt, col);
+			cpt++;
 		}
 	}
 
@@ -243,8 +248,8 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			int columnCount = table.getColumnCount();
 			if (columnCount == 0)
 				return;
-			int totalAreaWdith = table.getClientArea().width;
-			int newWidth = totalAreaWdith / columnCount;
+			int totalAreaWidth = table.getClientArea().width;
+			int newWidth = totalAreaWidth / columnCount;
 			for (TableColumn column : table.getColumns()) {
 				column.setWidth(newWidth);
 			}
@@ -252,26 +257,36 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	}
 
 	/**
-	 * Class used to sort the column (copied and adapted from StatisticsColumnComparator in
-	 * framesoc)
+	 * Class used to sort the column (copied and adapted from
+	 * StatisticsColumnComparator in Framesoc)
 	 */
 	public class OcelotlStatisticsColumnComparator extends ViewerComparator {
-		private OcelotlStatisticsTableColumn col = OcelotlStatisticsTableColumn.OCCURRENCES;
-		private int direction = SWT.DOWN;
+		private OcelotlStatisticsTableColumn col = columnIndex.get(ocelotlView
+				.getOcelotlParameters().getSortTableSettings()
+				.getColumnNumber());
+		private int direction = ocelotlView.getOcelotlParameters()
+				.getSortTableSettings().getDirection();
 
 		public int getDirection() {
 			return direction;
 		}
 
-		public void setColumn(OcelotlStatisticsTableColumn col) {
-			if (this.col.equals(col)) {
+		public void setColumn(OcelotlStatisticsTableColumn aCol) {
+			if (this.col.equals(aCol)) {
 				// Same column as last sort: toggle the direction
 				direction = (direction == SWT.UP) ? SWT.DOWN : SWT.UP;
 			} else {
 				// New column: do an ascending sort
-				this.col = col;
+				this.col = aCol;
 				direction = SWT.UP;
 			}
+
+			TableColumn[] columns =  tableViewer.getTable().getColumns();
+			for(int i = 0; i< columns.length; i++)
+				if(columns[i].getText().equals(aCol.getHeader()))
+					ocelotlView.getOcelotlParameters().getSortTableSettings().setColumnNumber(i);			
+					
+			ocelotlView.getOcelotlParameters().getSortTableSettings().setDirection(direction);
 		}
 
 		@Override
