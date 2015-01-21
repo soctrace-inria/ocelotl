@@ -28,7 +28,7 @@ public class MicroscopicDescriptionTypeResource {
 	List<String> traceFormats = new ArrayList<String>();
 	List<String> eventCategory = new ArrayList<String>();
 	List<String> visuCompatibility = new ArrayList<String>();
-	String valueType;
+	String unitDescription;
 
 	public MicroscopicDescriptionTypeResource() {
 		// TODO Auto-generated constructor stub
@@ -90,8 +90,8 @@ public class MicroscopicDescriptionTypeResource {
 		return generic;
 	}
 
-	public String getValueType() {
-		return valueType;
+	public String getUnitDescription() {
+		return unitDescription;
 	}
 
 	public void setGeneric(final boolean generic) {
@@ -114,8 +114,8 @@ public class MicroscopicDescriptionTypeResource {
 		decompose(this.traceFormats, traceFormats);
 	}
 
-	public void setValueType(String attribute) {
-		valueType = attribute;
+	public void setUnitDescription(String attribute) {
+		unitDescription = attribute;
 	}
 
 	public List<String> getEventCategory() {

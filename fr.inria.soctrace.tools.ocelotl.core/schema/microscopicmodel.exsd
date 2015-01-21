@@ -73,16 +73,12 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="unit" use="required">
+         <attribute name="unit" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
-            <simpleType>
-               <restriction base="string">
-               </restriction>
-            </simpleType>
          </attribute>
          <attribute name="visual_compatibility" type="string">
             <annotation>
@@ -105,14 +101,14 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="value_type" type="string">
+         <attribute name="selection_priority" type="int" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="selection_priority" type="int" use="required">
+         <attribute name="unit_description" type="string">
             <annotation>
                <documentation>
                   

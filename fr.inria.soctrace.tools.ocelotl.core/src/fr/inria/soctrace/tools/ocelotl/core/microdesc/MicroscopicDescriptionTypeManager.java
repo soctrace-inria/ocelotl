@@ -44,7 +44,7 @@ public class MicroscopicDescriptionTypeManager {
 	private static final String OP_TRACE_FORMATS = "trace_formats"; //$NON-NLS-1$
 	private static final String OP_GENERIC = "generic"; //$NON-NLS-1$
 	private static final String OP_UNIT = "unit"; //$NON-NLS-1$
-	private static final String OP_VALUE_TYPE = "value_type"; //$NON-NLS-1$
+	private static final String OP_UNIT_DESCRIPTION = "unit_description"; //$NON-NLS-1$
 	
 	private static final Logger logger = LoggerFactory
 			.getLogger(DataAggregationOperatorManager.class);
@@ -119,7 +119,7 @@ public class MicroscopicDescriptionTypeManager {
 			resource.setTraceFormats(e.getAttribute(OP_TRACE_FORMATS));
 			resource.setEventCategory(e.getAttribute(OP_EVENT_CATEGORY));
 			resource.setUnit(e.getAttribute(OP_UNIT));
-			resource.setValueType(e.getAttribute(OP_VALUE_TYPE));
+			resource.setUnitDescription(e.getAttribute(OP_UNIT_DESCRIPTION));
 			resource.setVisuCompatibility(e
 					.getAttribute(OP_VISUALIZATION_COMPATIBILITY));
 			typeList.put(resource.getName(), resource);
