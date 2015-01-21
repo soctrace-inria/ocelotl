@@ -23,6 +23,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
@@ -290,7 +291,7 @@ public class QualityView {
 	public void drawYGrads() {
 		YGrads();
 		NumberFormat formatter = null;
-		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
+		formatter = NumberFormat.getInstance(Locale.US);
 		formatter = new DecimalFormat("0.0E0");
 		final double width = root.getSize().width - XBorder - Border;
 		final double height = root.getSize().height - YBorder;

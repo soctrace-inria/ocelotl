@@ -531,21 +531,18 @@ public class OcelotlParameters {
 				if (spatiallySelectedProducers.contains(anEP)) {
 					currentSelection.add(anEP);
 
-					// If there are aggregated leaves then add them to the selection
+					// If there are aggregated leaves then add them to the
+					// selection
 					if (aggregatedLeavesIndex.containsKey(anEP)) {
-						List<SimpleEventProducerNode> childNode = eventProducerHierarchy.getAllChildrenNodes(eventProducerHierarchy.getEventProducerNodes().get(anEP.getId()));
+						List<SimpleEventProducerNode> childNode = eventProducerHierarchy
+								.getAllChildrenNodes(eventProducerHierarchy
+										.getEventProducerNodes().get(
+												anEP.getId()));
 						for (SimpleEventProducerNode anAggregEPN : childNode) {
-						//for (EventProducer anAggregEP : aggregatedEventProducers) {
 							if (aggregatedEventProducers.contains(anAggregEPN
 									.getMe())
 									&& unfilteredEventProducers
 											.contains(anAggregEPN.getMe()))
-								/*
-								 * if
-								 * (eventProducerHierarchy.getEventProducerNodes
-								 * () .get(anAggregEP.getId()).getParentNode()
-								 * .getMe().equals(anEP))
-								 */
 								currentSelection.add(anAggregEPN.getMe());
 						}
 					}

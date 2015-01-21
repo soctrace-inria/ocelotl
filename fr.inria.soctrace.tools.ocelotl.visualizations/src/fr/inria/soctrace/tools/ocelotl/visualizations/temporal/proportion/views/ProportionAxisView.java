@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
@@ -116,7 +117,7 @@ public class ProportionAxisView extends UnitAxisView {
 	 */
 	public void drawGrads() {
 		NumberFormat formatter = null;
-		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
+		formatter = NumberFormat.getInstance(Locale.US);
 		formatter = new DecimalFormat("0.00E0");
 		formatter.setMaximumIntegerDigits(3);
 
@@ -252,15 +253,7 @@ public class ProportionAxisView extends UnitAxisView {
 		textWidth = areaWidth - (areaWidth - mainLineXPosition - 2)
 				- TextPositionOffset;
 
-		// Try to divide the axis to have round number
-		double temp = maxValue;
-		int i;
-		for (i = 1; temp > 10; i++)
-			temp /= 10;
-		final double factor = temp < 6.0 ? 10.0 : temp;
-		for (int j = 1; j < i; j++)
-			temp *= 10;
-		gradDuration = temp / factor;
+		gradDuration = computeGradDuration();
 		gradNumber = maxValue / gradDuration;
 		gradHeight = drawingHeight / gradNumber;
 
@@ -270,6 +263,49 @@ public class ProportionAxisView extends UnitAxisView {
 			gradNumber /= 2;
 			gradHeight *= 2;
 			gradDuration *= 2;
+
+		}
+	}
+
+	/**
+	 * Compute a round grad duration
+	 * 
+	 * @return the computed grad duration
+	 */
+	private double computeGradDuration() {
+		// Try to divide the axis to have round number
+		if (maxValue > 1) {
+			long temp = (long) maxValue;
+			int i;
+			// Divide max value until there is only one significant number
+			// before the dot
+			for (i = 1; temp > 10; i++)
+				temp /= 10;
+			// Number of graduations (min: 6; max: 10)
+			final double numberOfGrads = temp < 6.0 ? 10.0 : temp;
+			// Get temp back to its original value
+			for (int j = 1; j < i; j++)
+				temp *= 10;
+			
+			// Have a round grad duration
+			return temp / numberOfGrads;
+		} else {
+			double temp = maxValue;
+			int i;
+			// Multiply max value until there is just one significant number
+			// before the dot
+			for (i = 1; temp < 1; i++)
+				temp *= 10;
+			// Number of graduations (min: 6; max: 10)
+			final double numberOfGrads = temp < 6.0 ? 10.0 : temp;
+			// Round the number to its integer part
+			double tempBis = (double) Math.round(temp);
+			// Get temp back to its original value
+			for (int j = 1; j < i; j++)
+				tempBis /= 10;
+			
+			// Have a round grad duration
+			return tempBis / numberOfGrads;
 		}
 	}
 
