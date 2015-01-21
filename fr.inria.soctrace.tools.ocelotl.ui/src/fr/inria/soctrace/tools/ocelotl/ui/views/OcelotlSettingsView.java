@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -101,6 +102,7 @@ public class OcelotlSettingsView extends Dialog {
 	private Button								btnEditFgMainSelected;
 	private Spinner								textMainDisplayAlpha;
 	private Spinner								textMainSelectionAlpha;
+	private Button								saveSettingsButton;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -178,16 +180,6 @@ public class OcelotlSettingsView extends Dialog {
 				}
 			}
 		}
-	}
-
-	/**
-	 * If necessary, update the snapshot directory
-	 */
-	private void modifySnapshotDir() {
-		// Was there change in the datacache directory ?
-		if (!snapshotDirectory.getText().equals(settings.getSnapShotDirectory()))
-			// If so, update the current datacache path
-			ocelotlView.getSnapshot().setSnapshotDirectory(snapshotDirectory.getText());
 	}
 
 	private class ModifyDatacacheDirectory extends SelectionAdapter {
@@ -328,6 +320,14 @@ public class OcelotlSettingsView extends Dialog {
 			ocelotlView.getTimeLineView().setPotentialColorBG(btnColorMap.get(btnEditBgMainSelected));
 			ocelotlView.getTimeLineView().setPotentialColorFG(btnColorMap.get(btnEditFgMainSelected));
 			ocelotlView.getTimeLineView().setPotentialColorAlpha(settings.getMainSelectionAlphaValue());
+		}
+	}
+	
+	private class SaveSettingsListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			setSettings();
+			settings.saveSettings();
 		}
 	}
 
@@ -868,7 +868,6 @@ public class OcelotlSettingsView extends Dialog {
 		new Label(groupMiscSettings, SWT.NONE);
 
 		btnChangeSnapshotDirectory.addSelectionListener(new ModifySnapshotDirectory());
-
 		
 		initSettings();
 		
@@ -877,7 +876,7 @@ public class OcelotlSettingsView extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		saveSettings();
+		setSettings();
 		super.okPressed();
 	}
 
@@ -904,7 +903,7 @@ public class OcelotlSettingsView extends Dialog {
 	/**
 	 * Save all the settings into the configuration file
 	 */
-	void saveSettings() {
+	void setSettings() {
 		// Cache settings
 		settings.setCacheActivated(btnCacheEnabled.getSelection());
 		settings.setCacheTimeSliceNumber(Integer.valueOf(cacheTimeSliceValue.getText()));
@@ -935,8 +934,8 @@ public class OcelotlSettingsView extends Dialog {
 		modifyNormalize();
 		modifyIncreasingQuality();
 
-		// Misc.
-		modifySnapshotDir();
+		// Snapshot.
+		settings.setSnapShotDirectory(snapshotDirectory.getText());
 		settings.setSnapshotXResolution(Integer.valueOf(snapshotWidth.getText()));
 		settings.setSnapshotYResolution(Integer.valueOf(snapshotHeight.getText()));
 		
@@ -963,6 +962,30 @@ public class OcelotlSettingsView extends Dialog {
 	@Override
 	protected void cancelPressed() {
 		super.cancelPressed();
+	}
+	
+	/**
+	 * Add button to save the settings
+	 */
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		// Change parent layout data to fill the whole bar
+		parent.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		saveSettingsButton = createButton(parent, IDialogConstants.NO_ID, "Save Settings", false);
+		saveSettingsButton.setToolTipText("Set Current Settings as Default Ocelotl Settings");
+		saveSettingsButton.addSelectionListener(new SaveSettingsListener());
+		
+		// Create a spacer label
+		Label spacer = new Label(parent, SWT.NONE);
+		spacer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		// Update layout of the parent composite to count the spacer
+		GridLayout layout = (GridLayout) parent.getLayout();
+		layout.numColumns++;
+		layout.makeColumnsEqualWidth = false;
+
+		createButton(parent, IDialogConstants.CANCEL_ID, "Cancel", false);
+		createButton(parent, IDialogConstants.OK_ID, "OK", true);
 	}
 
 }

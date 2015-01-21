@@ -50,17 +50,12 @@ public class Snapshot {
 	private SnapshotView		snapshotView;
 
 	public Snapshot(String directory, OcelotlView aView) {
-		snapshotDirectory = directory;
 		theView = aView;
+		snapshotDirectory = theView.getOcelotlParameters().getOcelotlSettings().getSnapShotDirectory();
 	}
 
 	public String getSnapshotDirectory() {
 		return snapshotDirectory;
-	}
-
-	public void setSnapshotDirectory(String snapshotDirectory) {
-		this.snapshotDirectory = snapshotDirectory;
-		theView.getOcelotlParameters().getOcelotlSettings().setSnapShotDirectory(this.snapshotDirectory);
 	}
 
 	/**
