@@ -96,7 +96,7 @@ public class OcelotlParameters {
 	private ITraceTypeConfig iTraceTypeConfig;
 	private IVisuConfig iVisuConfig;
 	private IStatisticOperatorConfig statisticOperatorConfig;
-	private SortTableSettings sortTableSettings = new SortTableSettings();
+	private StatisticsTableSettings sortTableSettings = new StatisticsTableSettings();
 
 	public OcelotlParameters() {
 		super();
@@ -489,11 +489,11 @@ public class OcelotlParameters {
 		this.currentUnit = currentUnit;
 	}
 
-	public SortTableSettings getSortTableSettings() {
+	public StatisticsTableSettings getSortTableSettings() {
 		return sortTableSettings;
 	}
 
-	public void setSortTableSettings(SortTableSettings sortTableSettings) {
+	public void setSortTableSettings(StatisticsTableSettings sortTableSettings) {
 		this.sortTableSettings = sortTableSettings;
 	}
 

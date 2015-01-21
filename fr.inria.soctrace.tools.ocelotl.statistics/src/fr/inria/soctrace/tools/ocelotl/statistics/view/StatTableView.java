@@ -10,6 +10,8 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -154,9 +156,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		tableViewer.setContentProvider(new StatContentProvider());
 		ColumnViewerToolTipSupport.enableFor(tableViewer);
-		createColumns();
-		comparator = new OcelotlStatisticsColumnComparator();
-		tableViewer.setComparator(comparator);
+
 		
 		Table table = tableViewer.getTable();
 		table.setLinesVisible(true);
@@ -164,6 +164,12 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		table.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		tableViewer.getTable().addListener(SWT.Resize, new ResizeListener());
+		// needed to set a correct table width
+		compositeTable.layout();
+		
+		createColumns();
+		comparator = new OcelotlStatisticsColumnComparator();
+		tableViewer.setComparator(comparator);
 		
 		// Default sorting of the table
 		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(ocelotlView.getOcelotlParameters().getSortTableSettings().getColumnNumber()));
@@ -179,6 +185,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				.values()) {
 			TableViewerColumn elemsViewerCol = new TableViewerColumn(
 					tableViewer, SWT.NONE);
+			
 			// If it is the column name
 			if (col.equals(OcelotlStatisticsTableColumn.NAME)) {
 				// add a filter for this column
@@ -200,7 +207,12 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			}
 
 			final TableColumn elemsTableCol = elemsViewerCol.getColumn();
-			elemsTableCol.setWidth(col.getWidth());
+
+			elemsTableCol
+					.setWidth(Math.max((int) (tableViewer.getTable().getClientArea().width * ocelotlView
+							.getOcelotlParameters().getSortTableSettings()
+							.getColumnWidthWeight()[cpt]), (int) (tableViewer.getTable().getClientArea().width * 0.05)));
+
 			elemsTableCol.setText(col.getHeader());
 			// Set sorting comparator when clicking on a column header
 			elemsTableCol.addSelectionListener(new SelectionAdapter() {
@@ -211,6 +223,38 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 							comparator.getDirection());
 					tableViewer.getTable().setSortColumn(elemsTableCol);
 					tableViewer.refresh();
+				}
+			});
+			
+			elemsTableCol.addControlListener(new ControlListener() {
+				
+				@Override
+				public void controlResized(ControlEvent e) {
+					// Modified the weight of each column according to their new
+					// width
+					double areaWidth = tableViewer.getTable().getClientArea().width;
+					// Avoid complication due to small number
+					if (areaWidth > 4.0) {
+						// Set a minimal and maximal value to avoid column
+						// disappearing
+						for (int anIndex : columnIndex.keySet())
+							if (columnIndex.get(anIndex).getHeader()
+									.equals(col.getHeader())) {
+								ocelotlView.getOcelotlParameters()
+										.getSortTableSettings()
+										.getColumnWidthWeight()[anIndex] = Math
+										.min(Math
+												.max(0.05,
+														(double) elemsTableCol
+																.getWidth()
+																/ areaWidth),
+												0.95);
+							}
+					}
+				}
+				
+				@Override
+				public void controlMoved(ControlEvent e) {
 				}
 			});
 			columnIndex.put(cpt, col);
@@ -249,9 +293,11 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			if (columnCount == 0)
 				return;
 			int totalAreaWidth = table.getClientArea().width;
-			int newWidth = totalAreaWidth / columnCount;
-			for (TableColumn column : table.getColumns()) {
-				column.setWidth(newWidth);
+			TableColumn[] columns = table.getColumns();
+			for (int i = 0; i < columns.length; i++) {
+				columns[i].setWidth((int) (totalAreaWidth * ocelotlView
+						.getOcelotlParameters().getSortTableSettings()
+						.getColumnWidthWeight()[i]));
 			}
 		}
 	}
@@ -281,12 +327,16 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				direction = SWT.UP;
 			}
 
-			TableColumn[] columns =  tableViewer.getTable().getColumns();
-			for(int i = 0; i< columns.length; i++)
-				if(columns[i].getText().equals(aCol.getHeader()))
-					ocelotlView.getOcelotlParameters().getSortTableSettings().setColumnNumber(i);			
-					
-			ocelotlView.getOcelotlParameters().getSortTableSettings().setDirection(direction);
+			// Get the column number and save it into the index
+			TableColumn[] columns = tableViewer.getTable().getColumns();
+			for (int i = 0; i < columns.length; i++)
+				if (columns[i].getText().equals(aCol.getHeader()))
+					ocelotlView.getOcelotlParameters().getSortTableSettings()
+							.setColumnNumber(i);
+
+			// Get the sorting direction
+			ocelotlView.getOcelotlParameters().getSortTableSettings()
+					.setDirection(direction);
 		}
 
 		@Override
