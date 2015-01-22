@@ -75,13 +75,11 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 		for (int id : hierarchy.getLeaves().keySet())
 			timeAggregation.addLeaf(id, hierarchy.getParentID(id),
 					hierarchy.getValues(id));
-
 	}
 
 	@Override
 	protected void addNodes() {
 		addChildren(hierarchy.getRoot().getID());
-
 	}
 
 	protected void addChildren(int id) {
@@ -97,7 +95,6 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	@Override
 	protected void addRoot() {
 		timeAggregation.addRoot(hierarchy.getRoot().getID());
-
 	}
 
 	@Override
