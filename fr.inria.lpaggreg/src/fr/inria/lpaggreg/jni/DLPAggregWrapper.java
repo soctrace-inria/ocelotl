@@ -39,8 +39,8 @@ public class DLPAggregWrapper {
     this(lpaggregJNI.new_DLPAggregWrapper(dimension), true);
   }
 
-  public int newLeaf(int parent, int id, int weight) {
-    return lpaggregJNI.DLPAggregWrapper_newLeaf(swigCPtr, this, parent, id, weight);
+  public int newLeaf(int parent, int id) {
+    return lpaggregJNI.DLPAggregWrapper_newLeaf(swigCPtr, this, parent, id);
   }
 
   public int newNode(int parent, int id) {
