@@ -44,10 +44,10 @@ public class JNISpaceTimeAggregation2 extends JNISpaceTimeAggregation implements
 	}
 
 	@Override
-	public void addLeaf(int id, int parentID, Object values) {
+	public void addLeaf(int id, int parentID, Object values, int weight) {
 		@SuppressWarnings("unchecked")
 		List<HashMap<String, Double>> val = (List<HashMap<String, Double>>) values;
-		jniWrapper.newLeaf(id, parentID);
+		jniWrapper.newLeaf(id, parentID, weight);
 		for (int i = 0; i < val.size(); i++) {
 			jniWrapper.addVector(id);
 			for (String s : val.get(i).keySet()) {

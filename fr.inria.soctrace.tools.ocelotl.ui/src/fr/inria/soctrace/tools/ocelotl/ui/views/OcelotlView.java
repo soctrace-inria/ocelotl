@@ -419,18 +419,21 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 						}
 						return Status.CANCEL_STATUS;
 					}
-					monitor.done();
 					Display.getDefault().syncExec(new Runnable() {
 
 						@Override
 						public void run() {
+							monitor.setTaskName("Draw Diagram");
 							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion(), ocelotlCore.getVisuOperator());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							textRun.setText(String.valueOf(getOcelotlParameters().getParameter()));
+							monitor.setTaskName("Draw Quality Curves");
 							qualityView.createDiagram();
+							monitor.setTaskName("Update Statistics");
 							statView.createDiagram();
+							monitor.setTaskName("Draw Y Axis");
 							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 							snapshotAction.setEnabled(true);
 							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
@@ -439,6 +442,8 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							unitAxisView.createDiagram(ocelotlCore.getVisuOperator());
 							updateStatus();
 							visuDisplayed = true;
+							
+							monitor.setTaskName("Launching Overview");
 							
 							if (ocelotlParameters.isOvervieweEnable()) {
 								try {
@@ -454,6 +459,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							
 							history.saveHistory();
 							timestampHasChanged = false;
+							monitor.done();
 						}
 					});
 					
