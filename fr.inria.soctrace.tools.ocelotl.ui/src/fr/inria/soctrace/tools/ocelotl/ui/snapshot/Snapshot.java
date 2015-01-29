@@ -189,7 +189,7 @@ public class Snapshot {
 		}
 
 		Date aDate = new Date(System.currentTimeMillis());
-		String convertedDate = new SimpleDateFormat("dd-MM-yyyy HHmmss z").format(aDate);
+		String convertedDate = new SimpleDateFormat("dd-MM-yyyy_HHmmss_z").format(aDate);
 		
 		String fileName = theView.getOcelotlParameters().getTrace().getAlias() + "_" + convertedDate;
 		fileName = FilenameValidator.checkNameValidity(fileName);
