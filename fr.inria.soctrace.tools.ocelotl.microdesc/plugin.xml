@@ -19,7 +19,7 @@
       <microscopic_model
       		name="States"
       		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistribution"
-      		unit="%TIME"
+      		unit=""
       		unit_description="Activity Ratio"
       		selection_priority = "1"
       		trace_formats="ALL"
