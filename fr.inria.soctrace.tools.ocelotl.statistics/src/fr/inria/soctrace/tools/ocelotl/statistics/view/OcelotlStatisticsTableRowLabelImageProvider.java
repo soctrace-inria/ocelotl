@@ -12,6 +12,7 @@
 package fr.inria.soctrace.tools.ocelotl.statistics.view;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Event;
 
 import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
@@ -33,6 +34,13 @@ public class OcelotlStatisticsTableRowLabelImageProvider extends SquareIconLabel
 	public OcelotlStatisticsTableRowLabelImageProvider(ITableColumn col) {
 		super();
 		this.col = col;
+	}
+	
+	@Override
+	protected void paint(Event event, Object element) {
+		// Make sure the image colors are updated
+		disposeImages();
+		super.paint(event, element);
 	}
 	
 	@Override
