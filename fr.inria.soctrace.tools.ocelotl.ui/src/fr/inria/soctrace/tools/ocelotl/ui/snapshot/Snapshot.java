@@ -37,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.lpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
 import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
@@ -71,6 +73,8 @@ public class Snapshot {
 		snapShotQualityCurve(currentDirPath);
 		// Save the the current parameters in a text file
 		saveConfig(currentDirPath);
+		// Save the the current parameter P values (+ gain/loss) in a .csv
+		saveParameterValues(currentDirPath);
 
 		// Create a symbolic link to the trace file
 		// createSymLink(currentDirPath);
@@ -161,6 +165,10 @@ public class Snapshot {
 		output.append(theView.getOcelotlParameters().getDataAggOperator());
 		output.append("\nVisualization Operator: ");
 		output.append(theView.getOcelotlParameters().getVisuOperator());
+		if (isTemporalAggregator()) {
+			output.append("\nMax Amplitude Value: ");
+			output.append(((VisuTOperator) theView.getOcelotlCore().getVisuOperator()).getMaxValue());
+		}
 		output.append("\nParameter: ");
 		output.append(theView.getOcelotlParameters().getParameter());
 		output.append("\nGain: ");
@@ -182,7 +190,7 @@ public class Snapshot {
 		if (!dir.exists()) {
 			logger.debug("Snapshot directory (" + snapshotDirectory + ") does not exist and will be created now.");
 
-			// Create the general snaphot directory
+			// Create the general snapshot directory
 			if (!dir.mkdirs()) {
 				logger.error("Failed to create cache directory: " + snapshotDirectory + ".");
 			}
@@ -196,13 +204,50 @@ public class Snapshot {
 			
 		dirName = snapshotDirectory + "/" + fileName;
 
-		// Create the specific snaphot directory
+		// Create the specific snapshot directory
 		dir = new File(dirName);
 		if (!dir.mkdirs()) {
 			logger.error("Failed to create cache directory: " + dirName + ".");
 		}
 
 		return dirName;
+	}
+	
+	/**
+	 * Save the the current parameter P values (+ gain/loss) in a .csv
+	 */
+	public void saveParameterValues(String aDirPath) {
+		StringBuffer output = new StringBuffer();
+		List<DLPQuality> qualities = theView.getCore().getLpaggregManager().getQualities();
+		List<Double> parameters = theView.getCore().getLpaggregManager().getParameters();
+		
+		// CSV header
+		output.append("PARAMETER" + OcelotlConstants.CSVDelimiter + "GAIN" + OcelotlConstants.CSVDelimiter + "LOSS\n");
+
+		// Get all parameters, gain and loss values
+		for (int i = 0; i < parameters.size(); i++) {
+			output.append(parameters.get(i) + OcelotlConstants.CSVDelimiter);
+			output.append(qualities.get(i).getGain() + OcelotlConstants.CSVDelimiter);
+			output.append(qualities.get(i).getLoss() + "\n");
+		}
+
+		// Save into a file
+		PrintWriter writer;
+
+		try {
+			writer = new PrintWriter(aDirPath + "/parameterPValues.csv", "UTF-8");
+			writer.print(output.toString());
+
+			// Close the fd
+			writer.flush();
+			writer.close();
+
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return;
 	}
 	
 	/**
@@ -242,6 +287,15 @@ public class Snapshot {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Check if the current aggregation operator is temporal
+	 * 
+	 * @return true if it is temporal, false otherwise
+	 */
+	public boolean isTemporalAggregator() {
+		return theView.getOcelotlCore().getAggregOperators().getSelectedOperatorResource().getName().equals("Temporal Aggregation");
 	}
 
 	/**

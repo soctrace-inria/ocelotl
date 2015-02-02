@@ -12,6 +12,7 @@
 package fr.inria.soctrace.tools.ocelotl.statistics.view;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Event;
 
 import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
@@ -19,22 +20,30 @@ import fr.inria.soctrace.framesoc.ui.providers.SquareIconLabelProvider;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.statistics.operators.SummaryStat.SummaryStatModel;
 
-public class OcelotlStatisticsTableRowLabelImageProvider extends SquareIconLabelProvider  {
+public class OcelotlStatisticsTableRowLabelImageProvider extends
+		SquareIconLabelProvider {
 
 	/**
 	 * Managed column
 	 */
 	protected ITableColumn col;
-	
+
 	/**
 	 * Constructor
-	 * @param col ITableColumn the provider is related to.
+	 * 
+	 * @param col
+	 *            ITableColumn the provider is related to.
 	 */
 	public OcelotlStatisticsTableRowLabelImageProvider(ITableColumn col) {
 		super();
 		this.col = col;
 	}
-	
+
+	@Override
+	protected void paint(Event event, Object element) {
+		super.paint(event, element);
+	}
+
 	@Override
 	public String getText(Object element) {
 		String text = "";
@@ -48,7 +57,7 @@ public class OcelotlStatisticsTableRowLabelImageProvider extends SquareIconLabel
 
 	@Override
 	public Color getColor(Object element) {
-		SummaryStatModel row = (SummaryStatModel)element;
+		SummaryStatModel row = (SummaryStatModel) element;
 		return row.getColor();
 	}
 }

@@ -101,5 +101,9 @@ public class TemporalProportion extends VisuTOperator {
 		for (final Part part : parts)
 			((PartMap) part.getData()).normalizeElements(timeSliceDuration, part.getPartSize());
 	}
+	
+	public double getMaxValue(){
+		return max;
+	}
 
 }

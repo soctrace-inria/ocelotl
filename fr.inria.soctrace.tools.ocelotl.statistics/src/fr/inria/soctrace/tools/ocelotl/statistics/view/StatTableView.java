@@ -96,6 +96,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			}
 		}
 	}
+	
 
 	@Override
 	public void createDiagram() {
@@ -196,7 +197,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				.values()) {
 			TableViewerColumn elemsViewerCol = new TableViewerColumn(
 					tableViewer, SWT.NONE);
-			
+
 			// If it is the column name
 			if (col.equals(OcelotlStatisticsTableColumn.NAME)) {
 				// add a filter for this column
