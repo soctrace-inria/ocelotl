@@ -71,11 +71,15 @@ public class Snapshot {
 		snapShotDiagram(currentDirPath);
 		// Save the currently displayed quality curves as an image
 		snapShotQualityCurve(currentDirPath);
-		// Save the the current parameters in a text file
+		// Save the currently displayed axes 
+		snapShotAxes(currentDirPath);
+		// Save the current parameters in a text file
 		saveConfig(currentDirPath);
-		// Save the the current parameter P values (+ gain/loss) in a .csv
+		// Save the current parameter P values (+ gain/loss) in a .csv
 		saveParameterValues(currentDirPath);
-
+		// Take a snapshot of the statistics
+		saveStatistics(currentDirPath);
+		
 		// Create a symbolic link to the trace file
 		// createSymLink(currentDirPath);
 	}
@@ -98,6 +102,15 @@ public class Snapshot {
 		createSnapshotFor(theView.getQualityView().getRoot(), dirPath + "/curves.png");
 	}
 
+	/**
+	 * Create png images of the axes
+	 * @param dirPath
+	 */
+	public void snapShotAxes(String dirPath) {
+		createSnapshotFor(theView.getTimeAxisView().getRoot(), dirPath + "/XAxis.png");
+		createSnapshotFor(theView.getUnitAxisView().getRoot(), dirPath + "/YAxis.png");
+	}
+	
 	/**
 	 * Save the actual configuration (trace name, number of slice , start and
 	 * end timestamps, used operators, parameter, gain and loss)
@@ -165,9 +178,11 @@ public class Snapshot {
 		output.append(theView.getOcelotlParameters().getDataAggOperator());
 		output.append("\nVisualization Operator: ");
 		output.append(theView.getOcelotlParameters().getVisuOperator());
+		output.append("\nStatistics Operator: ");
+		output.append(theView.getOcelotlParameters().getStatOperator());
 		if (isTemporalAggregator()) {
 			output.append("\nMax Amplitude Value: ");
-			output.append(((VisuTOperator) theView.getOcelotlCore().getVisuOperator()).getMaxValue());
+			output.append(((VisuTOperator) theView.getCore().getVisuOperator()).getMaxValue());
 		}
 		output.append("\nParameter: ");
 		output.append(theView.getOcelotlParameters().getParameter());
@@ -246,10 +261,28 @@ public class Snapshot {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		return;
 	}
 	
+	public void saveStatistics(String aDirPath) {
+		String stats = theView.getStatView().getStatDataToCSV();
+
+		// Save into a file
+		PrintWriter writer;
+
+		try {
+			writer = new PrintWriter(aDirPath + "/statistics.csv", "UTF-8");
+			writer.print(stats);
+
+			// Close the fd
+			writer.flush();
+			writer.close();
+
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Create a symbolic link to the trace file
 	 * @param aDirPath
@@ -295,7 +328,7 @@ public class Snapshot {
 	 * @return true if it is temporal, false otherwise
 	 */
 	public boolean isTemporalAggregator() {
-		return theView.getOcelotlCore().getAggregOperators().getSelectedOperatorResource().getName().equals("Temporal Aggregation");
+		return theView.getCore().getAggregOperators().getSelectedOperatorResource().getName().equals("Temporal Aggregation");
 	}
 
 	/**

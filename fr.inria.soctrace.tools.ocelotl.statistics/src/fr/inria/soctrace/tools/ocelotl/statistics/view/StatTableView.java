@@ -38,10 +38,14 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
 import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
+import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
+import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.framesoc.ui.model.TableRow;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.statistics.operators.StatisticsProvider;
+import fr.inria.soctrace.tools.ocelotl.statistics.operators.SummaryStat.SummaryStatModel;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatView;
 
@@ -97,10 +101,27 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		}
 	}
 	
+	@Override
+	public String getStatDataToCSV() {
+		StringBuffer output = new StringBuffer();
+		for (ITableRow aRow : statProvider.getStatData()) {
+			SummaryStatModel aStatRow = (SummaryStatModel) aRow;
+			for (ITableColumn aColumn : aStatRow.getFields().keySet()) {
+				output.append(aStatRow.getFields().get(aColumn)
+						+ OcelotlConstants.CSVDelimiter);
+			}
+			// Remove the last csv delimiter
+			output.deleteCharAt(output
+					.lastIndexOf(OcelotlConstants.CSVDelimiter));
+			output.append("\n");
+		}
+
+		return output.toString();
+	}
 
 	@Override
 	public void createDiagram() {
-		statProvider.setMicroMode(ocelotlView.getOcelotlCore().getMicroModel());
+		statProvider.setMicroMode(ocelotlView.getCore().getMicroModel());
 		updateData();
 	}
 	
@@ -169,7 +190,6 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		tableViewer.setContentProvider(new StatContentProvider());
 		ColumnViewerToolTipSupport.enableFor(tableViewer);
 
-		
 		Table table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);

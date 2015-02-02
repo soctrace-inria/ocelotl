@@ -232,6 +232,10 @@ public class TimeAxisView {
 
 		return canvas;
 	}
+	
+	public Figure getRoot() {
+		return root;
+	}
 
 	public void resizeDiagram() {
 		createDiagram(time, selectTime, true);

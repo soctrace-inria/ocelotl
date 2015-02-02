@@ -16,10 +16,12 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
+import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.framesoc.ui.model.TableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
@@ -35,7 +37,6 @@ public class SummaryStat extends StatisticsProvider {
 	Microscopic3DDescription microModel;
 	HashMap<String, Double> data;
 	HashMap<String, Double> proportions;
-	List<ITableRow> statData;
 
 	public SummaryStat(OcelotlView aView) {
 		super(aView);
@@ -161,6 +162,10 @@ public class SummaryStat extends StatisticsProvider {
 		 * Color for the name cell image
 		 */
 		protected Color color;
+		
+		public Map<ITableColumn, String> getFields() {
+			return fields;
+		}
 
 		public void setColor(Color color) {
 			this.color = color;

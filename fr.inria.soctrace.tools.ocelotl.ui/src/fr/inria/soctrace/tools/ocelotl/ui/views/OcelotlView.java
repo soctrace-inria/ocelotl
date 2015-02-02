@@ -513,7 +513,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			history.reset();
 			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
 			ocelotlCore.getAggregOperators().setSelectedOperator(comboDimension.getText());
-			ocelotlParameters.setUnit(getOcelotlCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
+			ocelotlParameters.setUnit(getCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
 			
 			// Set the number of time slice
 			spinnerTSNumber.setSelection(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getTs());
@@ -1516,10 +1516,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		return overView;
 	}
 
-	public OcelotlCore getOcelotlCore() {
-		return ocelotlCore;
-	}
-
 	public HasChanged getHasChanged() {
 		return hasChanged;
 	}
@@ -1745,7 +1741,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getMicromodelTypes().getSelectedOperatorResource().getType()));
 		// Init operator specific configuration
 		ocelotlParameters.setAllEventProducers(confDataLoader.getProducers());
-		ocelotlParameters.setUnit(getOcelotlCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
+		ocelotlParameters.setUnit(getCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
 		
 		if (ocelotlParameters.getUnfilteredEventProducers().isEmpty()) {
 			ocelotlParameters.getUnfilteredEventProducers().addAll(confDataLoader.getProducers());

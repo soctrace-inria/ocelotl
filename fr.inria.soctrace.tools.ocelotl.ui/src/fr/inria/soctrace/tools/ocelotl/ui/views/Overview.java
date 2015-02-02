@@ -362,7 +362,7 @@ public class Overview implements IFramesocBusListener {
 	 */
 	public void initVisuOperator(String name) {
 		// Instantiate the chosen visu operator
-		visuOperator = ocelotlView.getOcelotlCore().getVisuOperators().instantiateOperator(name);
+		visuOperator = ocelotlView.getCore().getVisuOperators().instantiateOperator(name);
 		visuOperatorName = name;
 		
 		final Bundle mybundle = Platform.getBundle(ocelotlView.getCore().getVisuOperators().getOperatorResource(name).getBundle());
@@ -462,7 +462,7 @@ public class Overview implements IFramesocBusListener {
 		// Recompute the parts
 		aggregManager.computeParts(parameter);
 		// Idem in the view
-		visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
+		visuOperator.initManager(ocelotlView.getCore(), aggregManager);
 		// Redraw
 		createDiagram();
 		displayedZone.draw(zoomedTimeRegion, true);
@@ -543,13 +543,13 @@ public class Overview implements IFramesocBusListener {
 		public void run() {
 			try {
 				// Get the number of time slice for the current overview aggregation operator
-				timeSlice = ocelotlView.getOcelotlCore().getAggregOperators().getOperatorResource(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator()).getTs();
+				timeSlice = ocelotlView.getCore().getAggregOperators().getOperatorResource(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator()).getTs();
 
 				//Set the overview parameters with the current ocelotlParameters
 				updateOverviewParameters(ocelotlView.getOcelotlParameters());
 		
 				// Get a new micro model
-				microModel = ocelotlView.getOcelotlCore().getMicromodelTypes().instantiateMicroModel(overviewParameters.getMicroModelType());
+				microModel = ocelotlView.getCore().getMicromodelTypes().instantiateMicroModel(overviewParameters.getMicroModelType());
 
 				// Build the microscopic description
 				microModel.setOcelotlParameters(overviewParameters, new NullProgressMonitor());
@@ -557,7 +557,7 @@ public class Overview implements IFramesocBusListener {
 			        return;
 			    
 				// Init the aggregation operator
-				aggregOperator = ocelotlView.getOcelotlCore().getAggregOperators().instantiateOperator(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator());
+				aggregOperator = ocelotlView.getCore().getAggregOperators().instantiateOperator(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator());
 				aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
 				aggregManager.computeQualities();
 			    if (Thread.interrupted()) 
@@ -574,7 +574,7 @@ public class Overview implements IFramesocBusListener {
 			    if (Thread.interrupted()) 
 			        return;
 			    	    
-				visuOperator.initManager(ocelotlView.getOcelotlCore(), aggregManager);
+				visuOperator.initManager(ocelotlView.getCore(), aggregManager);
 			    if (Thread.interrupted()) 
 			        return;
 			    

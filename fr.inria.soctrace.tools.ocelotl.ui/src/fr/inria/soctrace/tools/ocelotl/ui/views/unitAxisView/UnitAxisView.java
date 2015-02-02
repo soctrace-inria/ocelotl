@@ -61,6 +61,10 @@ abstract public class UnitAxisView {
 		eventProdToFigures = new HashMap<EventProducerNode, Rectangle>();
 		figuresToEventProd = new HashMap<Rectangle, EventProducerNode>();
 	}
+	
+	public Figure getRoot() {
+		return root;
+	}
 
 	public HashMap<EventProducerNode, Rectangle> getEventProdToFigures() {
 		return eventProdToFigures;

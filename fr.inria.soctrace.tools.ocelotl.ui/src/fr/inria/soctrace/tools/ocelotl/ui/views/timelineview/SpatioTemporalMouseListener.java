@@ -290,8 +290,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			// selected time slices
 			if (previous != MouseState.DRAG_LEFT_VERTICAL) {
 				// Get time slice numbers from the time slice manager
-				int startingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampStart());
-				int endingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampEnd());
+				int startingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampStart());
+				int endingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampEnd());
 
 				aggregatedView.setSelectTime(setTemporalSelection(startingSlice, endingSlice));
 			}
@@ -325,7 +325,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 */
 	protected void updateMeasurements() {
 		// Get the event producer hierarchy
-		spatioTemporalManager = (SpaceTimeAggregation2Manager) aggregatedView.getOcelotlView().getOcelotlCore().getLpaggregManager();
+		spatioTemporalManager = (SpaceTimeAggregation2Manager) aggregatedView.getOcelotlView().getCore().getLpaggregManager();
 		hierarchy = spatioTemporalManager.getHierarchy();
 
 		// Compute various height values

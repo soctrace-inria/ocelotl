@@ -81,7 +81,7 @@ public class SnapshotView {
 			aggregationView.setCanvas(canvas);
 
 			// Trigger the display
-			aggregationView.createDiagram(ocelotlview.getOcelotlCore().getLpaggregManager(), ocelotlview.getOcelotlParameters().getTimeRegion(), ocelotlview.getOcelotlCore().getVisuOperator());
+			aggregationView.createDiagram(ocelotlview.getCore().getLpaggregManager(), ocelotlview.getOcelotlParameters().getTimeRegion(), ocelotlview.getCore().getVisuOperator());
 			
 			// Make sure the drawing is up to date
 			compositeOverview.layout();

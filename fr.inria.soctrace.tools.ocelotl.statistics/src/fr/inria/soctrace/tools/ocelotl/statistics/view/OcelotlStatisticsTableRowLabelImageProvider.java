@@ -41,6 +41,8 @@ public class OcelotlStatisticsTableRowLabelImageProvider extends
 
 	@Override
 	protected void paint(Event event, Object element) {
+		// Make sure the image colors are updated
+		disposeImages();
 		super.paint(event, element);
 	}
 

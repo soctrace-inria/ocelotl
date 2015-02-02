@@ -36,4 +36,6 @@ public interface IStatView {
 	
 	public void setStatProvider(IStatisticsProvider aStatProvider);
 	
+	public String getStatDataToCSV();
+	
 }
