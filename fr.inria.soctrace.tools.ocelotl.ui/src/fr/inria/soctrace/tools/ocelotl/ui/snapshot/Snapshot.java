@@ -9,6 +9,7 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  *     Youenn Corre <youenn.corret@inria.fr>
  ******************************************************************************/
+
 package fr.inria.soctrace.tools.ocelotl.ui.snapshot;
 
 import java.io.ByteArrayOutputStream;
@@ -47,6 +48,9 @@ import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.QualityView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.TimeAxisView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewManager;
+import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.TimeLineViewWrapper;
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewManager;
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewWrapper;
@@ -58,7 +62,6 @@ public class Snapshot {
 	// Directory where all the snapshots are saved
 	private String				snapshotDirectory;
 	private OcelotlView			theView;
-	private SnapshotView		snapshotView;
 
 	public Snapshot(String directory, OcelotlView aView) {
 		theView = aView;
@@ -98,9 +101,30 @@ public class Snapshot {
 	 * @param dirPath
 	 */
 	public void snapShotDiagram(String dirPath) {
-		snapshotView = new SnapshotView();
-		snapshotView.createView(theView);
-		createSnapshotFor(snapshotView.getAggregationView().getRoot(), dirPath + "/diagram.png");
+		Shell dialogMainView = new Shell(Display.getDefault());
+		dialogMainView.setSize(theView.getOcelotlParameters().getOcelotlSettings().getSnapshotXResolution() + 2, theView.getOcelotlParameters().getOcelotlSettings().getSnapshotYResolution() + 2);
+
+		// Init drawing display zone
+		Composite compositeMainView = new Composite(dialogMainView, SWT.BORDER);
+		compositeMainView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		// Make sure we remove the title bar from the size in order to
+		// display it fully
+		compositeMainView.setSize(dialogMainView.getSize().x, dialogMainView.getSize().y);
+		compositeMainView.setLayout(new FillLayout());
+	
+		TimeLineViewWrapper mainViewWrapper = new TimeLineViewWrapper(theView);
+		mainViewWrapper.init(compositeMainView);
+		TimeLineViewManager mainViewManager = new TimeLineViewManager(theView);
+		AggregatedView mainView = (AggregatedView) mainViewManager.create();
+		mainViewWrapper.setView(mainView);
+		mainView.createDiagram(theView.getCore().getLpaggregManager(), theView.getOcelotlParameters().getTimeRegion(),  theView.getCore().getVisuOperator());
+		mainView.getSelectFigure().draw(theView.getTimeRegion(), -1, -1);
+		mainView.setSelectTime(((AggregatedView) theView.getTimeLineView()).getSelectTime());
+		mainView.setCurrentlySelectedNode(((AggregatedView) theView.getTimeLineView()).getCurrentlySelectedNode());
+		mainView.drawSelection();
+		compositeMainView.layout();
+		
+		createSnapshotFor(mainView.getRoot(), dirPath + "/diagram.png");
 	}
 
 	/**
@@ -144,12 +168,19 @@ public class Snapshot {
 		compositeOverview.setSize(dialogTimeAxis.getSize().x, dialogTimeAxis.getSize().y);
 		compositeOverview.setLayout(new FillLayout());
 		
-		TimeAxisView  aTimeAxisView = new TimeAxisView();
+		TimeAxisView aTimeAxisView = new TimeAxisView();
 		aTimeAxisView.initDiagram(compositeOverview);
-		aTimeAxisView.createDiagram(theView.getOcelotlParameters().getTimeRegion());
+		// If the selected time region is identical to the whole displayed time
+		// region
+		if (theView.getOcelotlParameters().getTimeRegion().compareTimeRegion(theView.getTimeRegion()))
+			// Do not draw the selection
+			aTimeAxisView.createDiagram(theView.getOcelotlParameters().getTimeRegion());
+		else
+			aTimeAxisView.createDiagram(theView.getOcelotlParameters().getTimeRegion(), theView.getTimeRegion(), false);
+		
 		compositeOverview.layout();
 		createSnapshotFor(aTimeAxisView.getRoot(), dirPath + "/XAxis.png");
-		
+	
 		// Y axis snapshot
 		Shell dialogUnitAxis = new Shell(Display.getDefault());
 		dialogUnitAxis.setSize(theView.getOcelotlParameters().getOcelotlSettings().getyAxisXResolution() + 2, theView.getOcelotlParameters().getOcelotlSettings().getSnapshotYResolution() + 2);
@@ -168,11 +199,14 @@ public class Snapshot {
 		UnitAxisView unitAxisView = aUnitAxisManager.create();
 		aUnitAxisWrapper.setView(unitAxisView);
 		unitAxisView.createDiagram(theView.getCore().getVisuOperator());
+		unitAxisView.select(theView.getUnitAxisView().getOriginY(), theView.getUnitAxisView().getCornerY(), true);
 		compositeUnitAxis.layout();
-		
 		createSnapshotFor(unitAxisView.getRoot(), dirPath + "/YAxis.png");
-	}
 
+		// Reupdate with the current timeline view in order to reset back to
+		// correct selection values
+		theView.getTimeLineView().drawSelection();
+	}
 
 	/**
 	 * Save the actual configuration (trace name, number of slice , start and
@@ -190,7 +224,6 @@ public class Snapshot {
 			// Close the fd
 			writer.flush();
 			writer.close();
-
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

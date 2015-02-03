@@ -48,6 +48,7 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 	public void createDiagram(IDataAggregManager manager, TimeRegion time, IVisuOperator aVisuOperator) {
 		setVisuOperator(aVisuOperator);
 		createDiagram(((TimeAggregationManager) manager).getParts(), time);
+		root.validate();
 	}
 	
 	public void createDiagram(final List<Integer> parts, final TimeRegion time) {
@@ -63,6 +64,7 @@ abstract public class TimeLineView extends AggregatedView implements IAggregated
 		if (parts != null) {
 			computeDiagram();
 		}
+		root.validate();
 	}
 
 	public List<Integer> getParts() {

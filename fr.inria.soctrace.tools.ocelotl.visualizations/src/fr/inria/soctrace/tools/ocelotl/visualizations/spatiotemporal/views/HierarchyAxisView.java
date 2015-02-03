@@ -76,14 +76,11 @@ public class HierarchyAxisView extends UnitAxisView {
 	protected final int horizontalSpace = 5;
 	protected int minLogicWeight = OcelotlConstants.MinimalHeightDrawingThreshold;
 	
-	protected SelectFigure selectFigure;
 	protected SelectFigure highLightAggregateFigure;
-	protected int originY;
-	protected int cornerY;
+
 	
 	public HierarchyAxisView() {
 		super();
-		selectFigure = new SelectFigure();
 		mouse = new HierarchyAxisMouseListener(this);
 		xendlist = new ArrayList<Integer>();
 		yendlist = new ArrayList<Integer>();
@@ -353,7 +350,7 @@ public class HierarchyAxisView extends UnitAxisView {
 	/**
 	 * Sort event producer based on their id
 	 */
-	public void sortPorducers(List<EventProducerNode> producers) {
+	public void sortProducers(List<EventProducerNode> producers) {
 		Collections.sort(producers,
 				new Comparator<EventProducerHierarchy.EventProducerNode>() {
 

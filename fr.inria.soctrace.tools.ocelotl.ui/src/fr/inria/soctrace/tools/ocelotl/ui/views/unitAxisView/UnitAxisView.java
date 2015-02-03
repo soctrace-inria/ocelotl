@@ -51,19 +51,46 @@ abstract public class UnitAxisView {
 	protected YAxisMouseListener					mouse;
 	protected SelectFigure							highLightDisplayedProducer;
 	protected SelectFigure							highLightSelectedProducer;
+	protected SelectFigure							selectFigure;
 	protected EventProducerNode						currentlySelectedEpn	= null;
+	protected int originY;
+	protected int cornerY;
 	
 	protected HashMap<EventProducerNode, Rectangle>	eventProdToFigures;
 	protected HashMap<Rectangle, EventProducerNode>	figuresToEventProd;
 
 	public UnitAxisView() {
-		super();
 		eventProdToFigures = new HashMap<EventProducerNode, Rectangle>();
 		figuresToEventProd = new HashMap<Rectangle, EventProducerNode>();
+		selectFigure = new SelectFigure();
 	}
 	
 	public Figure getRoot() {
 		return root;
+	}
+
+	public SelectFigure getSelectFigure() {
+		return selectFigure;
+	}
+
+	public void setSelectFigure(SelectFigure selectFigure) {
+		this.selectFigure = selectFigure;
+	}
+
+	public int getOriginY() {
+		return originY;
+	}
+
+	public void setOriginY(int originY) {
+		this.originY = originY;
+	}
+
+	public int getCornerY() {
+		return cornerY;
+	}
+
+	public void setCornerY(int cornerY) {
+		this.cornerY = cornerY;
 	}
 
 	public HashMap<EventProducerNode, Rectangle> getEventProdToFigures() {
@@ -171,7 +198,7 @@ abstract public class UnitAxisView {
 		root.repaint();
 	}
 
-	protected class SelectFigure extends RectangleFigure {
+	public class SelectFigure extends RectangleFigure {
 
 		public SelectFigure() {
 			super();
@@ -204,6 +231,7 @@ abstract public class UnitAxisView {
 			root.add(this,
 					new Rectangle(new Point(0, originY), new Point(root.getClientArea().width,
 							cornerY)));
+			root.validate();
 		}
 
 		public void draw(int originX, int originY, int cornerX, int cornerY) {

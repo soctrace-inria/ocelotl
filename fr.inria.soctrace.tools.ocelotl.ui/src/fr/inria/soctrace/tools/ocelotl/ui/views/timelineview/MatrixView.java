@@ -65,12 +65,14 @@ abstract public class MatrixView extends AggregatedView implements IAggregatedVi
 		figures.clear();
 		canvas.update();
 		computeDiagram(aNode, start, end);
+		root.validate();
 	}
 	
 	@Override
 	public void createDiagram(final IDataAggregManager manager, final TimeRegion time, IVisuOperator aVisuOperator) {
 		setVisuOperator(aVisuOperator);
 		createDiagram(((SpaceTimeAggregationManager) manager).getHierarchy(), time);
+		root.validate();
 	}
 
 	public EventProducerHierarchy getHierarchy() {

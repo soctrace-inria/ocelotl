@@ -88,6 +88,7 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 			DrawAggregate hp = new DrawAggregate();
 			hp.draw(aNode, start, end);
 		}
+		root.validate();
 	}
 	
 	@Override
@@ -98,6 +99,7 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 			DrawSpatialMode hp = new DrawSpatialMode();
 			hp.draw();
 		}
+		root.validate();
 	}
 
 	public class DrawAggregate extends DrawSpatialMode {
