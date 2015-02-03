@@ -100,6 +100,7 @@ public class HierarchyAxisView extends UnitAxisView {
 			if(currentlySelectedEpn != null)
 				highLightSelectedProducer.draw(currentlySelectedEpn);
 		}
+		root.validate();
 	}
 
 	@Override
@@ -110,6 +111,7 @@ public class HierarchyAxisView extends UnitAxisView {
 		if (!hierarchy.getEventProducerNodes().isEmpty()) {
 			drawHierarchy();
 		}
+		root.validate();
 	}
 
 	/**

@@ -97,6 +97,7 @@ public class ProportionAxisView extends UnitAxisView {
 			drawGrads();
 		}
 		canvas.update();
+		root.validate();
 	}
 
 	@Override
@@ -110,6 +111,7 @@ public class ProportionAxisView extends UnitAxisView {
 			resizeAxis();
 		}
 		canvas.update();
+		root.validate();
 	}
 
 	/**

@@ -56,6 +56,10 @@ public class OcelotlSettings {
 	private boolean increasingQualities;
 	private int snapshotXResolution;
 	private int snapshotYResolution;
+	private int yAxisXResolution;
+	private int xAxisYResolution;
+	private int qualCurveXResolution;
+	private int qualCurveYResolution;
 
 	private boolean enableOverview;
 	private double overviewParameter;
@@ -121,7 +125,11 @@ public class OcelotlSettings {
 
 		snapshotXResolution = OcelotlDefaultParameterConstants.SNAPSHOT_DEFAULT_X_RESOLUTION;
 		snapshotYResolution = OcelotlDefaultParameterConstants.SNAPSHOT_DEFAULT_Y_RESOLUTION;
-
+		xAxisYResolution = OcelotlDefaultParameterConstants.XAXIS_DEFAULT_Y_RESOLUTION;
+		yAxisXResolution = OcelotlDefaultParameterConstants.YAXIS_DEFAULT_X_RESOLUTION;
+		qualCurveXResolution = OcelotlDefaultParameterConstants.QUALCURVE_DEFAULT_X_RESOLUTION;
+		qualCurveYResolution = OcelotlDefaultParameterConstants.QUALCURVE_DEFAULT_Y_RESOLUTION;
+		
 		overviewSelectionBgColor = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_BG_COLOR;
 		overviewSelectionFgColor = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_FG_COLOR;
 		overviewSelectionAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_ALPHA;
@@ -213,11 +221,9 @@ public class OcelotlSettings {
 						OcelotlConstants.JSONOverviewSelectionFgColor)
 						.getAsString()));
 				setOverviewSelectionAlphaValue(theConf.get(
-						OcelotlConstants.JSONOverviewSelectionAlpha)
-						.getAsInt());
+						OcelotlConstants.JSONOverviewSelectionAlpha).getAsInt());
 				setOverviewDisplayAlphaValue(theConf.get(
-						OcelotlConstants.JSONOverviewDisplayAlpha)
-						.getAsInt());
+						OcelotlConstants.JSONOverviewDisplayAlpha).getAsInt());
 				setParameterPPolicy(ParameterPPolicy.valueOf(theConf.get(
 						OcelotlConstants.JSONParameterPPolicy).getAsString()));
 				setEnableOverview(theConf.get(
@@ -227,11 +233,9 @@ public class OcelotlSettings {
 				setMaxNumberOfLeaves(theConf.get(
 						OcelotlConstants.JSONMaxNumberOfLeaves).getAsInt());
 				setMainDisplayBgColor(loadColor(theConf.get(
-						OcelotlConstants.JSONMainDisplayBgColor)
-						.getAsString()));
+						OcelotlConstants.JSONMainDisplayBgColor).getAsString()));
 				setMainDisplayFgColor(loadColor(theConf.get(
-						OcelotlConstants.JSONMainDisplayFgColor)
-						.getAsString()));
+						OcelotlConstants.JSONMainDisplayFgColor).getAsString()));
 				setMainSelectionBgColor(loadColor(theConf.get(
 						OcelotlConstants.JSONMainSelectionBgColor)
 						.getAsString()));
@@ -239,11 +243,17 @@ public class OcelotlSettings {
 						OcelotlConstants.JSONMainSelectionFgColor)
 						.getAsString()));
 				setMainSelectionAlphaValue(theConf.get(
-						OcelotlConstants.JSONMainSelectionAlpha)
-						.getAsInt());
+						OcelotlConstants.JSONMainSelectionAlpha).getAsInt());
 				setMainDisplayAlphaValue(theConf.get(
-						OcelotlConstants.JSONMainDisplayAlpha)
-						.getAsInt());
+						OcelotlConstants.JSONMainDisplayAlpha).getAsInt());
+				setxAxisYResolution(theConf.get(
+						OcelotlConstants.JSONXAxisYResolution).getAsInt());
+				setyAxisXResolution(theConf.get(
+						OcelotlConstants.JSONYAxisXResolution).getAsInt());
+				setQualCurveXResolution(theConf.get(
+						OcelotlConstants.JSONQualCurveXResolution).getAsInt());
+				setQualCurveYResolution(theConf.get(
+						OcelotlConstants.JSONQualCurveYResolution).getAsInt());
 			
 				logger.debug("Settings values:\n");
 				logger.debug("Cache activated: " + cacheActivated);
@@ -340,6 +350,14 @@ public class OcelotlSettings {
 				saveColor(mainDisplayFgColor));
 		theConfig.addProperty(OcelotlConstants.JSONMainDisplayAlpha,
 				mainDisplayAlphaValue);
+		theConfig.addProperty(OcelotlConstants.JSONXAxisYResolution,
+				xAxisYResolution);
+		theConfig.addProperty(OcelotlConstants.JSONYAxisXResolution,
+				yAxisXResolution);
+		theConfig.addProperty(OcelotlConstants.JSONQualCurveXResolution,
+				qualCurveXResolution);
+		theConfig.addProperty(OcelotlConstants.JSONQualCurveYResolution,
+				qualCurveYResolution);
 		
 		String newSettings = gson.toJson(theConfig);
 
@@ -496,7 +514,6 @@ public class OcelotlSettings {
 
 	public void setOverviewTimesliceNumber(int overviewTimesliceNumber) {
 		this.overviewTimesliceNumber = overviewTimesliceNumber;
-
 	}
 
 	public String getOverviewAggregOperator() {
@@ -521,6 +538,38 @@ public class OcelotlSettings {
 
 	public void setSnapshotXResolution(int snapshotXResolution) {
 		this.snapshotXResolution = snapshotXResolution;
+	}
+
+	public int getyAxisXResolution() {
+		return yAxisXResolution;
+	}
+
+	public void setyAxisXResolution(int yAxisXResolution) {
+		this.yAxisXResolution = yAxisXResolution;
+	}
+
+	public int getxAxisYResolution() {
+		return xAxisYResolution;
+	}
+
+	public void setxAxisYResolution(int xAxisYResolution) {
+		this.xAxisYResolution = xAxisYResolution;
+	}
+
+	public int getQualCurveXResolution() {
+		return qualCurveXResolution;
+	}
+
+	public void setQualCurveXResolution(int qualCurveXResolution) {
+		this.qualCurveXResolution = qualCurveXResolution;
+	}
+
+	public int getQualCurveYResolution() {
+		return qualCurveYResolution;
+	}
+
+	public void setQualCurveYResolution(int qualCurveYResolution) {
+		this.qualCurveYResolution = qualCurveYResolution;
 	}
 
 	public Color getOverviewSelectionFgColor() {

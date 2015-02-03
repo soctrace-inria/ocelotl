@@ -43,8 +43,9 @@ public class SnapshotView {
 	}
 
 	public void createView(OcelotlView ocelotlview) {
-		width = ocelotlview.getOcelotlParameters().getOcelotlSettings().getSnapshotXResolution();
-		height = ocelotlview.getOcelotlParameters().getOcelotlSettings().getSnapshotYResolution();
+		// Add 2 to take into account the border of the dialog
+		width = ocelotlview.getOcelotlParameters().getOcelotlSettings().getSnapshotXResolution() + 2;
+		height = ocelotlview.getOcelotlParameters().getOcelotlSettings().getSnapshotYResolution() + 2;
 		String name = ocelotlview.getOcelotlParameters().getVisuOperator();
 
 		try {

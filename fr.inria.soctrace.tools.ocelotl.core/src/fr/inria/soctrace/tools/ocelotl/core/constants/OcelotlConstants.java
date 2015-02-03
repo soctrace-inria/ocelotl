@@ -105,6 +105,10 @@ public class OcelotlConstants {
 	public static final String JSONIncreasingQualities = "increasingQualities";
 	public static final String JSONSnapshotXResolution = "snapshotXResolution";
 	public static final String JSONSnapshotYResolution = "snapshotYResolution";
+	public static final String JSONYAxisXResolution = "yAxisXResolution";
+	public static final String JSONXAxisYResolution = "xAxisYResolution";
+	public static final String JSONQualCurveXResolution = "qualCurveXResolution";
+	public static final String JSONQualCurveYResolution = "qualCurveYResolution";
 	public static final String JSONAggregateLeaves = "aggregateLeaves";
 	public static final String JSONMaxNumberOfLeaves = "maxNumberOfLeaves";
 	

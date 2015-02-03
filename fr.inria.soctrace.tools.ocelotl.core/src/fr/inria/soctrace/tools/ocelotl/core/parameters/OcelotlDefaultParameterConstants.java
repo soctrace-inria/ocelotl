@@ -154,5 +154,9 @@ public class OcelotlDefaultParameterConstants {
 	
 	public static final int SNAPSHOT_DEFAULT_X_RESOLUTION = 1920;
 	public static final int SNAPSHOT_DEFAULT_Y_RESOLUTION = 1080;
+	public static final int YAXIS_DEFAULT_X_RESOLUTION = 100;
+	public static final int XAXIS_DEFAULT_Y_RESOLUTION = 100;
+	public static final int QUALCURVE_DEFAULT_X_RESOLUTION = 500;
+	public static final int QUALCURVE_DEFAULT_Y_RESOLUTION = 500;
 	
 }

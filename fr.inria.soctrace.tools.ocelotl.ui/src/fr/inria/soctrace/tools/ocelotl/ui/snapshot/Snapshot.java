@@ -32,7 +32,11 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.wb.swt.SWTResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +45,11 @@ import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
 import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.QualityView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.TimeAxisView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView;
+import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewManager;
+import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewWrapper;
 
 public class Snapshot {
 
@@ -99,7 +108,23 @@ public class Snapshot {
 	 * @param dirPath
 	 */
 	public void snapShotQualityCurve(String dirPath) {
-		createSnapshotFor(theView.getQualityView().getRoot(), dirPath + "/curves.png");
+		Shell dialogQualityView = new Shell(Display.getDefault());
+		dialogQualityView.setSize(theView.getOcelotlParameters().getOcelotlSettings().getQualCurveXResolution() + 2, theView.getOcelotlParameters().getOcelotlSettings().getQualCurveYResolution() + 2);
+
+		// Init drawing display zone
+		Composite compositeQualityView = new Composite(dialogQualityView, SWT.BORDER);
+		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		// Make sure we remove the title bar from the size in order to
+		// display it fully
+		compositeQualityView.setSize(dialogQualityView.getSize().x, dialogQualityView.getSize().y);
+		compositeQualityView.setLayout(new FillLayout());
+		
+		QualityView aQualityView = new QualityView(theView);
+		aQualityView.initDiagram(compositeQualityView);
+		aQualityView.createDiagram();
+		compositeQualityView.layout();
+		
+		createSnapshotFor(aQualityView.getRoot(), dirPath + "/curves.png");
 	}
 
 	/**
@@ -107,10 +132,48 @@ public class Snapshot {
 	 * @param dirPath
 	 */
 	public void snapShotAxes(String dirPath) {
-		createSnapshotFor(theView.getTimeAxisView().getRoot(), dirPath + "/XAxis.png");
-		createSnapshotFor(theView.getUnitAxisView().getRoot(), dirPath + "/YAxis.png");
-	}
+		// Time axis snapshot
+		Shell dialogTimeAxis = new Shell(Display.getDefault());
+		dialogTimeAxis.setSize(theView.getOcelotlParameters().getOcelotlSettings().getSnapshotXResolution() + 2, theView.getOcelotlParameters().getOcelotlSettings().getxAxisYResolution() + 2);
+
+		// Init drawing display zone
+		Composite compositeOverview = new Composite(dialogTimeAxis, SWT.BORDER);
+		compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		// Make sure we remove the title bar from the size in order to
+		// display it fully
+		compositeOverview.setSize(dialogTimeAxis.getSize().x, dialogTimeAxis.getSize().y);
+		compositeOverview.setLayout(new FillLayout());
+		
+		TimeAxisView  aTimeAxisView = new TimeAxisView();
+		aTimeAxisView.initDiagram(compositeOverview);
+		aTimeAxisView.createDiagram(theView.getOcelotlParameters().getTimeRegion());
+		compositeOverview.layout();
+		createSnapshotFor(aTimeAxisView.getRoot(), dirPath + "/XAxis.png");
+		
+		// Y axis snapshot
+		Shell dialogUnitAxis = new Shell(Display.getDefault());
+		dialogUnitAxis.setSize(theView.getOcelotlParameters().getOcelotlSettings().getyAxisXResolution() + 2, theView.getOcelotlParameters().getOcelotlSettings().getSnapshotYResolution() + 2);
+
+		// Init drawing display zone
+		Composite compositeUnitAxis = new Composite(dialogUnitAxis, SWT.BORDER);
+		compositeUnitAxis.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		// Make sure we remove the title bar from the size in order to
+		// display it fully
+		compositeUnitAxis.setSize(dialogUnitAxis.getSize().x, dialogUnitAxis.getSize().y);
+		compositeUnitAxis.setLayout(new FillLayout());
 	
+		UnitAxisViewWrapper aUnitAxisWrapper = new UnitAxisViewWrapper(theView);
+		aUnitAxisWrapper.init(compositeUnitAxis);
+		UnitAxisViewManager aUnitAxisManager = new UnitAxisViewManager(theView);
+		UnitAxisView unitAxisView = aUnitAxisManager.create();
+		aUnitAxisWrapper.setView(unitAxisView);
+		unitAxisView.createDiagram(theView.getCore().getVisuOperator());
+		compositeUnitAxis.layout();
+		
+		createSnapshotFor(unitAxisView.getRoot(), dirPath + "/YAxis.png");
+	}
+
+
 	/**
 	 * Save the actual configuration (trace name, number of slice , start and
 	 * end timestamps, used operators, parameter, gain and loss)
@@ -266,6 +329,11 @@ public class Snapshot {
 	public void saveStatistics(String aDirPath) {
 		String stats = theView.getStatView().getStatDataToCSV();
 
+		if (stats.isEmpty()) {
+			logger.debug("Failed to convert statisitics in CSV format.");
+			return;
+		}
+
 		// Save into a file
 		PrintWriter writer;
 
@@ -311,6 +379,11 @@ public class Snapshot {
 	 */
 	public void createSnapshotFor(Figure figure, String fileName) {
 		byte[] imageBytes = createImage(figure, SWT.IMAGE_PNG);
+		
+		if (imageBytes == null) {
+			logger.debug("Image generation failed: snapshot image will not be created");
+			return;
+		}
 
 		try {
 			FileOutputStream out = new FileOutputStream(fileName);
@@ -341,9 +414,13 @@ public class Snapshot {
 	 * @return an array of bytes corresponding to an image
 	 */
 	private byte[] createImage(Figure figure, int format) {
-
 		Device device = Display.getCurrent();
 		Rectangle r = figure.getBounds();
+		
+		if (r.width <= 0 || r.height <= 0) {
+			logger.debug("Size of figure is 0: stopping generation");
+			return null;
+		}
 
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 

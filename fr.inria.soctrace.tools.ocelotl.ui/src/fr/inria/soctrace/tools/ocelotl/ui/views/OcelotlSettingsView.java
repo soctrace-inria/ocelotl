@@ -85,6 +85,10 @@ public class OcelotlSettingsView extends Dialog {
 	private String								currentDatacacheDir;
 	private Text								snapshotWidth;
 	private Text								snapshotHeight;
+	private Spinner								xAxisHeight;
+	private Spinner								yAxisWidth;
+	private Spinner								qualCurveWidth;
+	private Spinner								qualCurveHeight;
 	private Button								btnEditBgOverviewDisplay;
 	private Button								btnEditFgOverviewDisplay;
 	private Button								btnEditBgOverviewSelected;
@@ -845,28 +849,84 @@ public class OcelotlSettingsView extends Dialog {
 
 		Label lblsnapshotWidth = new Label(groupMiscSettings, SWT.NONE);
 		lblsnapshotWidth.setFont(cantarell8);
-		lblsnapshotWidth.setText("Snapshot Width");
+		lblsnapshotWidth.setText("Main View Snapshot Width");
 
 		snapshotWidth = new Text(groupMiscSettings, SWT.BORDER);
 		snapshotWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		snapshotWidth.setFont(cantarell8);
-		snapshotWidth.setToolTipText("Width of the Generated Image in Pixels");
+		snapshotWidth.setToolTipText("Width of the Generated Image of the Main Diagram in Pixels");
 		snapshotWidth.setText(String.valueOf(settings.getSnapshotXResolution()));
 		snapshotWidth.addVerifyListener(new NumericTextFieldVerifyListener());
 		new Label(groupMiscSettings, SWT.NONE);
 
 		Label lblsnapshotHeight = new Label(groupMiscSettings, SWT.NONE);
 		lblsnapshotHeight.setFont(cantarell8);
-		lblsnapshotHeight.setText("Snapshot Height");
+		lblsnapshotHeight.setText("Main View Snapshot Height");
 
 		snapshotHeight = new Text(groupMiscSettings, SWT.BORDER);
 		snapshotHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		snapshotHeight.setText(String.valueOf(settings.getSnapshotYResolution()));
 		snapshotHeight.setFont(cantarell8);
-		snapshotHeight.setToolTipText("Height of the Generated Image in Pixels");
+		snapshotHeight.setToolTipText("Height of the Generated Image of the Main Diagram in Pixels");
 		snapshotHeight.addVerifyListener(new NumericTextFieldVerifyListener());
 		new Label(groupMiscSettings, SWT.NONE);
 
+		Label lblxAxisHeight = new Label(groupMiscSettings, SWT.NONE);
+		lblxAxisHeight.setFont(cantarell8);
+		lblxAxisHeight.setText("X Axis Height");
+		
+		xAxisHeight = new Spinner(groupMiscSettings, SWT.BORDER);
+		xAxisHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		xAxisHeight.setIncrement(1);
+		xAxisHeight.setMaximum(100000);
+		xAxisHeight.setMinimum(10);
+		xAxisHeight.setFont(cantarell8);
+		xAxisHeight.setSelection(settings.getxAxisYResolution());
+		xAxisHeight.setToolTipText("Height of the Generated Image of the X Axis in Pixels (10 - 100000)");
+		new Label(groupMiscSettings, SWT.NONE);
+		
+		Label lblyAxisWidth = new Label(groupMiscSettings, SWT.NONE);
+		lblyAxisWidth.setFont(cantarell8);
+		lblyAxisWidth.setText("Y Axis Width");
+		
+		yAxisWidth = new Spinner(groupMiscSettings, SWT.BORDER);
+		yAxisWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		yAxisWidth.setIncrement(1);
+		yAxisWidth.setMaximum(100000);
+		yAxisWidth.setMinimum(10);
+		yAxisWidth.setFont(cantarell8);
+		yAxisWidth.setSelection(settings.getyAxisXResolution());
+		yAxisWidth.setToolTipText("Width of the Generated Image of the Y Axis in Pixels (10 - 100000)");
+		new Label(groupMiscSettings, SWT.NONE);
+			
+		Label lblQualCurvesWidth = new Label(groupMiscSettings, SWT.NONE);
+		lblQualCurvesWidth.setFont(cantarell8);
+		lblQualCurvesWidth.setText("Quality Curves Width");
+		
+		qualCurveWidth = new Spinner(groupMiscSettings, SWT.BORDER);
+		qualCurveWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		qualCurveWidth.setIncrement(1);
+		qualCurveWidth.setMaximum(100000);
+		qualCurveWidth.setMinimum(10);
+		qualCurveWidth.setFont(cantarell8);
+		qualCurveWidth.setSelection(settings.getQualCurveXResolution());
+		qualCurveWidth.setToolTipText("Width of the Generated Image of the Quality Curves in Pixels (10 - 100000)");
+		new Label(groupMiscSettings, SWT.NONE);
+		
+		Label lblQualCurvesHeight = new Label(groupMiscSettings, SWT.NONE);
+		lblQualCurvesHeight.setFont(cantarell8);
+		lblQualCurvesHeight.setText("Quality Curves Height");
+		
+		qualCurveHeight = new Spinner(groupMiscSettings, SWT.BORDER);
+		qualCurveHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		qualCurveHeight.setIncrement(1);
+		qualCurveHeight.setMaximum(100000);
+		qualCurveHeight.setMinimum(10);
+		qualCurveHeight.setFont(cantarell8);
+		qualCurveHeight.setSelection(settings.getQualCurveYResolution());
+		qualCurveHeight.setToolTipText("Height of the Generated Image of the Quality Curves in Pixels (10 - 100000)");
+		new Label(groupMiscSettings, SWT.NONE);
+		
 		btnChangeSnapshotDirectory.addSelectionListener(new ModifySnapshotDirectory());
 		
 		initSettings();
@@ -938,6 +998,10 @@ public class OcelotlSettingsView extends Dialog {
 		settings.setSnapShotDirectory(snapshotDirectory.getText());
 		settings.setSnapshotXResolution(Integer.valueOf(snapshotWidth.getText()));
 		settings.setSnapshotYResolution(Integer.valueOf(snapshotHeight.getText()));
+		settings.setxAxisYResolution(Integer.valueOf(xAxisHeight.getText()));
+		settings.setyAxisXResolution(Integer.valueOf(yAxisWidth.getText()));
+		settings.setQualCurveXResolution(Integer.valueOf(qualCurveWidth.getText()));
+		settings.setQualCurveYResolution(Integer.valueOf(qualCurveHeight.getText()));
 		
 		//Overview colors
 		settings.setEnableOverview(btnEnableOverview.getSelection());

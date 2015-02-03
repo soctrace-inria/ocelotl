@@ -147,6 +147,7 @@ public class QualityView {
 				}
 			}
 			canvas.update();
+			root.validate();
 		}
 	}
 
