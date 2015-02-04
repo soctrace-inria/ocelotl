@@ -32,7 +32,7 @@ abstract public class VisuTOperator implements IVisuTOperator {
 	protected OcelotlCore ocelotlCore;
 	protected int timeSliceNumber;
 	protected long timeSliceDuration;
-	protected ITimeManager lpaggregManager;
+	protected ITimeManager timeManager;
 
 	public VisuTOperator() {
 		super();
@@ -70,14 +70,14 @@ abstract public class VisuTOperator implements IVisuTOperator {
 		int oldPart = 0;
 		// First part
 		parts.add(new Part(0, 1, null));
-		for (int i = 0; i < lpaggregManager.getParts().size(); i++)
+		for (int i = 0; i < timeManager.getParts().size(); i++)
 			// If we are still in the same part
-			if (lpaggregManager.getParts().get(i) == oldPart)
+			if (timeManager.getParts().get(i) == oldPart)
 				// Extend the current part
 				parts.get(parts.size() - 1).setEndPart(i + 1);
 			else {
 				// Start a new part
-				oldPart = lpaggregManager.getParts().get(i);
+				oldPart = timeManager.getParts().get(i);
 				parts.add(new Part(i, i + 1, null));
 			}
 	}
@@ -85,7 +85,7 @@ abstract public class VisuTOperator implements IVisuTOperator {
 	@Override
 	public void setOcelotlCore(final OcelotlCore ocelotlCore) {
 		this.ocelotlCore = ocelotlCore;
-		lpaggregManager = (ITimeManager) ocelotlCore.getLpaggregManager();
+		timeManager = (ITimeManager) ocelotlCore.getLpaggregManager();
 		timeSliceNumber = ocelotlCore.getOcelotlParameters()
 				.getTimeSlicesNumber();
 		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()
@@ -99,7 +99,7 @@ abstract public class VisuTOperator implements IVisuTOperator {
 	@Override
 	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
 		this.ocelotlCore = ocelotlCore;
-		lpaggregManager = (ITimeManager) aManager;
+		timeManager = (ITimeManager) aManager;
 		timeSliceNumber = ocelotlCore.getOcelotlParameters()
 				.getTimeSlicesNumber();
 		timeSliceDuration = ocelotlCore.getOcelotlParameters().getTimeRegion()

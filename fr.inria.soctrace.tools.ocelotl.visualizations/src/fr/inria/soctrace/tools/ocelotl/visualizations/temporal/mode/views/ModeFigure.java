@@ -29,7 +29,7 @@ public class ModeFigure extends RectangleFigure {
 	public void draw(MainEvent mainEvent) {
 		removeAll();
 		setPreferredSize(1000, 1000);
-		final Label label = new Label(" " + mainEvent.getState() + ": " + mainEvent.getAmplitude100()+"% ");
+		final Label label = new Label(" " + mainEvent.getState() + ": " + mainEvent.getAmplitude100() + "% ");
 		setToolTip(label);
 		final ToolbarLayout layout = new ToolbarLayout();
 		layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);

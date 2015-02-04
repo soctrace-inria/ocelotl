@@ -31,6 +31,7 @@ public abstract class TemporalMode extends VisuTOperator {
 	protected HashMap<Integer, Double> proportions;
 	protected List<String> states;
 	protected ITimeManager timeManager;
+	protected double max;
 
 	@Override
 	public OcelotlCore getOcelotlCore() {
@@ -49,6 +50,14 @@ public abstract class TemporalMode extends VisuTOperator {
 		computeParts();
 	}
 	
+	public double getMax() {
+		return max;
+	}
+
+	public void setMax(double max) {
+		this.max = max;
+	}
+
 	@Override
 	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager) {
 		this.ocelotlCore = ocelotlCore;
@@ -83,6 +92,8 @@ public abstract class TemporalMode extends VisuTOperator {
 		initParts();
 		initStates();
 		aggregateStates();
+		normalize();
+		computeMax();
 		computeMainStates();
 	}
 
@@ -117,9 +128,22 @@ public abstract class TemporalMode extends VisuTOperator {
 										.getTimeSliceMatrix().getMatrix()
 										.get(i).get(ep).get(state));
 	}
+	
+	public void computeMax() {
+		max = 0;
+		for (final Part part : parts)
+			if (((PartMap) part.getData()).getTotal() > max)
+				max = ((PartMap) part.getData()).getTotal();
+	}
 
 	public List<String> getStates() {
 		return ((TimeAggregation3Manager) timeManager).getKeys();
+	}
+	
+	private void normalize() {
+		for (final Part part : parts)
+			((PartMap) part.getData()).normalizeElements(timeSliceDuration,
+					part.getPartSize());
 	}
 	
 	public abstract void computeMainStates();
