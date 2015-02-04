@@ -138,8 +138,7 @@ public class Snapshot {
 		// Init drawing display zone
 		Composite compositeQualityView = new Composite(dialogQualityView, SWT.BORDER);
 		compositeQualityView.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		// Make sure we remove the title bar from the size in order to
-		// display it fully
+		compositeQualityView.setFont(SWTResourceManager.getFont("Cantarell", 11, SWT.NORMAL));
 		compositeQualityView.setSize(dialogQualityView.getSize().x, dialogQualityView.getSize().y);
 		compositeQualityView.setLayout(new FillLayout());
 		
@@ -163,8 +162,6 @@ public class Snapshot {
 		// Init drawing display zone
 		Composite compositeOverview = new Composite(dialogTimeAxis, SWT.BORDER);
 		compositeOverview.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		// Make sure we remove the title bar from the size in order to
-		// display it fully
 		compositeOverview.setSize(dialogTimeAxis.getSize().x, dialogTimeAxis.getSize().y);
 		compositeOverview.setLayout(new FillLayout());
 		
@@ -188,8 +185,6 @@ public class Snapshot {
 		// Init drawing display zone
 		Composite compositeUnitAxis = new Composite(dialogUnitAxis, SWT.BORDER);
 		compositeUnitAxis.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		// Make sure we remove the title bar from the size in order to
-		// display it fully
 		compositeUnitAxis.setSize(dialogUnitAxis.getSize().x, dialogUnitAxis.getSize().y);
 		compositeUnitAxis.setLayout(new FillLayout());
 	
