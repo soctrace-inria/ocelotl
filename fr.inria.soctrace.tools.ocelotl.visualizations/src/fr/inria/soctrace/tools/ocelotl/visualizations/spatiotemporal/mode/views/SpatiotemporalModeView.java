@@ -57,20 +57,23 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 			RectangleFigure rectangle = new RectangleFigure();
 
 			MainEvent state = getMainState(epn, startTimeSlice, endTimeSlice);
-			if(state.getState().equals(SpatiotemporalMode.Void))
-				return null;
-			
+
 			String label = " " + epn.getMe().getName() + " ("
 					+ state.getState() + ", " + state.getAmplitude100() + "%) ";
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()
 					.getEventTypeColor(state.getState()).getSwtColor());
 			rectangle.setForegroundColor(FramesocColorManager.getInstance()
 					.getEventTypeColor(state.getState()).getSwtColor());
+			if(!state.getState().equals(SpatiotemporalMode.Void)){
 			rectangle.setToolTip(new Label(label));
 
 			// Set the alpha transparency according to the spatiotemporalMode
 			rectangle.setAlpha(state.getAmplitude255Shifted());
 			rectangle.setLineWidth(1);
+			}else{
+				rectangle.setAlpha(0);
+				rectangle.setToolTip(new Label(" "));
+			}
 			rectangle.setLayoutManager(new BorderLayout());
 			rectangle.setPreferredSize(1000, 1000);
 			rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11,
