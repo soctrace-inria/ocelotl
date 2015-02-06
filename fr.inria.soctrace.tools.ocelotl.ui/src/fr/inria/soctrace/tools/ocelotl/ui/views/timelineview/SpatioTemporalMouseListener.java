@@ -335,6 +335,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		logicHeight = height / hierarchy.getRoot().getWeight();
 	}
 	
+	
 	/**
 	 * Set the spatial selection to the event producer node given in parameter
 	 * 
@@ -342,6 +343,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 *            the selected even producer node
 	 */
 	public void setSpatialSelection(EventProducerNode selectedNode) {
+		
 		ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
 
 		// If only one producer is selected, then also add the parent
@@ -349,9 +351,18 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		if (selectedNode.getChildrenNodes().isEmpty()) {
 			selectedProducers.add(selectedNode.getParentNode().getMe());
 		}
+
 		
 		aggregatedView.setCurrentlySelectedNode(selectedNode);
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatialSelection(true);
+		while (selectedNode.getParentNode()!=null){
+			if (selectedNode.getParentNode().getWeight()==selectedNode.getWeight()){
+				selectedNode=selectedNode.getParentNode();
+				selectedProducers.add(selectedNode.getMe());
+			}else{
+				break;
+			}
+		}
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 	}
 	

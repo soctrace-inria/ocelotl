@@ -271,7 +271,7 @@ public class DataCache {
 		CacheParameters cParam = new CacheParameters(parameters);
 		// Look for the correct trace
 		if (!cacheIndex.containsKey(parameters.getTrace())) {
-			logger.debug("No datacache was found");
+			logger.debug("No datacache was found (1)");
 			return null;
 		}
 		
@@ -301,7 +301,7 @@ public class DataCache {
 		}
 		
 		if (cache == null) {
-			logger.debug("No datacache was found");
+			logger.debug("No datacache was found (2)");
 			return null;
 		} else {
 			similarParameters(cParam, cache);
@@ -600,7 +600,6 @@ public class DataCache {
 						logger.debug("Found " + param.getTraceName() + " in "
 								+ traceCache.toString() + ", "
 								+ param.getMicroModelType() + ", "
-								+ param.getSpaceAggOperator() + ", "
 								+ param.getStartTimestamp() + ", "
 								+ param.getEndTimestamp());
 					}
