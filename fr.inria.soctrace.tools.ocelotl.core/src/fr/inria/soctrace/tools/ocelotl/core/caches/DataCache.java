@@ -9,7 +9,7 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  *     Youenn Corre <youenn.corret@inria.fr>
  ******************************************************************************/
-package fr.inria.soctrace.tools.ocelotl.core.datacache;
+package fr.inria.soctrace.tools.ocelotl.core.caches;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -600,7 +600,7 @@ public class DataCache {
 						logger.debug("Found " + param.getTraceName() + " in "
 								+ traceCache.toString() + ", "
 								+ param.getMicroModelType() + ", "
-								+ param.getSpaceAggOperator() + ", "
+								+ param.getVisuAggOperator() + ", "
 								+ param.getStartTimestamp() + ", "
 								+ param.getEndTimestamp());
 					}
@@ -705,7 +705,7 @@ public class DataCache {
 				if (line != null) {
 					String[] header = line.split(OcelotlConstants.CSVDelimiter);
 
-					if (header.length != OcelotlConstants.CACHE_HEADER_NORMAL_SIZE) {
+					if (header.length != OcelotlConstants.DATACACHE_HEADER_NORMAL_SIZE) {
 						bufFileReader.close();
 						return params;
 					}
@@ -720,7 +720,7 @@ public class DataCache {
 					// Time Aggregation Operator
 					params.setMicroModelType(header[2]);
 					// Space Aggregation Operator
-					params.setSpaceAggOperator(header[3]);
+					params.setVisuAggOperator(header[3]);
 					// Start timestamp
 					params.setStartTimestamp(Long.parseLong(header[4]));
 					// End timestamp
@@ -765,12 +765,12 @@ public class DataCache {
 				oParam.setMicroModelType(params.getMicroModelType());
 			}
 
-			if (!params.getTimeAggOperator().equals("null")) {
-				oParam.setDataAggOperator(params.getTimeAggOperator());
+			if (!params.getDataAggOperator().equals("null")) {
+				oParam.setDataAggOperator(params.getDataAggOperator());
 			}
 
-			if (!params.getSpaceAggOperator().equals("null")) {
-				oParam.setVisuOperator(params.getSpaceAggOperator());
+			if (!params.getVisuAggOperator().equals("null")) {
+				oParam.setVisuOperator(params.getVisuAggOperator());
 			}
 		}
 

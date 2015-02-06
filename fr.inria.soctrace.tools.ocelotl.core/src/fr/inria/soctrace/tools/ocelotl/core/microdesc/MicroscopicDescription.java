@@ -34,8 +34,8 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
+import fr.inria.soctrace.tools.ocelotl.core.caches.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
-import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
@@ -616,7 +616,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		
 		String fileName = parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
-				+ parameters.getMicroModelType() + "_" + convertedDate;
+				+ parameters.getMicroModelType() + "_" + convertedDate + ".octcache";
 		
 		fileName = FilenameValidator.checkNameValidity(fileName);
 			
@@ -676,6 +676,11 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		if (parameters.getCurrentProducers().size() != parameters
 				.getEventProducerHierarchy().getEventProducers().size()) {
 			logger.debug("At least one event producer is filtered: cache will not be generated.");
+			return false;
+		}
+		
+		if (parameters.isHasLeaveAggregated()) {
+			logger.debug("Some event producers are aggregated: cache will not be generated.");
 			return false;
 		}
 

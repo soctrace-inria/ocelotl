@@ -101,7 +101,7 @@ public class OcelotlCore {
 	}
 
 	public void computeDichotomy() throws OcelotlException {
-		lpaggregManager.computeDichotomy();
+		lpaggregManager.getDichotomyValue();
 		lpaggregManager.printParameters();
 	}
 

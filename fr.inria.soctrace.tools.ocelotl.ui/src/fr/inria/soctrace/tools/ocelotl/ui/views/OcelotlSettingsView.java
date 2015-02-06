@@ -212,9 +212,11 @@ public class OcelotlSettingsView extends Dialog {
 	 */
 	private void updateCacheDir() {
 		// Was there change in the datacache directory ?
-		if (!currentDatacacheDir.isEmpty())
+		if (!currentDatacacheDir.isEmpty()) {
 			// If so, update the current datacache path
 			ocelotlView.getOcelotlParameters().getDataCache().setCacheDirectory(currentDatacacheDir);
+			ocelotlView.getOcelotlParameters().getDichotomyCache().setCacheDirectory(currentDatacacheDir);
+		}
 	}
 
 	private class EnableCacheListener extends SelectionAdapter {

@@ -1044,6 +1044,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 		try {
 			ocelotlParameters.getDataCache().setSettings(ocelotlParameters.getOcelotlSettings());
+			ocelotlParameters.getDichotomyCache().setSettings(ocelotlParameters.getOcelotlSettings());
 		} catch (final OcelotlException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
@@ -1636,6 +1637,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		btnNextZoom.setEnabled(false);
 		btnPrevZoom.setEnabled(false);
 		ocelotlParameters.getDataCache().buildDictionary(confDataLoader.getTraces());
+		ocelotlParameters.getDichotomyCache().buildDictionary(confDataLoader.getTraces());
 	}
 
 	public void setComboAggregationOperator(final Combo comboAggregationOperator) {
@@ -1716,6 +1718,11 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	public void setTimeRegion(final TimeRegion time) {
 		textTimestampStart.setText(String.valueOf(time.getTimeStampStart()));
 		textTimestampEnd.setText(String.valueOf(time.getTimeStampEnd()));
+	}
+
+	public void setTimeRegion(final long startTimeStamp, final long endTimeStamp) {
+		textTimestampStart.setText(String.valueOf(startTimeStamp));
+		textTimestampEnd.setText(String.valueOf(endTimeStamp));
 	}
 
 	// When receiving a notification, update the trace list
@@ -1911,7 +1918,12 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				break;
 			}
 		}
-
+		
 		comboTraces.notifyListeners(SWT.Selection, new Event());
+		
+		if (data != null) {
+			TraceIntervalDescriptor intDes = (TraceIntervalDescriptor) data;
+			setTimeRegion(intDes.getStartTimestamp(), intDes.getEndTimestamp());
+		}
 	}
 }

@@ -35,6 +35,8 @@ public interface IDataAggregManager {
 	public void computeParts(double aParameter);
 
 	public void computeQualities();
+	
+	public void getDichotomyValue() throws OcelotlException;
 
 	public List<EventProducer> getEventProducers();
 
@@ -49,5 +51,4 @@ public interface IDataAggregManager {
 	public void reset(IProgressMonitor monitor) throws OcelotlException;
 
 	public void print(OcelotlCore core);
-
 }

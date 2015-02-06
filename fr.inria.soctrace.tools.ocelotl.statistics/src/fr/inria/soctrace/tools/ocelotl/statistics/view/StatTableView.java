@@ -217,6 +217,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				.values()) {
 			TableViewerColumn elemsViewerCol = new TableViewerColumn(
 					tableViewer, SWT.NONE);
+			int alignment;
 
 			// If it is the column name
 			if (col.equals(OcelotlStatisticsTableColumn.NAME)) {
@@ -228,6 +229,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				elemsViewerCol
 						.setLabelProvider(new OcelotlStatisticsTableRowLabelImageProvider(
 								col));
+				alignment = SWT.LEFT;
 			} else {
 				OcelotlStatisticsTableRowLabelProvider labelProvider = new OcelotlStatisticsTableRowLabelProvider(
 						col);
@@ -236,6 +238,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 							.getCurrentUnit());
 
 				elemsViewerCol.setLabelProvider(labelProvider);
+				alignment = SWT.RIGHT;
 			}
 
 			final TableColumn elemsTableCol = elemsViewerCol.getColumn();
@@ -246,6 +249,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 							.getColumnWidthWeight()[cpt]), (int) (tableViewer.getTable().getClientArea().width * 0.05)));
 
 			elemsTableCol.setText(col.getHeader());
+			elemsTableCol.setAlignment(alignment);
 			// Set sorting comparator when clicking on a column header
 			elemsTableCol.addSelectionListener(new SelectionAdapter() {
 				@Override
