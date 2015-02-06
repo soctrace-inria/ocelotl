@@ -350,7 +350,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
-					monitor.beginTask(title, 4);
+					monitor.beginTask(title, 4 * ocelotlParameters.getTrace().getNumberOfEvents());
 					try {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
@@ -371,10 +371,10 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 									}
 									return Status.CANCEL_STATUS;
 								}
-								monitor.setTaskName("Compute Qualities");
-								monitor.subTask("");
+								monitor.setTaskName("Aggregation (1/3)");
+								monitor.subTask("Computing Qualities...");
 								ocelotlCore.computeQualities();
-								monitor.worked(1);
+								monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents());
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
 								if (monitor.isCanceled()) {
@@ -383,9 +383,10 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 									}
 									return Status.CANCEL_STATUS;
 								}
-								monitor.setTaskName("Compute Dichotomy");
+								monitor.setTaskName("Aggregation (2/3)");
+								monitor.subTask("Computing Dichotomy...");
 								ocelotlCore.computeDichotomy();
-								monitor.worked(1);
+								monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents());
 							}
 
 							// Compute the parameter value
@@ -399,10 +400,11 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							}
 							return Status.CANCEL_STATUS;
 						}
-						monitor.setTaskName("Compute Parts");
+						monitor.setTaskName("Aggregation (3/3)");
+						monitor.subTask("Computing Parts...");
 
 						ocelotlCore.computeParts();
-						monitor.worked(1);
+						monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents());
 
 					} catch (final OcelotlException e) {
 						monitor.done();
@@ -423,17 +425,18 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 						@Override
 						public void run() {
-							monitor.setTaskName("Draw Diagram");
+							monitor.setTaskName("Rendering");
+							monitor.subTask("Drawing Diagram...");
 							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion(), ocelotlCore.getVisuOperator());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							textRun.setText(String.valueOf(getOcelotlParameters().getParameter()));
-							monitor.setTaskName("Draw Quality Curves");
+							monitor.subTask("Drawing Quality Curves...");
 							qualityView.createDiagram();
-							monitor.setTaskName("Update Statistics");
+							monitor.subTask("Updating Statistics...");
 							statView.createDiagram();
-							monitor.setTaskName("Draw Y Axis");
+							monitor.subTask("Drawing Y Axis...");
 							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 							snapshotAction.setEnabled(true);
 							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
@@ -443,7 +446,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 							updateStatus();
 							visuDisplayed = true;
 							
-							monitor.setTaskName("Launching Overview");
+							monitor.subTask("Launching Overview...");
 							
 							if (ocelotlParameters.isOvervieweEnable()) {
 								try {
@@ -471,7 +474,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			};
 			job.setUser(true);
 			job.schedule();
-
 		}
 	}
 
@@ -1044,6 +1046,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 
 		try {
 			ocelotlParameters.getDataCache().setSettings(ocelotlParameters.getOcelotlSettings());
+			ocelotlParameters.getDichotomyCache().setSettings(ocelotlParameters.getOcelotlSettings());
 		} catch (final OcelotlException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
@@ -1636,6 +1639,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		btnNextZoom.setEnabled(false);
 		btnPrevZoom.setEnabled(false);
 		ocelotlParameters.getDataCache().buildDictionary(confDataLoader.getTraces());
+		ocelotlParameters.getDichotomyCache().buildDictionary(confDataLoader.getTraces());
 	}
 
 	public void setComboAggregationOperator(final Combo comboAggregationOperator) {
@@ -1716,6 +1720,11 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 	public void setTimeRegion(final TimeRegion time) {
 		textTimestampStart.setText(String.valueOf(time.getTimeStampStart()));
 		textTimestampEnd.setText(String.valueOf(time.getTimeStampEnd()));
+	}
+
+	public void setTimeRegion(final long startTimeStamp, final long endTimeStamp) {
+		textTimestampStart.setText(String.valueOf(startTimeStamp));
+		textTimestampEnd.setText(String.valueOf(endTimeStamp));
 	}
 
 	// When receiving a notification, update the trace list
@@ -1911,7 +1920,12 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				break;
 			}
 		}
-
+		
 		comboTraces.notifyListeners(SWT.Selection, new Event());
+		
+		if (data != null) {
+			TraceIntervalDescriptor intDes = (TraceIntervalDescriptor) data;
+			setTimeRegion(intDes.getStartTimestamp(), intDes.getEndTimestamp());
+		}
 	}
 }

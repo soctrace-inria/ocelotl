@@ -26,24 +26,20 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.lpaggreg.time.ITimeAggregation;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.DataAggregationManager;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
-public abstract class TimeAggregationManager implements ITimeManager {
+public abstract class TimeAggregationManager extends DataAggregationManager implements ITimeManager {
 
 	protected List<Integer> parts = new ArrayList<Integer>();
-	protected List<DLPQuality> qualities = new ArrayList<DLPQuality>();
-	protected List<Double> parameters = new ArrayList<Double>();
 	protected List<List<Boolean>> eqMatrix;
 	protected ITimeAggregation timeAggregation;
-	protected OcelotlParameters ocelotlParameters;
 	
 	private static final Logger logger = LoggerFactory.getLogger(TimeAggregationManager.class);
-	
 
 	public TimeAggregationManager(final OcelotlParameters ocelotlParameters) {
 		super();
@@ -59,7 +55,6 @@ public abstract class TimeAggregationManager implements ITimeManager {
 		parameters = timeAggregation.getParameters();
 		qualities = timeAggregation.getQualityList();
 		dm.end("LPAGGREG - PARAMETERS LIST");
-
 	}
 
 	@Override
@@ -78,22 +73,11 @@ public abstract class TimeAggregationManager implements ITimeManager {
 		dm.end("LPAGGREG - COMPUTE QUALITIES");
 	}
 
-
 	protected abstract void fillVectors(IProgressMonitor monitor);
-
-	@Override
-	public List<Double> getParameters() {
-		return parameters;
-	}
 
 	@Override
 	public List<Integer> getParts() {
 		return parts;
-	}
-
-	@Override
-	public List<DLPQuality> getQualities() {
-		return qualities;
 	}
 
 	@Override

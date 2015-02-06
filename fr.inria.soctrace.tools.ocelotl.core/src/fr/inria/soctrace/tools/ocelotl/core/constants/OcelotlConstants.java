@@ -40,7 +40,8 @@ public class OcelotlConstants {
 	/**
 	 * Number of field in the header of a cache file 
 	 */
-	static public final int CACHE_HEADER_NORMAL_SIZE = 9;
+	static public final int DATACACHE_HEADER_NORMAL_SIZE = 9;
+	static public final int DICHOTOMYCACHE_HEADER_NORMAL_SIZE = 8;
 	
 	/**
 	 * Maximum size of the data cache in bytes.
@@ -87,6 +88,8 @@ public class OcelotlConstants {
 	public static final int[] yAxisDefaultWeight = {30, 388};
 	
 	public static final double TemporalProportionDrawingMarginRatio = 0.9;
+	
+	public static final String DichotomyCacheSuffix = ".octdicho";
 	
 	/**
 	 * JSON Config constants

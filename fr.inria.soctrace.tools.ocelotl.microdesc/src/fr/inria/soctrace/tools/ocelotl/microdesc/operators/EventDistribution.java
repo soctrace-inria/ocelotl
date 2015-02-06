@@ -106,8 +106,6 @@ public class EventDistribution extends Microscopic3DDescription {
 				if (monitor.isCanceled())
 					return;
 
-				if (events.size() == 0)
-					break;
 				for (final Event event : events) {
 					// final Map<Long, Long> distrib =
 					// state.getTimeSlicesDistribution();
@@ -129,6 +127,7 @@ public class EventDistribution extends Microscopic3DDescription {
 					if (monitor.isCanceled())
 						return;
 				}
+				monitor.worked(events.size());
 			}
 			// Merge local active event producers to the global one
 			synchronized (activeProducers) {
@@ -150,7 +149,7 @@ public class EventDistribution extends Microscopic3DDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		monitor.subTask("Query events");
+		monitor.subTask("Querying Database...");
 		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time,
 				monitor);
 		if (monitor.isCanceled()) {
@@ -161,7 +160,7 @@ public class EventDistribution extends Microscopic3DDescription {
 		setTimeSliceManager(new TimeSliceManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		monitor.subTask("Fill the matrix");
+		monitor.subTask("Loading Data From Database...");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()

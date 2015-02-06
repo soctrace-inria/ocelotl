@@ -9,7 +9,7 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  *     Youenn Corre <youenn.corret@inria.fr>
  ******************************************************************************/
-package fr.inria.soctrace.tools.ocelotl.core.datacache;
+package fr.inria.soctrace.tools.ocelotl.core.caches;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,8 +23,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -585,30 +587,32 @@ public class DataCache {
 		// Clear the current cache files
 		cachedData.clear();
 		if (workDir.exists()) {
-			File[] directoryListing = workDir.listFiles();
-			if (directoryListing != null) {
-				for (File traceCache : directoryListing) {
+			Iterator<File> anIT = FileUtils.iterateFiles(workDir, null, true);
+			
+			while (anIT.hasNext()) {
+				File traceCache = anIT.next();
 
-					// Try parsing the file and get the cache parameters
-					CacheParameters param = parseTraceCache(traceCache);
+				// Try parsing the file and get the cache parameters
+				CacheParameters param = parseTraceCache(traceCache);
 
-					// If parsing was successful
-					if (param.getTraceID() != -1) {
-						// Register the cache file
-						cachedData.put(param, traceCache);
+				// If parsing was successful
+				if (param.getTraceID() != -1) {
+					// Register the cache file
+					cachedData.put(param, traceCache);
 
-						logger.debug("Found " + param.getTraceName() + " in "
-								+ traceCache.toString() + ", "
-								+ param.getMicroModelType() + ", "
-								+ param.getStartTimestamp() + ", "
-								+ param.getEndTimestamp());
-					}
+					logger.debug("Found " + param.getTraceName() + " in "
+							+ traceCache.toString() + ", "
+							+ param.getMicroModelType() + ", "
+							+ param.getVisuAggOperator() + ", "
+							+ param.getStartTimestamp() + ", "
+							+ param.getEndTimestamp());
 				}
-				computeCacheSize();
 			}
+			
+			computeCacheSize();
 		} else {
 			System.err.println("The provided cache directory ("
-					+ cacheDirectory + ")does not exist");
+					+ cacheDirectory + ") does not exist");
 		}
 	}
 	
@@ -677,6 +681,22 @@ public class DataCache {
 			cachedData.remove(aCache);
 		}
 
+		// Check for empty directories
+		File workDir = new File(cacheDirectory);
+		if (workDir.exists()) {
+			File[] directoryListing = workDir.listFiles();
+			if (directoryListing != null) {
+				for (File traceCacheDir : directoryListing) {
+					if (traceCacheDir.isDirectory()) {
+						// If it is empty
+						if (traceCacheDir.list().length == 0)
+							// Delete it
+							traceCacheDir.delete();
+					}
+				}
+			}
+		}
+
 		// Recompute the current cache size
 		computeCacheSize();
 	}
@@ -704,7 +724,7 @@ public class DataCache {
 				if (line != null) {
 					String[] header = line.split(OcelotlConstants.CSVDelimiter);
 
-					if (header.length != OcelotlConstants.CACHE_HEADER_NORMAL_SIZE) {
+					if (header.length != OcelotlConstants.DATACACHE_HEADER_NORMAL_SIZE) {
 						bufFileReader.close();
 						return params;
 					}
@@ -719,7 +739,7 @@ public class DataCache {
 					// Time Aggregation Operator
 					params.setMicroModelType(header[2]);
 					// Space Aggregation Operator
-					params.setSpaceAggOperator(header[3]);
+					params.setVisuAggOperator(header[3]);
 					// Start timestamp
 					params.setStartTimestamp(Long.parseLong(header[4]));
 					// End timestamp
@@ -764,12 +784,12 @@ public class DataCache {
 				oParam.setMicroModelType(params.getMicroModelType());
 			}
 
-			if (!params.getTimeAggOperator().equals("null")) {
-				oParam.setDataAggOperator(params.getTimeAggOperator());
+			if (!params.getDataAggOperator().equals("null")) {
+				oParam.setDataAggOperator(params.getDataAggOperator());
 			}
 
-			if (!params.getSpaceAggOperator().equals("null")) {
-				oParam.setVisuOperator(params.getSpaceAggOperator());
+			if (!params.getVisuAggOperator().equals("null")) {
+				oParam.setVisuOperator(params.getVisuAggOperator());
 			}
 		}
 

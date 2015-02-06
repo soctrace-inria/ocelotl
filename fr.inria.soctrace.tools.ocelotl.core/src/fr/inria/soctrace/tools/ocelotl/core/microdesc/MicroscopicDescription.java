@@ -34,8 +34,8 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
+import fr.inria.soctrace.tools.ocelotl.core.caches.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
-import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
@@ -205,7 +205,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 				dm.end("Load matrix from cache (dirty)");
 			} else {
-				monitor.setTaskName("Rebuilding with cache data");
+				monitor.setTaskName("Data Cache Loading");
 				rebuildClean(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache");
 			}
@@ -235,8 +235,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException, SoCTraceException,
 			InterruptedException, OcelotlException {
-		monitor.setTaskName("Rebuilding the matrix with the precise strategy");
-		monitor.subTask("Initializing");
+		monitor.setTaskName("Data Cache Loading (Accurate Strategy)");
+		monitor.subTask("Initializing...");
 
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
@@ -288,7 +288,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Run a single database query with all the times of the dirty time
 		// slices to rebuild the matrix
 
-		monitor.subTask("Fetching incomplete data from database");
+		monitor.subTask("Loading Incomplete Data from Database...");
 
 		computeDirtyCacheMatrix(
 				new ArrayList<EventProducer>(eventProducers.values()), times,
@@ -303,7 +303,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Get header
 		line = bufFileReader.readLine();
 
-		monitor.subTask("Filling the matrix with cache data");
+		monitor.subTask("Loading Data Cache...");
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
@@ -366,8 +366,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException {
 
-		monitor.setTaskName("Rebuilding the matrix with the fast strategy");
-		monitor.subTask("Initializing");
+		monitor.setTaskName("Data Cache Loading (Fast Strategy)");
+		monitor.subTask("Initializing...");
 		
 		parameters.setApproximateRebuild(true);
 
@@ -405,7 +405,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		if (monitor.isCanceled())
 			return;
 
-		monitor.subTask("Filling the matrix with cache data");
+		monitor.subTask("Loading...");
 
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
@@ -479,8 +479,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			IProgressMonitor monitor) throws IOException {
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
-		monitor.setTaskName("Rebuilding the matrix with a clean cache");
-		monitor.subTask("Filling matrix with cache data");
+		monitor.setTaskName("Data Cache Loading");
+		monitor.subTask("Loading...");
 
 		String line;
 		// Get header
@@ -616,13 +616,23 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		
 		String fileName = parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
-				+ parameters.getMicroModelType() + "_" + convertedDate;
+				+ parameters.getMicroModelType() + "_" + convertedDate + ".octcache";
 		
 		fileName = FilenameValidator.checkNameValidity(fileName);
-			
-		
+
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
-				+ fileName;
+				+ parameters.getTrace().getAlias() + "_"
+				+ parameters.getTrace().getId();
+
+		File aFile = new File(filePath);
+
+		// If the directory does not exists
+		if (!aFile.exists()) {
+			// Create it
+			aFile.mkdir();
+		}
+
+		filePath = filePath + "/" + fileName;
 		
 		// Write to file,
 		try {
@@ -676,6 +686,11 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		if (parameters.getCurrentProducers().size() != parameters
 				.getEventProducerHierarchy().getEventProducers().size()) {
 			logger.debug("At least one event producer is filtered: cache will not be generated.");
+			return false;
+		}
+		
+		if (parameters.isHasLeaveAggregated()) {
+			logger.debug("Some event producers are aggregated: cache will not be generated.");
 			return false;
 		}
 
@@ -780,7 +795,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void buildNormalMatrix(IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 
-		monitor.setTaskName("Fetching data from database");
+		monitor.setTaskName("Reading Trace...");
 		initMatrix();
 		initQueries();
 		computeMatrix(monitor);
@@ -816,6 +831,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			// If a cache was found
 			if (cacheFile != null) {
 				loadFromCache(cacheFile, monitor);
+				monitor.worked(parameters.getTrace().getNumberOfEvents());
 			} else {
 				if (!generateCache(monitor)) {
 					// If the cache generation was not successful
@@ -830,7 +846,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 					// Save the newly computed matrix + parameters
 					dm.start();
-					monitor.subTask("Saving matrix in the cache.");
+					monitor.subTask("Saving Loaded Data in Cache...");
 					saveMatrix();
 					dm.end("DATACACHE - Save the matrix to cache");
 				} else {
@@ -844,7 +860,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 					initMatrix();
 
-					monitor.subTask("Loading from the newly generated cache");
+					monitor.subTask("Loading Data from the Newly Generated Cache...");
 					loadFromCache(aCacheFile, monitor);
 				}
 			}
