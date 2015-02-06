@@ -474,7 +474,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 			};
 			job.setUser(true);
 			job.schedule();
-
 		}
 	}
 

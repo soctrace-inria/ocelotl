@@ -23,8 +23,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -585,31 +587,32 @@ public class DataCache {
 		// Clear the current cache files
 		cachedData.clear();
 		if (workDir.exists()) {
-			File[] directoryListing = workDir.listFiles();
-			if (directoryListing != null) {
-				for (File traceCache : directoryListing) {
+			Iterator<File> anIT = FileUtils.iterateFiles(workDir, null, true);
+			
+			while (anIT.hasNext()) {
+				File traceCache = anIT.next();
 
-					// Try parsing the file and get the cache parameters
-					CacheParameters param = parseTraceCache(traceCache);
+				// Try parsing the file and get the cache parameters
+				CacheParameters param = parseTraceCache(traceCache);
 
-					// If parsing was successful
-					if (param.getTraceID() != -1) {
-						// Register the cache file
-						cachedData.put(param, traceCache);
+				// If parsing was successful
+				if (param.getTraceID() != -1) {
+					// Register the cache file
+					cachedData.put(param, traceCache);
 
-						logger.debug("Found " + param.getTraceName() + " in "
-								+ traceCache.toString() + ", "
-								+ param.getMicroModelType() + ", "
-								+ param.getVisuAggOperator() + ", "
-								+ param.getStartTimestamp() + ", "
-								+ param.getEndTimestamp());
-					}
+					logger.debug("Found " + param.getTraceName() + " in "
+							+ traceCache.toString() + ", "
+							+ param.getMicroModelType() + ", "
+							+ param.getVisuAggOperator() + ", "
+							+ param.getStartTimestamp() + ", "
+							+ param.getEndTimestamp());
 				}
-				computeCacheSize();
 			}
+			
+			computeCacheSize();
 		} else {
 			System.err.println("The provided cache directory ("
-					+ cacheDirectory + ")does not exist");
+					+ cacheDirectory + ") does not exist");
 		}
 	}
 	
@@ -676,6 +679,22 @@ public class DataCache {
 		// Remove the deleted cache
 		for (CacheParameters aCache : deletedCache) {
 			cachedData.remove(aCache);
+		}
+
+		// Check for empty directories
+		File workDir = new File(cacheDirectory);
+		if (workDir.exists()) {
+			File[] directoryListing = workDir.listFiles();
+			if (directoryListing != null) {
+				for (File traceCacheDir : directoryListing) {
+					if (traceCacheDir.isDirectory()) {
+						// If it is empty
+						if (traceCacheDir.list().length == 0)
+							// Delete it
+							traceCacheDir.delete();
+					}
+				}
+			}
 		}
 
 		// Recompute the current cache size

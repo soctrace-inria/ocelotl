@@ -619,10 +619,20 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				+ parameters.getMicroModelType() + "_" + convertedDate + ".octcache";
 		
 		fileName = FilenameValidator.checkNameValidity(fileName);
-			
-		
+
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
-				+ fileName;
+				+ parameters.getTrace().getAlias() + "_"
+				+ parameters.getTrace().getId();
+
+		File aFile = new File(filePath);
+
+		// If the directory does not exists
+		if (!aFile.exists()) {
+			// Create it
+			aFile.mkdir();
+		}
+
+		filePath = filePath + "/" + fileName;
 		
 		// Write to file,
 		try {

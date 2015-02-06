@@ -23,8 +23,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -360,31 +362,34 @@ public class DichotomyCache {
 		// Clear the current cache files
 		cachedDichotomy.clear();
 		if (workDir.exists()) {
-			File[] directoryListing = workDir.listFiles();
-			if (directoryListing != null) {
-				for (File traceCache : directoryListing) {
+			Iterator<File> anIT = FileUtils.iterateFiles(workDir, null, true);
+			
+			while (anIT.hasNext()) {
+				File traceCache = anIT.next();
 
-					if(!traceCache.getName().endsWith(OcelotlConstants.DichotomyCacheSuffix))
-						continue;
-					
-					// Try parsing the file and get the cache parameters
-					CacheParameters param = parseTraceCache(traceCache);
+				if (!traceCache.getName().endsWith(
+						OcelotlConstants.DichotomyCacheSuffix))
+					continue;
 
-					// If parsing was successful
-					if (param.getTraceID() != -1) {
-						// Register the cache file
-						cachedDichotomy.put(param, traceCache);
+				// Try parsing the file and get the cache parameters
+				CacheParameters param = parseTraceCache(traceCache);
 
-						logger.debug("[DICHOTOMY CACHE]Found " + param.getTraceName() + " in "
-								+ traceCache.toString() + ", "
-								+ param.getMicroModelType() + ", "
-								+ param.getDataAggOperator() + ", "
-								+ param.getStartTimestamp() + ", "
-								+ param.getEndTimestamp());
-					}
+				// If parsing was successful
+				if (param.getTraceID() != -1) {
+					// Register the cache file
+					cachedDichotomy.put(param, traceCache);
+
+					logger.debug("[DICHOTOMY CACHE]Found "
+							+ param.getTraceName() + " in "
+							+ traceCache.toString() + ", "
+							+ param.getMicroModelType() + ", "
+							+ param.getDataAggOperator() + ", "
+							+ param.getStartTimestamp() + ", "
+							+ param.getEndTimestamp());
 				}
-				computeCacheSize();
 			}
+
+			computeCacheSize();
 		} else {
 			System.err.println("The provided cache directory ("
 					+ cacheDirectory + ")does not exist");

@@ -134,9 +134,22 @@ public abstract class DataAggregationManager {
 
 		fileName = FilenameValidator.checkNameValidity(fileName);
 
-		String filePath = ocelotlParameters.getDichotomyCache().getCacheDirectory()
-				+ "/" + fileName;
-
+		String filePath = ocelotlParameters.getDichotomyCache()
+				.getCacheDirectory()
+				+ "/"
+				+ ocelotlParameters.getTrace().getAlias()
+				+ "_"
+				+ ocelotlParameters.getTrace().getId();
+		
+		File aFile = new File(filePath);
+		
+		// If the directory does not exists
+		if (!aFile.exists()) {
+			// Create it
+			aFile.mkdir();
+		}
+		
+		filePath = filePath + "/" + fileName;
 		// Write to file,
 		try {
 			PrintWriter writer = new PrintWriter(filePath, "UTF-8");
