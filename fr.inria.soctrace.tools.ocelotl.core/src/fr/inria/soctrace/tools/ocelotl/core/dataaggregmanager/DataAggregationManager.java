@@ -58,10 +58,13 @@ public abstract class DataAggregationManager {
 	 * @throws OcelotlException
 	 */
 	public void getDichotomyValue() throws OcelotlException {
-		File dichoCache = checkForValidCache();
-		
-		// If a valid cache file was found 
-		if (dichoCache != null) {
+		File dichoCache;
+
+		// If the cache is activated
+		if (ocelotlParameters.getOcelotlSettings().isCacheActivated()
+				&& (dichoCache = checkForValidCache()) != null) {
+			
+			// and if If a valid cache file was found
 			loadDichoCache(dichoCache);
 		} else {
 			computeDichotomy();

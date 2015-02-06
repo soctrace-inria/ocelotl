@@ -47,7 +47,7 @@ public class StateAverageDistribution extends StateDistribution {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		monitor.subTask("Query states");
+		monitor.subTask("Querying Database...");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
 				monitor);
 		if (monitor.isCanceled()) {
@@ -58,7 +58,7 @@ public class StateAverageDistribution extends StateDistribution {
 		setTimeSliceManager(new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		monitor.subTask("Fill the matrix");
+		monitor.subTask("Loading Data From Database...");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()
@@ -188,6 +188,7 @@ public class StateAverageDistribution extends StateDistribution {
 					if (monitor.isCanceled())
 						return;
 				}
+				monitor.worked(events.size());
 			}
 			// Merge local active event producers to the global one
 			synchronized (activeProducers) {
