@@ -89,7 +89,7 @@ public class SpatiotemporalModeStates extends SpatiotemporalMode {
 	public MainEvent getMainEvent(EventProducerNode epn, int start, int end) {
 		double max = 0.0;
 		MainEvent maj = new MainEvent(Void, max);
-		for (String state : getEvents()) {
+		for (String state : getAllEvents()) {
 			double amp = 0.0;
 			// Compute the total presence of the state
 			for (int i = start; i < end; i++)
