@@ -361,10 +361,11 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	 * @param eventProducers
 	 *            List of the event producers not filtered out
 	 * @throws IOException
+	 * @throws OcelotlException 
 	 */
 	public void rebuildApproximate(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
-			IProgressMonitor monitor) throws IOException {
+			IProgressMonitor monitor) throws IOException, OcelotlException {
 
 		monitor.setTaskName("Data Cache Loading (Fast Strategy)");
 		monitor.subTask("Initializing...");
@@ -413,6 +414,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
+		boolean emptyMatrix = true;
 
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
@@ -434,6 +436,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 				TimeSlice cachedTimeSlice = cacheTimeSliceIndex.get(slice);
 
+				emptyMatrix = false;
+				
 				// Is it dirty (i.e. does it cover more than one new time
 				// slice)?
 				// Note: it should not be more than 2 since it would mean
@@ -469,6 +473,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		}
 
 		bufFileReader.close();
+		if (emptyMatrix)
+			throw new OcelotlException(OcelotlException.NO_EVENTS);
 	}
 
 	/**

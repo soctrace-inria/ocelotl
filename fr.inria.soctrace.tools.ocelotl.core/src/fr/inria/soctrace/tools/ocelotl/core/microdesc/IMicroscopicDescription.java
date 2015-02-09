@@ -29,7 +29,7 @@ public interface IMicroscopicDescription {
 
 	void rebuildApproximate(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
-			IProgressMonitor monitor) throws IOException;
+			IProgressMonitor monitor) throws IOException, OcelotlException;
 
 	void rebuildDirty(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
