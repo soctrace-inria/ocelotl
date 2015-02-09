@@ -30,7 +30,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 
 	protected Boolean						clickOnView			= false;
 	protected int							minDrawThreshold	= OcelotlConstants.MinimalHeightDrawingThreshold;
-	protected int							originY, cornerY;
+	protected int							originY, cornerY, originX;
 	protected boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
 
 	protected double						rootHeight;
@@ -181,7 +181,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			currentPoint = arg0.getLocation();
 			// Compute the timestamp on which we clicked
 			long p3 = (long) ((double) ((arg0.x - aggregatedView.getBorder()) * aggregatedView.getResetTime().getTimeDuration()) / (aggregatedView.getRoot().getSize().width() - 2 * aggregatedView.getBorder())) + aggregatedView.getResetTime().getTimeStampStart();
-			
+			originX = arg0.x;
+
 			// We are dragging horizontally by the left side
 			if (state == MouseState.H_MOVE_START) {
 				originY = aggregatedView.getSelectFigure().getBounds().y();
@@ -335,7 +336,6 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		logicHeight = height / hierarchy.getRoot().getWeight();
 	}
 	
-	
 	/**
 	 * Set the spatial selection to the event producer node given in parameter
 	 * 
@@ -343,7 +343,6 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 *            the selected even producer node
 	 */
 	public void setSpatialSelection(EventProducerNode selectedNode) {
-		
 		ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
 
 		// If only one producer is selected, then also add the parent
@@ -352,14 +351,13 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			selectedProducers.add(selectedNode.getParentNode().getMe());
 		}
 
-		
 		aggregatedView.setCurrentlySelectedNode(selectedNode);
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatialSelection(true);
-		while (selectedNode.getParentNode()!=null){
-			if (selectedNode.getParentNode().getWeight()==selectedNode.getWeight()){
-				selectedNode=selectedNode.getParentNode();
+		while (selectedNode.getParentNode() != null) {
+			if (selectedNode.getParentNode().getWeight() == selectedNode.getWeight()) {
+				selectedNode = selectedNode.getParentNode();
 				selectedProducers.add(selectedNode.getMe());
-			}else{
+			} else {
 				break;
 			}
 		}
@@ -445,11 +443,13 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 */
 	protected SpatioTemporalAggregateView findAggregate(int x, int y) {
 		Point clickCoord = new Point(x, y);
+		Point clickCoord2 = new Point(originX, originY);
 		SpatioTemporalAggregateView selectedAggregate = null;
 
 		// Find the corresponding aggregate
 		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
-			if (aggreg.getAggregateZone().contains(clickCoord)) {
+			if (aggreg.getAggregateZone().contains(clickCoord) && 
+					aggreg.getAggregateZone().contains(clickCoord2)) {
 				selectedAggregate = aggreg;
 				break;
 			}
