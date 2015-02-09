@@ -591,6 +591,11 @@ public class DataCache {
 			
 			while (anIT.hasNext()) {
 				File traceCache = anIT.next();
+				
+				// Check that it is a cache file
+				if (!traceCache.getName().endsWith(
+						OcelotlConstants.DataCacheSuffix))
+					continue;
 
 				// Try parsing the file and get the cache parameters
 				CacheParameters param = parseTraceCache(traceCache);

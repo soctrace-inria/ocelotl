@@ -603,7 +603,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void saveMatrix() {
 		// Check that no event type or event producer was filtered out which
 		// would result in an incomplete datacache
-		if (!parameters.getOcelotlSettings().isCacheActivated() || !noFiltering()
+		if (!parameters.getOcelotlSettings().isDataCacheActivated() || !noFiltering()
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
@@ -616,8 +616,9 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		
 		String fileName = parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
-				+ parameters.getMicroModelType() + "_" + convertedDate + ".octcache";
-		
+				+ parameters.getMicroModelType() + "_" + convertedDate
+				+ OcelotlConstants.DataCacheSuffix;
+	
 		fileName = FilenameValidator.checkNameValidity(fileName);
 
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
@@ -723,7 +724,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				.getTimeRegion().getTimeStampEnd())
 			return false;
 
-		if (parameters.getOcelotlSettings().isCacheActivated()) {
+		if (parameters.getOcelotlSettings().isDataCacheActivated()) {
 			try {
 				// Set the number of time slices for the generated cache
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
@@ -825,7 +826,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		initMatrix();
 
 		// If the cache is enabled
-		if (parameters.getOcelotlSettings().isCacheActivated()) {
+		if (parameters.getOcelotlSettings().isDataCacheActivated()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
 			// If a cache was found

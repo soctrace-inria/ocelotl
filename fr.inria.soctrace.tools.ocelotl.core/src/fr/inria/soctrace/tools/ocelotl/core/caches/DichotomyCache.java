@@ -121,20 +121,20 @@ public class DichotomyCache {
 		// Check the existence of the cache directory
 		File dir = new File(cacheDirectory);
 		if (!dir.exists()) {
-			logger.debug("Cache directory (" + cacheDirectory
+			logger.debug("[DICHOTOMY CACHE] Cache directory (" + cacheDirectory
 					+ ") does not exist and will be created now.");
 
 			// Create the directory
 			if (!dir.mkdirs()) {
-				logger.error("Failed to create cache directory: "
+				logger.error("[DICHOTOMY CACHE] Failed to create cache directory: "
 						+ cacheDirectory + ".");
 
 				if (this.cacheDirectory.isEmpty()) {
-					logger.error("The current cache directory is still: "
+					logger.error("[DICHOTOMY CACHE] The current cache directory is still: "
 							+ this.cacheDirectory);
 				} else {
 					validDirectory = false;
-					logger.error("The cache will be turned off.");
+					logger.error("[DICHOTOMY CACHE] The cache will be turned off.");
 				}
 				return false;
 			}
@@ -142,14 +142,14 @@ public class DichotomyCache {
 
 		// Check that we have at least the reading rights
 		if (!dir.canRead()) {
-			logger.error("The application does not have the rights to read in the given directory: "
+			logger.error("[DICHOTOMY CACHE] The application does not have the rights to read in the given directory: "
 					+ cacheDirectory + ".");
 
 			if (this.cacheDirectory.isEmpty()) {
 				validDirectory = false;
-				logger.error("The cache will be turned off.");
+				logger.error("[DICHOTOMY CACHE] The cache will be turned off.");
 			} else {
-				logger.error("The current cache directory is still: "
+				logger.error("[DICHOTOMY CACHE] The current cache directory is still: "
 						+ this.cacheDirectory);
 			}
 			return false;
@@ -246,6 +246,10 @@ public class DichotomyCache {
 		// Check for similar threshold values
 		if (newParam.getTreshold() != cacheParam.getTreshold())
 			return false;
+		
+		// Check for similar normalize values
+		if (newParam.isNormalized() != cacheParam.isNormalized())
+			return false;
 
 		// Check that timestamps are equal
 		if (!checkCompatibleTimeStamp(newParam, cacheParam))
@@ -335,7 +339,7 @@ public class DichotomyCache {
 				e.printStackTrace();
 			}
 		} else {
-			logger.error("No corresponding cache file was found");
+			logger.error("[DICHOTOMY CACHE] No corresponding cache file was found");
 		}
 	}
 
@@ -379,7 +383,7 @@ public class DichotomyCache {
 					// Register the cache file
 					cachedDichotomy.put(param, traceCache);
 
-					logger.debug("[DICHOTOMY CACHE]Found "
+					logger.debug("[DICHOTOMY CACHE] Found "
 							+ param.getTraceName() + " in "
 							+ traceCache.toString() + ", "
 							+ param.getMicroModelType() + ", "
@@ -391,7 +395,7 @@ public class DichotomyCache {
 
 			computeCacheSize();
 		} else {
-			System.err.println("The provided cache directory ("
+			System.err.println("[DICHOTOMY CACHE] The provided cache directory ("
 					+ cacheDirectory + ")does not exist");
 		}
 	}
@@ -512,6 +516,8 @@ public class DichotomyCache {
 					params.setNbTimeSlice(Integer.parseInt(header[6]));
 					// Threshold
 					params.setTreshold(Double.parseDouble(header[7]));
+					// Normalized
+					params.setNormalized(Boolean.parseBoolean(header[8]));
 				}
 
 				bufFileReader.close();
@@ -589,7 +595,7 @@ public class DichotomyCache {
 			currentCacheSize = currentCacheSize + aCacheFile.length();
 		}
 
-		logger.debug("Size of the current cache is: " + currentCacheSize
+		logger.debug("[DICHOTOMY CACHE] Size of the current cache is: " + currentCacheSize
 				+ " bytes (" + currentCacheSize / 1000000 + " MB).");	 }
 
 	/**

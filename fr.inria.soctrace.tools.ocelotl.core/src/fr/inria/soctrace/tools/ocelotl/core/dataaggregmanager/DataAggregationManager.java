@@ -61,7 +61,7 @@ public abstract class DataAggregationManager {
 		File dichoCache;
 
 		// If the cache is activated
-		if (ocelotlParameters.getOcelotlSettings().isCacheActivated()
+		if (ocelotlParameters.getOcelotlSettings().isDichoCacheActivated()
 				&& (dichoCache = checkForValidCache()) != null) {
 			
 			// and if If a valid cache file was found
@@ -115,7 +115,7 @@ public abstract class DataAggregationManager {
 	public void saveDichotomyValues() {
 		// Check that no event type or event producer was filtered out which
 		// would result in an incorrect cache
-		if (!ocelotlParameters.getOcelotlSettings().isCacheActivated()
+		if (!ocelotlParameters.getOcelotlSettings().isDichoCacheActivated()
 				|| !noFiltering()
 				|| !ocelotlParameters.getDichotomyCache().isValidDirectory())
 			return;
@@ -171,7 +171,10 @@ public abstract class DataAggregationManager {
 					+ OcelotlConstants.CSVDelimiter
 					+ ocelotlParameters.getTimeSlicesNumber()
 					+ OcelotlConstants.CSVDelimiter
-					+ ocelotlParameters.getThreshold() + "\n";
+					+ ocelotlParameters.getThreshold() 
+					+ OcelotlConstants.CSVDelimiter
+					+ ocelotlParameters.isNormalize() + "\n";
+			
 			writer.print(header);
 
 			// Iterate over matrix and write data

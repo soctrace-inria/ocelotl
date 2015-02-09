@@ -77,7 +77,8 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Is the cache activated by default
 	 */
-	public static final boolean DEFAULT_CACHE_ACTIVATION = true;
+	public static final boolean DEFAULT_DATA_CACHE_ACTIVATION = true;
+	public static final boolean DEFAULT_DICHO_CACHE_ACTIVATION = true;
 
 	/**
 	 * Default cache policy

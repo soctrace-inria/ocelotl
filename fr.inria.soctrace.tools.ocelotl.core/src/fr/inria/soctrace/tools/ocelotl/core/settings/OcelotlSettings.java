@@ -42,7 +42,8 @@ public class OcelotlSettings {
 	private static final Logger logger = LoggerFactory
 			.getLogger(OcelotlSettings.class);
 
-	private boolean cacheActivated;
+	private boolean dataCacheActivated;
+	private boolean dichoCacheActivated;
 	private String cacheDirectory;
 	private long cacheSize;
 	private String snapShotDirectory;
@@ -99,7 +100,8 @@ public class OcelotlSettings {
 	 * Set all settings to their default values
 	 */
 	public void setDefaultValues() {
-		cacheActivated = OcelotlDefaultParameterConstants.DEFAULT_CACHE_ACTIVATION;
+		dataCacheActivated = OcelotlDefaultParameterConstants.DEFAULT_DATA_CACHE_ACTIVATION;
+		dichoCacheActivated = OcelotlDefaultParameterConstants.DEFAULT_DICHO_CACHE_ACTIVATION;
 
 		// Default cache directory is the directory "ocelotlCache" in the
 		// running directory
@@ -172,7 +174,7 @@ public class OcelotlSettings {
 				JsonObject theConf = theConfig.getAsJsonObject();
 				fileReader.close();
 
-				setCacheActivated(theConf.get(
+				setDataCacheActivated(theConf.get(
 						OcelotlConstants.JSONCacheActivated).getAsBoolean());
 				setCacheDirectory(theConf.get(
 						OcelotlConstants.JSONCacheDirectory).getAsString());
@@ -254,9 +256,11 @@ public class OcelotlSettings {
 						OcelotlConstants.JSONQualCurveXResolution).getAsInt());
 				setQualCurveYResolution(theConf.get(
 						OcelotlConstants.JSONQualCurveYResolution).getAsInt());
+				setDichoCacheActivated(theConf.get(
+						OcelotlConstants.JSONDichoCacheActivated).getAsBoolean());
 			
 				logger.debug("Settings values:\n");
-				logger.debug("Cache activated: " + cacheActivated);
+				logger.debug("Cache activated: " + dataCacheActivated);
 				logger.debug("Cache directory: " + cacheDirectory);
 				logger.debug("Cache size: " + cacheSize);
 				logger.debug("Snapshot directory: " + snapShotDirectory);
@@ -286,9 +290,10 @@ public class OcelotlSettings {
 		JsonObject theConfig = new JsonObject();
 
 		theConfig.addProperty(OcelotlConstants.JSONCacheActivated,
-				cacheActivated);
+				dataCacheActivated);
 		theConfig.addProperty(OcelotlConstants.JSONCacheDirectory,
 				cacheDirectory);
+		
 		// Convert from MB to bytes
 		if (cacheSize >= 0) {
 			theConfig.addProperty(OcelotlConstants.JSONCacheSize,
@@ -296,6 +301,7 @@ public class OcelotlSettings {
 		} else {
 			theConfig.addProperty(OcelotlConstants.JSONCacheSize, -1);
 		}
+		
 		theConfig.addProperty(OcelotlConstants.JSONSnapShotDirectory,
 				snapShotDirectory);
 		theConfig.addProperty(OcelotlConstants.JSONCachePolicy,
@@ -358,6 +364,8 @@ public class OcelotlSettings {
 				qualCurveXResolution);
 		theConfig.addProperty(OcelotlConstants.JSONQualCurveYResolution,
 				qualCurveYResolution);
+		theConfig.addProperty(OcelotlConstants.JSONDichoCacheActivated,
+				dichoCacheActivated);
 		
 		String newSettings = gson.toJson(theConfig);
 
@@ -428,12 +436,12 @@ public class OcelotlSettings {
 		this.cacheDirectory = cacheDir;
 	}
 
-	public boolean isCacheActivated() {
-		return cacheActivated;
+	public boolean isDataCacheActivated() {
+		return dataCacheActivated;
 	}
 
-	public void setCacheActivated(boolean cacheActivated) {
-		this.cacheActivated = cacheActivated;
+	public void setDataCacheActivated(boolean cacheActivated) {
+		this.dataCacheActivated = cacheActivated;
 	}
 
 	public DatacachePolicy getCachePolicy() {
@@ -450,6 +458,14 @@ public class OcelotlSettings {
 
 	public void setCacheTimeSliceNumber(int cacheTimeSliceNumber) {
 		this.cacheTimeSliceNumber = cacheTimeSliceNumber;
+	}
+
+	public boolean isDichoCacheActivated() {
+		return dichoCacheActivated;
+	}
+
+	public void setDichoCacheActivated(boolean dichoCacheActivated) {
+		this.dichoCacheActivated = dichoCacheActivated;
 	}
 
 	public int getEventsPerThread() {

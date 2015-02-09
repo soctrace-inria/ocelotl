@@ -65,7 +65,8 @@ public class OcelotlSettingsView extends Dialog {
 	private Button								btnDeleteDataCache;
 	private Text								datacacheDirectory;
 	private Button								btnChangeCacheDirectory;
-	private Button								btnCacheEnabled;
+	private Button								btnDataCacheEnabled;
+	private Button								btnDichoCacheEnabled;
 	private Button								btnRadioButton, btnRadioButton_1, btnRadioButton_2, btnRadioButton_3;
 	private HashMap<DatacachePolicy, Button>	cachepolicy	= new HashMap<DatacachePolicy, Button>();
 	private Spinner								cacheTimeSliceValue;
@@ -222,7 +223,7 @@ public class OcelotlSettingsView extends Dialog {
 	private class EnableCacheListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			boolean cacheActivation = btnCacheEnabled.getSelection();
+			boolean cacheActivation = btnDataCacheEnabled.getSelection();
 
 			btnDeleteDataCache.setEnabled(cacheActivation);
 			datacacheDirectory.setEnabled(cacheActivation);
@@ -470,26 +471,26 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Group groupDataCacheSettings = new Group(sashFormSettings, SWT.NONE);
 		groupDataCacheSettings.setFont(cantarell8);
-		groupDataCacheSettings.setText("Data Cache Settings");
+		groupDataCacheSettings.setText("Caches Settings");
 		groupDataCacheSettings.setLayout(new GridLayout(3, false));
 
-		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
-		btnCacheEnabled.setFont(cantarell8);
-		btnCacheEnabled.setText("Cache Enabled");
-		btnCacheEnabled.setSelection(settings.isCacheActivated());
-		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
+		btnDataCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
+		btnDataCacheEnabled.setFont(cantarell8);
+		btnDataCacheEnabled.setText("Data Cache Enabled");
+		btnDataCacheEnabled.setSelection(settings.isDataCacheActivated());
+		btnDataCacheEnabled.addSelectionListener(new EnableCacheListener());
 
 		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
-		btnDeleteDataCache.setToolTipText("Empty Cache");
+		btnDeleteDataCache.setToolTipText("Empty Caches");
 		btnDeleteDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/delete_obj.gif"));
-		btnDeleteDataCache.setText("Empty Cache");
+		btnDeleteDataCache.setText("Empty Caches");
 		btnDeleteDataCache.setFont(cantarell8);
 		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
 		lblDataCacheDirectory.setFont(cantarell8);
-		lblDataCacheDirectory.setText("Data cache directory:");
+		lblDataCacheDirectory.setText("Caches directory:");
 
 		final GridData gd_dataCacheDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_dataCacheDir.widthHint = 100;
@@ -502,14 +503,14 @@ public class OcelotlSettingsView extends Dialog {
 
 		btnChangeCacheDirectory = new Button(groupDataCacheSettings, SWT.PUSH);
 		btnChangeCacheDirectory.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
-		btnChangeCacheDirectory.setToolTipText("Change Cache Directory");
+		btnChangeCacheDirectory.setToolTipText("Change Caches Directory");
 		btnChangeCacheDirectory.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/fldr_obj.gif"));
 		btnChangeCacheDirectory.setFont(cantarell8);
 		btnChangeCacheDirectory.addSelectionListener(new ModifyDatacacheDirectory());
 
 		final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
 		lblDataCacheSize.setFont(cantarell8);
-		lblDataCacheSize.setText("MB Data cache size (-1=unlimited):");
+		lblDataCacheSize.setText("MB Caches Size (-1=unlimited):");
 
 		dataCacheSize = new Spinner(groupDataCacheSettings, SWT.BORDER);
 		dataCacheSize.setValues(0, -1, 99999999, 0, 1, 10);
@@ -526,9 +527,9 @@ public class OcelotlSettingsView extends Dialog {
 		}
 
 		Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
-		lblCacheTimeSlices.setText("Cache time slices:");
+		lblCacheTimeSlices.setText("Data Cache time slices:");
 		lblCacheTimeSlices.setFont(cantarell8);
-		lblCacheTimeSlices.setToolTipText("Number of Time Slices Used When Generating Cache");
+		lblCacheTimeSlices.setToolTipText("Number of Time Slices Used When Generating Data Cache");
 
 		cacheTimeSliceValue = new Spinner(groupDataCacheSettings, SWT.BORDER);
 		cacheTimeSliceValue.setValues(0, 0, 99999999, 0, 1, 10);
@@ -540,7 +541,7 @@ public class OcelotlSettingsView extends Dialog {
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		Label lblCachePolicy = new Label(groupDataCacheSettings, SWT.NONE);
-		lblCachePolicy.setText("Cache policy");
+		lblCachePolicy.setText("Data Cache policy");
 		lblCachePolicy.setFont(cantarell8);
 		new Label(groupDataCacheSettings, SWT.NONE);
 		new Label(groupDataCacheSettings, SWT.NONE);
@@ -573,7 +574,12 @@ public class OcelotlSettingsView extends Dialog {
 		cachepolicy.put(DatacachePolicy.CACHEPOLICY_AUTO, btnRadioButton_3);
 		cachepolicy.get(settings.getCachePolicy()).setSelection(true);
 		sashFormSettings.setWeights(new int[] { 1 });
-		btnCacheEnabled.notifyListeners(SWT.Selection, new Event());
+		btnDataCacheEnabled.notifyListeners(SWT.Selection, new Event());
+		
+		btnDichoCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
+		btnDichoCacheEnabled.setFont(cantarell8);
+		btnDichoCacheEnabled.setText("Dichotomy Cache Enabled");
+		btnDichoCacheEnabled.setSelection(settings.isDichoCacheActivated());
 
 		// Advanced settings
 		final TabItem tbtmAdvancedSettings = new TabItem(tabFolder, SWT.NONE);
@@ -967,7 +973,8 @@ public class OcelotlSettingsView extends Dialog {
 	 */
 	void setSettings() {
 		// Cache settings
-		settings.setCacheActivated(btnCacheEnabled.getSelection());
+		settings.setDataCacheActivated(btnDataCacheEnabled.getSelection());
+		settings.setDichoCacheActivated(btnDichoCacheEnabled.getSelection());
 		settings.setCacheTimeSliceNumber(Integer.valueOf(cacheTimeSliceValue.getText()));
 		modifyDataCacheSize();
 		updateCacheDir();

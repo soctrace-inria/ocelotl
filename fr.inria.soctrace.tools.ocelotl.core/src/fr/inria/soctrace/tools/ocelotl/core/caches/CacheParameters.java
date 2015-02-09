@@ -28,6 +28,7 @@ public class CacheParameters {
 		private String microModelType;
 		private String visuAggOperator;
 		private double treshold;
+		private boolean normalized;
 
 		public CacheParameters() {
 			traceName = "";
@@ -39,6 +40,7 @@ public class CacheParameters {
 			visuAggOperator = "null";
 			microModelType = "null";
 			treshold = OcelotlDefaultParameterConstants.Threshold;
+			normalized = false;
 		}
 
 		/**
@@ -55,6 +57,7 @@ public class CacheParameters {
 			endTimestamp = oParam.getTimeRegion().getTimeStampEnd();
 			nbTimeSlice = oParam.getTimeSlicesNumber();
 			treshold = oParam.getThreshold();
+			normalized = oParam.isNormalize();
 			
 			if (oParam.getDataAggOperator() == null) {
 				dataAggOperator = "null";
@@ -145,5 +148,13 @@ public class CacheParameters {
 
 		public void setTreshold(double treshold) {
 			this.treshold = treshold;
+		}
+
+		public boolean isNormalized() {
+			return normalized;
+		}
+
+		public void setNormalized(boolean normalized) {
+			this.normalized = normalized;
 		}
 }
