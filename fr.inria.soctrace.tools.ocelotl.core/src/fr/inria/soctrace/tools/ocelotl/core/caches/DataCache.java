@@ -63,7 +63,7 @@ public class DataCache {
 	/**
 	 * Dictionary of cache files associated to to trace
 	 */
-	protected HashMap<Trace, List<CacheParameters>> cacheIndex;
+	protected HashMap<String, List<CacheParameters>> cacheIndex;
 
 	/**
 	 * Factor between the number of time slices in the current aggregation and
@@ -237,7 +237,7 @@ public class DataCache {
 	public DataCache() {
 		super();
 		cachedData = new HashMap<CacheParameters, File>();
-		cacheIndex = new HashMap<Trace, List<CacheParameters>>();
+		cacheIndex = new HashMap<String, List<CacheParameters>>();
 
 		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
 	}
@@ -271,13 +271,14 @@ public class DataCache {
 		double bestRatio = Double.MAX_VALUE;
 
 		CacheParameters cParam = new CacheParameters(parameters);
+		String uniqueID = buildTraceUniqueID(parameters.getTrace());
 		// Look for the correct trace
-		if (!cacheIndex.containsKey(parameters.getTrace())) {
+		if (!cacheIndex.containsKey(uniqueID)) {
 			logger.debug("No datacache was found (1)");
 			return null;
 		}
 		
-		for (CacheParameters op : cacheIndex.get(parameters.getTrace())) {
+		for (CacheParameters op : cacheIndex.get(uniqueID)) {
 			if (similarParameters(cParam, op)) {
 				// If first iteration
 				if (cache == null) {
@@ -520,13 +521,13 @@ public class DataCache {
 		File aFile = new File(aFilePath);
 
 		cachedData.put(params, aFile);
-		
+		String uniqueID  = buildTraceUniqueID(oParam.getTrace());
 		// Update dictionary
-		if (!cacheIndex.containsKey(oParam.getTrace())) {
+		if (!cacheIndex.containsKey(uniqueID)) {
 			cacheIndex
-					.put(oParam.getTrace(), new ArrayList<CacheParameters>());
+					.put(uniqueID, new ArrayList<CacheParameters>());
 		}
-		cacheIndex.get(oParam.getTrace()).add(params);
+		cacheIndex.get(uniqueID).add(params);
 	}
 
 	/**
@@ -628,17 +629,18 @@ public class DataCache {
 	 *            List of all the traces in database
 	 */
 	public void buildDictionary(List<Trace> traces) {
-		cacheIndex = new HashMap<Trace, List<CacheParameters>>();
+		cacheIndex = new HashMap<String, List<CacheParameters>>();
 
 		for (CacheParameters aCache : cachedData.keySet()) {
 			// Check if the corresponding trace still exists
 			for (Trace aTrace : traces) {
 				if (aCache.getTraceID() == aTrace.getId()) {
-					if (!cacheIndex.containsKey(aTrace)) {
+					String uniqueID = buildTraceUniqueID(aTrace);
+					if (!cacheIndex.containsKey(uniqueID)) {
 						cacheIndex
-								.put(aTrace, new ArrayList<CacheParameters>());
+								.put(uniqueID, new ArrayList<CacheParameters>());
 					}
-					cacheIndex.get(aTrace).add(aCache);
+					cacheIndex.get(uniqueID).add(aCache);
 				}
 			}
 		}
@@ -865,5 +867,18 @@ public class DataCache {
 		}
 
 		cachedData.remove(oldestParam);
+	}
+	
+	/**
+	 * Construct an ID composed of the name of the trace (alias) and the id of
+	 * the trace in database
+	 * 
+	 * @param aTrace
+	 * @return
+	 * the unique ID
+	 */
+	String buildTraceUniqueID(Trace aTrace)
+	{
+		return aTrace.getDbName() + "_" + aTrace.getId();
 	}
 }
