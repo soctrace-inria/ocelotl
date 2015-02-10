@@ -84,6 +84,9 @@ public class OcelotlSettings {
 	private boolean aggregateLeaves;
 	private int maxNumberOfLeaves;
 	
+	private boolean overviewAggregateLeaves;
+	private int overviewMaxNumberOfLeaves;
+	
 	// Default directory where the config file is
 	private String defaultConfigFile;
 
@@ -150,6 +153,9 @@ public class OcelotlSettings {
 		enableOverview = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
 		aggregateLeaves = OcelotlDefaultParameterConstants.AGGREGATE_LEAVES;
 		maxNumberOfLeaves = OcelotlDefaultParameterConstants.MAX_NUMBER_OF_LEAVES;
+		
+		overviewAggregateLeaves = OcelotlDefaultParameterConstants.OVERVIEW_AGGREGATE_LEAVES;
+		overviewMaxNumberOfLeaves = OcelotlDefaultParameterConstants.OVERVIEW_MAX_NUMBER_OF_LEAVES;
 	}
 	
 	/**
@@ -258,7 +264,13 @@ public class OcelotlSettings {
 						OcelotlConstants.JSONQualCurveYResolution).getAsInt());
 				setDichoCacheActivated(theConf.get(
 						OcelotlConstants.JSONDichoCacheActivated).getAsBoolean());
-			
+				setOverviewAggregateLeaves(theConf.get(
+						OcelotlConstants.JSONOverviewAggregateLeaves)
+						.getAsBoolean());
+				setOverviewMaxNumberOfLeaves(theConf.get(
+						OcelotlConstants.JSONOverviewMaxNumberOfLeaves)
+						.getAsInt());
+
 				logger.debug("Settings values:\n");
 				logger.debug("Cache activated: " + dataCacheActivated);
 				logger.debug("Cache directory: " + cacheDirectory);
@@ -366,6 +378,10 @@ public class OcelotlSettings {
 				qualCurveYResolution);
 		theConfig.addProperty(OcelotlConstants.JSONDichoCacheActivated,
 				dichoCacheActivated);
+		theConfig.addProperty(OcelotlConstants.JSONOverviewAggregateLeaves,
+				overviewAggregateLeaves);
+		theConfig.addProperty(OcelotlConstants.JSONOverviewMaxNumberOfLeaves,
+				overviewMaxNumberOfLeaves);
 		
 		String newSettings = gson.toJson(theConfig);
 
@@ -722,5 +738,21 @@ public class OcelotlSettings {
 			return true;
 		}
 		return false;
+	}
+
+	public boolean isOverviewAggregateLeaves() {
+		return overviewAggregateLeaves;
+	}
+
+	public void setOverviewAggregateLeaves(boolean overviewAggregateLeaves) {
+		this.overviewAggregateLeaves = overviewAggregateLeaves;
+	}
+
+	public int getOverviewMaxNumberOfLeaves() {
+		return overviewMaxNumberOfLeaves;
+	}
+
+	public void setOverviewMaxNumberOfLeaves(int overviewMaxNumberOfLeaves) {
+		this.overviewMaxNumberOfLeaves = overviewMaxNumberOfLeaves;
 	}
 }

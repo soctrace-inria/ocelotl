@@ -93,6 +93,8 @@ public class OcelotlParameters {
 	private boolean approximateRebuild = false;
 	private String currentUnit = "";
 	private TimeSliceManager timeSliceManager;
+	private boolean aggregatedLeaveEnable = false;
+	private int maxNumberOfLeaves;
 
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
@@ -524,6 +526,22 @@ public class OcelotlParameters {
 		this.approximateRebuild = approximateRebuild;
 	}
 
+	public boolean isAggregatedLeaveEnable() {
+		return aggregatedLeaveEnable;
+	}
+
+	public void setAggregatedLeaveEnable(boolean aggregatedLeaveEnable) {
+		this.aggregatedLeaveEnable = aggregatedLeaveEnable;
+	}
+
+	public int getMaxNumberOfLeaves() {
+		return maxNumberOfLeaves;
+	}
+
+	public void setMaxNumberOfLeaves(int maxNumberOfLeaves) {
+		this.maxNumberOfLeaves = maxNumberOfLeaves;
+	}
+
 	/**
 	 * Update the selected producers when the filtered event producers has
 	 * changed
@@ -572,7 +590,7 @@ public class OcelotlParameters {
 		int numberOfLeaves = 0;
 
 		// Get the current number of leaves
-		if (getOcelotlSettings().isAggregateLeaves()) {
+		if (aggregatedLeaveEnable) {
 			for (EventProducer anEP : currentProducers)
 				if (getEventProducerHierarchy().getLeaves().keySet()
 						.contains(anEP.getId()))
@@ -581,7 +599,7 @@ public class OcelotlParameters {
 			return;
 		}
 		
-		if (numberOfLeaves > getOcelotlSettings().getMaxNumberOfLeaves())
+		if (numberOfLeaves > maxNumberOfLeaves)
 			setHasLeaveAggregated(true);
 	}
 	

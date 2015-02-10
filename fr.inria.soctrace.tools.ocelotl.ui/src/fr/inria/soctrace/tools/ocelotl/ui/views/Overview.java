@@ -401,13 +401,17 @@ public class Overview implements IFramesocBusListener {
 	public void updateOverviewParameters(OcelotlParameters ocelotlParameters) {
 		// Copy the given parameters
 		overviewParameters = new OcelotlParameters(ocelotlView.getOcelotlParameters());
-		
+
 		// Set the time slice number at the current value for overview
 		overviewParameters.setTimeSlicesNumber(timeSlice);
 		
 		// Set the time region at global
 		TimeRegion overviewTimeRegion  = new TimeRegion(overviewParameters.getTrace().getMinTimestamp(), overviewParameters.getTrace().getMaxTimestamp());
 		overviewParameters.setTimeRegion(overviewTimeRegion);
+		
+		// Set the pre-aggregation to true
+		overviewParameters.setAggregatedLeaveEnable(overviewParameters.getOcelotlSettings().isOverviewAggregateLeaves());
+		overviewParameters.setMaxNumberOfLeaves(overviewParameters.getOcelotlSettings().getOverviewMaxNumberOfLeaves());
 	}
 	
 	public void initSelectionFigure() {

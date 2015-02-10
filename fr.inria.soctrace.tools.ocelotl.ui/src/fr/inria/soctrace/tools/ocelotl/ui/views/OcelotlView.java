@@ -1454,18 +1454,18 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		final IActionBars actionBars = getViewSite().getActionBars();
 		final IToolBarManager toolBar = actionBars.getToolBarManager();
 
+		settings = createSettingWindow(this);
+		snapshotAction = createSnapshot();
+		
+		toolBar.add(settings);
+		toolBar.add(snapshotAction);
+		
+		toolBar.add(new Separator());
+
 		TableTraceIntervalAction.add(toolBar, createTableAction());
 		GanttTraceIntervalAction.add(toolBar, createGanttAction());
 		PieTraceIntervalAction.add(toolBar, createPieAction());
 		HistogramTraceIntervalAction.add(toolBar, createHistogramAction());
-
-		toolBar.add(new Separator());
-
-		settings = createSettingWindow(this);
-		snapshotAction = createSnapshot();
-
-		toolBar.add(settings);
-		toolBar.add(snapshotAction);
 		
 		statusLineManager = (SubStatusLineManager) actionBars.getStatusLineManager();
 	
@@ -1665,6 +1665,9 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		ocelotlParameters.setThreadNumber(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
+		ocelotlParameters.setAggregatedLeaveEnable(ocelotlParameters.getOcelotlSettings().isAggregateLeaves());
+		ocelotlParameters.setMaxNumberOfLeaves(ocelotlParameters.getOcelotlSettings().getMaxNumberOfLeaves());
+		
 		ocelotlParameters.updateCurrentProducers();
 		
 		// If there are aggregated leave, then it is necessary to update the

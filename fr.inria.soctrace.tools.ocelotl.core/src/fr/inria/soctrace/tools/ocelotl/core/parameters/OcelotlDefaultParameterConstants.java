@@ -136,6 +136,9 @@ public class OcelotlDefaultParameterConstants {
 	
 	public static final boolean AGGREGATE_LEAVES = false;
 	public static final int MAX_NUMBER_OF_LEAVES = 10000;
+	
+	public static final boolean OVERVIEW_AGGREGATE_LEAVES = false;
+	public static final int OVERVIEW_MAX_NUMBER_OF_LEAVES = 100;
 
 	/**
 	 * Number of events loaded by thread

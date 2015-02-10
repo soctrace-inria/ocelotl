@@ -117,6 +117,8 @@ public class OcelotlConstants {
 	public static final String JSONQualCurveYResolution = "qualCurveYResolution";
 	public static final String JSONAggregateLeaves = "aggregateLeaves";
 	public static final String JSONMaxNumberOfLeaves = "maxNumberOfLeaves";
+	public static final String JSONOverviewAggregateLeaves = "overviewAggregateLeaves";
+	public static final String JSONOverviewMaxNumberOfLeaves = "overviewMaxNumberOfLeaves";
 	
 	public static final String JSONEnableOverview = "enableOverview";
 	public static final String JSONOverviewAggregOperator = "overviewAggregOperator";

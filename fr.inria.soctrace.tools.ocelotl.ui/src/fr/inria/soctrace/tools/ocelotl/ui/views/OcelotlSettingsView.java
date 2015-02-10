@@ -100,6 +100,8 @@ public class OcelotlSettingsView extends Dialog {
 	private Button								btnEnableOverview;
 	private Spinner								spinnerMaxAggLeaves;
 	private Button								btnEnableLeavesAgg;
+	private Spinner								spinnerOverviewMaxAggLeaves;
+	private Button								btnOverviewEnableLeavesAgg;
 	
 	private Button								btnEditBgMainDisplay;
 	private Button								btnEditFgMainDisplay;
@@ -823,6 +825,23 @@ public class OcelotlSettingsView extends Dialog {
 		textOverviewSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
 		textOverviewSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
 
+		btnOverviewEnableLeavesAgg = new Button(groupOverviewSettings, SWT.CHECK);
+		btnOverviewEnableLeavesAgg.setFont(cantarell8);
+		btnOverviewEnableLeavesAgg.setSelection(settings.isOverviewAggregateLeaves());
+		btnOverviewEnableLeavesAgg.setText("Enable Leaves Aggregation for Overview");
+		new Label(groupOverviewSettings, SWT.NONE);
+		
+		final Label lblOverviewAggLeaves = new Label(groupOverviewSettings, SWT.NONE);
+		lblOverviewAggLeaves.setFont(cantarell8);
+		lblOverviewAggLeaves.setText("Max. Number of Leaves");
+
+		spinnerOverviewMaxAggLeaves = new Spinner(groupOverviewSettings, SWT.BORDER);
+		spinnerOverviewMaxAggLeaves.setFont(cantarell8);
+		spinnerOverviewMaxAggLeaves.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		spinnerOverviewMaxAggLeaves.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_AGGLEAVES);
+		spinnerOverviewMaxAggLeaves.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_AGGLEAVES);
+		spinnerOverviewMaxAggLeaves.setSelection(settings.getOverviewMaxNumberOfLeaves());
+
 		// Snapshot settings
 		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtMiscSettings.setText("Snapshot");
@@ -1020,6 +1039,8 @@ public class OcelotlSettingsView extends Dialog {
 		settings.setOverviewSelectionBgColor(btnColorMap.get(btnEditBgOverviewSelected));
 		settings.setOverviewSelectionFgColor(btnColorMap.get(btnEditFgOverviewSelected));
 		settings.setOverviewSelectionAlphaValue(Integer.valueOf(textOverviewSelectionAlpha.getText()));
+		settings.setOverviewAggregateLeaves(btnOverviewEnableLeavesAgg.getSelection());
+		settings.setOverviewMaxNumberOfLeaves(Integer.valueOf(spinnerOverviewMaxAggLeaves.getText()));
 		updateOverviewColors();
 		
 		// Main selection colors
