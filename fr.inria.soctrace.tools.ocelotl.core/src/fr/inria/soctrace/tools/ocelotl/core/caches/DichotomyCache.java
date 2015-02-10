@@ -9,7 +9,7 @@
  *     Damien Dosimont <damien.dosimont@imag.fr>
  *     Youenn Corre <youenn.corret@inria.fr>
  ******************************************************************************/
-package fr.inria.soctrace.tools.ocelotl.core.datacache;
+package fr.inria.soctrace.tools.ocelotl.core.caches;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,51 +23,36 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
-import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSlice;
-import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceStateManager;
 
-/**
- * Class handling the caching of the microscopic models.
- * 
- * It stores the cached data in a given directory in files using CSV. The first
- * line of the file is the header, containing several parameters describing the
- * characteristics of the cached microscopic model. The rest of the file is
- * composed of the non-null data values (one per line).
- */
-public class DataCache {
-
+public class DichotomyCache {
+	
 	private static final Logger logger = LoggerFactory
-			.getLogger(DataCache.class);
+			.getLogger(DichotomyCache.class);
 
 	private OcelotlSettings settings;
 
 	/**
 	 * List of the cache files in the current cache directory
 	 */
-	protected HashMap<CacheParameters, File> cachedData;
+	protected HashMap<CacheParameters, File> cachedDichotomy;
 
 	/**
 	 * Dictionary of cache files associated to to trace
 	 */
-	protected HashMap<Trace, List<CacheParameters>> cacheIndex;
-
-	/**
-	 * Factor between the number of time slices in the current aggregation and
-	 * the number of time slices of the cache model
-	 */
-	protected int timeSliceFactor = 1;
+	protected HashMap<String, List<CacheParameters>> cacheIndex;
 
 	/**
 	 * Path to the current cache directory
@@ -80,59 +65,12 @@ public class DataCache {
 	protected long cacheMaxSize = OcelotlConstants.MAX_CACHESIZE;
 
 	/**
-	 * Size of the current data cache
+	 * Size of the current cache
 	 */
 	protected long currentCacheSize;
 
-	/**
-	 * Minimal ratio value that can happen
-	 */
-	protected double minimalRatio = OcelotlConstants.MINIMAL_TIMESLICE_RATIO;
-
-	/**
-	 * Maximal ratio value of dirty time slices in a cache
-	 */
-	protected double maxDirtyRatio = OcelotlConstants.MAXIMAL_DIRTY_RATIO;
-
-	/**
-	 * Do we have to do some extra computation to rebuild the matrix from the
-	 * cache ?
-	 */
-	protected boolean rebuildDirty;
-
-	protected HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping;
-
-	protected DatacacheStrategy buildingStrategy;
-
 	protected boolean validDirectory;
 	
-	protected double currentDirtyRatio;
-
-	public DatacacheStrategy getBuildingStrategy() {
-		return buildingStrategy;
-	}
-
-	public void setBuildingStrategy(DatacacheStrategy buildingStrategy) {
-		this.buildingStrategy = buildingStrategy;
-	}
-
-	public HashMap<TimeSlice, List<TimeSlice>> getTimeSliceMapping() {
-		return timeSliceMapping;
-	}
-
-	public void setTimeSliceMapping(
-			HashMap<TimeSlice, List<TimeSlice>> timeSliceMapping) {
-		this.timeSliceMapping = timeSliceMapping;
-	}
-
-	public boolean isRebuildDirty() {
-		return rebuildDirty;
-	}
-
-	public void setRebuildDirty(boolean rebuildDirty) {
-		this.rebuildDirty = rebuildDirty;
-	}
-
 	public long getCacheMaxSize() {
 		return cacheMaxSize;
 	}
@@ -183,20 +121,20 @@ public class DataCache {
 		// Check the existence of the cache directory
 		File dir = new File(cacheDirectory);
 		if (!dir.exists()) {
-			logger.debug("Cache directory (" + cacheDirectory
+			logger.debug("[DICHOTOMY CACHE] Cache directory (" + cacheDirectory
 					+ ") does not exist and will be created now.");
 
 			// Create the directory
 			if (!dir.mkdirs()) {
-				logger.error("Failed to create cache directory: "
+				logger.error("[DICHOTOMY CACHE] Failed to create cache directory: "
 						+ cacheDirectory + ".");
 
 				if (this.cacheDirectory.isEmpty()) {
-					logger.error("The current cache directory is still: "
+					logger.error("[DICHOTOMY CACHE] The current cache directory is still: "
 							+ this.cacheDirectory);
 				} else {
 					validDirectory = false;
-					logger.error("The cache will be turned off.");
+					logger.error("[DICHOTOMY CACHE] The cache will be turned off.");
 				}
 				return false;
 			}
@@ -204,24 +142,20 @@ public class DataCache {
 
 		// Check that we have at least the reading rights
 		if (!dir.canRead()) {
-			logger.error("The application does not have the rights to read in the given directory: "
+			logger.error("[DICHOTOMY CACHE] The application does not have the rights to read in the given directory: "
 					+ cacheDirectory + ".");
 
 			if (this.cacheDirectory.isEmpty()) {
 				validDirectory = false;
-				logger.error("The cache will be turned off.");
+				logger.error("[DICHOTOMY CACHE] The cache will be turned off.");
 			} else {
-				logger.error("The current cache directory is still: "
+				logger.error("[DICHOTOMY CACHE] The current cache directory is still: "
 						+ this.cacheDirectory);
 			}
 			return false;
 		}
 		
 		return true;
-	}
-
-	public int getTimeSliceFactor() {
-		return timeSliceFactor;
 	}
 
 	public boolean isValidDirectory() {
@@ -232,12 +166,10 @@ public class DataCache {
 		this.validDirectory = validDirectory;
 	}
 
-	public DataCache() {
+	public DichotomyCache() {
 		super();
-		cachedData = new HashMap<CacheParameters, File>();
-		cacheIndex = new HashMap<Trace, List<CacheParameters>>();
-
-		buildingStrategy = DatacacheStrategy.DATACACHE_DATABASE;
+		cachedDichotomy = new HashMap<CacheParameters, File>();
+		cacheIndex = new HashMap<String, List<CacheParameters>>();
 	}
 
 	/**
@@ -249,7 +181,6 @@ public class DataCache {
 	 */
 	public void setSettings(OcelotlSettings settings) throws OcelotlException {
 		this.settings = settings;
-		setCacheMaxSize(settings.getCacheSize());
 		setCacheDirectory(settings.getCacheDirectory());
 	}
 
@@ -263,50 +194,30 @@ public class DataCache {
 	 *         null otherwise
 	 */
 	public File checkCache(OcelotlParameters parameters) {
-		rebuildDirty = false;
 		CacheParameters cache = null;
-		currentDirtyRatio = Double.MAX_VALUE;
-		double bestRatio = Double.MAX_VALUE;
-
 		CacheParameters cParam = new CacheParameters(parameters);
+		
+		String uniqueID = buildTraceUniqueID(parameters.getTrace());
+		
 		// Look for the correct trace
-		if (!cacheIndex.containsKey(parameters.getTrace())) {
-			logger.debug("No datacache was found");
+		if (!cacheIndex.containsKey(uniqueID)) {
+			logger.debug("[DICHOTOMY CACHE] No dichotomy cache was found.");
 			return null;
 		}
-		
-		for (CacheParameters op : cacheIndex.get(parameters.getTrace())) {
+
+		for (CacheParameters op : cacheIndex.get(uniqueID)) {
 			if (similarParameters(cParam, op)) {
-				// If first iteration
-				if (cache == null) {
-					// Init
-					cache = op;
-					bestRatio = currentDirtyRatio;
-				} else {
-					// If the dirty ratio of the cache is better than the
-					// current best
-					if (bestRatio < currentDirtyRatio) {
-						// Set it as the best candidate
-						cache = op;
-						bestRatio = currentDirtyRatio;
-					}
-				}
-				// If perfect cache
-				if (currentDirtyRatio == 0) {
-					cache = op;
-					// There is no better solution so stop looking
-					break;
-				}
+				cache = op;
+				break;
 			}
 		}
-		
+
 		if (cache == null) {
-			logger.debug("No datacache was found");
+			logger.debug("[DICHOTOMY CACHE] No dichotomy cache was found.");
 			return null;
 		} else {
-			similarParameters(cParam, cache);
-			parameters.setTimeSliceFactor(timeSliceFactor);
-			return cachedData.get(cache);
+			logger.debug("[DICHOTOMY CACHE] Found a cache.");
+			return cachedDichotomy.get(cache);
 		}
 	}
 
@@ -322,26 +233,36 @@ public class DataCache {
 	 */
 	protected boolean similarParameters(CacheParameters newParam,
 			CacheParameters cacheParam) {
-		
+		// Check for similar micro model types
 		if (!(newParam.getMicroModelType().equals(
 				cacheParam.getMicroModelType()) && (!newParam
 				.getMicroModelType().equals("null"))))
 			return false;
-
-		// Are timestamps equal or are they included inside the cache
-		// timeregion
-		if (!checkCompatibleTimeStamp(newParam, cacheParam))
+		
+		// Check for similar data aggregation types
+		if (!(newParam.getDataAggOperator().equals(
+				cacheParam.getDataAggOperator()) && (!newParam
+				.getDataAggOperator().equals("null"))))
+			return false;
+		
+		// Check for similar threshold values
+		if (newParam.getTreshold() != cacheParam.getTreshold())
+			return false;
+		
+		// Check for similar normalize values
+		if (newParam.isNormalized() != cacheParam.isNormalized())
 			return false;
 
-		// Compute the time slice factor
-		timeSliceFactor = cacheParam.getNbTimeSlice()
-				/ newParam.getNbTimeSlice();
+		// Check that timestamps are equal
+		if (!checkCompatibleTimeStamp(newParam, cacheParam))
+			return false;
 
 		return true;
 	}
 
 	/**
-	 * Test if the new explored time region is compatible with the cached data
+	 * Test if the new explored time region is compatible with the cached
+	 * dichotomy values
 	 * 
 	 * @param newParam
 	 *            parameters of the new view
@@ -356,150 +277,12 @@ public class DataCache {
 				newParam.getEndTimestamp());
 		TimeRegion cacheTimeRegion = new TimeRegion(
 				cachedParam.getStartTimestamp(), cachedParam.getEndTimestamp());
-		
-		currentDirtyRatio = Double.MAX_VALUE;
-		rebuildDirty = false;
 
 		// If timestamps are equal then OK
 		if (newTimeRegion.compareTimeRegion(cacheTimeRegion)) {
-			// Is the number of slices of cached data divisible by the tested
-			// number of slices?
-			if ((cachedParam.getNbTimeSlice() % newParam.getNbTimeSlice() == 0)){
-				timeSliceMapping = null;
-				logger.debug("[DATACACHE] Found full compatibility");
-				currentDirtyRatio = 0;
-				return true;
-			}
-		}
-
-		// If timestamps are included in the cache time stamps
-		if (cacheTimeRegion.containsTimeRegion(newTimeRegion)) {
-			// Compute the duration of a time slice in the cache
-			long timeSliceDuration = (cachedParam.getEndTimestamp() - cachedParam
-					.getStartTimestamp()) / cachedParam.getNbTimeSlice();
-
-			// Compute the number of cached time slices included in the new time
-			// region
-			int includedTimeslice = (int) ((newParam.getEndTimestamp() - newParam
-					.getStartTimestamp()) / timeSliceDuration);
-
-			// Compute the ratio between the demanded time slice and the current
-			// time slice
-			double ratio = includedTimeslice / newParam.getNbTimeSlice();
-
-			// If we have enough timeslices to build the zoomed view from the
-			// cache
-			if (ratio < minimalRatio)
-				return false;
-
-			TimeSliceStateManager cachedTsManager = new TimeSliceStateManager(
-					cacheTimeRegion, cachedParam.getNbTimeSlice());
-			TimeSliceStateManager newTsManager = new TimeSliceStateManager(
-					newTimeRegion, newParam.getNbTimeSlice());
-
-			return computeDirtyTimeSlice(newParam, cachedParam, newTsManager,
-					cachedTsManager);
-		}
-
-		return false;
-	}
-
-	/**
-	 * "Dirty" time slices are time slices of the cache that do not fit inside a
-	 * time slice of the new view (i.e. they are used to build at least two new
-	 * time slices)
-	 * 
-	 * @param newParam
-	 * @param cachedParam
-	 * @param newTsManager
-	 * @param cachedTsManager
-	 * @return the ratio of dirty cache time slices over the total of used time
-	 *         slices in cache
-	 */
-	public boolean computeDirtyTimeSlice(CacheParameters newParam,
-			CacheParameters cachedParam, TimeSliceStateManager newTsManager,
-			TimeSliceStateManager cachedTsManager) {
-		double dirtyTimeslicesNumber = 0.0;
-		double usedCachedTimeSlices = 0.0;
-
-		List<TimeSlice> cachedTimeSlice = cachedTsManager.getTimeSlices();
-		List<TimeSlice> newTimeSlice = newTsManager.getTimeSlices();
-
-		HashMap<TimeSlice, List<TimeSlice>> tmpTimeSliceMapping = new HashMap<TimeSlice, List<TimeSlice>>();
-
-		for (TimeSlice aCachedTimeSlice : cachedTimeSlice) {
-			// If the time slice is inside the new time region
-			if (!(aCachedTimeSlice.getTimeRegion().getTimeStampEnd() < newParam
-					.getStartTimestamp())
-					&& !(aCachedTimeSlice.getTimeRegion().getTimeStampStart() > newParam
-							.getEndTimestamp())) {
-
-				usedCachedTimeSlices++;
-
-				for (TimeSlice aNewTimeSlice : newTimeSlice) {
-					// Is the cached time slice is at least partly inside a new
-					// time slice ?
-					if (aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
-							.getTimeRegion().getTimeStampStart())
-							|| aNewTimeSlice.startIsInsideMe(aCachedTimeSlice
-									.getTimeRegion().getTimeStampEnd())) {
-
-						if (!tmpTimeSliceMapping.containsKey(aCachedTimeSlice)) {
-							tmpTimeSliceMapping.put(aCachedTimeSlice,
-									new ArrayList<TimeSlice>());
-						}
-						tmpTimeSliceMapping.get(aCachedTimeSlice).add(
-								aNewTimeSlice);
-					}
-				}
-
-				// If a cached time slice is used in more than one new slice
-				// then it is dirty
-				if (tmpTimeSliceMapping.get(aCachedTimeSlice).size() > 1
-						|| aCachedTimeSlice.getTimeRegion().getTimeStampStart() < newParam
-								.getStartTimestamp()
-						|| aCachedTimeSlice.getTimeRegion().getTimeStampEnd() > newParam
-								.getEndTimestamp()) {
-					dirtyTimeslicesNumber++;
-				}
-			}
-		}
-
-		// Proportion of dirty time slices in the part of the cache used to
-		// rebuild the matrix
-		currentDirtyRatio = (dirtyTimeslicesNumber / usedCachedTimeSlices);
-
-		// No dirty time slice
-		if (currentDirtyRatio == 0) {
-			timeSliceMapping = null;
-			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
-					+ " dirty Timeslices among " + usedCachedTimeSlices
-					+ " used cache time slices" + " (i.e. a ratio of "
-					+ currentDirtyRatio + ").");
-			rebuildDirty = false;
 			return true;
 		}
 
-		// Set the flag for rebuild from dirty
-		if (currentDirtyRatio > 0)
-			rebuildDirty = true;
-
-		// If the ratio is not over the max
-		if (currentDirtyRatio <= maxDirtyRatio) {
-			// Precompute stuff
-			if (timeSliceMapping != null)
-				timeSliceMapping.clear();
-
-			timeSliceMapping = tmpTimeSliceMapping;
-
-			logger.debug("[DATACACHE] Found " + dirtyTimeslicesNumber
-					+ " dirty Timeslices among " + usedCachedTimeSlices
-					+ " used cache time slices" + " (i.e. a ratio of "
-					+ currentDirtyRatio + ").");
-			return true;
-		}
-
-		rebuildDirty = false;
 		return false;
 	}
 
@@ -512,19 +295,19 @@ public class DataCache {
 	 * @param aFilePath
 	 *            path to the file where the data were saved
 	 */
-	public void saveData(OcelotlParameters oParam, String aFilePath) {
+	public void saveDichotomy(OcelotlParameters oParam, String aFilePath) {
 		// TODO check for cache size
 		CacheParameters params = new CacheParameters(oParam);
 		File aFile = new File(aFilePath);
 
-		cachedData.put(params, aFile);
+		cachedDichotomy.put(params, aFile);
 		
+		String uniqueID = buildTraceUniqueID(oParam.getTrace());
 		// Update dictionary
-		if (!cacheIndex.containsKey(oParam.getTrace())) {
-			cacheIndex
-					.put(oParam.getTrace(), new ArrayList<CacheParameters>());
+		if (!cacheIndex.containsKey(uniqueID)) {
+			cacheIndex.put(uniqueID, new ArrayList<CacheParameters>());
 		}
-		cacheIndex.get(oParam.getTrace()).add(params);
+		cacheIndex.get(uniqueID).add(params);
 	}
 
 	/**
@@ -535,15 +318,15 @@ public class DataCache {
 	 * @param destPath
 	 *            path to save the file
 	 */
-	public void saveDataCacheTo(OcelotlParameters oParam, String destPath) {
+	public void saveDichotomyCacheTo(OcelotlParameters oParam, String destPath) {
 		// Get the current cache file
 		CacheParameters params = new CacheParameters(oParam);
 		File source = null;
 
 		// Look for the corresponding file
-		for (CacheParameters par : cachedData.keySet()) {
+		for (CacheParameters par : cachedDichotomy.keySet()) {
 			if (similarParameters(params, par)) {
-				source = cachedData.get(par);
+				source = cachedDichotomy.get(par);
 			}
 		}
 
@@ -558,7 +341,7 @@ public class DataCache {
 				e.printStackTrace();
 			}
 		} else {
-			logger.error("No corresponding cache file was found");
+			logger.error("[DICHOTOMY CACHE] No corresponding cache file was found");
 		}
 	}
 
@@ -566,13 +349,13 @@ public class DataCache {
 	 * Delete all the files in the cache
 	 */
 	public void deleteCache() {
-		for (File aCacheFile : cachedData.values()) {
+		for (File aCacheFile : cachedDichotomy.values()) {
 			if (!aCacheFile.delete()) {
-				logger.debug("DataCache: Deletion of cache file " + aCacheFile
+				logger.debug("[DICHOTOMY CACHE]: Deletion of cache file " + aCacheFile
 						+ " failed.");
 			}
 		}
-		cachedData.clear();
+		cachedDichotomy.clear();
 		currentCacheSize = 0L;
 	}
 
@@ -583,32 +366,38 @@ public class DataCache {
 		File workDir = new File(cacheDirectory);
 
 		// Clear the current cache files
-		cachedData.clear();
+		cachedDichotomy.clear();
 		if (workDir.exists()) {
-			File[] directoryListing = workDir.listFiles();
-			if (directoryListing != null) {
-				for (File traceCache : directoryListing) {
+			Iterator<File> anIT = FileUtils.iterateFiles(workDir, null, true);
+			
+			while (anIT.hasNext()) {
+				File traceCache = anIT.next();
 
-					// Try parsing the file and get the cache parameters
-					CacheParameters param = parseTraceCache(traceCache);
+				if (!traceCache.getName().endsWith(
+						OcelotlConstants.DichotomyCacheSuffix))
+					continue;
 
-					// If parsing was successful
-					if (param.getTraceID() != -1) {
-						// Register the cache file
-						cachedData.put(param, traceCache);
+				// Try parsing the file and get the cache parameters
+				CacheParameters param = parseTraceCache(traceCache);
 
-						logger.debug("Found " + param.getTraceName() + " in "
-								+ traceCache.toString() + ", "
-								+ param.getMicroModelType() + ", "
-								+ param.getSpaceAggOperator() + ", "
-								+ param.getStartTimestamp() + ", "
-								+ param.getEndTimestamp());
-					}
+				// If parsing was successful
+				if (param.getTraceID() != -1) {
+					// Register the cache file
+					cachedDichotomy.put(param, traceCache);
+
+					logger.debug("[DICHOTOMY CACHE] Found "
+							+ param.getTraceName() + " in "
+							+ traceCache.toString() + ", "
+							+ param.getMicroModelType() + ", "
+							+ param.getDataAggOperator() + ", "
+							+ param.getStartTimestamp() + ", "
+							+ param.getEndTimestamp());
 				}
-				computeCacheSize();
 			}
+
+			computeCacheSize();
 		} else {
-			System.err.println("The provided cache directory ("
+			System.err.println("[DICHOTOMY CACHE] The provided cache directory ("
 					+ cacheDirectory + ")does not exist");
 		}
 	}
@@ -620,17 +409,18 @@ public class DataCache {
 	 *            List of all the traces in database
 	 */
 	public void buildDictionary(List<Trace> traces) {
-		cacheIndex = new HashMap<Trace, List<CacheParameters>>();
+		cacheIndex = new HashMap<String, List<CacheParameters>>();
 
-		for (CacheParameters aCache : cachedData.keySet()) {
+		for (CacheParameters aCache : cachedDichotomy.keySet()) {
 			// Check if the corresponding trace still exists
 			for (Trace aTrace : traces) {
 				if (aCache.getTraceID() == aTrace.getId()) {
-					if (!cacheIndex.containsKey(aTrace)) {
+					String uniqueID = buildTraceUniqueID(aTrace);
+					if (!cacheIndex.containsKey(uniqueID)) {
 						cacheIndex
-								.put(aTrace, new ArrayList<CacheParameters>());
+								.put(uniqueID, new ArrayList<CacheParameters>());
 					}
-					cacheIndex.get(aTrace).add(aCache);
+					cacheIndex.get(uniqueID).add(aCache);
 				}
 			}
 		}
@@ -647,7 +437,7 @@ public class DataCache {
 	public void removeDeletedTraces(List<Trace> traces) {
 		List<CacheParameters> deletedCache = new ArrayList<CacheParameters>();
 
-		for (CacheParameters aCache : cachedData.keySet()) {
+		for (CacheParameters aCache : cachedDichotomy.keySet()) {
 			boolean deleted = true;
 
 			// Check if the corresponding trace still exists
@@ -660,14 +450,14 @@ public class DataCache {
 
 			// If not delete the cache file
 			if (deleted) {
-				logger.debug("DataCache: The trace "
+				logger.debug("[DICHOTOMY CACHE]: The trace "
 						+ aCache.getTraceName()
 						+ " (ID = "
 						+ aCache.getTraceID()
 						+ ") is no longer in the database: the corresponding cache file will be deleted.");
-				if (!cachedData.get(aCache).delete()) {
-					logger.debug("DataCache: Deletion of cache file "
-							+ cachedData.get(aCache).getName() + " failed.");
+				if (!cachedDichotomy.get(aCache).delete()) {
+					logger.debug("[DICHOTOMY CACHE]: Deletion of cache file "
+							+ cachedDichotomy.get(aCache).getName() + " failed.");
 				}
 				deletedCache.add(aCache);
 			}
@@ -675,7 +465,7 @@ public class DataCache {
 
 		// Remove the deleted cache
 		for (CacheParameters aCache : deletedCache) {
-			cachedData.remove(aCache);
+			cachedDichotomy.remove(aCache);
 		}
 
 		// Recompute the current cache size
@@ -705,7 +495,7 @@ public class DataCache {
 				if (line != null) {
 					String[] header = line.split(OcelotlConstants.CSVDelimiter);
 
-					if (header.length != OcelotlConstants.CACHE_HEADER_NORMAL_SIZE) {
+					if (header.length != OcelotlConstants.DICHOTOMYCACHE_HEADER_NORMAL_SIZE) {
 						bufFileReader.close();
 						return params;
 					}
@@ -720,13 +510,17 @@ public class DataCache {
 					// Time Aggregation Operator
 					params.setMicroModelType(header[2]);
 					// Space Aggregation Operator
-					params.setSpaceAggOperator(header[3]);
+					params.setDataAggOperator(header[3]);
 					// Start timestamp
 					params.setStartTimestamp(Long.parseLong(header[4]));
 					// End timestamp
 					params.setEndTimestamp(Long.parseLong(header[5]));
 					// Number of time Slices
 					params.setNbTimeSlice(Integer.parseInt(header[6]));
+					// Threshold
+					params.setTreshold(Double.parseDouble(header[7]));
+					// Normalized
+					params.setNormalized(Boolean.parseBoolean(header[8]));
 				}
 
 				bufFileReader.close();
@@ -747,7 +541,7 @@ public class DataCache {
 	 * 
 	 * @param cacheFilePath
 	 */
-	public int loadDataCache(String cacheFilePath, OcelotlParameters oParam)
+	public int loadDichotomyCache(String cacheFilePath, OcelotlParameters oParam)
 			throws OcelotlException {
 		File cacheFile = new File(cacheFilePath);
 		CacheParameters params = parseTraceCache(cacheFile);
@@ -760,17 +554,18 @@ public class DataCache {
 			TimeRegion timeRegion = new TimeRegion(params.getStartTimestamp(),
 					params.getEndTimestamp());
 			oParam.setTimeRegion(timeRegion);
+			oParam.setThreshold(params.getTreshold());
 			
 			if (!params.getMicroModelType().equals("null")) {
 				oParam.setMicroModelType(params.getMicroModelType());
 			}
 
-			if (!params.getTimeAggOperator().equals("null")) {
-				oParam.setDataAggOperator(params.getTimeAggOperator());
+			if (!params.getDataAggOperator().equals("null")) {
+				oParam.setDataAggOperator(params.getDataAggOperator());
 			}
 
-			if (!params.getSpaceAggOperator().equals("null")) {
-				oParam.setVisuOperator(params.getSpaceAggOperator());
+			if (!params.getVisuAggOperator().equals("null")) {
+				oParam.setVisuOperator(params.getVisuAggOperator());
 			}
 		}
 
@@ -785,11 +580,11 @@ public class DataCache {
 			if (newFileSize > cacheMaxSize) {
 				return false;
 			}
-			while (currentCacheSize + newFileSize > cacheMaxSize
-					&& !cachedData.isEmpty()) {
-				removeCacheFile();
+			/*while (currentCacheSize + newFileSize > cacheMaxSize
+					&& !cachedDichotomy.isEmpty()) {
+				//removeCacheFile();
 				computeCacheSize();
-			}
+			}*/
 		}
 		return true;
 	}
@@ -799,11 +594,11 @@ public class DataCache {
 	 */
 	public void computeCacheSize() {
 		currentCacheSize = 0;
-		for (File aCacheFile : cachedData.values()) {
+		for (File aCacheFile : cachedDichotomy.values()) {
 			currentCacheSize = currentCacheSize + aCacheFile.length();
 		}
 
-		logger.debug("Size of the current cache is: " + currentCacheSize
+		logger.debug("[DICHOTOMY CACHE] Size of the current cache is: " + currentCacheSize
 				+ " bytes (" + currentCacheSize / 1000000 + " MB).");	 }
 
 	/**
@@ -815,10 +610,10 @@ public class DataCache {
 		FileTime oldestDate = FileTime.from(System.currentTimeMillis(), null);
 		CacheParameters oldestParam = null;
 
-		for (CacheParameters aCacheParam : cachedData.keySet()) {
+		for (CacheParameters aCacheParam : cachedDichotomy.keySet()) {
 			try {
 				// Get the last access to the file
-				Path path = cachedData.get(aCacheParam).toPath();
+				Path path = cachedDichotomy.get(aCacheParam).toPath();
 				BasicFileAttributes attrs;
 				attrs = Files.readAttributes(path, BasicFileAttributes.class);
 				FileTime currentTime = attrs.lastAccessTime();
@@ -835,11 +630,24 @@ public class DataCache {
 		}
 
 		// Delete oldest accessed cache
-		if (!cachedData.get(oldestParam).delete()) {
-			logger.debug("DataCache: Deletion of cache file "
-					+ cachedData.get(oldestParam).getName() + " failed.");
+		if (!cachedDichotomy.get(oldestParam).delete()) {
+			logger.debug("[DICHOTOMY CACHE]: Deletion of cache file "
+					+ cachedDichotomy.get(oldestParam).getName() + " failed.");
 		}
 
-		cachedData.remove(oldestParam);
+		cachedDichotomy.remove(oldestParam);
+	}
+	
+	/**
+	 * Construct an ID composed of the name of the trace (alias) and the id of
+	 * the trace in database
+	 * 
+	 * @param aTrace
+	 * @return
+	 * the unique ID
+	 */
+	String buildTraceUniqueID(Trace aTrace)
+	{
+		return aTrace.getDbName() + "_" + aTrace.getId();
 	}
 }

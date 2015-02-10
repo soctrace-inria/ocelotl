@@ -74,7 +74,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	protected void addLeaves() {
 		for (int id : hierarchy.getLeaves().keySet())
 			timeAggregation.addLeaf(id, hierarchy.getParentID(id),
-					hierarchy.getValues(id));
+					hierarchy.getValues(id), hierarchy.getEventProducerNodes().get(id).getWeight());
 	}
 
 	@Override

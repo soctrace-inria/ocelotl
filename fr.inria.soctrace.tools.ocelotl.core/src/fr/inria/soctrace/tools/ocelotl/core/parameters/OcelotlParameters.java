@@ -28,13 +28,14 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.TimeUnit;
+import fr.inria.soctrace.tools.ocelotl.core.caches.DataCache;
+import fr.inria.soctrace.tools.ocelotl.core.caches.DichotomyCache;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
-import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperatorConfig;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -81,6 +82,7 @@ public class OcelotlParameters {
 	private boolean spatialSelection;
 	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
 	private DataCache dataCache = new DataCache();
+	private DichotomyCache dichotomyCache = new DichotomyCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 	private ParameterPPolicy parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
 	private OcelotlSettings	ocelotlSettings;
@@ -91,6 +93,8 @@ public class OcelotlParameters {
 	private boolean approximateRebuild = false;
 	private String currentUnit = "";
 	private TimeSliceManager timeSliceManager;
+	private boolean aggregatedLeaveEnable = false;
+	private int maxNumberOfLeaves;
 
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
@@ -135,6 +139,7 @@ public class OcelotlParameters {
 		this.growingQualities = op.growingQualities;
 		this.dataCache = op.dataCache;
 		this.dataCachePolicy = op.dataCachePolicy;
+		this.dichotomyCache = op.dichotomyCache;
 		this.ocelotlSettings = op.ocelotlSettings;
 		this.timeSliceManager = op.timeSliceManager;
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
@@ -281,6 +286,14 @@ public class OcelotlParameters {
 
 	public void setDataCache(DataCache dataCache) {
 		this.dataCache = dataCache;
+	}
+
+	public DichotomyCache getDichotomyCache() {
+		return dichotomyCache;
+	}
+
+	public void setDichotomyCache(DichotomyCache dichotomyCache) {
+		this.dichotomyCache = dichotomyCache;
 	}
 
 	public SimpleEventProducerHierarchy getEventProducerHierarchy() {
@@ -513,6 +526,22 @@ public class OcelotlParameters {
 		this.approximateRebuild = approximateRebuild;
 	}
 
+	public boolean isAggregatedLeaveEnable() {
+		return aggregatedLeaveEnable;
+	}
+
+	public void setAggregatedLeaveEnable(boolean aggregatedLeaveEnable) {
+		this.aggregatedLeaveEnable = aggregatedLeaveEnable;
+	}
+
+	public int getMaxNumberOfLeaves() {
+		return maxNumberOfLeaves;
+	}
+
+	public void setMaxNumberOfLeaves(int maxNumberOfLeaves) {
+		this.maxNumberOfLeaves = maxNumberOfLeaves;
+	}
+
 	/**
 	 * Update the selected producers when the filtered event producers has
 	 * changed
@@ -561,7 +590,7 @@ public class OcelotlParameters {
 		int numberOfLeaves = 0;
 
 		// Get the current number of leaves
-		if (getOcelotlSettings().isAggregateLeaves()) {
+		if (aggregatedLeaveEnable) {
 			for (EventProducer anEP : currentProducers)
 				if (getEventProducerHierarchy().getLeaves().keySet()
 						.contains(anEP.getId()))
@@ -570,7 +599,7 @@ public class OcelotlParameters {
 			return;
 		}
 		
-		if (numberOfLeaves > getOcelotlSettings().getMaxNumberOfLeaves())
+		if (numberOfLeaves > maxNumberOfLeaves)
 			setHasLeaveAggregated(true);
 	}
 	

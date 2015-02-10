@@ -74,7 +74,6 @@ public class TimeAxisView {
 					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height - 2), new Point(
 							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), -1)));
 		}
-
 	}
 
 	Figure				root;
@@ -110,6 +109,7 @@ public class TimeAxisView {
 			drawMainLine();
 			drawGrads();
 		}
+		root.validate();
 		canvas.update();
 	}
 
@@ -124,6 +124,7 @@ public class TimeAxisView {
 				selectFigure.draw(timeRegion, active);
 			}
 		}
+		root.validate();
 		canvas.update();
 	}
 
@@ -140,24 +141,21 @@ public class TimeAxisView {
 			rectangle.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 			rectangle.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			rectangle.setLineWidth(1);
-			final RectangleFigure rectangleText = new RectangleFigure();
-			if (i != (int) GradNumber)
-				root.add(rectangleText, new Rectangle(new Point((int) (i * GradWidth), linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
-			else
-				root.add(rectangleText, new Rectangle(new Point((int) (i * GradWidth) - Border * 3, linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
-			rectangleText.setBackgroundColor(root.getBackgroundColor());
-			rectangleText.setForegroundColor(root.getBackgroundColor());
+
 			final long value = (long) (i * GradDuration + time.getTimeStampStart());
 			final String text = formatter.format(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
-			rectangleText.setLineWidth(1);
-			rectangleText.add(label);
+			label.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			rectangleText.setLayoutManager(layout);
+			if (i != (int) GradNumber)
+				root.add(label, new Rectangle(new Point((int) (i * GradWidth), linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
+			else
+				root.add(label, new Rectangle(new Point((int) (i * GradWidth) - Border * 3, linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
+
+			label.setLayoutManager(layout);
 			for (int j = 1; j < 5; j++) {
 				final RectangleFigure rectangle2 = new RectangleFigure();
 				if ((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide) > root.getSize().width() - Border)
@@ -231,6 +229,10 @@ public class TimeAxisView {
 		});
 
 		return canvas;
+	}
+	
+	public Figure getRoot() {
+		return root;
 	}
 
 	public void resizeDiagram() {

@@ -147,6 +147,7 @@ public class QualityView {
 				}
 			}
 			canvas.update();
+			root.validate();
 		}
 	}
 
@@ -245,21 +246,18 @@ public class QualityView {
 			line.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			line.setLineWidth(1);
 			root.add(line);
-			final RectangleFigure rectangleText = new RectangleFigure();
-			root.add(rectangleText, new Rectangle(new Point((int) (i * width + XBorder - width / 2), root.getSize().height() - YBorder + TextOffset), new Point(new Point((int) ((i + 1) * width + XBorder - width / 2), root.getSize().height() - YBorder
-					- AxisWidth + TextHeight + TextOffset))));
+
 			final float value = (float) ((10 - (i * XGradNumber / xGradNumber)) * 0.1);
 			final Label label = new Label("" + value);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
-			rectangleText.setLineWidth(1);
-			rectangleText.add(label);
-			rectangleText.setBackgroundColor(root.getBackgroundColor());
-			rectangleText.setForegroundColor(root.getBackgroundColor());
+			label.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
+			root.add(label, new Rectangle(new Point((int) (i * width + XBorder - width / 2), root.getSize().height() - YBorder + TextOffset), new Point(new Point((int) ((i + 1) * width + XBorder - width / 2), root.getSize().height() - YBorder
+					- AxisWidth + TextHeight + TextOffset))));
+			
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			rectangleText.setLayoutManager(layout);
+			label.setLayoutManager(layout);
 			if (i * (XGradNumber / xGradNumber) != (int) XGradNumber && width / MiniDivide > YGradWidthMin / 2)
 				for (int j = 1; j < 5; j++) {
 					if (((i * width + XBorder) + (int) (j * width / MiniDivide)) < xGradNumber * width + XBorder) {
@@ -308,25 +306,20 @@ public class QualityView {
 			line.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			line.setLineWidth(1);
 			root.add(line);
-			final RectangleFigure rectangleText = new RectangleFigure();
-			root.add(rectangleText, new Rectangle(new Point(XBorder - TextWidth - TextOffset, (int) (height - i * yGradWidth) + TextHeight / 3), new Point(new Point(XBorder - TextOffset, (int) (height - i * yGradWidth - TextHeight / 1.5)))));
-			rectangleText.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-			rectangleText.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			final double value = i == yGradNumber ? maxValue - minValue : (double) ((long) (i * qualityWidth * 10) / 10.0);
 			String text = formatter.format(value);
 			if (value < 1000)
 				text = String.valueOf(value);
 			final Label label = new Label(text);
+			label.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
-			rectangleText.setLineWidth(1);
-			rectangleText.add(label);
+			label.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+			root.add(label, new Rectangle(new Point(XBorder - TextWidth - TextOffset, (int) (height - i * yGradWidth) + TextHeight / 3), new Point(new Point(XBorder - TextOffset, (int) (height - i * yGradWidth - TextHeight / 1.5)))));
+
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			rectangleText.setLayoutManager(layout);
-			rectangleText.setBackgroundColor(root.getBackgroundColor());
-			rectangleText.setForegroundColor(root.getBackgroundColor());
+			label.setLayoutManager(layout);
 		}
 	}
 

@@ -20,22 +20,32 @@ import fr.inria.soctrace.framesoc.ui.providers.SquareIconLabelProvider;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.statistics.operators.SummaryStat.SummaryStatModel;
 
-public class OcelotlStatisticsTableRowLabelImageProvider extends SquareIconLabelProvider  {
+public class OcelotlStatisticsTableRowLabelImageProvider extends
+		SquareIconLabelProvider {
 
 	/**
 	 * Managed column
 	 */
 	protected ITableColumn col;
-	
+
 	/**
 	 * Constructor
-	 * @param col ITableColumn the provider is related to.
+	 * 
+	 * @param col
+	 *            ITableColumn the provider is related to.
 	 */
 	public OcelotlStatisticsTableRowLabelImageProvider(ITableColumn col) {
 		super();
 		this.col = col;
 	}
-	
+
+	@Override
+	protected void paint(Event event, Object element) {
+		// Make sure the image colors are updated
+		disposeImages();
+		super.paint(event, element);
+	}
+
 	@Override
 	protected void paint(Event event, Object element) {
 		// Make sure the image colors are updated
@@ -56,7 +66,7 @@ public class OcelotlStatisticsTableRowLabelImageProvider extends SquareIconLabel
 
 	@Override
 	public Color getColor(Object element) {
-		SummaryStatModel row = (SummaryStatModel)element;
+		SummaryStatModel row = (SummaryStatModel) element;
 		return row.getColor();
 	}
 }

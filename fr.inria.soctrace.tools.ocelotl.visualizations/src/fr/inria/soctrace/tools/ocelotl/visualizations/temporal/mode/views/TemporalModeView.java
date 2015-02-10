@@ -55,6 +55,7 @@ public class TemporalModeView extends TimeLineView {
 			}
 			j = j + aggParts.get(i);
 		}
+		root.validate();
 	}
 
 }

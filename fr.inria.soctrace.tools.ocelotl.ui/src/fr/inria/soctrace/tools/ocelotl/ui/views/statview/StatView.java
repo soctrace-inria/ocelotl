@@ -40,5 +40,10 @@ public abstract class StatView implements IStatView {
 	public void resizeDiagram() {
 		createDiagram();                                                             
 	}
+	
+	@Override
+	public String getStatDataToCSV() {
+           return "";                                              
+	}
 
 }

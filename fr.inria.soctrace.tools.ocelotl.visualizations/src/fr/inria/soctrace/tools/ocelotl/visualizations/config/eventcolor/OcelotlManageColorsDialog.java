@@ -37,15 +37,18 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class OcelotlManageColorsDialog extends ManageColorsDialog implements IVisualizationWindow {
+public class OcelotlManageColorsDialog extends ManageColorsDialog implements
+		IVisualizationWindow {
 
 	private OcelotlView ocelotlView;
 
 	private ColorsConfig config;
-			
+
 	/**
 	 * Constructor
-	 * @param parentShell shell
+	 * 
+	 * @param parentShell
+	 *            shell
 	 */
 	public OcelotlManageColorsDialog(Shell parentShell) {
 		super(parentShell);
@@ -54,7 +57,7 @@ public class OcelotlManageColorsDialog extends ManageColorsDialog implements IVi
 		this.entities.put(0, new Entity(ET_NAME, ModelEntity.EVENT_TYPE));
 	}
 
-    @Override
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		config.setTypes(ocelotlView.getOcelotlParameters().getTraceTypeConfig()
 				.getTypes());
@@ -62,14 +65,15 @@ public class OcelotlManageColorsDialog extends ManageColorsDialog implements IVi
 
 		return composite;
 	}
-    
+
+	@Override
 	protected Collection<String> getNames() {
 		return config.getTypeNames();
-}
-    
- 	@Override
+	}
+
+	@Override
 	public void init(OcelotlView ocelotlView, IVisuConfig aConfig) {
 		this.ocelotlView = ocelotlView;
 		this.config = (ColorsConfig) aConfig;
 	}
-} 
+}

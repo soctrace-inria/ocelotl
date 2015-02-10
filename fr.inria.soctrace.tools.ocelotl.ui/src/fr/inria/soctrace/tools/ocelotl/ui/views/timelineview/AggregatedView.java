@@ -73,9 +73,9 @@ abstract public class AggregatedView implements IAggregatedView {
 	public static int							activeColorAlpha	= 120;
 	public static int							selectColorAlpha	= 250;
 		
-	class SelectFigure extends RectangleFigure {
+	public class SelectFigure extends RectangleFigure {
 
-		private SelectFigure() {
+		public SelectFigure() {
 			super();
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
@@ -85,7 +85,7 @@ abstract public class AggregatedView implements IAggregatedView {
 			setAlpha(potentialColorAlpha);
 		}
 		
-		private SelectFigure(Color foreGround, Color backGround) {
+		public SelectFigure(Color foreGround, Color backGround) {
 			super();
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);

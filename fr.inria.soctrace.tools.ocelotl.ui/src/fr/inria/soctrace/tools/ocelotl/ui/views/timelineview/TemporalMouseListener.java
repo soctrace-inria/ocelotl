@@ -194,11 +194,11 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	protected TimeRegion setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
 		// Since timestamps start and end of two adjacent time slice overlap,
 		// add 1 to the starting timestamp
-		long startTimeStamp = aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
+		long startTimeStamp = aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
 
 		// Since the timestamp of the last time slice goes further than the max
 		// timestamp of the trace, we must check that we are not over it
-		long endTimeStamp = Math.min(aggregatedView.getResetTime().getTimeStampEnd(), aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
+		long endTimeStamp = Math.min(aggregatedView.getResetTime().getTimeStampEnd(), aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
 
 		return new TimeRegion(startTimeStamp, endTimeStamp);
 	}
@@ -212,8 +212,8 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	 *         time slice
 	 */
 	protected Point getTimeSlices(TimeRegion aTimeRegion) {
-		int startingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampStart());
-		int endingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
+		int startingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampStart());
+		int endingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
 
 		return new Point(startingSlice, endingSlice);
 	}

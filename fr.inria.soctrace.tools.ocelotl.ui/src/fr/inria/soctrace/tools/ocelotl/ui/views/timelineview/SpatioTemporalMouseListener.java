@@ -30,7 +30,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 
 	protected Boolean						clickOnView			= false;
 	protected int							minDrawThreshold	= OcelotlConstants.MinimalHeightDrawingThreshold;
-	protected int							originY, cornerY;
+	protected int							originY, cornerY, originX;
 	protected boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
 
 	protected double						rootHeight;
@@ -181,7 +181,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			currentPoint = arg0.getLocation();
 			// Compute the timestamp on which we clicked
 			long p3 = (long) ((double) ((arg0.x - aggregatedView.getBorder()) * aggregatedView.getResetTime().getTimeDuration()) / (aggregatedView.getRoot().getSize().width() - 2 * aggregatedView.getBorder())) + aggregatedView.getResetTime().getTimeStampStart();
-			
+			originX = arg0.x;
+
 			// We are dragging horizontally by the left side
 			if (state == MouseState.H_MOVE_START) {
 				originY = aggregatedView.getSelectFigure().getBounds().y();
@@ -290,8 +291,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			// selected time slices
 			if (previous != MouseState.DRAG_LEFT_VERTICAL) {
 				// Get time slice numbers from the time slice manager
-				int startingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampStart());
-				int endingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampEnd());
+				int startingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampStart());
+				int endingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampEnd());
 
 				aggregatedView.setSelectTime(setTemporalSelection(startingSlice, endingSlice));
 			}
@@ -325,7 +326,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 */
 	protected void updateMeasurements() {
 		// Get the event producer hierarchy
-		spatioTemporalManager = (SpaceTimeAggregation2Manager) aggregatedView.getOcelotlView().getOcelotlCore().getLpaggregManager();
+		spatioTemporalManager = (SpaceTimeAggregation2Manager) aggregatedView.getOcelotlView().getCore().getLpaggregManager();
 		hierarchy = spatioTemporalManager.getHierarchy();
 
 		// Compute various height values
@@ -349,9 +350,17 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		if (selectedNode.getChildrenNodes().isEmpty()) {
 			selectedProducers.add(selectedNode.getParentNode().getMe());
 		}
-		
+
 		aggregatedView.setCurrentlySelectedNode(selectedNode);
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatialSelection(true);
+		while (selectedNode.getParentNode() != null) {
+			if (selectedNode.getParentNode().getWeight() == selectedNode.getWeight()) {
+				selectedNode = selectedNode.getParentNode();
+				selectedProducers.add(selectedNode.getMe());
+			} else {
+				break;
+			}
+		}
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 	}
 	
@@ -434,11 +443,13 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 */
 	protected SpatioTemporalAggregateView findAggregate(int x, int y) {
 		Point clickCoord = new Point(x, y);
+		Point clickCoord2 = new Point(originX, originY);
 		SpatioTemporalAggregateView selectedAggregate = null;
 
 		// Find the corresponding aggregate
 		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
-			if (aggreg.getAggregateZone().contains(clickCoord)) {
+			if (aggreg.getAggregateZone().contains(clickCoord) && 
+					aggreg.getAggregateZone().contains(clickCoord2)) {
 				selectedAggregate = aggreg;
 				break;
 			}

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Core
 Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.core;singleton:=true
-Bundle-Version: 1.1.3
+Bundle-Version: 1.1.4
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.core.Activator
 Bundle-Vendor: INRIA
 Require-Bundle: org.eclipse.ui,
@@ -18,12 +18,12 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: fr.inria.soctrace.tools.ocelotl.core,
+ fr.inria.soctrace.tools.ocelotl.core.caches,
  fr.inria.soctrace.tools.ocelotl.core.config,
  fr.inria.soctrace.tools.ocelotl.core.constants,
  fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager,
  fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime,
  fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.time,
- fr.inria.soctrace.tools.ocelotl.core.datacache,
  fr.inria.soctrace.tools.ocelotl.core.events,
  fr.inria.soctrace.tools.ocelotl.core.exceptions,
  fr.inria.soctrace.tools.ocelotl.core.idataaggregop,
@@ -42,5 +42,7 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.core,
 Import-Package: com.google.gson,
  fr.inria.soctrace.framesoc.ui.model,
  fr.inria.soctrace.framesoc.ui.utils,
+ org.apache.commons.io,
+ org.apache.commons.io.filefilter,
  org.eclipse.core.resources,
  org.eclipse.draw2d

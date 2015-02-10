@@ -215,6 +215,7 @@ public class TemporalProportionView extends TimeLineView {
 				label.getUpdateManager().performUpdate();
 				icon.getUpdateManager().performUpdate();
 			}
+			root.validate();
 		}
 
 		public void setIndex(final int index) {

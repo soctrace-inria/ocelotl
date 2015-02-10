@@ -77,7 +77,8 @@ public class OcelotlDefaultParameterConstants {
 	/**
 	 * Is the cache activated by default
 	 */
-	public static final boolean DEFAULT_CACHE_ACTIVATION = true;
+	public static final boolean DEFAULT_DATA_CACHE_ACTIVATION = true;
+	public static final boolean DEFAULT_DICHO_CACHE_ACTIVATION = true;
 
 	/**
 	 * Default cache policy
@@ -135,6 +136,9 @@ public class OcelotlDefaultParameterConstants {
 	
 	public static final boolean AGGREGATE_LEAVES = false;
 	public static final int MAX_NUMBER_OF_LEAVES = 10000;
+	
+	public static final boolean OVERVIEW_AGGREGATE_LEAVES = false;
+	public static final int OVERVIEW_MAX_NUMBER_OF_LEAVES = 100;
 
 	/**
 	 * Number of events loaded by thread
@@ -154,5 +158,9 @@ public class OcelotlDefaultParameterConstants {
 	
 	public static final int SNAPSHOT_DEFAULT_X_RESOLUTION = 1920;
 	public static final int SNAPSHOT_DEFAULT_Y_RESOLUTION = 1080;
+	public static final int YAXIS_DEFAULT_X_RESOLUTION = 100;
+	public static final int XAXIS_DEFAULT_Y_RESOLUTION = 100;
+	public static final int QUALCURVE_DEFAULT_X_RESOLUTION = 500;
+	public static final int QUALCURVE_DEFAULT_Y_RESOLUTION = 500;
 	
 }

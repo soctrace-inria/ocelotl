@@ -90,6 +90,7 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 			DrawPartition hp = new DrawPartition();
 			hp.draw();
 		}
+		root.validate();
 	}
 
 	@Override
@@ -99,6 +100,7 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 			DrawAggregate hp = new DrawAggregate();
 			hp.draw(aNode, start, end);
 		}
+		root.validate();
 	}
 
 	public class DrawAggregate extends DrawPartition {

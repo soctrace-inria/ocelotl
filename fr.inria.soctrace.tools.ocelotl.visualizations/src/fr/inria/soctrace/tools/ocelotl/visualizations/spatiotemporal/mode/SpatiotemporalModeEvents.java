@@ -101,6 +101,9 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 		double max = 0.0;
 		MainEvent maj = new MainEvent(Void, max);
 		for (String event : getEvents()) {
+			if(!getAllEvents().contains(event))
+				continue;
+			
 			double amp = 0.0;
 			// Compute the total presence of the event
 			for (int i = start; i < end; i++)

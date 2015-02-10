@@ -21,29 +21,24 @@ public class TemporalModeState extends TemporalMode {
 	@Override
 	public void computeMainStates() {
 		mainEvents = new HashMap<Integer, MainEvent>();
-		double max = 0.0;
+		double currentMax = 0.0;
 		double tempMax = 0.0;
 		MainEvent maj;
 		int index;
 
 		for (index = 0; index < parts.size(); index++) {
-			maj = new MainEvent("void", max);
+			maj = new MainEvent("void", currentMax);
 			tempMax = 0.0;
-			max = 0.0;
+			currentMax = 0.0;
 			for (String state : states) {
 				tempMax = ((PartMap) parts.get(index).getData()).getElements()
 						.get(state);
 				
-				double duration = (parts.get(index).getEndPart() - parts.get(
-						index).getStartPart())
-						* Long.valueOf(timeSliceDuration).doubleValue();
-				tempMax = tempMax
-						/ (duration * ocelotlCore.getOcelotlParameters()
-								.getCurrentProducers().size());
-
-				if (tempMax > max) {
+				tempMax = tempMax / max;
+				
+				if (tempMax > currentMax) {
 					maj = new MainEvent(state, tempMax);
-					max = tempMax;
+					currentMax = tempMax;
 				}
 			}
 			mainEvents.put(index, maj);
