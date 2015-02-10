@@ -575,6 +575,7 @@ public class DataCache {
 						+ " failed.");
 			}
 		}
+		checkForEmptyDirectories();
 		cachedData.clear();
 		currentCacheSize = 0L;
 	}
@@ -614,7 +615,6 @@ public class DataCache {
 							+ param.getEndTimestamp());
 				}
 			}
-			
 			computeCacheSize();
 		} else {
 			System.err.println("The provided cache directory ("
@@ -683,11 +683,22 @@ public class DataCache {
 			}
 		}
 
+		checkForEmptyDirectories();
+		
 		// Remove the deleted cache
 		for (CacheParameters aCache : deletedCache) {
 			cachedData.remove(aCache);
 		}
 
+		// Recompute the current cache size
+		computeCacheSize();
+	}
+	
+	/**
+	 * Check if there are empty directories in the cache directory, and if so,
+	 * delete them
+	 */
+	void checkForEmptyDirectories() {
 		// Check for empty directories
 		File workDir = new File(cacheDirectory);
 		if (workDir.exists()) {
@@ -703,9 +714,6 @@ public class DataCache {
 				}
 			}
 		}
-
-		// Recompute the current cache size
-		computeCacheSize();
 	}
 
 	/**

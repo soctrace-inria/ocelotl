@@ -149,6 +149,7 @@ public class OcelotlSettingsView extends Dialog {
 		public void widgetSelected(final SelectionEvent e) {
 			// Ask user confirmation
 			if (MessageDialog.openConfirm(getShell(), "Delete cached data", "This will delete all cached data and it cannot be cancelled. Do you want to continue ?"))
+				ocelotlView.getOcelotlParameters().getDichotomyCache().deleteCache();
 				ocelotlView.getOcelotlParameters().getDataCache().deleteCache();
 		}
 	}
@@ -226,18 +227,48 @@ public class OcelotlSettingsView extends Dialog {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			boolean cacheActivation = btnDataCacheEnabled.getSelection();
-
-			btnDeleteDataCache.setEnabled(cacheActivation);
-			datacacheDirectory.setEnabled(cacheActivation);
-			btnChangeCacheDirectory.setEnabled(cacheActivation);
 			btnRadioButton.setEnabled(cacheActivation);
 			btnRadioButton_1.setEnabled(cacheActivation);
 			btnRadioButton_2.setEnabled(cacheActivation);
 			btnRadioButton_3.setEnabled(cacheActivation);
 			cacheTimeSliceValue.setEnabled(cacheActivation);
-			dataCacheSize.setEnabled(cacheActivation);
 		}
 	}
+	
+	private class EnableOverviewListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			boolean overviewActivation = btnEnableOverview.getSelection();
+			
+			btnEditBgOverviewDisplay.setEnabled(overviewActivation);
+			btnEditFgOverviewDisplay.setEnabled(overviewActivation);
+			btnEditBgOverviewSelected.setEnabled(overviewActivation);
+			btnEditFgOverviewSelected.setEnabled(overviewActivation);
+			textOverviewDisplayAlpha.setEnabled(overviewActivation);
+			textOverviewSelectionAlpha.setEnabled(overviewActivation);
+			btnOverviewEnableLeavesAgg.setEnabled(overviewActivation);
+			btnOverviewEnableLeavesAgg.notifyListeners(SWT.Selection, new Event());
+		}
+	}
+
+	private class OverviewPreAggregListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			boolean preAggegActivation = btnOverviewEnableLeavesAgg.getSelection() && btnOverviewEnableLeavesAgg.getEnabled();
+
+			spinnerOverviewMaxAggLeaves.setEnabled(preAggegActivation);
+		}
+	}
+
+	private class PreAggregListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			boolean preAggegActivation = btnEnableLeavesAgg.getSelection();
+			
+			spinnerMaxAggLeaves.setEnabled(preAggegActivation);
+		}
+	}
+
 
 	private class EditColorSelection extends SelectionAdapter {
 		@Override
@@ -476,18 +507,16 @@ public class OcelotlSettingsView extends Dialog {
 		groupDataCacheSettings.setText("Caches Settings");
 		groupDataCacheSettings.setLayout(new GridLayout(3, false));
 
-		btnDataCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
-		btnDataCacheEnabled.setFont(cantarell8);
-		btnDataCacheEnabled.setText("Data Cache Enabled");
-		btnDataCacheEnabled.setSelection(settings.isDataCacheActivated());
-		btnDataCacheEnabled.addSelectionListener(new EnableCacheListener());
-
-		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
-		btnDeleteDataCache.setToolTipText("Empty Caches");
-		btnDeleteDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/delete_obj.gif"));
-		btnDeleteDataCache.setText("Empty Caches");
-		btnDeleteDataCache.setFont(cantarell8);
-		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
+		final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
+		lblDataCacheSize.setFont(cantarell8);
+		lblDataCacheSize.setText("MB Caches Size (-1=unlimited):");
+		
+		dataCacheSize = new Spinner(groupDataCacheSettings, SWT.BORDER);
+		dataCacheSize.setValues(0, -1, 99999999, 0, 1, 10);
+		dataCacheSize.setFont(cantarell8);
+		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_text.widthHint = 100;
+		dataCacheSize.setLayoutData(gd_text);
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
@@ -502,7 +531,7 @@ public class OcelotlSettingsView extends Dialog {
 		datacacheDirectory.setFont(cantarell8);
 		datacacheDirectory.setEditable(false);
 		datacacheDirectory.setText(ocelotlView.getOcelotlParameters().getDataCache().getCacheDirectory());
-
+		
 		btnChangeCacheDirectory = new Button(groupDataCacheSettings, SWT.PUSH);
 		btnChangeCacheDirectory.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		btnChangeCacheDirectory.setToolTipText("Change Caches Directory");
@@ -510,18 +539,23 @@ public class OcelotlSettingsView extends Dialog {
 		btnChangeCacheDirectory.setFont(cantarell8);
 		btnChangeCacheDirectory.addSelectionListener(new ModifyDatacacheDirectory());
 
-		final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
-		lblDataCacheSize.setFont(cantarell8);
-		lblDataCacheSize.setText("MB Caches Size (-1=unlimited):");
-
-		dataCacheSize = new Spinner(groupDataCacheSettings, SWT.BORDER);
-		dataCacheSize.setValues(0, -1, 99999999, 0, 1, 10);
-		dataCacheSize.setFont(cantarell8);
-		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_text.widthHint = 100;
-		dataCacheSize.setLayoutData(gd_text);
 		new Label(groupDataCacheSettings, SWT.NONE);
-
+		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
+		btnDeleteDataCache.setToolTipText("Empty Caches");
+		btnDeleteDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/delete_obj.gif"));
+		btnDeleteDataCache.setText("Empty Caches");
+		btnDeleteDataCache.setFont(cantarell8);
+		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		btnDataCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
+		btnDataCacheEnabled.setFont(cantarell8);
+		btnDataCacheEnabled.setText("Data Cache Enabled");
+		btnDataCacheEnabled.setSelection(settings.isDataCacheActivated());
+		btnDataCacheEnabled.addSelectionListener(new EnableCacheListener());
+		new Label(groupDataCacheSettings, SWT.NONE);
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
 		if (settings.getCacheSize() > 0) {
 			dataCacheSize.setSelection((int) (settings.getCacheSize() / 1000000));
 		} else {
@@ -646,6 +680,7 @@ public class OcelotlSettingsView extends Dialog {
 		btnEnableLeavesAgg.setFont(cantarell8);
 		btnEnableLeavesAgg.setSelection(settings.isAggregateLeaves());
 		btnEnableLeavesAgg.setText("Enable Leaves Aggregation");
+		btnEnableLeavesAgg.addSelectionListener(new PreAggregListener());
 		new Label(grpAggregateLeaves, SWT.NONE);
 
 		final Label lblAggLeaves = new Label(grpAggregateLeaves, SWT.NONE);
@@ -659,7 +694,8 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerMaxAggLeaves.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_AGGLEAVES);
 		spinnerMaxAggLeaves.setSelection(settings.getMaxNumberOfLeaves());
 		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1, 1 });
-
+		btnEnableLeavesAgg.notifyListeners(SWT.Selection, new Event());
+		
 		// Selection settings
 		final TabItem tbtSelectionSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtSelectionSettings.setText("Selection");
@@ -757,6 +793,7 @@ public class OcelotlSettingsView extends Dialog {
 		btnEnableOverview.setFont(cantarell8);
 		btnEnableOverview.setSelection(settings.isEnableOverview());
 		btnEnableOverview.setText("Display Overview");
+		btnEnableOverview.addSelectionListener(new EnableOverviewListener());
 		new Label(groupOverviewSettings, SWT.NONE);
 		
 		final Label lblBgDisplay = new Label(groupOverviewSettings, SWT.NONE);
@@ -829,6 +866,7 @@ public class OcelotlSettingsView extends Dialog {
 		btnOverviewEnableLeavesAgg.setFont(cantarell8);
 		btnOverviewEnableLeavesAgg.setSelection(settings.isOverviewAggregateLeaves());
 		btnOverviewEnableLeavesAgg.setText("Enable Leaves Aggregation for Overview");
+		btnOverviewEnableLeavesAgg.addSelectionListener(new OverviewPreAggregListener());
 		new Label(groupOverviewSettings, SWT.NONE);
 		
 		final Label lblOverviewAggLeaves = new Label(groupOverviewSettings, SWT.NONE);
@@ -841,7 +879,8 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerOverviewMaxAggLeaves.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_AGGLEAVES);
 		spinnerOverviewMaxAggLeaves.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_AGGLEAVES);
 		spinnerOverviewMaxAggLeaves.setSelection(settings.getOverviewMaxNumberOfLeaves());
-
+		btnEnableOverview.notifyListeners(SWT.Selection, new Event());
+		
 		// Snapshot settings
 		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtMiscSettings.setText("Snapshot");
