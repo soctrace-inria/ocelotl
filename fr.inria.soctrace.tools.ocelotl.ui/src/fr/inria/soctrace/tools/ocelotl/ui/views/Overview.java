@@ -83,6 +83,8 @@ public class Overview implements IFramesocBusListener {
 	private SelectFigure				selectedZone;
 	private int							Border				= 3;
 	private OverviewThread				overviewThread		= null;
+	// Used to control the overview computing thread
+	NullProgressMonitor					monitor;
 
 	/**
 	 * Followed topics
@@ -415,9 +417,9 @@ public class Overview implements IFramesocBusListener {
 
 	public void reset() {
 		if (overviewThread != null && overviewThread.isAlive()) {
-			overviewThread.interrupt();
+			monitor.setCanceled(true);
 		}
-			
+
 		overviewThread = null;
 		aggregManager = null;
 		displayedTimeRegion = null;
@@ -547,35 +549,35 @@ public class Overview implements IFramesocBusListener {
 
 				//Set the overview parameters with the current ocelotlParameters
 				updateOverviewParameters(ocelotlView.getOcelotlParameters());
-		
+				monitor = new NullProgressMonitor();
 				// Get a new micro model
 				microModel = ocelotlView.getCore().getMicromodelTypes().instantiateMicroModel(overviewParameters.getMicroModelType());
 
 				// Build the microscopic description
-				microModel.setOcelotlParameters(overviewParameters, new NullProgressMonitor());
-			    if (Thread.interrupted()) 
+				microModel.setOcelotlParameters(overviewParameters, monitor);
+			    if (monitor.isCanceled()) 
 			        return;
 			    
 				// Init the aggregation operator
 				aggregOperator = ocelotlView.getCore().getAggregOperators().instantiateOperator(ocelotlView.getOcelotlParameters().getOcelotlSettings().getOverviewAggregOperator());
-				aggregManager = aggregOperator.createManager(microModel, new NullProgressMonitor());
+				aggregManager = aggregOperator.createManager(microModel, monitor);
 				aggregManager.computeQualities();
-			    if (Thread.interrupted()) 
+				if (monitor.isCanceled()) 
 			        return;
 			    
 				aggregManager.computeDichotomy();
-			    if (Thread.interrupted()) 
+			    	if (monitor.isCanceled()) 
 			        return;
 			     
 				parameter = ocelotlView.getParameterPPolicy().computeInitialParameter(aggregManager, ocelotlView.getOcelotlParameters().getParameterPPolicy());
 
 				// Compute the view according to the new parameter value
 				aggregManager.computeParts(parameter);
-			    if (Thread.interrupted()) 
+				if (monitor.isCanceled()) 
 			        return;
 			    	    
 				visuOperator.initManager(ocelotlView.getCore(), aggregManager);
-			    if (Thread.interrupted()) 
+				if (monitor.isCanceled()) 
 			        return;
 			    
 				Display.getDefault().syncExec(new Runnable() {
@@ -585,7 +587,7 @@ public class Overview implements IFramesocBusListener {
 						displayedZone.draw(time, true);
 					}
 				});
-			    if (Thread.interrupted()) 
+				if (monitor.isCanceled()) 
 			        return;
 			     
 				redrawOverview = false;

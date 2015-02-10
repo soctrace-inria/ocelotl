@@ -360,6 +360,13 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 									}
 									return Status.CANCEL_STATUS;
 								}
+
+								// If overview is currently computed
+								if (ocelotlParameters.isOvervieweEnable() && overView.getOverviewThread() != null && overView.getOverviewThread().isAlive()) {
+									// cancel it
+									overView.reset();
+								}
+
 								monitor.setTaskName("Initializing Aggregation Operator");
 								ocelotlCore.initAggregOperator(monitor);
 								monitor.worked(1);

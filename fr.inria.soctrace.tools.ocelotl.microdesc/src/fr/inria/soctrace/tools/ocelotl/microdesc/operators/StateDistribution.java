@@ -165,6 +165,7 @@ public class StateDistribution extends Microscopic3DDescription {
 					.getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
+
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");
