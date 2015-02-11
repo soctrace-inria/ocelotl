@@ -229,7 +229,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			
 			// Compute highlight selection
 			Point heights = getSpatialSelectionCoordinates(selectedAggregate.getEventProducerNode());
-			aggregatedView.getHighLightAggregateFigure().draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y() - 1);
+			aggregatedView.getHighLightAggregateFigure().draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y());
 
 			// Trigger the display
 			selectedAggregate.display(aggregatedView.getOcelotlView());
@@ -300,7 +300,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			// If we are performing an horizontal drag then don't change the
 			// selected hierarchy
 			if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
-				SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
+				SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y, originX, originY);
 				if (selectedAggregate == null || !selectedAggregate.isVisualAggregate())
 					selectedNode = findEventProducerNode(arg0.y);
 				else
@@ -441,15 +441,39 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 *            y coordinate
 	 * @return the found aggregate, or null otherwise
 	 */
-	protected SpatioTemporalAggregateView findAggregate(int x, int y) {
-		Point clickCoord = new Point(x, y);
-		Point clickCoord2 = new Point(originX, originY);
+	protected SpatioTemporalAggregateView findAggregate(int xa, int ya, int xb, int yb) {
+		Point clickCoord = new Point(xa, ya);
+		Point clickCoord2 = new Point(xb, yb);
 		SpatioTemporalAggregateView selectedAggregate = null;
 
 		// Find the corresponding aggregate
 		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
 			if (aggreg.getAggregateZone().contains(clickCoord) && 
 					aggreg.getAggregateZone().contains(clickCoord2)) {
+				selectedAggregate = aggreg;
+				break;
+			}
+		}
+	
+		return selectedAggregate;
+	}
+	
+	/**
+	 * Find the aggregate in the corresponding coordinate
+	 * 
+	 * @param x
+	 *            x coordinate
+	 * @param y
+	 *            y coordinate
+	 * @return the found aggregate, or null otherwise
+	 */
+	protected SpatioTemporalAggregateView findAggregate(int x, int y) {
+		Point clickCoord = new Point(x, y);
+		SpatioTemporalAggregateView selectedAggregate = null;
+
+		// Find the corresponding aggregate
+		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
+			if (aggreg.getAggregateZone().contains(clickCoord)) {
 				selectedAggregate = aggreg;
 				break;
 			}
