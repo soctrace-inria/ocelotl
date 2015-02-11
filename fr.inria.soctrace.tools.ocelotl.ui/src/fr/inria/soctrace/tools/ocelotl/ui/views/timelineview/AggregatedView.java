@@ -53,7 +53,6 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected TimeRegion						potentialSelectTime;
 	protected TimeRegion						resetTime;
 	protected int								aBorder				= 10;
-	protected final int							space				= 3;
 	protected final OcelotlView					ocelotlView;
 	protected SelectFigure						selectFigure;
 	protected SelectFigure						highLightAggregateFigure;
@@ -63,6 +62,7 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected OcelotlMouseListener				mouse;
 	protected String							unit;
 	protected List<SpatioTemporalAggregateView>	aggregates;
+	public static final int						space				= 3;
 	public static Color							selectColorFG		= ColorConstants.white;
 	public static Color							selectColorBG		= ColorConstants.blue;
 	public static Color							potentialColorFG	= ColorConstants.darkBlue;

@@ -14,7 +14,6 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -78,8 +77,7 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
-		if (shell != null)
-			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		setShellCursor(SWT.CURSOR_ARROW);
 		
 		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.EXITED) {
 			state = MouseState.EXITED;
@@ -97,13 +95,13 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 		if (aggregatedView.getSelectFigure() != null && aggregatedView.getRoot().getChildren().contains(aggregatedView.getSelectFigure()))
 			if (Math.abs(aggregatedView.getSelectFigure().getBounds().x - arg0.x) < Threshold) {
 				state = MouseState.H_MOVE_START;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+				setShellCursor(SWT.CURSOR_SIZEWE);
 			} else if (Math.abs(aggregatedView.getSelectFigure().getBounds().x + aggregatedView.getSelectFigure().getBounds().width - arg0.x) < Threshold) {
 				state = MouseState.H_MOVE_END;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+				setShellCursor(SWT.CURSOR_SIZEWE);
 			} else {
 				state = MouseState.RELEASED;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+				setShellCursor(SWT.CURSOR_ARROW);
 			}
 	}
 
@@ -151,7 +149,8 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
 
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		setShellCursor(SWT.CURSOR_ARROW);
+		
 		if (state == MouseState.DRAG_LEFT || state == MouseState.DRAG_LEFT_START)
 			mouseDragged(arg0);
 		

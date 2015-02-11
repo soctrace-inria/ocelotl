@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Cursor;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
@@ -101,7 +100,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		setShellCursor(SWT.CURSOR_ARROW);
 		
 		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.V_MOVE_END && state != MouseState.V_MOVE_START && state != MouseState.EXITED) {
 			previous = state;
@@ -119,23 +118,23 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		// If we are close to one vertical edge
 		if (closeToVStart) {
 			state = MouseState.H_MOVE_START;
-			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+			setShellCursor(SWT.CURSOR_SIZEWE);
 			// Or the other vertical edge
 		} else if (closeToVEnd) {
 			state = MouseState.H_MOVE_END;
-			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+			setShellCursor(SWT.CURSOR_SIZEWE);
 		} else if (closeToHStart) {
 			state = MouseState.V_MOVE_START;
-			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZENS));
+			setShellCursor(SWT.CURSOR_SIZENS);
 		} else if (closeToHEnd) {
 			state = MouseState.V_MOVE_END;
-			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZENS));
+			setShellCursor(SWT.CURSOR_SIZENS);
 		} else {
 			if (state != MouseState.PRESSED_LEFT) {
 				state = MouseState.RELEASED;
 			}
 			
-			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+			setShellCursor(SWT.CURSOR_ARROW);
 		}
 	}
 	
@@ -271,8 +270,10 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		// If left click or arriving through an exit event
 		// and if the released correspond to an action actually started in the view
 		if ((arg0.button == 1 || state == MouseState.EXITED) && clickOnView) {
+			
 			// Reset to normal cursor
-			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+			setShellCursor(SWT.CURSOR_ARROW);
+			
 			clickOnView = false;
 			
 			// Remove the potential selection figure

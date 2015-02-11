@@ -2,7 +2,7 @@
 <feature
       id="fr.inria.soctrace.tools.ocelotl.feature"
       label="Ocelotl"
-      version="1.1.4"
+      version="1.1.5"
       provider-name="INRIA"
       plugin="fr.inria.soctrace.tools.ocelotl.brand"
       os="linux,win32"
@@ -88,7 +88,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="fr.inria.lpaggreg" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.slf4j.api"/>
-      <import feature="fr.inria.soctrace.features.framesoc" version="1.1.4.qualifier"/>
+      <import feature="fr.inria.soctrace.features.framesoc" version="1.1.5.qualifier"/>
       <import plugin="fr.inria.soctrace.tools.ocelotl.slf4j" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="fr.inria.soctrace.tools.ocelotl.json" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.io"/>

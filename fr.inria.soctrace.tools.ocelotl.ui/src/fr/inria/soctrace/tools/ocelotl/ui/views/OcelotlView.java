@@ -1078,13 +1078,6 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 		textRun.setText(String.valueOf(OcelotlDefaultParameterConstants.RunParameter));
 	}
 
-	@Override
-	public void dispose() {
-		topics.unregisterAll();
-		super.dispose();
-	}
-
-
 	protected TraceIntervalDescriptor getIntervalDescriptor() {
 		if (confDataLoader.getCurrentTrace() == null)
 			return null;
