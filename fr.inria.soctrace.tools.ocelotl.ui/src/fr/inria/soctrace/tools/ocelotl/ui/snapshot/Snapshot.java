@@ -118,10 +118,11 @@ public class Snapshot {
 		AggregatedView mainView = (AggregatedView) mainViewManager.create();
 		mainViewWrapper.setView(mainView);
 		mainView.createDiagram(theView.getCore().getLpaggregManager(), theView.getOcelotlParameters().getTimeRegion(),  theView.getCore().getVisuOperator());
-		mainView.getSelectFigure().draw(theView.getTimeRegion(), -1, -1);
-		mainView.setSelectTime(((AggregatedView) theView.getTimeLineView()).getSelectTime());
-		mainView.setCurrentlySelectedNode(((AggregatedView) theView.getTimeLineView()).getCurrentlySelectedNode());
-		mainView.drawSelection();
+		//mainView.getSelectFigure().draw(theView.getTimeRegion(), -1, -1);
+		//mainView.setSelectTime(((AggregatedView) theView.getTimeLineView()).getSelectTime());
+		//mainView.setCurrentlySelectedNode(((AggregatedView) theView.getTimeLineView()).getCurrentlySelectedNode());
+		//mainView.drawSelection();
+		//TODO does not work well, commented
 		compositeMainView.layout();
 		
 		createSnapshotFor(mainView.getRoot(), dirPath + "/diagram.png");
@@ -169,11 +170,11 @@ public class Snapshot {
 		aTimeAxisView.initDiagram(compositeOverview);
 		// If the selected time region is identical to the whole displayed time
 		// region
-		if (theView.getOcelotlParameters().getTimeRegion().compareTimeRegion(theView.getTimeRegion()))
+//		if (theView.getOcelotlParameters().getTimeRegion().compareTimeRegion(theView.getTimeRegion()))
 			// Do not draw the selection
 			aTimeAxisView.createDiagram(theView.getOcelotlParameters().getTimeRegion());
-		else
-			aTimeAxisView.createDiagram(theView.getOcelotlParameters().getTimeRegion(), theView.getTimeRegion(), false);
+//		else
+//			aTimeAxisView.createDiagram(theView.getOcelotlParameters().getTimeRegion(), theView.getTimeRegion(), false);
 		
 		compositeOverview.layout();
 		createSnapshotFor(aTimeAxisView.getRoot(), dirPath + "/XAxis.png");
@@ -194,13 +195,13 @@ public class Snapshot {
 		UnitAxisView unitAxisView = aUnitAxisManager.create();
 		aUnitAxisWrapper.setView(unitAxisView);
 		unitAxisView.createDiagram(theView.getCore().getVisuOperator());
-		unitAxisView.select(theView.getUnitAxisView().getOriginY(), theView.getUnitAxisView().getCornerY(), true);
+		//unitAxisView.select(theView.getUnitAxisView().getOriginY(), theView.getUnitAxisView().getCornerY(), true);
 		compositeUnitAxis.layout();
 		createSnapshotFor(unitAxisView.getRoot(), dirPath + "/YAxis.png");
 
 		// Reupdate with the current timeline view in order to reset back to
 		// correct selection values
-		theView.getTimeLineView().drawSelection();
+		//theView.getTimeLineView().drawSelection();
 	}
 
 	/**
@@ -249,6 +250,7 @@ public class Snapshot {
 				break;
 			}
 		}
+		//TODO does not work, return always 0
 
 		StringBuffer output = new StringBuffer();
 		output.append("Trace name: ");
@@ -430,6 +432,7 @@ public class Snapshot {
 	 */
 	public boolean isTemporalAggregator() {
 		return theView.getCore().getAggregOperators().getSelectedOperatorResource().getName().equals("Temporal Aggregation");
+		//TODO !!!!!!!! make that generic!
 	}
 
 	/**
