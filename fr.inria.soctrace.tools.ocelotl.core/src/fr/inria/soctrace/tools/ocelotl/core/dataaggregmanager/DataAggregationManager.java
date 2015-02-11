@@ -97,7 +97,6 @@ public abstract class DataAggregationManager {
 				parameters.add(Double.valueOf(values[0]));
 				qualities.add(new DLPQuality(Double.valueOf(values[1]), Double
 						.valueOf(values[2])));
-
 			}
 			bufFileReader.close();
 		} catch (FileNotFoundException e) {

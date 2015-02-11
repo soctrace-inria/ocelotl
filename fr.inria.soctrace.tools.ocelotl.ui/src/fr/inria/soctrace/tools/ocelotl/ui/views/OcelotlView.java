@@ -72,7 +72,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
-import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
 import fr.inria.soctrace.framesoc.ui.model.GanttTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.HistogramTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.PieTraceIntervalAction;
@@ -113,7 +112,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisViewWrapper
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class OcelotlView extends FramesocPart implements IFramesocBusListener {
+public class OcelotlView extends FramesocPart {
 
 	private class SaveDataListener extends SelectionAdapter {
 
@@ -956,7 +955,7 @@ public class OcelotlView extends FramesocPart implements IFramesocBusListener {
 				break;
 			case SWT.KEYPAD_CR:
 			case SWT.CR:
-				if (!e.widget.isListening(e.type))
+				if (!e.widget.isListening(e.type) && !btnRun.isDisposed())
 					btnRun.notifyListeners(SWT.Selection, new Event());
 				break;
 			case SWT.ESC:

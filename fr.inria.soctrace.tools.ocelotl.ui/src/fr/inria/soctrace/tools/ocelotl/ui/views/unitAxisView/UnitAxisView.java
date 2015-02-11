@@ -195,6 +195,7 @@ abstract public class UnitAxisView {
 	
 	public void deleteDiagram() {
 		root.removeAll();
+		unselect();
 		root.repaint();
 	}
 

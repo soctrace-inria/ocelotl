@@ -210,6 +210,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		root.removeAll();
 		figures.clear();
 		root.repaint();
+		deleteSelectFigure();
 	}
 	
 	@Override

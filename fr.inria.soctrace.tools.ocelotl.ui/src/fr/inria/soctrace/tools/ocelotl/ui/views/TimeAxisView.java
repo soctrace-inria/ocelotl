@@ -111,6 +111,7 @@ public class TimeAxisView {
 		}
 		root.validate();
 		canvas.update();
+		unselect();
 	}
 
 	public void createDiagram(final TimeRegion time, final TimeRegion timeRegion, final boolean active) {
