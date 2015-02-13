@@ -366,6 +366,8 @@ public class OcelotlSettingsView extends Dialog {
 	private class SaveSettingsListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
+			MessageDialog.openInformation(getShell(), "Settings saved", "Settings were saved as default Ocelolt settings.");
+
 			setSettings();
 			settings.saveSettings();
 		}

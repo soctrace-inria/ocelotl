@@ -29,4 +29,6 @@ public interface IVisuOperator {
 	public void setOcelotlCore(OcelotlCore ocelotlCore);
 
 	public void initManager(OcelotlCore ocelotlCore, IDataAggregManager aManager);
+	
+	public double getMaxValue();
 }

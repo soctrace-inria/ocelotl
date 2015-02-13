@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 
 import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
-import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuTOperator;
 import fr.inria.soctrace.tools.ocelotl.core.utils.FilenameValidator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.QualityView;
@@ -122,7 +121,6 @@ public class Snapshot {
 		mainView.setSelectTime(((AggregatedView) theView.getTimeLineView()).getSelectTime());
 		mainView.setCurrentlySelectedNode(((AggregatedView) theView.getTimeLineView()).getCurrentlySelectedNode());
 		mainView.drawSelection();
-		//TODO does not work well, commented
 		compositeMainView.layout();
 		
 		createSnapshotFor(mainView.getRoot(), dirPath + "/diagram.png");
@@ -273,9 +271,9 @@ public class Snapshot {
 		output.append(theView.getOcelotlParameters().getVisuOperator());
 		output.append("\nStatistics Operator: ");
 		output.append(theView.getOcelotlParameters().getStatOperator());
-		if (isTemporalAggregator()) {
+		if (theView.getCore().getVisuOperator().getMaxValue() > 0) {
 			output.append("\nMax Amplitude Value: ");
-			output.append(((VisuTOperator) theView.getCore().getVisuOperator()).getMaxValue());
+			output.append(theView.getCore().getVisuOperator().getMaxValue());
 		}
 		output.append("\nParameter: ");
 		output.append(theView.getOcelotlParameters().getParameter());
@@ -423,16 +421,6 @@ public class Snapshot {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Check if the current aggregation operator is temporal
-	 * 
-	 * @return true if it is temporal, false otherwise
-	 */
-	public boolean isTemporalAggregator() {
-		return theView.getCore().getAggregOperators().getSelectedOperatorResource().getName().equals("Temporal Aggregation");
-		//TODO !!!!!!!! make that generic!
 	}
 
 	/**

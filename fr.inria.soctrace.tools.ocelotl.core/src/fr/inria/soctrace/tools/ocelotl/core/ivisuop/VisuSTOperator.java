@@ -99,5 +99,9 @@ abstract public class VisuSTOperator implements IVisuSTOperator {
 		initParts();
 		computeParts();
 	}
+	
+	public double getMaxValue(){
+		return -1.0;
+	}
 
 }

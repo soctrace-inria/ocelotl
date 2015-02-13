@@ -111,6 +111,6 @@ abstract public class VisuTOperator implements IVisuTOperator {
 	}
 
 	public double getMaxValue(){
-		return 0.0;
+		return -1.0;
 	}
 }

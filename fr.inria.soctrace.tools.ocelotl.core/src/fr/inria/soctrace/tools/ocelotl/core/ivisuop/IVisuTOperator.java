@@ -26,6 +26,4 @@ public interface IVisuTOperator extends IVisuOperator {
 	public int getPartNumber();
 
 	public int getSliceNumber();
-	
-	public double getMaxValue();
 }
