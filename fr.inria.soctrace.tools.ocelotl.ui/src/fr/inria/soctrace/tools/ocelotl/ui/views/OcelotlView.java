@@ -494,6 +494,7 @@ public class OcelotlView extends FramesocPart {
 
 			// Get the available aggregation operators
 			comboDimension.setEnabled(true);
+			String previousDimensionValue = comboDimension.getText();
 			comboDimension.removeAll();
 
 			for (final String op : ocelotlCore.getAggregOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
@@ -502,8 +503,19 @@ public class OcelotlView extends FramesocPart {
 
 			comboDimension.setText("");
 			if (comboDimension.getItems().length != 0) {
-				// Items are sorted according to the selection priority
-				comboDimension.setText(comboDimension.getItem(0));
+				boolean foundPreviousValue = false;
+
+				for (String aType : comboDimension.getItems()) {
+					if (aType.equals(previousDimensionValue)) {
+						comboDimension.setText(aType);
+						foundPreviousValue = true;
+					}
+				}
+
+				if (!foundPreviousValue)
+					// Items are sorted according to the selection priority
+					comboDimension.setText(comboDimension.getItem(0));
+
 				// Set the selected operator as operator in Ocelotl
 				comboDimension.notifyListeners(SWT.Selection, new Event());
 			}
@@ -536,6 +548,7 @@ public class OcelotlView extends FramesocPart {
 			}
 			
 			comboVisu.setEnabled(true);
+			String previousVisuValue = comboVisu.getText();
 			comboVisu.removeAll();
 
 			comboStatistics.setEnabled(true);
@@ -560,7 +573,18 @@ public class OcelotlView extends FramesocPart {
 			// Since the operators are sorted by priority, set the default
 			// choice to the first item
 			if (comboVisu.getItems().length != 0) {
-				comboVisu.setText(comboVisu.getItem(0));
+				boolean foundPreviousValue = false;
+
+				for (String aType : comboVisu.getItems()) {
+					if (aType.equals(previousVisuValue)) {
+						comboVisu.setText(aType);
+						foundPreviousValue = true;
+					}
+				}
+
+				if (!foundPreviousValue)
+					comboVisu.setText(comboVisu.getItem(0));
+				
 				// Set the selected operator as operator in Ocelotl
 				comboVisu.notifyListeners(SWT.Selection, new Event());
 			}
@@ -865,9 +889,6 @@ public class OcelotlView extends FramesocPart {
 		public void widgetSelected(final SelectionEvent e) {
 			trace = traceMap.get(comboTraces.getSelectionIndex());
 			final String title = "Loading Trace";
-			comboType.removeAll();
-			comboDimension.removeAll();
-			comboVisu.removeAll();
 			btnRun.setEnabled(false);
 			overView.reset();
 			
@@ -898,20 +919,33 @@ public class OcelotlView extends FramesocPart {
 								textDisplayedStart.setText(textTimestampStart.getText());
 								textDisplayedEnd.setText(textTimestampEnd.getText());
 								comboType.setEnabled(true);
+								String previousTypeValue = comboType.getText();
 								comboType.removeAll();
 								ocelotlParameters.setTrace(confDataLoader.getCurrentTrace());
 								
 								for (final String type : ocelotlCore.getMicromodelTypes().getTypes(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
 									comboType.add(type);
 								}
+								
 								// Since the types are sorted by priority, set
 								// the default choice to the first item
 								if (comboType.getItems().length != 0) {
-									comboType.setText(comboType.getItem(0));
+									boolean foundPreviousValue = false;
+
+									for (String aType : comboType.getItems()) {
+										if (aType.equals(previousTypeValue)) {
+											comboType.setText(aType);
+											foundPreviousValue = true;
+										}
+									}
+
+									if (!foundPreviousValue)
+										comboType.setText(comboType.getItem(0));
+
 									// Set the selected type as operator in
 									// Ocelotl
 									comboType.notifyListeners(SWT.Selection, new Event());
-								}
+								}	
 							}
 						});
 					} catch (final Exception e) {
