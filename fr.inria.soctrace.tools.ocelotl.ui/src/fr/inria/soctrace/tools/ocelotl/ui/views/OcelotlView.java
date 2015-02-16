@@ -335,6 +335,7 @@ public class OcelotlView extends FramesocPart {
 
 				// else we are starting a job
 				running = true;
+				enableButton(false);
 			}
 
 			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER)
@@ -353,12 +354,8 @@ public class OcelotlView extends FramesocPart {
 					try {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
-								if (monitor.isCanceled()) {
-									synchronized (lock) {
-										running = false;
-									}
+								if (checkMonitor(monitor))
 									return Status.CANCEL_STATUS;
-								}
 
 								// If overview is currently computed
 								if (ocelotlParameters.isOvervieweEnable() && overView.getOverviewThread() != null && overView.getOverviewThread().isAlive()) {
@@ -371,24 +368,18 @@ public class OcelotlView extends FramesocPart {
 								monitor.worked(1);
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
-								if (monitor.isCanceled()) {
-									synchronized (lock) {
-										running = false;
-									}
+								if (checkMonitor(monitor))
 									return Status.CANCEL_STATUS;
-								}
+
 								monitor.setTaskName("Aggregation (1/3)");
 								monitor.subTask("Computing Qualities...");
 								ocelotlCore.computeQualities();
 								monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents());
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE || hasChanged == HasChanged.THRESHOLD) {
-								if (monitor.isCanceled()) {
-									synchronized (lock) {
-										running = false;
-									}
+								if (checkMonitor(monitor))
 									return Status.CANCEL_STATUS;
-								}
+
 								monitor.setTaskName("Aggregation (2/3)");
 								monitor.subTask("Computing Dichotomy...");
 								ocelotlCore.computeDichotomy();
@@ -400,12 +391,9 @@ public class OcelotlView extends FramesocPart {
 						}
 
 						hasChanged = HasChanged.PARAMETER;
-						if (monitor.isCanceled()) {
-							synchronized (lock) {
-								running = false;
-							}
+						if (checkMonitor(monitor))
 							return Status.CANCEL_STATUS;
-						}
+						
 						monitor.setTaskName("Aggregation (3/3)");
 						monitor.subTask("Computing Parts...");
 
@@ -420,11 +408,17 @@ public class OcelotlView extends FramesocPart {
 							public void run() {
 								hasChanged = HasChanged.ALL;
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+								if(e.getMessage().equals(OcelotlException.NO_EVENTS)) {
+									// Reset selection
+									btnReset.notifyListeners(SWT.Selection, new Event());
+									// End this run
+									endRun();
+									// Launch another one
+									btnRun.notifyListeners(SWT.Selection, new Event());
+								}
 							}
 						});
-						synchronized (lock) {
-							running = false;
-						}
+						endRun();
 						return Status.CANCEL_STATUS;
 					}
 					Display.getDefault().syncExec(new Runnable() {
@@ -472,14 +466,53 @@ public class OcelotlView extends FramesocPart {
 						}
 					});
 					
-					synchronized (lock) {
-						running = false;
-					}
+					endRun();
 					return Status.OK_STATUS;
 				}
 			};
 			job.setUser(true);
 			job.schedule();
+		}
+
+		/**
+		 * Check the monitor state
+		 * 
+		 * @param monitor
+		 * @return true if the monitor is cancelled, false otherwise
+		 */
+		private boolean checkMonitor(IProgressMonitor monitor) {
+			if (monitor.isCanceled())
+				endRun();
+
+			return monitor.isCanceled();
+		}
+
+		/**
+		 * Perform a series of operations necessary when a run has ended
+		 */
+		private void endRun() {
+			// Release the lock
+			synchronized (lock) {
+				running = false;
+			}
+			// Re-enable the GUI
+			enableButton(true);
+		}
+
+		/**
+		 * Set the enable state of interface components
+		 * 
+		 * @param enabled
+		 *            boolean specifying the states of the components
+		 */
+		private void enableButton(boolean enabled) {
+			final boolean enableButtons = enabled;
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					setButtonState(enableButtons);
+				}
+			});
 		}
 	}
 
@@ -1027,6 +1060,7 @@ public class OcelotlView extends FramesocPart {
 	private Button						buttonDown;
 	private Button						buttonUp;
 	private Button						btnSaveDataCache;
+	private Button						btnLoadDataCache;
 	private Combo						comboVisu;
 	private final TimeLineViewManager	timeLineViewManager;
 	private final UnitAxisViewManager	unitAxisViewManager;
@@ -1166,7 +1200,7 @@ public class OcelotlView extends FramesocPart {
 		 				comboTraces.addSelectionListener(new TraceAdapter());
 		 				comboTraces.setToolTipText("Trace Selection");
 		 		
-		 				Button btnLoadDataCache = new Button(groupTraces, SWT.NONE);
+		 				btnLoadDataCache = new Button(groupTraces, SWT.NONE);
 		 				btnLoadDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/etool16/import_wiz.gif"));
 		 				btnLoadDataCache.setToolTipText("Load a Microscopic Description");
 		 				btnLoadDataCache.setFont(SWTResourceManager.getFont("Cantarell", 7, SWT.NORMAL));
@@ -1937,6 +1971,37 @@ public class OcelotlView extends FramesocPart {
 		}
 
 		statusLineManager.update(true);
+	}
+
+	/**
+	 * Enable and disable GUI components according to the given value
+	 * 
+	 * @param enabled
+	 *            specifies if components should be enabled
+	 */
+	private void setButtonState(boolean enabled) {
+		comboTraces.setEnabled(enabled);
+		comboType.setEnabled(enabled);
+		comboDimension.setEnabled(enabled);
+		comboVisu.setEnabled(enabled);
+		comboStatistics.setEnabled(enabled);
+		btnRun.setEnabled(enabled);
+		snapshotAction.setEnabled(enabled);
+		btnNextZoom.setEnabled(enabled);
+		btnPrevZoom.setEnabled(enabled);
+		btnReset.setEnabled(enabled);
+		btnSaveDataCache.setEnabled(enabled);
+		btnLoadDataCache.setEnabled(enabled);
+		btnSettings.setEnabled(enabled);
+		btnSettings2.setEnabled(enabled);
+		buttonCancelSelection.setEnabled(enabled);
+		buttonDown.setEnabled(enabled);
+		buttonUp.setEnabled(enabled);
+		buttonHome.setEnabled(enabled);
+		spinnerTSNumber.setEnabled(enabled);
+		textTimestampEnd.setEnabled(enabled);
+		textTimestampStart.setEnabled(enabled);
+		textRun.setEnabled(enabled);
 	}
 
 	@Override

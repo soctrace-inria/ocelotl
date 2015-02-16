@@ -97,6 +97,7 @@ public class ProportionAxisView extends UnitAxisView {
 		if (maxValue > 0.0) {
 			drawMainLine();
 			drawGrads();
+			resizeAxis();
 		}
 		canvas.update();
 		root.validate();
@@ -324,13 +325,14 @@ public class ProportionAxisView extends UnitAxisView {
 	 */
 	protected void resizeAxis() {
 		int minSize = labelMaxWidth + TextPositionOffset + (areaWidth - mainLineXPosition);
-		if (minSize > areaWidth) {
-			ocelotlView.getMainViewTopSashform().setWeights(
-					new int[] {
-							minSize,
-							ocelotlView.getMainViewTopSashform().getSize().x
-									- minSize });
-		}
+
+		if(areaWidth < minSize && (ocelotlView.getMainViewTopSashform().getSize().x
+				- minSize > 0))
+		ocelotlView.getMainViewTopSashform().setWeights(
+				new int[] {
+						minSize,
+						ocelotlView.getMainViewTopSashform().getSize().x
+								- minSize });
 	}
 
 	@Override

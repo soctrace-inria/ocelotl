@@ -233,7 +233,7 @@ public abstract class DataAggregationManager {
 		}
 
 		if (ocelotlParameters.getTraceTypeConfig().getTypes().size() != ocelotlParameters
-				.getUnfilteredEventProducers().size()) {
+				.getAllEventTypes().size()) {
 			logger.debug("At least one event type is filtered: dichotomy cache will not be used/generated.");
 			return false;
 		}
