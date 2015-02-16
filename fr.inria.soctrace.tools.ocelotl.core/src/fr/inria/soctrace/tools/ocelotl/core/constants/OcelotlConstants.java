@@ -137,4 +137,6 @@ public class OcelotlConstants {
 	public static final String JSONMainDisplayFgColor = "mainDisplayFgColor";
 	public static final String JSONMainDisplayBgColor = "mainDisplayBgColor";
 	public static final String JSONMainDisplayAlpha = "mainDisplayAlpha";	
+	
+	public static final String JSONUseVisualAggregate = "useVisualAggregate";
 }

@@ -138,10 +138,14 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 							((VisualAggregation) p.getData()).getValue(), epn, false, false);
 				else {
 					boolean aggy = false;
-					for (EventProducerNode ep : epn.getChildrenNodes()) {
-						if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
-							aggy = true;
-							break;
+					
+					if (ocelotlView.getOcelotlParameters().getOcelotlSettings()
+							.isUseVisualAggregate()) {
+						for (EventProducerNode ep : epn.getChildrenNodes()) {
+							if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
+								aggy = true;
+								break;
+							}
 						}
 					}
 					if (aggy == false)

@@ -154,13 +154,16 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 					// Check for each child that we have enough vertical space
 					// to display them
 					boolean aggy = false;
-					for (EventProducerNode ep : epn.getChildrenNodes()) {
-						// if the space needed to print an element is smaller
-						// than 1 pixel
-						if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
-							// Aggregate
-							aggy = true;
-							break;
+					if (ocelotlView.getOcelotlParameters().getOcelotlSettings()
+							.isUseVisualAggregate()) {
+						for (EventProducerNode ep : epn.getChildrenNodes()) {
+							// if the space needed to print an element is
+							// smaller than 1 pixel
+							if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
+								// Aggregate
+								aggy = true;
+								break;
+							}
 						}
 					}
 					// If enough space

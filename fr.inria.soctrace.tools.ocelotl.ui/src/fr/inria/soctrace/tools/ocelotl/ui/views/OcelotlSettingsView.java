@@ -110,6 +110,7 @@ public class OcelotlSettingsView extends Dialog {
 	private Spinner								textMainDisplayAlpha;
 	private Spinner								textMainSelectionAlpha;
 	private Button								saveSettingsButton;
+	private Button								btnEnableVisualAggregation;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -492,10 +493,24 @@ public class OcelotlSettingsView extends Dialog {
 		GridData gd_parameterPStrategy = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		parameterPStrategy.setLayoutData(gd_parameterPStrategy);
 		parameterPStrategy.setFont(cantarell8);
-		parameterPStrategy.setToolTipText("Parameter Default vValue Strategy");
-			
-		sashFormAdvancedParameters.setWeights(new int[] { 2, 1 });
+		parameterPStrategy.setToolTipText("Parameter Default Value Strategy");
 		
+		final SashForm sashFormVisualAggregate = new SashForm(sashFormAdvancedParameters, SWT.VERTICAL);
+		sashFormVisualAggregate.setFont(cantarell8);
+		
+		final Group groupVisualAggregate = new Group(sashFormVisualAggregate, SWT.NONE);
+		groupVisualAggregate.setFont(cantarell8);
+		groupVisualAggregate.setText("Visual Aggregation");
+		groupVisualAggregate.setLayout(new GridLayout(2, false));
+		
+		btnEnableVisualAggregation = new Button(groupVisualAggregate, SWT.CHECK);
+		btnEnableVisualAggregation.setText("Enable Visual Aggregation");
+		btnEnableVisualAggregation.setSelection(settings.isUseVisualAggregate());
+		btnEnableVisualAggregation.setFont(cantarell8);
+		btnEnableVisualAggregation.setToolTipText("Aggregate Producers that Are Too Small to Display");
+			
+		sashFormAdvancedParameters.setWeights(new int[] { 2, 1, 1 });
+				
 		// Datacache settings
 		final TabItem tbtmOcelotlSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtmOcelotlSettings.setText("Cache");
@@ -1057,6 +1072,8 @@ public class OcelotlSettingsView extends Dialog {
 
 		if (hasChangedAll)
 			ocelotlView.setHasChanged(HasChanged.ALL);
+		
+		settings.setUseVisualAggregate(btnEnableVisualAggregation.getSelection());
 		
 		// Curve settings
 		modifyThreshold();

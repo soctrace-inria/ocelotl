@@ -81,11 +81,13 @@ public class OcelotlSettings {
 	private int mainDisplayAlphaValue;
 	
 	private ParameterPPolicy parameterPPolicy;
+	
 	private boolean aggregateLeaves;
 	private int maxNumberOfLeaves;
-	
 	private boolean overviewAggregateLeaves;
 	private int overviewMaxNumberOfLeaves;
+	
+	private boolean useVisualAggregate;
 	
 	// Default directory where the config file is
 	private String defaultConfigFile;
@@ -156,6 +158,7 @@ public class OcelotlSettings {
 		
 		overviewAggregateLeaves = OcelotlDefaultParameterConstants.OVERVIEW_AGGREGATE_LEAVES;
 		overviewMaxNumberOfLeaves = OcelotlDefaultParameterConstants.OVERVIEW_MAX_NUMBER_OF_LEAVES;
+		useVisualAggregate = OcelotlDefaultParameterConstants.USE_VISUAL_AGGREGATE;
 	}
 	
 	/**
@@ -270,6 +273,8 @@ public class OcelotlSettings {
 				setOverviewMaxNumberOfLeaves(theConf.get(
 						OcelotlConstants.JSONOverviewMaxNumberOfLeaves)
 						.getAsInt());
+				setUseVisualAggregate(theConf.get(
+						OcelotlConstants.JSONUseVisualAggregate).getAsBoolean());
 
 				logger.debug("Settings values:\n");
 				logger.debug("Cache activated: " + dataCacheActivated);
@@ -286,7 +291,7 @@ public class OcelotlSettings {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (JsonParseException | NullPointerException e) {
-				logger.error("Incomplete or invalid JSON configuration file: the file will be regenerated with default values will be used");
+				logger.error("Incomplete or invalid JSON configuration file: the file will be regenerated with default values");
 				// Regenerate the configuration file with the default values
 				saveSettings();
 			}
@@ -382,6 +387,8 @@ public class OcelotlSettings {
 				overviewAggregateLeaves);
 		theConfig.addProperty(OcelotlConstants.JSONOverviewMaxNumberOfLeaves,
 				overviewMaxNumberOfLeaves);
+		theConfig.addProperty(OcelotlConstants.JSONUseVisualAggregate,
+				useVisualAggregate);
 		
 		String newSettings = gson.toJson(theConfig);
 
@@ -754,5 +761,13 @@ public class OcelotlSettings {
 
 	public void setOverviewMaxNumberOfLeaves(int overviewMaxNumberOfLeaves) {
 		this.overviewMaxNumberOfLeaves = overviewMaxNumberOfLeaves;
+	}
+
+	public boolean isUseVisualAggregate() {
+		return useVisualAggregate;
+	}
+
+	public void setUseVisualAggregate(boolean useVisualAggregate) {
+		this.useVisualAggregate = useVisualAggregate;
 	}
 }

@@ -238,17 +238,13 @@ public class Snapshot {
 		double loss = 0;
 
 		// Look for the gain and loss value
-		for (int i = 0; i < parameters.size() - 1; i++) {
-			if (theView.getOcelotlParameters().getParameter() < parameters.get(i)) {
-				if (i > 0)
-					i = i - 1;
-
+		for (int i = 0; i < parameters.size(); i++) {
+			if (theView.getOcelotlParameters().getParameter() <= parameters.get(i)) {
 				gain = qualities.get(i).getGain();
 				loss = qualities.get(i).getLoss();
 				break;
 			}
 		}
-		//TODO does not work, return always 0
 
 		StringBuffer output = new StringBuffer();
 		output.append("Trace name: ");

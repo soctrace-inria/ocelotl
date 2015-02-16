@@ -106,6 +106,8 @@ public class OcelotlDefaultParameterConstants {
 	 */
 	public static final String OVERVIEW_AGGREG_OPERATOR = "Temporal Aggregation";
 	
+	public static final boolean USE_VISUAL_AGGREGATE = true;
+	
 	/**
 	 * Colors for the overview
 	 */
