@@ -89,8 +89,10 @@ public class SpatiotemporalModeStates extends SpatiotemporalMode {
 	public MainEvent getMainEvent(EventProducerNode epn, int start, int end) {
 		double max = 0.0;
 		MainEvent maj = new MainEvent(Void, max);
-		for (String state : getEvents()) {
-			if(!getAllEvents().contains(state))
+		ArrayList<String> usedEvents = (ArrayList<String>) getAllEvents();
+		ArrayList<String> displayedEvents = (ArrayList<String>) getEvents();
+		for (String state : usedEvents) {
+			if(!displayedEvents.contains(state))
 				continue;
 			
 			double amp = 0.0;

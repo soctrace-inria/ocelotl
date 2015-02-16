@@ -62,8 +62,9 @@ public abstract class DataAggregationManager {
 
 		// If the cache is activated
 		if (ocelotlParameters.getOcelotlSettings().isDichoCacheActivated()
+				&& noFiltering()
 				&& (dichoCache = checkForValidCache()) != null) {
-			
+
 			// and if If a valid cache file was found
 			loadDichoCache(dichoCache);
 		} else {
@@ -222,18 +223,18 @@ public abstract class DataAggregationManager {
 	public boolean noFiltering() {
 		if (ocelotlParameters.getCurrentProducers().size() != ocelotlParameters
 				.getEventProducerHierarchy().getEventProducers().size()) {
-			logger.debug("At least one event producer is filtered: dichotomy cache will not be generated.");
+			logger.debug("At least one event producer is filtered: dichotomy cache will not be used/generated.");
 			return false;
 		}
 		
 		if (ocelotlParameters.isHasLeaveAggregated()) {
-			logger.debug("Some event producers are aggregated: dichotomy cache will not be generated.");
+			logger.debug("Some event producers are aggregated: dichotomy cache will not be used/generated.");
 			return false;
 		}
 
 		if (ocelotlParameters.getTraceTypeConfig().getTypes().size() != ocelotlParameters
-				.getOperatorEventTypes().size()) {
-			logger.debug("At least one event type is filtered: dichotomy cache will not be generated.");
+				.getUnfilteredEventProducers().size()) {
+			logger.debug("At least one event type is filtered: dichotomy cache will not be used/generated.");
 			return false;
 		}
 

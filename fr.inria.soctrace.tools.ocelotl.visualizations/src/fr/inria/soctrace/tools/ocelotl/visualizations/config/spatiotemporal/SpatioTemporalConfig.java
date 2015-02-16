@@ -22,6 +22,7 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.
 public class SpatioTemporalConfig implements IVisuConfig {
 
 	protected List<EventType>	types	= new LinkedList<EventType>();
+	protected List<EventType>	undisplayedTypes	= new LinkedList<EventType>();
 	protected EventColorManager colors;
 
 	public SpatioTemporalConfig() {
@@ -32,16 +33,25 @@ public class SpatioTemporalConfig implements IVisuConfig {
 		return types;
 	}
 	
-	public List<String> getTypeNames() {
+	public List<String> getDisplayedTypeNames() {
 		List<String> l = new ArrayList<String>();
 		for (EventType et: types){
-			l.add(et.getName());
+			if(!undisplayedTypes.contains(et))
+				l.add(et.getName());
 		}
 		return l;
 	}
 
 	public void setTypes(final List<EventType> types) {
 		this.types = types;
+	}
+	
+	public List<EventType> getUndisplayedTypes() {
+		return undisplayedTypes;
+	}
+
+	public void setUndisplayedTypes(List<EventType> undisplayedTypes) {
+		this.undisplayedTypes = undisplayedTypes;
 	}
 
 	public EventColorManager getColors() {

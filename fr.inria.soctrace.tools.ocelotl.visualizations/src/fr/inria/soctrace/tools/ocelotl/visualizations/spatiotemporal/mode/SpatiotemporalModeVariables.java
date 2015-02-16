@@ -91,8 +91,8 @@ public class SpatiotemporalModeVariables extends SpatiotemporalMode {
 		MainEvent maj = new MainEvent(Void, max);
 		ArrayList<String> usedEvents = (ArrayList<String>) getAllEvents();
 		ArrayList<String> displayedEvents = (ArrayList<String>)  getEvents();
-		for (String event : displayedEvents) {
-			if(!usedEvents.contains(event))
+		for (String event : usedEvents) {
+			if(!displayedEvents.contains(event))
 				continue;
 			
 			double amp = 0.0;

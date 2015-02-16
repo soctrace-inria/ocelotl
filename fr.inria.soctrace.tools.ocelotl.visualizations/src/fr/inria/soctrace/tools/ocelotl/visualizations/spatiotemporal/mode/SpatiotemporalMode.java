@@ -54,7 +54,7 @@ public abstract class SpatiotemporalMode extends VisuSTOperator {
 	}
 
 	protected List<String> getEvents() {
-		return ((SpatioTemporalConfig) ocelotlCore.getOcelotlParameters().getVisuConfig()).getTypeNames();
+		return ((SpatioTemporalConfig) ocelotlCore.getOcelotlParameters().getVisuConfig()).getDisplayedTypeNames();
 	}
 	
 	protected List<String> getAllEvents() {
@@ -74,10 +74,11 @@ public abstract class SpatiotemporalMode extends VisuSTOperator {
 		
 		SpatioTemporalConfig config = ((SpatioTemporalConfig) ocelotlCore
 				.getOcelotlParameters().getVisuConfig());
-		if (config.getTypes().isEmpty())
-			config.getTypes().addAll(
-					ocelotlCore.getOcelotlParameters().getOperatorEventTypes());
 		
+		config.getTypes().clear();
+		config.getTypes().addAll(
+				ocelotlCore.getOcelotlParameters().getOperatorEventTypes());
+
 		config.checkForFilteredType(ocelotlCore.getOcelotlParameters().getTraceTypeConfig().getTypes());
 		
 		initParts();

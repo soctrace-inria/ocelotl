@@ -1005,18 +1005,31 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				.getEventProducerHierarchy();
 
 		int maxHierarchyLevel = fullHierarchy.getMaxHierarchyLevel();
-		int acceptedHierarchyLevel = -1;
+		int acceptedHierarchyLevel = 1;
+		boolean foundASolution = false;
 	
-		for (int i = maxHierarchyLevel; i >= 0; i--) {
-		
+		// Prevent the accepted hierarchy level to be 0 (which is just root),
+		// which would make problem in later stages of the aggregation (building
+		// the hierarchy)
+		for (int i = maxHierarchyLevel; i >= 1; i--) {
 			if (removeFilteredEP(fullHierarchy.getEventProducerNodesFromHierarchyLevel(i)).size() > parameters
 					.getOcelotlSettings().getMaxNumberOfLeaves()) {
 				continue;
 			} else {
 				acceptedHierarchyLevel = i;
+				foundASolution = true;
 				break;
 			}
 		}
+		
+		if(!foundASolution)
+			logger.error("Spatial preaggregation failed: No hierarchy level was found that satisfies the given constraints (Max leaves: "
+					+ parameters.getOcelotlSettings().getMaxNumberOfLeaves()
+					+ "). The level just under root will be used as defaults (Actual number of leaves: "
+					+ removeFilteredEP(
+							fullHierarchy
+									.getEventProducerNodesFromHierarchyLevel(acceptedHierarchyLevel))
+							.size() + ").");
 
 		for (SimpleEventProducerNode newLeafProducer : fullHierarchy
 				.getEventProducerNodesFromHierarchyLevel(acceptedHierarchyLevel)) {
@@ -1039,7 +1052,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 			logger.debug(numberOfAggregatedLeaves
 					+ " children nodes of the following operator were aggregated: "
-					+ newLeafProducer.getName() + " ("
+					+ newLeafProducer.getName() + " (ID: "
 					+ newLeafProducer.getID() + ")");
 
 			parameters.getAggregatedLeavesIndex().put(newLeafProducer.getMe(),

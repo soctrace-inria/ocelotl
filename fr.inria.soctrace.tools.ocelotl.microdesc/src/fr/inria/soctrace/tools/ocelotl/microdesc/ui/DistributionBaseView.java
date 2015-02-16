@@ -444,7 +444,6 @@ public abstract class DistributionBaseView extends Dialog implements
 		groupEventProducers.setText("Event Producers");
 		groupEventProducers.setLayout(new GridLayout());
 
-	
 		// Tree viewer
 		treeViewerEventProducer = new CheckboxTreeViewer(groupEventProducers, SWT.BORDER | SWT.MULTI);
 		treeViewerEventProducer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);

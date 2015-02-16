@@ -13,8 +13,6 @@ package fr.inria.soctrace.tools.ocelotl.visualizations.config.spatiotemporal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -138,8 +136,8 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 		this.entities = new TreeMap<Integer, Entity>();
 		this.entities.put(0, new Entity(ET_NAME, ModelEntity.EVENT_TYPE));
 	}
-	
-    @Override
+
+	@Override
     protected Control createDialogArea(Composite parent) {
     	Composite all = (Composite) super.createDialogArea(parent);
         
@@ -346,7 +344,10 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 				SWT.NORMAL));
 		btnResetEventTypes.setImage(null);
 		
-		listViewerEventTypes.setInput(config.getTypes());
+		java.util.List<EventType> displayedEventTypes = new ArrayList<EventType>();
+		displayedEventTypes.addAll(config.getTypes());
+		displayedEventTypes.removeAll(config.getUndisplayedTypes());
+		listViewerEventTypes.setInput(displayedEventTypes);
 		
         return composite;
     }	
@@ -371,7 +372,10 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
     	ColorsChangeDescriptor des = new ColorsChangeDescriptor();
     	des.setEntity(entity);
     	FramesocBus.getInstance().send(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED, des);
-    	config.setTypes((java.util.List<EventType>) listViewerEventTypes.getInput());
+    	config.getUndisplayedTypes().clear();
+    	config.getUndisplayedTypes().addAll(ocelotlView.getOcelotlParameters().getTraceTypeConfig()
+						.getTypes());
+    	config.getUndisplayedTypes().removeAll((java.util.List<EventType>) listViewerEventTypes.getInput());
     	super.okPressed();
     }
     
@@ -385,26 +389,25 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
     }
     
 	private FramesocColor getColor(String name) {
-			return FramesocColorManager.getInstance().getEventTypeColor(name);
+		return FramesocColorManager.getInstance().getEventTypeColor(name);
 	}
 		
 	private void setColor(String name, FramesocColor color) {
-			FramesocColorManager.getInstance().setEventTypeColor(name, color);
+		FramesocColorManager.getInstance().setEventTypeColor(name, color);
 	}
 
 	private void saveColors() {
-			FramesocColorManager.getInstance().saveEventTypeColors();
+		FramesocColorManager.getInstance().saveEventTypeColors();
 	}
-	
-	private void loadColors() {
-			FramesocColorManager.getInstance().loadEventTypeColors();
-	}
-	
-	private Collection<String> getNames() {
-			return config.getTypeNames();
 
+	private void loadColors() {
+		FramesocColorManager.getInstance().loadEventTypeColors();
 	}
-   
+
+	private Collection<String> getNames() {
+		return config.getDisplayedTypeNames();
+	}
+
     @Override
 	protected Point getInitialSize() {
 		return new Point(504, 464);
@@ -476,42 +479,33 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 	public void init(OcelotlView ocelotlView, IVisuConfig aConfig) {
 		this.ocelotlView = ocelotlView;
 		this.config = (SpatioTemporalConfig) aConfig;
-		if (config.getTypes().isEmpty())
-	    	config.getTypes().addAll(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
+		config.getTypes().clear();
+		config.getTypes().addAll(
+				ocelotlView.getOcelotlParameters().getTraceTypeConfig()
+						.getTypes());
 
 		config.checkForFilteredType(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
 	}
 	
 	private class TypesSelectionAdapter extends SelectionAdapter {
-		// allUnfilteredEvents - input
-		java.util.List<EventType> diff(final java.util.List<EventType> allUnfilteredEvents,
-				final java.util.List<EventType> input) {
-			final java.util.List<EventType> tmp = new ArrayList<>();
-			for (final EventType anET : allUnfilteredEvents)
-				tmp.add(anET);
-			tmp.removeAll(input);
-			Collections.sort(tmp, new Comparator<EventType>() {
-				@Override
-				public int compare(EventType arg0, EventType arg1) {
-					return arg0.getName().compareToIgnoreCase(arg1.getName());
-				}
-			});
-			return tmp;
-		}
 
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			if (ocelotlView.getConfDataLoader().getCurrentTrace() == null)
 				return;
 			final ListSelectionDialog dialog = new ListSelectionDialog(
-					getShell(), diff(getEventTypes(), config.getTypes()),
+					getShell(), config.getUndisplayedTypes(),
 					new ArrayContentProvider(), new EventTypeLabelProvider(),
 					"Select Event Types");
 			if (dialog.open() == Window.CANCEL)
 				return;
 			for (final Object o : dialog.getResult())
-				config.getTypes().add((EventType) o);
-			listViewerEventTypes.setInput(config.getTypes());
+				config.getUndisplayedTypes().remove((EventType) o);
+			
+			java.util.List<EventType> displayedEventTypes = new ArrayList<EventType>();
+			displayedEventTypes.addAll(config.getTypes());
+			displayedEventTypes.removeAll(config.getUndisplayedTypes());
+			listViewerEventTypes.setInput(displayedEventTypes);
 		}
 	}
 	
