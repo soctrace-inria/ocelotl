@@ -66,6 +66,8 @@ public class ProportionAxisView extends UnitAxisView {
 	protected int mainLineXPosition;
 	// Max size of a label
 	protected int labelMaxWidth;
+	// Height of a mini-graduation
+	protected double minGradHeight;
 	
 	// Margin from the frame
 	protected final static int Border = 10;
@@ -125,16 +127,18 @@ public class ProportionAxisView extends UnitAxisView {
 
 		computeMeasurements();
 
-		// Draw the graduations
+		// Draw the graduations, starting from the bottom (reversed Y
+		// coordinates)
 		for (int i = 0; i < (int) gradNumber + 1; i++) {
-			// Draw the main graduation line
+			// Draw the main graduation lines
 			final PolylineConnection line = new PolylineConnection();
 			line.setForegroundColor(SWTResourceManager
 					.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			line.setLineWidth(2);
-			line.setEndpoints(new Point(mainLineXPosition, (int) axisHeight
-					- (int) (i * gradHeight)), new Point(mainLineXPosition
-					+ gradWidth, (int) axisHeight - (int) (i * gradHeight)));
+			
+			int gradYpos = (int) axisHeight - (int) (i * gradHeight);
+			line.setEndpoints(new Point(mainLineXPosition, gradYpos),
+					new Point(mainLineXPosition + gradWidth, gradYpos));
 			root.add(line);
 
 			// Draw the legend
@@ -161,25 +165,28 @@ public class ProportionAxisView extends UnitAxisView {
 					- (int) (i * gradHeight) + TextHeight - Border), new Point(
 					new Point(mainLineXPosition - TextPositionOffset,
 							axisHeight - (int) (i * gradHeight) - Border))));
-
-			// Draw the mini graduations
+	
+			// Do not draw the sub-grads under the first grad
+			if(i == 0)
+				continue;
+			
+			// Draw the sub graduations
 			for (int j = 1; j < NumberOfSubGraduation; j++) {
 				final PolylineConnection line2 = new PolylineConnection();
-				if (axisHeight - (int) (i * gradHeight) - Border
-						+ (int) (j * gradHeight / NumberOfSubGraduation) > root.getSize()
-						.height() - Border)
+				
+				int minGradYposition = (int) axisHeight
+						- (int) (i * gradHeight) + (int) (j * minGradHeight);
+				
+				if (minGradYposition - Border > root.getSize().height()
+						- Border)
 					break;
 
 				line2.setForegroundColor(SWTResourceManager
 						.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 				line2.setLineWidth(1);
-				line2.setEndpoints(new Point(
-						mainLineXPosition,
-						axisHeight - (int) (i * gradHeight)
-								+ (int) (j * gradHeight / NumberOfSubGraduation)),
-						new Point(new Point(mainLineXPosition + MiniGradWidth,
-								axisHeight - (int) (i * gradHeight)
-										+ (int) (j * gradHeight / NumberOfSubGraduation))));
+				line2.setEndpoints(new Point(mainLineXPosition,
+						minGradYposition), new Point(new Point(
+						mainLineXPosition + MiniGradWidth, minGradYposition)));
 				root.add(line2);
 			}
 		}
@@ -189,7 +196,7 @@ public class ProportionAxisView extends UnitAxisView {
 		if (drawingHeight > yPositionOfLastGraduation) {
 			int j = 0;
 			while (yPositionOfLastGraduation
-					+ (int) (j * gradHeight / NumberOfSubGraduation) < drawingHeight) {
+					+ (int) (j * minGradHeight) < drawingHeight) {
 				final PolylineConnection line2 = new PolylineConnection();
 				line2.setForegroundColor(SWTResourceManager
 						.getColor(SWT.COLOR_WIDGET_FOREGROUND));
@@ -197,11 +204,11 @@ public class ProportionAxisView extends UnitAxisView {
 				line2.setEndpoints(new Point(mainLineXPosition,
 						(int) axisHeight
 								- (yPositionOfLastGraduation + (int) (j
-										* gradHeight / NumberOfSubGraduation))),
+										* minGradHeight))),
 						new Point(new Point(mainLineXPosition + MiniGradWidth,
 								axisHeight
 										- (yPositionOfLastGraduation + (int) (j
-												* gradHeight / NumberOfSubGraduation)))));
+												* minGradHeight)))));
 				root.add(line2);
 				j++;
 			}
@@ -265,8 +272,9 @@ public class ProportionAxisView extends UnitAxisView {
 			gradNumber /= 2;
 			gradHeight *= 2;
 			gradDuration *= 2;
-
 		}
+		
+		minGradHeight = gradHeight / NumberOfSubGraduation;
 	}
 
 	/**
@@ -320,7 +328,7 @@ public class ProportionAxisView extends UnitAxisView {
 			ocelotlView.getMainViewTopSashform().setWeights(
 					new int[] {
 							minSize,
-							ocelotlView.getMainViewTopSashform().getSize().y
+							ocelotlView.getMainViewTopSashform().getSize().x
 									- minSize });
 		}
 	}
