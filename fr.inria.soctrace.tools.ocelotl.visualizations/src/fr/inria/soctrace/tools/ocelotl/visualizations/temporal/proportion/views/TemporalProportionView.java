@@ -78,25 +78,25 @@ public class TemporalProportionView extends TimeLineView {
 			return false;
 		}
 		
-		//Draw the proportion visualization of the aggregates
+		// Draw the proportion visualization of the aggregates
 		public void init() {
 			DecimalFormat valueFormat = new DecimalFormat("0.00E0");
 			valueFormat.setMaximumIntegerDigits(3);
 			double total = 0;
 			
-			//Height of the drawing area
+			// Height of the drawing area
 			final double y0 = root.getSize().height - aBorder;
 			final double y1 = DrawingMarginRatio * root.getSize().height - aBorder;
-			//Width of the drawing area
+			// Width of the drawing area
 			final double drawingAreaWidth = root.getSize().width - 2 * aBorder;
 			final double numberOfTimeSlice = distribution.getSliceNumber();
-			//Highest value among the aggregates
+			// Highest value among the aggregates
 			final double maxValue = distribution.getMax();
 			double agg = 0;
 			final List<String> aggList = new ArrayList<String>();
 			final List<String> states = new ArrayList<String>();
 			states.addAll(distribution.getStates());
-			//Sort states alphabetically
+			// Sort states alphabetically
 			Collections.sort(states, new Comparator<String>() {
 				@Override
 				public int compare(final String o1, final String o2) {
@@ -112,16 +112,17 @@ public class TemporalProportionView extends TimeLineView {
 							.getEventTypeColor(state).getSwtColor());
 					rect.setForegroundColor(ColorConstants.white);
 					rect.setLineWidth(1);
-					//If the color is too light, add a border
+					// If the color is too light, add a border
 					if (isTooLight(rect.getBackgroundColor())) {
 						rect.setForegroundColor(ColorConstants.black);
 					}
 					final Label label = new Label(" " + state + ": "
 							+ valueFormat.format(value) + " " + unit + " ");
 					rect.setToolTip(label);
-					//If the height of the state proportion is big enough
-					if (y1 * value / maxValue - stackSpace > MinHeight) {
-						//Draw a rectangle
+					// If the height of the state proportion is big enough
+					if (!ocelotlView.getOcelotlParameters().getOcelotlSettings().isUseVisualAggregate()
+							|| y1 * value / maxValue - stackSpace > MinHeight) {
+						// Draw a rectangle
 						if (isTooLight(rect.getBackgroundColor()))
 							 root.add(rect, new Rectangle(new Point(
 							 (int) (distribution.getPart(index)
@@ -169,9 +170,9 @@ public class TemporalProportionView extends TimeLineView {
 				lineDash.setLineWidth(2);
 				lineDash.setLineStyle(SWT.LINE_DASH);
 				lineDash.setToolTip(label);
-				//If the aggregated state proportion is high enough
+				// If the aggregated state proportion is high enough
 				if (y1 * agg / maxValue - stackSpace > MinHeight) {
-					//Display a rectangle
+					// Display a rectangle
 					root.add(rectangle, new Rectangle(new Point((int) (distribution
 							.getPart(index).getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
 							(int) (y0 - y1 * total / maxValue)), new Point(

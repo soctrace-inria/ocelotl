@@ -501,13 +501,20 @@ public class OcelotlSettingsView extends Dialog {
 		final Group groupVisualAggregate = new Group(sashFormVisualAggregate, SWT.NONE);
 		groupVisualAggregate.setFont(cantarell8);
 		groupVisualAggregate.setText("Visual Aggregation");
-		groupVisualAggregate.setLayout(new GridLayout(2, false));
+		groupVisualAggregate.setLayout(new GridLayout(3, false));
 		
 		btnEnableVisualAggregation = new Button(groupVisualAggregate, SWT.CHECK);
 		btnEnableVisualAggregation.setText("Enable Visual Aggregation");
 		btnEnableVisualAggregation.setSelection(settings.isUseVisualAggregate());
 		btnEnableVisualAggregation.setFont(cantarell8);
 		btnEnableVisualAggregation.setToolTipText("Aggregate Producers that Are Too Small to Display");
+
+		Label labelWarningImg = new Label (groupVisualAggregate, SWT.NONE);
+		labelWarningImg.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/warn_tsk.gif"));
+		
+		Label labelWarningText = new Label (groupVisualAggregate, SWT.NONE);
+		labelWarningText.setFont(cantarell8);
+		labelWarningText.setText("Disabling this option can lead to discripancies in the visualization");
 			
 		sashFormAdvancedParameters.setWeights(new int[] { 2, 1, 1 });
 				
