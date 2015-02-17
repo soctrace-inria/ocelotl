@@ -1987,8 +1987,6 @@ public class OcelotlView extends FramesocPart {
 		comboStatistics.setEnabled(enabled);
 		btnRun.setEnabled(enabled);
 		snapshotAction.setEnabled(enabled);
-		btnNextZoom.setEnabled(enabled);
-		btnPrevZoom.setEnabled(enabled);
 		btnReset.setEnabled(enabled);
 		btnSaveDataCache.setEnabled(enabled);
 		btnLoadDataCache.setEnabled(enabled);
@@ -2002,6 +2000,13 @@ public class OcelotlView extends FramesocPart {
 		textTimestampEnd.setEnabled(enabled);
 		textTimestampStart.setEnabled(enabled);
 		textRun.setEnabled(enabled);
+		
+		if (enabled) {
+			history.setCurrentHistoryIndex(history.getCurrentHistoryIndex());
+		} else {
+			btnNextZoom.setEnabled(enabled);
+			btnPrevZoom.setEnabled(enabled);
+		}
 	}
 
 	@Override

@@ -22,7 +22,6 @@ package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.MouseListener;
@@ -114,7 +113,6 @@ public class TimeLineViewWrapper {
 		final XYLayout layout = new XYLayout();
 		root.setLayoutManager(layout);
 		canvas = new Canvas(parent, SWT.DOUBLE_BUFFERED);
-		canvas.setBackground(ColorConstants.white);
 		canvas.setSize(parent.getSize());
 		final LightweightSystem lws = new LightweightSystem(canvas);
 		lws.setContents(root);

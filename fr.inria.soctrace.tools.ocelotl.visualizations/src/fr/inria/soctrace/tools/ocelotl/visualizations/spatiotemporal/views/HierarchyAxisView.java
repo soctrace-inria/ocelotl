@@ -125,15 +125,19 @@ public class HierarchyAxisView extends UnitAxisView {
 			drawProd(epn, newHierarchy.get(epn.getHierarchyLevel()), false);
 
 		boolean tooSmall = false;
-		// Check for each child that we have enough vertical space
-		// to display them
-		for (EventProducerNode ep : epn.getChildrenNodes()) {
-			if ((ep.getWeight() * logicHeight - verticalSpace) < minLogicWeight) {
-				// Too small
-				tooSmall = true;
-				break;
+		if (ocelotlView.getOcelotlParameters().getOcelotlSettings()
+				.isUseVisualAggregate()) {
+			// Check for each child that we have enough vertical space
+			// to display them
+			for (EventProducerNode ep : epn.getChildrenNodes()) {
+				if ((ep.getWeight() * logicHeight - verticalSpace) < minLogicWeight) {
+					// Too small
+					tooSmall = true;
+					break;
+				}
 			}
 		}
+		
 		// If enough space
 		// recursively call print() on the children node
 		if (!tooSmall) {

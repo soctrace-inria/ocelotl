@@ -187,7 +187,7 @@ public class OcelotlQueries {
 				ocelotlParameters).initialize();
 
 		return traceSearch.getEventIterator(ocelotlParameters.getTrace(),
-				ocelotlParameters.getTraceTypeConfig().getTypes(), time, null,
+				ocelotlParameters.getTraceTypeConfig().getTypes(), time, eventProducers,
 				monitor);
 	}
 }
