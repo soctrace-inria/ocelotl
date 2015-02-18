@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -43,6 +43,7 @@ public class TemporalPartitionView extends TimeLineView {
 	protected void computeDiagram() {
 		// Height of a part (roughly 90% percent of the display zone)
 		final int partHeight = (int) (root.getSize().height / 1.1 - 2 * aBorder);
+		final int drawingAreaWidth = root.getSize().width - 2 * aBorder;
 		int i;
 		// If no aggregation
 		if (!config.isAggregated()) {
@@ -52,12 +53,11 @@ public class TemporalPartitionView extends TimeLineView {
 								parts.get(i) % colors.getColors().size()),
 						config.isNumbers());
 				figures.add(part);
-				root.add(part, new Rectangle(new Point(i
-						* (root.getSize().width - 2 * aBorder) / parts.size()
-						+ aBorder, root.getSize().height / 2 - partHeight / 2),
-						new Point((i + 1) * (root.getSize().width - 2 * aBorder)
-								/ parts.size() + aBorder - space,
-								root.getSize().height / 2 + partHeight / 2)));
+				root.add(part, new Rectangle(new Point(i * drawingAreaWidth
+						/ parts.size() + aBorder, root.getSize().height / 2
+						- partHeight / 2), new Point((i + 1) * drawingAreaWidth
+						/ parts.size() + aBorder - space, root.getSize().height
+						/ 2 + partHeight / 2)));
 				part.getUpdateManager().performUpdate();
 				part.init();
 			}
@@ -73,14 +73,11 @@ public class TemporalPartitionView extends TimeLineView {
 				final PartFigure part = new PartFigure(i, i, colors.getColors()
 						.get(j % colors.getColors().size()), config.isNumbers());
 				figures.add(part);
-				root.add(
-						part,
-						new Rectangle(new Point(j
-								* (root.getSize().width - 2 * aBorder)
-								/ parts.size() + aBorder, root.getSize().height
-								- aBorder), new Point((j + aggParts.get(i))
-								* (root.getSize().width - 2 * aBorder)
-								/ parts.size() - space + aBorder, aBorder)));
+				root.add(part, new Rectangle(new Point(j * drawingAreaWidth
+						/ parts.size() + aBorder, root.getSize().height
+						- aBorder), new Point((j + aggParts.get(i))
+						* drawingAreaWidth / parts.size() - space + aBorder,
+						aBorder)));
 				j = j + aggParts.get(i);
 				part.getUpdateManager().performUpdate();
 				part.init();

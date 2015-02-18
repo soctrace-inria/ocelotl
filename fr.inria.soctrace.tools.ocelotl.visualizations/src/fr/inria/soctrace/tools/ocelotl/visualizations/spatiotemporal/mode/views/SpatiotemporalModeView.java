@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode.views;
 
 import java.util.ArrayList;
@@ -46,17 +57,23 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 			RectangleFigure rectangle = new RectangleFigure();
 
 			MainEvent state = getMainState(epn, startTimeSlice, endTimeSlice);
+
 			String label = " " + epn.getMe().getName() + " ("
 					+ state.getState() + ", " + state.getAmplitude100() + "%) ";
 			rectangle.setBackgroundColor(FramesocColorManager.getInstance()
 					.getEventTypeColor(state.getState()).getSwtColor());
 			rectangle.setForegroundColor(FramesocColorManager.getInstance()
 					.getEventTypeColor(state.getState()).getSwtColor());
+			if(!state.getState().equals(SpatiotemporalMode.Void)){
 			rectangle.setToolTip(new Label(label));
 
 			// Set the alpha transparency according to the spatiotemporalMode
 			rectangle.setAlpha(state.getAmplitude255Shifted());
 			rectangle.setLineWidth(1);
+			}else{
+				rectangle.setAlpha(0);
+				rectangle.setToolTip(new Label(" "));
+			}
 			rectangle.setLayoutManager(new BorderLayout());
 			rectangle.setPreferredSize(1000, 1000);
 			rectangle.setFont(SWTResourceManager.getFont("Cantarell", 11,
@@ -74,6 +91,7 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 			DrawAggregate hp = new DrawAggregate();
 			hp.draw(aNode, start, end);
 		}
+		root.validate();
 	}
 	
 	@Override
@@ -84,6 +102,7 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 			DrawSpatialMode hp = new DrawSpatialMode();
 			hp.draw();
 		}
+		root.validate();
 	}
 
 	public class DrawAggregate extends DrawSpatialMode {
@@ -135,13 +154,16 @@ public class SpatiotemporalModeView extends SpatioTemporalView {
 					// Check for each child that we have enough vertical space
 					// to display them
 					boolean aggy = false;
-					for (EventProducerNode ep : epn.getChildrenNodes()) {
-						// if the space needed to print an element is smaller
-						// than 1 pixel
-						if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
-							// Aggregate
-							aggy = true;
-							break;
+					if (ocelotlView.getOcelotlParameters().getOcelotlSettings()
+							.isUseVisualAggregate()) {
+						for (EventProducerNode ep : epn.getChildrenNodes()) {
+							// if the space needed to print an element is
+							// smaller than 1 pixel
+							if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
+								// Aggregate
+								aggy = true;
+								break;
+							}
 						}
 					}
 					// If enough space

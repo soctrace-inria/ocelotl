@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -40,7 +40,8 @@ public class OcelotlConstants {
 	/**
 	 * Number of field in the header of a cache file 
 	 */
-	static public final int CACHE_HEADER_NORMAL_SIZE = 10;
+	static public final int DATACACHE_HEADER_NORMAL_SIZE = 9;
+	static public final int DICHOTOMYCACHE_HEADER_NORMAL_SIZE = 9;
 	
 	/**
 	 * Maximum size of the data cache in bytes.
@@ -88,10 +89,15 @@ public class OcelotlConstants {
 	
 	public static final double TemporalProportionDrawingMarginRatio = 0.9;
 	
+
+	public static final String DataCacheSuffix = ".octcache";
+	public static final String DichotomyCacheSuffix = ".octdicho";
+	
 	/**
 	 * JSON Config constants
 	 */
 	public static final String JSONCacheActivated = "cacheActivated";
+	public static final String JSONDichoCacheActivated = "dichoCacheActivated";
 	public static final String JSONCacheDirectory = "cacheDirectory";
 	public static final String JSONCacheSize = "cacheSize";
 	public static final String JSONSnapShotDirectory = "snapShotDirectory";
@@ -105,6 +111,14 @@ public class OcelotlConstants {
 	public static final String JSONIncreasingQualities = "increasingQualities";
 	public static final String JSONSnapshotXResolution = "snapshotXResolution";
 	public static final String JSONSnapshotYResolution = "snapshotYResolution";
+	public static final String JSONYAxisXResolution = "yAxisXResolution";
+	public static final String JSONXAxisYResolution = "xAxisYResolution";
+	public static final String JSONQualCurveXResolution = "qualCurveXResolution";
+	public static final String JSONQualCurveYResolution = "qualCurveYResolution";
+	public static final String JSONAggregateLeaves = "aggregateLeaves";
+	public static final String JSONMaxNumberOfLeaves = "maxNumberOfLeaves";
+	public static final String JSONOverviewAggregateLeaves = "overviewAggregateLeaves";
+	public static final String JSONOverviewMaxNumberOfLeaves = "overviewMaxNumberOfLeaves";
 	
 	public static final String JSONEnableOverview = "enableOverview";
 	public static final String JSONOverviewAggregOperator = "overviewAggregOperator";
@@ -116,4 +130,13 @@ public class OcelotlConstants {
 	public static final String JSONOverviewDisplayBgColor = "overviewDisplayBgColor";
 	public static final String JSONOverviewDisplayAlpha = "overviewDisplayAlpha";	
 	public static final String JSONParameterPPolicy = "parameterPPolicy";	
+	
+	public static final String JSONMainSelectionFgColor = "mainSelectionFgColor";
+	public static final String JSONMainSelectionBgColor = "mainSelectionBgColor";
+	public static final String JSONMainSelectionAlpha = "mainSelectionAlpha";
+	public static final String JSONMainDisplayFgColor = "mainDisplayFgColor";
+	public static final String JSONMainDisplayBgColor = "mainDisplayBgColor";
+	public static final String JSONMainDisplayAlpha = "mainDisplayAlpha";	
+	
+	public static final String JSONUseVisualAggregate = "useVisualAggregate";
 }

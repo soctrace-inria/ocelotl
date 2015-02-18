@@ -1,9 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
 
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -67,7 +77,8 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		setShellCursor(SWT.CURSOR_ARROW);
+		
 		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.EXITED) {
 			state = MouseState.EXITED;
 			mouseReleased(arg0);
@@ -84,13 +95,13 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 		if (aggregatedView.getSelectFigure() != null && aggregatedView.getRoot().getChildren().contains(aggregatedView.getSelectFigure()))
 			if (Math.abs(aggregatedView.getSelectFigure().getBounds().x - arg0.x) < Threshold) {
 				state = MouseState.H_MOVE_START;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+				setShellCursor(SWT.CURSOR_SIZEWE);
 			} else if (Math.abs(aggregatedView.getSelectFigure().getBounds().x + aggregatedView.getSelectFigure().getBounds().width - arg0.x) < Threshold) {
 				state = MouseState.H_MOVE_END;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+				setShellCursor(SWT.CURSOR_SIZEWE);
 			} else {
 				state = MouseState.RELEASED;
-				shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+				setShellCursor(SWT.CURSOR_ARROW);
 			}
 	}
 
@@ -138,7 +149,8 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	@Override
 	public void mouseReleased(final MouseEvent arg0) {
 
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		setShellCursor(SWT.CURSOR_ARROW);
+		
 		if (state == MouseState.DRAG_LEFT || state == MouseState.DRAG_LEFT_START)
 			mouseDragged(arg0);
 		
@@ -181,11 +193,11 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	protected TimeRegion setTemporalSelection(int startingTimeSlice, int endingTimeslice) {
 		// Since timestamps start and end of two adjacent time slice overlap,
 		// add 1 to the starting timestamp
-		long startTimeStamp = aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
+		long startTimeStamp = aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(startingTimeSlice).getTimeRegion().getTimeStampStart() + 1;
 
 		// Since the timestamp of the last time slice goes further than the max
 		// timestamp of the trace, we must check that we are not over it
-		long endTimeStamp = Math.min(aggregatedView.getResetTime().getTimeStampEnd(), aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
+		long endTimeStamp = Math.min(aggregatedView.getResetTime().getTimeStampEnd(), aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlices().get(endingTimeslice).getTimeRegion().getTimeStampEnd());
 
 		return new TimeRegion(startTimeStamp, endTimeStamp);
 	}
@@ -199,8 +211,8 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 	 *         time slice
 	 */
 	protected Point getTimeSlices(TimeRegion aTimeRegion) {
-		int startingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampStart());
-		int endingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
+		int startingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampStart());
+		int endingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aTimeRegion.getTimeStampEnd());
 
 		return new Point(startingSlice, endingSlice);
 	}

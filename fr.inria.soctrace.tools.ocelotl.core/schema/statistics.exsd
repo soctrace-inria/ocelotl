@@ -117,6 +117,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="leave_aggregation_compatiblity" type="boolean" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

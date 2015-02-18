@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.soctrace.framesoc.core.tools.model.FramesocTool;
+import fr.inria.soctrace.framesoc.core.tools.model.IFramesocToolInput;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 /**
@@ -41,10 +42,8 @@ public class OcelotlTool extends FramesocTool {
 	}
 
 	@Override
-	public void launch(final String[] args) {
+	public void launch(IFramesocToolInput input) {
 		logger.debug("Arguments");
-		for (final String s : args)
-			logger.debug(s);
 
 		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		try {
@@ -53,5 +52,6 @@ public class OcelotlTool extends FramesocTool {
 			e.printStackTrace();
 		}
 	}
+
 
 }

@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -101,7 +101,7 @@ public class OcelotlCore {
 	}
 
 	public void computeDichotomy() throws OcelotlException {
-		lpaggregManager.computeDichotomy();
+		lpaggregManager.getDichotomyValue();
 		lpaggregManager.printParameters();
 	}
 
@@ -201,4 +201,5 @@ public class OcelotlCore {
 		microModelTypeManager.activateSelectedMicroModel(ocelotlParameters);
 		microModel = microModelTypeManager.getSelectedMicroModel();
 	}
+	
 }

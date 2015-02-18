@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import java.util.ArrayList;
@@ -5,7 +16,6 @@ import java.util.ArrayList;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Cursor;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
@@ -19,7 +29,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 
 	protected Boolean						clickOnView			= false;
 	protected int							minDrawThreshold	= OcelotlConstants.MinimalHeightDrawingThreshold;
-	protected int							originY, cornerY;
+	protected int							originY, cornerY, originX;
 	protected boolean						closeToVStart, closeToVEnd, closeToHStart, closeToHEnd;
 
 	protected double						rootHeight;
@@ -28,7 +38,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	protected double						logicHeight;
 	protected SpaceTimeAggregation2Manager	spatioTemporalManager;
 	protected EventProducerHierarchy		hierarchy;
-
+	protected EventProducerNode				selectedNode;
+	
 	public SpatioTemporalMouseListener(AggregatedView theView) {
 		super(theView);
 	}
@@ -69,9 +80,10 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 					aggregatedView.setSelectTime(new TimeRegion(moved, fixed));
 			}
 			
-			// If we are not performing an horizontal drag 
+			// If we are not performing an horizontal drag
 			if (!(state == MouseState.DRAG_LEFT_HORIZONTAL)) {
-				// Update the height coordinate with the current one of the mouse
+				// Update the height coordinate with the current one of the
+				// mouse
 				cornerY = arg0.y;
 			}
 			
@@ -80,16 +92,15 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			aggregatedView.setPotentialSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
 			EventProducerNode foundNode = findEventProducerNode(cornerY);
 			Point heights = getSpatialSelectionCoordinates(foundNode);
-			
-			updateEverything(heights.x(),  heights.y(), false, aggregatedView.getPotentialSelectTime());
+
+			updateEverything(heights.x(), heights.y(), false, aggregatedView.getPotentialSelectTime());
 			aggregatedView.getPotentialSelectFigure().draw(aggregatedView.getPotentialSelectTime(), heights.x(), heights.y());
 		}
-
 	}
 
 	@Override
 	public void mouseExited(final MouseEvent arg0) {
-		shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+		setShellCursor(SWT.CURSOR_ARROW);
 		
 		if (state != MouseState.RELEASED && state != MouseState.H_MOVE_START && state != MouseState.H_MOVE_END && state != MouseState.V_MOVE_END && state != MouseState.V_MOVE_START && state != MouseState.EXITED) {
 			previous = state;
@@ -107,23 +118,23 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		// If we are close to one vertical edge
 		if (closeToVStart) {
 			state = MouseState.H_MOVE_START;
-			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+			setShellCursor(SWT.CURSOR_SIZEWE);
 			// Or the other vertical edge
 		} else if (closeToVEnd) {
 			state = MouseState.H_MOVE_END;
-			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZEWE));
+			setShellCursor(SWT.CURSOR_SIZEWE);
 		} else if (closeToHStart) {
 			state = MouseState.V_MOVE_START;
-			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZENS));
+			setShellCursor(SWT.CURSOR_SIZENS);
 		} else if (closeToHEnd) {
 			state = MouseState.V_MOVE_END;
-			shell.setCursor(new Cursor(display, SWT.CURSOR_SIZENS));
+			setShellCursor(SWT.CURSOR_SIZENS);
 		} else {
 			if (state != MouseState.PRESSED_LEFT) {
 				state = MouseState.RELEASED;
 			}
 			
-			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+			setShellCursor(SWT.CURSOR_ARROW);
 		}
 	}
 	
@@ -169,7 +180,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			currentPoint = arg0.getLocation();
 			// Compute the timestamp on which we clicked
 			long p3 = (long) ((double) ((arg0.x - aggregatedView.getBorder()) * aggregatedView.getResetTime().getTimeDuration()) / (aggregatedView.getRoot().getSize().width() - 2 * aggregatedView.getBorder())) + aggregatedView.getResetTime().getTimeStampStart();
-			
+			originX = arg0.x;
+
 			// We are dragging horizontally by the left side
 			if (state == MouseState.H_MOVE_START) {
 				originY = aggregatedView.getSelectFigure().getBounds().y();
@@ -216,7 +228,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			
 			// Compute highlight selection
 			Point heights = getSpatialSelectionCoordinates(selectedAggregate.getEventProducerNode());
-			aggregatedView.getHighLightAggregateFigure().draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y() - 1);
+			aggregatedView.getHighLightAggregateFigure().draw(setTemporalSelection(selectedAggregate.getStartingTimeSlice(), selectedAggregate.getEndingTimeSlice() - 1), heights.x(), heights.y());
 
 			// Trigger the display
 			selectedAggregate.display(aggregatedView.getOcelotlView());
@@ -258,8 +270,10 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		// If left click or arriving through an exit event
 		// and if the released correspond to an action actually started in the view
 		if ((arg0.button == 1 || state == MouseState.EXITED) && clickOnView) {
+			
 			// Reset to normal cursor
-			shell.setCursor(new Cursor(display, SWT.CURSOR_ARROW));
+			setShellCursor(SWT.CURSOR_ARROW);
+			
 			clickOnView = false;
 			
 			// Remove the potential selection figure
@@ -278,8 +292,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			// selected time slices
 			if (previous != MouseState.DRAG_LEFT_VERTICAL) {
 				// Get time slice numbers from the time slice manager
-				int startingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampStart());
-				int endingSlice = (int) aggregatedView.getOcelotlView().getOcelotlCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampEnd());
+				int startingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampStart());
+				int endingSlice = (int) aggregatedView.getOcelotlView().getCore().getMicroModel().getTimeSliceManager().getTimeSlice(aggregatedView.getSelectTime().getTimeStampEnd());
 
 				aggregatedView.setSelectTime(setTemporalSelection(startingSlice, endingSlice));
 			}
@@ -287,13 +301,11 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			// If we are performing an horizontal drag then don't change the
 			// selected hierarchy
 			if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
-				EventProducerNode selectedNode;
-
-				SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y);
-					if (selectedAggregate == null || !selectedAggregate.isVisualAggregate())
-						selectedNode = findEventProducerNode(arg0.y);
-					else
-						selectedNode = selectedAggregate.getEventProducerNode();
+				SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y, originX, originY);
+				if (selectedAggregate == null || !selectedAggregate.isVisualAggregate())
+					selectedNode = findEventProducerNode(arg0.y);
+				else
+					selectedNode = selectedAggregate.getEventProducerNode();
 
 				Point heights = getSpatialSelectionCoordinates(selectedNode);
 
@@ -315,7 +327,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 */
 	protected void updateMeasurements() {
 		// Get the event producer hierarchy
-		spatioTemporalManager = (SpaceTimeAggregation2Manager) aggregatedView.getOcelotlView().getOcelotlCore().getLpaggregManager();
+		spatioTemporalManager = (SpaceTimeAggregation2Manager) aggregatedView.getOcelotlView().getCore().getLpaggregManager();
 		hierarchy = spatioTemporalManager.getHierarchy();
 
 		// Compute various height values
@@ -339,9 +351,17 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		if (selectedNode.getChildrenNodes().isEmpty()) {
 			selectedProducers.add(selectedNode.getParentNode().getMe());
 		}
-		
+
 		aggregatedView.setCurrentlySelectedNode(selectedNode);
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatialSelection(true);
+		while (selectedNode.getParentNode() != null) {
+			if (selectedNode.getParentNode().getWeight() == selectedNode.getWeight()) {
+				selectedNode = selectedNode.getParentNode();
+				selectedProducers.add(selectedNode.getMe());
+			} else {
+				break;
+			}
+		}
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 	}
 	
@@ -349,27 +369,29 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 * For a given producer node, compute the starting and ending vertical
 	 * coordinates
 	 * 
-	 * @param selectedNode
+	 * @param theSelectedNode
 	 *            the selected producer node
 	 * @return a Point containing the coordinate (x = yStart, y = yEnd)
 	 */
-	protected Point getSpatialSelectionCoordinates(EventProducerNode selectedNode) {
+	protected Point getSpatialSelectionCoordinates(EventProducerNode theSelectedNode) {
 		updateMeasurements();
 
-		int y0 = (int) (selectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
-		int y1 = y0 + (int) ((selectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
+		int y0 = (int) (theSelectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
+		int y1 = y0 + (int) ((theSelectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
 		
 		// If the selected producer is too small to be represented, take the
 		// parent node until the size is superior to the threshold
-		while ((selectedNode.getWeight() * logicHeight - aggregatedView.getSpace()) < minDrawThreshold) {
-			if (selectedNode.getParentNode() != null)
-				selectedNode = selectedNode.getParentNode();
+		while ((theSelectedNode.getWeight() * logicHeight - aggregatedView.getSpace()) < minDrawThreshold) {
+			if (theSelectedNode.getParentNode() != null)
+				theSelectedNode = theSelectedNode.getParentNode();
 			else
 				break;
 
-			y0 = (int) (selectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
-			y1 = y0 + (int) ((selectedNode.getWeight()) * logicHeight) - aggregatedView.getSpace();
+			y0 = (int) (theSelectedNode.getIndex() * logicHeight + aggregatedView.getBorder());
+			y1 = y0 + (int) (theSelectedNode.getWeight() * logicHeight) - aggregatedView.getSpace();
 		}
+		
+		selectedNode = theSelectedNode;
 
 		return new Point(y0, y1);
 	}
@@ -411,6 +433,32 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		return hierarchy.findSmallestContainingNode(currentProducers);
 	}
 
+	/**
+	 * Find the aggregate in the corresponding coordinate
+	 * 
+	 * @param x
+	 *            x coordinate
+	 * @param y
+	 *            y coordinate
+	 * @return the found aggregate, or null otherwise
+	 */
+	protected SpatioTemporalAggregateView findAggregate(int xa, int ya, int xb, int yb) {
+		Point clickCoord = new Point(xa, ya);
+		Point clickCoord2 = new Point(xb, yb);
+		SpatioTemporalAggregateView selectedAggregate = null;
+
+		// Find the corresponding aggregate
+		for (SpatioTemporalAggregateView aggreg : aggregatedView.getAggregates()) {
+			if (aggreg.getAggregateZone().contains(clickCoord) && 
+					aggreg.getAggregateZone().contains(clickCoord2)) {
+				selectedAggregate = aggreg;
+				break;
+			}
+		}
+	
+		return selectedAggregate;
+	}
+	
 	/**
 	 * Find the aggregate in the corresponding coordinate
 	 * 

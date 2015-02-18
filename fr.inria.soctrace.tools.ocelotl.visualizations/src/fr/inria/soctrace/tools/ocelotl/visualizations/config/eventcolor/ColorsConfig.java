@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -29,8 +29,8 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.
 
 public class ColorsConfig implements IVisuConfig {
 
-	private List<EventType>	types	= new LinkedList<EventType>();
-	private EventColorManager colors;
+	protected List<EventType>	types	= new LinkedList<EventType>();
+	protected EventColorManager colors;
 
 	public ColorsConfig() {
 		super();

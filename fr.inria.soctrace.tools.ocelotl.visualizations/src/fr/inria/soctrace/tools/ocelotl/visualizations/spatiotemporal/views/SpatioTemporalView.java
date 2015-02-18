@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.views;
 
 import java.util.ArrayList;
@@ -104,13 +115,16 @@ public abstract class SpatioTemporalView extends MatrixView {
 					// Check for each child that we have enough vertical space
 					// to display them
 					boolean aggy = false;
-					for (EventProducerNode ep : epn.getChildrenNodes()) {
-						// if the space needed to print an element is smaller
-						// than 1 pixel
-						if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
-							// Aggregate
-							aggy = true;
-							break;
+					if (ocelotlView.getOcelotlParameters().getOcelotlSettings()
+							.isUseVisualAggregate()) {
+						for (EventProducerNode ep : epn.getChildrenNodes()) {
+							// if the space needed to print an element is
+							// smaller than 1 pixel
+							if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
+								// Aggregate
+								aggy = true;
+								break;
+							}
 						}
 					}
 					// If enough space
@@ -183,6 +197,10 @@ public abstract class SpatioTemporalView extends MatrixView {
 			// Set the rectangle characteristics
 			final RectangleFigure rectangle = setRectangle(epn, logicX,
 					logicX2, isVisualAggregate, number);
+			
+			// Void state
+			if(rectangle == null)
+				return;
 
 			String label = ((Label) rectangle.getToolTip()).getText();
 

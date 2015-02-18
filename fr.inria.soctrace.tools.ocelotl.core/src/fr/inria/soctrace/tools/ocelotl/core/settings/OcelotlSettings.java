@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.core.settings;
 
 import java.io.File;
@@ -31,7 +42,8 @@ public class OcelotlSettings {
 	private static final Logger logger = LoggerFactory
 			.getLogger(OcelotlSettings.class);
 
-	private boolean cacheActivated;
+	private boolean dataCacheActivated;
+	private boolean dichoCacheActivated;
 	private String cacheDirectory;
 	private long cacheSize;
 	private String snapShotDirectory;
@@ -45,6 +57,10 @@ public class OcelotlSettings {
 	private boolean increasingQualities;
 	private int snapshotXResolution;
 	private int snapshotYResolution;
+	private int yAxisXResolution;
+	private int xAxisYResolution;
+	private int qualCurveXResolution;
+	private int qualCurveYResolution;
 
 	private boolean enableOverview;
 	private double overviewParameter;
@@ -56,14 +72,41 @@ public class OcelotlSettings {
 	private Color overviewDisplayFgColor;
 	private Color overviewDisplayBgColor;
 	private int overviewDisplayAlphaValue;
+	
+	private Color mainSelectionFgColor;
+	private Color mainSelectionBgColor;
+	private int mainSelectionAlphaValue;
+	private Color mainDisplayFgColor;
+	private Color mainDisplayBgColor;
+	private int mainDisplayAlphaValue;
+	
 	private ParameterPPolicy parameterPPolicy;
+	
+	private boolean aggregateLeaves;
+	private int maxNumberOfLeaves;
+	private boolean overviewAggregateLeaves;
+	private int overviewMaxNumberOfLeaves;
+	
+	private boolean useVisualAggregate;
 	
 	// Default directory where the config file is
 	private String defaultConfigFile;
 
 	public OcelotlSettings() {
 		// Init with default configuration
-		cacheActivated = OcelotlDefaultParameterConstants.DEFAULT_CACHE_ACTIVATION;
+		setDefaultValues();
+
+		// Check if a configuration file exists and if so, load the saved
+		// configuration
+		loadConfigurationFile();
+	}
+
+	/**
+	 * Set all settings to their default values
+	 */
+	public void setDefaultValues() {
+		dataCacheActivated = OcelotlDefaultParameterConstants.DEFAULT_DATA_CACHE_ACTIVATION;
+		dichoCacheActivated = OcelotlDefaultParameterConstants.DEFAULT_DICHO_CACHE_ACTIVATION;
 
 		// Default cache directory is the directory "ocelotlCache" in the
 		// running directory
@@ -89,21 +132,35 @@ public class OcelotlSettings {
 
 		snapshotXResolution = OcelotlDefaultParameterConstants.SNAPSHOT_DEFAULT_X_RESOLUTION;
 		snapshotYResolution = OcelotlDefaultParameterConstants.SNAPSHOT_DEFAULT_Y_RESOLUTION;
-
+		xAxisYResolution = OcelotlDefaultParameterConstants.XAXIS_DEFAULT_Y_RESOLUTION;
+		yAxisXResolution = OcelotlDefaultParameterConstants.YAXIS_DEFAULT_X_RESOLUTION;
+		qualCurveXResolution = OcelotlDefaultParameterConstants.QUALCURVE_DEFAULT_X_RESOLUTION;
+		qualCurveYResolution = OcelotlDefaultParameterConstants.QUALCURVE_DEFAULT_Y_RESOLUTION;
+		
 		overviewSelectionBgColor = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_BG_COLOR;
 		overviewSelectionFgColor = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_FG_COLOR;
 		overviewSelectionAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_SELECT_ALPHA;
 		overviewDisplayBgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_BG_COLOR;
 		overviewDisplayFgColor = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_FG_COLOR;
 		overviewDisplayAlphaValue = OcelotlDefaultParameterConstants.OVERVIEW_DISPLAY_ALPHA;
+
+		mainSelectionBgColor = OcelotlDefaultParameterConstants.MAIN_SELECT_BG_COLOR;
+		mainSelectionFgColor = OcelotlDefaultParameterConstants.MAIN_SELECT_FG_COLOR;
+		mainSelectionAlphaValue = OcelotlDefaultParameterConstants.MAIN_SELECT_ALPHA;
+		mainDisplayBgColor = OcelotlDefaultParameterConstants.MAIN_DISPLAY_BG_COLOR;
+		mainDisplayFgColor = OcelotlDefaultParameterConstants.MAIN_DISPLAY_FG_COLOR;
+		mainDisplayAlphaValue = OcelotlDefaultParameterConstants.MAIN_DISPLAY_ALPHA;
+
 		parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
 		enableOverview = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
+		aggregateLeaves = OcelotlDefaultParameterConstants.AGGREGATE_LEAVES;
+		maxNumberOfLeaves = OcelotlDefaultParameterConstants.MAX_NUMBER_OF_LEAVES;
 		
-		// Check if a configuration file exists and if so, load the saved
-		// configuration
-		loadConfigurationFile();
+		overviewAggregateLeaves = OcelotlDefaultParameterConstants.OVERVIEW_AGGREGATE_LEAVES;
+		overviewMaxNumberOfLeaves = OcelotlDefaultParameterConstants.OVERVIEW_MAX_NUMBER_OF_LEAVES;
+		useVisualAggregate = OcelotlDefaultParameterConstants.USE_VISUAL_AGGREGATE;
 	}
-
+	
 	/**
 	 * Load a previously saved configuration file
 	 */
@@ -126,7 +183,7 @@ public class OcelotlSettings {
 				JsonObject theConf = theConfig.getAsJsonObject();
 				fileReader.close();
 
-				setCacheActivated(theConf.get(
+				setDataCacheActivated(theConf.get(
 						OcelotlConstants.JSONCacheActivated).getAsBoolean());
 				setCacheDirectory(theConf.get(
 						OcelotlConstants.JSONCacheDirectory).getAsString());
@@ -175,18 +232,52 @@ public class OcelotlSettings {
 						OcelotlConstants.JSONOverviewSelectionFgColor)
 						.getAsString()));
 				setOverviewSelectionAlphaValue(theConf.get(
-						OcelotlConstants.JSONOverviewSelectionAlpha)
-						.getAsInt());
+						OcelotlConstants.JSONOverviewSelectionAlpha).getAsInt());
 				setOverviewDisplayAlphaValue(theConf.get(
-						OcelotlConstants.JSONOverviewDisplayAlpha)
-						.getAsInt());
+						OcelotlConstants.JSONOverviewDisplayAlpha).getAsInt());
 				setParameterPPolicy(ParameterPPolicy.valueOf(theConf.get(
 						OcelotlConstants.JSONParameterPPolicy).getAsString()));
 				setEnableOverview(theConf.get(
 						OcelotlConstants.JSONEnableOverview).getAsBoolean());
+				setAggregateLeaves(theConf.get(
+						OcelotlConstants.JSONAggregateLeaves).getAsBoolean());
+				setMaxNumberOfLeaves(theConf.get(
+						OcelotlConstants.JSONMaxNumberOfLeaves).getAsInt());
+				setMainDisplayBgColor(loadColor(theConf.get(
+						OcelotlConstants.JSONMainDisplayBgColor).getAsString()));
+				setMainDisplayFgColor(loadColor(theConf.get(
+						OcelotlConstants.JSONMainDisplayFgColor).getAsString()));
+				setMainSelectionBgColor(loadColor(theConf.get(
+						OcelotlConstants.JSONMainSelectionBgColor)
+						.getAsString()));
+				setMainSelectionFgColor(loadColor(theConf.get(
+						OcelotlConstants.JSONMainSelectionFgColor)
+						.getAsString()));
+				setMainSelectionAlphaValue(theConf.get(
+						OcelotlConstants.JSONMainSelectionAlpha).getAsInt());
+				setMainDisplayAlphaValue(theConf.get(
+						OcelotlConstants.JSONMainDisplayAlpha).getAsInt());
+				setxAxisYResolution(theConf.get(
+						OcelotlConstants.JSONXAxisYResolution).getAsInt());
+				setyAxisXResolution(theConf.get(
+						OcelotlConstants.JSONYAxisXResolution).getAsInt());
+				setQualCurveXResolution(theConf.get(
+						OcelotlConstants.JSONQualCurveXResolution).getAsInt());
+				setQualCurveYResolution(theConf.get(
+						OcelotlConstants.JSONQualCurveYResolution).getAsInt());
+				setDichoCacheActivated(theConf.get(
+						OcelotlConstants.JSONDichoCacheActivated).getAsBoolean());
+				setOverviewAggregateLeaves(theConf.get(
+						OcelotlConstants.JSONOverviewAggregateLeaves)
+						.getAsBoolean());
+				setOverviewMaxNumberOfLeaves(theConf.get(
+						OcelotlConstants.JSONOverviewMaxNumberOfLeaves)
+						.getAsInt());
+				setUseVisualAggregate(theConf.get(
+						OcelotlConstants.JSONUseVisualAggregate).getAsBoolean());
 
 				logger.debug("Settings values:\n");
-				logger.debug("Cache activated: " + cacheActivated);
+				logger.debug("Cache activated: " + dataCacheActivated);
 				logger.debug("Cache directory: " + cacheDirectory);
 				logger.debug("Cache size: " + cacheSize);
 				logger.debug("Snapshot directory: " + snapShotDirectory);
@@ -200,7 +291,7 @@ public class OcelotlSettings {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (JsonParseException | NullPointerException e) {
-				logger.error("Incomplete or invalid JSON configuration file: the file will be regenerated with default values will be used");
+				logger.error("Incomplete or invalid JSON configuration file: the file will be regenerated with default values");
 				// Regenerate the configuration file with the default values
 				saveSettings();
 			}
@@ -216,9 +307,10 @@ public class OcelotlSettings {
 		JsonObject theConfig = new JsonObject();
 
 		theConfig.addProperty(OcelotlConstants.JSONCacheActivated,
-				cacheActivated);
+				dataCacheActivated);
 		theConfig.addProperty(OcelotlConstants.JSONCacheDirectory,
 				cacheDirectory);
+		
 		// Convert from MB to bytes
 		if (cacheSize >= 0) {
 			theConfig.addProperty(OcelotlConstants.JSONCacheSize,
@@ -226,6 +318,7 @@ public class OcelotlSettings {
 		} else {
 			theConfig.addProperty(OcelotlConstants.JSONCacheSize, -1);
 		}
+		
 		theConfig.addProperty(OcelotlConstants.JSONSnapShotDirectory,
 				snapShotDirectory);
 		theConfig.addProperty(OcelotlConstants.JSONCachePolicy,
@@ -264,6 +357,38 @@ public class OcelotlSettings {
 				parameterPPolicy.toString());
 		theConfig.addProperty(OcelotlConstants.JSONEnableOverview,
 				enableOverview);
+		theConfig.addProperty(OcelotlConstants.JSONAggregateLeaves,
+				aggregateLeaves);
+		theConfig.addProperty(OcelotlConstants.JSONMaxNumberOfLeaves,
+				maxNumberOfLeaves);
+		theConfig.addProperty(OcelotlConstants.JSONMainSelectionBgColor,
+				saveColor(mainSelectionBgColor));
+		theConfig.addProperty(OcelotlConstants.JSONMainSelectionFgColor,
+				saveColor(mainSelectionFgColor));
+		theConfig.addProperty(OcelotlConstants.JSONMainSelectionAlpha,
+				mainSelectionAlphaValue);
+		theConfig.addProperty(OcelotlConstants.JSONMainDisplayBgColor,
+				saveColor(mainDisplayBgColor));
+		theConfig.addProperty(OcelotlConstants.JSONMainDisplayFgColor,
+				saveColor(mainDisplayFgColor));
+		theConfig.addProperty(OcelotlConstants.JSONMainDisplayAlpha,
+				mainDisplayAlphaValue);
+		theConfig.addProperty(OcelotlConstants.JSONXAxisYResolution,
+				xAxisYResolution);
+		theConfig.addProperty(OcelotlConstants.JSONYAxisXResolution,
+				yAxisXResolution);
+		theConfig.addProperty(OcelotlConstants.JSONQualCurveXResolution,
+				qualCurveXResolution);
+		theConfig.addProperty(OcelotlConstants.JSONQualCurveYResolution,
+				qualCurveYResolution);
+		theConfig.addProperty(OcelotlConstants.JSONDichoCacheActivated,
+				dichoCacheActivated);
+		theConfig.addProperty(OcelotlConstants.JSONOverviewAggregateLeaves,
+				overviewAggregateLeaves);
+		theConfig.addProperty(OcelotlConstants.JSONOverviewMaxNumberOfLeaves,
+				overviewMaxNumberOfLeaves);
+		theConfig.addProperty(OcelotlConstants.JSONUseVisualAggregate,
+				useVisualAggregate);
 		
 		String newSettings = gson.toJson(theConfig);
 
@@ -315,10 +440,7 @@ public class OcelotlSettings {
 	}
 
 	public void setSnapShotDirectory(String snapShotDir) {
-		if (!snapShotDirectory.equals(snapShotDir)) {
-			this.snapShotDirectory = snapShotDir;
-			saveSettings();
-		}
+		this.snapShotDirectory = snapShotDir;
 	}
 
 	public long getCacheSize() {
@@ -326,10 +448,7 @@ public class OcelotlSettings {
 	}
 
 	public void setCacheSize(long cacheMaxSize) {
-		if (this.cacheSize != cacheMaxSize) {
-			this.cacheSize = cacheMaxSize;
-			saveSettings();
-		}
+		this.cacheSize = cacheMaxSize;
 	}
 
 	public String getCacheDirectory() {
@@ -337,21 +456,15 @@ public class OcelotlSettings {
 	}
 
 	public void setCacheDirectory(String cacheDir) {
-		if (!this.cacheDirectory.equals(cacheDir)) {
-			this.cacheDirectory = cacheDir;
-			saveSettings();
-		}
+		this.cacheDirectory = cacheDir;
 	}
 
-	public boolean isCacheActivated() {
-		return cacheActivated;
+	public boolean isDataCacheActivated() {
+		return dataCacheActivated;
 	}
 
-	public void setCacheActivated(boolean cacheActivated) {
-		if (this.cacheActivated != cacheActivated) {
-			this.cacheActivated = cacheActivated;
-			saveSettings();
-		}
+	public void setDataCacheActivated(boolean cacheActivated) {
+		this.dataCacheActivated = cacheActivated;
 	}
 
 	public DatacachePolicy getCachePolicy() {
@@ -359,10 +472,7 @@ public class OcelotlSettings {
 	}
 
 	public void setCachePolicy(DatacachePolicy cachePolicy) {
-		if (this.cachePolicy != cachePolicy) {
-			this.cachePolicy = cachePolicy;
-			saveSettings();
-		}
+		this.cachePolicy = cachePolicy;
 	}
 
 	public int getCacheTimeSliceNumber() {
@@ -370,10 +480,15 @@ public class OcelotlSettings {
 	}
 
 	public void setCacheTimeSliceNumber(int cacheTimeSliceNumber) {
-		if (this.cacheTimeSliceNumber != cacheTimeSliceNumber) {
-			this.cacheTimeSliceNumber = cacheTimeSliceNumber;
-			saveSettings();
-		}
+		this.cacheTimeSliceNumber = cacheTimeSliceNumber;
+	}
+
+	public boolean isDichoCacheActivated() {
+		return dichoCacheActivated;
+	}
+
+	public void setDichoCacheActivated(boolean dichoCacheActivated) {
+		this.dichoCacheActivated = dichoCacheActivated;
 	}
 
 	public int getEventsPerThread() {
@@ -381,10 +496,7 @@ public class OcelotlSettings {
 	}
 
 	public void setEventsPerThread(int eventsPerThread) {
-		if (this.eventsPerThread != eventsPerThread) {
-			this.eventsPerThread = eventsPerThread;
-			saveSettings();
-		}
+		this.eventsPerThread = eventsPerThread;
 	}
 
 	public int getMaxEventProducersPerQuery() {
@@ -392,10 +504,7 @@ public class OcelotlSettings {
 	}
 
 	public void setMaxEventProducersPerQuery(int maxEventProducers) {
-		if (this.maxEventProducersPerQuery != maxEventProducers) {
-			this.maxEventProducersPerQuery = maxEventProducers;
-			saveSettings();
-		}
+		this.maxEventProducersPerQuery = maxEventProducers;
 	}
 
 	public int getNumberOfThread() {
@@ -403,10 +512,7 @@ public class OcelotlSettings {
 	}
 
 	public void setNumberOfThread(int numberOfThread) {
-		if (this.numberOfThread != numberOfThread) {
-			this.numberOfThread = numberOfThread;
-			saveSettings();
-		}
+		this.numberOfThread = numberOfThread;
 	}
 
 	public boolean isNormalizedCurve() {
@@ -414,10 +520,7 @@ public class OcelotlSettings {
 	}
 
 	public void setNormalizedCurve(boolean normalizedCurve) {
-		if (this.normalizedCurve != normalizedCurve) {
-			this.normalizedCurve = normalizedCurve;
-			saveSettings();
-		}
+		this.normalizedCurve = normalizedCurve;
 	}
 
 	public double getThresholdPrecision() {
@@ -425,10 +528,7 @@ public class OcelotlSettings {
 	}
 
 	public void setThresholdPrecision(double thresholdPrecision) {
-		if (this.thresholdPrecision != thresholdPrecision) {
-			this.thresholdPrecision = thresholdPrecision;
-			saveSettings();
-		}
+		this.thresholdPrecision = thresholdPrecision;
 	}
 
 	public boolean getIncreasingQualities() {
@@ -436,10 +536,7 @@ public class OcelotlSettings {
 	}
 
 	public void setIncreasingQualities(boolean increasingQualities) {
-		if (this.increasingQualities != increasingQualities) {
-			this.increasingQualities = increasingQualities;
-			saveSettings();
-		}
+		this.increasingQualities = increasingQualities;
 	}
 
 	public double getOverviewParameter() {
@@ -447,10 +544,7 @@ public class OcelotlSettings {
 	}
 
 	public void setOverviewParameter(double overviewParameter) {
-		if (this.overviewParameter != overviewParameter) {
-			this.overviewParameter = overviewParameter;
-			saveSettings();
-		}
+		this.overviewParameter = overviewParameter;
 	}
 
 	public int getOverviewTimesliceNumber() {
@@ -458,10 +552,7 @@ public class OcelotlSettings {
 	}
 
 	public void setOverviewTimesliceNumber(int overviewTimesliceNumber) {
-		if (this.overviewTimesliceNumber != overviewTimesliceNumber) {
-			this.overviewTimesliceNumber = overviewTimesliceNumber;
-			saveSettings();
-		}
+		this.overviewTimesliceNumber = overviewTimesliceNumber;
 	}
 
 	public String getOverviewAggregOperator() {
@@ -470,10 +561,6 @@ public class OcelotlSettings {
 
 	public void setOverviewAggregOperator(String overviewAggregOperator) {
 		this.overviewAggregOperator = overviewAggregOperator;
-		if (!this.overviewAggregOperator.equals(overviewAggregOperator)) {
-			this.overviewAggregOperator = overviewAggregOperator;
-			saveSettings();
-		}
 	}
 
 	public int getSnapshotYResolution() {
@@ -481,10 +568,7 @@ public class OcelotlSettings {
 	}
 
 	public void setSnapshotYResolution(int snapshotYResolution) {
-		if (this.snapshotYResolution != snapshotYResolution) {
-			this.snapshotYResolution = snapshotYResolution;
-			saveSettings();
-		}
+		this.snapshotYResolution = snapshotYResolution;
 	}
 
 	public int getSnapshotXResolution() {
@@ -492,10 +576,39 @@ public class OcelotlSettings {
 	}
 
 	public void setSnapshotXResolution(int snapshotXResolution) {
-		if (this.snapshotXResolution != snapshotXResolution) {
-			this.snapshotXResolution = snapshotXResolution;
-			saveSettings();
-		}
+		this.snapshotXResolution = snapshotXResolution;
+	}
+
+	public int getyAxisXResolution() {
+		return yAxisXResolution;
+	}
+
+	public void setyAxisXResolution(int yAxisXResolution) {
+		this.yAxisXResolution = yAxisXResolution;
+	}
+
+	public int getxAxisYResolution() {
+		return xAxisYResolution;
+	}
+
+	public void setxAxisYResolution(int xAxisYResolution) {
+		this.xAxisYResolution = xAxisYResolution;
+	}
+
+	public int getQualCurveXResolution() {
+		return qualCurveXResolution;
+	}
+
+	public void setQualCurveXResolution(int qualCurveXResolution) {
+		this.qualCurveXResolution = qualCurveXResolution;
+	}
+
+	public int getQualCurveYResolution() {
+		return qualCurveYResolution;
+	}
+
+	public void setQualCurveYResolution(int qualCurveYResolution) {
+		this.qualCurveYResolution = qualCurveYResolution;
 	}
 
 	public Color getOverviewSelectionFgColor() {
@@ -503,10 +616,7 @@ public class OcelotlSettings {
 	}
 
 	public void setOverviewSelectionFgColor(Color overviewSelectionFgColor) {
-		if (this.overviewSelectionFgColor != overviewSelectionFgColor) {
-			this.overviewSelectionFgColor = overviewSelectionFgColor;
-			saveSettings();
-		}
+		this.overviewSelectionFgColor = overviewSelectionFgColor;
 	}
 
 	public Color getOverviewSelectionBgColor() {
@@ -514,11 +624,7 @@ public class OcelotlSettings {
 	}
 
 	public void setOverviewSelectionBgColor(Color overviewSelectionBgColor) {
-		if (this.overviewSelectionBgColor != overviewSelectionBgColor) {
-			this.overviewSelectionBgColor = overviewSelectionBgColor;
-			saveSettings();
-		}
-
+		this.overviewSelectionBgColor = overviewSelectionBgColor;
 	}
 
 	public Color getOverviewDisplayFgColor() {
@@ -526,10 +632,7 @@ public class OcelotlSettings {
 	}
 
 	public void setOverviewDisplayFgColor(Color overviewDisplayFgColor) {
-		if (this.overviewDisplayFgColor != overviewDisplayFgColor) {
-			this.overviewDisplayFgColor = overviewDisplayFgColor;
-			saveSettings();
-		}
+		this.overviewDisplayFgColor = overviewDisplayFgColor;
 	}
 
 	public Color getOverviewDisplayBgColor() {
@@ -537,10 +640,7 @@ public class OcelotlSettings {
 	}
 
 	public void setOverviewDisplayBgColor(Color overviewDisplayBgColor) {
-		if (this.overviewDisplayBgColor != overviewDisplayBgColor) {
-			this.overviewDisplayBgColor = overviewDisplayBgColor;
-			saveSettings();
-		}
+		this.overviewDisplayBgColor = overviewDisplayBgColor;
 	}
 
 	public int getOverviewSelectionAlphaValue() {
@@ -548,10 +648,7 @@ public class OcelotlSettings {
 	}
 
 	public void setOverviewSelectionAlphaValue(int overviewSelectionAlphaValue) {
-		if (this.overviewSelectionAlphaValue != overviewSelectionAlphaValue) {
-			this.overviewSelectionAlphaValue = overviewSelectionAlphaValue;
-			saveSettings();
-		}
+		this.overviewSelectionAlphaValue = overviewSelectionAlphaValue;
 	}
 
 	public int getOverviewDisplayAlphaValue() {
@@ -559,10 +656,55 @@ public class OcelotlSettings {
 	}
 
 	public void setOverviewDisplayAlphaValue(int overviewDisplayAlphaValue) {
-		if (this.overviewDisplayAlphaValue != overviewDisplayAlphaValue) {
-			this.overviewDisplayAlphaValue = overviewDisplayAlphaValue;
-			saveSettings();
-		}
+		this.overviewDisplayAlphaValue = overviewDisplayAlphaValue;
+	}
+
+	public Color getMainSelectionFgColor() {
+		return mainSelectionFgColor;
+	}
+
+	public void setMainSelectionFgColor(Color mainSelectionFgColor) {
+		this.mainSelectionFgColor = mainSelectionFgColor;
+	}
+
+	public Color getMainSelectionBgColor() {
+		return mainSelectionBgColor;
+	}
+
+	public void setMainSelectionBgColor(Color mainSelectionBgColor) {
+		this.mainSelectionBgColor = mainSelectionBgColor;
+	}
+
+	public int getMainSelectionAlphaValue() {
+		return mainSelectionAlphaValue;
+	}
+
+	public void setMainSelectionAlphaValue(int mainSelectionAlphaValue) {
+		this.mainSelectionAlphaValue = mainSelectionAlphaValue;
+	}
+
+	public Color getMainDisplayFgColor() {
+		return mainDisplayFgColor;
+	}
+
+	public void setMainDisplayFgColor(Color mainDisplayFgColor) {
+		this.mainDisplayFgColor = mainDisplayFgColor;
+	}
+
+	public Color getMainDisplayBgColor() {
+		return mainDisplayBgColor;
+	}
+
+	public void setMainDisplayBgColor(Color mainDisplayBgColor) {
+		this.mainDisplayBgColor = mainDisplayBgColor;
+	}
+
+	public int getMainDisplayAlphaValue() {
+		return mainDisplayAlphaValue;
+	}
+
+	public void setMainDisplayAlphaValue(int mainDisplayAlphaValue) {
+		this.mainDisplayAlphaValue = mainDisplayAlphaValue;
 	}
 
 	public boolean isEnableOverview() {
@@ -570,10 +712,7 @@ public class OcelotlSettings {
 	}
 
 	public void setEnableOverview(boolean enableOverview) {
-		if (this.enableOverview != enableOverview) {
-			this.enableOverview = enableOverview;
-			saveSettings();
-		}
+		this.enableOverview = enableOverview;
 	}
 
 	public ParameterPPolicy getParameterPPolicy() {
@@ -581,9 +720,54 @@ public class OcelotlSettings {
 	}
 
 	public void setParameterPPolicy(ParameterPPolicy parameterPPolicy) {
-		if (this.parameterPPolicy != parameterPPolicy) {
-			this.parameterPPolicy = parameterPPolicy;
-			saveSettings();
+		this.parameterPPolicy = parameterPPolicy;
+	}
+
+	public boolean isAggregateLeaves() {
+		return aggregateLeaves;
+	}
+
+	public boolean setAggregateLeaves(boolean aggregateLeaves) {
+		if (this.aggregateLeaves != aggregateLeaves) {
+			this.aggregateLeaves = aggregateLeaves;
+			return true;
 		}
+		return false;
+	}
+
+	public int getMaxNumberOfLeaves() {
+		return maxNumberOfLeaves;
+	}
+
+	public boolean setMaxNumberOfLeaves(int maxNumberOfLeaves) {
+		if (this.maxNumberOfLeaves != maxNumberOfLeaves) {
+			this.maxNumberOfLeaves = maxNumberOfLeaves;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isOverviewAggregateLeaves() {
+		return overviewAggregateLeaves;
+	}
+
+	public void setOverviewAggregateLeaves(boolean overviewAggregateLeaves) {
+		this.overviewAggregateLeaves = overviewAggregateLeaves;
+	}
+
+	public int getOverviewMaxNumberOfLeaves() {
+		return overviewMaxNumberOfLeaves;
+	}
+
+	public void setOverviewMaxNumberOfLeaves(int overviewMaxNumberOfLeaves) {
+		this.overviewMaxNumberOfLeaves = overviewMaxNumberOfLeaves;
+	}
+
+	public boolean isUseVisualAggregate() {
+		return useVisualAggregate;
+	}
+
+	public void setUseVisualAggregate(boolean useVisualAggregate) {
+		this.useVisualAggregate = useVisualAggregate;
 	}
 }

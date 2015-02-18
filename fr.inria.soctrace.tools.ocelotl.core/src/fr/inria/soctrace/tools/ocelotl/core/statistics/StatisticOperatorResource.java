@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -35,6 +35,7 @@ public class StatisticOperatorResource {
 	String visualization;
 	String bundle;
 	int selectionPriority;
+	boolean leaveAggregationCompatiblity;
 
 	public StatisticOperatorResource() {
 		// TODO Auto-generated constructor stub
@@ -43,8 +44,9 @@ public class StatisticOperatorResource {
 	public StatisticOperatorResource(final String operatorClass,
 			final String name, final List<String> timeCompatibility,
 			final String visualization, String paramWinClass,
-			String paramConfig, final int selectionPriority, final String bundle) {
-		super();
+			String paramConfig, final int selectionPriority,
+			final boolean leaveAggregationCompatiblity, final String bundle) {
+	super();
 		this.operatorClass = operatorClass;
 		this.name = name;
 		this.timeCompatibility = timeCompatibility;
@@ -52,6 +54,7 @@ public class StatisticOperatorResource {
 		this.paramWinClass = paramWinClass;
 		this.paramConfig = paramConfig;
 		this.selectionPriority = selectionPriority;
+		this.leaveAggregationCompatiblity = leaveAggregationCompatiblity;
 		this.bundle = bundle;
 	}
 
@@ -129,6 +132,14 @@ public class StatisticOperatorResource {
 
 	public void setSelectionPriority(int selectionPriority) {
 		this.selectionPriority = selectionPriority;
+	}
+
+	public boolean isLeaveAggregationCompatiblity() {
+		return leaveAggregationCompatiblity;
+	}
+
+	public void setLeaveAggregationCompatiblity(boolean leaveAggregationCompatiblity) {
+		this.leaveAggregationCompatiblity = leaveAggregationCompatiblity;
 	}
 	
 }

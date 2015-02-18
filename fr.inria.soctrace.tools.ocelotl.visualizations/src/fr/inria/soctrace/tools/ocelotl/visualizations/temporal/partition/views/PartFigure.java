@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -19,7 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.visualizations.temporal.partition.views;
 
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.OrderedLayout;
 import org.eclipse.draw2d.RectangleFigure;
@@ -31,26 +30,26 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 public class PartFigure extends RectangleFigure {
 
-	private int					index;
-	private final int			value;
-	private final PartitionColor		color;
-	private final static int	textSize	= 15;
-	private final boolean		numbers;
+	private int index;
+	private final int value;
+	private final PartitionColor color;
+	private final static int textSize = 15;
+	private final boolean numbers;
 
-	public PartFigure(final int index, final int value, final PartitionColor color, final boolean numbers) {
+	public PartFigure(final int index, final int value,
+			final PartitionColor color, final boolean numbers) {
 		super();
 		setIndex(index);
 		this.value = value;
 		this.color = color;
 		this.numbers = numbers;
-
 	}
 
 	public int getIndex() {
 		return index;
 	}
 
-	//Draw the part visualization of the aggregates
+	// Draw the part visualization of the aggregates
 	public void init() {
 		removeAll();
 		final RoundedRectangle roundedRectangle = new RoundedRectangle();
@@ -66,16 +65,16 @@ public class PartFigure extends RectangleFigure {
 		final Label label = new Label("" + value);
 		label.setLabelAlignment(SWT.CENTER);
 		label.setForegroundColor(color.getFg());
-		roundedRectangle.setFont(SWTResourceManager.getFont("Cantarell", textSize, SWT.BOLD));
+		roundedRectangle.setFont(SWTResourceManager.getFont("Cantarell",
+				textSize, SWT.BOLD));
 		if (numbers)
-			if (getSize().width / 2 - 3 > textSize && getSize().height / 2 - 3 > textSize)
+			if (getSize().width / 2 - 3 > textSize
+					&& getSize().height / 2 - 3 > textSize)
 				roundedRectangle.add(label);
 		final ToolbarLayout layout = new ToolbarLayout();
 		layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 		setConstraint(roundedRectangle, getBounds());
 		setLayoutManager(layout);
-		setForegroundColor(ColorConstants.white);
-		setBackgroundColor(ColorConstants.white);
 	}
 
 	public void setIndex(final int index) {

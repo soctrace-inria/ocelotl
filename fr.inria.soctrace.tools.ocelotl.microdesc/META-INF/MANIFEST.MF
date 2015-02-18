@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GenericTimeAggOp
 Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.microdesc;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.5
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.microdesc.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -18,5 +18,6 @@ Export-Package: fr.inria.soctrace.tools.ocelotl.microdesc,
  fr.inria.soctrace.tools.ocelotl.microdesc.config,
  fr.inria.soctrace.tools.ocelotl.microdesc.operators,
  fr.inria.soctrace.tools.ocelotl.microdesc.ui
-Import-Package: fr.inria.soctrace.lib.search.utils,
+Import-Package: fr.inria.soctrace.framesoc.ui.utils,
+ fr.inria.soctrace.lib.search.utils,
  org.eclipse.wb.swt

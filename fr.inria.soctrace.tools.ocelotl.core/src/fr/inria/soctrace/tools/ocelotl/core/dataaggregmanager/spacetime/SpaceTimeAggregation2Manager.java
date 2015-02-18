@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -74,14 +74,12 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	protected void addLeaves() {
 		for (int id : hierarchy.getLeaves().keySet())
 			timeAggregation.addLeaf(id, hierarchy.getParentID(id),
-					hierarchy.getValues(id));
-
+					hierarchy.getValues(id), hierarchy.getEventProducerNodes().get(id).getWeight());
 	}
 
 	@Override
 	protected void addNodes() {
 		addChildren(hierarchy.getRoot().getID());
-
 	}
 
 	protected void addChildren(int id) {
@@ -97,7 +95,6 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	@Override
 	protected void addRoot() {
 		timeAggregation.addRoot(hierarchy.getRoot().getID());
-
 	}
 
 	@Override
@@ -113,7 +110,7 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 	}
 
 	private void setHierarchy() throws OcelotlException {
-		hierarchy = new EventProducerHierarchy(getEventProducers());
+		hierarchy = new EventProducerHierarchy(getEventProducers(), matrix);
 	}
 
 }

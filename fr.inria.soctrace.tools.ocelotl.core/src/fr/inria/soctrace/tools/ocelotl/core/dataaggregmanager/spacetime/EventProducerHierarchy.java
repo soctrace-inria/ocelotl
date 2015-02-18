@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -26,8 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.inria.soctrace.framesoc.ui.utils.AlphanumComparator;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
 
 public class EventProducerHierarchy {
 
@@ -36,7 +38,6 @@ public class EventProducerHierarchy {
 	}
 
 	public class EventProducerNode {
-
 		private int id;
 		private EventProducer me;
 		private EventProducerNode parentNode;
@@ -154,12 +155,10 @@ public class EventProducerHierarchy {
 			Collections.sort(childrenNodes,
 					new Comparator<EventProducerNode>() {
 						@Override
-						public int compare(EventProducerNode arg0,
-								EventProducerNode arg1) {
-							return arg0
-									.getMe()
-									.getName()
-									.compareToIgnoreCase(arg1.getMe().getName());
+						public int compare(EventProducerNode o1,
+								EventProducerNode o2) {
+							return AlphanumComparator.compare(o1.getMe()
+									.getName(), o2.getMe().getName());
 						}
 					});
 		}
@@ -202,13 +201,35 @@ public class EventProducerHierarchy {
 		 * @return the newly computed weight
 		 */
 		public int setWeight() {
-			if (childrenNodes.isEmpty())
+			if (childrenNodes.isEmpty()) {
+				// If it is an aggregated leave
+				if (microModel3D.getAggregatedProducers()
+						.containsValue(me)) {
+					weight = microModel3D
+							.removeFilteredEP(
+									microModel3D
+											.getOcelotlParameters()
+											.getEventProducerHierarchy()
+											.getLeaves(
+													microModel3D
+															.getOcelotlParameters()
+															.getEventProducerHierarchy()
+															.getEventProducerNodes()
+															.get(this.getMe()
+																	.getId())))
+							.size();
+					
+					aggLeaves.add(this);
+				}
+
 				return weight;
-			else
+			} else
 				weight = 0;
+
 			for (EventProducerNode epn : childrenNodes) {
 				weight += epn.setWeight();
 			}
+			
 			return weight;
 		}
 
@@ -353,15 +374,21 @@ public class EventProducerHierarchy {
 	private Map<Integer, EventProducerNode> orphans = new HashMap<Integer, EventProducerNode>();
 	private Map<Integer, EventProducerNode> leaves = new HashMap<Integer, EventProducerNode>();
 	private Map<Integer, EventProducer> eventProducers = new HashMap<Integer, EventProducer>();
+	private ArrayList<EventProducerNode> aggLeaves = new ArrayList<EventProducerNode>();
 	private EventProducerNode root = null;
 	protected int maxHierarchyLevel;
+	protected Microscopic3DDescription microModel3D;
 
-	public EventProducerHierarchy(List<EventProducer> eventProducers) throws OcelotlException {
+	public EventProducerHierarchy(List<EventProducer> eventProducers,
+			Microscopic3DDescription microModel3D) throws OcelotlException {
 		super();
+
 		for (EventProducer ep : eventProducers) {
 			this.eventProducers.put(ep.getId(), ep);
 		}
+
 		root = null;
+		this.microModel3D = microModel3D;
 		maxHierarchyLevel = 0;
 		setHierarchy();
 	}
@@ -374,12 +401,7 @@ public class EventProducerHierarchy {
 		
 		// If there are some node with no parent
 		if (!orphans.isEmpty()) {
-		//	System.err.println("Careful: hierarchy is incomplete and some elements will be destroyed!");
 			throw new OcelotlException(OcelotlException.INCOMPLETE_HIERARCHY);
-//			for (Integer orphan : orphans.keySet()) {
-//				if (orphans.containsKey(orphan))
-//					orphans.get(orphan).destroy();
-//			}
 		}
 		root.setWeight();
 		root.setChildIndex();
@@ -506,6 +528,13 @@ public class EventProducerHierarchy {
 			if ((epn.index + epn.weight > start && epn.index + epn.weight < end)
 					|| (epn.index >= start && epn.index <= end))
 				containedEpn.add(epn);
+		}
+
+		if (containedEpn.isEmpty()) {
+			for (EventProducerNode epn : leaves.values()) {
+				if (start >= epn.index && end <= epn.index + epn.weight)
+					containedEpn.add(epn);
+			}
 		}
 		return containedEpn;
 	}

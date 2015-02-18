@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.inria.soctrace.tools.ocelotl.maven.master</groupId>
+	<artifactId>fr.inria.soctrace.tools.ocelotl.maven.master</artifactId>
+	<version>1.1.5</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<tycho-version>0.22.0</tycho-version>
+	</properties>
+
+	<build>
+		<plugins>
+			<!-- tycho -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+
+			<!-- Generate bundles source http://wiki.eclipse.org/Tycho/Reference_Card -->
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<id>plugin-source</id>
+						<goals>
+							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<id>attach-p2-metadata</id>
+						<phase>package</phase>
+						<goals>
+							<goal>p2-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>eclipse-kepler</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/kepler</url>
+		</repository>
+		<repository>
+			<id>framesoc</id>
+			<layout>p2</layout>
+			<url>http://soctrace-inria.github.io/updatesite/</url>
+		</repository>
+	</repositories>
+
+	<modules>
+		<!-- Ocelotl feature and plugins -->
+		<module>../fr.inria.soctrace.tools.ocelotl.feature</module>
+		<module>../fr.inria.soctrace.tools.ocelotl.core</module>
+		<module>../fr.inria.soctrace.tools.ocelotl.ui</module>
+		<module>../fr.inria.soctrace.tools.ocelotl.json</module>
+		<module>../fr.inria.soctrace.tools.ocelotl.microdesc</module>
+		<module>../fr.inria.soctrace.tools.ocelotl.slf4j</module>
+		<module>../fr.inria.soctrace.tools.ocelotl.statistics</module>
+		<module>../fr.inria.soctrace.tools.ocelotl.visualizations</module>
+		<module>../fr.inria.lpaggreg</module>
+		<module>../fr.inria.lpaggreg.linux_x64</module>
+		<module>../fr.inria.lpaggreg.linux_x86</module>
+		<module>../fr.inria.lpaggreg.win32</module>
+		<module>../fr.inria.lpaggreg.win64</module>
+
+		<!-- Repository configuration -->
+		<module>../fr.inria.soctrace.tools.ocelotl.maven.repository</module>
+
+		<!-- Branding -->
+		<module>../fr.inria.soctrace.tools.ocelotl.brand</module>
+	</modules>
+</project>

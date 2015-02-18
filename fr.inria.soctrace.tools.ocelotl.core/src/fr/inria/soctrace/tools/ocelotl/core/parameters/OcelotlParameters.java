@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -20,18 +20,22 @@
 package fr.inria.soctrace.tools.ocelotl.core.parameters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
+import fr.inria.soctrace.lib.model.utils.ModelConstants.TimeUnit;
+import fr.inria.soctrace.tools.ocelotl.core.caches.DataCache;
+import fr.inria.soctrace.tools.ocelotl.core.caches.DichotomyCache;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
-import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
 import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticOperatorConfig;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -48,10 +52,17 @@ public class OcelotlParameters {
 	private List<EventProducer> currentProducers = new ArrayList<EventProducer>();
 	// List of the event producers selected through a spatial selection 
 	private List<EventProducer> spatiallySelectedProducers = new ArrayList<EventProducer>();
+	// List of all the event producers present in the trace
+	private List<EventProducer> allEventProducers = new ArrayList<EventProducer>();
+	// List of all the event producers that are not filtered out
+	private List<EventProducer> unfilteredEventProducers = new ArrayList<EventProducer>();
+	// List of all the event producers that are aggregated 
+	private List<EventProducer> aggregatedEventProducers = new ArrayList<EventProducer>();
+	
 	private List<EventType> eventTypes = new LinkedList<EventType>();
 	private List<EventType> allEventTypes;
 	private List<EventType> operatorEventTypes;
-	private List<EventProducer> allEventProducers;
+
 	private List<List<EventType>> catEventTypes;
 	// Hierarchy to display the event producer in the settings windows
     private SimpleEventProducerHierarchy eventProducerHierarchy;
@@ -71,18 +82,25 @@ public class OcelotlParameters {
 	private boolean spatialSelection;
 	private boolean growingQualities = OcelotlDefaultParameterConstants.IncreasingQualities;
 	private DataCache dataCache = new DataCache();
+	private DichotomyCache dichotomyCache = new DichotomyCache();
 	private DatacachePolicy dataCachePolicy = OcelotlDefaultParameterConstants.DEFAULT_CACHE_POLICY;
 	private ParameterPPolicy parameterPPolicy = OcelotlDefaultParameterConstants.DEFAULT_PARAMETERP_POLICY;
 	private OcelotlSettings	ocelotlSettings;
 	private Integer	timeSliceFactor = 1;
 	private boolean overvieweEnable = OcelotlDefaultParameterConstants.OVERVIEW_ENABLE;
-	
+	private HashMap<EventProducer, Integer> aggregatedLeavesIndex = new HashMap<EventProducer, Integer>();
+	private boolean hasLeaveAggregated = false;
+	private boolean approximateRebuild = false;
+	private String currentUnit = "";
 	private TimeSliceManager timeSliceManager;
+	private boolean aggregatedLeaveEnable = false;
+	private int maxNumberOfLeaves;
 
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
 	private IVisuConfig iVisuConfig;
 	private IStatisticOperatorConfig statisticOperatorConfig;
+	private StatisticsTableSettings sortTableSettings = new StatisticsTableSettings();
 
 	public OcelotlParameters() {
 		super();
@@ -95,6 +113,9 @@ public class OcelotlParameters {
 		this.currentProducers = op.currentProducers;
 		// Make a deep copy
 		this.spatiallySelectedProducers = new ArrayList<EventProducer>(op.spatiallySelectedProducers);
+		this.unfilteredEventProducers = new ArrayList<EventProducer>(op.unfilteredEventProducers);
+		this.aggregatedEventProducers = new ArrayList<EventProducer>(op.aggregatedEventProducers);
+		this.currentProducers = op.currentProducers;
 		this.eventTypes = op.eventTypes;
 		this.allEventTypes = op.allEventTypes;
 		this.operatorEventTypes = op.operatorEventTypes;
@@ -118,12 +139,17 @@ public class OcelotlParameters {
 		this.growingQualities = op.growingQualities;
 		this.dataCache = op.dataCache;
 		this.dataCachePolicy = op.dataCachePolicy;
+		this.dichotomyCache = op.dichotomyCache;
 		this.ocelotlSettings = op.ocelotlSettings;
 		this.timeSliceManager = op.timeSliceManager;
 		this.iTraceTypeConfig = op.iTraceTypeConfig;
 		this.iVisuConfig = op.iVisuConfig;
 		this.statisticOperatorConfig = op.statisticOperatorConfig;
 		this.timeSliceFactor = op.timeSliceFactor;
+		this.hasLeaveAggregated = op.hasLeaveAggregated;
+		this.approximateRebuild = op.approximateRebuild;
+		this.currentUnit = op.currentUnit;
+		this.sortTableSettings = op.sortTableSettings;
 	}
 	
 	public List<EventProducer> getEventProducers() {
@@ -262,6 +288,14 @@ public class OcelotlParameters {
 		this.dataCache = dataCache;
 	}
 
+	public DichotomyCache getDichotomyCache() {
+		return dichotomyCache;
+	}
+
+	public void setDichotomyCache(DichotomyCache dichotomyCache) {
+		this.dichotomyCache = dichotomyCache;
+	}
+
 	public SimpleEventProducerHierarchy getEventProducerHierarchy() {
 		return eventProducerHierarchy;
 	}
@@ -269,6 +303,7 @@ public class OcelotlParameters {
 	public void setEventProducerHierarchy(
 			SimpleEventProducerHierarchy eventProducerHierarchy) {
 		this.eventProducerHierarchy = eventProducerHierarchy;
+		checkLeaveAggregation();
 	}
 
 	public TimeSliceManager getTimeSliceManager() {
@@ -403,6 +438,23 @@ public class OcelotlParameters {
 		this.overvieweEnable = overvieweEnable;
 	}
 
+	public boolean isHasLeaveAggregated() {
+		return hasLeaveAggregated;
+	}
+
+	public void setHasLeaveAggregated(boolean hasLeaveAggregated) {
+		this.hasLeaveAggregated = hasLeaveAggregated;
+	}
+
+	public HashMap<EventProducer, Integer> getAggregatedLeavesIndex() {
+		return aggregatedLeavesIndex;
+	}
+
+	public void setAggregatedLeavesIndex(
+			HashMap<EventProducer, Integer> aggregatedLeavesIndex) {
+		this.aggregatedLeavesIndex = aggregatedLeavesIndex;
+	}
+
 	public List<EventProducer> getCurrentProducers() {
 		return currentProducers;
 	}
@@ -413,6 +465,24 @@ public class OcelotlParameters {
 		this.currentProducers.addAll(selectedEventProducers);
 	}
 	
+	public List<EventProducer> getUnfilteredEventProducers() {
+		return unfilteredEventProducers;
+	}
+
+	public void setUnfilteredEventProducers(
+			List<EventProducer> unfilteredEventProducers) {
+		this.unfilteredEventProducers = unfilteredEventProducers;
+	}
+
+	public List<EventProducer> getAggregatedEventProducers() {
+		return aggregatedEventProducers;
+	}
+
+	public void setAggregatedEventProducers(
+			List<EventProducer> aggregatedEventProducers) {
+		this.aggregatedEventProducers = aggregatedEventProducers;
+	}
+
 	public List<EventProducer> getSpatiallySelectedProducers() {
 		return spatiallySelectedProducers;
 	}
@@ -424,6 +494,22 @@ public class OcelotlParameters {
 		this.spatiallySelectedProducers.addAll(spatiallySelectedProducers);
 	}
 
+	public String getCurrentUnit() {
+		return currentUnit;
+	}
+
+	public void setCurrentUnit(String currentUnit) {
+		this.currentUnit = currentUnit;
+	}
+
+	public StatisticsTableSettings getSortTableSettings() {
+		return sortTableSettings;
+	}
+
+	public void setSortTableSettings(StatisticsTableSettings sortTableSettings) {
+		this.sortTableSettings = sortTableSettings;
+	}
+
 	public boolean isSpatialSelection() {
 		return spatialSelection;
 	}
@@ -432,6 +518,30 @@ public class OcelotlParameters {
 		this.spatialSelection = spatialSelection;
 	}
 	
+	public boolean isApproximateRebuild() {
+		return approximateRebuild;
+	}
+
+	public void setApproximateRebuild(boolean approximateRebuild) {
+		this.approximateRebuild = approximateRebuild;
+	}
+
+	public boolean isAggregatedLeaveEnable() {
+		return aggregatedLeaveEnable;
+	}
+
+	public void setAggregatedLeaveEnable(boolean aggregatedLeaveEnable) {
+		this.aggregatedLeaveEnable = aggregatedLeaveEnable;
+	}
+
+	public int getMaxNumberOfLeaves() {
+		return maxNumberOfLeaves;
+	}
+
+	public void setMaxNumberOfLeaves(int maxNumberOfLeaves) {
+		this.maxNumberOfLeaves = maxNumberOfLeaves;
+	}
+
 	/**
 	 * Update the selected producers when the filtered event producers has
 	 * changed
@@ -440,15 +550,31 @@ public class OcelotlParameters {
 		// If there is no current spatial selection
 		if (spatialSelection == false) {
 			// Then selectedProducer is identical to eventProducers
-			setCurrentProducers(eventProducers);
+			setCurrentProducers(unfilteredEventProducers);
 		} else {
 			ArrayList<EventProducer> currentSelection = new ArrayList<EventProducer>();
 
 			// Make the intersection of the selected producers and the filtered
 			// ones
-			for (EventProducer anEP : eventProducers) {
+			for (EventProducer anEP : unfilteredEventProducers) {
 				if (spatiallySelectedProducers.contains(anEP)) {
 					currentSelection.add(anEP);
+
+					// If there are aggregated leaves then add them to the
+					// selection
+					if (aggregatedLeavesIndex.containsKey(anEP)) {
+						List<SimpleEventProducerNode> childNode = eventProducerHierarchy
+								.getAllChildrenNodes(eventProducerHierarchy
+										.getEventProducerNodes().get(
+												anEP.getId()));
+						for (SimpleEventProducerNode anAggregEPN : childNode) {
+							if (aggregatedEventProducers.contains(anAggregEPN
+									.getMe())
+									&& unfilteredEventProducers
+											.contains(anAggregEPN.getMe()))
+								currentSelection.add(anAggregEPN.getMe());
+						}
+					}
 				}
 			}
 
@@ -456,4 +582,75 @@ public class OcelotlParameters {
 		}
 	}
 
+	/**
+	 * Check if there will be leave aggregation
+	 */
+	public void checkLeaveAggregation() {
+		setHasLeaveAggregated(false);
+		int numberOfLeaves = 0;
+
+		// Get the current number of leaves
+		if (aggregatedLeaveEnable) {
+			for (EventProducer anEP : currentProducers)
+				if (getEventProducerHierarchy().getLeaves().keySet()
+						.contains(anEP.getId()))
+					numberOfLeaves++;
+		} else {
+			return;
+		}
+		
+		if (numberOfLeaves > maxNumberOfLeaves)
+			setHasLeaveAggregated(true);
+	}
+	
+	/**
+	 * Get the corresponding units
+	 * 
+	 * @param aUnitType
+	 *            the unit type provided by the extension point
+	 * @return the corresponding unit as String
+	 */
+	public String setUnit(String aUnitType) {
+		String unit = "";
+
+		String[] splitUnit = aUnitType.split(" ");
+		for (int i = 0; i < splitUnit.length; i++) {
+			String word = "";
+			if (splitUnit[i].startsWith("%"))
+				word = getUnitValue(splitUnit[i]);
+			else
+				word = splitUnit[i];
+
+			unit = unit + " " + word;
+		}
+
+		setCurrentUnit(unit);
+		return unit;
+	}
+
+	/**
+	 * Replace a specialized unit token by the current value
+	 * 
+	 * @param aUnitType
+	 *            the unit token
+	 * @return the corresponding value if found
+	 */
+	public String getUnitValue(String aUnitType) {
+		String res = "";
+		switch (aUnitType) {
+
+		case "%TIME":
+			// Get the time unit of the trace
+			String timeUnit = TimeUnit.getLabel(getTrace().getTimeUnit());
+
+			res = timeUnit;
+			break;
+
+		case "%UNKNOWN":
+		default:
+			break;
+		}
+
+		return res;
+	}
 }

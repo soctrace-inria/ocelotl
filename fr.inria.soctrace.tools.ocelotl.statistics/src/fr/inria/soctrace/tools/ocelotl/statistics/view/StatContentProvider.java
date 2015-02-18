@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.statistics.view;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -7,8 +18,6 @@ import fr.inria.soctrace.tools.ocelotl.statistics.operators.StatisticsProvider;
 
 /**
  * Generic table content provider.
- * 
- * @author "Youenn Corre <youenn.corre@inria.fr>"
  */
 public class StatContentProvider implements IStructuredContentProvider {
 

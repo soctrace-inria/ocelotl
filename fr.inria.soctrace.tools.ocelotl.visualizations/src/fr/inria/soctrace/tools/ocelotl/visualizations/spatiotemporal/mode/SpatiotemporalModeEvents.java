@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.visualizations.spatiotemporal.mode;
 
 import java.util.ArrayList;
@@ -29,7 +40,7 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 		for (int i = 0; i < node.getParts().size(); i++) {
 			proportions.get(node).add(new HashMap<String, Double>());
 			// And for each state of the part
-			for (String event : getEvents())
+			for (String event : getAllEvents())
 				// Init to zero
 				proportions.get(node).get(i).put(event, 0.0);
 		}
@@ -37,11 +48,12 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 		if (node.getChildrenNodes().isEmpty()) {
 			for (int i = 0; i < node.getParts().size(); i++) {
 				double tempAmp = 0.0;
-				for (String event : getEvents()) {
+				for (String event : getAllEvents()) {
 					// Add value (= value / time slice duration)
 					Double computedValue = ((List<HashMap<String, Double>>) node
 							.getValues()).get(i).get(event)
-							/ (Long.valueOf(timeSliceDuration).doubleValue());
+							/ ((Long.valueOf(timeSliceDuration).doubleValue() * node
+									.getWeight()));
 					// Compute amplitude max
 					tempAmp += computedValue;
 					proportions.get(node).get(i).put(event, computedValue);
@@ -56,7 +68,7 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 				computeProportions(child);
 				for (int i = 0; i < node.getParts().size(); i++) {
 					double tempAmp = 0.0;
-					for (String event : getEvents()) {
+					for (String event : getAllEvents()) {
 						Double computedValue = proportions.get(node).get(i)
 								.get(event)
 								+ proportions.get(child).get(i).get(event)
@@ -88,7 +100,12 @@ public class SpatiotemporalModeEvents extends SpatiotemporalMode {
 	public MainEvent getMainEvent(EventProducerNode epn, int start, int end) {
 		double max = 0.0;
 		MainEvent maj = new MainEvent(Void, max);
-		for (String event : getEvents()) {
+		ArrayList<String> usedEvents = (ArrayList<String>) getAllEvents();
+		ArrayList<String> displayedEvents = (ArrayList<String>) getEvents();
+		for (String event : usedEvents) {
+			if(!displayedEvents.contains(event))
+				continue;
+			
 			double amp = 0.0;
 			// Compute the total presence of the event
 			for (int i = start; i < end; i++)

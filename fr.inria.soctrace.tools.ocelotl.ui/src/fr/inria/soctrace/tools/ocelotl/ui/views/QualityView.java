@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -23,6 +23,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
@@ -80,7 +81,8 @@ public class QualityView {
 		@Override
 		public void mouseReleased(final MouseEvent arg0) {
 			state = State.RELEASED;
-			ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
+			if (qualities != null)
+				ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
 		}
 
 	}
@@ -120,8 +122,8 @@ public class QualityView {
 		super();
 		ocelotlView = lpaggregView;
 	}
-
-public Figure getRoot() {
+	
+	public Figure getRoot() {
 		return root;
 	}
 
@@ -145,6 +147,7 @@ public Figure getRoot() {
 				}
 			}
 			canvas.update();
+			root.validate();
 		}
 	}
 
@@ -243,21 +246,18 @@ public Figure getRoot() {
 			line.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			line.setLineWidth(1);
 			root.add(line);
-			final RectangleFigure rectangleText = new RectangleFigure();
-			root.add(rectangleText, new Rectangle(new Point((int) (i * width + XBorder - width / 2), root.getSize().height() - YBorder + TextOffset), new Point(new Point((int) ((i + 1) * width + XBorder - width / 2), root.getSize().height() - YBorder
-					- AxisWidth + TextHeight + TextOffset))));
+
 			final float value = (float) ((10 - (i * XGradNumber / xGradNumber)) * 0.1);
 			final Label label = new Label("" + value);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
-			rectangleText.setLineWidth(1);
-			rectangleText.add(label);
-			rectangleText.setBackgroundColor(root.getBackgroundColor());
-			rectangleText.setForegroundColor(root.getBackgroundColor());
+			label.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
+			root.add(label, new Rectangle(new Point((int) (i * width + XBorder - width / 2), root.getSize().height() - YBorder + TextOffset), new Point(new Point((int) ((i + 1) * width + XBorder - width / 2), root.getSize().height() - YBorder
+					- AxisWidth + TextHeight + TextOffset))));
+			
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			rectangleText.setLayoutManager(layout);
+			label.setLayoutManager(layout);
 			if (i * (XGradNumber / xGradNumber) != (int) XGradNumber && width / MiniDivide > YGradWidthMin / 2)
 				for (int j = 1; j < 5; j++) {
 					if (((i * width + XBorder) + (int) (j * width / MiniDivide)) < xGradNumber * width + XBorder) {
@@ -289,7 +289,7 @@ public Figure getRoot() {
 	public void drawYGrads() {
 		YGrads();
 		NumberFormat formatter = null;
-		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
+		formatter = NumberFormat.getInstance(Locale.US);
 		formatter = new DecimalFormat("0.0E0");
 		final double width = root.getSize().width - XBorder - Border;
 		final double height = root.getSize().height - YBorder;
@@ -306,25 +306,20 @@ public Figure getRoot() {
 			line.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			line.setLineWidth(1);
 			root.add(line);
-			final RectangleFigure rectangleText = new RectangleFigure();
-			root.add(rectangleText, new Rectangle(new Point(XBorder - TextWidth - TextOffset, (int) (height - i * yGradWidth) + TextHeight / 3), new Point(new Point(XBorder - TextOffset, (int) (height - i * yGradWidth - TextHeight / 1.5)))));
-			rectangleText.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-			rectangleText.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			final double value = i == yGradNumber ? maxValue - minValue : (double) ((long) (i * qualityWidth * 10) / 10.0);
 			String text = formatter.format(value);
 			if (value < 1000)
 				text = String.valueOf(value);
 			final Label label = new Label(text);
+			label.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
-			rectangleText.setLineWidth(1);
-			rectangleText.add(label);
+			label.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+			root.add(label, new Rectangle(new Point(XBorder - TextWidth - TextOffset, (int) (height - i * yGradWidth) + TextHeight / 3), new Point(new Point(XBorder - TextOffset, (int) (height - i * yGradWidth - TextHeight / 1.5)))));
+
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			rectangleText.setLayoutManager(layout);
-			rectangleText.setBackgroundColor(root.getBackgroundColor());
-			rectangleText.setForegroundColor(root.getBackgroundColor());
+			label.setLayoutManager(layout);
 		}
 	}
 
@@ -388,5 +383,10 @@ public Figure getRoot() {
 			qualityWidth *= 2;
 		}
 	}
-
+	
+	public void deleteDiagram() {
+		root.removeAll();
+		qualities = null;
+		root.repaint();
+	}
 }

@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -98,32 +98,36 @@ public class EventDistribution extends Microscopic3DDescription {
 
 		@Override
 		public void run() {
-				EventProducer currentEP=null;
-				while (true) {
-					final List<Event> events = getEvents(size, monitor);
-					if (events.size() == 0)
-						break;
-					if (monitor.isCanceled())
-						return;
-
+			EventProducer currentEP = null;
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
 					break;
+				if (monitor.isCanceled())
+					return;
+
 				for (final Event event : events) {
 					// final Map<Long, Long> distrib =
 					// state.getTimeSlicesDistribution();
-					matrixUpdate(event, event.getEventProducer());
+					EventProducer eventEP = event.getEventProducer();
 					
-					if (currentEP != event.getEventProducer()){
-						currentEP=event.getEventProducer();
-					// If the event producer is not in the active producers list
-						if (!localActiveEventProducers.contains(event.getEventProducer())) {
+					if(aggregatedProducers.containsKey(event.getEventProducer()))
+						eventEP = aggregatedProducers.get(event.getEventProducer());
+					
+					matrixUpdate(event, eventEP);
+					
+					if (currentEP != eventEP) {
+						currentEP = eventEP;
+						// If the event producer is not in the active producers list
+						if (!localActiveEventProducers.contains(eventEP)) {
 							// Add it
-							localActiveEventProducers.add(event.getEventProducer());
+							localActiveEventProducers.add(eventEP);
 						}
 					}
 					if (monitor.isCanceled())
 						return;
 				}
+				monitor.worked(events.size());
 			}
 			// Merge local active event producers to the global one
 			synchronized (activeProducers) {
@@ -145,7 +149,7 @@ public class EventDistribution extends Microscopic3DDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		monitor.subTask("Query events");
+		monitor.subTask("Querying Database...");
 		eventIterator = ocelotlQueries.getEventIterator(eventProducers, time,
 				monitor);
 		if (monitor.isCanceled()) {
@@ -156,7 +160,7 @@ public class EventDistribution extends Microscopic3DDescription {
 		setTimeSliceManager(new TimeSliceManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		monitor.subTask("Fill the matrix");
+		monitor.subTask("Loading Data From Database...");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()
@@ -175,5 +179,5 @@ public class EventDistribution extends Microscopic3DDescription {
 			InterruptedException, OcelotlException {
 		buildNormalMatrix(monitor);
 	}
-
+	
 }

@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -58,6 +58,7 @@ public class StatisticOperatorManager {
 	private static final String OP_METRIC_COMPATIBILITY = "metric_compatibility"; //$NON-NLS-1$
 	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
 	private static final String OP_AGGREGATOR_COMPATIBILITY = "aggregator_compatibility"; //$NON-NLS-1$
+	private static final String OP_LEAVE_AGGREGATION_COMPATIBILITY = "leave_aggregation_compatiblity";
 
 	public StatisticOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
@@ -127,8 +128,12 @@ public class StatisticOperatorManager {
 									.getAggregatorCompatibility())
 								if (ownAggComp.equals(aggComp))
 									if (!op.contains(resource.getName()))
-										op.add(resource.getName());
-
+										// Check compatibility with aggregation operation
+										if (!parameters.isHasLeaveAggregated()
+												|| (parameters
+														.isHasLeaveAggregated() && resource
+														.isLeaveAggregationCompatiblity()))
+											op.add(resource.getName());
 		}
 		// Sort according to the selection priority level
 		Collections.sort(op, new Comparator<String>() {
@@ -189,6 +194,8 @@ public class StatisticOperatorManager {
 			resource.setVisualization(e.getAttribute(OP_VIEW));
 			resource.setSelectionPriority(Integer.parseInt(e
 					.getAttribute(OP_SELECTION_PRIORITY)));
+			resource.setLeaveAggregationCompatiblity(Boolean.valueOf(e
+					.getAttribute(OP_LEAVE_AGGREGATION_COMPATIBILITY)));
 			resource.setBundle(e.getContributor().getName());
 			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "

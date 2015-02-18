@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.core.microdesc;
 
 import java.util.ArrayList;
@@ -33,7 +44,7 @@ public class MicroscopicDescriptionTypeManager {
 	private static final String OP_TRACE_FORMATS = "trace_formats"; //$NON-NLS-1$
 	private static final String OP_GENERIC = "generic"; //$NON-NLS-1$
 	private static final String OP_UNIT = "unit"; //$NON-NLS-1$
-	private static final String OP_VALUE_TYPE = "value_type"; //$NON-NLS-1$
+	private static final String OP_UNIT_DESCRIPTION = "unit_description"; //$NON-NLS-1$
 	
 	private static final Logger logger = LoggerFactory
 			.getLogger(DataAggregationOperatorManager.class);
@@ -108,7 +119,7 @@ public class MicroscopicDescriptionTypeManager {
 			resource.setTraceFormats(e.getAttribute(OP_TRACE_FORMATS));
 			resource.setEventCategory(e.getAttribute(OP_EVENT_CATEGORY));
 			resource.setUnit(e.getAttribute(OP_UNIT));
-			resource.setValueType(e.getAttribute(OP_VALUE_TYPE));
+			resource.setUnitDescription(e.getAttribute(OP_UNIT_DESCRIPTION));
 			resource.setVisuCompatibility(e
 					.getAttribute(OP_VISUALIZATION_COMPATIBILITY));
 			typeList.put(resource.getName(), resource);
@@ -163,5 +174,4 @@ public class MicroscopicDescriptionTypeManager {
 			HashMap<String, MicroscopicDescriptionTypeResource> typeList) {
 		this.typeList = typeList;
 	}
-	
 }

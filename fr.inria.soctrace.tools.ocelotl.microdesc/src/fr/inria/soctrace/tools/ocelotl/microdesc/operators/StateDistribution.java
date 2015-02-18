@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -89,11 +89,10 @@ public class StateDistribution extends Microscopic3DDescription {
 					matrixWrite(it, ep, state.getType(), distrib);
 			}
 		}
-		
 
 		@Override
 		public void run() {
-			EventProducer currentEP=null;
+			EventProducer currentEP = null;
 			while (true) {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
@@ -109,18 +108,24 @@ public class StateDistribution extends Microscopic3DDescription {
 					// Get duration of the state for every time slice it is in
 					final Map<Long, Double> distrib = state
 							.getTimeSlicesDistribution();
-					matrixUpdate(state, event.getEventProducer(), distrib);
-					if (currentEP != event.getEventProducer()){
-						currentEP=event.getEventProducer();
-					// If the event producer is not in the active producers list
-						if (!localActiveEventProducers.contains(event.getEventProducer())) {
+					EventProducer eventEP = event.getEventProducer();
+					
+					if(aggregatedProducers.containsKey(event.getEventProducer()))
+						eventEP = aggregatedProducers.get(event.getEventProducer());
+					
+					matrixUpdate(state, eventEP, distrib);
+					if (currentEP != eventEP) {
+						currentEP = eventEP;
+						// If the event producer is not in the active producers list
+						if (!localActiveEventProducers.contains(eventEP)) {
 							// Add it
-							localActiveEventProducers.add(event.getEventProducer());
+							localActiveEventProducers.add(eventEP);
 						}
 					}
 					if (monitor.isCanceled())
 						return;
 				}
+				monitor.worked(events.size());
 			}
 			// Merge local active event producers to the global one
 			synchronized (activeProducers) {
@@ -142,7 +147,7 @@ public class StateDistribution extends Microscopic3DDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		monitor.subTask("Query states");
+		monitor.subTask("Querying Database...");
 		eventIterator = ocelotlQueries.getStateIterator(eventProducers, time,
 				monitor);
 		if (monitor.isCanceled()) {
@@ -153,13 +158,14 @@ public class StateDistribution extends Microscopic3DDescription {
 		setTimeSliceManager(new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		monitor.subTask("Fill the matrix");
+		monitor.subTask("Loading Data From Database...");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()
 					.getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
+
 		ocelotlQueries.closeIterator();
 		dm.end("VECTORS COMPUTATION: "
 				+ getOcelotlParameters().getTimeSlicesNumber() + " timeslices");

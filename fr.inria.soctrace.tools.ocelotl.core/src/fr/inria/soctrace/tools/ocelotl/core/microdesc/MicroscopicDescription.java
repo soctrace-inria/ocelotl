@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.core.microdesc;
 
 import java.io.BufferedReader;
@@ -23,9 +34,11 @@ import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.search.utils.IntervalDesc;
+import fr.inria.soctrace.tools.ocelotl.core.caches.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
-import fr.inria.soctrace.tools.ocelotl.core.datacache.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
@@ -41,6 +54,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected ArrayList<EventProducer> inactiveProducers = new ArrayList<EventProducer>();
 	protected ArrayList<EventProducer> activeProducers = new ArrayList<EventProducer>();
 	protected OcelotlParameters parameters;
+	protected double density;
 
 	protected EventIterator eventIterator;
 	protected int count = 0;
@@ -48,12 +62,13 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	protected int eventsNumber;
 	protected OcelotlQueries ocelotlQueries;
 	protected TimeSliceManager timeSliceManager;
-	double density;
+	protected HashMap<EventProducer, EventProducer> aggregatedProducers = new HashMap<EventProducer, EventProducer>();
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MicroscopicDescription.class);
 
 	public MicroscopicDescription() {
+		
 	}
 
 	public MicroscopicDescription(OcelotlParameters param) {
@@ -61,7 +76,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		dataCache = parameters.getDataCache();
 	}
 
-	public abstract void initVectors() throws SoCTraceException;
+	public abstract void initMatrix() throws SoCTraceException;
 
 	/**
 	 * Convert the matrix values in one String formatted in CSV
@@ -99,6 +114,15 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 	public void setDataCache(DataCache dataCache) {
 		this.dataCache = dataCache;
+	}
+
+	public HashMap<EventProducer, EventProducer> getAggregatedProducers() {
+		return aggregatedProducers;
+	}
+
+	public void setAggregatedProducers(
+			HashMap<EventProducer, EventProducer> aggregatedProducers) {
+		this.aggregatedProducers = aggregatedProducers;
 	}
 
 	public TimeSliceManager getTimeSliceManager() {
@@ -182,7 +206,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 				dm.end("Load matrix from cache (dirty)");
 			} else {
-				monitor.setTaskName("Rebuilding with cache data");
+				monitor.setTaskName("Data Cache Loading");
 				rebuildClean(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache");
 			}
@@ -212,8 +236,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException, SoCTraceException,
 			InterruptedException, OcelotlException {
-		monitor.setTaskName("Rebuilding the matrix with the precise strategy");
-		monitor.subTask("Initializing");
+		monitor.setTaskName("Data Cache Loading (Accurate Strategy)");
+		monitor.subTask("Initializing...");
 
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
@@ -265,7 +289,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Run a single database query with all the times of the dirty time
 		// slices to rebuild the matrix
 
-		monitor.subTask("Fetching incomplete data from database");
+		monitor.subTask("Loading Incomplete Data from Database...");
 
 		computeDirtyCacheMatrix(
 				new ArrayList<EventProducer>(eventProducers.values()), times,
@@ -280,7 +304,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Get header
 		line = bufFileReader.readLine();
 
-		monitor.subTask("Filling the matrix with cache data");
+		monitor.subTask("Loading Data Cache...");
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
@@ -338,13 +362,16 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	 * @param eventProducers
 	 *            List of the event producers not filtered out
 	 * @throws IOException
+	 * @throws OcelotlException 
 	 */
 	public void rebuildApproximate(File aCacheFile,
 			HashMap<String, EventProducer> eventProducers,
-			IProgressMonitor monitor) throws IOException {
+			IProgressMonitor monitor) throws IOException, OcelotlException {
 
-		monitor.setTaskName("Rebuilding the matrix with the fast strategy");
-		monitor.subTask("Initializing");
+		monitor.setTaskName("Data Cache Loading (Fast Strategy)");
+		monitor.subTask("Initializing...");
+		
+		parameters.setApproximateRebuild(true);
 
 		// Contains the proportion factor for the dirty cached time slices
 		HashMap<TimeSlice, List<Double>> cachedSliceProportions = new HashMap<TimeSlice, List<Double>>();
@@ -380,7 +407,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		if (monitor.isCanceled())
 			return;
 
-		monitor.subTask("Filling the matrix with cache data");
+		monitor.subTask("Loading...");
 
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
@@ -388,6 +415,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		String line;
 		// Get header
 		line = bufFileReader.readLine();
+		boolean emptyMatrix = true;
 
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
@@ -409,6 +437,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 				TimeSlice cachedTimeSlice = cacheTimeSliceIndex.get(slice);
 
+				emptyMatrix = false;
+				
 				// Is it dirty (i.e. does it cover more than one new time
 				// slice)?
 				// Note: it should not be more than 2 since it would mean
@@ -444,6 +474,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		}
 
 		bufFileReader.close();
+		if (emptyMatrix)
+			throw new OcelotlException(OcelotlException.NO_EVENTS);
 	}
 
 	/**
@@ -454,8 +486,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			IProgressMonitor monitor) throws IOException {
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
-		monitor.setTaskName("Rebuilding the matrix with a clean cache");
-		monitor.subTask("Filling matrix with cache data");
+		monitor.setTaskName("Data Cache Loading");
+		monitor.subTask("Loading...");
 
 		String line;
 		// Get header
@@ -578,7 +610,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void saveMatrix() {
 		// Check that no event type or event producer was filtered out which
 		// would result in an incomplete datacache
-		if (!parameters.getOcelotlSettings().isCacheActivated() || !noFiltering()
+		if (!parameters.getOcelotlSettings().isDataCacheActivated() || !noFiltering()
 				|| !parameters.getDataCache().isValidDirectory())
 			return;
 
@@ -591,13 +623,24 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		
 		String fileName = parameters.getTrace().getAlias() + "_"
 				+ parameters.getTrace().getId() + "_"
-				+ parameters.getMicroModelType() + "_" + convertedDate;
-		
+				+ parameters.getMicroModelType() + "_" + convertedDate
+				+ OcelotlConstants.DataCacheSuffix;
+	
 		fileName = FilenameValidator.checkNameValidity(fileName);
-			
-		
+
 		String filePath = parameters.getDataCache().getCacheDirectory() + "/"
-				+ fileName;
+				+ parameters.getTrace().getAlias() + "_"
+				+ parameters.getTrace().getId();
+
+		File aFile = new File(filePath);
+
+		// If the directory does not exists
+		if (!aFile.exists()) {
+			// Create it
+			aFile.mkdir();
+		}
+
+		filePath = filePath + "/" + fileName;
 		
 		// Write to file,
 		try {
@@ -653,6 +696,11 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			logger.debug("At least one event producer is filtered: cache will not be generated.");
 			return false;
 		}
+		
+		if (parameters.isHasLeaveAggregated()) {
+			logger.debug("Some event producers are aggregated: cache will not be generated.");
+			return false;
+		}
 
 		if (parameters.getTraceTypeConfig().getTypes().size() != parameters
 				.getOperatorEventTypes().size()) {
@@ -675,11 +723,15 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				.getTimeRegion().getTimeStampStart())
 			return false;
 
+		// If there is some leaves aggregated, do not generate a cache
+		if (parameters.isHasLeaveAggregated())
+			return false;
+		
 		if (parameters.getTrace().getMaxTimestamp() != parameters
 				.getTimeRegion().getTimeStampEnd())
 			return false;
 
-		if (parameters.getOcelotlSettings().isCacheActivated()) {
+		if (parameters.getOcelotlSettings().isDataCacheActivated()) {
 			try {
 				// Set the number of time slices for the generated cache
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
@@ -751,8 +803,8 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void buildNormalMatrix(IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 
-		monitor.setTaskName("Fetching data from database");
-		initVectors();
+		monitor.setTaskName("Reading Trace...");
+		initMatrix();
 		initQueries();
 		computeMatrix(monitor);
 
@@ -763,16 +815,31 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void buildMicroscopicModel(final OcelotlParameters parameters,
 			IProgressMonitor monitor) throws SoCTraceException,
 			InterruptedException, OcelotlException {
+		activeProducers = new ArrayList<EventProducer>();
+		aggregatedProducers = new HashMap<EventProducer, EventProducer>(); 
+		parameters.setApproximateRebuild(false);
+		
+		// Reset the aggregation index
+		parameters.setAggregatedLeavesIndex(new HashMap<EventProducer, Integer>());
+		parameters.setAggregatedEventProducers(new ArrayList<EventProducer>());
+		parameters.checkLeaveAggregation();
+		
+		// Check whether we should aggregate the leaves of the event producers
+		// hierarchy
+		if (parameters.isHasLeaveAggregated()) {
+			aggregateLeaveHierarchy();
+		}
 
-		initVectors();
+		initMatrix();
 
 		// If the cache is enabled
-		if (parameters.getOcelotlSettings().isCacheActivated()) {
+		if (parameters.getOcelotlSettings().isDataCacheActivated()) {
 			File cacheFile = parameters.getDataCache().checkCache(parameters);
 
 			// If a cache was found
 			if (cacheFile != null) {
 				loadFromCache(cacheFile, monitor);
+				monitor.worked(parameters.getTrace().getNumberOfEvents());
 			} else {
 				if (!generateCache(monitor)) {
 					// If the cache generation was not successful
@@ -787,7 +854,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 					// Save the newly computed matrix + parameters
 					dm.start();
-					monitor.subTask("Saving matrix in the cache.");
+					monitor.subTask("Saving Loaded Data in Cache...");
 					saveMatrix();
 					dm.end("DATACACHE - Save the matrix to cache");
 				} else {
@@ -799,15 +866,16 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 					File aCacheFile = parameters.getDataCache().checkCache(
 							parameters);
 
-					initVectors();
+					initMatrix();
 
-					monitor.subTask("Loading from the newly generated cache");
+					monitor.subTask("Loading Data from the Newly Generated Cache...");
 					loadFromCache(aCacheFile, monitor);
 				}
 			}
 		} else {
 			buildNormalMatrix(monitor);
 		}
+		// Get the list of inactive producers
 		computeInactiveProducers();
 	}
 	
@@ -816,6 +884,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	 * difference between the current producers and the active ones
 	 */
 	public void computeInactiveProducers() {
+		inactiveProducers = new ArrayList<EventProducer>();
 		for (EventProducer ep : parameters.getCurrentProducers())
 			if (!activeProducers.contains(ep))
 				inactiveProducers.add(ep);
@@ -927,5 +996,105 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 		buildMicroscopicModel(parameters, monitor);
 	}
+	
+	/**
+	 * Aggregate the leave of an event producer in order to reduce the memory
+	 * footprint of the matrix
+	 */
+	public void aggregateLeaveHierarchy() {
+		SimpleEventProducerHierarchy fullHierarchy = parameters
+				.getEventProducerHierarchy();
 
+		int maxHierarchyLevel = fullHierarchy.getMaxHierarchyLevel();
+		int acceptedHierarchyLevel = 1;
+		boolean foundASolution = false;
+	
+		// Prevent the accepted hierarchy level to be 0 (which is just root),
+		// which would make problem in later stages of the aggregation (building
+		// the hierarchy)
+		for (int i = maxHierarchyLevel; i >= 1; i--) {
+			if (removeFilteredEP(fullHierarchy.getEventProducerNodesFromHierarchyLevel(i)).size() > parameters
+					.getOcelotlSettings().getMaxNumberOfLeaves()) {
+				continue;
+			} else {
+				acceptedHierarchyLevel = i;
+				foundASolution = true;
+				break;
+			}
+		}
+		
+		if(!foundASolution)
+			logger.error("Spatial preaggregation failed: No hierarchy level was found that satisfies the given constraints (Max leaves: "
+					+ parameters.getOcelotlSettings().getMaxNumberOfLeaves()
+					+ "). The level just under root will be used as defaults (Actual number of leaves: "
+					+ removeFilteredEP(
+							fullHierarchy
+									.getEventProducerNodesFromHierarchyLevel(acceptedHierarchyLevel))
+							.size() + ").");
+
+		for (SimpleEventProducerNode newLeafProducer : fullHierarchy
+				.getEventProducerNodesFromHierarchyLevel(acceptedHierarchyLevel)) {
+			int numberOfAggregatedLeaves = 0;
+			ArrayList<SimpleEventProducerNode> childrenNodes = fullHierarchy
+					.getAllChildrenNodes(newLeafProducer);
+			childrenNodes.remove(newLeafProducer);
+
+			for (SimpleEventProducerNode aChildNode : childrenNodes) {
+				if (!parameters.getCurrentProducers().contains(
+						aChildNode.getMe()))
+					continue;
+
+				aggregatedProducers.put(aChildNode.getMe(),
+						newLeafProducer.getMe());
+				parameters.getAggregatedEventProducers()
+						.add(aChildNode.getMe());
+				numberOfAggregatedLeaves++;
+			}
+
+			logger.debug(numberOfAggregatedLeaves
+					+ " children nodes of the following operator were aggregated: "
+					+ newLeafProducer.getName() + " (ID: "
+					+ newLeafProducer.getID() + ")");
+
+			parameters.getAggregatedLeavesIndex().put(newLeafProducer.getMe(),
+					numberOfAggregatedLeaves);
+		}
+	}
+	
+	/**
+	 * Remove the filtered EP from a given list of event producer nodes
+	 * 
+	 * @param listOfNodes
+	 *            the list of EPN to be checked
+	 * @return the filtered list of EPN
+	 */
+	public ArrayList<SimpleEventProducerNode> removeFilteredEP(
+			ArrayList<SimpleEventProducerNode> listOfNodes) {
+		ArrayList<SimpleEventProducerNode> unfilteredNodes = new ArrayList<SimpleEventProducerNode>();
+
+		for (SimpleEventProducerNode aSEPN : listOfNodes) {
+			if (!parameters.getCurrentProducers().contains(aSEPN.getMe()))
+				continue;
+
+			unfilteredNodes.add(aSEPN);
+		}
+
+		return unfilteredNodes;
+	}
+	
+	/**
+	 * Check whether an event producer is an aggregated leave
+	 * 
+	 * @param anEP
+	 *            the tested event producer
+	 * @return true if it is aggregated leaf, false otherwise
+	 */
+	public boolean isAggretedLeave(EventProducer anEP) {
+		for (EventProducer aggEP : aggregatedProducers.values())
+			if (aggEP == anEP)
+				return true;
+
+		return false;
+	}
+	
 }

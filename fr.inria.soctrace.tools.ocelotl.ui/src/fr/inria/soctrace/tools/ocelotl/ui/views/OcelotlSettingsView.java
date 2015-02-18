@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.text.Collator;
@@ -5,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -53,7 +65,8 @@ public class OcelotlSettingsView extends Dialog {
 	private Button								btnDeleteDataCache;
 	private Text								datacacheDirectory;
 	private Button								btnChangeCacheDirectory;
-	private Button								btnCacheEnabled;
+	private Button								btnDataCacheEnabled;
+	private Button								btnDichoCacheEnabled;
 	private Button								btnRadioButton, btnRadioButton_1, btnRadioButton_2, btnRadioButton_3;
 	private HashMap<DatacachePolicy, Button>	cachepolicy	= new HashMap<DatacachePolicy, Button>();
 	private Spinner								cacheTimeSliceValue;
@@ -73,14 +86,31 @@ public class OcelotlSettingsView extends Dialog {
 	private String								currentDatacacheDir;
 	private Text								snapshotWidth;
 	private Text								snapshotHeight;
-	private Button								btnEditBgDisplay;
-	private Button								btnEditFgDisplay;
-	private Button								btnEditBgSelected;
-	private Button								btnEditFgSelected;
+	private Spinner								xAxisHeight;
+	private Spinner								yAxisWidth;
+	private Spinner								qualCurveWidth;
+	private Spinner								qualCurveHeight;
+	private Button								btnEditBgOverviewDisplay;
+	private Button								btnEditFgOverviewDisplay;
+	private Button								btnEditBgOverviewSelected;
+	private Button								btnEditFgOverviewSelected;
 	private HashMap<Button, Color>				btnColorMap;
-	private Spinner								textDisplayAlpha;
-	private Spinner								textSelectionAlpha;
+	private Spinner								textOverviewDisplayAlpha;
+	private Spinner								textOverviewSelectionAlpha;
 	private Button								btnEnableOverview;
+	private Spinner								spinnerMaxAggLeaves;
+	private Button								btnEnableLeavesAgg;
+	private Spinner								spinnerOverviewMaxAggLeaves;
+	private Button								btnOverviewEnableLeavesAgg;
+	
+	private Button								btnEditBgMainDisplay;
+	private Button								btnEditFgMainDisplay;
+	private Button								btnEditBgMainSelected;
+	private Button								btnEditFgMainSelected;
+	private Spinner								textMainDisplayAlpha;
+	private Spinner								textMainSelectionAlpha;
+	private Button								saveSettingsButton;
+	private Button								btnEnableVisualAggregation;
 
 	public OcelotlSettingsView(final OcelotlView ocelotlView) {
 		super(ocelotlView.getSite().getShell());
@@ -120,6 +150,7 @@ public class OcelotlSettingsView extends Dialog {
 		public void widgetSelected(final SelectionEvent e) {
 			// Ask user confirmation
 			if (MessageDialog.openConfirm(getShell(), "Delete cached data", "This will delete all cached data and it cannot be cancelled. Do you want to continue ?"))
+				ocelotlView.getOcelotlParameters().getDichotomyCache().deleteCache();
 				ocelotlView.getOcelotlParameters().getDataCache().deleteCache();
 		}
 	}
@@ -160,16 +191,6 @@ public class OcelotlSettingsView extends Dialog {
 		}
 	}
 
-	/**
-	 * If necessary, update the snapshot directory
-	 */
-	private void modifySnapshotDir() {
-		// Was there change in the datacache directory ?
-		if (!snapshotDirectory.getText().equals(settings.getSnapShotDirectory()))
-			// If so, update the current datacache path
-			ocelotlView.getSnapshot().setSnapshotDirectory(snapshotDirectory.getText());
-	}
-
 	private class ModifyDatacacheDirectory extends SelectionAdapter {
 
 		@Override
@@ -196,27 +217,59 @@ public class OcelotlSettingsView extends Dialog {
 	 */
 	private void updateCacheDir() {
 		// Was there change in the datacache directory ?
-		if (!currentDatacacheDir.isEmpty())
+		if (!currentDatacacheDir.isEmpty()) {
 			// If so, update the current datacache path
 			ocelotlView.getOcelotlParameters().getDataCache().setCacheDirectory(currentDatacacheDir);
+			ocelotlView.getOcelotlParameters().getDichotomyCache().setCacheDirectory(currentDatacacheDir);
+		}
 	}
 
 	private class EnableCacheListener extends SelectionAdapter {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			boolean cacheActivation = btnCacheEnabled.getSelection();
-
-			btnDeleteDataCache.setEnabled(cacheActivation);
-			datacacheDirectory.setEnabled(cacheActivation);
-			btnChangeCacheDirectory.setEnabled(cacheActivation);
+			boolean cacheActivation = btnDataCacheEnabled.getSelection();
 			btnRadioButton.setEnabled(cacheActivation);
 			btnRadioButton_1.setEnabled(cacheActivation);
 			btnRadioButton_2.setEnabled(cacheActivation);
 			btnRadioButton_3.setEnabled(cacheActivation);
 			cacheTimeSliceValue.setEnabled(cacheActivation);
-			dataCacheSize.setEnabled(cacheActivation);
 		}
 	}
+	
+	private class EnableOverviewListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			boolean overviewActivation = btnEnableOverview.getSelection();
+			
+			btnEditBgOverviewDisplay.setEnabled(overviewActivation);
+			btnEditFgOverviewDisplay.setEnabled(overviewActivation);
+			btnEditBgOverviewSelected.setEnabled(overviewActivation);
+			btnEditFgOverviewSelected.setEnabled(overviewActivation);
+			textOverviewDisplayAlpha.setEnabled(overviewActivation);
+			textOverviewSelectionAlpha.setEnabled(overviewActivation);
+			btnOverviewEnableLeavesAgg.setEnabled(overviewActivation);
+			btnOverviewEnableLeavesAgg.notifyListeners(SWT.Selection, new Event());
+		}
+	}
+
+	private class OverviewPreAggregListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			boolean preAggegActivation = btnOverviewEnableLeavesAgg.getSelection() && btnOverviewEnableLeavesAgg.getEnabled();
+
+			spinnerOverviewMaxAggLeaves.setEnabled(preAggegActivation);
+		}
+	}
+
+	private class PreAggregListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			boolean preAggegActivation = btnEnableLeavesAgg.getSelection();
+			
+			spinnerMaxAggLeaves.setEnabled(preAggegActivation);
+		}
+	}
+
 
 	private class EditColorSelection extends SelectionAdapter {
 		@Override
@@ -289,12 +342,36 @@ public class OcelotlSettingsView extends Dialog {
 	 * Update the overview selection colors
 	 */
 	public void updateOverviewColors() {
-		ocelotlView.getOverView().setDisplayBGColor(btnColorMap.get(btnEditBgDisplay));
-		ocelotlView.getOverView().setDisplayFGColor(btnColorMap.get(btnEditFgDisplay));
+		ocelotlView.getOverView().setDisplayBGColor(btnColorMap.get(btnEditBgOverviewDisplay));
+		ocelotlView.getOverView().setDisplayFGColor(btnColorMap.get(btnEditFgOverviewDisplay));
 		ocelotlView.getOverView().setDisplayAlphaValue(settings.getOverviewDisplayAlphaValue());
-		ocelotlView.getOverView().setSelectFGColor(btnColorMap.get(btnEditFgSelected));
-		ocelotlView.getOverView().setSelectBGColor(btnColorMap.get(btnEditBgSelected));
+		ocelotlView.getOverView().setSelectFGColor(btnColorMap.get(btnEditFgOverviewSelected));
+		ocelotlView.getOverView().setSelectBGColor(btnColorMap.get(btnEditBgOverviewSelected));
 		ocelotlView.getOverView().setSelectAlphaValue(settings.getOverviewSelectionAlphaValue());
+	}
+	
+	/**
+	 * Update the main selection colors
+	 */
+	public void updateMainSelectionColors() {
+		if (ocelotlView.getTimeLineView() != null) {
+			ocelotlView.getTimeLineView().setActiveColorBG(btnColorMap.get(btnEditBgMainDisplay));
+			ocelotlView.getTimeLineView().setActiveColorFG(btnColorMap.get(btnEditFgMainDisplay));
+			ocelotlView.getTimeLineView().setActiveColorAlpha(settings.getMainDisplayAlphaValue());
+			ocelotlView.getTimeLineView().setPotentialColorBG(btnColorMap.get(btnEditBgMainSelected));
+			ocelotlView.getTimeLineView().setPotentialColorFG(btnColorMap.get(btnEditFgMainSelected));
+			ocelotlView.getTimeLineView().setPotentialColorAlpha(settings.getMainSelectionAlphaValue());
+		}
+	}
+	
+	private class SaveSettingsListener extends SelectionAdapter {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			MessageDialog.openInformation(getShell(), "Settings saved", "Settings were saved as default Ocelolt settings.");
+
+			setSettings();
+			settings.saveSettings();
+		}
 	}
 
 	/**
@@ -416,10 +493,31 @@ public class OcelotlSettingsView extends Dialog {
 		GridData gd_parameterPStrategy = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		parameterPStrategy.setLayoutData(gd_parameterPStrategy);
 		parameterPStrategy.setFont(cantarell8);
-		parameterPStrategy.setToolTipText("Parameter Default vValue Strategy");
-			
-		sashFormAdvancedParameters.setWeights(new int[] { 2, 1 });
+		parameterPStrategy.setToolTipText("Parameter Default Value Strategy");
 		
+		final SashForm sashFormVisualAggregate = new SashForm(sashFormAdvancedParameters, SWT.VERTICAL);
+		sashFormVisualAggregate.setFont(cantarell8);
+		
+		final Group groupVisualAggregate = new Group(sashFormVisualAggregate, SWT.NONE);
+		groupVisualAggregate.setFont(cantarell8);
+		groupVisualAggregate.setText("Visual Aggregation");
+		groupVisualAggregate.setLayout(new GridLayout(3, false));
+		
+		btnEnableVisualAggregation = new Button(groupVisualAggregate, SWT.CHECK);
+		btnEnableVisualAggregation.setText("Enable Visual Aggregation");
+		btnEnableVisualAggregation.setSelection(settings.isUseVisualAggregate());
+		btnEnableVisualAggregation.setFont(cantarell8);
+		btnEnableVisualAggregation.setToolTipText("Aggregate Producers that Are Too Small to Display");
+
+		Label labelWarningImg = new Label (groupVisualAggregate, SWT.NONE);
+		labelWarningImg.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/warn_tsk.gif"));
+		
+		Label labelWarningText = new Label (groupVisualAggregate, SWT.NONE);
+		labelWarningText.setFont(cantarell8);
+		labelWarningText.setText("Disabling this option can lead to discripancies in the visualization");
+			
+		sashFormAdvancedParameters.setWeights(new int[] { 2, 1, 1 });
+				
 		// Datacache settings
 		final TabItem tbtmOcelotlSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtmOcelotlSettings.setText("Cache");
@@ -430,26 +528,24 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Group groupDataCacheSettings = new Group(sashFormSettings, SWT.NONE);
 		groupDataCacheSettings.setFont(cantarell8);
-		groupDataCacheSettings.setText("Data Cache Settings");
+		groupDataCacheSettings.setText("Caches Settings");
 		groupDataCacheSettings.setLayout(new GridLayout(3, false));
 
-		btnCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
-		btnCacheEnabled.setFont(cantarell8);
-		btnCacheEnabled.setText("Cache Enabled");
-		btnCacheEnabled.setSelection(settings.isCacheActivated());
-		btnCacheEnabled.addSelectionListener(new EnableCacheListener());
-
-		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
-		btnDeleteDataCache.setToolTipText("Empty Cache");
-		btnDeleteDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/delete_obj.gif"));
-		btnDeleteDataCache.setText("Empty Cache");
-		btnDeleteDataCache.setFont(cantarell8);
-		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
+		final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
+		lblDataCacheSize.setFont(cantarell8);
+		lblDataCacheSize.setText("MB Caches Size (-1=unlimited):");
+		
+		dataCacheSize = new Spinner(groupDataCacheSettings, SWT.BORDER);
+		dataCacheSize.setValues(0, -1, 99999999, 0, 1, 10);
+		dataCacheSize.setFont(cantarell8);
+		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+		gd_text.widthHint = 100;
+		dataCacheSize.setLayoutData(gd_text);
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
 		lblDataCacheDirectory.setFont(cantarell8);
-		lblDataCacheDirectory.setText("Data cache directory:");
+		lblDataCacheDirectory.setText("Caches directory:");
 
 		final GridData gd_dataCacheDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_dataCacheDir.widthHint = 100;
@@ -459,26 +555,31 @@ public class OcelotlSettingsView extends Dialog {
 		datacacheDirectory.setFont(cantarell8);
 		datacacheDirectory.setEditable(false);
 		datacacheDirectory.setText(ocelotlView.getOcelotlParameters().getDataCache().getCacheDirectory());
-
+		
 		btnChangeCacheDirectory = new Button(groupDataCacheSettings, SWT.PUSH);
 		btnChangeCacheDirectory.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
-		btnChangeCacheDirectory.setToolTipText("Change Cache Directory");
+		btnChangeCacheDirectory.setToolTipText("Change Caches Directory");
 		btnChangeCacheDirectory.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/fldr_obj.gif"));
 		btnChangeCacheDirectory.setFont(cantarell8);
 		btnChangeCacheDirectory.addSelectionListener(new ModifyDatacacheDirectory());
 
-		final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
-		lblDataCacheSize.setFont(cantarell8);
-		lblDataCacheSize.setText("MB Data cache size (-1=unlimited):");
-
-		dataCacheSize = new Spinner(groupDataCacheSettings, SWT.BORDER);
-		dataCacheSize.setValues(0, -1, 99999999, 0, 1, 10);
-		dataCacheSize.setFont(cantarell8);
-		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
-		gd_text.widthHint = 100;
-		dataCacheSize.setLayoutData(gd_text);
 		new Label(groupDataCacheSettings, SWT.NONE);
-
+		btnDeleteDataCache = new Button(groupDataCacheSettings, SWT.PUSH);
+		btnDeleteDataCache.setToolTipText("Empty Caches");
+		btnDeleteDataCache.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.tools.ocelotl.ui", "icons/obj16/delete_obj.gif"));
+		btnDeleteDataCache.setText("Empty Caches");
+		btnDeleteDataCache.setFont(cantarell8);
+		btnDeleteDataCache.addSelectionListener(new DeleteDataCache());
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
+		btnDataCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
+		btnDataCacheEnabled.setFont(cantarell8);
+		btnDataCacheEnabled.setText("Data Cache Enabled");
+		btnDataCacheEnabled.setSelection(settings.isDataCacheActivated());
+		btnDataCacheEnabled.addSelectionListener(new EnableCacheListener());
+		new Label(groupDataCacheSettings, SWT.NONE);
+		new Label(groupDataCacheSettings, SWT.NONE);
+		
 		if (settings.getCacheSize() > 0) {
 			dataCacheSize.setSelection((int) (settings.getCacheSize() / 1000000));
 		} else {
@@ -486,9 +587,9 @@ public class OcelotlSettingsView extends Dialog {
 		}
 
 		Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
-		lblCacheTimeSlices.setText("Cache time slices:");
+		lblCacheTimeSlices.setText("Data Cache time slices:");
 		lblCacheTimeSlices.setFont(cantarell8);
-		lblCacheTimeSlices.setToolTipText("Number of Time Slices Used When Generating Cache");
+		lblCacheTimeSlices.setToolTipText("Number of Time Slices Used When Generating Data Cache");
 
 		cacheTimeSliceValue = new Spinner(groupDataCacheSettings, SWT.BORDER);
 		cacheTimeSliceValue.setValues(0, 0, 99999999, 0, 1, 10);
@@ -500,7 +601,7 @@ public class OcelotlSettingsView extends Dialog {
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		Label lblCachePolicy = new Label(groupDataCacheSettings, SWT.NONE);
-		lblCachePolicy.setText("Cache policy");
+		lblCachePolicy.setText("Data Cache policy");
 		lblCachePolicy.setFont(cantarell8);
 		new Label(groupDataCacheSettings, SWT.NONE);
 		new Label(groupDataCacheSettings, SWT.NONE);
@@ -533,9 +634,14 @@ public class OcelotlSettingsView extends Dialog {
 		cachepolicy.put(DatacachePolicy.CACHEPOLICY_AUTO, btnRadioButton_3);
 		cachepolicy.get(settings.getCachePolicy()).setSelection(true);
 		sashFormSettings.setWeights(new int[] { 1 });
-		btnCacheEnabled.notifyListeners(SWT.Selection, new Event());
+		btnDataCacheEnabled.notifyListeners(SWT.Selection, new Event());
+		
+		btnDichoCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
+		btnDichoCacheEnabled.setFont(cantarell8);
+		btnDichoCacheEnabled.setText("Dichotomy Cache Enabled");
+		btnDichoCacheEnabled.setSelection(settings.isDichoCacheActivated());
 
-		// Thread settings
+		// Advanced settings
 		final TabItem tbtmAdvancedSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtmAdvancedSettings.setText("Advanced");
 
@@ -588,8 +694,217 @@ public class OcelotlSettingsView extends Dialog {
 		spinnerThread.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_THREAD);
 		spinnerThread.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_THREAD);
 		spinnerThread.setSelection(settings.getNumberOfThread());
-		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1 });
+		
+		final Group grpAggregateLeaves = new Group(advancedSettingsSashForm, SWT.NONE);
+		grpAggregateLeaves.setFont(cantarell8);
+		grpAggregateLeaves.setText("Leaves Aggregation");
+		grpAggregateLeaves.setLayout(new GridLayout(2, false));
+		
+		btnEnableLeavesAgg = new Button(grpAggregateLeaves, SWT.CHECK);
+		btnEnableLeavesAgg.setFont(cantarell8);
+		btnEnableLeavesAgg.setSelection(settings.isAggregateLeaves());
+		btnEnableLeavesAgg.setText("Enable Leaves Aggregation");
+		btnEnableLeavesAgg.addSelectionListener(new PreAggregListener());
+		new Label(grpAggregateLeaves, SWT.NONE);
 
+		final Label lblAggLeaves = new Label(grpAggregateLeaves, SWT.NONE);
+		lblAggLeaves.setFont(cantarell8);
+		lblAggLeaves.setText("Max. Number of Leaves");
+
+		spinnerMaxAggLeaves = new Spinner(grpAggregateLeaves, SWT.BORDER);
+		spinnerMaxAggLeaves.setFont(cantarell8);
+		spinnerMaxAggLeaves.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		spinnerMaxAggLeaves.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_AGGLEAVES);
+		spinnerMaxAggLeaves.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_AGGLEAVES);
+		spinnerMaxAggLeaves.setSelection(settings.getMaxNumberOfLeaves());
+		advancedSettingsSashForm.setWeights(new int[] { 1, 1, 1, 1 });
+		btnEnableLeavesAgg.notifyListeners(SWT.Selection, new Event());
+		
+		// Selection settings
+		final TabItem tbtSelectionSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtSelectionSettings.setText("Selection");
+
+		final SashForm sashFormSelectionSettings = new SashForm(tabFolder, SWT.VERTICAL);
+		sashFormSelectionSettings.setFont(cantarell8);
+		tbtSelectionSettings.setControl(sashFormSelectionSettings);
+
+		final Group groupSelectionSettings = new Group(sashFormSelectionSettings, SWT.NONE);
+		groupSelectionSettings.setFont(cantarell8);
+		groupSelectionSettings.setText("Selection Settings");
+		groupSelectionSettings.setLayout(new GridLayout(2, false));
+		
+		final Label lblSelectionBgDisplay = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionBgDisplay.setFont(cantarell8);
+		lblSelectionBgDisplay.setText("Display Background");
+
+		btnEditBgMainDisplay = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditBgMainDisplay.setToolTipText("Edit Color");
+		btnEditBgMainDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgMainDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgMainDisplay, settings.getMainDisplayBgColor());
+
+		final Label lblSelectionFgDisplay = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionFgDisplay.setFont(cantarell8);
+		lblSelectionFgDisplay.setText("Display Foreground");
+
+		btnEditFgMainDisplay = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditFgMainDisplay.setToolTipText("Edit Color");
+		btnEditFgMainDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgMainDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgMainDisplay, settings.getMainDisplayFgColor());
+		
+		final Label lblSelectionDisplayAlpha = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionDisplayAlpha.setFont(cantarell8);
+		lblSelectionDisplayAlpha.setText("Display Transparency");
+
+		textMainDisplayAlpha = new Spinner(groupSelectionSettings, SWT.BORDER);
+		textMainDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textMainDisplayAlpha.setIncrement(1);
+		textMainDisplayAlpha.setMaximum(255);
+		textMainDisplayAlpha.setMinimum(0);
+		textMainDisplayAlpha.setFont(cantarell8);
+		textMainDisplayAlpha.setSelection(settings.getMainDisplayAlphaValue());
+		textMainDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
+	
+		final Label lblSelectionBgSelect = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionBgSelect.setFont(cantarell8);
+		lblSelectionBgSelect.setText("Selection Background");
+
+		btnEditBgMainSelected = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditBgMainSelected.setToolTipText("Edit Color");
+		btnEditBgMainSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgMainSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgMainSelected, settings.getMainSelectionBgColor());
+		
+		final Label lblSelectionFgSelect = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionFgSelect.setFont(cantarell8);
+		lblSelectionFgSelect.setText("Selection Foreground");
+
+		btnEditFgMainSelected = new Button(groupSelectionSettings, SWT.NONE);
+		btnEditFgMainSelected.setToolTipText("Edit Color");
+		btnEditFgMainSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgMainSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgMainSelected, settings.getMainSelectionFgColor());
+		
+		final Label lblSelectionAlpha = new Label(groupSelectionSettings, SWT.NONE);
+		lblSelectionAlpha.setFont(cantarell8);
+		lblSelectionAlpha.setText("Selection Transparency");
+
+		textMainSelectionAlpha = new Spinner(groupSelectionSettings, SWT.BORDER);
+		textMainSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textMainSelectionAlpha.setIncrement(1);
+		textMainSelectionAlpha.setMaximum(255);
+		textMainSelectionAlpha.setMinimum(0);
+		textMainSelectionAlpha.setFont(cantarell8);
+		textMainSelectionAlpha.setSelection(settings.getMainSelectionAlphaValue());
+		textMainSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
+		
+		// Overview settings
+		final TabItem tbtOverviewSettings = new TabItem(tabFolder, SWT.NONE);
+		tbtOverviewSettings.setText("Overview");
+
+		final SashForm sashFormOverviewSettings = new SashForm(tabFolder, SWT.VERTICAL);
+		sashFormOverviewSettings.setFont(cantarell8);
+		tbtOverviewSettings.setControl(sashFormOverviewSettings);
+
+
+		final Group groupOverviewSettings = new Group(sashFormOverviewSettings, SWT.NONE);
+		groupOverviewSettings.setFont(cantarell8);
+		groupOverviewSettings.setText("Overview Settings");
+		groupOverviewSettings.setLayout(new GridLayout(2, false));
+		
+		btnEnableOverview = new Button(groupOverviewSettings, SWT.CHECK);
+		btnEnableOverview.setFont(cantarell8);
+		btnEnableOverview.setSelection(settings.isEnableOverview());
+		btnEnableOverview.setText("Display Overview");
+		btnEnableOverview.addSelectionListener(new EnableOverviewListener());
+		new Label(groupOverviewSettings, SWT.NONE);
+		
+		final Label lblBgDisplay = new Label(groupOverviewSettings, SWT.NONE);
+		lblBgDisplay.setFont(cantarell8);
+		lblBgDisplay.setText("Display Background");
+
+		btnEditBgOverviewDisplay = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditBgOverviewDisplay.setToolTipText("Edit Color");
+		btnEditBgOverviewDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgOverviewDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgOverviewDisplay, settings.getOverviewDisplayBgColor());
+
+		final Label lblFgDisplay = new Label(groupOverviewSettings, SWT.NONE);
+		lblFgDisplay.setFont(cantarell8);
+		lblFgDisplay.setText("Display Foreground");
+
+		btnEditFgOverviewDisplay = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditFgOverviewDisplay.setToolTipText("Edit Color");
+		btnEditFgOverviewDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgOverviewDisplay.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgOverviewDisplay, settings.getOverviewDisplayFgColor());
+		
+		final Label lblDisplayAlpha = new Label(groupOverviewSettings, SWT.NONE);
+		lblDisplayAlpha.setFont(cantarell8);
+		lblDisplayAlpha.setText("Display Transparency");
+
+		textOverviewDisplayAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
+		textOverviewDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textOverviewDisplayAlpha.setIncrement(1);
+		textOverviewDisplayAlpha.setMaximum(255);
+		textOverviewDisplayAlpha.setMinimum(0);
+		textOverviewDisplayAlpha.setFont(cantarell8);
+		textOverviewDisplayAlpha.setSelection(settings.getOverviewDisplayAlphaValue());
+		textOverviewDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
+	
+		final Label lblBgSelect = new Label(groupOverviewSettings, SWT.NONE);
+		lblBgSelect.setFont(cantarell8);
+		lblBgSelect.setText("Selection Background");
+
+		btnEditBgOverviewSelected = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditBgOverviewSelected.setToolTipText("Edit Color");
+		btnEditBgOverviewSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditBgOverviewSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditBgOverviewSelected, settings.getOverviewSelectionBgColor());
+		
+		final Label lblFgSelect = new Label(groupOverviewSettings, SWT.NONE);
+		lblFgSelect.setFont(cantarell8);
+		lblFgSelect.setText("Selection Foreground");
+
+		btnEditFgOverviewSelected = new Button(groupOverviewSettings, SWT.NONE);
+		btnEditFgOverviewSelected.setToolTipText("Edit Color");
+		btnEditFgOverviewSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
+		btnEditFgOverviewSelected.addSelectionListener(new EditColorSelection());
+		btnColorMap.put(btnEditFgOverviewSelected, settings.getOverviewSelectionFgColor());
+		
+		final Label lblOverviewSelectionAlpha = new Label(groupOverviewSettings, SWT.NONE);
+		lblOverviewSelectionAlpha.setFont(cantarell8);
+		lblOverviewSelectionAlpha.setText("Selection Transparency");
+
+		textOverviewSelectionAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
+		textOverviewSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		textOverviewSelectionAlpha.setIncrement(1);
+		textOverviewSelectionAlpha.setMaximum(255);
+		textOverviewSelectionAlpha.setMinimum(0);
+		textOverviewSelectionAlpha.setFont(cantarell8);
+		textOverviewSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
+		textOverviewSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
+
+		btnOverviewEnableLeavesAgg = new Button(groupOverviewSettings, SWT.CHECK);
+		btnOverviewEnableLeavesAgg.setFont(cantarell8);
+		btnOverviewEnableLeavesAgg.setSelection(settings.isOverviewAggregateLeaves());
+		btnOverviewEnableLeavesAgg.setText("Enable Leaves Aggregation for Overview");
+		btnOverviewEnableLeavesAgg.addSelectionListener(new OverviewPreAggregListener());
+		new Label(groupOverviewSettings, SWT.NONE);
+		
+		final Label lblOverviewAggLeaves = new Label(groupOverviewSettings, SWT.NONE);
+		lblOverviewAggLeaves.setFont(cantarell8);
+		lblOverviewAggLeaves.setText("Max. Number of Leaves");
+
+		spinnerOverviewMaxAggLeaves = new Spinner(groupOverviewSettings, SWT.BORDER);
+		spinnerOverviewMaxAggLeaves.setFont(cantarell8);
+		spinnerOverviewMaxAggLeaves.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		spinnerOverviewMaxAggLeaves.setMinimum(OcelotlDefaultParameterConstants.MIN_NUMBER_OF_AGGLEAVES);
+		spinnerOverviewMaxAggLeaves.setMaximum(OcelotlDefaultParameterConstants.MAX_NUMBER_OF_AGGLEAVES);
+		spinnerOverviewMaxAggLeaves.setSelection(settings.getOverviewMaxNumberOfLeaves());
+		btnEnableOverview.notifyListeners(SWT.Selection, new Event());
+		
 		// Snapshot settings
 		final TabItem tbtMiscSettings = new TabItem(tabFolder, SWT.NONE);
 		tbtMiscSettings.setText("Snapshot");
@@ -624,116 +939,86 @@ public class OcelotlSettingsView extends Dialog {
 
 		Label lblsnapshotWidth = new Label(groupMiscSettings, SWT.NONE);
 		lblsnapshotWidth.setFont(cantarell8);
-		lblsnapshotWidth.setText("Snapshot Width");
+		lblsnapshotWidth.setText("Main View Snapshot Width");
 
 		snapshotWidth = new Text(groupMiscSettings, SWT.BORDER);
 		snapshotWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		snapshotWidth.setFont(cantarell8);
-		snapshotWidth.setToolTipText("Width of the Generated Image in Pixels");
+		snapshotWidth.setToolTipText("Width of the Generated Image of the Main Diagram in Pixels");
 		snapshotWidth.setText(String.valueOf(settings.getSnapshotXResolution()));
 		snapshotWidth.addVerifyListener(new NumericTextFieldVerifyListener());
 		new Label(groupMiscSettings, SWT.NONE);
 
 		Label lblsnapshotHeight = new Label(groupMiscSettings, SWT.NONE);
 		lblsnapshotHeight.setFont(cantarell8);
-		lblsnapshotHeight.setText("Snapshot Height");
+		lblsnapshotHeight.setText("Main View Snapshot Height");
 
 		snapshotHeight = new Text(groupMiscSettings, SWT.BORDER);
 		snapshotHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		snapshotHeight.setText(String.valueOf(settings.getSnapshotYResolution()));
 		snapshotHeight.setFont(cantarell8);
-		snapshotHeight.setToolTipText("Height of the Generated Image in Pixels");
+		snapshotHeight.setToolTipText("Height of the Generated Image of the Main Diagram in Pixels");
 		snapshotHeight.addVerifyListener(new NumericTextFieldVerifyListener());
 		new Label(groupMiscSettings, SWT.NONE);
 
+		Label lblxAxisHeight = new Label(groupMiscSettings, SWT.NONE);
+		lblxAxisHeight.setFont(cantarell8);
+		lblxAxisHeight.setText("X Axis Height");
+		
+		xAxisHeight = new Spinner(groupMiscSettings, SWT.BORDER);
+		xAxisHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		xAxisHeight.setIncrement(1);
+		xAxisHeight.setMaximum(100000);
+		xAxisHeight.setMinimum(10);
+		xAxisHeight.setFont(cantarell8);
+		xAxisHeight.setSelection(settings.getxAxisYResolution());
+		xAxisHeight.setToolTipText("Height of the Generated Image of the X Axis in Pixels (10 - 100000)");
+		new Label(groupMiscSettings, SWT.NONE);
+		
+		Label lblyAxisWidth = new Label(groupMiscSettings, SWT.NONE);
+		lblyAxisWidth.setFont(cantarell8);
+		lblyAxisWidth.setText("Y Axis Width");
+		
+		yAxisWidth = new Spinner(groupMiscSettings, SWT.BORDER);
+		yAxisWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		yAxisWidth.setIncrement(1);
+		yAxisWidth.setMaximum(100000);
+		yAxisWidth.setMinimum(10);
+		yAxisWidth.setFont(cantarell8);
+		yAxisWidth.setSelection(settings.getyAxisXResolution());
+		yAxisWidth.setToolTipText("Width of the Generated Image of the Y Axis in Pixels (10 - 100000)");
+		new Label(groupMiscSettings, SWT.NONE);
+			
+		Label lblQualCurvesWidth = new Label(groupMiscSettings, SWT.NONE);
+		lblQualCurvesWidth.setFont(cantarell8);
+		lblQualCurvesWidth.setText("Quality Curves Width");
+		
+		qualCurveWidth = new Spinner(groupMiscSettings, SWT.BORDER);
+		qualCurveWidth.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		qualCurveWidth.setIncrement(1);
+		qualCurveWidth.setMaximum(100000);
+		qualCurveWidth.setMinimum(10);
+		qualCurveWidth.setFont(cantarell8);
+		qualCurveWidth.setSelection(settings.getQualCurveXResolution());
+		qualCurveWidth.setToolTipText("Width of the Generated Image of the Quality Curves in Pixels (10 - 100000)");
+		new Label(groupMiscSettings, SWT.NONE);
+		
+		Label lblQualCurvesHeight = new Label(groupMiscSettings, SWT.NONE);
+		lblQualCurvesHeight.setFont(cantarell8);
+		lblQualCurvesHeight.setText("Quality Curves Height");
+		
+		qualCurveHeight = new Spinner(groupMiscSettings, SWT.BORDER);
+		qualCurveHeight.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		qualCurveHeight.setIncrement(1);
+		qualCurveHeight.setMaximum(100000);
+		qualCurveHeight.setMinimum(10);
+		qualCurveHeight.setFont(cantarell8);
+		qualCurveHeight.setSelection(settings.getQualCurveYResolution());
+		qualCurveHeight.setToolTipText("Height of the Generated Image of the Quality Curves in Pixels (10 - 100000)");
+		new Label(groupMiscSettings, SWT.NONE);
+		
 		btnChangeSnapshotDirectory.addSelectionListener(new ModifySnapshotDirectory());
-
-		// Overview settings
-		final TabItem tbtOverviewSettings = new TabItem(tabFolder, SWT.NONE);
-		tbtOverviewSettings.setText("Overview");
-
-		final SashForm sashFormOverviewSettings = new SashForm(tabFolder, SWT.VERTICAL);
-		sashFormOverviewSettings.setFont(cantarell8);
-		tbtOverviewSettings.setControl(sashFormOverviewSettings);
-
-
-		final Group groupOverviewSettings = new Group(sashFormOverviewSettings, SWT.NONE);
-		groupOverviewSettings.setFont(cantarell8);
-		groupOverviewSettings.setText("Snapshot Settings");
-		groupOverviewSettings.setLayout(new GridLayout(2, false));
 		
-		btnEnableOverview = new Button(groupOverviewSettings, SWT.CHECK);
-		btnEnableOverview.setFont(cantarell8);
-		btnEnableOverview.setSelection(settings.isEnableOverview());
-		btnEnableOverview.setText("Display Overview");
-		new Label(groupOverviewSettings, SWT.NONE);
-		
-		final Label lblBgDisplay = new Label(groupOverviewSettings, SWT.NONE);
-		lblBgDisplay.setFont(cantarell8);
-		lblBgDisplay.setText("Display Background");
-
-		btnEditBgDisplay = new Button(groupOverviewSettings, SWT.NONE);
-		btnEditBgDisplay.setToolTipText("Edit Color");
-		btnEditBgDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditBgDisplay.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditBgDisplay, settings.getOverviewDisplayBgColor());
-
-		final Label lblFgDisplay = new Label(groupOverviewSettings, SWT.NONE);
-		lblFgDisplay.setFont(cantarell8);
-		lblFgDisplay.setText("Display Foreground");
-
-		btnEditFgDisplay = new Button(groupOverviewSettings, SWT.NONE);
-		btnEditFgDisplay.setToolTipText("Edit Color");
-		btnEditFgDisplay.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditFgDisplay.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditFgDisplay, settings.getOverviewDisplayFgColor());
-		
-		final Label lblDisplayAlpha = new Label(groupOverviewSettings, SWT.NONE);
-		lblDisplayAlpha.setFont(cantarell8);
-		lblDisplayAlpha.setText("Display Transparency");
-
-		textDisplayAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
-		textDisplayAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		textDisplayAlpha.setIncrement(1);
-		textDisplayAlpha.setMaximum(255);
-		textDisplayAlpha.setMinimum(0);
-		textDisplayAlpha.setFont(cantarell8);
-		textDisplayAlpha.setSelection(settings.getOverviewDisplayAlphaValue());
-		textDisplayAlpha.setToolTipText("Display Alpha Value (0 - 255)");
-	
-		final Label lblBgSelect = new Label(groupOverviewSettings, SWT.NONE);
-		lblBgSelect.setFont(cantarell8);
-		lblBgSelect.setText("Selection Background");
-
-		btnEditBgSelected = new Button(groupOverviewSettings, SWT.NONE);
-		btnEditBgSelected.setToolTipText("Edit Color");
-		btnEditBgSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditBgSelected.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditBgSelected, settings.getOverviewSelectionBgColor());
-		
-		final Label lblFgSelect = new Label(groupOverviewSettings, SWT.NONE);
-		lblFgSelect.setFont(cantarell8);
-		lblFgSelect.setText("Selection Foreground");
-
-		btnEditFgSelected = new Button(groupOverviewSettings, SWT.NONE);
-		btnEditFgSelected.setToolTipText("Edit Color");
-		btnEditFgSelected.setImage(ResourceManager.getPluginImage("fr.inria.soctrace.framesoc.ui", "icons/edit2.png"));
-		btnEditFgSelected.addSelectionListener(new EditColorSelection());
-		btnColorMap.put(btnEditFgSelected, settings.getOverviewSelectionFgColor());
-		
-		final Label lblSelectionAlpha = new Label(groupOverviewSettings, SWT.NONE);
-		lblSelectionAlpha.setFont(cantarell8);
-		lblSelectionAlpha.setText("Selection Transparency");
-
-		textSelectionAlpha = new Spinner(groupOverviewSettings, SWT.BORDER);
-		textSelectionAlpha.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		textSelectionAlpha.setIncrement(1);
-		textSelectionAlpha.setMaximum(255);
-		textSelectionAlpha.setMinimum(0);
-		textSelectionAlpha.setFont(cantarell8);
-		textSelectionAlpha.setSelection(settings.getOverviewSelectionAlphaValue());
-		textSelectionAlpha.setToolTipText("Selection Alpha Value (0 - 255)");
-
 		initSettings();
 		
 		return sashFormGlobal;
@@ -741,7 +1026,7 @@ public class OcelotlSettingsView extends Dialog {
 
 	@Override
 	protected void okPressed() {
-		saveSettings();
+		setSettings();
 		super.okPressed();
 	}
 
@@ -768,14 +1053,15 @@ public class OcelotlSettingsView extends Dialog {
 	/**
 	 * Save all the settings into the configuration file
 	 */
-	void saveSettings() {
+	void setSettings() {
 		// Cache settings
-		settings.setCacheActivated(btnCacheEnabled.getSelection());
+		settings.setDataCacheActivated(btnDataCacheEnabled.getSelection());
+		settings.setDichoCacheActivated(btnDichoCacheEnabled.getSelection());
 		settings.setCacheTimeSliceNumber(Integer.valueOf(cacheTimeSliceValue.getText()));
 		modifyDataCacheSize();
 		updateCacheDir();
 		settings.setCachePolicy(currentSelectedDatacachePolicy);
-		
+
 		// Parameter P strategy
 		settings.setParameterPPolicy(ocelotlView.getParameterPPolicy().getStrategy(parameterPStrategy.getText()));
 
@@ -784,30 +1070,81 @@ public class OcelotlSettingsView extends Dialog {
 		settings.setMaxEventProducersPerQuery(Integer.valueOf(spinnerDivideDbQuery.getText()));
 		settings.setEventsPerThread(Integer.valueOf(spinnerEventSize.getText()));
 
+		boolean hasChangedAll = false;
+		if (settings.setAggregateLeaves(btnEnableLeavesAgg.getSelection()))
+			hasChangedAll = true;
+
+		if (settings.setMaxNumberOfLeaves(Integer.valueOf(spinnerMaxAggLeaves.getText())))
+			hasChangedAll = true;
+
+		if (hasChangedAll)
+			ocelotlView.setHasChanged(HasChanged.ALL);
+		
+		settings.setUseVisualAggregate(btnEnableVisualAggregation.getSelection());
+		
 		// Curve settings
 		modifyThreshold();
 		modifyNormalize();
 		modifyIncreasingQuality();
 
-		// Misc.
-		modifySnapshotDir();
+		// Snapshot.
+		settings.setSnapShotDirectory(snapshotDirectory.getText());
 		settings.setSnapshotXResolution(Integer.valueOf(snapshotWidth.getText()));
 		settings.setSnapshotYResolution(Integer.valueOf(snapshotHeight.getText()));
+		settings.setxAxisYResolution(Integer.valueOf(xAxisHeight.getText()));
+		settings.setyAxisXResolution(Integer.valueOf(yAxisWidth.getText()));
+		settings.setQualCurveXResolution(Integer.valueOf(qualCurveWidth.getText()));
+		settings.setQualCurveYResolution(Integer.valueOf(qualCurveHeight.getText()));
 		
 		//Overview colors
 		settings.setEnableOverview(btnEnableOverview.getSelection());
-		settings.setOverviewDisplayBgColor(btnColorMap.get(btnEditBgDisplay));
-		settings.setOverviewDisplayFgColor(btnColorMap.get(btnEditFgDisplay));
-		settings.setOverviewDisplayAlphaValue(Integer.valueOf(textDisplayAlpha.getText()));
-		settings.setOverviewSelectionBgColor(btnColorMap.get(btnEditBgSelected));
-		settings.setOverviewSelectionFgColor(btnColorMap.get(btnEditFgSelected));
-		settings.setOverviewSelectionAlphaValue(Integer.valueOf(textSelectionAlpha.getText()));
+		settings.setOverviewDisplayBgColor(btnColorMap.get(btnEditBgOverviewDisplay));
+		settings.setOverviewDisplayFgColor(btnColorMap.get(btnEditFgOverviewDisplay));
+		settings.setOverviewDisplayAlphaValue(Integer.valueOf(textOverviewDisplayAlpha.getText()));
+		settings.setOverviewSelectionBgColor(btnColorMap.get(btnEditBgOverviewSelected));
+		settings.setOverviewSelectionFgColor(btnColorMap.get(btnEditFgOverviewSelected));
+		settings.setOverviewSelectionAlphaValue(Integer.valueOf(textOverviewSelectionAlpha.getText()));
+		settings.setOverviewAggregateLeaves(btnOverviewEnableLeavesAgg.getSelection());
+		settings.setOverviewMaxNumberOfLeaves(Integer.valueOf(spinnerOverviewMaxAggLeaves.getText()));
 		updateOverviewColors();
+		
+		// Main selection colors
+		settings.setMainDisplayBgColor(btnColorMap.get(btnEditBgMainDisplay));
+		settings.setMainDisplayFgColor(btnColorMap.get(btnEditFgMainDisplay));
+		settings.setMainDisplayAlphaValue(Integer.valueOf(textMainDisplayAlpha.getText()));
+		settings.setMainSelectionBgColor(btnColorMap.get(btnEditBgMainSelected));
+		settings.setMainSelectionFgColor(btnColorMap.get(btnEditFgMainSelected));
+		settings.setMainSelectionAlphaValue(Integer.valueOf(textMainSelectionAlpha.getText()));
+		updateMainSelectionColors();
 	}
 
 	@Override
 	protected void cancelPressed() {
 		super.cancelPressed();
+	}
+	
+	/**
+	 * Add button to save the settings
+	 */
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		// Change parent layout data to fill the whole bar
+		parent.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		saveSettingsButton = createButton(parent, IDialogConstants.NO_ID, "Save Settings", false);
+		saveSettingsButton.setToolTipText("Set Current Settings as Default Ocelotl Settings");
+		saveSettingsButton.addSelectionListener(new SaveSettingsListener());
+		
+		// Create a spacer label
+		Label spacer = new Label(parent, SWT.NONE);
+		spacer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		// Update layout of the parent composite to count the spacer
+		GridLayout layout = (GridLayout) parent.getLayout();
+		layout.numColumns++;
+		layout.makeColumnsEqualWidth = false;
+
+		createButton(parent, IDialogConstants.CANCEL_ID, "Cancel", false);
+		createButton(parent, IDialogConstants.OK_ID, "OK", true);
 	}
 
 }

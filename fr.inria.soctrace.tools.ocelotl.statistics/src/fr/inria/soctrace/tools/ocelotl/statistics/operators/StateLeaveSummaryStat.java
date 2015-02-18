@@ -1,7 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.statistics.operators;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
@@ -49,17 +62,7 @@ public class StateLeaveSummaryStat extends SummaryStat{
 			}
 		}
 
-		int nbProducers;
-		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
-			nbProducers = numberOfSelectedLeaves();
-		} else {
-			nbProducers = 0;
-			for (SimpleEventProducerNode anSepn : ocelotlview
-					.getOcelotlParameters().getEventProducerHierarchy()
-					.getLeaves().values())
-				if (microModel.getActiveProducers().contains(anSepn.getMe()))
-					nbProducers++;
-		}
+		int nbProducers = numberOfSelectedLeaves();
 		
 		total = timeRegion.getTimeDuration() * nbProducers;
 		statData = new ArrayList<ITableRow>();
@@ -77,9 +80,17 @@ public class StateLeaveSummaryStat extends SummaryStat{
 		}
 	}
 	
+	/**
+	 * Check whether or not an event producer is a leaf in the EP hierarchy
+	 * 
+	 * @param ep
+	 * @return
+	 */
 	protected boolean isLeaf(EventProducer ep) {
 		return ocelotlview.getOcelotlParameters().getEventProducerHierarchy()
-				.isLeaf(ep);
+				.isLeaf(ep)
+				|| ocelotlview.getOcelotlParameters()
+						.getAggregatedLeavesIndex().keySet().contains(ep);
 	}
 	
 	/**
@@ -89,15 +100,68 @@ public class StateLeaveSummaryStat extends SummaryStat{
 	 */
 	public Integer numberOfSelectedLeaves() {
 		int numberOfLeaves = 0;
+		Set<EventProducer> aggregatedProd = new HashSet<EventProducer>();
 
-		for (SimpleEventProducerNode anSepn : ocelotlview
-				.getOcelotlParameters().getEventProducerHierarchy().getLeaves()
-				.values())
-			if (ocelotlview.getOcelotlParameters()
-					.getSpatiallySelectedProducers().contains(anSepn.getMe())
-					&& microModel.getActiveProducers().contains(anSepn.getMe()))
-				numberOfLeaves++;
+		// If there is a spatial selection
+		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
+			// Check for all leave producers (non-aggregated)
+			for (SimpleEventProducerNode anSepn : ocelotlview
+					.getOcelotlParameters().getEventProducerHierarchy()
+					.getLeaves().values()) {
+				// That it is part of the selection and active
+				if (ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers()
+						.contains(anSepn.getMe())
+						&& microModel.getActiveProducers().contains(
+								anSepn.getMe()))
+					numberOfLeaves++;
+			}
+			
+			// Search for selected producer that are aggregation of EP leaves
+			if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
+				for (EventProducer anEP : ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers())
+					if ((microModel.getAggregatedProducers()
+							.containsValue(anEP) && microModel
+							.getActiveProducers().contains(anEP)))
+						aggregatedProd.add(anEP);
+		} else {
+			// Same thing as above without caring about spatial selection
+			for (SimpleEventProducerNode anSepn : ocelotlview
+					.getOcelotlParameters().getEventProducerHierarchy()
+					.getLeaves().values()) {
+				if (microModel.getActiveProducers().contains(anSepn.getMe()))
+					numberOfLeaves++;
 
+				if (microModel.getActiveProducers().contains(
+						anSepn.getParentNode().getMe()))
+					aggregatedProd.add(anSepn.getParentNode().getMe());
+			}
+
+			if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
+				for (EventProducer anEP : microModel.getAggregatedProducers()
+						.values())
+					if (microModel.getActiveProducers().contains(anEP))
+						aggregatedProd.add(anEP);
+		}
+
+		// For all prod that are aggregation of leaves, add the
+		// corresponding number of aggregated leaves
+		for (EventProducer anEp : aggregatedProd)
+			numberOfLeaves = numberOfLeaves
+					+ microModel
+							.removeFilteredEP(
+									ocelotlview
+											.getOcelotlParameters()
+											.getEventProducerHierarchy()
+											.getLeaves(
+													ocelotlview
+															.getOcelotlParameters()
+															.getEventProducerHierarchy()
+															.getEventProducerNodes()
+															.get(anEp.getId())))
+							.size();
+		
 		return numberOfLeaves;
 	}
 }

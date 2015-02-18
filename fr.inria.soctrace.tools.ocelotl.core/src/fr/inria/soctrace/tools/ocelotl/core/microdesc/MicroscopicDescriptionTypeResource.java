@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.core.microdesc;
 
 import java.util.ArrayList;
@@ -17,7 +28,7 @@ public class MicroscopicDescriptionTypeResource {
 	List<String> traceFormats = new ArrayList<String>();
 	List<String> eventCategory = new ArrayList<String>();
 	List<String> visuCompatibility = new ArrayList<String>();
-	String valueType;
+	String unitDescription;
 
 	public MicroscopicDescriptionTypeResource() {
 		// TODO Auto-generated constructor stub
@@ -79,8 +90,8 @@ public class MicroscopicDescriptionTypeResource {
 		return generic;
 	}
 
-	public String getValueType() {
-		return valueType;
+	public String getUnitDescription() {
+		return unitDescription;
 	}
 
 	public void setGeneric(final boolean generic) {
@@ -103,8 +114,8 @@ public class MicroscopicDescriptionTypeResource {
 		decompose(this.traceFormats, traceFormats);
 	}
 
-	public void setValueType(String attribute) {
-		valueType = attribute;
+	public void setUnitDescription(String attribute) {
+		unitDescription = attribute;
 	}
 
 	public List<String> getEventCategory() {
@@ -124,7 +135,6 @@ public class MicroscopicDescriptionTypeResource {
 		return visuCompatibility;
 	}
 
-
 	private List<String> decompose(List<String> list, String string) {
 		final String[] tmp = string
 				.split(OcelotlConstants.MultipleValueExtensionSeparator);
@@ -133,5 +143,5 @@ public class MicroscopicDescriptionTypeResource {
 			list.add(s);
 		return list;
 	}
-
+	
 }

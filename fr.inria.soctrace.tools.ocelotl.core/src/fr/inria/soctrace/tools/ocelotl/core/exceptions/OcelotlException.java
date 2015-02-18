@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.core.exceptions;
 
 public class OcelotlException extends Exception {
@@ -19,7 +30,7 @@ public class OcelotlException extends Exception {
 	public static final String INVALID_START_TIMESTAMP = "Error: The provided starting timestamp is smaller than the trace starting timestamp";
 	public static final String INVALID_END_TIMESTAMP = "Error: The provided ending timestamp is greater than the trace ending timestamp";
 	public static final String NO_TIMESTAMP = "Error: At least one of the starting or ending timestamps is missing.";
-	public static final String INCOMPLETE_HIERARCHY = "Error: The event producer hierarchy is incomplete.";
+	public static final String INCOMPLETE_HIERARCHY = "Error: The event producer hierarchy is incomplete. There are some event producer with no parent node (non-unique root node is the most likely explanation)";
 	public static final String INVALID_CACHEFILE = "Error: The selected file is not a valid cache file.";
 	public static final String INVALID_CACHED_TRACE = "Error: The corresponding trace was not found in the database.";
 	public static final String INVALID_MICRO_DESCRIPTION = "Error: The corresponding microscopic description was not found.";

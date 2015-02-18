@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.core.microdesc;
 
 import java.util.ArrayList;
@@ -29,14 +40,15 @@ public abstract class Microscopic2DDescription extends MicroscopicDescription {
 	}
 
 	@Override
-	public void initVectors() throws SoCTraceException {
+	public void initMatrix() throws SoCTraceException {
 		matrix = new ArrayList<HashMap<EventProducer, Double>>();
 		final List<EventProducer> producers = parameters.getCurrentProducers();
 		for (long i = 0; i < parameters.getTimeSlicesNumber(); i++) {
 			matrix.add(new HashMap<EventProducer, Double>());
 
 			for (final EventProducer ep : producers)
-				matrix.get((int) i).put(ep, 0.0);
+				if (!aggregatedProducers.containsKey(ep))
+					matrix.get((int) i).put(ep, 0.0);
 		}
 	}
 

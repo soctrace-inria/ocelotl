@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.views;
 
 import java.util.ArrayList;
@@ -21,6 +32,7 @@ public class TemporalModeView extends TimeLineView {
 	protected void computeDiagram() {
 		int i;
 		final List<Integer> aggParts = new ArrayList<Integer>();
+		final int drawingAreaWidth = root.getSize().width - 2 * aBorder;
 		for (i = 0; i <= parts.get(parts.size() - 1); i++)
 			aggParts.add(0);
 		for (i = 0; i < parts.size(); i++)
@@ -30,16 +42,20 @@ public class TemporalModeView extends TimeLineView {
 		for (i = 0; i < aggParts.size(); i++) {
 			final ModeFigure part = new ModeFigure();
 			part.getUpdateManager().performUpdate();
-			MainEvent mState = ((TemporalMode) visuOperator).getMajStates().get(i);
-			part.draw(mState);
-			figures.add(part);
-			root.add(part, new Rectangle(new Point(j
-					* (root.getSize().width - 2 * aBorder) / parts.size()
-					+ aBorder, root.getSize().height - aBorder), new Point(
-					(j + aggParts.get(i)) * (root.getSize().width - 2 * aBorder)
-							/ parts.size() - space + aBorder, aBorder)));
+			MainEvent mState = ((TemporalMode) visuOperator).getMajStates()
+					.get(i);
+			if (!mState.getState().equals("void")) {
+				part.draw(mState);
+				figures.add(part);
+				root.add(part, new Rectangle(new Point(j * drawingAreaWidth
+						/ parts.size() + aBorder, root.getSize().height
+						- aBorder), new Point((j + aggParts.get(i))
+						* drawingAreaWidth / parts.size() - space + aBorder,
+						aBorder)));
+			}
 			j = j + aggParts.get(i);
 		}
+		root.validate();
 	}
 
 }

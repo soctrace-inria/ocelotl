@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -26,5 +26,4 @@ public interface IVisuTOperator extends IVisuOperator {
 	public int getPartNumber();
 
 	public int getSliceNumber();
-
 }

@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.statistics.operators;
 
 import java.text.DecimalFormat;
@@ -5,10 +16,12 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.graphics.Color;
 
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
+import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.framesoc.ui.model.TableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
@@ -24,7 +37,6 @@ public class SummaryStat extends StatisticsProvider {
 	Microscopic3DDescription microModel;
 	HashMap<String, Double> data;
 	HashMap<String, Double> proportions;
-	List<ITableRow> statData;
 
 	public SummaryStat(OcelotlView aView) {
 		super(aView);
@@ -150,6 +162,10 @@ public class SummaryStat extends StatisticsProvider {
 		 * Color for the name cell image
 		 */
 		protected Color color;
+		
+		public Map<ITableColumn, String> getFields() {
+			return fields;
+		}
 
 		public void setColor(Color color) {
 			this.color = color;
@@ -178,6 +194,11 @@ public class SummaryStat extends StatisticsProvider {
 		public Color getColor() {
 			return color;
 		}
+	}
+
+	@Override
+	public MicroscopicDescription getMicroMode() {
+		return microModel;
 	}
 
 }

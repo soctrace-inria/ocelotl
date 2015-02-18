@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -19,27 +19,21 @@
 
 package fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.lpaggreg.quality.DLPQuality;
 import fr.inria.lpaggreg.spacetime.ISpaceTimeAggregation;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.OcelotlCore;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.DataAggregationManager;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
 
-public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
+public abstract class SpaceTimeAggregationManager extends DataAggregationManager  implements ISpaceTimeManager {
 
-	protected List<DLPQuality> qualities = new ArrayList<DLPQuality>();
-	protected List<Double> parameters = new ArrayList<Double>();
 	protected ISpaceTimeAggregation timeAggregation;
-	protected OcelotlParameters ocelotlParameters;
 	protected EventProducerHierarchy hierarchy;
 
 	private static final Logger logger = LoggerFactory.getLogger(SpaceTimeAggregationManager.class);
@@ -95,22 +89,11 @@ public abstract class SpaceTimeAggregationManager implements ISpaceTimeManager {
 			fillNodesJNI();
 		else
 			fillNodesJava();
-
 	}
 
 	protected abstract void fillNodesJava();
 
 	protected abstract void fillNodesJNI();
-
-	@Override
-	public List<Double> getParameters() {
-		return parameters;
-	}
-
-	@Override
-	public List<DLPQuality> getQualities() {
-		return qualities;
-	}
 
 	protected void addHierarchyToJNI() {
 		addRoot();

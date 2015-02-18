@@ -1,8 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.ui.views.timelineview;
 
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -23,4 +35,15 @@ public abstract class OcelotlMouseListener implements MouseListener, MouseMotion
 	public abstract void drawSelection();
 	
 	public void setSpatialSelection(EventProducerNode selectedNode) {}
+	
+	/**
+	 * Set the current shape of the mouse cursor
+	 * 
+	 * @param aCursor
+	 *            the shape of the cursor
+	 */
+	public void setShellCursor(int aCursor) {
+		if (shell != null && !shell.isDisposed())
+			shell.setCursor(new Cursor(display, aCursor));
+	}
 }

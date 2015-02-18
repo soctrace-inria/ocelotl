@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.statistics.operators;
 
 import java.util.ArrayList;
@@ -48,19 +59,7 @@ public class StateActiveProducerSummaryStat extends SummaryStat{
 			}
 		}
 
-		int nbProducers;
-		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
-			nbProducers = getNumberOfSelectedActiveProducers();
-			
-			if (nbProducers == 2)
-				// Since we add the parent producers when only one producer is
-				// selected, we remove it to have correct data
-				nbProducers = 1;
-			
-			
-		} else {
-			nbProducers = microModel.getActiveProducers().size();
-		}
+		int nbProducers = getNumberOfProducers();
 		
 		total = timeRegion.getTimeDuration() * nbProducers;
 		statData = new ArrayList<ITableRow>();
@@ -83,15 +82,48 @@ public class StateActiveProducerSummaryStat extends SummaryStat{
 	 * 
 	 * @return the current number of selected leaves producers
 	 */
-	public Integer getNumberOfSelectedActiveProducers() {
-		int numberOfSelectedActiveProducers = 0;
+	public Integer getNumberOfProducers() {
+		int nbProducers = 0;
+		
+		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
+			ArrayList<EventProducer> currentSelection = new ArrayList<EventProducer>();
 
-		for (EventProducer anEp : microModel.getActiveProducers())
-			if (ocelotlview.getOcelotlParameters().getSpatiallySelectedProducers()
-					.contains(anEp))
-				numberOfSelectedActiveProducers++;
+			for (EventProducer anEP : microModel.getActiveProducers())
+				if (ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers().contains(anEP)
+						&& (!ocelotlview.getOcelotlParameters()
+								.getOcelotlSettings().isAggregateLeaves() || (ocelotlview
+								.getOcelotlParameters().getOcelotlSettings()
+								.isAggregateLeaves() && !ocelotlview
+								.getOcelotlParameters()
+								.getAggregatedEventProducers().contains(anEP)))) {
+					currentSelection.add(anEP);
+				}
 
-		return numberOfSelectedActiveProducers;
+			nbProducers = currentSelection.size();
+
+			if (nbProducers == 2)
+				// Since we add the parent producers when only one producer is
+				// selected, we remove it to have correct data
+				nbProducers = 1;
+
+			// Add the corresponding number of aggregated producers and
+			// remove the current producer as we cannot know if it is really an
+			// active producer
+			// TODO : deactivate this operator ?
+			for (EventProducer anEP : ocelotlview.getOcelotlParameters()
+					.getAggregatedLeavesIndex().keySet())
+				if (ocelotlview.getOcelotlParameters()
+						.getSpatiallySelectedProducers().contains(anEP))
+					nbProducers = nbProducers
+							+ ocelotlview.getOcelotlParameters()
+									.getAggregatedLeavesIndex().get(anEP) - 1;
+		}
+		else {
+			nbProducers = microModel.getActiveProducers().size();
+		}
+		
+		return nbProducers;
 	}
 	
 }

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Win64
 Bundle-SymbolicName: fr.inria.lpaggreg.win64
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.5
 Fragment-Host: fr.inria.lpaggreg;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-NativeCode: lpaggregjni.dll;selection-filter=

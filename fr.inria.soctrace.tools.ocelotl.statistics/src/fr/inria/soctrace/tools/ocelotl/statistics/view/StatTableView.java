@@ -1,19 +1,30 @@
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.statistics.view;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -22,17 +33,19 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
 import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
 import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
+import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
+import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.framesoc.ui.model.TableRow;
-import fr.inria.soctrace.framesoc.ui.providers.TableRowLabelProvider;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.statistics.IStatisticsProvider;
 import fr.inria.soctrace.tools.ocelotl.statistics.operators.StatisticsProvider;
+import fr.inria.soctrace.tools.ocelotl.statistics.operators.SummaryStat.SummaryStatModel;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatView;
 
@@ -54,39 +67,25 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	private StatisticsProvider statProvider;
 
 	/**
-	 * Filter text for table
-	 */
-	private Text textFilter;
-
-	/**
-	 * Filter for table
-	 */
-	private OcelotlStatisticsTableRowFilter nameFilter;
-
-	/**
 	 * Column comparator
 	 */
 	private OcelotlStatisticsColumnComparator comparator;
+	private HashMap<Integer, OcelotlStatisticsTableColumn> columnIndex = new HashMap<Integer, OcelotlStatisticsTableColumn>();
 
 	private Composite compositeTable;
 
-	/**
-	 * Images
-	 */
-	private Map<String, Image> images = new HashMap<String, Image>();
-	
 	/**
 	 * Constructor
 	 */
 	public StatTableView(OcelotlView theView) {
 		super(theView);
-
+		dispose();
+		
 		// Register update to synchronize traces
 		topics = new FramesocBusTopicList(this);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
 		topics.registerAll();
-		
-		dispose();
+			
 		createPartControl(ocelotlView.getStatComposite());
 	}
 	
@@ -95,35 +94,40 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		// If color has changed
 		if ((topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED))) {
 			if (statProvider != null && statProvider.getTableData() != null && tableViewer != null) {
-				// Get rid of the cached images
-				disposeImages();
 				// Update colors and the table
 				statProvider.updateColor();
 				updateTableData();
 			}
 		}
 	}
+	
+	@Override
+	public String getStatDataToCSV() {
+		StringBuffer output = new StringBuffer();
+		for (ITableRow aRow : statProvider.getStatData()) {
+			SummaryStatModel aStatRow = (SummaryStatModel) aRow;
+			for (ITableColumn aColumn : aStatRow.getFields().keySet()) {
+				output.append(aStatRow.getFields().get(aColumn)
+						+ OcelotlConstants.CSVDelimiter);
+			}
+			// Remove the last csv delimiter
+			output.deleteCharAt(output
+					.lastIndexOf(OcelotlConstants.CSVDelimiter));
+			output.append("\n");
+		}
+
+		return output.toString();
+	}
 
 	@Override
 	public void createDiagram() {
-		statProvider.setMicroMode(ocelotlView.getOcelotlCore().getMicroModel());
+		statProvider.setMicroMode(ocelotlView.getCore().getMicroModel());
 		updateData();
 	}
 	
-	/**
-	 * Delete cached images (square next to the event types)
-	 */
-	private void disposeImages() {
-		Iterator<Image> it = images.values().iterator();
-		while (it.hasNext()) {
-			it.next().dispose();
-		}
-		images.clear();
-	}
-
 	@Override
 	public void deleteDiagram() {
-		if (tableViewer != null)
+		if (tableViewer != null) 
 			tableViewer.setInput(null);
 	}
 
@@ -139,10 +143,12 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	
 	@Override
 	public void updateData() {
-		statProvider.computeData();
-		updateTableData();
-		// Needed for correct redraw of the table
-		compositeTable.layout();
+		if (statProvider.getMicroMode() != null) {
+			statProvider.computeData();
+			updateTableData();
+			// Needed for correct redraw of the table
+			compositeTable.layout();
+		}
 	}
 
 	@Override
@@ -182,45 +188,68 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		tableViewer = new TableViewer(compositeTable, SWT.FILL | SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		tableViewer.setContentProvider(new StatContentProvider());
-		comparator = new OcelotlStatisticsColumnComparator();
-		tableViewer.setComparator(comparator);
-		createColumns();
-		
+		ColumnViewerToolTipSupport.enableFor(tableViewer);
+
 		Table table = tableViewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		table.setFont(SWTResourceManager.getFont("Cantarell", 8, SWT.NORMAL));
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		tableViewer.getTable().addListener(SWT.Resize, new ResizeListener());
+		// needed to set a correct table width
+		compositeTable.layout();
+		
+		createColumns();
+		comparator = new OcelotlStatisticsColumnComparator();
+		tableViewer.setComparator(comparator);
 		
 		// Default sorting of the table
-		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(2));
-		tableViewer.getTable().setSortDirection(SWT.DOWN);
+		tableViewer.getTable().setSortColumn(tableViewer.getTable().getColumn(ocelotlView.getOcelotlParameters().getSortTableSettings().getColumnNumber()));
+		tableViewer.getTable().setSortDirection(ocelotlView.getOcelotlParameters().getSortTableSettings().getDirection());
 	}
 
 	private void createColumns() {
+		int cpt = 0;
+		columnIndex = new HashMap<Integer, OcelotlStatisticsTableColumn>();
+
 		// For each column
 		for (final OcelotlStatisticsTableColumn col : OcelotlStatisticsTableColumn
 				.values()) {
 			TableViewerColumn elemsViewerCol = new TableViewerColumn(
 					tableViewer, SWT.NONE);
+			int alignment;
 
 			// If it is the column name
 			if (col.equals(OcelotlStatisticsTableColumn.NAME)) {
 				// add a filter for this column
-				//nameFilter = new OcelotlStatisticsTableRowFilter(col);
-				//tableViewer.addFilter(nameFilter);
+				// nameFilter = new OcelotlStatisticsTableRowFilter(col);
+				// tableViewer.addFilter(nameFilter);
 
 				// the label provider also puts the image
 				elemsViewerCol
-						.setLabelProvider(new OcelotlStatisticsTableRowLabelProvider(
-								col, images));
-			} else
-				elemsViewerCol.setLabelProvider(new TableRowLabelProvider(col));
+						.setLabelProvider(new OcelotlStatisticsTableRowLabelImageProvider(
+								col));
+				alignment = SWT.LEFT;
+			} else {
+				OcelotlStatisticsTableRowLabelProvider labelProvider = new OcelotlStatisticsTableRowLabelProvider(
+						col);
+				if (col.equals(OcelotlStatisticsTableColumn.OCCURRENCES))
+					labelProvider.setToolTip(ocelotlView.getOcelotlParameters()
+							.getCurrentUnit());
+
+				elemsViewerCol.setLabelProvider(labelProvider);
+				alignment = SWT.RIGHT;
+			}
 
 			final TableColumn elemsTableCol = elemsViewerCol.getColumn();
-			elemsTableCol.setWidth(col.getWidth());
+
+			elemsTableCol
+					.setWidth(Math.max((int) (tableViewer.getTable().getClientArea().width * ocelotlView
+							.getOcelotlParameters().getSortTableSettings()
+							.getColumnWidthWeight()[cpt]), (int) (tableViewer.getTable().getClientArea().width * 0.05)));
+
 			elemsTableCol.setText(col.getHeader());
+			elemsTableCol.setAlignment(alignment);
 			// Set sorting comparator when clicking on a column header
 			elemsTableCol.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -232,6 +261,40 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 					tableViewer.refresh();
 				}
 			});
+			
+			elemsTableCol.addControlListener(new ControlListener() {
+				
+				@Override
+				public void controlResized(ControlEvent e) {
+					// Modified the weight of each column according to their new
+					// width
+					double areaWidth = tableViewer.getTable().getClientArea().width;
+					// Avoid complication due to small number
+					if (areaWidth > 4.0) {
+						// Set a minimal and maximal value to avoid column
+						// disappearing
+						for (int anIndex : columnIndex.keySet())
+							if (columnIndex.get(anIndex).getHeader()
+									.equals(col.getHeader())) {
+								ocelotlView.getOcelotlParameters()
+										.getSortTableSettings()
+										.getColumnWidthWeight()[anIndex] = Math
+										.min(Math
+												.max(0.05,
+														(double) elemsTableCol
+																.getWidth()
+																/ areaWidth),
+												0.95);
+							}
+					}
+				}
+				
+				@Override
+				public void controlMoved(ControlEvent e) {
+				}
+			});
+			columnIndex.put(cpt, col);
+			cpt++;
 		}
 	}
 
@@ -247,6 +310,9 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	 * Delete the old widgets
 	 */
 	public void dispose() {
+		if (topics != null)
+			topics.unregisterAll();
+
 		for (Control c : ocelotlView.getStatComposite().getChildren())
 			c.dispose();
 	}
@@ -262,35 +328,51 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			int columnCount = table.getColumnCount();
 			if (columnCount == 0)
 				return;
-			int totalAreaWdith = table.getClientArea().width;
-			int newWidth = totalAreaWdith / columnCount;
-			for (TableColumn column : table.getColumns()) {
-				column.setWidth(newWidth);
+			int totalAreaWidth = table.getClientArea().width;
+			TableColumn[] columns = table.getColumns();
+			for (int i = 0; i < columns.length; i++) {
+				columns[i].setWidth((int) (totalAreaWidth * ocelotlView
+						.getOcelotlParameters().getSortTableSettings()
+						.getColumnWidthWeight()[i]));
 			}
 		}
 	}
 
 	/**
-	 * Class used to sort the column (copied and adapted from StatisticsColumnComparator in
-	 * framesoc)
+	 * Class used to sort the column (copied and adapted from
+	 * StatisticsColumnComparator in Framesoc)
 	 */
 	public class OcelotlStatisticsColumnComparator extends ViewerComparator {
-		private OcelotlStatisticsTableColumn col = OcelotlStatisticsTableColumn.OCCURRENCES;
-		private int direction = SWT.DOWN;
+		private OcelotlStatisticsTableColumn col = columnIndex.get(ocelotlView
+				.getOcelotlParameters().getSortTableSettings()
+				.getColumnNumber());
+		private int direction = ocelotlView.getOcelotlParameters()
+				.getSortTableSettings().getDirection();
 
 		public int getDirection() {
 			return direction;
 		}
 
-		public void setColumn(OcelotlStatisticsTableColumn col) {
-			if (this.col.equals(col)) {
+		public void setColumn(OcelotlStatisticsTableColumn aCol) {
+			if (this.col.equals(aCol)) {
 				// Same column as last sort: toggle the direction
 				direction = (direction == SWT.UP) ? SWT.DOWN : SWT.UP;
 			} else {
 				// New column: do an ascending sort
-				this.col = col;
+				this.col = aCol;
 				direction = SWT.UP;
 			}
+
+			// Get the column number and save it into the index
+			TableColumn[] columns = tableViewer.getTable().getColumns();
+			for (int i = 0; i < columns.length; i++)
+				if (columns[i].getText().equals(aCol.getHeader()))
+					ocelotlView.getOcelotlParameters().getSortTableSettings()
+							.setColumnNumber(i);
+
+			// Get the sorting direction
+			ocelotlView.getOcelotlParameters().getSortTableSettings()
+					.setDirection(direction);
 		}
 
 		@Override

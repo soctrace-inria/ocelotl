@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -21,6 +21,7 @@ package fr.inria.soctrace.tools.ocelotl.ui.views;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
@@ -63,15 +64,16 @@ public class TimeAxisView {
 			if (active) {
 				setForegroundColor(AggregatedView.activeColorFG);
 				setBackgroundColor(AggregatedView.activeColorBG);
+				setAlpha(AggregatedView.activeColorAlpha);
 			} else {
 				setForegroundColor(AggregatedView.potentialColorFG);
 				setBackgroundColor(AggregatedView.potentialColorBG);
+				setAlpha(AggregatedView.potentialColorAlpha);
 			}
 			root.add(this,
 					new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), root.getSize().height - 2), new Point(
 							(int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * Border) / time.getTimeDuration() + Border), -1)));
 		}
-
 	}
 
 	Figure				root;
@@ -107,7 +109,9 @@ public class TimeAxisView {
 			drawMainLine();
 			drawGrads();
 		}
+		root.validate();
 		canvas.update();
+		unselect();
 	}
 
 	public void createDiagram(final TimeRegion time, final TimeRegion timeRegion, final boolean active) {
@@ -121,13 +125,14 @@ public class TimeAxisView {
 				selectFigure.draw(timeRegion, active);
 			}
 		}
+		root.validate();
 		canvas.update();
 	}
 
 	public void drawGrads() {
 		grads();
 		NumberFormat formatter = null;
-		formatter = java.text.NumberFormat.getInstance(java.util.Locale.US);
+		formatter = NumberFormat.getInstance(Locale.US);
 		formatter = new DecimalFormat("0.00E0");
 		formatter.setMaximumIntegerDigits(3);
 		final int linePosition = root.getSize().height() - TextHeight / 2 - TextPositionOffset - Border;
@@ -137,24 +142,21 @@ public class TimeAxisView {
 			rectangle.setBackgroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 			rectangle.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			rectangle.setLineWidth(1);
-			final RectangleFigure rectangleText = new RectangleFigure();
-			if (i != (int) GradNumber)
-				root.add(rectangleText, new Rectangle(new Point((int) (i * GradWidth), linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
-			else
-				root.add(rectangleText, new Rectangle(new Point((int) (i * GradWidth) - Border * 3, linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
-			rectangleText.setBackgroundColor(root.getBackgroundColor());
-			rectangleText.setForegroundColor(root.getBackgroundColor());
+
 			final long value = (long) (i * GradDuration + time.getTimeStampStart());
 			final String text = formatter.format(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-			rectangleText.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
-			rectangleText.setLineWidth(1);
-			rectangleText.add(label);
+			label.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
-			rectangleText.setLayoutManager(layout);
+			if (i != (int) GradNumber)
+				root.add(label, new Rectangle(new Point((int) (i * GradWidth), linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
+			else
+				root.add(label, new Rectangle(new Point((int) (i * GradWidth) - Border * 3, linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
+
+			label.setLayoutManager(layout);
 			for (int j = 1; j < 5; j++) {
 				final RectangleFigure rectangle2 = new RectangleFigure();
 				if ((int) (i * GradWidth) + Border + (int) (j * GradWidth / MiniDivide) > root.getSize().width() - Border)
@@ -229,6 +231,10 @@ public class TimeAxisView {
 
 		return canvas;
 	}
+	
+	public Figure getRoot() {
+		return root;
+	}
 
 	public void resizeDiagram() {
 		createDiagram(time, selectTime, true);
@@ -243,6 +249,12 @@ public class TimeAxisView {
 	public void unselect() {
 		selectTime = null;
 		resizeDiagram();
+	}
+	
+	public void deleteDiagram() {
+		root.removeAll();
+		root.repaint();
+		time = null;
 	}
 
 }

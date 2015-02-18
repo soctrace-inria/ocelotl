@@ -14,10 +14,11 @@
     </plugins>
   </build>
   <parent>
-  	<groupId>fr.inria.soctrace.maven</groupId>
-  	<artifactId>fr.inria.soctrace.maven.master</artifactId>
-  	<version>1.0.0-SNAPSHOT</version>
-  	<relativePath>../fr.inria.soctrace.maven.master</relativePath>
+  	<groupId>fr.inria.soctrace.tools.ocelotl.maven.master</groupId>
+  	<artifactId>fr.inria.soctrace.tools.ocelotl.maven.master</artifactId>
+  	<version>1.1.5</version>
+  	<relativePath>../fr.inria.soctrace.tools.ocelotl.maven.master</relativePath>
   </parent>
   <packaging>eclipse-plugin</packaging>
+  <groupId>fr.inria.soctrace.tools.ocelotl.slf4j</groupId>
 </project>

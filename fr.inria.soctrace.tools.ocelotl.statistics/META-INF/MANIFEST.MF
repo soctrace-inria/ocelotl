@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Statistics
 Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.statistics;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.1.5
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.statistics.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -17,9 +17,11 @@ Import-Package: fr.inria.soctrace.framesoc.core.bus,
  fr.inria.soctrace.lib.storage,
  fr.inria.soctrace.lib.utils,
  fr.inria.soctrace.tools.ocelotl.core,
+ fr.inria.soctrace.tools.ocelotl.core.constants,
  fr.inria.soctrace.tools.ocelotl.core.microdesc,
  fr.inria.soctrace.tools.ocelotl.core.model,
  fr.inria.soctrace.tools.ocelotl.core.parameters,
+ fr.inria.soctrace.tools.ocelotl.core.settings,
  fr.inria.soctrace.tools.ocelotl.core.statistics,
  fr.inria.soctrace.tools.ocelotl.core.timeregion,
  fr.inria.soctrace.tools.ocelotl.core.timeslice,

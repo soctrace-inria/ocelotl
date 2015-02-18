@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -90,6 +90,7 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 			DrawPartition hp = new DrawPartition();
 			hp.draw();
 		}
+		root.validate();
 	}
 
 	@Override
@@ -99,6 +100,7 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 			DrawAggregate hp = new DrawAggregate();
 			hp.draw(aNode, start, end);
 		}
+		root.validate();
 	}
 
 	public class DrawAggregate extends DrawPartition {
@@ -136,10 +138,14 @@ public class SpatiotemporalPartitionView extends SpatioTemporalView {
 							((VisualAggregation) p.getData()).getValue(), epn, false, false);
 				else {
 					boolean aggy = false;
-					for (EventProducerNode ep : epn.getChildrenNodes()) {
-						if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
-							aggy = true;
-							break;
+					
+					if (ocelotlView.getOcelotlParameters().getOcelotlSettings()
+							.isUseVisualAggregate()) {
+						for (EventProducerNode ep : epn.getChildrenNodes()) {
+							if ((ep.getWeight() * logicHeight - space) < minLogicWeight) {
+								aggy = true;
+								break;
+							}
 						}
 					}
 					if (aggy == false)

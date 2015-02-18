@@ -1,5 +1,17 @@
-package fr.inria.soctrace.tools.ocelotl.core.datacache;
+/*******************************************************************************
+ * Copyright (c) 2012-2015 INRIA.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Damien Dosimont <damien.dosimont@imag.fr>
+ *     Youenn Corre <youenn.corret@inria.fr>
+ ******************************************************************************/
+package fr.inria.soctrace.tools.ocelotl.core.caches;
 
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 
 /**
@@ -12,9 +24,11 @@ public class CacheParameters {
 		private long startTimestamp;
 		private long endTimestamp;
 		private int nbTimeSlice;
-		private String timeAggOperator;
+		private String dataAggOperator;
 		private String microModelType;
-		private String spaceAggOperator;
+		private String visuAggOperator;
+		private double treshold;
+		private boolean normalized;
 
 		public CacheParameters() {
 			traceName = "";
@@ -22,9 +36,11 @@ public class CacheParameters {
 			startTimestamp = 0L;
 			endTimestamp = 0L;
 			nbTimeSlice = 0;
-			timeAggOperator = "null";
-			spaceAggOperator = "null";
+			dataAggOperator = "null";
+			visuAggOperator = "null";
 			microModelType = "null";
+			treshold = OcelotlDefaultParameterConstants.Threshold;
+			normalized = false;
 		}
 
 		/**
@@ -33,23 +49,26 @@ public class CacheParameters {
 		 * @param oParam
 		 *            the Ocelotl parameters
 		 */
-		CacheParameters(OcelotlParameters oParam) {
+		public CacheParameters(OcelotlParameters oParam) {
 			traceName = oParam.getTrace().getAlias();
 			traceID = oParam.getTrace().getId();
 
 			startTimestamp = oParam.getTimeRegion().getTimeStampStart();
 			endTimestamp = oParam.getTimeRegion().getTimeStampEnd();
 			nbTimeSlice = oParam.getTimeSlicesNumber();
+			treshold = oParam.getThreshold();
+			normalized = oParam.isNormalize();
+			
 			if (oParam.getDataAggOperator() == null) {
-				timeAggOperator = "null";
+				dataAggOperator = "null";
 			} else {
-				timeAggOperator = oParam.getDataAggOperator();
+				dataAggOperator = oParam.getDataAggOperator();
 			}
 
 			if (oParam.getVisuOperator() == null) {
-				spaceAggOperator = "null";
+				visuAggOperator = "null";
 			} else {
-				spaceAggOperator = oParam.getVisuOperator();
+				visuAggOperator = oParam.getVisuOperator();
 			}
 			
 			if (oParam.getMicroModelType() == null) {
@@ -99,20 +118,20 @@ public class CacheParameters {
 			this.nbTimeSlice = nbTimeSlice;
 		}
 
-		public String getTimeAggOperator() {
-			return timeAggOperator;
+		public String getDataAggOperator() {
+			return dataAggOperator;
 		}
 
-		public void setTimeAggOperator(String timeAggOperator) {
-			this.timeAggOperator = timeAggOperator;
+		public void setDataAggOperator(String timeAggOperator) {
+			this.dataAggOperator = timeAggOperator;
 		}
 
-		public String getSpaceAggOperator() {
-			return spaceAggOperator;
+		public String getVisuAggOperator() {
+			return visuAggOperator;
 		}
 
-		public void setSpaceAggOperator(String spaceAggOperator) {
-			this.spaceAggOperator = spaceAggOperator;
+		public void setVisuAggOperator(String spaceAggOperator) {
+			this.visuAggOperator = spaceAggOperator;
 		}
 
 		public String getMicroModelType() {
@@ -121,5 +140,21 @@ public class CacheParameters {
 
 		public void setMicroModelType(String microModelType) {
 			this.microModelType = microModelType;
+		}
+
+		public double getTreshold() {
+			return treshold;
+		}
+
+		public void setTreshold(double treshold) {
+			this.treshold = treshold;
+		}
+
+		public boolean isNormalized() {
+			return normalized;
+		}
+
+		public void setNormalized(boolean normalized) {
+			this.normalized = normalized;
 		}
 }

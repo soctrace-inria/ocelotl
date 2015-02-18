@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -55,11 +55,13 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.framesoc.ui.utils.AlphanumComparator;
 import fr.inria.soctrace.lib.model.AnalysisResult;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
+import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IAggregationWindow;
@@ -234,7 +236,6 @@ public abstract class DistributionBaseView extends Dialog implements
 			final Collection<?> c = (Collection<?>) viewer.getInput();
 			c.clear();
 			viewer.refresh(false);
-			// hasChanged = HasChanged.ALL;
 		}
 	}
 
@@ -443,7 +444,6 @@ public abstract class DistributionBaseView extends Dialog implements
 		groupEventProducers.setText("Event Producers");
 		groupEventProducers.setLayout(new GridLayout());
 
-	
 		// Tree viewer
 		treeViewerEventProducer = new CheckboxTreeViewer(groupEventProducers, SWT.BORDER | SWT.MULTI);
 		treeViewerEventProducer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
@@ -463,6 +463,15 @@ public abstract class DistributionBaseView extends Dialog implements
 		treeViewerEventProducer.expandAll();
 		treeViewerEventProducer.setComparator(new ViewerComparator());
 		treeViewerEventProducer.addCheckStateListener(new CheckStateListener());
+		treeViewerEventProducer.setComparator(new ViewerComparator(
+				new Comparator<String>() {
+					@Override
+					public int compare(String o1,
+							String o2) {
+						return AlphanumComparator.compare(o1,
+								o2);
+					}
+				}));
 		
 		// Buttons
 		Composite buttonComposite = new Composite(groupEventProducers, SWT.RIGHT);
@@ -571,16 +580,17 @@ public abstract class DistributionBaseView extends Dialog implements
 	/**
 	 * Initialize settings values
 	 */
-	public void initSettings()
-	{
+	public void initSettings() {
 		oldEventTypes = new ArrayList<EventType>(config.getTypes());
-		oldProducer = new LinkedList<EventProducer>(params.getEventProducers());
-		
-		producers = new LinkedList<EventProducer>();
-		for(EventProducer ep: params.getEventProducers())
-			producers.add(ep); 
+		oldProducer = new LinkedList<EventProducer>(
+				params.getUnfilteredEventProducers());
 
-		treeViewerEventProducer.setInput(params.getEventProducerHierarchy().getRoot());
+		producers = new LinkedList<EventProducer>();
+		for (EventProducer ep : params.getUnfilteredEventProducers())
+			producers.add(ep);
+
+		treeViewerEventProducer.setInput(params.getEventProducerHierarchy()
+				.getRoot());
 		setParameters();
 		listViewerEventTypes.setInput(config.getTypes());
 		updateTreeStatus();
@@ -597,14 +607,39 @@ public abstract class DistributionBaseView extends Dialog implements
 
 	@Override
 	protected void okPressed() {
-		params.setEventProducers(producers);
+		params.setUnfilteredEventProducers(producers);
+		
+		// Check if event types have been modified
+		if(checkEventTypesModified())
+			ocelotlView.setHasChanged(HasChanged.ALL);
+		
 		super.okPressed();
+	}
+
+	/**
+	 * Check if there were modifications on the event types
+	 * 
+	 * @return true if there were modifications, false otherwise
+	 */
+	private boolean checkEventTypesModified() {
+		if (config.getTypes().size() != oldEventTypes.size())
+			return true;
+
+		for (EventType anET : config.getTypes())
+			if (!oldEventTypes.contains(anET))
+				return true;
+
+		for (EventType anET : oldEventTypes)
+			if (!config.getTypes().contains(anET))
+				return true;
+
+		return false;
 	}
 
 	@Override
 	protected void cancelPressed() {
 		config.setTypes(oldEventTypes);
-		params.setEventProducers(oldProducer);
+		params.setUnfilteredEventProducers(oldProducer);
 		super.cancelPressed();
 	}
 
@@ -645,7 +680,6 @@ public abstract class DistributionBaseView extends Dialog implements
 			producers.add(anEPNode.getMe());
 		}
 	}
-
 
 	/**
 	 * Check an element
@@ -699,7 +733,7 @@ public abstract class DistributionBaseView extends Dialog implements
 	 */
 	private void checkElementAndSubtree(Object element) {
 		checkElement(element);
-
+		
 		for (Object child : new FilterTreeContentProvider()
 				.getChildren(element)) {
 			checkElementAndSubtree(child);
@@ -714,7 +748,7 @@ public abstract class DistributionBaseView extends Dialog implements
 	 */
 	private void uncheckElementAndSubtree(Object element) {
 		uncheckElement(element);
-
+		
 		for (Object child : new FilterTreeContentProvider()
 				.getChildren(element)) {
 			uncheckElementAndSubtree(child);

@@ -2,7 +2,7 @@
 <feature
       id="fr.inria.soctrace.tools.ocelotl.feature"
       label="Ocelotl"
-      version="1.1.2"
+      version="1.1.5"
       provider-name="INRIA"
       plugin="fr.inria.soctrace.tools.ocelotl.brand"
       os="linux,win32"
@@ -78,16 +78,20 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <import plugin="fr.inria.soctrace.lib.storage"/>
       <import plugin="fr.inria.soctrace.lib.search"/>
       <import plugin="fr.inria.soctrace.lib.utils"/>
-      <import plugin="org.eclipse.jface"/>
+      <import plugin="com.google.gson"/>
       <import plugin="fr.inria.soctrace.framesoc.ui"/>
-      <import plugin="fr.inria.soctrace.framesoc.core"/>
-      <import plugin="org.eclipse.draw2d"/>
-      <import feature="fr.inria.soctrace.features.framesoc" version="1.0.0.qualifier"/>
-      <import plugin="fr.inria.soctrace.tools.ocelotl.slf4j" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.draw2d"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="fr.inria.soctrace.framesoc.core"/>
+      <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="fr.inria.lpaggreg" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.slf4j.api"/>
+      <import feature="fr.inria.soctrace.features.framesoc" version="1.1.5.qualifier"/>
+      <import plugin="fr.inria.soctrace.tools.ocelotl.slf4j" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="fr.inria.soctrace.tools.ocelotl.json" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.io"/>
    </requires>
 
    <plugin

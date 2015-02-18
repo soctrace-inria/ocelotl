@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -78,25 +78,25 @@ public class TemporalProportionView extends TimeLineView {
 			return false;
 		}
 		
-		//Draw the proportion visualization of the aggregates
+		// Draw the proportion visualization of the aggregates
 		public void init() {
 			DecimalFormat valueFormat = new DecimalFormat("0.00E0");
 			valueFormat.setMaximumIntegerDigits(3);
 			double total = 0;
 			
-			//Height of the drawing area
+			// Height of the drawing area
 			final double y0 = root.getSize().height - aBorder;
 			final double y1 = DrawingMarginRatio * root.getSize().height - aBorder;
-			//Width of the drawing area
-			final double x0 = root.getSize().width - 2 * aBorder;
-			final double d = distribution.getSliceNumber();
-			//Highest value among the aggregates
-			final double m = distribution.getMax();
+			// Width of the drawing area
+			final double drawingAreaWidth = root.getSize().width - 2 * aBorder;
+			final double numberOfTimeSlice = distribution.getSliceNumber();
+			// Highest value among the aggregates
+			final double maxValue = distribution.getMax();
 			double agg = 0;
 			final List<String> aggList = new ArrayList<String>();
 			final List<String> states = new ArrayList<String>();
 			states.addAll(distribution.getStates());
-			//Sort states alphabetically
+			// Sort states alphabetically
 			Collections.sort(states, new Comparator<String>() {
 				@Override
 				public int compare(final String o1, final String o2) {
@@ -108,38 +108,37 @@ public class TemporalProportionView extends TimeLineView {
 						.getData()).getElements().get(state);
 				if (value > 0) {
 					final RectangleFigure rect = new RectangleFigure();
-					rect.setBackgroundColor(ColorConstants.white);
 					rect.setBackgroundColor(FramesocColorManager.getInstance()
 							.getEventTypeColor(state).getSwtColor());
 					rect.setForegroundColor(ColorConstants.white);
 					rect.setLineWidth(1);
-					//If the color is too light add a border
+					// If the color is too light, add a border
 					if (isTooLight(rect.getBackgroundColor())) {
 						rect.setForegroundColor(ColorConstants.black);
-						rect.setLineWidth(1);
 					}
 					final Label label = new Label(" " + state + ": "
-							+ valueFormat.format(value) + " ");
+							+ valueFormat.format(value) + " " + unit + " ");
 					rect.setToolTip(label);
-					//If the height of the state proportion is big enough
-					if (y1 * value / m - stackSpace > MinHeight) {
-						//Draw a rectangle
+					// If the height of the state proportion is big enough
+					if (!ocelotlView.getOcelotlParameters().getOcelotlSettings().isUseVisualAggregate()
+							|| y1 * value / maxValue - stackSpace > MinHeight) {
+						// Draw a rectangle
 						if (isTooLight(rect.getBackgroundColor()))
 							 root.add(rect, new Rectangle(new Point(
 							 (int) (distribution.getPart(index)
-							 .getStartPart() * x0 / d + aBorder + 1),
-							 (int) (y0 - y1 * total / m)), new Point(
+							 .getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder + 1),
+							 (int) (y0 - y1 * total / maxValue)), new Point(
 							 (int) (distribution.getPart(index).getEndPart()
-							 * x0 / d - space + aBorder - 1),
-							 (int) (y0 + space - y1 * (total + value) / m))));
+							 * drawingAreaWidth / numberOfTimeSlice - space + aBorder - 1),
+							 (int) (y0 + space - y1 * (total + value) / maxValue))));
 						else {
 							root.add(rect, new Rectangle(new Point(
 								(int) (distribution.getPart(index)
-										.getStartPart() * x0 / d + aBorder),
-								(int) (y0 - y1 * total / m)), new Point(
+										.getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
+								(int) (y0 - y1 * total / maxValue)), new Point(
 								(int) (distribution.getPart(index).getEndPart()
-										* x0 / d - stackSpace + aBorder), (int) (y0
-										+ stackSpace - y1 * (total + value) / m))));
+										* drawingAreaWidth / numberOfTimeSlice - space + aBorder), (int) (y0
+										+ stackSpace - y1 * (total + value) / maxValue))));
 						}
 						total += value;
 					} else { // else aggregates it
@@ -171,44 +170,45 @@ public class TemporalProportionView extends TimeLineView {
 				lineDash.setLineWidth(2);
 				lineDash.setLineStyle(SWT.LINE_DASH);
 				lineDash.setToolTip(label);
-				//If the aggregated state proportion is high enough
-				if (y1 * agg / m - stackSpace > MinHeight) {
-					//Display a rectangle
+				// If the aggregated state proportion is high enough
+				if (y1 * agg / maxValue - stackSpace > MinHeight) {
+					// Display a rectangle
 					root.add(rectangle, new Rectangle(new Point((int) (distribution
-							.getPart(index).getStartPart() * x0 / d + aBorder),
-							(int) (y0 - y1 * total / m)), new Point(
-							(int) (distribution.getPart(index).getEndPart() * x0
-									/ d - stackSpace + aBorder), (int) (y0 + stackSpace - y1
-									* (total + agg) / m))));
+							.getPart(index).getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
+							(int) (y0 - y1 * total / maxValue)), new Point(
+							(int) (distribution.getPart(index).getEndPart() * drawingAreaWidth
+									/ numberOfTimeSlice - space + aBorder), (int) (y0 + stackSpace - y1
+									* (total + agg) / maxValue))));
 				} else { // else display as a dash line and an icon
 					int size = (int) Math.min(IconMax,
-							Math.min(x0 / d - 2 * stackSpace, (y0 - y1 * total / m)));
+							Math.min(drawingAreaWidth / numberOfTimeSlice - 2 * stackSpace, (y0 - y1 * total / maxValue)));
 					if (size > IconMin) {
 						icon.setImage(iconManager.getImage(size));
 
 						lineDash.setEndpoints(new Point(
 								(int) (distribution.getPart(index).getStartPart()
-										* x0 / d + aBorder + 1), (int) (y0 - y1
-										* total / m)), new Point(
+										* drawingAreaWidth / numberOfTimeSlice + aBorder + 1), (int) (y0 - y1
+										* total / maxValue)), new Point(
 								(int) (distribution.getPart(index).getEndPart()
-										* x0 / d - stackSpace - 1 + aBorder),
-								(int) (y0 - y1 * (total) / m)));
+										* drawingAreaWidth / numberOfTimeSlice - space - 1 + aBorder),
+								(int) (y0 - y1 * (total) / maxValue)));
 						root.add(lineDash);
 						root.add(icon, new Rectangle(new Point((int) (distribution
-								.getPart(index).getStartPart() * x0 / d + aBorder),
-								(int) (y0 - y1 * total / m) - stackSpace), new Point(
+								.getPart(index).getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
+										(int) (y0 - y1 * total / maxValue)
+												- stackSpace), new Point(
 								(int) (distribution.getPart(index).getEndPart()
-										* x0 / d - stackSpace + aBorder), (int) (y0 - y1
-										* (total) / m)
+										* drawingAreaWidth / numberOfTimeSlice - space + aBorder), (int) (y0 - y1
+										* (total) / maxValue)
 										- size - stackSpace)));
 					} else {
 						lineDash.setEndpoints(new Point(
 								(int) (distribution.getPart(index).getStartPart()
-										* x0 / d + aBorder + 1), (int) (y0 - y1
-										* total / m)), new Point(
+										* drawingAreaWidth / numberOfTimeSlice + aBorder + 1), (int) (y0 - y1
+										* total / maxValue)), new Point(
 								(int) (distribution.getPart(index).getEndPart()
-										* x0 / d - stackSpace - 1 + aBorder),
-								(int) (y0 - y1 * (total) / m)));
+										* drawingAreaWidth / numberOfTimeSlice - space - 1 + aBorder),
+								(int) (y0 - y1 * (total) / maxValue)));
 						root.add(lineDash);
 					}
 
@@ -216,6 +216,7 @@ public class TemporalProportionView extends TimeLineView {
 				label.getUpdateManager().performUpdate();
 				icon.getUpdateManager().performUpdate();
 			}
+			root.validate();
 		}
 
 		public void setIndex(final int index) {

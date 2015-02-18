@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -98,22 +98,26 @@ public class VariableDistribution extends Microscopic3DDescription {
 							(TimeSliceVariableManager) timeSliceManager);
 					final Map<Long, Double> distrib = variable
 							.getTimeSlicesDistribution();
-					matrixUpdate(variable, event.getEventProducer(), distrib);
+					EventProducer eventEP = event.getEventProducer();
+					
+					if(aggregatedProducers.containsKey(event.getEventProducer()))
+						eventEP = aggregatedProducers.get(event.getEventProducer());
+					
+					matrixUpdate(variable, eventEP, distrib);
 
-					if (currentEP != event.getEventProducer()) {
-						currentEP = event.getEventProducer();
+					if (currentEP != eventEP) {
+						currentEP = eventEP;
 						// If the event producer is not in the active producers
 						// list
-						if (!localActiveEventProducers.contains(event
-								.getEventProducer())) {
+						if (!localActiveEventProducers.contains(eventEP)) {
 							// Add it
-							localActiveEventProducers.add(event
-									.getEventProducer());
+							localActiveEventProducers.add(eventEP);
 						}
 					}
 					if (monitor.isCanceled())
 						return;
 				}
+				monitor.worked(events.size());
 			}
 			// Merge local active event producers to the global one
 			synchronized (activeProducers) {
@@ -135,7 +139,7 @@ public class VariableDistribution extends Microscopic3DDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		monitor.subTask("Query variables");
+		monitor.subTask("Querying Database...");
 		eventIterator = ocelotlQueries.getVariableIterator(eventProducers,
 				time, monitor);
 		if (monitor.isCanceled()) {
@@ -146,7 +150,7 @@ public class VariableDistribution extends Microscopic3DDescription {
 		setTimeSliceManager(new TimeSliceVariableManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		monitor.subTask("Fill the matrix");
+		monitor.subTask("Loading Data From Database...");
 		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()
@@ -167,11 +171,16 @@ public class VariableDistribution extends Microscopic3DDescription {
 		// If the event type is filtered out
 		if (!typeNames.contains(evType))
 			return;
+		
+		EventProducer eventEP = ep;
+		
+		if(aggregatedProducers.containsKey(ep))
+			eventEP = aggregatedProducers.get(ep);
 
 		// If the event producer is flag as inactive
-		if (!getActiveProducers().contains(ep)) {
+		if (!getActiveProducers().contains(eventEP)) {
 			// Remove it
-			getActiveProducers().add(ep);
+			getActiveProducers().add(eventEP);
 		}
 		
 		int slice = Integer.parseInt(values[0]);
@@ -184,11 +193,11 @@ public class VariableDistribution extends Microscopic3DDescription {
 			slice = slice / sliceMultiple;
 
 			// And add the value to the one already in the matrix
-			if (matrix.get(slice).get(ep).get(evType) != null)
-				value = matrix.get(slice).get(ep).get(evType) + (value / sliceMultiple);
+			if (matrix.get(slice).get(eventEP).get(evType) != null)
+				value = matrix.get(slice).get(eventEP).get(evType) + (value / sliceMultiple);
 		}
 
-		matrix.get(slice).get(ep).put(evType, value);
+		matrix.get(slice).get(eventEP).put(evType, value);
 	}
 	
 	@Override
@@ -201,20 +210,25 @@ public class VariableDistribution extends Microscopic3DDescription {
 		if (!typeNames.contains(evType))
 			return;
 		
+		EventProducer eventEP = ep;
+		
+		if(aggregatedProducers.containsKey(ep))
+			eventEP = aggregatedProducers.get(ep);
+		
 		// If the event producer is flag as inactive
-		if (!getActiveProducers().contains(ep)) {
+		if (!getActiveProducers().contains(eventEP)) {
 			// Remove it
-			getActiveProducers().add(ep);
+			getActiveProducers().add(eventEP);
 		}
 
 		// Compute a value proportional to the time ratio spent in the slice
 		double value = Double.parseDouble(values[3]) * factor;
 
 		// Add the value to the one potentially already in the matrix
-		if (matrix.get(slice).get(ep).get(evType) != null)
-			value = matrix.get(slice).get(ep).get(evType) + value / parameters.getTimeSliceFactor();
+		if (matrix.get(slice).get(eventEP).get(evType) != null)
+			value = matrix.get(slice).get(eventEP).get(evType) + value / parameters.getTimeSliceFactor();
 
-		matrix.get(slice).get(ep).put(evType, value);
+		matrix.get(slice).get(eventEP).put(evType, value);
 	}
 	
 	@Override

@@ -2,7 +2,7 @@
  * Ocelotl Visualization Tool
  * =====================================================================
  * 
- * Ocelotl is a FrameSoC plug in that enables to visualize a trace 
+ * Ocelotl is a Framesoc plug in that enables to visualize a trace 
  * overview by using aggregation techniques
  *
  * (C) Copyright 2013 INRIA
@@ -52,7 +52,6 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 public class HierarchyAxisView extends UnitAxisView {
 
 	protected EventProducerHierarchy hierarchy;
-	protected ArrayList<EventProducerNode> producers;
 
 	// Level of hierarchy to display
 	protected int hierarchyLevel;
@@ -77,14 +76,11 @@ public class HierarchyAxisView extends UnitAxisView {
 	protected final int horizontalSpace = 5;
 	protected int minLogicWeight = OcelotlConstants.MinimalHeightDrawingThreshold;
 	
-	protected SelectFigure selectFigure;
 	protected SelectFigure highLightAggregateFigure;
-	protected int originY;
-	protected int cornerY;
+
 	
 	public HierarchyAxisView() {
 		super();
-		selectFigure = new SelectFigure();
 		mouse = new HierarchyAxisMouseListener(this);
 		xendlist = new ArrayList<Integer>();
 		yendlist = new ArrayList<Integer>();
@@ -101,6 +97,7 @@ public class HierarchyAxisView extends UnitAxisView {
 			if(currentlySelectedEpn != null)
 				highLightSelectedProducer.draw(currentlySelectedEpn);
 		}
+		root.validate();
 	}
 
 	@Override
@@ -111,6 +108,7 @@ public class HierarchyAxisView extends UnitAxisView {
 		if (!hierarchy.getEventProducerNodes().isEmpty()) {
 			drawHierarchy();
 		}
+		root.validate();
 	}
 
 	/**
@@ -127,15 +125,19 @@ public class HierarchyAxisView extends UnitAxisView {
 			drawProd(epn, newHierarchy.get(epn.getHierarchyLevel()), false);
 
 		boolean tooSmall = false;
-		// Check for each child that we have enough vertical space
-		// to display them
-		for (EventProducerNode ep : epn.getChildrenNodes()) {
-			if ((ep.getWeight() * logicHeight - verticalSpace) < minLogicWeight) {
-				// Too small
-				tooSmall = true;
-				break;
+		if (ocelotlView.getOcelotlParameters().getOcelotlSettings()
+				.isUseVisualAggregate()) {
+			// Check for each child that we have enough vertical space
+			// to display them
+			for (EventProducerNode ep : epn.getChildrenNodes()) {
+				if ((ep.getWeight() * logicHeight - verticalSpace) < minLogicWeight) {
+					// Too small
+					tooSmall = true;
+					break;
+				}
 			}
 		}
+		
 		// If enough space
 		// recursively call print() on the children node
 		if (!tooSmall) {
@@ -352,7 +354,7 @@ public class HierarchyAxisView extends UnitAxisView {
 	/**
 	 * Sort event producer based on their id
 	 */
-	public void sortPorducers() {
+	public void sortProducers(List<EventProducerNode> producers) {
 		Collections.sort(producers,
 				new Comparator<EventProducerHierarchy.EventProducerNode>() {
 
