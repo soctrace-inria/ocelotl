@@ -16,9 +16,9 @@ public class TestParameters {
 	private ArrayList<Integer> timeSlicesCollection;
 	private ArrayList<Integer> timeSlicesNumber;
 	private int nbEventProd;
-	private String timeAggOperator;
+	private String microModelType;
 	private String dataAggOperator;
-	private String spaceAggOperator;
+	private String visuOperator;
 	private ArrayList<Double> parameters;
 	private DatacacheStrategy datacacheStrat;
 	private String directory;
@@ -32,8 +32,8 @@ public class TestParameters {
 		endTimestamp = 0L;
 		nbTimeSlice = 0;
 		nbEventProd = 0;
-		timeAggOperator = "null";
-		spaceAggOperator = "null";
+		microModelType = "null";
+		visuOperator = "null";
 		setParameters(new ArrayList<Double>());
 		setDatacacheStrat(DatacacheStrategy.DATACACHE_PROPORTIONAL);
 		directory = "";
@@ -57,9 +57,9 @@ public class TestParameters {
 		endTimestamp = oParam.getTimeRegion().getTimeStampEnd();
 		nbTimeSlice = oParam.getTimeSlicesNumber();
 		if (oParam.getMicroModelType() == null) {
-			timeAggOperator = "null";
+			microModelType = "null";
 		} else {
-			timeAggOperator = oParam.getMicroModelType();
+			microModelType = oParam.getMicroModelType();
 		}
 		
 		if (oParam.getDataAggOperator() == null) {
@@ -70,9 +70,9 @@ public class TestParameters {
 
 
 		if (oParam.getVisuOperator() == null) {
-			spaceAggOperator = "null";
+			visuOperator = "null";
 		} else {
-			spaceAggOperator = oParam.getVisuOperator();
+			visuOperator = oParam.getVisuOperator();
 		}
 	}
 
@@ -116,20 +116,20 @@ public class TestParameters {
 		this.nbTimeSlice = nbTimeSlice;
 	}
 
-	public String getTimeAggOperator() {
-		return timeAggOperator;
+	public String getMicroModelType() {
+		return microModelType;
 	}
 
-	public void setTimeAggOperator(String timeAggOperator) {
-		this.timeAggOperator = timeAggOperator;
+	public void setMicroModelType(String timeAggOperator) {
+		this.microModelType = timeAggOperator;
 	}
 
-	public String getSpaceAggOperator() {
-		return spaceAggOperator;
+	public String getVisuOperator() {
+		return visuOperator;
 	}
 
-	public void setSpaceAggOperator(String spaceAggOperator) {
-		this.spaceAggOperator = spaceAggOperator;
+	public void setVisuOperator(String spaceAggOperator) {
+		this.visuOperator = spaceAggOperator;
 	}
 
 	public String getDataAggOperator() {
@@ -205,16 +205,16 @@ public class TestParameters {
 
 			oParam.setParameter(getParameters().get(0));
 
-			if (!getTimeAggOperator().equals("null")) {
-				oParam.setMicroModelType(getTimeAggOperator());
+			if (!getMicroModelType().equals("null")) {
+				oParam.setMicroModelType(getMicroModelType());
 			}
 			
 			if (!getDataAggOperator().equals("null")) {
 				oParam.setDataAggOperator(getDataAggOperator());
 			}
 
-			if (!getSpaceAggOperator().equals("null")) {
-				oParam.setVisuOperator(getSpaceAggOperator());
+			if (!getVisuOperator().equals("null")) {
+				oParam.setVisuOperator(getVisuOperator());
 			}
 
 			oParam.getDataCache().setBuildingStrategy(getDatacacheStrat());
@@ -224,7 +224,7 @@ public class TestParameters {
 	}
 
 	public String toString() {
-		String newString = traceName + "_" + traceID + "_" + startTimestamp + "_" + endTimestamp + "_" + nbTimeSlice + "_" + timeAggOperator + "_" + datacacheStrat;
+		String newString = traceName + "_" + traceID + "_" + startTimestamp + "_" + endTimestamp + "_" + nbTimeSlice + "_" + microModelType + "_" + datacacheStrat;
 		return newString;
 	}
 

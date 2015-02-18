@@ -103,6 +103,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.TestBench;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench2;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench3;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench4;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench5;
 import fr.inria.soctrace.tools.ocelotl.ui.TestParameters;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.snapshot.Snapshot;
@@ -296,6 +297,8 @@ public Trace aTestTrace;
 						aTest = new TestBench3(loadCachefile, view);
 					} else if (line.equals("v4")) {
 						aTest = new TestBench4(loadCachefile, view);
+					} else if (line.equals("v5")) {
+						aTest = new TestBench5(loadCachefile, view);
 					} else {
 						aTest = new TestBench(loadCachefile, view);
 					}

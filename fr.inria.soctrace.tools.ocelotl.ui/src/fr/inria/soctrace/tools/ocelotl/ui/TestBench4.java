@@ -73,7 +73,7 @@ public class TestBench4 extends TestBench {
 					// Cache activation
 					params.setActivateCache(Boolean.parseBoolean(header[CacheActivatedPos]));
 					// Time Aggregation Operator
-					params.setTimeAggOperator(header[TimeAggregatorPos]);
+					params.setMicroModelType(header[TimeAggregatorPos]);
 					// Number of time Slices
 					params.getTimeSlicesNumber().add(Integer.parseInt(header[NumberOfTimeSlicePos]));
 
@@ -123,7 +123,7 @@ public class TestBench4 extends TestBench {
 				aTest.setEndTimestamp(theTrace.getMaxTimestamp());
 				aTest.getParameters().add(1.0);
 				aTest.setDataAggOperator("null");
-				aTest.setSpaceAggOperator("null");
+				aTest.setVisuOperator("null");
 				aTest.setDatacacheStrat(DatacacheStrategy.DATACACHE_PROPORTIONAL);
 
 				for (int i = 0; i < aTest.getTimeSlicesNumber().size(); i++) {

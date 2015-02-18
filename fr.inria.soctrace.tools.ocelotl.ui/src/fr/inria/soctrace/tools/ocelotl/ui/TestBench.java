@@ -94,7 +94,7 @@ public class TestBench {
 					// End timestamp
 					params.setEndTimestamp(Long.parseLong(header[3]));
 					// Time Aggregation Operator
-					params.setTimeAggOperator(header[4]);
+					params.setMicroModelType(header[4]);
 					// Parameter value
 					params.getParameters().add(Double.parseDouble(header[5]));
 					

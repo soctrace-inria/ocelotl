@@ -80,7 +80,7 @@ public class TestBench2 extends TestBench {
 					// End timestamp
 					params.setEndTimestamp(Long.parseLong(header[EndTimeStampPos]));
 					// Time Aggregation Operator
-					params.setTimeAggOperator(header[TimeAggregatorPos]);
+					params.setMicroModelType(header[TimeAggregatorPos]);
 					// Number of repetitions
 					params.setNumberOfRepetition(Integer.parseInt(header[NumberOfRepetetionPos]));
 

@@ -74,7 +74,7 @@ public class TestBench3 extends TestBench {
 					// End timestamp
 					params.setEndTimestamp(Long.parseLong(header[EndTimeStampPos]));
 					// Time Aggregation Operator
-					params.setTimeAggOperator(header[TimeAggregatorPos]);
+					params.setMicroModelType(header[TimeAggregatorPos]);
 					// Number of repetitions
 					params.setNumberOfRepetition(Integer.parseInt(header[NumberOfRepetetionPos]));
 
@@ -108,7 +108,7 @@ public class TestBench3 extends TestBench {
 						// End timestamp
 						params.setEndTimestamp(aTrace.getMaxTimestamp());
 						// Time Aggregation Operator
-						params.setTimeAggOperator(aParam.getTimeAggOperator());
+						params.setMicroModelType(aParam.getMicroModelType());
 						// Number of repetitions
 						params.setNumberOfRepetition(aParam.getNumberOfRepetition());
 						// Parameter value
