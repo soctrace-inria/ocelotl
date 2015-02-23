@@ -6,10 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
@@ -28,7 +25,7 @@ public class TestBench5 extends TestBench {
 	public final int	StartTimestampPos		= 5;
 	public final int	EndTimeStampPos			= 6;
 	public final int	TimeAggregatorPos		= 3;
-	public final int	DataAggregatorPos		= 4;
+	public final int	DataAggregatorPos		= 3;
 	public final int	NumberOfRepetetionPos	= 8;
 	public final int	ParameterPos			= 9;
 	public final int	testbenchHeaderSize		= 10;
@@ -94,7 +91,7 @@ public class TestBench5 extends TestBench {
 	public void launchTest() {
 
 		if (!testParams.isEmpty()) {
-			statData = "TRACE; CACHE_USED; TS; MICROMODEL_TIME; QUALITY_TIME; DICHO_TIME; PART_DISPLAY_TIME; CACHE_SIZE\n";
+			statData = "TRACE; CACHE_USED; AGG OPERATOR; TS; MICROMODEL_TIME; QUALITY_TIME; DICHO_TIME; PART_DISPLAY_TIME; CACHE_SIZE\n";
 			String fileDir = aConfFile.substring(0, aConfFile.lastIndexOf("/") + 1);
 			Date aDate = new Date(System.currentTimeMillis());
 			String dirName = testParams.get(0).getTraceName() + "_" + aDate.toString();
@@ -123,7 +120,7 @@ public class TestBench5 extends TestBench {
 
 				for (int i = 0; i < aTest.getTimeSlicesNumber().size(); i++) {
 					aTest.setNbTimeSlice(aTest.getTimeSlicesNumber().get(i));
-					theView.loadFromParam(aTest, false);
+					theView.loadFromParam(aTest, aTest.isActivateCache());
 					statData = statData + getStatData();
 					writeStat();
 				}
@@ -186,9 +183,9 @@ public class TestBench5 extends TestBench {
 				}
 			}
 			
-			// TRACE; CACHE_USED; TS; MICROMODEL_TIME; QUALITY_TIME; DICHO_TIME;
+			// TRACE; CACHE_USED; AGG OPERATOR; TS; MICROMODEL_TIME; QUALITY_TIME; DICHO_TIME;
 			// PART_DISPLAY_TIME;
-			stat = theView.aTestTrace.getAlias() + ";" + usedCache + ";" + theView.getOcelotlParameters().getTimeSlicesNumber() + ";" + microscopicModel + ";" + computeQualities + ";" + computeDicho + "; " + computePartAndDisplay + "; " + "\n";
+			stat = theView.aTestTrace.getAlias() + ";" + usedCache + ";" +  theView.getOcelotlParameters().getDataAggOperator() + ";" + theView.getOcelotlParameters().getTimeSlicesNumber() + ";" + microscopicModel + ";" + computeQualities + ";" + computeDicho + "; " + computePartAndDisplay + "; " + "\n";
 
 			bufFileReader.close();
 

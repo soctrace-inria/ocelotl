@@ -134,8 +134,10 @@ public Trace aTestTrace;
 		comboDimension.removeAll();
 		comboVisu.removeAll();
 		
+		//V5
 		ocelotlParameters.getOcelotlSettings().setDataCacheActivated(activeCache);
-
+		ocelotlParameters.getOcelotlSettings().setDichoCacheActivated(false);
+		
 		final Job job = new Job("Loading trace from micro description") {
 
 			@Override
@@ -192,7 +194,32 @@ public Trace aTestTrace;
 							}
 
 							// If no operator was found
-							if (comboType.getText().isEmpty())
+							if (comboType.getText().isEmpty()){
+								try {
+									throw new OcelotlException(OcelotlException.INVALID_CACHED_OPERATOR);
+								} catch (OcelotlException e) {
+									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+									return;
+								}
+							}
+							
+							for (final String op : ocelotlCore.getAggregOperators().getOperators(confDataLoader.getCurrentTrace().getType().getName(), confDataLoader.getCategories())) {
+								comboDimension.add(op);
+							}
+
+							comboDimension.setText("");
+
+							// Search for the corresponding operator
+							for (int i = 0; i < comboDimension.getItemCount(); i++) {
+								if (comboDimension.getItem(i).equals(ocelotlParameters.getDataAggOperator())) {
+									comboDimension.select(i);
+									comboDimension.notifyListeners(SWT.Selection, new Event());
+									break;
+								}
+							}
+							
+								// If no operator was found
+							if (comboDimension.getText().isEmpty())
 								try {
 									throw new OcelotlException(OcelotlException.INVALID_CACHED_OPERATOR);
 								} catch (OcelotlException e) {
@@ -647,11 +674,12 @@ public Trace aTestTrace;
 							statView.createDiagram();
 							monitor.subTask("Drawing Y Axis...");
 							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
-							snapshotAction.setEnabled(true);
 							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 							unitAxisView.deleteDiagram();
 							unitAxisView.createDiagram(ocelotlCore.getVisuOperator());
+							aDm.end("Compute parts and display");
+							snapshotAction.setEnabled(true);
 							updateStatus();
 							visuDisplayed = true;
 							
@@ -668,8 +696,6 @@ public Trace aTestTrace;
 									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 								}
 							}
-
-							aDm.end("Compute parts and display");
 							
 							history.saveHistory();
 							timestampHasChanged = false;

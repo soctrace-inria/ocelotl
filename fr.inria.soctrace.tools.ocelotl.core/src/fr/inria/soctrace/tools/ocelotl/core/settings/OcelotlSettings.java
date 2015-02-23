@@ -296,6 +296,10 @@ public class OcelotlSettings {
 				saveSettings();
 			}
 		}
+ else {
+			logger.debug("No configuration file was found: default values will be used");
+			saveSettings();
+		}
 	}
 
 	/**
