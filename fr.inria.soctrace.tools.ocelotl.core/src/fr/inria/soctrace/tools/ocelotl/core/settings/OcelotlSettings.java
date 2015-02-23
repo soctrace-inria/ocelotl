@@ -286,7 +286,8 @@ public class OcelotlSettings {
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				logger.debug("No configuration file was found: default values will be used");
+				logger.debug("No configuration file was found: the file will be regenerated with default values");
+				saveSettings();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -295,6 +296,9 @@ public class OcelotlSettings {
 				// Regenerate the configuration file with the default values
 				saveSettings();
 			}
+		} else {
+			logger.debug("No configuration file was found: the file will be regenerated with default values");
+			saveSettings();
 		}
 	}
 

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 
 import fr.inria.soctrace.lib.model.EventProducer;
@@ -259,8 +260,8 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 
 		// Avoid triggering the mouse released event
 		clickOnView = false;
-		
-		updateEverything(originY, cornerY, true, aggregatedView.getSelectTime());
+
+		updateEverything(selectedAggregate.getAggregateZone().x, selectedAggregate.getAggregateZone().x + selectedAggregate.getAggregateZone().width, selectedAggregate.getAggregateZone().y, selectedAggregate.getAggregateZone().y + selectedAggregate.getAggregateZone().height, true, aggregatedView.getSelectTime());
 		aggregatedView.getOcelotlView().getStatView().updateData();
 	}
 
@@ -302,16 +303,20 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			// selected hierarchy
 			if (previous != MouseState.DRAG_LEFT_HORIZONTAL) {
 				SpatioTemporalAggregateView selectedAggregate = findAggregate(arg0.x, arg0.y, originX, originY);
-				if (selectedAggregate == null || !selectedAggregate.isVisualAggregate())
+				if (selectedAggregate == null || !selectedAggregate.isVisualAggregate()) {
 					selectedNode = findEventProducerNode(arg0.y);
-				else
+
+					Point heights = getSpatialSelectionCoordinates(selectedNode);
+
+					// Set the height points
+					originY = heights.x();
+					cornerY = heights.y();
+				} else {
 					selectedNode = selectedAggregate.getEventProducerNode();
 
-				Point heights = getSpatialSelectionCoordinates(selectedNode);
-
-				// Set the height points
-				originY = heights.x();
-				cornerY = heights.y();
+					originY = selectedAggregate.getAggregateZone().y();
+					cornerY = selectedAggregate.getAggregateZone().y() + selectedAggregate.getAggregateZone().height();
+				}
 
 				// Select producers
 				setSpatialSelection(selectedNode);
@@ -391,6 +396,11 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			y1 = y0 + (int) (theSelectedNode.getWeight() * logicHeight) - aggregatedView.getSpace();
 		}
 		
+		Rectangle rect = aggregatedView.getOcelotlView().getUnitAxisView().getEventProdToFigures().get(theSelectedNode);
+		if(rect != null){
+		y0 = rect.y();
+		y1 = y0 + rect.height();
+		}
 		selectedNode = theSelectedNode;
 
 		return new Point(y0, y1);
@@ -488,6 +498,14 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		aggregatedView.getOcelotlView().getTimeAxisView().select(aTimeRegion, active);
 		aggregatedView.getOcelotlView().getUnitAxisView().select(y0, y1, active);
 		aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), active, originY, cornerY);
+		aggregatedView.getOcelotlView().getOverView().updateSelection(aTimeRegion);
+	}
+	
+	public void updateEverything(int x0, int x1, int y0, int y1, boolean active, TimeRegion aTimeRegion) {
+		aggregatedView.getOcelotlView().setTimeRegion(aTimeRegion);
+		aggregatedView.getOcelotlView().getTimeAxisView().select(aTimeRegion, active);
+		aggregatedView.getOcelotlView().getUnitAxisView().select(y0, y1, active);
+		aggregatedView.getSelectFigure().draw(x0, x1, y0, y1, active);
 		aggregatedView.getOcelotlView().getOverView().updateSelection(aTimeRegion);
 	}
 	

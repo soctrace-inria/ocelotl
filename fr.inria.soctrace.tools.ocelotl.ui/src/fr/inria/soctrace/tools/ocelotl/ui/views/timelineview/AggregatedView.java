@@ -149,6 +149,33 @@ abstract public class AggregatedView implements IAggregatedView {
 					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
 			root.repaint();
 		}
+		
+		public void draw(int x0, int x1, int y0, int y1, boolean active) {
+			if (getParent() != root)
+				root.add(this);
+
+			if (active) {
+				setForegroundColor(activeColorFG);
+				setBackgroundColor(activeColorBG);
+				setFill(true);
+				setAlpha(activeColorAlpha);
+			} else {
+				setForegroundColor(selectColorFG);
+				setBackgroundColor(selectColorBG);
+				setFill(false);
+				setAlpha(selectColorAlpha);
+			}
+			
+			// Default values for selecting the height of the graph
+			if (y0 == -1)
+				y0 = root.getSize().height - 1;
+
+			if (y1 == -1)
+				y1 = 2;
+
+			root.setConstraint(this, new Rectangle(new Point(x0, y0), new Point(x1, y1)));
+			root.repaint();
+		}
 
 		/**
 		 * Remove the selection from display
