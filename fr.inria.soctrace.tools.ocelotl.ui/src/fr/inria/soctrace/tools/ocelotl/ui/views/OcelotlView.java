@@ -997,6 +997,7 @@ public class OcelotlView extends FramesocPart {
 
 		@Override
 		public void handleEvent(final Event e) {
+			
 			switch (e.keyCode) {
 			case SWT.ARROW_LEFT:
 			case SWT.ARROW_UP:

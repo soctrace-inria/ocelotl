@@ -128,7 +128,7 @@ public class OcelotlDefaultParameterConstants {
 	public static final Color MAIN_SELECT_BG_COLOR = ColorConstants.darkBlue;
 	public static final int MAIN_SELECT_ALPHA = 120;
 	
-	public static final int SORT_TABLE_DEFAULT_COLUMN = 1;
+	public static final int SORT_TABLE_DEFAULT_COLUMN = 2;
 	public static final int SORT_TABLE_DEFAULT_ORDER = SWT.DOWN;
 	
 	/*
