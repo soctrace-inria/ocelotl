@@ -427,6 +427,8 @@ public class Overview implements IFramesocBusListener {
 		overviewThread = null;
 		aggregManager = null;
 		displayedTimeRegion = null;
+		zoomedTimeRegion = null;
+		selectedTimeRegion = null;
 	}
 	
 	/**
