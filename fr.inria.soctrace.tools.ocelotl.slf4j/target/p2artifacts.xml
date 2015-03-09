@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?artifactRepository version='1.1.0'?>
 <artifacts size='1'>
-  <artifact classifier='osgi.bundle' id='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.5'>
+  <artifact classifier='osgi.bundle' id='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.6'>
     <properties size='5'>
       <property name='artifact.size' value='635279'/>
       <property name='download.size' value='635279'/>
       <property name='maven-groupId' value='fr.inria.soctrace.tools.ocelotl.slf4j'/>
       <property name='maven-artifactId' value='fr.inria.soctrace.tools.ocelotl.slf4j'/>
-      <property name='maven-version' value='1.1.5'/>
+      <property name='maven-version' value='1.1.6'/>
     </properties>
   </artifact>
 </artifacts>

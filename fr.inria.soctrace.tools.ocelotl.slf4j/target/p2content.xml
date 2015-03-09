@@ -1,30 +1,30 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <units size='1'>
-  <unit id='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.5'>
-    <update id='fr.inria.soctrace.tools.ocelotl.slf4j' range='[0.0.0,1.1.5)' severity='0'/>
+  <unit id='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.6'>
+    <update id='fr.inria.soctrace.tools.ocelotl.slf4j' range='[0.0.0,1.1.6)' severity='0'/>
     <properties size='5'>
       <property name='org.eclipse.equinox.p2.name' value='SLF4J'/>
       <property name='org.eclipse.equinox.p2.provider' value='INRIA'/>
       <property name='maven-groupId' value='fr.inria.soctrace.tools.ocelotl.slf4j'/>
       <property name='maven-artifactId' value='fr.inria.soctrace.tools.ocelotl.slf4j'/>
-      <property name='maven-version' value='1.1.5'/>
+      <property name='maven-version' value='1.1.6'/>
     </properties>
     <provides size='6'>
-      <provided namespace='org.eclipse.equinox.p2.iu' name='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.5'/>
-      <provided namespace='osgi.bundle' name='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.5'/>
+      <provided namespace='org.eclipse.equinox.p2.iu' name='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.6'/>
+      <provided namespace='osgi.bundle' name='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.6'/>
       <provided namespace='java.package' name='ch.qos.logback.classic' version='0.0.0'/>
       <provided namespace='java.package' name='ch.qos.logback.core' version='0.0.0'/>
       <provided namespace='java.package' name='org.slf4j' version='0.0.0'/>
       <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
     </provides>
     <artifacts size='1'>
-      <artifact classifier='osgi.bundle' id='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.5'/>
+      <artifact classifier='osgi.bundle' id='fr.inria.soctrace.tools.ocelotl.slf4j' version='1.1.6'/>
     </artifacts>
     <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
     <touchpointData size='1'>
       <instructions size='1'>
         <instruction key='manifest'>
-          Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.slf4j;singleton:=true&#xA;Bundle-Version: 1.1.5&#xA;
+          Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.slf4j;singleton:=true&#xA;Bundle-Version: 1.1.6&#xA;
         </instruction>
       </instructions>
     </touchpointData>
