@@ -39,6 +39,17 @@
             event_category="STATE">
       </microscopic_model>
       <microscopic_model
+      		name="States Query"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQuery"
+      		unit="Event^-1"
+      		unit_description="Activity Ratio / Event"
+      		selection_priority = "1"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+      <microscopic_model
      		name="Variables"
      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.VariableDistribution"
      		unit_description=""
