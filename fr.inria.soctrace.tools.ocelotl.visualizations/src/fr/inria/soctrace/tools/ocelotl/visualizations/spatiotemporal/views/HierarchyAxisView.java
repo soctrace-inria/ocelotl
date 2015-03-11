@@ -94,7 +94,7 @@ public class HierarchyAxisView extends UnitAxisView {
 			drawHierarchy();
 			if (originY != -1 && cornerY != -1)
 				selectFigure.draw(originY, cornerY, activeSelection);
-			if(currentlySelectedEpn != null)
+			if (currentlySelectedEpn != null)
 				highLightSelectedProducer.draw(currentlySelectedEpn);
 		}
 		root.validate();

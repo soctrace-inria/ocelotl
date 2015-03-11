@@ -106,7 +106,6 @@ public class SpaceTimeAggregation2Manager extends SpaceTimeAggregationManager {
 		// timeAggregation = new SpaceTimeAggregation2();
 		// TODO implements
 		fillNodes();
-
 	}
 
 	private void setHierarchy() throws OcelotlException {
