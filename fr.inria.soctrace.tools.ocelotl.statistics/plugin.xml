@@ -33,7 +33,18 @@
 			param_config=""
 			param_win=""
 			metric_compatibility="STATE"
-			aggregator_compatibility="2D, 3D"
+			aggregator_compatibility="2D"
+			selection_priority="2"
+			leave_aggregation_compatiblity="true"
+			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
+		</statistic_operator>
+		<statistic_operator
+			class="fr.inria.soctrace.tools.ocelotl.statistics.operators.StateLeaveSummaryStatST"
+			operator="Leaves State Summary"
+			param_config=""
+			param_win=""
+			metric_compatibility="STATE"
+			aggregator_compatibility="3D"
 			selection_priority="2"
 			leave_aggregation_compatiblity="true"
 			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">

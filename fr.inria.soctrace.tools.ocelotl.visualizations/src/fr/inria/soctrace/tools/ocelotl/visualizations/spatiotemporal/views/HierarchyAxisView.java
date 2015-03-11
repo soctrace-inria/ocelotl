@@ -181,6 +181,10 @@ public class HierarchyAxisView extends UnitAxisView {
 		int ya = (int) (rootHeight - height + epn.getIndex() * logicHeight - verticalBorder);
 		int xb = xendlist.get(currentHierarchyLevel);
 		int yb = yendlist.get(epn.getIndex() + epn.getWeight());
+		
+		// If it is a false leaf (i.e. a non-leaf producer producing event)
+		if(epn.getChildrenNodes().isEmpty() && !epn.isRealLeaf())
+			xa = xa - horizontalSpace;
 
 		Rectangle boundrect =  new Rectangle(new Point(xa, ya), new Point(xb, yb));
 		root.add(rectangle, boundrect);
