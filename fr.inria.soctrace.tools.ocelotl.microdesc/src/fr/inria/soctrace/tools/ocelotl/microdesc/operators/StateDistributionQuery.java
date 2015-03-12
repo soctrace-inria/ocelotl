@@ -58,8 +58,10 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		List<IntervalDesc> time;
 		List<EventProducer> producers;
 		List<EventType> types;
+		boolean typeFiltering;
+		boolean prodFiltering;
+		boolean timeFiltering;
 		
-
 		public OcelotlThread() {
 			super();
 		}
@@ -67,7 +69,8 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		public OcelotlThread(final int threadNumber, final int thread,
 				final int size, List<IntervalDesc> time,
 				List<EventProducer> producers, List<EventType> types,
-				IProgressMonitor monitor) {
+				boolean typeFiltering, boolean prodFiltering,
+				boolean timeFiltering, IProgressMonitor monitor) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
@@ -76,6 +79,9 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			this.time = time;
 			this.producers = producers;
 			this.types = types;
+			this.typeFiltering = typeFiltering;
+			this.prodFiltering = prodFiltering;
+			this.timeFiltering = timeFiltering;
 			
 			localActiveEventProducers = new ArrayList<EventProducer>();
 
@@ -115,21 +121,26 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 				IState state;
 				// For each event
 				for (final Event event : events) {
-					if(event.getCategory() != EventCategory.STATE)
-						continue;
 					
-					if(!producers.contains(event.getEventProducer()))
-						continue;
-					
-					if (!types.contains(event.getType()))
-						continue;
-					
-					for (IntervalDesc anInterval : time)
-						if (!((event.getTimestamp() >= anInterval.t1 && event
-								.getTimestamp() <= anInterval.t2) || (event
-								.getTimestamp() < anInterval.t1 && event
-								.getLongPar() > anInterval.t1)))
+					if (prodFiltering)
+						if (!producers.contains(event.getEventProducer()))
 							continue;
+
+					if (typeFiltering) {
+						if (!types.contains(event.getType()))
+							continue;
+					} else {
+						if (event.getCategory() != EventCategory.STATE)
+							continue;
+					}
+
+					if (timeFiltering)
+						for (IntervalDesc anInterval : time)
+							if (!((event.getTimestamp() >= anInterval.t1 && event
+									.getTimestamp() <= anInterval.t2) || (event
+									.getTimestamp() < anInterval.t1 && event
+									.getLongPar() > anInterval.t1)))
+								continue;
 
 					// Convert to state
 					state = new GenericState(event, (TimeSliceStateManager) timeSliceManager);
@@ -182,6 +193,22 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			return;
 		}
 		
+		boolean typeFiltering = false;
+		boolean prodFiltering = false;
+		boolean timeFiltering = false;
+		
+		if (parameters.getTraceTypeConfig().getTypes().size() != parameters
+				.getOperatorEventTypes().size())
+			typeFiltering = true;
+
+		if (eventProducers.size() != parameters.getAllEventProducers().size())
+			prodFiltering = true;
+
+		if (time.size() > 1
+				|| parameters.getTrace().getMinTimestamp() != time.get(0).t1
+				|| parameters.getTrace().getMaxTimestamp() != time.get(0).t2)
+			timeFiltering = true;
+
 		setTimeSliceManager(new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
@@ -190,7 +217,8 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getThreadNumber(), t, getOcelotlParameters()
 					.getEventsPerThread(), time, eventProducers, parameters
-					.getTraceTypeConfig().getTypes(), monitor));
+					.getTraceTypeConfig().getTypes(), typeFiltering,
+					prodFiltering, timeFiltering, monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 
