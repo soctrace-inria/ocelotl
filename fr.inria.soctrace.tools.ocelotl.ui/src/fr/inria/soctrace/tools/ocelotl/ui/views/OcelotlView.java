@@ -924,7 +924,7 @@ public class OcelotlView extends FramesocPart {
 			final String title = "Loading Trace";
 			btnRun.setEnabled(false);
 			overView.reset();
-			
+			cancelSelection();
 			currentShownTrace = trace;
 			setFocus();
 

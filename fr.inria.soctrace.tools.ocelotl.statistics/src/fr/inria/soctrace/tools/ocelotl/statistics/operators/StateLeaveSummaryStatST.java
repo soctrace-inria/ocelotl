@@ -101,10 +101,15 @@ public class StateLeaveSummaryStatST extends StateLeaveSummaryStat {
 	
 	@Override
 	protected boolean isInSpatialSelection(EventProducer ep) {
-		if (ocelotlview.getOcelotlParameters().isSpatialSelection()
-				&& (!ocelotlview.getOcelotlParameters()
-						.getSpatiallySelectedProducers().contains(ep)))
+		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
+			for (EventProducerNode epn : ocelotlview.getOcelotlParameters()
+					.getSelectedEventProducerNodes()) {
+				if (epn.getMe().getId() == ep.getId()) {
+					return true;
+				}
+			}
 			return false;
+		}
 
 		return true;
 	}
@@ -124,8 +129,8 @@ public class StateLeaveSummaryStatST extends StateLeaveSummaryStat {
 			for (EventProducerNode anSepn : hierarchy.getLeaves().values()) {
 				// That it is part of the selection and active
 				if (ocelotlview.getOcelotlParameters()
-						.getSpatiallySelectedProducers()
-						.contains(anSepn.getMe())
+						.getSelectedEventProducerNodes()
+						.contains(anSepn)
 						&& microModel.getActiveProducers().contains(
 								anSepn.getMe()))
 					numberOfLeaves++;

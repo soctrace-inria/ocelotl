@@ -41,7 +41,8 @@ public class SpaceTimeAggregationLeavesManager extends SpaceTimeAggregation2Mana
 				values.add(matrix.getMatrix().get(i).get(ep));
 			hierarchy.setValues(ep, values);
 		}
-		hierarchy.buildLeavesFromActiveProducers(matrix.getActiveProducers());
+		hierarchy.buildLeavesFromActiveProducers(matrix.getActiveProducers(), ocelotlParameters.isSpatialSelection(), 
+				ocelotlParameters.getSelectedEventProducerNodes());
 		addHierarchyToJNI();
 	}
 	

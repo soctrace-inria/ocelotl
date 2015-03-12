@@ -593,10 +593,34 @@ public class EventProducerHierarchy {
 	 *            the list of all active producers
 	 */
 	public void buildLeavesFromActiveProducers(
-			List<EventProducer> activeProducers) {
+			List<EventProducer> activeProducers, boolean spatialSelection, List<EventProducerNode> selectedNodes) {
 		for (EventProducer anEP : activeProducers) {
 			// If active but not a leaf
 			if (!leaves.containsKey(anEP.getId())) {
+			
+				// Check if the leave is part of a spatial selection
+				if (spatialSelection) {
+					boolean selected = false;
+					for (EventProducerNode epn : selectedNodes)
+						if (epn.getMe().getId() == anEP.getId())
+							selected = true;
+
+					if (!selected)
+						continue;
+				}
+
+				logger.debug("Creating new leave for event prod " + anEP.getName() + ", " + anEP.getId());
+				EventProducerNode newNode = new EventProducerNode(anEP, eventProducerNodes.get(anEP.getId()));
+				// Copy the values of the parent node
+				newNode.setValues(eventProducerNodes.get(anEP.getId()).getValues());
+				// Add it to the leaves but with the key of the parent ID
+				leaves.put(anEP.getId(), newNode);
+				// Add it to the list of epn, but with their own id
+				eventProducerNodes.put(newNode.getID(), newNode);
+			}
+			// Case where only one false leaf was selected
+			else if(leaves.get(anEP.getId()).getParentNode() == null)
+			{
 				logger.debug("Creating new leave for event prod " + anEP.getName() + ", " + anEP.getId());
 				EventProducerNode newNode = new EventProducerNode(anEP, eventProducerNodes.get(anEP.getId()));
 				// Copy the values of the parent node

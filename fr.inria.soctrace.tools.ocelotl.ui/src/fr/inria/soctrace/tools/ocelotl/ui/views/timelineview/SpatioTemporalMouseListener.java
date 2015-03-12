@@ -349,6 +349,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 	 *            the selected even producer node
 	 */
 	public void setSpatialSelection(EventProducerNode selectedNode) {
+		updateMeasurements();
 		ArrayList<EventProducer> selectedProducers = selectedNode.getContainedProducers();
 
 		// If only one producer is selected, then also add the parent
@@ -358,6 +359,11 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		}
 
 		aggregatedView.setCurrentlySelectedNode(selectedNode);
+		
+		// Find the event producer node containing all the selected node
+		ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(selectedNode.getIndex(), selectedNode.getIndex() + selectedNode.getWeight());
+		aggregatedView.getOcelotlView().getOcelotlParameters().setSelectedEventProducerNodes(currentProducers);
+
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatialSelection(true);
 		while (selectedNode.getParentNode() != null) {
 			if (selectedNode.getParentNode().getWeight() == selectedNode.getWeight()) {
@@ -367,6 +373,7 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 				break;
 			}
 		}
+		
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatiallySelectedProducers(selectedProducers);
 	}
 	
@@ -396,11 +403,14 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			y1 = y0 + (int) (theSelectedNode.getWeight() * logicHeight) - aggregatedView.getSpace();
 		}
 		
+		// Try to get the same coordinates as the hierarchy axis view
 		Rectangle rect = aggregatedView.getOcelotlView().getUnitAxisView().getEventProdToFigures().get(theSelectedNode);
-		if(rect != null){
-		y0 = rect.y();
-		y1 = y0 + rect.height();
+		
+		if (rect != null) {
+			y0 = rect.y();
+			y1 = y0 + rect.height();
 		}
+		
 		selectedNode = theSelectedNode;
 
 		return new Point(y0, y1);

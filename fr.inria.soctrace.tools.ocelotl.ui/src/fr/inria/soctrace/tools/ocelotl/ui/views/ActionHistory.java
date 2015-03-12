@@ -130,7 +130,8 @@ public class ActionHistory {
 		ocelotlView.setTimeRegion(parameterHistory.get(currentHistoryIndex).getTimeRegion());
 		ocelotlView.getOcelotlParameters().setSpatialSelection(parameterHistory.get(currentHistoryIndex).isSpatialSelection());
 		ocelotlView.getOcelotlParameters().setSpatiallySelectedProducers(parameterHistory.get(currentHistoryIndex).getSpatiallySelectedProducers());
-	
+		ocelotlView.getOcelotlParameters().setSelectedEventProducerNodes(parameterHistory.get(currentHistoryIndex).getSelectedEventProducerNodes());
+		
 		// Trigger a redraw
 		ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
 	}
