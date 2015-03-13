@@ -361,10 +361,11 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 		aggregatedView.setCurrentlySelectedNode(selectedNode);
 		
 		// Find the event producer node containing all the selected node
-		ArrayList<EventProducerNode> currentProducers = hierarchy.findNodeWithin(selectedNode.getIndex(), selectedNode.getIndex() + selectedNode.getWeight());
+		ArrayList<EventProducerNode> currentProducers = hierarchy.getLeaves(selectedNode);
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSelectedEventProducerNodes(currentProducers);
-
+		aggregatedView.getOcelotlView().getOcelotlParameters().setDisplayedSubselection(true);
 		aggregatedView.getOcelotlView().getOcelotlParameters().setSpatialSelection(true);
+		
 		while (selectedNode.getParentNode() != null) {
 			if (selectedNode.getParentNode().getWeight() == selectedNode.getWeight()) {
 				selectedNode = selectedNode.getParentNode();

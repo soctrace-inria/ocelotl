@@ -587,7 +587,7 @@ public class EventProducerHierarchy {
 	}
 	
 	/**
-	 * Add leaf for each producer htat produce events but are not leaves
+	 * Add leaf for each producer that produce events but are not leaves
 	 * 
 	 * @param activeProducers
 	 *            the list of all active producers
@@ -636,4 +636,32 @@ public class EventProducerHierarchy {
 		root.setChildIndex();
 	}
 
+	/**
+	 * Get leaf producers that are under a given node in the hierarchy
+	 * 
+	 * @param aNode
+	 *            the node from which we want to get the leaves
+	 * @return the leaves
+	 */
+	public ArrayList<EventProducerNode> getLeaves(EventProducerNode aNode) {
+		ArrayList<EventProducerNode> theLeaves = new ArrayList<EventProducerNode>();
+		
+		// If the node is a leaf
+		if (leaves.values().contains(aNode)) {
+			theLeaves.add(aNode);
+			return theLeaves;
+		}
+		
+		for (EventProducerNode aLeaf : leaves.values()) {
+			EventProducerNode parent = aLeaf.getParentNode();
+			while (parent != aNode && parent != root && parent != null) {
+				parent = parent.getParentNode();
+			}
+
+			if (parent == aNode)
+				theLeaves.add(aLeaf);
+		}
+
+		return theLeaves;
+	}
 }

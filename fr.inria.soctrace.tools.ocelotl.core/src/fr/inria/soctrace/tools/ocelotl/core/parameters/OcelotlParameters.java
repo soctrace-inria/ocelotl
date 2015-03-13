@@ -98,6 +98,8 @@ public class OcelotlParameters {
 	private TimeSliceManager timeSliceManager;
 	private boolean aggregatedLeaveEnable = false;
 	private int maxNumberOfLeaves;
+	// Is there a zone of the display currently selected with the mouse
+	private boolean displayedSubselection = false;
 
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
@@ -533,6 +535,14 @@ public class OcelotlParameters {
 		this.spatialSelection = spatialSelection;
 	}
 	
+	public boolean isDisplayedSubselection() {
+		return displayedSubselection;
+	}
+
+	public void setDisplayedSubselection(boolean displayedSubselection) {
+		this.displayedSubselection = displayedSubselection;
+	}
+
 	public boolean isApproximateRebuild() {
 		return approximateRebuild;
 	}

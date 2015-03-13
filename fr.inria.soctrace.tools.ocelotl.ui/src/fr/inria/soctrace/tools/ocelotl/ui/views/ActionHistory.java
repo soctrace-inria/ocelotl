@@ -69,8 +69,10 @@ public class ActionHistory {
 	}
 
 	/**
-	 * Check for changes from previous registered parameters 
-	 * For now we only deal with zoom (temporal and spatial)
+	 * Check for changes from previous registered parameters For now we only
+	 * deal with zoom (temporal and spatial)
+	 * 
+	 * @return true if there was a change, false otherwise
 	 */
 	public boolean checkForChanges() {
 
@@ -78,10 +80,14 @@ public class ActionHistory {
 		if (!ocelotlView.getTimeRegion().compareTimeRegion(parameterHistory.get(currentHistoryIndex).getTimeRegion()))
 			return true;
 
-		// If event producers have changed
-		if(ocelotlView.getOcelotlParameters().getSpatiallySelectedProducers().size() != parameterHistory.get(currentHistoryIndex).getSpatiallySelectedProducers().size())
+		// If event producers selection have changed
+		if (ocelotlView.getOcelotlParameters().getSpatiallySelectedProducers().size() != parameterHistory.get(currentHistoryIndex).getSpatiallySelectedProducers().size())
 			return true;
 		
+		// Special case for false leaves
+		if (ocelotlView.getOcelotlParameters().getSelectedEventProducerNodes().size() != parameterHistory.get(currentHistoryIndex).getSelectedEventProducerNodes().size())
+			return true;
+
 		for (EventProducer anEP : ocelotlView.getOcelotlParameters().getSpatiallySelectedProducers())
 			if (!parameterHistory.get(currentHistoryIndex).getSpatiallySelectedProducers().contains(anEP))
 				return true;

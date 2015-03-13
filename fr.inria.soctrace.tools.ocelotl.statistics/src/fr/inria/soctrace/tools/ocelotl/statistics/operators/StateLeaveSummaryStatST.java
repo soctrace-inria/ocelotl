@@ -50,7 +50,7 @@ public class StateLeaveSummaryStatST extends StateLeaveSummaryStat {
 				.getTimeSlice(timeRegion.getTimeStampStart() + 2);
 		int endingSlice = (int) microModel.getTimeSliceManager().getTimeSlice(
 				timeRegion.getTimeStampEnd());
-		
+
 		// Get data from the microscopic model
 		for (i = startingSlice; i <= endingSlice; i++) {
 			for (EventProducer ep : microModel.getMatrix().get(i).keySet()) {
@@ -102,18 +102,27 @@ public class StateLeaveSummaryStatST extends StateLeaveSummaryStat {
 	@Override
 	protected boolean isInSpatialSelection(EventProducer ep) {
 		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
-			for (EventProducerNode epn : ocelotlview.getOcelotlParameters()
-					.getSelectedEventProducerNodes()) {
-				if (epn.getMe().getId() == ep.getId()) {
-					return true;
+			if (ocelotlview.getOcelotlParameters().isDisplayedSubselection()) {
+				for (EventProducerNode epn : ocelotlview.getOcelotlParameters()
+						.getSelectedEventProducerNodes()) {
+					if (epn.getMe().getId() == ep.getId()) {
+						return true;
+					}
 				}
+				return false;
+			} else {
+				for (EventProducerNode epn : hierarchy.getLeaves().values()) {
+					if (epn.getMe().getId() == ep.getId()) {
+						return true;
+					}
+				}
+				return false;
 			}
-			return false;
 		}
 
 		return true;
 	}
-	
+
 	/**
 	 * Select the leaf producers among the current selected producer
 	 * 
@@ -129,11 +138,15 @@ public class StateLeaveSummaryStatST extends StateLeaveSummaryStat {
 			for (EventProducerNode anSepn : hierarchy.getLeaves().values()) {
 				// That it is part of the selection and active
 				if (ocelotlview.getOcelotlParameters()
-						.getSelectedEventProducerNodes()
-						.contains(anSepn)
-						&& microModel.getActiveProducers().contains(
-								anSepn.getMe()))
+						.isDisplayedSubselection()) {
+					if (ocelotlview.getOcelotlParameters()
+							.getSelectedEventProducerNodes().contains(anSepn)
+							&& microModel.getActiveProducers().contains(
+									anSepn.getMe()))
+						numberOfLeaves++;
+				} else {
 					numberOfLeaves++;
+				}
 			}
 			
 			// Search for selected producer that are aggregation of EP leaves

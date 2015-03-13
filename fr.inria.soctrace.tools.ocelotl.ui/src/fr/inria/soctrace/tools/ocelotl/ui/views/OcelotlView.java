@@ -819,7 +819,8 @@ public class OcelotlView extends FramesocPart {
 			// Cancel potential spatialselection
 			getOcelotlParameters().setSpatialSelection(true);
 			getOcelotlParameters().setSpatiallySelectedProducers(getOcelotlParameters().getCurrentProducers());
-			
+			getOcelotlParameters().setDisplayedSubselection(false);
+
 			// Update stats
 			statView.updateData();
 			
@@ -1733,6 +1734,7 @@ public class OcelotlView extends FramesocPart {
 		ocelotlParameters.setMaxNumberOfLeaves(ocelotlParameters.getOcelotlSettings().getMaxNumberOfLeaves());
 		
 		ocelotlParameters.updateCurrentProducers();
+		ocelotlParameters.setDisplayedSubselection(false);
 		
 		// If there are aggregated leave, then it is necessary to update the
 		// spatial selection
