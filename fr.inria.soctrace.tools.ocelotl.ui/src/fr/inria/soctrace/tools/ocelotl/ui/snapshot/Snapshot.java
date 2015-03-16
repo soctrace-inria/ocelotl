@@ -78,6 +78,8 @@ public class Snapshot {
 		// Create and set directory
 		String currentDirPath = createDirectory();
 
+		// Take a snapshot of the statistics
+		saveStatistics(currentDirPath);
 		// Save the currently displayed diagram as an image
 		snapShotDiagram(currentDirPath);
 		// Save the currently displayed quality curves as an image
@@ -88,8 +90,7 @@ public class Snapshot {
 		saveConfig(currentDirPath);
 		// Save the current parameter P values (+ gain/loss) in a .csv
 		saveParameterValues(currentDirPath);
-		// Take a snapshot of the statistics
-		saveStatistics(currentDirPath);
+
 		
 		// Create a symbolic link to the trace file
 		// createSymLink(currentDirPath);
@@ -115,6 +116,7 @@ public class Snapshot {
 		mainViewWrapper.init(compositeMainView);
 		TimeLineViewManager mainViewManager = new TimeLineViewManager(theView);
 		AggregatedView mainView = (AggregatedView) mainViewManager.create();
+		mainView.setMainView(false);
 		mainViewWrapper.setView(mainView);
 		mainView.createDiagram(theView.getCore().getLpaggregManager(), theView.getOcelotlParameters().getTimeRegion(),  theView.getCore().getVisuOperator());
 		mainView.getSelectFigure().draw(theView.getTimeRegion(), -1, -1);

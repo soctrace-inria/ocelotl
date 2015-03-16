@@ -404,12 +404,14 @@ public class SpatioTemporalMouseListener extends TemporalMouseListener {
 			y1 = y0 + (int) (theSelectedNode.getWeight() * logicHeight) - aggregatedView.getSpace();
 		}
 		
-		// Try to get the same coordinates as the hierarchy axis view
-		Rectangle rect = aggregatedView.getOcelotlView().getUnitAxisView().getEventProdToFigures().get(theSelectedNode);
-		
-		if (rect != null) {
-			y0 = rect.y();
-			y1 = y0 + rect.height();
+		if (aggregatedView.isMainView()) {
+			// Try to get the same coordinates as the hierarchy axis view
+			Rectangle rect = aggregatedView.getOcelotlView().getUnitAxisView().getEventProdToFigures().get(theSelectedNode);
+
+			if (rect != null) {
+				y0 = rect.y();
+				y1 = y0 + rect.height();
+			}
 		}
 		
 		selectedNode = theSelectedNode;

@@ -61,6 +61,8 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected IVisuOperator						visuOperator		= null;
 	protected OcelotlMouseListener				mouse;
 	protected String							unit;
+	// Is this for the main view? (i.e. not overview, snapshot)
+	protected boolean							mainView			= true;
 	protected List<SpatioTemporalAggregateView>	aggregates;
 	public static final int						space				= 3;
 	public static Color							selectColorFG		= ColorConstants.white;
@@ -408,6 +410,14 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public void setVisuOperator(final IVisuOperator visuOperator) {
 		this.visuOperator = visuOperator;
+	}
+
+	public boolean isMainView() {
+		return mainView;
+	}
+
+	public void setMainView(boolean mainView) {
+		this.mainView = mainView;
 	}
 
 	public EventProducerNode getCurrentlySelectedNode() {

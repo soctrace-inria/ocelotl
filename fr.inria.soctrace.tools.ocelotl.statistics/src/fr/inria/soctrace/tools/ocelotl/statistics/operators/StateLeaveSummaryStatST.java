@@ -70,7 +70,6 @@ public class StateLeaveSummaryStatST extends StateLeaveSummaryStat {
 		}
 
 		int nbProducers = numberOfSelectedLeaves();
-		
 		total = timeRegion.getTimeDuration() * nbProducers;
 		statData = new ArrayList<ITableRow>();
 
@@ -164,9 +163,10 @@ public class StateLeaveSummaryStatST extends StateLeaveSummaryStat {
 				if (microModel.getActiveProducers().contains(anSepn.getMe()))
 					numberOfLeaves++;
 
-				if (microModel.getActiveProducers().contains(
-						anSepn.getParentNode().getMe()))
-					aggregatedProd.add(anSepn.getParentNode().getMe());
+				if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
+					if (microModel.getActiveProducers().contains(
+							anSepn.getParentNode().getMe()))
+						aggregatedProd.add(anSepn.getParentNode().getMe());
 			}
 
 			if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
