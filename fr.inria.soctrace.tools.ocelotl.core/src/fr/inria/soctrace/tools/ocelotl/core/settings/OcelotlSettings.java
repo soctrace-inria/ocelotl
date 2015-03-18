@@ -300,10 +300,6 @@ public class OcelotlSettings {
 			logger.debug("No configuration file was found: the file will be regenerated with default values");
 			saveSettings();
 		}
- else {
-			logger.debug("No configuration file was found: default values will be used");
-			saveSettings();
-		}
 	}
 
 	/**
