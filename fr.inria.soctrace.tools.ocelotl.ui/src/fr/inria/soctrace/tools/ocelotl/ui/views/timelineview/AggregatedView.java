@@ -61,6 +61,8 @@ abstract public class AggregatedView implements IAggregatedView {
 	protected IVisuOperator						visuOperator		= null;
 	protected OcelotlMouseListener				mouse;
 	protected String							unit;
+	// Is this for the main view? (i.e. not overview, snapshot)
+	protected boolean							mainView			= true;
 	protected List<SpatioTemporalAggregateView>	aggregates;
 	public static final int						space				= 3;
 	public static Color							selectColorFG		= ColorConstants.white;
@@ -147,6 +149,33 @@ abstract public class AggregatedView implements IAggregatedView {
 
 			root.setConstraint(this, new Rectangle(new Point((int) ((timeRegion.getTimeStampStart() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder), y0), new Point(
 					((int) ((timeRegion.getTimeStampEnd() - time.getTimeStampStart()) * (root.getSize().width - 2 * aBorder) / time.getTimeDuration() + aBorder)) - space, y1)));
+			root.repaint();
+		}
+		
+		public void draw(int x0, int x1, int y0, int y1, boolean active) {
+			if (getParent() != root)
+				root.add(this);
+
+			if (active) {
+				setForegroundColor(activeColorFG);
+				setBackgroundColor(activeColorBG);
+				setFill(true);
+				setAlpha(activeColorAlpha);
+			} else {
+				setForegroundColor(selectColorFG);
+				setBackgroundColor(selectColorBG);
+				setFill(false);
+				setAlpha(selectColorAlpha);
+			}
+			
+			// Default values for selecting the height of the graph
+			if (y0 == -1)
+				y0 = root.getSize().height - 1;
+
+			if (y1 == -1)
+				y1 = 2;
+
+			root.setConstraint(this, new Rectangle(new Point(x0, y0), new Point(x1, y1)));
 			root.repaint();
 		}
 
@@ -381,6 +410,14 @@ abstract public class AggregatedView implements IAggregatedView {
 
 	public void setVisuOperator(final IVisuOperator visuOperator) {
 		this.visuOperator = visuOperator;
+	}
+
+	public boolean isMainView() {
+		return mainView;
+	}
+
+	public void setMainView(boolean mainView) {
+		this.mainView = mainView;
 	}
 
 	public EventProducerNode getCurrentlySelectedNode() {

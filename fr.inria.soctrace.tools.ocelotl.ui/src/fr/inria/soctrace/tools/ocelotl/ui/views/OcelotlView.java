@@ -1063,7 +1063,8 @@ public Trace aTestTrace;
 			// Cancel potential spatialselection
 			getOcelotlParameters().setSpatialSelection(true);
 			getOcelotlParameters().setSpatiallySelectedProducers(getOcelotlParameters().getCurrentProducers());
-			
+			getOcelotlParameters().setDisplayedSubselection(false);
+
 			// Update stats
 			statView.updateData();
 			
@@ -1168,7 +1169,7 @@ public Trace aTestTrace;
 			final String title = "Loading Trace";
 			btnRun.setEnabled(false);
 			overView.reset();
-			
+			cancelSelection();
 			currentShownTrace = trace;
 			setFocus();
 
@@ -1241,6 +1242,7 @@ public Trace aTestTrace;
 
 		@Override
 		public void handleEvent(final Event e) {
+			
 			switch (e.keyCode) {
 			case SWT.ARROW_LEFT:
 			case SWT.ARROW_UP:
@@ -1981,6 +1983,7 @@ public Trace aTestTrace;
 		ocelotlParameters.setMaxNumberOfLeaves(ocelotlParameters.getOcelotlSettings().getMaxNumberOfLeaves());
 		
 		ocelotlParameters.updateCurrentProducers();
+		ocelotlParameters.setDisplayedSubselection(false);
 		
 		// If there are aggregated leave, then it is necessary to update the
 		// spatial selection

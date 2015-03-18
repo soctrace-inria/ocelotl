@@ -65,14 +65,14 @@ public abstract class SpaceTimeAggregationManager extends DataAggregationManager
 			if (ocelotlParameters.getParameter() == parameters.get(i))
 				break;
 
-		logger.debug("parameter: " + ocelotlParameters.getParameter()
+		logger.debug("Parameter: " + ocelotlParameters.getParameter()
 				+ ", gain: " + qualities.get(i).getGain() + ", loss: "
 				+ qualities.get(i).getLoss());
 		dm.end("LPAGGREG - COMPUTE PARTS");
 	}
 
 	private void updateHierarchy() {
-		for (int id : hierarchy.getEventProducers().keySet())
+		for (int id : hierarchy.getEventProducerNodes().keySet())
 			hierarchy.setParts(id, timeAggregation.getParts(id));
 	}
 
@@ -100,7 +100,6 @@ public abstract class SpaceTimeAggregationManager extends DataAggregationManager
 		addNodes();
 		addLeaves();
 		timeAggregation.validate();
-
 	}
 
 	protected abstract void addLeaves();

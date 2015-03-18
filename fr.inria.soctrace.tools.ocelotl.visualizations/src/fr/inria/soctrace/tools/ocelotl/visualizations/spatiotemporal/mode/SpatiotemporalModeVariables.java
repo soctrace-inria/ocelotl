@@ -90,7 +90,7 @@ public class SpatiotemporalModeVariables extends SpatiotemporalMode {
 		double max = 0.0;
 		MainEvent maj = new MainEvent(Void, max);
 		ArrayList<String> usedEvents = (ArrayList<String>) getAllEvents();
-		ArrayList<String> displayedEvents = (ArrayList<String>)  getEvents();
+		ArrayList<String> displayedEvents = (ArrayList<String>) getEvents();
 		for (String event : usedEvents) {
 			if(!displayedEvents.contains(event))
 				continue;

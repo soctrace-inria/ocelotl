@@ -36,6 +36,11 @@ public interface IStatView {
 	
 	public void setStatProvider(IStatisticsProvider aStatProvider);
 	
+	/**
+	 * Convert the statistics to a csv format
+	 * 
+	 * @return String in csv
+	 */
 	public String getStatDataToCSV();
-	
+
 }

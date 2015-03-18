@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.inria.soctrace.framesoc.ui.utils.AlphanumComparator;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -33,6 +36,8 @@ import fr.inria.soctrace.tools.ocelotl.core.microdesc.Microscopic3DDescription;
 
 public class EventProducerHierarchy {
 
+	private static final Logger logger = LoggerFactory.getLogger(EventProducerHierarchy.class);
+	
 	public enum Aggregation {
 		FULL, PARTIAL, NULL
 	}
@@ -51,6 +56,7 @@ public class EventProducerHierarchy {
 		// Depth in the hierarchy level of the node (the smaller, the higher
 		// in the hierarchy)
 		private int hierarchyLevel;
+		private boolean realLeaf = true;
 		
 		public EventProducerNode(EventProducer ep) {
 			if(ep == null)
@@ -63,7 +69,24 @@ public class EventProducerHierarchy {
 			hierarchyLevel = 0;
 			setParent();
 		}
-
+		
+		/**
+		 * Constructor for false leaf (i.e. for producers that have events but are not leaves
+		 * @param ep
+		 * @param epn
+		 */
+		public EventProducerNode(EventProducer ep, EventProducerNode epn) {
+			me = ep;
+			// False ID (must be unique to avoid problem at later stages)
+			id = me.getId() + maxID + 1;
+			hierarchyLevel = epn.getHierarchyLevel() + 1;
+			parentNode = epn;
+			// Update the weight of the parent
+			parentNode.weight = parentNode.getWeight();
+			epn.getChildrenNodes().add(this);
+			realLeaf = false;
+		}
+		
 		public Aggregation isAggregated() {
 			return aggregated;
 		}
@@ -96,7 +119,7 @@ public class EventProducerHierarchy {
 
 		private void setParent() {
 			try {
-				if (!eventProducerNodes.containsKey(me.getParentId()))
+				if (!eventProducerNodes.containsKey(me.getParentId())) {
 					// Is the parent id is a known producer
 					if (eventProducers.containsKey(me.getParentId())) {
 						eventProducerNodes.put(
@@ -112,6 +135,7 @@ public class EventProducerHierarchy {
 						}
 						return;
 					}
+				}
 
 				parentNode = eventProducerNodes.get(me.getParentId());
 				parentNode.addChild(this);
@@ -132,8 +156,10 @@ public class EventProducerHierarchy {
 
 		public void addChild(EventProducerNode child) {
 			childrenNodes.add(child);
-			if (leaves.containsKey(id))
+			if (leaves.containsKey(id)) {
 				leaves.remove(id);
+				realLeaf = false;
+			}
 		}
 
 		public EventProducer getMe() {
@@ -181,10 +207,10 @@ public class EventProducerHierarchy {
 		}
 
 		public void setValues(Object values) {
-			if (leaves.containsKey(id))
+		//	if (leaves.containsKey(id) || pseudoLeaves.containsKey(id))
 				this.values = values;
-			else
-				values = null;
+	//		else
+	//			values = null;
 		}
 
 		public void setParentValues(Object values) {
@@ -265,6 +291,14 @@ public class EventProducerHierarchy {
 
 		public void setHierarchyLevel(int hierarchyLevel) {
 			this.hierarchyLevel = hierarchyLevel;
+		}
+
+		public boolean isRealLeaf() {
+			return realLeaf;
+		}
+
+		public void setRealLeaf(boolean realLeaf) {
+			this.realLeaf = realLeaf;
 		}
 
 		/**
@@ -373,10 +407,13 @@ public class EventProducerHierarchy {
 	private Map<Integer, EventProducerNode> eventProducerNodes = new HashMap<Integer, EventProducerNode>();
 	private Map<Integer, EventProducerNode> orphans = new HashMap<Integer, EventProducerNode>();
 	private Map<Integer, EventProducerNode> leaves = new HashMap<Integer, EventProducerNode>();
+	// Contains EP that are not leaves but still produces events
+	private Map<Integer, EventProducerNode> pseudoLeaves = new HashMap<Integer, EventProducerNode>();
 	private Map<Integer, EventProducer> eventProducers = new HashMap<Integer, EventProducer>();
 	private ArrayList<EventProducerNode> aggLeaves = new ArrayList<EventProducerNode>();
 	private EventProducerNode root = null;
 	protected int maxHierarchyLevel;
+	protected int maxID = 0;
 	protected Microscopic3DDescription microModel3D;
 
 	public EventProducerHierarchy(List<EventProducer> eventProducers,
@@ -385,8 +422,10 @@ public class EventProducerHierarchy {
 
 		for (EventProducer ep : eventProducers) {
 			this.eventProducers.put(ep.getId(), ep);
+			if (ep.getId() > maxID)
+				maxID = ep.getId();
 		}
-
+		
 		root = null;
 		this.microModel3D = microModel3D;
 		maxHierarchyLevel = 0;
@@ -434,6 +473,14 @@ public class EventProducerHierarchy {
 
 	public EventProducerNode getRoot() {
 		return root;
+	}
+
+	public Map<Integer, EventProducerNode> getPseudoLeaves() {
+		return pseudoLeaves;
+	}
+
+	public void setPseudoLeaves(Map<Integer, EventProducerNode> pseudoLeaves) {
+		this.pseudoLeaves = pseudoLeaves;
 	}
 
 	public void setValues(HashMap<EventProducer, Object> values) {
@@ -538,5 +585,83 @@ public class EventProducerHierarchy {
 		}
 		return containedEpn;
 	}
+	
+	/**
+	 * Add leaf for each producer that produce events but are not leaves
+	 * 
+	 * @param activeProducers
+	 *            the list of all active producers
+	 */
+	public void buildLeavesFromActiveProducers(
+			List<EventProducer> activeProducers, boolean spatialSelection, List<EventProducerNode> selectedNodes) {
+		for (EventProducer anEP : activeProducers) {
+			// If active but not a leaf
+			if (!leaves.containsKey(anEP.getId())) {
+			
+				// Check if the leave is part of a spatial selection
+				if (spatialSelection) {
+					boolean selected = false;
+					for (EventProducerNode epn : selectedNodes)
+						if (epn.getMe().getId() == anEP.getId())
+							selected = true;
 
+					if (!selected)
+						continue;
+				}
+
+				logger.debug("Creating new leave for event prod " + anEP.getName() + ", " + anEP.getId());
+				EventProducerNode newNode = new EventProducerNode(anEP, eventProducerNodes.get(anEP.getId()));
+				// Copy the values of the parent node
+				newNode.setValues(eventProducerNodes.get(anEP.getId()).getValues());
+				// Add it to the leaves but with the key of the parent ID
+				leaves.put(anEP.getId(), newNode);
+				// Add it to the list of epn, but with their own id
+				eventProducerNodes.put(newNode.getID(), newNode);
+			}
+			// Case where only one false leaf was selected
+			else if(leaves.get(anEP.getId()).getParentNode() == null)
+			{
+				logger.debug("Creating new leave for event prod " + anEP.getName() + ", " + anEP.getId());
+				EventProducerNode newNode = new EventProducerNode(anEP, eventProducerNodes.get(anEP.getId()));
+				// Copy the values of the parent node
+				newNode.setValues(eventProducerNodes.get(anEP.getId()).getValues());
+				// Add it to the leaves but with the key of the parent ID
+				leaves.put(anEP.getId(), newNode);
+				// Add it to the list of epn, but with their own id
+				eventProducerNodes.put(newNode.getID(), newNode);
+			}
+		}
+		// Update weight and index
+		root.setWeight();
+		root.setChildIndex();
+	}
+
+	/**
+	 * Get leaf producers that are under a given node in the hierarchy
+	 * 
+	 * @param aNode
+	 *            the node from which we want to get the leaves
+	 * @return the leaves
+	 */
+	public ArrayList<EventProducerNode> getLeaves(EventProducerNode aNode) {
+		ArrayList<EventProducerNode> theLeaves = new ArrayList<EventProducerNode>();
+		
+		// If the node is a leaf
+		if (leaves.values().contains(aNode)) {
+			theLeaves.add(aNode);
+			return theLeaves;
+		}
+		
+		for (EventProducerNode aLeaf : leaves.values()) {
+			EventProducerNode parent = aLeaf.getParentNode();
+			while (parent != aNode && parent != root && parent != null) {
+				parent = parent.getParentNode();
+			}
+
+			if (parent == aNode)
+				theLeaves.add(aLeaf);
+		}
+
+		return theLeaves;
+	}
 }

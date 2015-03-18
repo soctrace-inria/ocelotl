@@ -19,20 +19,27 @@ import java.util.Set;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ITableRow;
 import fr.inria.soctrace.lib.model.EventProducer;
-import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
+import fr.inria.soctrace.tools.ocelotl.core.ivisuop.VisuSTOperator;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-public class StateLeaveSummaryStat extends SummaryStat {
-
-	public StateLeaveSummaryStat(OcelotlView aView) {
+public class StateLeaveSummaryStatST extends StateLeaveSummaryStat {
+	
+	public StateLeaveSummaryStatST(OcelotlView aView) {
 		super(aView);
 	}
+	
+	EventProducerHierarchy hierarchy;
 
 	@Override
 	public void computeData() {
 		int i;
 		data = new HashMap<String, Double>();
 		double total = 0.0;
+		
+		VisuSTOperator propOperator = (VisuSTOperator) ocelotlview.getCore().getVisuOperator();
+		hierarchy = propOperator.getHierarchy();
 
 		setupTimeRegion();
 
@@ -43,7 +50,7 @@ public class StateLeaveSummaryStat extends SummaryStat {
 				.getTimeSlice(timeRegion.getTimeStampStart() + 2);
 		int endingSlice = (int) microModel.getTimeSliceManager().getTimeSlice(
 				timeRegion.getTimeStampEnd());
-		
+
 		// Get data from the microscopic model
 		for (i = startingSlice; i <= endingSlice; i++) {
 			for (EventProducer ep : microModel.getMatrix().get(i).keySet()) {
@@ -63,7 +70,6 @@ public class StateLeaveSummaryStat extends SummaryStat {
 		}
 
 		int nbProducers = numberOfSelectedLeaves();
-		
 		total = timeRegion.getTimeDuration() * nbProducers;
 		statData = new ArrayList<ITableRow>();
 
@@ -87,12 +93,35 @@ public class StateLeaveSummaryStat extends SummaryStat {
 	 * @return
 	 */
 	protected boolean isLeaf(EventProducer ep) {
-		return ocelotlview.getOcelotlParameters().getEventProducerHierarchy()
-				.isLeaf(ep)
+		return hierarchy.getLeaves().containsKey(ep.getId())
 				|| ocelotlview.getOcelotlParameters()
 						.getAggregatedLeavesIndex().keySet().contains(ep);
 	}
 	
+	@Override
+	protected boolean isInSpatialSelection(EventProducer ep) {
+		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
+			if (ocelotlview.getOcelotlParameters().isDisplayedSubselection()) {
+				for (EventProducerNode epn : ocelotlview.getOcelotlParameters()
+						.getSelectedEventProducerNodes()) {
+					if (epn.getMe().getId() == ep.getId()) {
+						return true;
+					}
+				}
+				return false;
+			} else {
+				for (EventProducerNode epn : hierarchy.getLeaves().values()) {
+					if (epn.getMe().getId() == ep.getId()) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	/**
 	 * Select the leaf producers among the current selected producer
 	 * 
@@ -105,16 +134,18 @@ public class StateLeaveSummaryStat extends SummaryStat {
 		// If there is a spatial selection
 		if (ocelotlview.getOcelotlParameters().isSpatialSelection()) {
 			// Check for all leave producers (non-aggregated)
-			for (SimpleEventProducerNode anSepn : ocelotlview
-					.getOcelotlParameters().getEventProducerHierarchy()
-					.getLeaves().values()) {
+			for (EventProducerNode anSepn : hierarchy.getLeaves().values()) {
 				// That it is part of the selection and active
 				if (ocelotlview.getOcelotlParameters()
-						.getSpatiallySelectedProducers()
-						.contains(anSepn.getMe())
-						&& microModel.getActiveProducers().contains(
-								anSepn.getMe()))
+						.isDisplayedSubselection()) {
+					if (ocelotlview.getOcelotlParameters()
+							.getSelectedEventProducerNodes().contains(anSepn)
+							&& microModel.getActiveProducers().contains(
+									anSepn.getMe()))
+						numberOfLeaves++;
+				} else {
 					numberOfLeaves++;
+				}
 			}
 			
 			// Search for selected producer that are aggregation of EP leaves
@@ -127,15 +158,15 @@ public class StateLeaveSummaryStat extends SummaryStat {
 						aggregatedProd.add(anEP);
 		} else {
 			// Same thing as above without caring about spatial selection
-			for (SimpleEventProducerNode anSepn : ocelotlview
-					.getOcelotlParameters().getEventProducerHierarchy()
+			for (EventProducerNode anSepn : hierarchy
 					.getLeaves().values()) {
 				if (microModel.getActiveProducers().contains(anSepn.getMe()))
 					numberOfLeaves++;
 
-				if (microModel.getActiveProducers().contains(
-						anSepn.getParentNode().getMe()))
-					aggregatedProd.add(anSepn.getParentNode().getMe());
+				if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())
+					if (microModel.getActiveProducers().contains(
+							anSepn.getParentNode().getMe()))
+						aggregatedProd.add(anSepn.getParentNode().getMe());
 			}
 
 			if (ocelotlview.getOcelotlParameters().isHasLeaveAggregated())

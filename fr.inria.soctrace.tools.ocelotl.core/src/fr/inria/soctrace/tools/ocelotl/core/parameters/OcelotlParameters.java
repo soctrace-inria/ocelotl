@@ -34,6 +34,7 @@ import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.core.config.ITraceTypeConfig;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacachePolicy;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.ParameterPPolicy;
+import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.settings.OcelotlSettings;
@@ -58,6 +59,8 @@ public class OcelotlParameters {
 	private List<EventProducer> unfilteredEventProducers = new ArrayList<EventProducer>();
 	// List of all the event producers that are aggregated 
 	private List<EventProducer> aggregatedEventProducers = new ArrayList<EventProducer>();
+	// List of all the event producer nodes selected through a spatial selection 
+	private List<EventProducerNode> selectedEventProducerNodes = new ArrayList<EventProducerNode>();
 	
 	private List<EventType> eventTypes = new LinkedList<EventType>();
 	private List<EventType> allEventTypes;
@@ -95,6 +98,8 @@ public class OcelotlParameters {
 	private TimeSliceManager timeSliceManager;
 	private boolean aggregatedLeaveEnable = false;
 	private int maxNumberOfLeaves;
+	// Is there a zone of the display currently selected with the mouse
+	private boolean displayedSubselection = false;
 
 	private static boolean jniFlag = true;
 	private ITraceTypeConfig iTraceTypeConfig;
@@ -115,6 +120,7 @@ public class OcelotlParameters {
 		this.spatiallySelectedProducers = new ArrayList<EventProducer>(op.spatiallySelectedProducers);
 		this.unfilteredEventProducers = new ArrayList<EventProducer>(op.unfilteredEventProducers);
 		this.aggregatedEventProducers = new ArrayList<EventProducer>(op.aggregatedEventProducers);
+		this.selectedEventProducerNodes = new ArrayList<EventProducerNode>(op.selectedEventProducerNodes);
 		this.currentProducers = op.currentProducers;
 		this.eventTypes = op.eventTypes;
 		this.allEventTypes = op.allEventTypes;
@@ -493,6 +499,17 @@ public class OcelotlParameters {
 		this.spatiallySelectedProducers = new ArrayList<EventProducer>();
 		this.spatiallySelectedProducers.addAll(spatiallySelectedProducers);
 	}
+	
+	public List<EventProducerNode> getSelectedEventProducerNodes() {
+		return selectedEventProducerNodes;
+	}
+
+	public void setSelectedEventProducerNodes(
+			List<EventProducerNode> selectedEventProducerNodes) {
+		// Make sure we make a deep copy
+		this.selectedEventProducerNodes = new ArrayList<EventProducerNode>();
+		this.selectedEventProducerNodes.addAll(selectedEventProducerNodes);
+	}
 
 	public String getCurrentUnit() {
 		return currentUnit;
@@ -518,6 +535,14 @@ public class OcelotlParameters {
 		this.spatialSelection = spatialSelection;
 	}
 	
+	public boolean isDisplayedSubselection() {
+		return displayedSubselection;
+	}
+
+	public void setDisplayedSubselection(boolean displayedSubselection) {
+		this.displayedSubselection = displayedSubselection;
+	}
+
 	public boolean isApproximateRebuild() {
 		return approximateRebuild;
 	}

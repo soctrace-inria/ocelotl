@@ -39,6 +39,17 @@
             event_category="STATE">
       </microscopic_model>
       <microscopic_model
+      		name="States Query"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionQuery"
+      		unit="Event^-1"
+      		unit_description="Activity Ratio / Event"
+      		selection_priority = "1"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+      <microscopic_model
      		name="Variables"
      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.VariableDistribution"
      		unit_description=""
@@ -75,6 +86,15 @@
             dimension="3D"
             ts_default_number="30">
       </aggregation_operator>
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.core.idataaggregop.SpatioTemporalLeafAggregation"
+            operator="Spatiotemporal Leaf Aggregation"
+            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
+            visual_compatibility="PARTS, STATEMODE, EVENTMODE, VARIABLEMODE"
+            selection_priority="3"
+            dimension="3D"
+            ts_default_number="30">
+      </aggregation_operator>
    </extension>
-       
 </plugin>

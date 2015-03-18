@@ -111,6 +111,23 @@ public class OcelotlQueries {
 		final List<IntervalDesc> time = setTimeInterval();
 		return getEventIterator(eventProducers, time, monitor);
 	}
+	
+	/**
+	 * Get the event iterator with no condition at all
+	 * 
+	 * @param monitor
+	 * @return the produced eventIterator
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
+	public EventIterator getEventIterator(IProgressMonitor monitor)
+			throws SoCTraceException, OcelotlException {
+		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
+				ocelotlParameters).initialize();
+		
+		return traceSearch.getEventIterator(ocelotlParameters.getTrace(), null,
+				new ArrayList<IntervalDesc>(), null, monitor);
+	}
 
 	/**
 	 * 
