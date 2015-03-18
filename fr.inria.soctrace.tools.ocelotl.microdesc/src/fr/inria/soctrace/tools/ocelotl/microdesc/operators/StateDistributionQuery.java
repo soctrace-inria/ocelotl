@@ -54,6 +54,7 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		int threadNumber;
 		int thread;
 		int size;
+		EventProducer currentEP;
 		IProgressMonitor monitor;
 		List<IntervalDesc> time;
 		List<EventProducer> producers;
@@ -108,9 +109,139 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			}
 		}
 
+		protected void handleEvent(List<Event> events) {
+			// For each event
+			for (final Event event : events) {
+				if (event.getCategory() != EventCategory.STATE)
+					continue;
+
+				convertToState(event);
+			}
+		}
+		
+		protected void handleEventProdFilter(List<Event> events) {
+			// For each event
+			for (final Event event : events) {
+				if (event.getCategory() != EventCategory.STATE)
+					continue;
+
+				if (!producers.contains(event.getEventProducer()))
+					continue;
+
+				convertToState(event);
+			}
+		}
+		
+		protected void handleEventProdTimeFilter(List<Event> events) {
+			// For each event
+			for (final Event event : events) {
+				if (event.getCategory() != EventCategory.STATE)
+					continue;
+
+				if (!producers.contains(event.getEventProducer()))
+					continue;
+
+				for (IntervalDesc anInterval : time)
+					if (!((event.getTimestamp() >= anInterval.t1 && event
+							.getTimestamp() <= anInterval.t2) || (event
+							.getTimestamp() < anInterval.t1 && event
+							.getLongPar() > anInterval.t1)))
+						continue;
+
+				convertToState(event);
+			}
+		}
+		
+		protected void handleEventTimeFilter(List<Event> events) {
+			// For each event
+			for (final Event event : events) {
+				if (event.getCategory() != EventCategory.STATE)
+					continue;
+
+				for (IntervalDesc anInterval : time)
+					if (!((event.getTimestamp() >= anInterval.t1 && event
+							.getTimestamp() <= anInterval.t2) || (event
+							.getTimestamp() < anInterval.t1 && event
+							.getLongPar() > anInterval.t1)))
+						continue;
+
+				convertToState(event);
+			}
+		}
+		
+		protected void handleEventTypeFilter(List<Event> events) {
+			// For each event
+			for (final Event event : events) {
+				if (!types.contains(event.getType()))
+					continue;
+
+				convertToState(event);
+			}
+		}
+		
+		protected void handleEventTimeTypeFilter(List<Event> events) {
+			// For each event
+			for (final Event event : events) {
+				if (!types.contains(event.getType()))
+					continue;
+
+				for (IntervalDesc anInterval : time)
+					if (!((event.getTimestamp() >= anInterval.t1 && event
+							.getTimestamp() <= anInterval.t2) || (event
+							.getTimestamp() < anInterval.t1 && event
+							.getLongPar() > anInterval.t1)))
+						continue;
+
+				convertToState(event);
+			}
+		}
+		
+		protected void handleEventTimeTypeProdFilter(List<Event> events) {
+			// For each event
+			for (final Event event : events) {
+				if (!types.contains(event.getType()))
+					continue;
+				
+				if (!producers.contains(event.getEventProducer()))
+					continue;
+
+				for (IntervalDesc anInterval : time)
+					if (!((event.getTimestamp() >= anInterval.t1 && event
+							.getTimestamp() <= anInterval.t2) || (event
+							.getTimestamp() < anInterval.t1 && event
+							.getLongPar() > anInterval.t1)))
+						continue;
+
+				convertToState(event);
+			}
+		}
+
+		protected void convertToState(Event event)
+		{
+			// Convert to state
+			IState state = new GenericState(event, (TimeSliceStateManager) timeSliceManager);
+			// Get duration of the state for every time slice it is in
+			final Map<Long, Double> distrib = state
+					.getTimeSlicesDistribution();
+			EventProducer eventEP = event.getEventProducer();
+			
+			if(aggregatedProducers.containsKey(event.getEventProducer()))
+				eventEP = aggregatedProducers.get(event.getEventProducer());
+			
+			matrixUpdate(state, eventEP, distrib);
+			if (currentEP != eventEP) {
+				currentEP = eventEP;
+				// If the event producer is not in the active producers list
+				if (!localActiveEventProducers.contains(eventEP)) {
+					// Add it
+					localActiveEventProducers.add(eventEP);
+				}
+			}
+		}
+
 		@Override
 		public void run() {
-			EventProducer currentEP = null;
+			currentEP = null;
 			while (true) {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
@@ -118,52 +249,34 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 				if (monitor.isCanceled())
 					return;
 
-				IState state;
-				// For each event
-				for (final Event event : events) {
-					
-					if (prodFiltering)
-						if (!producers.contains(event.getEventProducer()))
-							continue;
-
-					if (typeFiltering) {
-						if (!types.contains(event.getType()))
-							continue;
+				if (typeFiltering) {
+					if (prodFiltering) {
+						handleEventTimeTypeProdFilter(events);
 					} else {
-						if (event.getCategory() != EventCategory.STATE)
-							continue;
-					}
-
-					if (timeFiltering)
-						for (IntervalDesc anInterval : time)
-							if (!((event.getTimestamp() >= anInterval.t1 && event
-									.getTimestamp() <= anInterval.t2) || (event
-									.getTimestamp() < anInterval.t1 && event
-									.getLongPar() > anInterval.t1)))
-								continue;
-
-					// Convert to state
-					state = new GenericState(event, (TimeSliceStateManager) timeSliceManager);
-					// Get duration of the state for every time slice it is in
-					final Map<Long, Double> distrib = state
-							.getTimeSlicesDistribution();
-					EventProducer eventEP = event.getEventProducer();
-					
-					if(aggregatedProducers.containsKey(event.getEventProducer()))
-						eventEP = aggregatedProducers.get(event.getEventProducer());
-					
-					matrixUpdate(state, eventEP, distrib);
-					if (currentEP != eventEP) {
-						currentEP = eventEP;
-						// If the event producer is not in the active producers list
-						if (!localActiveEventProducers.contains(eventEP)) {
-							// Add it
-							localActiveEventProducers.add(eventEP);
+						if (timeFiltering) {
+							handleEventTimeTypeFilter(events);
+						} else {
+							handleEventTypeFilter(events);
 						}
 					}
-					if (monitor.isCanceled())
-						return;
+				} else {
+					if (prodFiltering) {
+						if (timeFiltering) {
+							handleEventProdTimeFilter(events);
+						} else {
+							handleEventProdFilter(events);
+						}
+					} else {
+						if (timeFiltering) {
+							handleEventTimeFilter(events);
+						} else {
+							handleEvent(events);
+						}
+					}
 				}
+				
+				if (monitor.isCanceled())
+					return;
 				monitor.worked(events.size());
 			}
 			// Merge local active event producers to the global one
@@ -213,9 +326,9 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Loading Data From Database...");
-		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
+		for (int t = 0; t < getOcelotlParameters().getNumberOfThread(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
-					.getThreadNumber(), t, getOcelotlParameters()
+					.getNumberOfThread(), t, getOcelotlParameters()
 					.getEventsPerThread(), time, eventProducers, parameters
 					.getTraceTypeConfig().getTypes(), typeFiltering,
 					prodFiltering, timeFiltering, monitor));

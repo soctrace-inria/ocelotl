@@ -1,6 +1,7 @@
 package fr.inria.soctrace.tools.ocelotl.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
@@ -13,18 +14,20 @@ public class TestParameters {
 	private long startTimestamp;
 	private long endTimestamp;
 	private int nbTimeSlice;
-	private ArrayList<Integer> timeSlicesCollection;
-	private ArrayList<Integer> timeSlicesNumber;
+	private List<Integer> timeSlicesCollection;
+	private List<Integer> timeSlicesNumber;
 	private int nbEventProd;
 	private String microModelType;
 	private String dataAggOperator;
 	private String visuOperator;
-	private ArrayList<Double> parameters;
+	private List<Double> parameters;
 	private DatacacheStrategy datacacheStrat;
 	private String directory;
 	private int numberOfRepetition;
 	private boolean activateCache;
-
+	private List<String> filteredEventType;
+	private List<String> filteredEventProducer;
+	
 	public TestParameters() {
 		traceName = "";
 		traceID = -1;
@@ -41,6 +44,8 @@ public class TestParameters {
 		setActivateCache(false);
 		timeSlicesCollection =  new ArrayList<Integer>();
 		timeSlicesNumber = new ArrayList<Integer>();
+		filteredEventType = new ArrayList<String>();
+		filteredEventProducer = new ArrayList<String>();
 	}
 
 	/**
@@ -67,7 +72,6 @@ public class TestParameters {
 		} else {
 			dataAggOperator = oParam.getDataAggOperator();
 		}
-
 
 		if (oParam.getVisuOperator() == null) {
 			visuOperator = "null";
@@ -140,7 +144,7 @@ public class TestParameters {
 		this.dataAggOperator = dataAggOperator;
 	}
 
-	public ArrayList<Double> getParameters() {
+	public List<Double> getParameters() {
 		return parameters;
 	}
 
@@ -172,11 +176,11 @@ public class TestParameters {
 		this.numberOfRepetition = numberOfRepetition;
 	}
 
-	public ArrayList<Integer> getTimeSlicesNumber() {
+	public List<Integer> getTimeSlicesNumber() {
 		return timeSlicesNumber;
 	}
 
-	public void setTimeSlicesNumber(ArrayList<Integer> timeSlicesNumber) {
+	public void setTimeSlicesNumber(List<Integer> timeSlicesNumber) {
 		this.timeSlicesNumber = timeSlicesNumber;
 	}
 
@@ -236,11 +240,27 @@ public class TestParameters {
 		this.nbEventProd = nbEventProd;
 	}
 
-	public ArrayList<Integer> getTimeSlicesCollection() {
+	public List<String> getFilteredEventType() {
+		return filteredEventType;
+	}
+
+	public void setFilteredEventType(List<String> filteredEventType) {
+		this.filteredEventType = filteredEventType;
+	}
+
+	public List<String> getFilteredEventProducer() {
+		return filteredEventProducer;
+	}
+
+	public void setFilteredEventProducer(List<String> filteredEventProducer) {
+		this.filteredEventProducer = filteredEventProducer;
+	}
+
+	public List<Integer> getTimeSlicesCollection() {
 		return timeSlicesCollection;
 	}
 
-	public void setTimeSlicesCollection(ArrayList<Integer> timeSlicesCollection) {
+	public void setTimeSlicesCollection(List<Integer> timeSlicesCollection) {
 		this.timeSlicesCollection = timeSlicesCollection;
 	}
 }

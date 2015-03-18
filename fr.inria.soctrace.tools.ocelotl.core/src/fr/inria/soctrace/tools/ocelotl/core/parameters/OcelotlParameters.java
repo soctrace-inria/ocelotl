@@ -77,7 +77,7 @@ public class OcelotlParameters {
 	private Trace trace = null;
 	private int maxEventProducers = OcelotlDefaultParameterConstants.EventProducersPerQuery;
 	private int eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
-	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
+	private int numberOfThread = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
 	private String dataAggOperator;
 	private String visuOperator;
 	private String statOperator;
@@ -136,7 +136,7 @@ public class OcelotlParameters {
 		this.trace = op.trace;
 		this.maxEventProducers = op.maxEventProducers;
 		this.eventsPerThread = op.eventsPerThread;
-		this.threadNumber = op.threadNumber;
+		this.numberOfThread = op.numberOfThread;
 		this.dataAggOperator = op.dataAggOperator;
 		this.visuOperator = op.visuOperator;
 		this.statOperator = op.statOperator;
@@ -170,14 +170,6 @@ public class OcelotlParameters {
 		return parameter;
 	}
 
-	public List<EventType> getTypes() {
-		return eventTypes;
-	}
-
-	public void setTypes(final List<EventType> types) {
-		this.eventTypes = types;
-	}
-	
 	public String getVisuOperator() {
 		return visuOperator;
 	}
@@ -380,12 +372,12 @@ public class OcelotlParameters {
 		this.dataCachePolicy = dataCachePolicy;
 	}
 
-	public int getThreadNumber() {
-		return threadNumber;
+	public int getNumberOfThread() {
+		return numberOfThread;
 	}
 
-	public void setThreadNumber(int threadNumber) {
-		this.threadNumber = threadNumber;
+	public void setNumberOfThread(int threadNumber) {
+		this.numberOfThread = threadNumber;
 	}
 
 	public int getEventsPerThread() {

@@ -83,6 +83,7 @@ import fr.inria.soctrace.framesoc.ui.model.TableTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocPart;
 import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
@@ -104,6 +105,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.TestBench2;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench3;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench4;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench5;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench6;
 import fr.inria.soctrace.tools.ocelotl.ui.TestParameters;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.snapshot.Snapshot;
@@ -134,8 +136,8 @@ public Trace aTestTrace;
 		comboDimension.removeAll();
 		comboVisu.removeAll();
 		
-		//V5
-		ocelotlParameters.getOcelotlSettings().setDataCacheActivated(activeCache);
+		// V6 -- No cache
+		ocelotlParameters.getOcelotlSettings().setDataCacheActivated(false);
 		ocelotlParameters.getOcelotlSettings().setDichoCacheActivated(false);
 		
 		final Job job = new Job("Loading trace from micro description") {
@@ -170,7 +172,7 @@ public Trace aTestTrace;
 					// Load the trace
 					confDataLoader.load(aTestTrace);
 					ocelotlParameters.setEventProducerHierarchy(new SimpleEventProducerHierarchy(confDataLoader.getProducers()));
-
+					
 					monitor.beginTask("Loading cached data...", IProgressMonitor.UNKNOWN);
 
 					Display.getDefault().syncExec(new Runnable() {
@@ -227,6 +229,22 @@ public Trace aTestTrace;
 									return;
 								}
 
+							ocelotlParameters.getUnfilteredEventProducers().clear();
+							ocelotlParameters.getUnfilteredEventProducers().addAll(confDataLoader.getProducers());
+
+							for (EventProducer anEP : confDataLoader.getProducers()) {
+								if (testParams.getFilteredEventProducer().contains(anEP.getName()))
+									ocelotlParameters.getUnfilteredEventProducers().remove(anEP);
+							}
+
+							ocelotlParameters.getTraceTypeConfig().getTypes().clear();
+							ocelotlParameters.getTraceTypeConfig().getTypes().addAll(ocelotlParameters.getAllEventTypes());
+
+							for (EventType anET : ocelotlParameters.getAllEventTypes()) {
+								if (testParams.getFilteredEventType().contains(anET.getName()))
+									ocelotlParameters.getTraceTypeConfig().getTypes().remove(anET);
+							}
+
 							// Set the corresponding parameters
 							spinnerTSNumber.setSelection(ocelotlParameters.getTimeSlicesNumber());
 							textTimestampStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
@@ -248,16 +266,15 @@ public Trace aTestTrace;
 
 							hasChanged = HasChanged.ALL;
 							
-							for(Double aParamValue: testParams.getParameters())
-							{
+							for (Double aParamValue : testParams.getParameters()) {
 								textRun.setText(String.valueOf(aParamValue));
-				
+
 								// And launch the display
 								btnRun.notifyListeners(SWT.Selection, new Event());
-								
+
 								String spaceLess = testParams.toString().replace(" ", "_");
 								spaceLess = spaceLess + "_" + aParamValue;
-								
+
 								/*if (ocelotlParameters.getOcelotlSettings().isCacheActivated()) {
 									snapshot.snapShotDiagramWithName(testParams.getDirectory() + "/" + spaceLess + ".png");
 								} else {
@@ -326,6 +343,8 @@ public Trace aTestTrace;
 						aTest = new TestBench4(loadCachefile, view);
 					} else if (line.equals("v5")) {
 						aTest = new TestBench5(loadCachefile, view);
+					} else if (line.equals("v6")) {
+						aTest = new TestBench6(loadCachefile, view);
 					} else {
 						aTest = new TestBench(loadCachefile, view);
 					}
@@ -597,6 +616,8 @@ public Trace aTestTrace;
 								ocelotlCore.initAggregOperator(monitor);
 								aDm.end("Total Time for Microscopic Rebuilding");
 								monitor.worked(1);
+								endRun();
+								return Status.CANCEL_STATUS;
 							}
 							if (hasChanged == HasChanged.ALL || hasChanged == HasChanged.NORMALIZE) {
 								if (checkMonitor(monitor))
@@ -1169,7 +1190,6 @@ public Trace aTestTrace;
 			final String title = "Loading Trace";
 			btnRun.setEnabled(false);
 			overView.reset();
-			cancelSelection();
 			currentShownTrace = trace;
 			setFocus();
 
@@ -1976,7 +1996,7 @@ public Trace aTestTrace;
 		ocelotlParameters.setVisuOperator(comboVisu.getText());
 		ocelotlParameters.setStatOperator(comboStatistics.getText());
 		ocelotlParameters.setEventsPerThread(ocelotlParameters.getOcelotlSettings().getEventsPerThread());
-		ocelotlParameters.setThreadNumber(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
+		ocelotlParameters.setNumberOfThread(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
 		ocelotlParameters.setAggregatedLeaveEnable(ocelotlParameters.getOcelotlSettings().isAggregateLeaves());
