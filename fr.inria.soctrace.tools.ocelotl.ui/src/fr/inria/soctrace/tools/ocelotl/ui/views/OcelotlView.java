@@ -409,12 +409,15 @@ public class OcelotlView extends FramesocPart {
 								hasChanged = HasChanged.ALL;
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 								if(e.getMessage().equals(OcelotlException.NO_EVENTS)) {
-									// Reset selection
-									btnReset.notifyListeners(SWT.Selection, new Event());
-									// End this run
-									endRun();
-									// Launch another one
-									btnRun.notifyListeners(SWT.Selection, new Event());
+									// If we are not already showing the whole trace
+									if (!getTimeRegion().compareTimeRegion(new TimeRegion(currentShownTrace.getMinTimestamp(), currentShownTrace.getMaxTimestamp()))) {
+										// Reset selection
+										btnReset.notifyListeners(SWT.Selection, new Event());
+										// End this run
+										endRun();
+										// Launch another one
+										btnRun.notifyListeners(SWT.Selection, new Event());
+									}
 								}
 							}
 						});
