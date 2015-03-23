@@ -24,8 +24,10 @@ public class TestBench6 extends TestBench {
 	public final int	TimeAggregatorPos		= 2;
 	public final int	StartTimestampPos		= 3;
 	public final int	EndTimeStampPos			= 4;
-	public final int 	filteredEventTypePos	= 5;
-	public final int	filteredEventProdPos	= 6;
+	public final int	numberOfThreadPos		= 5;
+	public final int	eventPerthreadPos		= 6;
+	public final int	filteredEventTypePos	= 7;
+	public final int	filteredEventProdPos	= 8;
 	
 	public final int	CacheActivatedPos		= 2;
 	public final int	NumberOfTimeSlicePos	= 4;
@@ -73,6 +75,8 @@ public class TestBench6 extends TestBench {
 					params.setDataAggOperator("Temporal Aggregation");
 					params.setStartTimestamp(Long.parseLong(header[StartTimestampPos]));
 					params.setEndTimestamp(Long.parseLong(header[EndTimeStampPos]));
+					params.setNumberOfThreads(Integer.parseInt(header[numberOfThreadPos]));
+					params.setEventPerThread(Integer.parseInt(header[eventPerthreadPos]));
 					String[] fET = header[filteredEventTypePos].split(",");
 					if(fET.length > 1 || (fET.length > 0 && !fET[0].equals(" ")))
 						params.setFilteredEventType(Arrays.asList(fET));
@@ -115,7 +119,7 @@ public class TestBench6 extends TestBench {
 				
 				theView.loadFromParam(aTest, false);
 				
-				statData = statData + getStatData();
+				statData = statData + getStatData(aTest);
 				writeStat();
 			}
 
@@ -137,7 +141,7 @@ public class TestBench6 extends TestBench {
 	/**
 	 * Write the stat data for the current test
 	 */
-	public String getStatData() {
+	public String getStatData(TestParameters aTest) {
 		String stat = "";
 		BufferedReader bufFileReader;
 		String line;
@@ -159,7 +163,9 @@ public class TestBench6 extends TestBench {
 			
 			// TRACE; QUERY_TYPE; NB_THREAD; NB_EVENT_PER_THREAD; TS_START; TS_END; Filtered ET; filtered EP; MICROMODEL_TIME
 			stat = theView.aTestTrace.getAlias() + ";" + theView.getOcelotlParameters().getMicroModelType() + ";" + theView.getOcelotlParameters().getNumberOfThread() + ";" + theView.getOcelotlParameters().getEventsPerThread() + ";"
-					+ theView.getTimeRegion().getTimeStampStart() + ";" + theView.getTimeRegion().getTimeStampEnd() + ";" + microscopicModel + "\n";
+					+ theView.getTimeRegion().getTimeStampStart() + ";" + theView.getTimeRegion().getTimeStampEnd() + ";" 
+					+ aTest.getFilteredEventType().toString() + ";" + aTest.getFilteredEventProducer().toString() + ";"
+					+ microscopicModel + "\n";
 			bufFileReader.close();
 
 			// Delete the output file

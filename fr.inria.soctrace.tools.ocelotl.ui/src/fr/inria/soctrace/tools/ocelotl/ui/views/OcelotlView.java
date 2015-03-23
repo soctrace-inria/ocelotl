@@ -139,6 +139,8 @@ public Trace aTestTrace;
 		// V6 -- No cache
 		ocelotlParameters.getOcelotlSettings().setDataCacheActivated(false);
 		ocelotlParameters.getOcelotlSettings().setDichoCacheActivated(false);
+		ocelotlParameters.setNumberOfThread(testParams.getNumberOfThreads());
+		ocelotlParameters.setEventsPerThread(testParams.getEventPerThread());
 		
 		final Job job = new Job("Loading trace from micro description") {
 
@@ -1995,8 +1997,8 @@ public Trace aTestTrace;
 		ocelotlParameters.setDataAggOperator(comboDimension.getText());
 		ocelotlParameters.setVisuOperator(comboVisu.getText());
 		ocelotlParameters.setStatOperator(comboStatistics.getText());
-		ocelotlParameters.setEventsPerThread(ocelotlParameters.getOcelotlSettings().getEventsPerThread());
-		ocelotlParameters.setNumberOfThread(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
+		//ocelotlParameters.setEventsPerThread(ocelotlParameters.getOcelotlSettings().getEventsPerThread());
+		//ocelotlParameters.setNumberOfThread(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
 		ocelotlParameters.setAggregatedLeaveEnable(ocelotlParameters.getOcelotlSettings().isAggregateLeaves());

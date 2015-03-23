@@ -109,110 +109,188 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			}
 		}
 
-		protected void handleEvent(List<Event> events) {
-			// For each event
-			for (final Event event : events) {
-				if (event.getCategory() != EventCategory.STATE)
-					continue;
+		protected void handleEvent() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
 
-				convertToState(event);
-			}
-		}
-		
-		protected void handleEventProdFilter(List<Event> events) {
-			// For each event
-			for (final Event event : events) {
-				if (event.getCategory() != EventCategory.STATE)
-					continue;
-
-				if (!producers.contains(event.getEventProducer()))
-					continue;
-
-				convertToState(event);
-			}
-		}
-		
-		protected void handleEventProdTimeFilter(List<Event> events) {
-			// For each event
-			for (final Event event : events) {
-				if (event.getCategory() != EventCategory.STATE)
-					continue;
-
-				if (!producers.contains(event.getEventProducer()))
-					continue;
-
-				for (IntervalDesc anInterval : time)
-					if (!((event.getTimestamp() >= anInterval.t1 && event
-							.getTimestamp() <= anInterval.t2) || (event
-							.getTimestamp() < anInterval.t1 && event
-							.getLongPar() > anInterval.t1)))
+				// For each event
+				for (final Event event : events) {
+					if (event.getCategory() != EventCategory.STATE)
 						continue;
 
-				convertToState(event);
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
 			}
 		}
-		
-		protected void handleEventTimeFilter(List<Event> events) {
-			// For each event
-			for (final Event event : events) {
-				if (event.getCategory() != EventCategory.STATE)
-					continue;
 
-				for (IntervalDesc anInterval : time)
-					if (!((event.getTimestamp() >= anInterval.t1 && event
-							.getTimestamp() <= anInterval.t2) || (event
-							.getTimestamp() < anInterval.t1 && event
-							.getLongPar() > anInterval.t1)))
+		protected void handleEventProdFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (event.getCategory() != EventCategory.STATE)
 						continue;
 
-				convertToState(event);
-			}
-		}
-		
-		protected void handleEventTypeFilter(List<Event> events) {
-			// For each event
-			for (final Event event : events) {
-				if (!types.contains(event.getType()))
-					continue;
-
-				convertToState(event);
-			}
-		}
-		
-		protected void handleEventTimeTypeFilter(List<Event> events) {
-			// For each event
-			for (final Event event : events) {
-				if (!types.contains(event.getType()))
-					continue;
-
-				for (IntervalDesc anInterval : time)
-					if (!((event.getTimestamp() >= anInterval.t1 && event
-							.getTimestamp() <= anInterval.t2) || (event
-							.getTimestamp() < anInterval.t1 && event
-							.getLongPar() > anInterval.t1)))
+					if (!producers.contains(event.getEventProducer()))
 						continue;
 
-				convertToState(event);
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
 			}
 		}
-		
-		protected void handleEventTimeTypeProdFilter(List<Event> events) {
-			// For each event
-			for (final Event event : events) {
-				if (!types.contains(event.getType()))
-					continue;
-				
-				if (!producers.contains(event.getEventProducer()))
-					continue;
 
-				for (IntervalDesc anInterval : time)
-					if (!((event.getTimestamp() >= anInterval.t1 && event
-							.getTimestamp() <= anInterval.t2) || (event
-							.getTimestamp() < anInterval.t1 && event
-							.getLongPar() > anInterval.t1)))
+		protected void handleEventProdTimeFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (event.getCategory() != EventCategory.STATE)
 						continue;
 
-				convertToState(event);
+					if (!producers.contains(event.getEventProducer()))
+						continue;
+
+					for (IntervalDesc anInterval : time)
+						if (!((event.getTimestamp() >= anInterval.t1 && event
+								.getTimestamp() <= anInterval.t2) || (event
+								.getTimestamp() < anInterval.t1 && event
+								.getLongPar() > anInterval.t1)))
+							continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventTimeFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (event.getCategory() != EventCategory.STATE)
+						continue;
+
+					for (IntervalDesc anInterval : time)
+						if (!((event.getTimestamp() >= anInterval.t1 && event
+								.getTimestamp() <= anInterval.t2) || (event
+								.getTimestamp() < anInterval.t1 && event
+								.getLongPar() > anInterval.t1)))
+							continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventTypeFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (!types.contains(event.getType()))
+						continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventTimeTypeFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (!types.contains(event.getType()))
+						continue;
+
+					for (IntervalDesc anInterval : time)
+						if (!((event.getTimestamp() >= anInterval.t1 && event
+								.getTimestamp() <= anInterval.t2) || (event
+								.getTimestamp() < anInterval.t1 && event
+								.getLongPar() > anInterval.t1)))
+							continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventTimeTypeProdFilter() {
+
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (!types.contains(event.getType()))
+						continue;
+
+					if (!producers.contains(event.getEventProducer()))
+						continue;
+
+					for (IntervalDesc anInterval : time)
+						if (!((event.getTimestamp() >= anInterval.t1 && event
+								.getTimestamp() <= anInterval.t2) || (event
+								.getTimestamp() < anInterval.t1 && event
+								.getLongPar() > anInterval.t1)))
+							continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
 			}
 		}
 
@@ -242,43 +320,33 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		@Override
 		public void run() {
 			currentEP = null;
-			while (true) {
-				final List<Event> events = getEvents(size, monitor);
-				if (events.size() == 0)
-					break;
-				if (monitor.isCanceled())
-					return;
-
-				if (typeFiltering) {
-					if (prodFiltering) {
-						handleEventTimeTypeProdFilter(events);
-					} else {
-						if (timeFiltering) {
-							handleEventTimeTypeFilter(events);
-						} else {
-							handleEventTypeFilter(events);
-						}
-					}
+		
+			if (typeFiltering) {
+				if (prodFiltering) {
+					handleEventTimeTypeProdFilter();
 				} else {
-					if (prodFiltering) {
-						if (timeFiltering) {
-							handleEventProdTimeFilter(events);
-						} else {
-							handleEventProdFilter(events);
-						}
+					if (timeFiltering) {
+						handleEventTimeTypeFilter();
 					} else {
-						if (timeFiltering) {
-							handleEventTimeFilter(events);
-						} else {
-							handleEvent(events);
-						}
+						handleEventTypeFilter();
 					}
 				}
-				
-				if (monitor.isCanceled())
-					return;
-				monitor.worked(events.size());
+			} else {
+				if (prodFiltering) {
+					if (timeFiltering) {
+						handleEventProdTimeFilter();
+					} else {
+						handleEventProdFilter();
+					}
+				} else {
+					if (timeFiltering) {
+						handleEventTimeFilter();
+					} else {
+						handleEvent();
+					}
+				}
 			}
+		
 			// Merge local active event producers to the global one
 			synchronized (activeProducers) {
 				for (EventProducer ep : localActiveEventProducers) {

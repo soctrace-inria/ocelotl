@@ -5,6 +5,7 @@ import java.util.List;
 
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 
@@ -25,6 +26,8 @@ public class TestParameters {
 	private String directory;
 	private int numberOfRepetition;
 	private boolean activateCache;
+	private int numberOfThreads;
+	private int eventPerThread;
 	private List<String> filteredEventType;
 	private List<String> filteredEventProducer;
 	
@@ -46,6 +49,8 @@ public class TestParameters {
 		timeSlicesNumber = new ArrayList<Integer>();
 		filteredEventType = new ArrayList<String>();
 		filteredEventProducer = new ArrayList<String>();
+		numberOfThreads = OcelotlDefaultParameterConstants.MAX_NUMBER_OF_THREAD;
+		eventPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
 	}
 
 	/**
@@ -174,6 +179,22 @@ public class TestParameters {
 
 	public void setNumberOfRepetition(int numberOfRepetition) {
 		this.numberOfRepetition = numberOfRepetition;
+	}
+
+	public int getNumberOfThreads() {
+		return numberOfThreads;
+	}
+
+	public void setNumberOfThreads(int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
+	}
+
+	public int getEventPerThread() {
+		return eventPerThread;
+	}
+
+	public void setEventPerThread(int eventPerThread) {
+		this.eventPerThread = eventPerThread;
 	}
 
 	public List<Integer> getTimeSlicesNumber() {
