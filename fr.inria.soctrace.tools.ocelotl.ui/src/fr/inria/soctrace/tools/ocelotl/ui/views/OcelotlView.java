@@ -635,7 +635,8 @@ public class OcelotlView extends FramesocPart {
 			setDefaultDescriptionSettings();
 			
 			// Init the overview
-			overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
+			if (!comboVisu.getText().isEmpty())
+				overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
 		}
 	}
 
@@ -809,7 +810,7 @@ public class OcelotlView extends FramesocPart {
 	 * Cancel the current selection
 	 */
 	public void cancelSelection() {
-		if (timeLineView != null) {
+		if (timeLineView != null && getOcelotlParameters().getTimeRegion() != null) {
 			// Reset selected time region to displayed time region
 			setTimeRegion(getOcelotlParameters().getTimeRegion());
 
@@ -1730,7 +1731,7 @@ public class OcelotlView extends FramesocPart {
 		ocelotlParameters.setVisuOperator(comboVisu.getText());
 		ocelotlParameters.setStatOperator(comboStatistics.getText());
 		ocelotlParameters.setEventsPerThread(ocelotlParameters.getOcelotlSettings().getEventsPerThread());
-		ocelotlParameters.setThreadNumber(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
+		ocelotlParameters.setNumberOfThread(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
 		ocelotlParameters.setAggregatedLeaveEnable(ocelotlParameters.getOcelotlSettings().isAggregateLeaves());

@@ -213,9 +213,9 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Loading Data From Database...");
-		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
+		for (int t = 0; t < getOcelotlParameters().getNumberOfThreads(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
-					.getThreadNumber(), t, getOcelotlParameters()
+					.getNumberOfThreads(), t, getOcelotlParameters()
 					.getEventsPerThread(), time, eventProducers, parameters
 					.getTraceTypeConfig().getTypes(), typeFiltering,
 					prodFiltering, timeFiltering, monitor));

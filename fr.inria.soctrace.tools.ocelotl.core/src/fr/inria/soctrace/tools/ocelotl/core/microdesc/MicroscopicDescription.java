@@ -734,30 +734,34 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			try {
 				// Set the number of time slices for the generated cache
 				int savedTimeSliceNumber = parameters.getTimeSlicesNumber();
-
+				int timesliceNumber = parameters.getTimeSlicesNumber();
 				// If the number of generated time slices is divisible by the
 				// current number of time slices
 				if (parameters.getOcelotlSettings().getCacheTimeSliceNumber()
 						% savedTimeSliceNumber == 0) {
+
 					// Use the setting number
-					parameters.setTimeSlicesNumber(parameters
-							.getOcelotlSettings().getCacheTimeSliceNumber());
+					timesliceNumber = parameters.getOcelotlSettings()
+							.getCacheTimeSliceNumber();
 				} else if (parameters.getOcelotlSettings()
 						.getCacheTimeSliceNumber() > savedTimeSliceNumber) {
 					// If it is not divisible but still greater than the current
 					// number of time slices
 					// Then set the number of generated time by subtracting the
 					// remnant from the number given in the settings
-					parameters
-							.setTimeSlicesNumber(parameters
+					timesliceNumber = parameters
 									.getOcelotlSettings()
 									.getCacheTimeSliceNumber()
 									- (parameters.getOcelotlSettings()
-											.getCacheTimeSliceNumber() % savedTimeSliceNumber));
-				} else {
-					// Else simply put the number of current time slices
-					parameters.setTimeSlicesNumber(savedTimeSliceNumber);
-				}
+											.getCacheTimeSliceNumber() % savedTimeSliceNumber);
+				} 
+			/*	if (timesliceNumber > (int) (parameters.getTrace().getMaxTimestamp() - parameters
+						.getTrace().getMinTimestamp()))
+					timesliceNumber = (int) (parameters.getTrace()
+							.getMaxTimestamp() - parameters.getTrace()
+							.getMinTimestamp()) / 10;*/
+
+				parameters.setTimeSlicesNumber(timesliceNumber);
 
 				logger.debug("Generating cache with "
 						+ parameters.getTimeSlicesNumber() + " time slices");

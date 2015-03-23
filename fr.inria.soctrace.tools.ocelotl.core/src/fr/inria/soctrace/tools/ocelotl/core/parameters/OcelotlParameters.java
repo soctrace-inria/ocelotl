@@ -47,8 +47,6 @@ public class OcelotlParameters {
 	// Modify to deactivate JNI
 	private static boolean forceJava = false;
 
-	// List of the event producers in the trace and that are not filtered out
-	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
 	// List of the event producers taken into account for computation
 	private List<EventProducer> currentProducers = new ArrayList<EventProducer>();
 	// List of the event producers selected through a spatial selection 
@@ -77,7 +75,7 @@ public class OcelotlParameters {
 	private Trace trace = null;
 	private int maxEventProducers = OcelotlDefaultParameterConstants.EventProducersPerQuery;
 	private int eventsPerThread = OcelotlDefaultParameterConstants.EVENTS_PER_THREAD;
-	private int threadNumber = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
+	private int numberOfThread = OcelotlDefaultParameterConstants.NUMBER_OF_THREADS;
 	private String dataAggOperator;
 	private String visuOperator;
 	private String statOperator;
@@ -114,7 +112,6 @@ public class OcelotlParameters {
 	
 	public OcelotlParameters(OcelotlParameters op) {
 		super();
-		this.eventProducers = op.eventProducers;
 		this.currentProducers = op.currentProducers;
 		// Make a deep copy
 		this.spatiallySelectedProducers = new ArrayList<EventProducer>(op.spatiallySelectedProducers);
@@ -136,7 +133,7 @@ public class OcelotlParameters {
 		this.trace = op.trace;
 		this.maxEventProducers = op.maxEventProducers;
 		this.eventsPerThread = op.eventsPerThread;
-		this.threadNumber = op.threadNumber;
+		this.numberOfThread = op.numberOfThread;
 		this.dataAggOperator = op.dataAggOperator;
 		this.visuOperator = op.visuOperator;
 		this.statOperator = op.statOperator;
@@ -158,10 +155,6 @@ public class OcelotlParameters {
 		this.sortTableSettings = op.sortTableSettings;
 	}
 	
-	public List<EventProducer> getEventProducers() {
-		return eventProducers;
-	}
-
 	public int getMaxEventProducers() {
 		return maxEventProducers;
 	}
@@ -170,14 +163,6 @@ public class OcelotlParameters {
 		return parameter;
 	}
 
-	public List<EventType> getTypes() {
-		return eventTypes;
-	}
-
-	public void setTypes(final List<EventType> types) {
-		this.eventTypes = types;
-	}
-	
 	public String getVisuOperator() {
 		return visuOperator;
 	}
@@ -212,10 +197,6 @@ public class OcelotlParameters {
 
 	public boolean isNormalize() {
 		return normalize;
-	}
-
-	public void setEventProducers(final List<EventProducer> eventProducers) {
-		this.eventProducers = eventProducers;
 	}
 
 	public void setGrowingQualities(final boolean growingQualities) {
@@ -380,12 +361,12 @@ public class OcelotlParameters {
 		this.dataCachePolicy = dataCachePolicy;
 	}
 
-	public int getThreadNumber() {
-		return threadNumber;
+	public int getNumberOfThreads() {
+		return numberOfThread;
 	}
 
-	public void setThreadNumber(int threadNumber) {
-		this.threadNumber = threadNumber;
+	public void setNumberOfThread(int threadNumber) {
+		this.numberOfThread = threadNumber;
 	}
 
 	public int getEventsPerThread() {

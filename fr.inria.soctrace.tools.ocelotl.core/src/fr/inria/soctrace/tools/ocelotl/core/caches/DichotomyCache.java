@@ -245,6 +245,10 @@ public class DichotomyCache {
 				.getDataAggOperator().equals("null"))))
 			return false;
 		
+		// Check for similar time slices number
+		if (newParam.getNbTimeSlice() != cacheParam.getNbTimeSlice())
+			return false;
+		
 		// Check for similar threshold values
 		if (newParam.getTreshold() != cacheParam.getTreshold())
 			return false;
@@ -256,7 +260,15 @@ public class DichotomyCache {
 		// Check that timestamps are equal
 		if (!checkCompatibleTimeStamp(newParam, cacheParam))
 			return false;
+		
+		// Check that the event producers are the same
+		if(!checkCompatibleEventProducers(newParam, cacheParam))
+			return false;
 
+		// Check that the event types are the same
+		if(!checkCompatibleEventTypes(newParam, cacheParam))
+			return false;
+		
 		return true;
 	}
 
@@ -284,6 +296,52 @@ public class DichotomyCache {
 		}
 
 		return false;
+	}
+	
+	/**
+	 * Check that all the current event producers are the same than in the
+	 * tested cache
+	 * 
+	 * @param newParam
+	 *            parameters of the new view
+	 * @param cachedParam
+	 *            parameters of the cached data
+	 * @return true if they are compatible, false otherwise
+	 */
+	protected boolean checkCompatibleEventProducers(CacheParameters newParam,
+			CacheParameters cachedParam) {
+		if (newParam.getEventProducers().size() != cachedParam
+				.getEventProducers().size())
+			return false;
+
+		for (Integer anID : newParam.getEventProducers())
+			if (!cachedParam.getEventProducers().contains(anID))
+				return false;
+
+		return true;
+	}
+	
+	/**
+	 * Check that all the current event types are the same than in the tested
+	 * cache
+	 * 
+	 * @param newParam
+	 *            parameters of the new view
+	 * @param cachedParam
+	 *            parameters of the cached data
+	 * @return true if they are compatible, false otherwise
+	 */
+	protected boolean checkCompatibleEventTypes(CacheParameters newParam,
+			CacheParameters cachedParam) {
+		if (newParam.getEventTypes().size() != cachedParam
+				.getEventTypes().size())
+			return false;
+
+		for (Integer anID : newParam.getEventTypes())
+			if (!cachedParam.getEventTypes().contains(anID))
+				return false;
+
+		return true;
 	}
 
 	/**
@@ -523,10 +581,32 @@ public class DichotomyCache {
 					params.setNormalized(Boolean.parseBoolean(header[8]));
 				}
 
+				// Parse event prod
+				line = bufFileReader.readLine();
+				if (line != null && !line.isEmpty()) {
+					String[] eventProd = line
+							.split(OcelotlConstants.CSVDelimiter);
+					for (int i = 0; i < eventProd.length; i++)
+						params.getEventProducers().add(
+								Integer.parseInt(eventProd[i]));
+				}
+				
+				// Parse event type
+				line = bufFileReader.readLine();
+				if (line != null && !line.isEmpty()) {
+					String[] eventType = line
+							.split(OcelotlConstants.CSVDelimiter);
+					for (int i = 0; i < eventType.length; i++)
+						params.getEventTypes().add(
+								Integer.parseInt(eventType[i]));
+				}
+				
 				bufFileReader.close();
-
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+			} catch (NumberFormatException e) {
+				logger.error("Could not parse the current cache file: Invalid cache version?");
+				return params;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -646,8 +726,7 @@ public class DichotomyCache {
 	 * @return
 	 * the unique ID
 	 */
-	String buildTraceUniqueID(Trace aTrace)
-	{
+	String buildTraceUniqueID(Trace aTrace) {
 		return aTrace.getDbName() + "_" + aTrace.getId();
 	}
 }

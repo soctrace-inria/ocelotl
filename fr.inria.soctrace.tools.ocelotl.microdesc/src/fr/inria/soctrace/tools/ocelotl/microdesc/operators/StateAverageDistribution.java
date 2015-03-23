@@ -59,9 +59,9 @@ public class StateAverageDistribution extends StateDistribution {
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
 		monitor.subTask("Loading Data From Database...");
-		for (int t = 0; t < getOcelotlParameters().getThreadNumber(); t++)
+		for (int t = 0; t < getOcelotlParameters().getNumberOfThreads(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
-					.getThreadNumber(), t, getOcelotlParameters()
+					.getNumberOfThreads(), t, getOcelotlParameters()
 					.getEventsPerThread(), monitor));
 		for (final Thread thread : threadlist)
 			thread.join();

@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.lpaggreg.quality.DLPQuality;
+import fr.inria.soctrace.lib.model.EventProducer;
+import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
@@ -90,7 +92,11 @@ public abstract class DataAggregationManager {
 			String line;
 			// Get header
 			line = bufFileReader.readLine();
-
+			// Get Event prod
+			line = bufFileReader.readLine();
+			// Get Event types
+			line = bufFileReader.readLine();
+			
 			// Read data
 			while ((line = bufFileReader.readLine()) != null) {
 				String[] values = line.split(OcelotlConstants.CSVDelimiter);
@@ -177,6 +183,30 @@ public abstract class DataAggregationManager {
 			
 			writer.print(header);
 
+			// Add current event prod
+			String currentEP = "";
+			for (EventProducer anEP : ocelotlParameters
+					.getCurrentProducers()) {
+				if (!currentEP.isEmpty())
+					currentEP = currentEP + OcelotlConstants.CSVDelimiter;
+
+				currentEP = currentEP + anEP.getId();
+			}
+			currentEP = currentEP + "\n";
+			writer.print(currentEP);
+
+			// Add current event type
+			String currentET = "";
+			for (EventType anET : ocelotlParameters.getTraceTypeConfig()
+					.getTypes()) {
+				if (!currentET.isEmpty())
+					currentET = currentET + OcelotlConstants.CSVDelimiter;
+
+				currentET = currentET + anET.getId();
+			}
+			currentET = currentET + "\n";
+			writer.print(currentET);
+			
 			// Iterate over matrix and write data
 			writer.print(dichoValueToCSV());
 
@@ -221,20 +251,8 @@ public abstract class DataAggregationManager {
 	 * @return true if nothing is filtered out, false otherwise
 	 */
 	public boolean noFiltering() {
-		if (ocelotlParameters.getCurrentProducers().size() != ocelotlParameters
-				.getEventProducerHierarchy().getEventProducers().size()) {
-			logger.debug("At least one event producer is filtered: dichotomy cache will not be used/generated.");
-			return false;
-		}
-		
 		if (ocelotlParameters.isHasLeaveAggregated()) {
 			logger.debug("Some event producers are aggregated: dichotomy cache will not be used/generated.");
-			return false;
-		}
-
-		if (ocelotlParameters.getTraceTypeConfig().getTypes().size() != ocelotlParameters
-				.getAllEventTypes().size()) {
-			logger.debug("At least one event type is filtered: dichotomy cache will not be used/generated.");
 			return false;
 		}
 

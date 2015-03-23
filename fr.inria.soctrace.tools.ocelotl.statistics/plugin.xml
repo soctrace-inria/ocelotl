@@ -44,7 +44,7 @@
 			param_config=""
 			param_win=""
 			metric_compatibility="STATE"
-			aggregator_compatibility="3D"
+			aggregator_compatibility="3D, 3D_Leaf"
 			selection_priority="2"
 			leave_aggregation_compatiblity="true"
 			view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
