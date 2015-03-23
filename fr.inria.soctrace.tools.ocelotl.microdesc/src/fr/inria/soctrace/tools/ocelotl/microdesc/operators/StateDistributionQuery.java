@@ -54,6 +54,7 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		int threadNumber;
 		int thread;
 		int size;
+		EventProducer currentEP;
 		IProgressMonitor monitor;
 		List<IntervalDesc> time;
 		List<EventProducer> producers;
@@ -108,9 +109,7 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			}
 		}
 
-		@Override
-		public void run() {
-			EventProducer currentEP = null;
+		protected void handleEvent() {
 			while (true) {
 				final List<Event> events = getEvents(size, monitor);
 				if (events.size() == 0)
@@ -118,54 +117,236 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 				if (monitor.isCanceled())
 					return;
 
-				IState state;
 				// For each event
 				for (final Event event : events) {
-					
-					if (prodFiltering)
-						if (!producers.contains(event.getEventProducer()))
-							continue;
+					if (event.getCategory() != EventCategory.STATE)
+						continue;
 
-					if (typeFiltering) {
-						if (!types.contains(event.getType()))
-							continue;
-					} else {
-						if (event.getCategory() != EventCategory.STATE)
-							continue;
-					}
-
-					if (timeFiltering)
-						for (IntervalDesc anInterval : time)
-							if (!((event.getTimestamp() >= anInterval.t1 && event
-									.getTimestamp() <= anInterval.t2) || (event
-									.getTimestamp() < anInterval.t1 && event
-									.getLongPar() > anInterval.t1)))
-								continue;
-
-					// Convert to state
-					state = new GenericState(event, (TimeSliceStateManager) timeSliceManager);
-					// Get duration of the state for every time slice it is in
-					final Map<Long, Double> distrib = state
-							.getTimeSlicesDistribution();
-					EventProducer eventEP = event.getEventProducer();
-					
-					if(aggregatedProducers.containsKey(event.getEventProducer()))
-						eventEP = aggregatedProducers.get(event.getEventProducer());
-					
-					matrixUpdate(state, eventEP, distrib);
-					if (currentEP != eventEP) {
-						currentEP = eventEP;
-						// If the event producer is not in the active producers list
-						if (!localActiveEventProducers.contains(eventEP)) {
-							// Add it
-							localActiveEventProducers.add(eventEP);
-						}
-					}
-					if (monitor.isCanceled())
-						return;
+					convertToState(event);
 				}
+				if (monitor.isCanceled())
+					return;
 				monitor.worked(events.size());
 			}
+		}
+
+		protected void handleEventProdFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (event.getCategory() != EventCategory.STATE)
+						continue;
+
+					if (!producers.contains(event.getEventProducer()))
+						continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventProdTimeFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (event.getCategory() != EventCategory.STATE)
+						continue;
+
+					if (!producers.contains(event.getEventProducer()))
+						continue;
+
+					for (IntervalDesc anInterval : time)
+						if (!((event.getTimestamp() >= anInterval.t1 && event
+								.getTimestamp() <= anInterval.t2) || (event
+								.getTimestamp() < anInterval.t1 && event
+								.getLongPar() > anInterval.t1)))
+							continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventTimeFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (event.getCategory() != EventCategory.STATE)
+						continue;
+
+					for (IntervalDesc anInterval : time)
+						if (!((event.getTimestamp() >= anInterval.t1 && event
+								.getTimestamp() <= anInterval.t2) || (event
+								.getTimestamp() < anInterval.t1 && event
+								.getLongPar() > anInterval.t1)))
+							continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventTypeFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (!types.contains(event.getType()))
+						continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventTimeTypeFilter() {
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (!types.contains(event.getType()))
+						continue;
+
+					for (IntervalDesc anInterval : time)
+						if (!((event.getTimestamp() >= anInterval.t1 && event
+								.getTimestamp() <= anInterval.t2) || (event
+								.getTimestamp() < anInterval.t1 && event
+								.getLongPar() > anInterval.t1)))
+							continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void handleEventTimeTypeProdFilter() {
+
+			while (true) {
+				final List<Event> events = getEvents(size, monitor);
+				if (events.size() == 0)
+					break;
+				if (monitor.isCanceled())
+					return;
+
+				// For each event
+				for (final Event event : events) {
+					if (!types.contains(event.getType()))
+						continue;
+
+					if (!producers.contains(event.getEventProducer()))
+						continue;
+
+					for (IntervalDesc anInterval : time)
+						if (!((event.getTimestamp() >= anInterval.t1 && event
+								.getTimestamp() <= anInterval.t2) || (event
+								.getTimestamp() < anInterval.t1 && event
+								.getLongPar() > anInterval.t1)))
+							continue;
+
+					convertToState(event);
+				}
+				if (monitor.isCanceled())
+					return;
+				monitor.worked(events.size());
+			}
+		}
+
+		protected void convertToState(Event event)
+		{
+			// Convert to state
+			IState state = new GenericState(event, (TimeSliceStateManager) timeSliceManager);
+			// Get duration of the state for every time slice it is in
+			final Map<Long, Double> distrib = state
+					.getTimeSlicesDistribution();
+			EventProducer eventEP = event.getEventProducer();
+			
+			if(aggregatedProducers.containsKey(event.getEventProducer()))
+				eventEP = aggregatedProducers.get(event.getEventProducer());
+			
+			matrixUpdate(state, eventEP, distrib);
+			if (currentEP != eventEP) {
+				currentEP = eventEP;
+				// If the event producer is not in the active producers list
+				if (!localActiveEventProducers.contains(eventEP)) {
+					// Add it
+					localActiveEventProducers.add(eventEP);
+				}
+			}
+		}
+
+		@Override
+		public void run() {
+			currentEP = null;
+		
+			if (typeFiltering) {
+				if (prodFiltering) {
+					handleEventTimeTypeProdFilter();
+				} else {
+					if (timeFiltering) {
+						handleEventTimeTypeFilter();
+					} else {
+						handleEventTypeFilter();
+					}
+				}
+			} else {
+				if (prodFiltering) {
+					if (timeFiltering) {
+						handleEventProdTimeFilter();
+					} else {
+						handleEventProdFilter();
+					}
+				} else {
+					if (timeFiltering) {
+						handleEventTimeFilter();
+					} else {
+						handleEvent();
+					}
+				}
+			}
+		
 			// Merge local active event producers to the global one
 			synchronized (activeProducers) {
 				for (EventProducer ep : localActiveEventProducers) {

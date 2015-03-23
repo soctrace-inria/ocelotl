@@ -310,6 +310,14 @@ public class DichotomyCache {
 	 */
 	protected boolean checkCompatibleEventProducers(CacheParameters newParam,
 			CacheParameters cachedParam) {
+		
+		if(newParam.isLeafAggregation() != cachedParam.isLeafAggregation())
+			return false;
+		
+		if(newParam.isLeafAggregation())
+			if(newParam.getMaxLeaf() != cachedParam.getMaxLeaf())
+				return false;
+		
 		if (newParam.getEventProducers().size() != cachedParam
 				.getEventProducers().size())
 			return false;
@@ -579,6 +587,8 @@ public class DichotomyCache {
 					params.setTreshold(Double.parseDouble(header[7]));
 					// Normalized
 					params.setNormalized(Boolean.parseBoolean(header[8]));
+					// hasLeaveAggregated
+					params.setLeafAggregation(Boolean.parseBoolean(header[9]));
 				}
 
 				// Parse event prod

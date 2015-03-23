@@ -34,6 +34,8 @@ public class CacheParameters {
 	private String visuAggOperator;
 	private double treshold;
 	private boolean normalized;
+	private boolean leafAggregation;
+	private int maxLeaf;
 	private List<Integer> eventProducers;
 	private List<Integer> eventTypes;
 
@@ -66,6 +68,8 @@ public class CacheParameters {
 		normalized = false;
 		eventProducers = new ArrayList<Integer>();
 		eventTypes = new ArrayList<Integer>();
+		leafAggregation = false;
+		maxLeaf = -1;
 	}
 
 	/**
@@ -83,8 +87,13 @@ public class CacheParameters {
 		nbTimeSlice = oParam.getTimeSlicesNumber();
 		treshold = oParam.getThreshold();
 		normalized = oParam.isNormalize();
+		leafAggregation = oParam.isHasLeaveAggregated();
 		eventProducers = new ArrayList<Integer>();
 		eventTypes = new ArrayList<Integer>();
+		if(leafAggregation)
+			maxLeaf = oParam.getMaxNumberOfLeaves();
+		else
+			maxLeaf = -1;
 		
 		for (EventType anET : oParam.getTraceTypeConfig().getTypes())
 			eventTypes.add(anET.getId());
@@ -189,5 +198,21 @@ public class CacheParameters {
 
 	public void setNormalized(boolean normalized) {
 		this.normalized = normalized;
+	}
+
+	public boolean isLeafAggregation() {
+		return leafAggregation;
+	}
+
+	public void setLeafAggregation(boolean leafAggregation) {
+		this.leafAggregation = leafAggregation;
+	}
+
+	public int getMaxLeaf() {
+		return maxLeaf;
+	}
+
+	public void setMaxLeaf(int maxLeaf) {
+		this.maxLeaf = maxLeaf;
 	}
 }

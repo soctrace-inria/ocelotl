@@ -179,7 +179,12 @@ public abstract class DataAggregationManager {
 					+ OcelotlConstants.CSVDelimiter
 					+ ocelotlParameters.getThreshold() 
 					+ OcelotlConstants.CSVDelimiter
-					+ ocelotlParameters.isNormalize() + "\n";
+					+ ocelotlParameters.isNormalize() 
+					+ OcelotlConstants.CSVDelimiter
+					+ ocelotlParameters.isHasLeaveAggregated() 
+					+ OcelotlConstants.CSVDelimiter
+					+ ocelotlParameters.getOcelotlSettings()
+							.getMaxNumberOfLeaves() + "\n";
 			
 			writer.print(header);
 
@@ -251,11 +256,6 @@ public abstract class DataAggregationManager {
 	 * @return true if nothing is filtered out, false otherwise
 	 */
 	public boolean noFiltering() {
-		if (ocelotlParameters.isHasLeaveAggregated()) {
-			logger.debug("Some event producers are aggregated: dichotomy cache will not be used/generated.");
-			return false;
-		}
-
 		return true;
 	}
 	
