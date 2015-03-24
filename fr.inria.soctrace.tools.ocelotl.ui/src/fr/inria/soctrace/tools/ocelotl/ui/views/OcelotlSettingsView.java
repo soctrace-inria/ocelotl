@@ -514,7 +514,7 @@ public class OcelotlSettingsView extends Dialog {
 		
 		Label labelWarningText = new Label (groupVisualAggregate, SWT.NONE);
 		labelWarningText.setFont(cantarell8);
-		labelWarningText.setText("Disabling this option can lead to discripancies in the visualization");
+		labelWarningText.setText("Disabling this option can lead to discrepancies in the visualization");
 			
 		sashFormAdvancedParameters.setWeights(new int[] { 2, 1, 1 });
 				

@@ -61,7 +61,6 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		List<EventType> types;
 		boolean typeFiltering;
 		boolean prodFiltering;
-		boolean timeFiltering;
 		
 		public OcelotlThread() {
 			super();
@@ -71,7 +70,7 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 				final int size, List<IntervalDesc> time,
 				List<EventProducer> producers, List<EventType> types,
 				boolean typeFiltering, boolean prodFiltering,
-				boolean timeFiltering, IProgressMonitor monitor) {
+				IProgressMonitor monitor) {
 			super();
 			this.threadNumber = threadNumber;
 			this.thread = thread;
@@ -82,7 +81,6 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			this.types = types;
 			this.typeFiltering = typeFiltering;
 			this.prodFiltering = prodFiltering;
-			this.timeFiltering = timeFiltering;
 			
 			localActiveEventProducers = new ArrayList<EventProducer>();
 
@@ -154,65 +152,6 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			}
 		}
 
-		protected void handleEventProdTimeFilter() {
-			while (true) {
-				final List<Event> events = getEvents(size, monitor);
-				if (events.size() == 0)
-					break;
-				if (monitor.isCanceled())
-					return;
-
-				// For each event
-				for (final Event event : events) {
-					if (event.getCategory() != EventCategory.STATE)
-						continue;
-
-					if (!producers.contains(event.getEventProducer()))
-						continue;
-
-					for (IntervalDesc anInterval : time)
-						if (!((event.getTimestamp() >= anInterval.t1 && event
-								.getTimestamp() <= anInterval.t2) || (event
-								.getTimestamp() < anInterval.t1 && event
-								.getLongPar() > anInterval.t1)))
-							continue;
-
-					convertToState(event);
-				}
-				if (monitor.isCanceled())
-					return;
-				monitor.worked(events.size());
-			}
-		}
-
-		protected void handleEventTimeFilter() {
-			while (true) {
-				final List<Event> events = getEvents(size, monitor);
-				if (events.size() == 0)
-					break;
-				if (monitor.isCanceled())
-					return;
-
-				// For each event
-				for (final Event event : events) {
-					if (event.getCategory() != EventCategory.STATE)
-						continue;
-
-					for (IntervalDesc anInterval : time)
-						if (!((event.getTimestamp() >= anInterval.t1 && event
-								.getTimestamp() <= anInterval.t2) || (event
-								.getTimestamp() < anInterval.t1 && event
-								.getLongPar() > anInterval.t1)))
-							continue;
-
-					convertToState(event);
-				}
-				if (monitor.isCanceled())
-					return;
-				monitor.worked(events.size());
-			}
-		}
-
 		protected void handleEventTypeFilter() {
 			while (true) {
 				final List<Event> events = getEvents(size, monitor);
@@ -234,35 +173,7 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 			}
 		}
 
-		protected void handleEventTimeTypeFilter() {
-			while (true) {
-				final List<Event> events = getEvents(size, monitor);
-				if (events.size() == 0)
-					break;
-				if (monitor.isCanceled())
-					return;
-
-				// For each event
-				for (final Event event : events) {
-					if (!types.contains(event.getType()))
-						continue;
-
-					for (IntervalDesc anInterval : time)
-						if (!((event.getTimestamp() >= anInterval.t1 && event
-								.getTimestamp() <= anInterval.t2) || (event
-								.getTimestamp() < anInterval.t1 && event
-								.getLongPar() > anInterval.t1)))
-							continue;
-
-					convertToState(event);
-				}
-				if (monitor.isCanceled())
-					return;
-				monitor.worked(events.size());
-			}
-		}
-
-		protected void handleEventTimeTypeProdFilter() {
+		protected void handleEventTypeProdFilter() {
 
 			while (true) {
 				final List<Event> events = getEvents(size, monitor);
@@ -278,13 +189,6 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 
 					if (!producers.contains(event.getEventProducer()))
 						continue;
-
-					for (IntervalDesc anInterval : time)
-						if (!((event.getTimestamp() >= anInterval.t1 && event
-								.getTimestamp() <= anInterval.t2) || (event
-								.getTimestamp() < anInterval.t1 && event
-								.getLongPar() > anInterval.t1)))
-							continue;
 
 					convertToState(event);
 				}
@@ -323,30 +227,18 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		
 			if (typeFiltering) {
 				if (prodFiltering) {
-					handleEventTimeTypeProdFilter();
+					handleEventTypeProdFilter();
 				} else {
-					if (timeFiltering) {
-						handleEventTimeTypeFilter();
-					} else {
-						handleEventTypeFilter();
-					}
+					handleEventTypeFilter();
 				}
 			} else {
 				if (prodFiltering) {
-					if (timeFiltering) {
-						handleEventProdTimeFilter();
-					} else {
-						handleEventProdFilter();
-					}
+					handleEventProdFilter();
 				} else {
-					if (timeFiltering) {
-						handleEventTimeFilter();
-					} else {
-						handleEvent();
-					}
+					handleEvent();
 				}
 			}
-		
+
 			// Merge local active event producers to the global one
 			synchronized (activeProducers) {
 				for (EventProducer ep : localActiveEventProducers) {
@@ -368,7 +260,7 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
 		monitor.subTask("Querying Database...");
-		eventIterator = ocelotlQueries.getEventIterator(monitor);
+		eventIterator = ocelotlQueries.getEventIteratorTime(time, monitor);
 		if (monitor.isCanceled()) {
 			ocelotlQueries.closeIterator();
 			return;
@@ -376,7 +268,6 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 		
 		boolean typeFiltering = false;
 		boolean prodFiltering = false;
-		boolean timeFiltering = false;
 		
 		if (parameters.getTraceTypeConfig().getTypes().size() != parameters
 				.getOperatorEventTypes().size())
@@ -384,11 +275,6 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 
 		if (eventProducers.size() != parameters.getAllEventProducers().size())
 			prodFiltering = true;
-
-		if (time.size() > 1
-				|| parameters.getTrace().getMinTimestamp() != time.get(0).t1
-				|| parameters.getTrace().getMaxTimestamp() != time.get(0).t2)
-			timeFiltering = true;
 
 		setTimeSliceManager(new TimeSliceStateManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
@@ -399,7 +285,7 @@ public class StateDistributionQuery extends Microscopic3DDescription {
 					.getNumberOfThreads(), t, getOcelotlParameters()
 					.getEventsPerThread(), time, eventProducers, parameters
 					.getTraceTypeConfig().getTypes(), typeFiltering,
-					prodFiltering, timeFiltering, monitor));
+					prodFiltering, monitor));
 		for (final Thread thread : threadlist)
 			thread.join();
 
