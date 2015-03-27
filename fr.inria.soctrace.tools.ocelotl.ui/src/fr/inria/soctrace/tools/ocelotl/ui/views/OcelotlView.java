@@ -106,6 +106,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.TestBench3;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench4;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench5;
 import fr.inria.soctrace.tools.ocelotl.ui.TestBench6;
+import fr.inria.soctrace.tools.ocelotl.ui.TestBench7;
 import fr.inria.soctrace.tools.ocelotl.ui.TestParameters;
 import fr.inria.soctrace.tools.ocelotl.ui.loaders.ConfDataLoader;
 import fr.inria.soctrace.tools.ocelotl.ui.snapshot.Snapshot;
@@ -136,7 +137,7 @@ public Trace aTestTrace;
 		comboDimension.removeAll();
 		comboVisu.removeAll();
 		
-		// V6 -- No cache
+		// V6 & V7 -- No cache
 		ocelotlParameters.getOcelotlSettings().setDataCacheActivated(false);
 		ocelotlParameters.getOcelotlSettings().setDichoCacheActivated(false);
 		ocelotlParameters.setNumberOfThread(testParams.getNumberOfThreads());
@@ -234,17 +235,18 @@ public Trace aTestTrace;
 							ocelotlParameters.getUnfilteredEventProducers().clear();
 							ocelotlParameters.getUnfilteredEventProducers().addAll(confDataLoader.getProducers());
 
-							for (EventProducer anEP : confDataLoader.getProducers()) {
-								if (testParams.getFilteredEventProducer().contains(anEP.getName()))
-									ocelotlParameters.getUnfilteredEventProducers().remove(anEP);
+							for (int i = testParams.getNumberOfEventProd(); i > 0; i--) {
+								ocelotlParameters.getUnfilteredEventProducers().remove(i);
 							}
 
 							ocelotlParameters.getTraceTypeConfig().getTypes().clear();
 							ocelotlParameters.getTraceTypeConfig().getTypes().addAll(ocelotlParameters.getAllEventTypes());
 
-							for (EventType anET : ocelotlParameters.getAllEventTypes()) {
-								if (testParams.getFilteredEventType().contains(anET.getName()))
-									ocelotlParameters.getTraceTypeConfig().getTypes().remove(anET);
+							//for (EventType anET : ocelotlParameters.getAllEventTypes()) {
+							//	if (testParams.getFilteredEventType().contains(anET.getName()))
+									
+							for (int i = testParams.getNumberOfEventProd(); i > 0; i--) {
+								ocelotlParameters.getTraceTypeConfig().getTypes().remove(i);
 							}
 
 							// Set the corresponding parameters
@@ -347,6 +349,8 @@ public Trace aTestTrace;
 						aTest = new TestBench5(loadCachefile, view);
 					} else if (line.equals("v6")) {
 						aTest = new TestBench6(loadCachefile, view);
+					} else if (line.equals("v7")) {
+						aTest = new TestBench7(loadCachefile, view);
 					} else {
 						aTest = new TestBench(loadCachefile, view);
 					}

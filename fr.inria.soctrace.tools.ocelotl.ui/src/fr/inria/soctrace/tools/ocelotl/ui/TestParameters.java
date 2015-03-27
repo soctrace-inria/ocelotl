@@ -28,6 +28,8 @@ public class TestParameters {
 	private boolean activateCache;
 	private int numberOfThreads;
 	private int eventPerThread;
+	private int numberOfEventProd;
+	private int numberOfEventType;
 	private List<String> filteredEventType;
 	private List<String> filteredEventProducer;
 	
@@ -283,5 +285,21 @@ public class TestParameters {
 
 	public void setTimeSlicesCollection(List<Integer> timeSlicesCollection) {
 		this.timeSlicesCollection = timeSlicesCollection;
+	}
+
+	public int getNumberOfEventProd() {
+		return numberOfEventProd;
+	}
+
+	public void setNumberOfEventProd(int numberOfEventProd) {
+		this.numberOfEventProd = numberOfEventProd;
+	}
+
+	public int getNumberOfEventType() {
+		return numberOfEventType;
+	}
+
+	public void setNumberOfEventType(int numberOfEventType) {
+		this.numberOfEventType = numberOfEventType;
 	}
 }
