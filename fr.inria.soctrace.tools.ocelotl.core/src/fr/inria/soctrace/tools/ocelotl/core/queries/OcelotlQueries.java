@@ -128,6 +128,25 @@ public class OcelotlQueries {
 		return traceSearch.getEventIterator(ocelotlParameters.getTrace(), null,
 				new ArrayList<IntervalDesc>(), null, monitor);
 	}
+	
+	/**
+	 * Make a query with only condition on time
+	 * 
+	 * @param time
+	 * @return an EventIterator on all events produced by the event producers in
+	 *         eventProducers and in the time range defined in time
+	 * @throws SoCTraceException
+	 * @throws OcelotlException
+	 */
+	public EventIterator getEventIteratorTime(final List<IntervalDesc> time,
+			IProgressMonitor monitor) throws SoCTraceException,
+			OcelotlException {
+		traceSearch = (OcelotlTraceSearch) new OcelotlTraceSearch(
+				ocelotlParameters).initialize();
+
+		return traceSearch.getEventIterator(ocelotlParameters.getTrace(), null,
+				time, null, monitor);
+	}
 
 	/**
 	 * 
