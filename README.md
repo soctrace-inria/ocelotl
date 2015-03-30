@@ -8,7 +8,7 @@ Ocelotl is integrated into [Framesoc](http://soctrace-inria.github.io/framesoc/)
 
 You will find here a video showing Ocelotl functionalities
 
-[![Ocelotl Analysis Tool](http://pixabay.com/static/uploads/photo/2014/10/01/11/56/play-468292_640.png =100x100)](https://www.youtube.com/watch?v=3cbLM0rUu78)
+[![Ocelotl Analysis Tool](http://soctrace-inria.github.io/ocelotl/images/play.png)](https://www.youtube.com/watch?v=3cbLM0rUu78)
 
 ##Get Ocelotl Now!
 
