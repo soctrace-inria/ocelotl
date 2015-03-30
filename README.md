@@ -4,7 +4,7 @@ Ocelotl is an innovative visualization tool, which provides overviews for execut
 
 Ocelotl is integrated into [Framesoc](http://soctrace-inria.github.io/framesoc/), a generic trace management and analysis infrastructure. You can take advantage of the tool bunch provided by Framesoc, and switch from an Ocelotl's overview to more detailed representations once you know where to focus.
 
-< iframe title="YouTube video player" width="480" height="390" src="https://www.youtube.com/watch?v=3cbLM0rUu78?autoplay=1" frameborder="0" allowfullscreen>< /iframe>
+<iframe title="YouTube video player" width="480" height="390" src="https://www.youtube.com/watch?v=3cbLM0rUu78?autoplay=1" frameborder="0" allowfullscreen></iframe>
 
 ##Get Ocelotl Now!
 
