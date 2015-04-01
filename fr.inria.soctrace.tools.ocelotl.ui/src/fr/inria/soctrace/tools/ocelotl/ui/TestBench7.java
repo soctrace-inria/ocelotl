@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import fr.inria.soctrace.lib.model.Trace;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.DatacacheStrategy;
@@ -47,11 +48,12 @@ public class TestBench7 extends TestBench {
 	public void parseFile() {
 
 		LinkedList<String> microModels = new LinkedList<String>();
-		microModels.add("State");
-		microModels.add("State Query");
-		microModels.add("State Hybrid");
+		microModels.add("States");
+		microModels.add("States Query");
+		microModels.add("States Hybrid");
 
 		LinkedList<Integer> nbThreadParam = new LinkedList<Integer>();
+		nbThreadParam.add(2);
 		nbThreadParam.add(4);
 		nbThreadParam.add(8);
 		nbThreadParam.add(16);
@@ -59,11 +61,14 @@ public class TestBench7 extends TestBench {
 		LinkedList<Integer> nbEventPerThreadParam = new LinkedList<Integer>();
 		nbEventPerThreadParam.add(100);
 		nbEventPerThreadParam.add(1000);
+		nbEventPerThreadParam.add(5000);
 		nbEventPerThreadParam.add(10000);
+		nbEventPerThreadParam.add(15000);
+		nbEventPerThreadParam.add(20000);
+		nbEventPerThreadParam.add(50000);
 		nbEventPerThreadParam.add(100000);
 
 		LinkedList<Double> duration = new LinkedList<Double>();
-		duration.add(1.0);
 		duration.add(0.1);
 		duration.add(0.25);
 		duration.add(0.5);
@@ -79,44 +84,53 @@ public class TestBench7 extends TestBench {
 		nbProd.add(1000);
 
 		LinkedList<Integer> nbET = new LinkedList<Integer>();
-		nbProd.add(10);
-		nbProd.add(1);
-		nbProd.add(3);
-		nbProd.add(5);
-		nbProd.add(7);
-		nbProd.add(9);
+		nbET.add(10);
+		nbET.add(1);
+		nbET.add(3);
+		nbET.add(5);
+		nbET.add(7);
+		nbET.add(9);
+		List<List<Long>> timeStamps; 
 
 		for (Trace aTrace : theView.getConfDataLoader().getTraces()) {
+			
+			// Make random timestamps similar for the same trace 
+			timeStamps = getRandomTimeDuration(aTrace, duration);
+			
 			for (String aMicroModel : microModels) {
-				for (Integer nbThread : nbThreadParam) {
-					for (Integer nbEventThread : nbEventPerThreadParam) {
-						for (Double aDuration : duration) {
-							for (Integer aNbProd : nbProd) {
-								for (Integer aNbET : nbET) {
-									TestParameters params = new TestParameters();
+				//for (Integer nbThread : nbThreadParam) {
+					//for (Integer nbEventThread : nbEventPerThreadParam) {
 
-									// Name
-									params.setTraceName(aTrace.getAlias());
-									// Database unique ID
-									params.setTraceID(aTrace.getId());
-									// Cache activation
-									params.setActivateCache(false);
-									// Time Aggregation Operator
-									params.setMicroModelType(aMicroModel);
-									// Data Aggregation Operator
-									params.setDataAggOperator("Temporal Aggregation");
-									params.setStartTimestamp(aTrace.getMinTimestamp());
-									params.setEndTimestamp((long) (aTrace.getMaxTimestamp() * aDuration));
-									params.setNumberOfThreads(nbThread);
-									params.setEventPerThread(nbEventThread);
+				for (List<Long> aDuration : timeStamps) {
+					for (Integer aNbProd : nbProd) {
+						for (Integer aNbET : nbET) {
 
-									params.setNumberOfEventProd(aNbProd);
-									params.setNumberOfEventType(aNbET);
+							TestParameters params = new TestParameters();
+							
+							// Name
+							params.setTraceName(aTrace.getAlias());
+							// Database unique ID
+							params.setTraceID(aTrace.getId());
+							// Cache activation
+							params.setActivateCache(false);
+							// Time Aggregation Operator
+							params.setMicroModelType(aMicroModel);
+							// Data Aggregation Operator
+							params.setDataAggOperator("Temporal Aggregation");
+							params.setStartTimestamp(aDuration.get(0));
+							params.setEndTimestamp(aDuration.get(1));
+							// params.setEndTimestamp((long)
+							// (aTrace.getMaxTimestamp() * aDuration));
+							params.setNumberOfThreads(8);
+							params.setEventPerThread(20000);
 
-									testParams.add(params);
-								}
-							}
+							params.setNumberOfEventProd(aNbProd);
+							params.setNumberOfEventType(aNbET);
+
+							testParams.add(params);
 						}
+						// }
+						// }
 					}
 				}
 			}
@@ -186,8 +200,8 @@ public class TestBench7 extends TestBench {
 				}
 			}
 			
-			// TRACE; NB_EVENTS; QUERY_TYPE; NB_THREAD; NB_EVENT_PER_THREAD; TS_START; TS_END; Filtered ET; filtered EP; MICROMODEL_TIME
-			stat = theView.aTestTrace.getAlias() + ";" + theView.getCurrentShownTrace().getNumberOfEvents() + ";" + theView.getOcelotlParameters().getMicroModelType() + ";" + theView.getOcelotlParameters().getNumberOfThread() + ";" + theView.getOcelotlParameters().getEventsPerThread() + ";"
+			// TRACE; NB_EVENTS; QUERY_TYPE; NB_THREAD; NB_EVENT_PER_THREAD; TS_START; TS_END; Unfiltered ET; Unfiltered EP; MICROMODEL_TIME
+			stat = theView.aTestTrace.getAlias() + ";" + theView.aTestTrace.getNumberOfEvents() + ";" + theView.getOcelotlParameters().getMicroModelType() + ";" + theView.getOcelotlParameters().getNumberOfThread() + ";" + theView.getOcelotlParameters().getEventsPerThread() + ";"
 					+ theView.getTimeRegion().getTimeStampStart() + ";" + theView.getTimeRegion().getTimeStampEnd() + ";" 
 					+ aTest.getNumberOfEventType() + ";" + aTest.getNumberOfEventProd() + ";"
 					//+ aTest.getFilteredEventType().toString() + ";" + aTest.getFilteredEventProducer().toString() + ";"
@@ -208,5 +222,46 @@ public class TestBench7 extends TestBench {
 		}
 
 		return stat;
+	}
+	
+	List<List<Long>> getRandomTimeDuration(Trace aTrace, LinkedList<Double> durations) {
+		LinkedList<List<Long>> timestamps = new LinkedList<List<Long>>();
+
+		// Add the whole trace
+		LinkedList<Long> traceDuration = new LinkedList<Long>();
+		traceDuration.add(aTrace.getMinTimestamp());
+		traceDuration.add(aTrace.getMaxTimestamp());
+		timestamps.add(traceDuration);
+
+		long totalTraceDuration = aTrace.getMaxTimestamp() - aTrace.getMinTimestamp();
+		long halfDuration = totalTraceDuration / 2l;
+		
+		// Add the half the trace starting at minTS
+		LinkedList<Long> traceDurationStartMin = new LinkedList<Long>();
+		traceDurationStartMin.add(aTrace.getMinTimestamp());
+		traceDurationStartMin.add(aTrace.getMinTimestamp() + halfDuration);
+		timestamps.add(traceDurationStartMin);
+		
+		// Add the half the trace ending at maxTS
+		LinkedList<Long> traceDurationStartMax = new LinkedList<Long>();
+		traceDurationStartMax.add(aTrace.getMaxTimestamp() - halfDuration);
+		traceDurationStartMax.add(aTrace.getMaxTimestamp());
+		timestamps.add(traceDurationStartMax);
+		
+		for (Double aDuration : durations) {
+			// Compute the duration of the trace that will be loaded
+			long newDuration = (long) (totalTraceDuration * aDuration);
+
+			// Compute the new starttime
+			long startTime = aTrace.getMinTimestamp() + (long) (Math.random() * (totalTraceDuration - newDuration));
+
+			// Add it to the combination of tested times 
+			LinkedList<Long> aTraceDuration = new LinkedList<Long>();
+			aTraceDuration.add(startTime);
+			aTraceDuration.add(startTime + newDuration);
+			timestamps.add(aTraceDuration);
+		}
+
+		return timestamps;
 	}
 }

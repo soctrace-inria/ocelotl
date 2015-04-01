@@ -235,7 +235,7 @@ public Trace aTestTrace;
 							ocelotlParameters.getUnfilteredEventProducers().clear();
 							ocelotlParameters.getUnfilteredEventProducers().addAll(confDataLoader.getProducers());
 
-							for (int i = testParams.getNumberOfEventProd(); i > 0; i--) {
+							for (int i = ocelotlParameters.getUnfilteredEventProducers().size() - 1; i > testParams.getNumberOfEventProd() - 1; i--) {
 								ocelotlParameters.getUnfilteredEventProducers().remove(i);
 							}
 
@@ -245,7 +245,7 @@ public Trace aTestTrace;
 							//for (EventType anET : ocelotlParameters.getAllEventTypes()) {
 							//	if (testParams.getFilteredEventType().contains(anET.getName()))
 									
-							for (int i = testParams.getNumberOfEventProd(); i > 0; i--) {
+							for (int i = ocelotlParameters.getTraceTypeConfig().getTypes().size() - 1; i > testParams.getNumberOfEventType() - 1; i--) {
 								ocelotlParameters.getTraceTypeConfig().getTypes().remove(i);
 							}
 
@@ -621,6 +621,7 @@ public Trace aTestTrace;
 								aDm.start();
 								ocelotlCore.initAggregOperator(monitor);
 								aDm.end("Total Time for Microscopic Rebuilding");
+								System.out.println("Toto");
 								monitor.worked(1);
 								endRun();
 								return Status.CANCEL_STATUS;
