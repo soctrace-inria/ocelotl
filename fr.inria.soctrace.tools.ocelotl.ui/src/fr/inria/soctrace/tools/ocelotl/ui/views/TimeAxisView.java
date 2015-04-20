@@ -136,6 +136,8 @@ public class TimeAxisView {
 			timeFormatter = new TimestampFormat(TimeUnit.getTimeUnit(ocelotlView.getCurrentShownTrace().getTimeUnit()));
 		else
 			timeFormatter = new TimestampFormat();
+		
+		timeFormatter.setContext(time.getTimeStampStart(), time.getTimeStampEnd(),false);
 
 		// Set the number of grads and their properties
 		grads();
