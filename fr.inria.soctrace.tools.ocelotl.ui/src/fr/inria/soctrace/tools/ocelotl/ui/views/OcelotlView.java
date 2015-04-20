@@ -1169,7 +1169,7 @@ public class OcelotlView extends FramesocPart {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		timeAxisView = new TimeAxisView();
+		timeAxisView = new TimeAxisView(this);
 		qualityView = new QualityView(this);
 		timeLineViewWrapper = new TimeLineViewWrapper(this);
 		statViewWrapper = new StatViewWrapper(this);

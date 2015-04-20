@@ -19,10 +19,6 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Label;
@@ -40,6 +36,9 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.lib.model.utils.ModelConstants.TimeUnit;
+import fr.inria.soctrace.lib.model.utils.TimestampFormat;
+import fr.inria.soctrace.lib.model.utils.TimestampFormat.TickDescriptor;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
 import fr.inria.soctrace.tools.ocelotl.ui.views.timelineview.AggregatedView;
 
@@ -80,6 +79,7 @@ public class TimeAxisView {
 	Canvas				canvas;
 	TimeRegion			time;
 	TimeRegion			selectTime;
+	OcelotlView			ocelotlView;
 	final static int	Height				= 100;
 	final static int	Border				= 10;
 	final static int	TimeAxisWidth		= 1;
@@ -96,10 +96,12 @@ public class TimeAxisView {
 	final static int	TextPositionOffset	= 2;
 	int					Space				= 6;
 	SelectFigure		selectFigure;
-
-	public TimeAxisView() {
+	TimestampFormat		timeFormatter;
+	
+	public TimeAxisView(OcelotlView theView) {
 		super();
 		selectFigure = new SelectFigure();
+		ocelotlView = theView;
 	}
 
 	public void createDiagram(final TimeRegion time) {
@@ -130,11 +132,16 @@ public class TimeAxisView {
 	}
 
 	public void drawGrads() {
+		if (ocelotlView != null && ocelotlView.getCurrentShownTrace() != null)
+			timeFormatter = new TimestampFormat(TimeUnit.getTimeUnit(ocelotlView.getCurrentShownTrace().getTimeUnit()));
+		else
+			timeFormatter = new TimestampFormat();
+
+		// Set the number of grads and their properties
 		grads();
-		NumberFormat formatter = null;
-		formatter = NumberFormat.getInstance(Locale.US);
-		formatter = new DecimalFormat("0.00E0");
-		formatter.setMaximumIntegerDigits(3);
+
+		timeFormatter.setMaximumIntegerDigits(3);
+
 		final int linePosition = root.getSize().height() - TextHeight / 2 - TextPositionOffset - Border;
 		for (int i = 0; i < (int) GradNumber + 1; i++) {
 			final RectangleFigure rectangle = new RectangleFigure();
@@ -144,7 +151,7 @@ public class TimeAxisView {
 			rectangle.setLineWidth(1);
 
 			final long value = (long) (i * GradDuration + time.getTimeStampStart());
-			final String text = formatter.format(value);
+			final String text = timeFormatter.format(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
 			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
@@ -180,17 +187,11 @@ public class TimeAxisView {
 	}
 
 	public void grads() {
-		final long duration = time.getTimeDuration();
-		long temp = duration;
-		int i;
-		for (i = 1; temp > 10; i++)
-			temp /= 10;
-		final long factor = temp < 6 ? Divide : temp;
-		for (int j = 1; j < i; j++)
-			temp *= 10;
-		GradDuration = (double) temp / (double) factor;
-		GradNumber = duration / GradDuration;
+		TickDescriptor ticks = timeFormatter.getTickDescriptor(time.getTimeStampStart(), time.getTimeStampEnd(), 10);
+		GradDuration = ticks.delta;
+		GradNumber = time.getTimeDuration() / GradDuration;
 		GradWidth = (root.getSize().width - 2 * Border - 1) / GradNumber;
+
 		while (GradWidth < GradWidthMin && GradNumber > 6) {
 			GradNumber /= 2;
 			GradWidth *= 2;
@@ -255,6 +256,14 @@ public class TimeAxisView {
 		root.removeAll();
 		root.repaint();
 		time = null;
+	}
+
+	public OcelotlView getOcelotlView() {
+		return ocelotlView;
+	}
+
+	public void setOcelotlView(OcelotlView ocelotlView) {
+		this.ocelotlView = ocelotlView;
 	}
 
 }
