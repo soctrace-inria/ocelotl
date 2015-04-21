@@ -137,7 +137,7 @@ public class TimeAxisView {
 		else
 			timeFormatter = new TimestampFormat();
 		
-		timeFormatter.setContext(time.getTimeStampStart(), time.getTimeStampEnd(),false);
+		timeFormatter.setContext(time.getTimeStampStart(), time.getTimeStampEnd());
 
 		// Set the number of grads and their properties
 		grads();
