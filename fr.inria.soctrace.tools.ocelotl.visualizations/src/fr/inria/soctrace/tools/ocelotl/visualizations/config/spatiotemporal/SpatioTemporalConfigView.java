@@ -135,8 +135,8 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 		super(parentShell);
 		this.images = new HashMap<String, Image>();
 		this.entities = new TreeMap<Integer, Entity>();
-		this.entities.put(0, new Entity(ET_NAME, ModelEntity.EVENT_TYPE));
-		this.entities.put(1, new Entity(EP_NAME, ModelEntity.EVENT_PRODUCER));
+		this.entities.put(0, new Entity(EP_NAME, ModelEntity.EVENT_PRODUCER));
+		this.entities.put(1, new Entity(ET_NAME, ModelEntity.EVENT_TYPE));
 	}
 
 	@Override

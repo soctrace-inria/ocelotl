@@ -722,12 +722,13 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 				.getTimeRegion().getTimeStampStart())
 			return false;
 
-		// If there is some leaves aggregated, do not generate a cache
-		if (parameters.isHasLeaveAggregated())
-			return false;
-		
 		if (parameters.getTrace().getMaxTimestamp() != parameters
 				.getTimeRegion().getTimeStampEnd())
+			return false;
+		
+		// Check that no event type or event producer was filtered out which
+		// would result in an incomplete datacache
+		if (!noFiltering())
 			return false;
 
 		if (parameters.getOcelotlSettings().isDataCacheActivated()) {

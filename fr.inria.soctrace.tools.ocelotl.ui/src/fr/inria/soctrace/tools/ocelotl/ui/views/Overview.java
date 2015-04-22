@@ -89,7 +89,7 @@ public class Overview implements IFramesocBusListener {
 	/**
 	 * Followed topics
 	 */
-	protected FramesocBusTopicList		topics			= null;
+	protected FramesocBusTopicList		topics				= null;
 
 	public Overview(OcelotlView aView) {
 		super();

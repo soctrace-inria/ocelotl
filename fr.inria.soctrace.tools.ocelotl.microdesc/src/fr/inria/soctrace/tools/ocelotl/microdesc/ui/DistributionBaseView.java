@@ -42,12 +42,16 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
@@ -88,7 +92,7 @@ public abstract class DistributionBaseView extends Dialog implements
 			updateSelectedEventProducer();
 		}
 	}
-
+	
 	private class AddEventProducerAdapter extends SelectionAdapter {
 
 		// all - input
@@ -156,6 +160,28 @@ public abstract class DistributionBaseView extends Dialog implements
             updateSelectedEventProducer();
         }
     }
+	
+	
+	public class HierarchySelection extends SelectionAdapter {
+
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			Object[] viewerElements = new FilterTreeContentProvider()
+			.getElements(params.getEventProducerHierarchy().getRoot());
+			
+			// Get selection level
+			int selectionLevel = Integer.valueOf(hierarchyLevelSelection.getText());
+			
+			// Uncheck all
+			treeViewerEventProducer.setCheckedElements(new Object[0]);
+			
+			// Check only those above selected level
+			checkAllElementsBelow(selectionLevel, viewerElements[0], 1);
+			
+			updateSelectedEventProducer();
+		}
+	}
+
 	
 	private class UncheckEventProducerAdapter extends SelectionAdapter {
 		@Override
@@ -327,22 +353,15 @@ public abstract class DistributionBaseView extends Dialog implements
 	}
 
 	protected OcelotlView ocelotlView;
-
 	protected ListViewer listViewerIdleStates;
-
 	protected ListViewer listViewerEventTypes;
-
 	protected DistributionConfig config;
-
 	protected OcelotlParameters params;
-
 	private java.util.List<EventType> oldEventTypes;
-	
 	protected CheckboxTreeViewer treeViewerEventProducer;
-
 	private java.util.List<EventProducer> producers = new LinkedList<EventProducer>();
-
 	private java.util.List<EventProducer> oldProducer;
+	private Combo hierarchyLevelSelection;
 
 	public DistributionBaseView(final Shell parent) {
 		super(parent);
@@ -355,13 +374,16 @@ public abstract class DistributionBaseView extends Dialog implements
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite all = (Composite) super.createDialogArea(parent);
-			
+		
 		final SashForm sashFormGlobal = new SashForm(all, SWT.VERTICAL);
 		sashFormGlobal.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 				true, 1, 1));
 		sashFormGlobal.setBackground(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 
+		Font cantarell11 = new Font(sashFormGlobal.getDisplay(), new FontData("Cantarell", 11, SWT.NORMAL));
+
+		
 		TabFolder tabFolder = new TabFolder(sashFormGlobal, SWT.NONE);
 
 		TabItem tbtmNewItem = new TabItem(tabFolder, SWT.NONE);
@@ -369,8 +391,7 @@ public abstract class DistributionBaseView extends Dialog implements
 
 		final Group groupEventTypes = new Group(tabFolder, SWT.NONE);
 		tbtmNewItem.setControl(groupEventTypes);
-		groupEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
+		groupEventTypes.setFont(cantarell11);
 		groupEventTypes.setText("Set Event Types");
 		final GridLayout gl_groupEventTypes = new GridLayout(2, false);
 		gl_groupEventTypes.horizontalSpacing = 0;
@@ -382,8 +403,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		listViewerEventTypes.setLabelProvider(new EventTypeLabelProvider());
 		listViewerEventTypes.setComparator(new ViewerComparator());
 		final List listEventTypes = listViewerEventTypes.getList();
-		listEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
+		listEventTypes.setFont(cantarell11);
 		listEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 				true, 1, 1));
 
@@ -401,8 +421,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		final Button btnAddEventTypes = new Button(compositeEventTypeButtons,
 				SWT.NONE);
 		btnAddEventTypes.setText("Add");
-		btnAddEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
+		btnAddEventTypes.setFont(cantarell11);
 		btnAddEventTypes.setImage(null);
 		btnAddEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
 				false, 1, 1));
@@ -411,8 +430,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		final Button btnRemoveEventTypes = new Button(
 				compositeEventTypeButtons, SWT.NONE);
 		btnRemoveEventTypes.setText("Remove");
-		btnRemoveEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
+		btnRemoveEventTypes.setFont(cantarell11);
 		btnRemoveEventTypes.setImage(null);
 		btnRemoveEventTypes.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
 				true, false, 1, 1));
@@ -428,8 +446,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnResetEventTypes.setText("Reset");
 		btnResetEventTypes.addSelectionListener(new ResetSelectionAdapter(
 				listViewerEventTypes));
-		btnResetEventTypes.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
+		btnResetEventTypes.setFont(cantarell11);
 		btnResetEventTypes.setImage(null);
 
 		
@@ -439,8 +456,7 @@ public abstract class DistributionBaseView extends Dialog implements
 
 		final Group groupEventProducers = new Group(tabFolder, SWT.NONE);
 		tbtmNewItem_2.setControl(groupEventProducers);
-		groupEventProducers.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
+		groupEventProducers.setFont(cantarell11);
 		groupEventProducers.setText("Event Producers");
 		groupEventProducers.setLayout(new GridLayout());
 
@@ -490,8 +506,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnCheckEventProducer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
 				true, false, 1, 1));
 		btnCheckEventProducer.setText("Check");
-		btnCheckEventProducer.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
+		btnCheckEventProducer.setFont(cantarell11);
 		btnCheckEventProducer.setImage(null);
 		btnCheckEventProducer.addSelectionListener(new AddProducerNodeAdapter());
 				
@@ -500,8 +515,7 @@ public abstract class DistributionBaseView extends Dialog implements
 				SWT.CENTER, false, false, 1, 1));
 		btnCheckAllEventProducer.setText("Check All");
 		btnCheckAllEventProducer.setImage(null);
-		btnCheckAllEventProducer.setFont(SWTResourceManager.getFont(
-				"Cantarell", 11, SWT.NORMAL));
+		btnCheckAllEventProducer.setFont(cantarell11);
 		btnCheckAllEventProducer
 				.addSelectionListener(new CheckAllEventProducersAdapter());
 
@@ -510,8 +524,7 @@ public abstract class DistributionBaseView extends Dialog implements
 				false, 1, 1));
 		btnAddResult.setText("Add Result");
 		btnAddResult.setImage(null);
-		btnAddResult.setFont(SWTResourceManager.getFont("Cantarell", 11,
-				SWT.NORMAL));
+		btnAddResult.setFont(cantarell11);
 		btnAddResult
 				.addSelectionListener(new AddResultsEventProducersAdapter());
 		
@@ -520,8 +533,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnUncheckEventProducer.setLayoutData(new GridData(SWT.FILL,
 				SWT.CENTER, true, false, 1, 1));
 		btnUncheckEventProducer.setText("Uncheck");
-		btnUncheckEventProducer.setFont(SWTResourceManager.getFont("Cantarell",
-				11, SWT.NORMAL));
+		btnUncheckEventProducer.setFont(cantarell11);
 		btnUncheckEventProducer.setImage(null);
 		btnUncheckEventProducer.setImage(null);
 		btnUncheckEventProducer
@@ -532,8 +544,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnUncheckAllEventProducer.setLayoutData(new GridData(SWT.FILL,
 				SWT.CENTER, true, false, 1, 1));
 		btnUncheckAllEventProducer.setText("Uncheck All");
-		btnUncheckAllEventProducer.setFont(SWTResourceManager.getFont(
-				"Cantarell", 11, SWT.NORMAL));
+		btnUncheckAllEventProducer.setFont(cantarell11);
 		btnUncheckAllEventProducer.setImage(null);
 		btnUncheckAllEventProducer.addSelectionListener(new UnCheckAllEventProducersAdapter());
 		
@@ -542,8 +553,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnCheckSubtreeEventProducer.setLayoutData(new GridData(SWT.FILL,
 				SWT.CENTER, true, false, 1, 1));
 		btnCheckSubtreeEventProducer.setText("Check Subtree");
-		btnCheckSubtreeEventProducer.setFont(SWTResourceManager.getFont(
-				"Cantarell", 11, SWT.NORMAL));
+		btnCheckSubtreeEventProducer.setFont(cantarell11);
 		btnCheckSubtreeEventProducer.setImage(null);
 		btnCheckSubtreeEventProducer.addSelectionListener(new CheckSubtreeEventProducersAdapter());
 		
@@ -552,8 +562,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnUncheckSubtreeEventProducer.setLayoutData(new GridData(SWT.FILL,
 				SWT.CENTER, true, false, 1, 1));
 		btnUncheckSubtreeEventProducer.setText("Uncheck Subtree");
-		btnUncheckSubtreeEventProducer.setFont(SWTResourceManager.getFont(
-				"Cantarell", 11, SWT.NORMAL));
+		btnUncheckSubtreeEventProducer.setFont(cantarell11);
 		btnUncheckSubtreeEventProducer.setImage(null);
 		btnUncheckSubtreeEventProducer.addSelectionListener(new UncheckSubtreeEventProducersAdapter());
 		
@@ -562,11 +571,25 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnAddEventProducer.setLayoutData(new GridData(SWT.FILL,
 				SWT.CENTER, true, false, 1, 1));
 		btnAddEventProducer.setText("Add");
-		btnAddEventProducer.setFont(SWTResourceManager.getFont(
-				"Cantarell", 11, SWT.NORMAL));
+		btnAddEventProducer.setFont(cantarell11);
 		btnAddEventProducer.setImage(null);
 		btnAddEventProducer.addSelectionListener(new AddEventProducerAdapter());
-				
+		
+		hierarchyLevelSelection = new Combo(buttonComposite, SWT.READ_ONLY);
+		hierarchyLevelSelection.setFont(cantarell11);
+		hierarchyLevelSelection.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, true, false, 1, 1));
+		hierarchyLevelSelection.setToolTipText("Hierarchy Level Selection (Root = 1; Leaves = max).");
+		
+		Button btnCheckHierarchy = new Button(buttonComposite,
+				SWT.NONE);
+		btnCheckHierarchy.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, true, false, 1, 1));
+		btnCheckHierarchy.setText("Check Hierarchy Level");
+		btnCheckHierarchy.setToolTipText("Check All the Producers of the Specified Hierarchy Level and Above.");
+		btnCheckHierarchy.setFont(cantarell11);
+		btnCheckHierarchy.addSelectionListener(new HierarchySelection());
+		
 		layout.numColumns = 4;
         buttonComposite.setLayout(layout);
 
@@ -591,6 +614,14 @@ public abstract class DistributionBaseView extends Dialog implements
 
 		treeViewerEventProducer.setInput(params.getEventProducerHierarchy()
 				.getRoot());
+		for (int i = 1; i <= params.getEventProducerHierarchy()
+				.getMaxHierarchyLevel() + 1; i++) {
+			hierarchyLevelSelection.add(String.valueOf(i));
+		}
+		
+		hierarchyLevelSelection.setText(String.valueOf(params
+				.getEventProducerHierarchy().getMaxHierarchyLevel() + 1));
+
 		setParameters();
 		listViewerEventTypes.setInput(config.getTypes());
 		updateTreeStatus();
@@ -702,6 +733,30 @@ public abstract class DistributionBaseView extends Dialog implements
 	}
 
 	/**
+	 * Recursively check all the elements down to the specified hierarchy level
+	 * 
+	 * @param aSelectionLevel
+	 *            the specified hierarchy level
+	 * @param element
+	 *            the elemnts being selected
+	 * @param currentLevel
+	 *            the level of the element currently being selected
+	 */
+	protected void checkAllElementsBelow(int aSelectionLevel, Object element,
+			int currentLevel) {
+		if (currentLevel > aSelectionLevel)
+			return;
+
+		checkElement(element);
+
+		for (Object child : new FilterTreeContentProvider()
+				.getChildren(element)) {
+			checkAllElementsBelow(aSelectionLevel, child, currentLevel + 1);
+		}
+	}
+	
+	
+	/**
 	 * Private classes
 	 */
 	private class CheckStateListener implements ICheckStateListener {
@@ -741,7 +796,7 @@ public abstract class DistributionBaseView extends Dialog implements
 	}
 	
 	/**
-	 * Check an element, all its parents and all its children.
+	 * Uncheck an element, all its parents and all its children.
 	 * 
 	 * @param element
 	 *            The element to check.
