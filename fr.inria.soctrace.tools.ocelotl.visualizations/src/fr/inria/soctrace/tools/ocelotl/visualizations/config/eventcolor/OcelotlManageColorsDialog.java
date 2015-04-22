@@ -26,6 +26,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+
 import fr.inria.soctrace.framesoc.ui.dialogs.ManageColorsDialog;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.ModelEntity;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
@@ -41,7 +42,6 @@ public class OcelotlManageColorsDialog extends ManageColorsDialog implements
 		IVisualizationWindow {
 
 	private OcelotlView ocelotlView;
-
 	private ColorsConfig config;
 
 	/**

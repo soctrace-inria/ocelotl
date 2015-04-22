@@ -78,7 +78,7 @@ public abstract class SpatiotemporalMode extends VisuSTOperator {
 		config.getTypes().clear();
 		config.getTypes().addAll(
 				ocelotlCore.getOcelotlParameters().getOperatorEventTypes());
-
+		
 		config.checkForFilteredType(ocelotlCore.getOcelotlParameters().getTraceTypeConfig().getTypes());
 		
 		initParts();
