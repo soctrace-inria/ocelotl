@@ -33,6 +33,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
+
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -360,7 +361,6 @@ abstract public class AggregatedView implements IAggregatedView {
 		canvas = wrapper.getCanvas();
 		wrapper.cleanControlListeners();
 		wrapper.addControlListener(new ControlListener() {
-
 			@Override
 			public void controlMoved(final ControlEvent arg0) {
 				canvas.redraw();

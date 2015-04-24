@@ -6,51 +6,31 @@ LPAGGREG_SRC_DIR=$2
 LPAGGREGJNI_SRC_DIR=$3
 
 if [ "$ARCH" = "32" ]; then
-  BUILD="build_linux_x86"
-  SCRIPT="makelin32"
+  BUILD="32"
 else 
-  BUILD="build_linux_x64"
-  SCRIPT="makelin64"
+  BUILD=""
 fi
 
-mkdir -p $BASE/tmp/
-mkdir -p $BASE/$BUILD/
+mkdir -p $BASE/build_linux_x$ARCH/
 
-LPA_NEWREP=$BASE/tmp/lpaggreg_`eval date +%Y%m%d%H%M%S`
-LPAJNI_NEWREP=$BASE/tmp/lpaggregjni_`eval date +%Y%m%d%H%M%S`
-
-cp -R $LPAGGREG_SRC_DIR $LPA_NEWREP
-cp -R $LPAGGREGJNI_SRC_DIR $LPAJNI_NEWREP
-
-cp $BASE/$SCRIPT/subdir_lpa.mk $LPA_NEWREP/Shared/src/subdir.mk
-cp $BASE/$SCRIPT/subdir_lpa.mk $LPA_NEWREP/Static/src/subdir.mk
-cp $BASE/$SCRIPT/makefile_lpa_shared $LPA_NEWREP/Shared/makefile
-
-cd $LPA_NEWREP
-
-echo "Building liblpaggreg.so..."
-make clean
-make 
-cp Shared/liblpaggreg.so.3.1 ../../$BUILD/
+cd $LPAGGREG_SRC_DIR
 
 echo "Building liblpaggreg.a..."
 make clean
-make static
-cp Static/liblpaggreg.a.3.1 ../../$BUILD/liblpaggreg.a
+make static$BUILD
+cp Static$BUILD/liblpaggreg.a.3.1 ../../$BASE/build_linux_x$ARCH/liblpaggreg.a
 
-cd ../../..
-cp $BASE/$SCRIPT/subdir_lpajni.mk $LPAJNI_NEWREP/Release/src/subdir.mk
-cp $BASE/$SCRIPT/makefile_jni $LPAJNI_NEWREP/Release/makefile
-cd $LPAJNI_NEWREP
+cd -
+
+cd $LPAGGREGJNI_SRC_DIR
 
 echo "Building liblpaggregjni.so..."
 make clean
-make
-cp Release/liblpaggregjni.so.3.1 ../../$BUILD/liblpaggregjni.so
+make ocelotl$BUILD
+cp Ocelotl$BUILD/liblpaggregjni.so.3.1 ../../$BASE/build_linux_x$ARCH/liblpaggregjni.so
 
-cd ../..
+cd -
 
 echo "Cleaning temp files..."
 rm -Rf tmp
-
 

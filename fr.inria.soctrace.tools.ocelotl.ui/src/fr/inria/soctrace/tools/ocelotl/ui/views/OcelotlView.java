@@ -457,7 +457,6 @@ public class OcelotlView extends FramesocPart {
 									// Do we need to compute everything
 									if (overView.isRedrawOverview())
 										overView.getOverviewThread().start();
-
 								} catch (OcelotlException e) {
 									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 								}
@@ -465,6 +464,7 @@ public class OcelotlView extends FramesocPart {
 							
 							history.saveHistory();
 							timestampHasChanged = false;
+
 							monitor.done();
 						}
 					});
