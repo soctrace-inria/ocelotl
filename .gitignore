@@ -3,4 +3,6 @@
 /bin
 /doc
 *~
+fr.inria.lpaggreg/build/download
+*.swp
 
