@@ -37,7 +37,6 @@ fi
 
 cd $OCELOTL_PROJECT_DIR
 OCELOTL_PROJECT_DIR=`pwd`
-make clean
 cd -
 cd $LPAGGREGJNI_PROJECT_DIR
 LPAGGREGJNI_PROJECT_DIR=`pwd`
@@ -45,6 +44,7 @@ make clean
 cd -
 cd $LPAGGREG_PROJECT_DIR
 LPAGGREG_PROJECT_DIR=`pwd`
+make clean
 make static-linux
 make static-linux-x86
 make static-win64
