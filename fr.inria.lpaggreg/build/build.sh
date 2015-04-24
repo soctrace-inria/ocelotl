@@ -37,9 +37,11 @@ fi
 
 cd $OCELOTL_PROJECT_DIR
 OCELOTL_PROJECT_DIR=`pwd`
+make clean
 cd -
 cd $LPAGGREGJNI_PROJECT_DIR
 LPAGGREGJNI_PROJECT_DIR=`pwd`
+make clean
 cd -
 cd $LPAGGREG_PROJECT_DIR
 LPAGGREG_PROJECT_DIR=`pwd`
@@ -58,8 +60,8 @@ make otl-linux
 make otl-linux-x86
 make otl-win64
 make otl-win32
-cp otl-linux/lpaggregjni.so $OCELOTL_PROJECT_DIR/fr.inria.lpaggreg.linux_x64/lpaggregjni.so
-cp otl-linux-x86/lpaggregjni.so $OCELOTL_PROJECT_DIR/fr.inria.lpaggreg.linux_x86/lpaggregjni.so
-cp otl-win64/lpaggregjni.dll $OCELOTL_PROJECT_DIR/fr.inria.lpaggreg.win64/lpaggregjni.so
-cp otl-win32/lpaggregjni.dll $OCELOTL_PROJECT_DIR/fr.inria.lpaggreg.win32/lpaggregjni.so
+cp otl-linux/liblpaggregjni.so $OCELOTL_PROJECT_DIR/fr.inria.lpaggreg.linux_x64/liblpaggregjni.so
+cp otl-linux-x86/liblpaggregjni.so $OCELOTL_PROJECT_DIR/fr.inria.lpaggreg.linux_x86/liblpaggregjni.so
+cp otl-win64/lpaggregjni.dll $OCELOTL_PROJECT_DIR/fr.inria.lpaggreg.win64/lpaggregjni.dll
+cp otl-win32/lpaggregjni.dll $OCELOTL_PROJECT_DIR/fr.inria.lpaggreg.win32/lpaggregjni.dll
 
