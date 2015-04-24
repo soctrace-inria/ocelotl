@@ -3,7 +3,6 @@
 LPAGGREG_GITHUB_DIR=https://github.com/dosimont/lpaggreg.git
 LPAGGREGJNI_GITHUB_DIR=https://github.com/dosimont/lpaggregjni.git
 
-JNI_INCLUDE_DIR=/usr/local/include/
 OCELOTL_PROJECT_DIR=../..
 
 
