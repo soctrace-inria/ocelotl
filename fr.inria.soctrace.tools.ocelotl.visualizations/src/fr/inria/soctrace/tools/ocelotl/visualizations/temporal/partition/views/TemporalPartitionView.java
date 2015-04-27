@@ -53,9 +53,9 @@ public class TemporalPartitionView extends TimeLineView {
 								parts.get(i) % colors.getColors().size()),
 						config.isNumbers());
 				figures.add(part);
-				root.add(part, new Rectangle(new Point(i * drawingAreaWidth
+				root.add(part, new Rectangle(new Point((i * drawingAreaWidth)
 						/ parts.size() + aBorder, root.getSize().height / 2
-						- partHeight / 2), new Point((i + 1) * drawingAreaWidth
+						- partHeight / 2), new Point(((i + 1) * drawingAreaWidth)
 						/ parts.size() + aBorder - space, root.getSize().height
 						/ 2 + partHeight / 2)));
 				part.getUpdateManager().performUpdate();
@@ -73,10 +73,10 @@ public class TemporalPartitionView extends TimeLineView {
 				final PartFigure part = new PartFigure(i, i, colors.getColors()
 						.get(j % colors.getColors().size()), config.isNumbers());
 				figures.add(part);
-				root.add(part, new Rectangle(new Point(j * drawingAreaWidth
+				root.add(part, new Rectangle(new Point((j * drawingAreaWidth)
 						/ parts.size() + aBorder, root.getSize().height
-						- aBorder), new Point((j + aggParts.get(i))
-						* drawingAreaWidth / parts.size() - space + aBorder,
+						- aBorder), new Point(((j + aggParts.get(i))
+						* drawingAreaWidth) / parts.size() - space + aBorder,
 						aBorder)));
 				j = j + aggParts.get(i);
 				part.getUpdateManager().performUpdate();

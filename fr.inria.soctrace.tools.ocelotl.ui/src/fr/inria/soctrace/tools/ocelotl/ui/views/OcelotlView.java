@@ -409,12 +409,15 @@ public class OcelotlView extends FramesocPart {
 								hasChanged = HasChanged.ALL;
 								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 								if(e.getMessage().equals(OcelotlException.NO_EVENTS)) {
-									// Reset selection
-									btnReset.notifyListeners(SWT.Selection, new Event());
-									// End this run
-									endRun();
-									// Launch another one
-									btnRun.notifyListeners(SWT.Selection, new Event());
+									// If we are not already showing the whole trace
+									if (!getTimeRegion().compareTimeRegion(new TimeRegion(currentShownTrace.getMinTimestamp(), currentShownTrace.getMaxTimestamp()))) {
+										// Reset selection
+										btnReset.notifyListeners(SWT.Selection, new Event());
+										// End this run
+										endRun();
+										// Launch another one
+										btnRun.notifyListeners(SWT.Selection, new Event());
+									}
 								}
 							}
 						});
@@ -454,7 +457,6 @@ public class OcelotlView extends FramesocPart {
 									// Do we need to compute everything
 									if (overView.isRedrawOverview())
 										overView.getOverviewThread().start();
-
 								} catch (OcelotlException e) {
 									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
 								}
@@ -462,6 +464,7 @@ public class OcelotlView extends FramesocPart {
 							
 							history.saveHistory();
 							timestampHasChanged = false;
+
 							monitor.done();
 						}
 					});
@@ -632,7 +635,8 @@ public class OcelotlView extends FramesocPart {
 			setDefaultDescriptionSettings();
 			
 			// Init the overview
-			overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
+			if (!comboVisu.getText().isEmpty())
+				overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
 		}
 	}
 
@@ -806,7 +810,7 @@ public class OcelotlView extends FramesocPart {
 	 * Cancel the current selection
 	 */
 	public void cancelSelection() {
-		if (timeLineView != null) {
+		if (timeLineView != null && getOcelotlParameters().getTimeRegion() != null) {
 			// Reset selected time region to displayed time region
 			setTimeRegion(getOcelotlParameters().getTimeRegion());
 
@@ -819,7 +823,8 @@ public class OcelotlView extends FramesocPart {
 			// Cancel potential spatialselection
 			getOcelotlParameters().setSpatialSelection(true);
 			getOcelotlParameters().setSpatiallySelectedProducers(getOcelotlParameters().getCurrentProducers());
-			
+			getOcelotlParameters().setDisplayedSubselection(false);
+
 			// Update stats
 			statView.updateData();
 			
@@ -924,7 +929,7 @@ public class OcelotlView extends FramesocPart {
 			final String title = "Loading Trace";
 			btnRun.setEnabled(false);
 			overView.reset();
-			
+			cancelSelection();
 			currentShownTrace = trace;
 			setFocus();
 
@@ -1164,7 +1169,7 @@ public class OcelotlView extends FramesocPart {
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		timeAxisView = new TimeAxisView();
+		timeAxisView = new TimeAxisView(this);
 		qualityView = new QualityView(this);
 		timeLineViewWrapper = new TimeLineViewWrapper(this);
 		statViewWrapper = new StatViewWrapper(this);
@@ -1726,13 +1731,14 @@ public class OcelotlView extends FramesocPart {
 		ocelotlParameters.setVisuOperator(comboVisu.getText());
 		ocelotlParameters.setStatOperator(comboStatistics.getText());
 		ocelotlParameters.setEventsPerThread(ocelotlParameters.getOcelotlSettings().getEventsPerThread());
-		ocelotlParameters.setThreadNumber(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
+		ocelotlParameters.setNumberOfThread(ocelotlParameters.getOcelotlSettings().getNumberOfThread());
 		ocelotlParameters.setMaxEventProducers(ocelotlParameters.getOcelotlSettings().getMaxEventProducersPerQuery());
 		ocelotlParameters.setThreshold(ocelotlParameters.getOcelotlSettings().getThresholdPrecision());
 		ocelotlParameters.setAggregatedLeaveEnable(ocelotlParameters.getOcelotlSettings().isAggregateLeaves());
 		ocelotlParameters.setMaxNumberOfLeaves(ocelotlParameters.getOcelotlSettings().getMaxNumberOfLeaves());
 		
 		ocelotlParameters.updateCurrentProducers();
+		ocelotlParameters.setDisplayedSubselection(false);
 		
 		// If there are aggregated leave, then it is necessary to update the
 		// spatial selection

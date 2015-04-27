@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1.6"?>
 <site>
-   <feature url="features/fr.inria.soctrace.tools.ocelotl.feature_1.1.5.qualifier.jar" id="fr.inria.soctrace.tools.ocelotl.feature" version="1.1.5.qualifier" os="linux,win32" arch="x86,x86_64">
+   <feature url="features/fr.inria.soctrace.tools.ocelotl.feature_1.1.6.jar" id="fr.inria.soctrace.tools.ocelotl.feature" version="1.1.6">
       <category name="ocelotl"/>
    </feature>
    <category-def name="ocelotl" label="Ocelotl"/>

@@ -51,10 +51,9 @@ public class JNISpaceTimeAggregation2 extends JNISpaceTimeAggregation implements
 		for (int i = 0; i < val.size(); i++) {
 			jniWrapper.addVector(id);
 			for (String s : val.get(i).keySet()) {
-				jniWrapper.push_back(id, val.get(i).get(s)/(double)weight);
+				jniWrapper.push_back(id, val.get(i).get(s) / (double) weight);
 			}
 		}
-
 	}
 
 }

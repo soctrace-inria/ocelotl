@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ui
 Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.ui;singleton:=true
-Bundle-Version: 1.1.5
+Bundle-Version: 1.1.6
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.ui.Activator
 Bundle-Vendor: INRIA
 Require-Bundle: org.eclipse.ui,
@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.draw2d,
  fr.inria.soctrace.tools.ocelotl.core,
  fr.inria.lpaggreg,
- fr.inria.soctrace.framesoc.ui,
+ fr.inria.soctrace.framesoc.ui;bundle-version="1.0.6",
  fr.inria.soctrace.tools.ocelotl.slf4j;bundle-version="1.0.0",
  org.eclipse.swt
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

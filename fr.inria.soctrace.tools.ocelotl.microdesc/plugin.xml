@@ -75,6 +75,15 @@
             dimension="3D"
             ts_default_number="30">
       </aggregation_operator>
+      <aggregation_operator
+            class="fr.inria.soctrace.tools.ocelotl.core.idataaggregop.SpatioTemporalLeafAggregation"
+            operator="Spatiotemporal Leaf Aggregation"
+            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
+            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
+            visual_compatibility="PARTS, STATEMODE, EVENTMODE, VARIABLEMODE"
+            selection_priority="3"
+            dimension="3D_Leaf"
+            ts_default_number="30">
+      </aggregation_operator>
    </extension>
-       
 </plugin>

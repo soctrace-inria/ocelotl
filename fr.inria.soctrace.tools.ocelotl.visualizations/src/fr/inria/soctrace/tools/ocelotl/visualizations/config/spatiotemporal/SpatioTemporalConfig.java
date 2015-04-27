@@ -15,14 +15,16 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.EventColorManager;
 
 public class SpatioTemporalConfig implements IVisuConfig {
 
-	protected List<EventType>	types	= new LinkedList<EventType>();
-	protected List<EventType>	undisplayedTypes	= new LinkedList<EventType>();
+	protected List<EventType> types = new LinkedList<EventType>();
+	protected List<EventType> undisplayedTypes = new LinkedList<EventType>();
+	protected List<EventProducer> producers = new LinkedList<EventProducer>();
 	protected EventColorManager colors;
 
 	public SpatioTemporalConfig() {
@@ -56,6 +58,22 @@ public class SpatioTemporalConfig implements IVisuConfig {
 
 	public EventColorManager getColors() {
 		return colors;
+	}
+	
+	public List<EventProducer> getProducers() {
+		return producers;
+	}
+
+	public void setProducers(List<EventProducer> producers) {
+		this.producers = producers;
+	}
+	
+	public List<String> getProducerNames() {
+		List<String> l = new ArrayList<String>();
+		for (EventProducer ep: producers){
+			l.add(ep.getName());
+		}
+		return l;
 	}
 
 	public void initColors() {

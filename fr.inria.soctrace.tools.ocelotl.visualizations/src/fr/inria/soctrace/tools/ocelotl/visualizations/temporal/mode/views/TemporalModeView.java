@@ -14,7 +14,7 @@ package fr.inria.soctrace.tools.ocelotl.visualizations.temporal.mode.views;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.PrecisionPoint;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
@@ -32,7 +32,8 @@ public class TemporalModeView extends TimeLineView {
 	protected void computeDiagram() {
 		int i;
 		final List<Integer> aggParts = new ArrayList<Integer>();
-		final int drawingAreaWidth = root.getSize().width - 2 * aBorder;
+		final double drawingAreaWidth = root.getSize().width - 2 * aBorder;
+		final double partWidth = drawingAreaWidth / parts.size();
 		for (i = 0; i <= parts.get(parts.size() - 1); i++)
 			aggParts.add(0);
 		for (i = 0; i < parts.size(); i++)
@@ -47,11 +48,10 @@ public class TemporalModeView extends TimeLineView {
 			if (!mState.getState().equals("void")) {
 				part.draw(mState);
 				figures.add(part);
-				root.add(part, new Rectangle(new Point(j * drawingAreaWidth
-						/ parts.size() + aBorder, root.getSize().height
-						- aBorder), new Point((j + aggParts.get(i))
-						* drawingAreaWidth / parts.size() - space + aBorder,
-						aBorder)));
+				root.add(part, new Rectangle(new PrecisionPoint((j * partWidth)
+						+ aBorder, root.getSize().height - aBorder), new PrecisionPoint(
+						((j + aggParts.get(i)) * partWidth) - space
+								+ aBorder, aBorder)));
 			}
 			j = j + aggParts.get(i);
 		}

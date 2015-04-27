@@ -324,10 +324,14 @@ public class ProportionAxisView extends UnitAxisView {
 	 * After the first run, resize the axis to display the labels
 	 */
 	protected void resizeAxis() {
-		int minSize = labelMaxWidth + TextPositionOffset + (areaWidth - mainLineXPosition);
+		canvas.update();
+		root.validate();
+		
+		int minSize = labelMaxWidth + TextPositionOffset
+				+ (areaWidth - mainLineXPosition);
 
-		if(areaWidth < minSize && (ocelotlView.getMainViewTopSashform().getSize().x
-				- minSize > 0))
+		if((areaWidth < minSize && (ocelotlView.getMainViewTopSashform().getSize().x
+				- minSize > 0)) || areaWidth > minSize + 10)
 		ocelotlView.getMainViewTopSashform().setWeights(
 				new int[] {
 						minSize,
@@ -337,7 +341,7 @@ public class ProportionAxisView extends UnitAxisView {
 
 	@Override
 	public void initDiagram() {
-		// Modify the width only if the it is currently 0
+		// Modify the width only if it is currently 0
 		if (ocelotlView.getMainViewTopSashform().getWeights()[0] == 0) {
 			ocelotlView.getMainViewTopSashform().setWeights(
 					OcelotlConstants.yAxisDefaultWeight);

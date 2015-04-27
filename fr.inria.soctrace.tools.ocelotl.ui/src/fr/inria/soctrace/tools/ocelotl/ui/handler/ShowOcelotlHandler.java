@@ -16,9 +16,16 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 public class ShowOcelotlHandler extends ShowTraceHandler {
 
+	private final static String	VIEW_NAME	= "Ocelotl";
+
 	@Override
 	public String getViewId() {
 		return OcelotlView.ID;
+	}
+
+	@Override
+	public String getViewName() {
+		return VIEW_NAME;
 	}
 
 }

@@ -42,6 +42,7 @@
             launchCommand="fr.inria.soctrace.tools.ocelotl.ui.command.ShowOcelotl"
             position="TOP_RIGHT"
             priority="3"
+            show_default="false"
             viewId="fr.inria.soctrace.tools.ocelotl.ui.OcelotlView">
       </part>
    </extension>
