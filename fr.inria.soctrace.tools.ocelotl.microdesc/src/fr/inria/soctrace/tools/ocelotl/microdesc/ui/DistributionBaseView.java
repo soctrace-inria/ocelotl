@@ -517,7 +517,16 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnCheckAllEventProducer.setFont(cantarell11);
 		btnCheckAllEventProducer
 				.addSelectionListener(new CheckAllEventProducersAdapter());
-
+		
+		Button btnCheckSubtreeEventProducer = new Button(buttonComposite,
+				SWT.NONE);
+		btnCheckSubtreeEventProducer.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, true, false, 1, 1));
+		btnCheckSubtreeEventProducer.setText("Check Subtree");
+		btnCheckSubtreeEventProducer.setFont(cantarell11);
+		btnCheckSubtreeEventProducer.setImage(null);
+		btnCheckSubtreeEventProducer.addSelectionListener(new CheckSubtreeEventProducersAdapter());
+		
 		final Button btnAddResult = new Button(buttonComposite, SWT.NONE);
 		btnAddResult.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
 				false, 1, 1));
@@ -537,7 +546,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnUncheckEventProducer.setImage(null);
 		btnUncheckEventProducer
 				.addSelectionListener(new UncheckEventProducerAdapter());
-
+		
 		Button btnUncheckAllEventProducer = new Button(buttonComposite,
 				SWT.NONE);
 		btnUncheckAllEventProducer.setLayoutData(new GridData(SWT.FILL,
@@ -546,16 +555,7 @@ public abstract class DistributionBaseView extends Dialog implements
 		btnUncheckAllEventProducer.setFont(cantarell11);
 		btnUncheckAllEventProducer.setImage(null);
 		btnUncheckAllEventProducer.addSelectionListener(new UnCheckAllEventProducersAdapter());
-		
-		Button btnCheckSubtreeEventProducer = new Button(buttonComposite,
-				SWT.NONE);
-		btnCheckSubtreeEventProducer.setLayoutData(new GridData(SWT.FILL,
-				SWT.CENTER, true, false, 1, 1));
-		btnCheckSubtreeEventProducer.setText("Check Subtree");
-		btnCheckSubtreeEventProducer.setFont(cantarell11);
-		btnCheckSubtreeEventProducer.setImage(null);
-		btnCheckSubtreeEventProducer.addSelectionListener(new CheckSubtreeEventProducersAdapter());
-		
+
 		Button btnUncheckSubtreeEventProducer = new Button(buttonComposite,
 				SWT.NONE);
 		btnUncheckSubtreeEventProducer.setLayoutData(new GridData(SWT.FILL,
