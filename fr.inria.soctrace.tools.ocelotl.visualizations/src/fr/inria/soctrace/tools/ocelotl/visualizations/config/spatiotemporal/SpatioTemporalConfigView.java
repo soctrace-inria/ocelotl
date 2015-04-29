@@ -13,6 +13,8 @@ package fr.inria.soctrace.tools.ocelotl.visualizations.config.spatiotemporal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,7 +35,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -75,6 +76,7 @@ import fr.inria.soctrace.framesoc.ui.Activator;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColor;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.framesoc.ui.model.ColorsChangeDescriptor;
+import fr.inria.soctrace.framesoc.ui.utils.AlphanumComparator;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.ModelEntity;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
@@ -228,7 +230,6 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
         
         tableViewer.setContentProvider(new ArrayContentProvider());
         tableViewer.setLabelProvider(new RowLabelProvider());
-        tableViewer.setSorter(new ViewerSorter());
         tableViewer.addFilter(new RowFilter());
         tableViewer.setInput(getNames());
         
@@ -419,10 +420,22 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 	}
 
 	private Collection<String> getNames() {
+		java.util.List<String> names;
+
 		if (entity.equals(ModelEntity.EVENT_TYPE))
-			return config.getDisplayedTypeNames();
+			names = config.getDisplayedTypeNames();
 		else
-			return config.getProducerNames();
+			names = config.getProducerNames();
+
+		// Sort the names alphabetically
+		Collections.sort(names, new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return AlphanumComparator.compare(o1, o2);
+			}
+		});
+
+		return names;
 	}
 
     @Override
@@ -564,5 +577,4 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 			viewer.refresh(false);
 		}
 	}
-	
 }

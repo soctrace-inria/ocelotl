@@ -73,6 +73,7 @@ public class SpatioTemporalConfig implements IVisuConfig {
 		for (EventProducer ep: producers){
 			l.add(ep.getName());
 		}
+		
 		return l;
 	}
 
