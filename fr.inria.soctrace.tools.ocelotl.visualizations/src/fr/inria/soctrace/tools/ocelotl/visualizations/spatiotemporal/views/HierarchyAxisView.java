@@ -34,6 +34,9 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopic;
+import fr.inria.soctrace.framesoc.core.bus.FramesocBusTopicList;
+import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
 import fr.inria.soctrace.framesoc.ui.colors.FramesocColorManager;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.dataaggregmanager.spacetime.EventProducerHierarchy.EventProducerNode;
@@ -49,7 +52,7 @@ import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;
  * 
  * @author "Damien Dosimont <damien.dosimont@imag.fr>"
  */
-public class HierarchyAxisView extends UnitAxisView {
+public class HierarchyAxisView extends UnitAxisView implements IFramesocBusListener {
 
 	protected EventProducerHierarchy hierarchy;
 
@@ -78,12 +81,18 @@ public class HierarchyAxisView extends UnitAxisView {
 	
 	protected SelectFigure highLightAggregateFigure;
 
-	
+	protected FramesocBusTopicList		topics			= null;
+
 	public HierarchyAxisView() {
 		super();
 		mouse = new HierarchyAxisMouseListener(this);
 		xendlist = new ArrayList<Integer>();
 		yendlist = new ArrayList<Integer>();
+		
+		// Register update to synchronize traces
+		topics = new FramesocBusTopicList(this);
+		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
+		topics.registerAll();
 	}
 
 	public void createDiagram(EventProducerHierarchy hierarchy,
@@ -109,6 +118,26 @@ public class HierarchyAxisView extends UnitAxisView {
 			drawHierarchy();
 		}
 		root.validate();
+	}
+	
+	public void createDiagram() {
+		root.removeAll();
+		if (hierarchy != null && !hierarchy.getEventProducerNodes().isEmpty()) {
+			drawHierarchy();
+			if (originY != -1 && cornerY != -1)
+				selectFigure.draw(originY, cornerY, true);
+			if (currentlySelectedEpn != null)
+				highLightSelectedProducer.draw(currentlySelectedEpn);
+		}
+		root.validate();
+	}
+	
+	// When receiving a notification, redraw the overview with the new color
+	@Override
+	public void handle(FramesocBusTopic topic, Object data) {
+		if (topic.equals(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED) && hierarchy != null) {
+			createDiagram();
+		}
 	}
 
 	/**

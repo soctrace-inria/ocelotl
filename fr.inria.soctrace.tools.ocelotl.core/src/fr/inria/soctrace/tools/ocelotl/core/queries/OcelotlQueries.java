@@ -132,7 +132,7 @@ public class OcelotlQueries {
 	/**
 	 * Make a query with only condition on time
 	 * 
-	 * @param time
+ 	 * @param time
 	 * @return an EventIterator on all events produced by the event producers in
 	 *         eventProducers and in the time range defined in time
 	 * @throws SoCTraceException

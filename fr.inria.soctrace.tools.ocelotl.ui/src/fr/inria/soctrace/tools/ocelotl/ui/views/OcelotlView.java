@@ -904,7 +904,8 @@ public Trace aTestTrace;
 			setDefaultDescriptionSettings();
 			
 			// Init the overview
-			overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
+			if (!comboVisu.getText().isEmpty())
+				overView.initVisuOperator(ocelotlCore.getVisuOperators().getOperatorResource(comboVisu.getText()).getOverviewVisualization());
 		}
 	}
 
@@ -1078,7 +1079,7 @@ public Trace aTestTrace;
 	 * Cancel the current selection
 	 */
 	public void cancelSelection() {
-		if (timeLineView != null) {
+		if (timeLineView != null && getOcelotlParameters().getTimeRegion() != null) {
 			// Reset selected time region to displayed time region
 			setTimeRegion(getOcelotlParameters().getTimeRegion());
 
@@ -1197,6 +1198,7 @@ public Trace aTestTrace;
 			final String title = "Loading Trace";
 			btnRun.setEnabled(false);
 			overView.reset();
+			cancelSelection();
 			currentShownTrace = trace;
 			setFocus();
 
@@ -1436,7 +1438,7 @@ public Trace aTestTrace;
 		parent.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		final SashForm sashFormGlobal = new SashForm(parent, SWT.VERTICAL);
 		sashFormGlobal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
-		timeAxisView = new TimeAxisView();
+		timeAxisView = new TimeAxisView(this);
 		qualityView = new QualityView(this);
 		timeLineViewWrapper = new TimeLineViewWrapper(this);
 		statViewWrapper = new StatViewWrapper(this);

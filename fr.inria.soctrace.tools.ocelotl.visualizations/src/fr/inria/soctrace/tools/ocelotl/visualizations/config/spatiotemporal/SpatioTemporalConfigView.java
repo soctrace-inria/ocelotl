@@ -124,6 +124,7 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 	private OcelotlView ocelotlView;
 	private SpatioTemporalConfig config;
 	private final static String ET_NAME = "Event Types";
+	private final static String EP_NAME = "Event Producers";
 	protected ListViewer listViewerEventTypes;
 			
 	/**
@@ -134,7 +135,8 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 		super(parentShell);
 		this.images = new HashMap<String, Image>();
 		this.entities = new TreeMap<Integer, Entity>();
-		this.entities.put(0, new Entity(ET_NAME, ModelEntity.EVENT_TYPE));
+		this.entities.put(0, new Entity(EP_NAME, ModelEntity.EVENT_PRODUCER));
+		this.entities.put(1, new Entity(ET_NAME, ModelEntity.EVENT_TYPE));
 	}
 
 	@Override
@@ -388,24 +390,39 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
     	super.cancelPressed();
     }
     
-	private FramesocColor getColor(String name) {
-		return FramesocColorManager.getInstance().getEventTypeColor(name);
+	protected FramesocColor getColor(String name) {
+		if (entity.equals(ModelEntity.EVENT_TYPE))
+			return FramesocColorManager.getInstance().getEventTypeColor(name);
+		else
+			return FramesocColorManager.getInstance().getEventProducerColor(name);
 	}
 		
 	private void setColor(String name, FramesocColor color) {
-		FramesocColorManager.getInstance().setEventTypeColor(name, color);
+		if (entity.equals(ModelEntity.EVENT_TYPE))
+			FramesocColorManager.getInstance().setEventTypeColor(name, color);
+		else
+			FramesocColorManager.getInstance().setEventProducerColor(name, color);
 	}
 
 	private void saveColors() {
-		FramesocColorManager.getInstance().saveEventTypeColors();
+		if (entity.equals(ModelEntity.EVENT_TYPE))
+			FramesocColorManager.getInstance().saveEventTypeColors();
+		else 
+			FramesocColorManager.getInstance().saveEventProducerColors();
 	}
-
+	
 	private void loadColors() {
-		FramesocColorManager.getInstance().loadEventTypeColors();
+		if (entity.equals(ModelEntity.EVENT_TYPE))
+			FramesocColorManager.getInstance().loadEventTypeColors();
+		else 
+			FramesocColorManager.getInstance().loadEventProducerColors();
 	}
 
 	private Collection<String> getNames() {
-		return config.getDisplayedTypeNames();
+		if (entity.equals(ModelEntity.EVENT_TYPE))
+			return config.getDisplayedTypeNames();
+		else
+			return config.getProducerNames();
 	}
 
     @Override
@@ -483,7 +500,7 @@ public class SpatioTemporalConfigView extends Dialog implements IVisualizationWi
 		config.getTypes().addAll(
 				ocelotlView.getOcelotlParameters().getTraceTypeConfig()
 						.getTypes());
-
+		config.setProducers(ocelotlView.getOcelotlParameters().getCurrentProducers());
 		config.checkForFilteredType(ocelotlView.getOcelotlParameters().getTraceTypeConfig().getTypes());
 	}
 	

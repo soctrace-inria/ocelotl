@@ -29,7 +29,7 @@ import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.views.
 
 public class ColorsConfig implements IVisuConfig {
 
-	protected List<EventType>	types	= new LinkedList<EventType>();
+	protected List<EventType> types = new LinkedList<EventType>();
 	protected EventColorManager colors;
 
 	public ColorsConfig() {
@@ -55,7 +55,7 @@ public class ColorsConfig implements IVisuConfig {
 	public EventColorManager getColors() {
 		return colors;
 	}
-
+	
 	public void initColors() {
 		this.colors = new EventColorManager();
 	}

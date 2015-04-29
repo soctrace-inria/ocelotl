@@ -41,7 +41,7 @@ public class OcelotlConstants {
 	 * Number of field in the header of a cache file 
 	 */
 	static public final int DATACACHE_HEADER_NORMAL_SIZE = 9;
-	static public final int DICHOTOMYCACHE_HEADER_NORMAL_SIZE = 9;
+	static public final int DICHOTOMYCACHE_HEADER_NORMAL_SIZE = 11;
 	
 	/**
 	 * Maximum size of the data cache in bytes.

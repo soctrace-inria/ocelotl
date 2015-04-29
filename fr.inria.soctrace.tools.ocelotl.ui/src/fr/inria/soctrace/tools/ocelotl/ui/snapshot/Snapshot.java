@@ -166,7 +166,7 @@ public class Snapshot {
 		compositeOverview.setSize(dialogTimeAxis.getSize().x, dialogTimeAxis.getSize().y);
 		compositeOverview.setLayout(new FillLayout());
 		
-		TimeAxisView aTimeAxisView = new TimeAxisView();
+		TimeAxisView aTimeAxisView = new TimeAxisView(theView);
 		aTimeAxisView.initDiagram(compositeOverview);
 		// If the selected time region is identical to the whole displayed time
 		// region

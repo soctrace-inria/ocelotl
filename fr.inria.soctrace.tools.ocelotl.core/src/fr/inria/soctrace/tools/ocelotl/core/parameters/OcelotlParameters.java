@@ -47,6 +47,7 @@ public class OcelotlParameters {
 	// Modify to deactivate JNI
 	private static boolean forceJava = false;
 
+
 	// List of the event producers in the trace and that are not filtered out
 	private List<EventProducer> eventProducers = new ArrayList<EventProducer>();
 	// List of the event producers taken into account for computation
@@ -161,7 +162,11 @@ public class OcelotlParameters {
 	public List<EventProducer> getEventProducers() {
 		return eventProducers;
 	}
-
+	
+	public void setEventProducers(final List<EventProducer> eventProducers) {
+		this.eventProducers = eventProducers;
+	}
+	
 	public int getMaxEventProducers() {
 		return maxEventProducers;
 	}
@@ -204,10 +209,6 @@ public class OcelotlParameters {
 
 	public boolean isNormalize() {
 		return normalize;
-	}
-
-	public void setEventProducers(final List<EventProducer> eventProducers) {
-		this.eventProducers = eventProducers;
 	}
 
 	public void setGrowingQualities(final boolean growingQualities) {

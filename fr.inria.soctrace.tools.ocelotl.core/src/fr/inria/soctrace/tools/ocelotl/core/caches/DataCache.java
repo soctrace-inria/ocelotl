@@ -381,6 +381,9 @@ public class DataCache {
 			long timeSliceDuration = (cachedParam.getEndTimestamp() - cachedParam
 					.getStartTimestamp()) / cachedParam.getNbTimeSlice();
 
+			if(timeSliceDuration == 0)
+				return false;
+			
 			// Compute the number of cached time slices included in the new time
 			// region
 			int includedTimeslice = (int) ((newParam.getEndTimestamp() - newParam

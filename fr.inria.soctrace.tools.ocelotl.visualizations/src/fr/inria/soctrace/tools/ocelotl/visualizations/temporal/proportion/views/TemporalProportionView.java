@@ -31,6 +31,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.PrecisionPoint;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -90,12 +91,20 @@ public class TemporalProportionView extends TimeLineView {
 			// Width of the drawing area
 			final double drawingAreaWidth = root.getSize().width - 2 * aBorder;
 			final double numberOfTimeSlice = distribution.getSliceNumber();
+			final double sliceWidth = drawingAreaWidth / numberOfTimeSlice;
+			
 			// Highest value among the aggregates
 			final double maxValue = distribution.getMax();
 			double agg = 0;
 			final List<String> aggList = new ArrayList<String>();
 			final List<String> states = new ArrayList<String>();
 			states.addAll(distribution.getStates());
+			
+			int startingX = (int) (distribution.getPart(index).getStartPart()
+					* sliceWidth + aBorder);
+			int endingX = (int) (distribution.getPart(index).getEndPart()
+					* sliceWidth - space + aBorder);
+
 			// Sort states alphabetically
 			Collections.sort(states, new Comparator<String>() {
 				@Override
@@ -123,22 +132,18 @@ public class TemporalProportionView extends TimeLineView {
 					if (!ocelotlView.getOcelotlParameters().getOcelotlSettings().isUseVisualAggregate()
 							|| y1 * value / maxValue - stackSpace > MinHeight) {
 						// Draw a rectangle
-						if (isTooLight(rect.getBackgroundColor()))
-							 root.add(rect, new Rectangle(new Point(
-							 (int) (distribution.getPart(index)
-							 .getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder + 1),
-							 (int) (y0 - y1 * total / maxValue)), new Point(
-							 (int) (distribution.getPart(index).getEndPart()
-							 * drawingAreaWidth / numberOfTimeSlice - space + aBorder - 1),
-							 (int) (y0 + space - y1 * (total + value) / maxValue))));
-						else {
+						if (isTooLight(rect.getBackgroundColor())) {
 							root.add(rect, new Rectangle(new Point(
-								(int) (distribution.getPart(index)
-										.getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
-								(int) (y0 - y1 * total / maxValue)), new Point(
-								(int) (distribution.getPart(index).getEndPart()
-										* drawingAreaWidth / numberOfTimeSlice - space + aBorder), (int) (y0
-										+ stackSpace - y1 * (total + value) / maxValue))));
+									startingX + 1, (int) (y0 - y1 * total
+											/ maxValue)), new Point(
+									endingX - 1, (int) (y0 + space - y1
+											* (total + value) / maxValue))));
+						} else {
+							root.add(rect, new Rectangle(new PrecisionPoint(
+									startingX, (int) (y0 - y1 * total
+											/ maxValue)), new PrecisionPoint(
+									endingX, (int) (y0 + stackSpace - y1
+											* (total + value) / maxValue))));
 						}
 						total += value;
 					} else { // else aggregates it
@@ -173,45 +178,31 @@ public class TemporalProportionView extends TimeLineView {
 				// If the aggregated state proportion is high enough
 				if (y1 * agg / maxValue - stackSpace > MinHeight) {
 					// Display a rectangle
-					root.add(rectangle, new Rectangle(new Point((int) (distribution
-							.getPart(index).getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
+					root.add(rectangle, new Rectangle(new Point(startingX,
 							(int) (y0 - y1 * total / maxValue)), new Point(
-							(int) (distribution.getPart(index).getEndPart() * drawingAreaWidth
-									/ numberOfTimeSlice - space + aBorder), (int) (y0 + stackSpace - y1
+							endingX, (int) (y0 + stackSpace - y1
 									* (total + agg) / maxValue))));
 				} else { // else display as a dash line and an icon
 					int size = (int) Math.min(IconMax,
-							Math.min(drawingAreaWidth / numberOfTimeSlice - 2 * stackSpace, (y0 - y1 * total / maxValue)));
+							Math.min(sliceWidth - 2 * stackSpace, (y0 - y1 * total / maxValue)));
 					if (size > IconMin) {
 						icon.setImage(iconManager.getImage(size));
-
-						lineDash.setEndpoints(new Point(
-								(int) (distribution.getPart(index).getStartPart()
-										* drawingAreaWidth / numberOfTimeSlice + aBorder + 1), (int) (y0 - y1
-										* total / maxValue)), new Point(
-								(int) (distribution.getPart(index).getEndPart()
-										* drawingAreaWidth / numberOfTimeSlice - space - 1 + aBorder),
-								(int) (y0 - y1 * (total) / maxValue)));
+						lineDash.setEndpoints(new Point(startingX + 1,
+								(int) (y0 - y1 * total / maxValue)), new Point(
+								endingX, (int) (y0 - y1 * (total) / maxValue)));
 						root.add(lineDash);
-						root.add(icon, new Rectangle(new Point((int) (distribution
-								.getPart(index).getStartPart() * drawingAreaWidth / numberOfTimeSlice + aBorder),
-										(int) (y0 - y1 * total / maxValue)
-												- stackSpace), new Point(
-								(int) (distribution.getPart(index).getEndPart()
-										* drawingAreaWidth / numberOfTimeSlice - space + aBorder), (int) (y0 - y1
-										* (total) / maxValue)
-										- size - stackSpace)));
+						root.add(icon, new Rectangle(
+								new Point(startingX, (int) (y0 - y1 * total
+										/ maxValue)
+										- stackSpace), new Point(endingX,
+										(int) (y0 - y1 * (total) / maxValue)
+												- size - stackSpace)));
 					} else {
-						lineDash.setEndpoints(new Point(
-								(int) (distribution.getPart(index).getStartPart()
-										* drawingAreaWidth / numberOfTimeSlice + aBorder + 1), (int) (y0 - y1
-										* total / maxValue)), new Point(
-								(int) (distribution.getPart(index).getEndPart()
-										* drawingAreaWidth / numberOfTimeSlice - space - 1 + aBorder),
-								(int) (y0 - y1 * (total) / maxValue)));
+						lineDash.setEndpoints(new Point(startingX + 1,
+								(int) (y0 - y1 * total / maxValue)), new Point(
+								endingX, (int) (y0 - y1 * (total) / maxValue)));
 						root.add(lineDash);
 					}
-
 				}
 				label.getUpdateManager().performUpdate();
 				icon.getUpdateManager().performUpdate();

@@ -6,12 +6,16 @@ Ocelotl is integrated into [Framesoc](http://soctrace-inria.github.io/framesoc/)
 
 ![Ocelotl Screenshot](http://soctrace-inria.github.io/ocelotl/images/screenshots/ocelotl_spatiotemporal.png)
 
+You will find here a video showing Ocelotl functionalities :
+
+[![Ocelotl Analysis Tool](http://soctrace-inria.github.io/ocelotl/images/play.png)](https://www.youtube.com/watch?v=3cbLM0rUu78)
+
 ##Get Ocelotl Now!
 
 ### Update Site
 
 This is the easiest way to start with Ocelotl.
-First, [download](https://www.eclipse.org/) a version of Eclipse. We recommand [Eclipse Kepler](http://www.eclipse.org/downloads/packages/release/Kepler/SR2).
+First, [download](https://www.eclipse.org/) a version of Eclipse. We recommand [Eclipse Luna](http://www.eclipse.org/downloads/packages/release/Luna/SR2).
 Then, install Ocelotl in Eclipse using the following procedure: Go to _Help > Install New Software_. In the new window, put the following URL in the field _Work with:_ 
 
 http://soctrace-inria.github.io/updatesite/
@@ -29,7 +33,7 @@ Follow the [wiki](https://github.com/soctrace-inria/ocelotl/wiki/User-Guide) to 
 ## Wiki and User Guide
 
 Check our [wiki](https://github.com/soctrace-inria/ocelotl/wiki/User-Guide) to install, configure and use Ocelotl.
-A detailed [user guide](https://github.com/soctrace-inria/ocelotl/raw/master/docs/OCELOTL_userguide.pdf) is also available for more details.
+A detailed [user guide](https://github.com/soctrace-inria/ocelotl/raw/master/docs/ocelotl_userguide.pdf) is also available for more details.
 
 ##Licence
 
