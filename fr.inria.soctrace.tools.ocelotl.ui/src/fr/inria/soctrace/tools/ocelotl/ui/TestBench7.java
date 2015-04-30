@@ -140,7 +140,7 @@ public class TestBench7 extends TestBench {
 	public void launchTest() {
 
 		if (!testParams.isEmpty()) {
-			statData = "TRACE; NB_EVENTS; QUERY_TYPE; NB_THREAD; NB_EVENT_PER_THREAD; TS_START; TS_END; Filtered ET; filtered EP; MICROMODEL_TIME\n";
+			statData = "TRACE; NB_EVENTS; QUERY_TYPE; NB_THREAD; NB_EVENT_PER_THREAD; TS_START; TS_END; Filtered ET; filtered EP; MICROMODEL_TIME; USED_OPERATOR\n";
 			String fileDir = aConfFile.substring(0, aConfFile.lastIndexOf("/") + 1);
 			Date aDate = new Date(System.currentTimeMillis());
 			String dirName = testParams.get(0).getTraceName() + "_" + aDate.toString();
@@ -205,7 +205,7 @@ public class TestBench7 extends TestBench {
 					+ theView.getTimeRegion().getTimeStampStart() + ";" + theView.getTimeRegion().getTimeStampEnd() + ";" 
 					+ aTest.getNumberOfEventType() + ";" + aTest.getNumberOfEventProd() + ";"
 					//+ aTest.getFilteredEventType().toString() + ";" + aTest.getFilteredEventProducer().toString() + ";"
-					+ microscopicModel + "\n";
+					+ microscopicModel + ";" +  theView.getOcelotlParameters().getChosenStateOperator() + "\n";
 			bufFileReader.close();
 
 			// Delete the output file

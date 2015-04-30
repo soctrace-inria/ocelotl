@@ -107,6 +107,7 @@ public class OcelotlParameters {
 	private IVisuConfig iVisuConfig;
 	private IStatisticOperatorConfig statisticOperatorConfig;
 	private StatisticsTableSettings sortTableSettings = new StatisticsTableSettings();
+	private String chosenStateOperator = "";
 
 	public OcelotlParameters() {
 		super();
@@ -157,6 +158,7 @@ public class OcelotlParameters {
 		this.approximateRebuild = op.approximateRebuild;
 		this.currentUnit = op.currentUnit;
 		this.sortTableSettings = op.sortTableSettings;
+		this.chosenStateOperator = op.chosenStateOperator;
 	}
 	
 	public List<EventProducer> getEventProducers() {
@@ -670,5 +672,13 @@ public class OcelotlParameters {
 		}
 
 		return res;
+	}
+
+	public String getChosenStateOperator() {
+		return chosenStateOperator;
+	}
+
+	public void setChosenStateOperator(String chosenStateOperator) {
+		this.chosenStateOperator = chosenStateOperator;
 	}
 }

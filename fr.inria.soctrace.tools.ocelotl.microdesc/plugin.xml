@@ -50,6 +50,17 @@
             event_category="STATE">
       </microscopic_model>
       <microscopic_model
+      		name="States Dynamic"
+      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDynamicDistribution"
+      		unit="Event^-1"
+      		unit_description="Activity Ratio / Event"
+      		selection_priority = "1"
+      		trace_formats="ALL"
+     		generic="true"
+     		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
+            event_category="STATE">
+      </microscopic_model>
+      <microscopic_model
       		name="States Hybrid"
       		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistributionHybrid"
       		unit="Event^-1"
