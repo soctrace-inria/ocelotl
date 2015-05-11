@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import fr.inria.soctrace.framesoc.ui.dialogs.ManageColorsDialog;
 import fr.inria.soctrace.lib.model.utils.ModelConstants.ModelEntity;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
 import fr.inria.soctrace.tools.ocelotl.ui.views.IVisualizationWindow;
@@ -38,7 +37,7 @@ import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
  * 
  * @author "Generoso Pagano <generoso.pagano@inria.fr>"
  */
-public class OcelotlManageColorsDialog extends ManageColorsDialog implements
+public class OcelotlManageColorsDialog extends ConfigurationDialog implements
 		IVisualizationWindow {
 
 	private OcelotlView ocelotlView;
@@ -76,4 +75,6 @@ public class OcelotlManageColorsDialog extends ManageColorsDialog implements
 		this.ocelotlView = ocelotlView;
 		this.config = (ColorsConfig) aConfig;
 	}
+	
+	
 }
