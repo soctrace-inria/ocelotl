@@ -39,6 +39,7 @@ import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy.SimpleEventProducerNode;
+import fr.inria.soctrace.tools.ocelotl.core.monitor.MonitorMessages;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.queries.IteratorQueries.EventIterator;
@@ -205,7 +206,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 				dm.end("Load matrix from cache (dirty)");
 			} else {
-				monitor.setTaskName("Data Cache Loading");
+				monitor.setTaskName(MonitorMessages.ReadingCache);
 				rebuildClean(aCacheFile, eventProducers, monitor);
 				dm.end("Load matrix from cache");
 			}
@@ -235,7 +236,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException, SoCTraceException,
 			InterruptedException, OcelotlException {
-		monitor.setTaskName("Data Cache Loading (Accurate Strategy)");
+		monitor.setTaskName(MonitorMessages.ReadingCache);
 		monitor.subTask("Initializing...");
 
 		// Contains the time interval of the events to query
@@ -367,7 +368,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			HashMap<String, EventProducer> eventProducers,
 			IProgressMonitor monitor) throws IOException, OcelotlException {
 
-		monitor.setTaskName("Data Cache Loading (Fast Strategy)");
+		monitor.setTaskName(MonitorMessages.ReadingCache);
 		monitor.subTask("Initializing...");
 		
 		parameters.setApproximateRebuild(true);
@@ -485,7 +486,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			IProgressMonitor monitor) throws IOException {
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
-		monitor.setTaskName("Data Cache Loading");
+		monitor.setTaskName(MonitorMessages.ReadingCache);
 		monitor.subTask("Loading...");
 
 		String line;
@@ -807,7 +808,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	public void buildNormalMatrix(IProgressMonitor monitor)
 			throws SoCTraceException, InterruptedException, OcelotlException {
 
-		monitor.setTaskName("Reading Trace...");
+		monitor.setTaskName(MonitorMessages.ReadingTrace);
 		initMatrix();
 		initQueries();
 		computeMatrix(monitor);

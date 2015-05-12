@@ -87,6 +87,7 @@ import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.Datacache
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants.HasChanged;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
 import fr.inria.soctrace.tools.ocelotl.core.model.SimpleEventProducerHierarchy;
+import fr.inria.soctrace.tools.ocelotl.core.monitor.MonitorMessages;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlDefaultParameterConstants;
 import fr.inria.soctrace.tools.ocelotl.core.parameters.OcelotlParameters;
 import fr.inria.soctrace.tools.ocelotl.core.timeregion.TimeRegion;
@@ -161,11 +162,11 @@ public class OcelotlView extends FramesocPart {
 				comboDimension.removeAll();
 				comboVisu.removeAll();
 
-				final Job job = new Job("Loading trace from micro description") {
+				final Job job = new Job(MonitorMessages.BuildAbstraction) {
 
 					@Override
 					protected IStatus run(final IProgressMonitor monitor) {
-						monitor.beginTask("Gathering data from trace...", IProgressMonitor.UNKNOWN);
+						monitor.beginTask(MonitorMessages.LoadData, IProgressMonitor.UNKNOWN);
 						try {
 							traceID = ocelotlParameters.getDataCache().loadDataCache(loadCachefile, ocelotlParameters);
 							trace = null;
@@ -193,7 +194,7 @@ public class OcelotlView extends FramesocPart {
 							// Load the trace
 							confDataLoader.load(trace);
 
-							monitor.beginTask("Loading cached data...", IProgressMonitor.UNKNOWN);
+							monitor.beginTask(MonitorMessages.LoadCache, IProgressMonitor.UNKNOWN);
 							Display.getDefault().syncExec(new Runnable() {
 
 								@Override
@@ -345,7 +346,7 @@ public class OcelotlView extends FramesocPart {
 				hasChanged = HasChanged.ALL;
 				
 			setConfiguration();
-			final String title = "Computing Aggregated View";
+			final String title = MonitorMessages.ComputingAggregatedView;
 			final Job job = new Job(title) {
 
 				@Override
@@ -363,7 +364,7 @@ public class OcelotlView extends FramesocPart {
 									overView.reset();
 								}
 
-								monitor.setTaskName("Initializing Aggregation Operator");
+								monitor.setTaskName(MonitorMessages.Initialization);
 								ocelotlCore.initAggregOperator(monitor);
 								monitor.worked(1);
 							}
@@ -371,8 +372,8 @@ public class OcelotlView extends FramesocPart {
 								if (checkMonitor(monitor))
 									return Status.CANCEL_STATUS;
 
-								monitor.setTaskName("Aggregation (1/3)");
-								monitor.subTask("Computing Qualities...");
+								monitor.setTaskName(MonitorMessages.AggregationProcess);
+								monitor.subTask(MonitorMessages.subQualities);
 								ocelotlCore.computeQualities();
 								monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents());
 							}
@@ -380,8 +381,7 @@ public class OcelotlView extends FramesocPart {
 								if (checkMonitor(monitor))
 									return Status.CANCEL_STATUS;
 
-								monitor.setTaskName("Aggregation (2/3)");
-								monitor.subTask("Computing Dichotomy...");
+								monitor.subTask(MonitorMessages.subDichotomy);
 								ocelotlCore.computeDichotomy();
 								monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents());
 							}
@@ -394,8 +394,7 @@ public class OcelotlView extends FramesocPart {
 						if (checkMonitor(monitor))
 							return Status.CANCEL_STATUS;
 						
-						monitor.setTaskName("Aggregation (3/3)");
-						monitor.subTask("Computing Parts...");
+						monitor.subTask(MonitorMessages.subParts);
 
 						ocelotlCore.computeParts();
 						monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents());
@@ -428,8 +427,8 @@ public class OcelotlView extends FramesocPart {
 
 						@Override
 						public void run() {
-							monitor.setTaskName("Rendering");
-							monitor.subTask("Drawing Diagram...");
+							monitor.setTaskName(MonitorMessages.Rendering);
+							monitor.subTask(MonitorMessages.subDiagram);
 							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion(), ocelotlCore.getVisuOperator());
