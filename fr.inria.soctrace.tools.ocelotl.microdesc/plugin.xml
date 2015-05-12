@@ -6,18 +6,18 @@
          name="MicroModel"
          point="fr.inria.soctrace.tools.ocelotl.core.microscopicmodel">
      <microscopic_model
-     		name="Events"
+     		name="Event Occurences"
      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.EventDistribution"
      		unit="Events / %TIME"
      		unit_description="Events / Time"
-     		selection_priority = "2"
+     		selection_priority = "3"
      		trace_formats="ALL"
      		generic="true"
      		visual_compatibility="PARTS, PROPORTIONS, MODE, EVENTMODE"
             event_category="ALL">
       </microscopic_model>
       <microscopic_model
-      		name="States"
+      		name="State Total Duration"
       		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateDistribution"
       		unit=""
       		unit_description="Activity Ratio"
@@ -28,24 +28,24 @@
             event_category="STATE">
       </microscopic_model>
       <microscopic_model
-      		name="States Average"
+      		name="State Average Duration"
       		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.StateAverageDistribution"
       		unit="Event^-1"
       		unit_description="Activity Ratio / Event"
-      		selection_priority = "1"
+      		selection_priority = "2"
       		trace_formats="ALL"
      		generic="true"
      		visual_compatibility="PARTS, PROPORTIONS, MODE, STATEMODE"
             event_category="STATE">
       </microscopic_model>
       <microscopic_model
-     		name="Variables"
+     		name="Variable Average Value"
      		class="fr.inria.soctrace.tools.ocelotl.microdesc.operators.VariableDistribution"
      		unit_description=""
      		unit="%UNKNOWN"
      		trace_formats="ALL"
      		generic="true"
-     		selection_priority = "3"
+     		selection_priority = "4"
      		visual_compatibility="PARTS, PROPORTIONS, VARIABLEMODE"
             event_category="VARIABLE">
       </microscopic_model>
@@ -62,27 +62,17 @@
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.TypeDistributionView"
             visual_compatibility="PARTS, PROPORTIONS, STATEMODE, EVENTMODE, VARIABLEMODE"
             selection_priority="1"
-            dimension="2D"
+            dimension="OLP_3D"
             ts_default_number="100">
       </aggregation_operator>
       <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.core.idataaggregop.SpatioTemporalAggregation"
+            class="fr.inria.soctrace.tools.ocelotl.core.idataaggregop.SpatioTemporalLeafAggregation"
             operator="Spatiotemporal Aggregation"
             param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
             param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
             visual_compatibility="PARTS, STATEMODE, EVENTMODE, VARIABLEMODE"
             selection_priority="2"
-            dimension="3D"
-            ts_default_number="30">
-      </aggregation_operator>
-      <aggregation_operator
-            class="fr.inria.soctrace.tools.ocelotl.core.idataaggregop.SpatioTemporalLeafAggregation"
-            operator="Spatiotemporal Leaf Aggregation"
-            param_config="fr.inria.soctrace.tools.ocelotl.microdesc.config.DistributionConfig"
-            param_win="fr.inria.soctrace.tools.ocelotl.microdesc.ui.HierarchicalDistributionView"
-            visual_compatibility="PARTS, STATEMODE, EVENTMODE, VARIABLEMODE"
-            selection_priority="3"
-            dimension="3D_Leaf"
+            dimension="DLP_2D_Leaf"
             ts_default_number="30">
       </aggregation_operator>
    </extension>
