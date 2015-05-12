@@ -237,7 +237,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			IProgressMonitor monitor) throws IOException, SoCTraceException,
 			InterruptedException, OcelotlException {
 		monitor.setTaskName(MonitorMessages.ReadingCache);
-		monitor.subTask("Initializing...");
+		monitor.subTask(MonitorMessages.subInitializing);
 
 		// Contains the time interval of the events to query
 		ArrayList<IntervalDesc> times = new ArrayList<IntervalDesc>();
@@ -289,7 +289,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Run a single database query with all the times of the dirty time
 		// slices to rebuild the matrix
 
-		monitor.subTask("Loading Incomplete Data from Database...");
+		monitor.subTask(MonitorMessages.subPartial);
 
 		computeDirtyCacheMatrix(
 				new ArrayList<EventProducer>(eventProducers.values()), times,
@@ -304,7 +304,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Get header
 		line = bufFileReader.readLine();
 
-		monitor.subTask("Loading Data Cache...");
+		monitor.subTask(MonitorMessages.subLoading);
 		// Read data
 		while ((line = bufFileReader.readLine()) != null) {
 			String[] values = line.split(OcelotlConstants.CSVDelimiter);
@@ -369,7 +369,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 			IProgressMonitor monitor) throws IOException, OcelotlException {
 
 		monitor.setTaskName(MonitorMessages.ReadingCache);
-		monitor.subTask("Initializing...");
+		monitor.subTask(MonitorMessages.subInitializing);
 		
 		parameters.setApproximateRebuild(true);
 
@@ -407,7 +407,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		if (monitor.isCanceled())
 			return;
 
-		monitor.subTask("Loading...");
+		monitor.subTask(MonitorMessages.subLoading);
 
 		BufferedReader bufFileReader;
 		bufFileReader = new BufferedReader(new FileReader(aCacheFile.getPath()));
@@ -487,7 +487,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		BufferedReader bufFileReader = new BufferedReader(new FileReader(
 				aCacheFile.getPath()));
 		monitor.setTaskName(MonitorMessages.ReadingCache);
-		monitor.subTask("Loading...");
+		monitor.subTask(MonitorMessages.subLoading);
 
 		String line;
 		// Get header
@@ -859,7 +859,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 					// Save the newly computed matrix + parameters
 					dm.start();
-					monitor.subTask("Saving Loaded Data in Cache...");
+					monitor.subTask(MonitorMessages.subCacheSaving);
 					saveMatrix();
 					dm.end("DATACACHE - Save the matrix to cache");
 				} else {
@@ -873,7 +873,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 
 					initMatrix();
 
-					monitor.subTask("Loading Data from the Newly Generated Cache...");
+					monitor.subTask(MonitorMessages.subCacheLoading);
 					loadFromCache(aCacheFile, monitor);
 				}
 			}

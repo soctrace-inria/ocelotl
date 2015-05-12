@@ -26,6 +26,7 @@ import fr.inria.soctrace.lib.model.utils.SoCTraceException;
 import fr.inria.soctrace.lib.utils.DeltaManager;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.exceptions.OcelotlException;
+import fr.inria.soctrace.tools.ocelotl.core.monitor.MonitorMessages;
 import fr.inria.soctrace.tools.ocelotl.core.queries.OcelotlQueries;
 import fr.inria.soctrace.tools.ocelotl.core.timeslice.TimeSliceManager;
 import fr.inria.soctrace.tools.ocelotl.core.utils.DeltaManagerOcelotl;
@@ -36,6 +37,14 @@ public abstract class Microscopic3DDescription extends MicroscopicDescription {
 			.getLogger(Microscopic3DDescription.class);
 	
 	protected List<HashMap<EventProducer, HashMap<String, Double>>> matrix;
+	
+	protected void monitorMessageDatabaseQuery(IProgressMonitor monitor){
+		monitor.subTask(MonitorMessages.subDBQuery);
+	}
+	
+	protected void monitorMessageDatabaseReading(IProgressMonitor monitor){
+		monitor.subTask(MonitorMessages.subDBReading);
+	}
 
 	public Microscopic3DDescription() {
 		super();

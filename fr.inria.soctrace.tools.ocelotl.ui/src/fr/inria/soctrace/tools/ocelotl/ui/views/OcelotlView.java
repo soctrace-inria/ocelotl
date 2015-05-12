@@ -434,11 +434,11 @@ public class OcelotlView extends FramesocPart {
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion(), ocelotlCore.getVisuOperator());
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							textRun.setText(String.valueOf(getOcelotlParameters().getParameter()));
-							monitor.subTask("Drawing Quality Curves...");
+							monitor.subTask(MonitorMessages.subCurves);
 							qualityView.createDiagram();
-							monitor.subTask("Updating Statistics...");
+							monitor.subTask(MonitorMessages.subStats);
 							statView.createDiagram();
-							monitor.subTask("Drawing Y Axis...");
+							monitor.subTask(MonitorMessages.subY);
 							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 							snapshotAction.setEnabled(true);
 							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
@@ -448,7 +448,7 @@ public class OcelotlView extends FramesocPart {
 							updateStatus();
 							visuDisplayed = true;
 							
-							monitor.subTask("Launching Overview...");
+							monitor.subTask(MonitorMessages.subOverview);
 							
 							if (ocelotlParameters.isOvervieweEnable()) {
 								try {

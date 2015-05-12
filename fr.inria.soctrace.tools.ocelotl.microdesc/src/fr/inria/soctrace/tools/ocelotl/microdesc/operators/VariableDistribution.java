@@ -139,7 +139,7 @@ public class VariableDistribution extends Microscopic3DDescription {
 			throws SoCTraceException, InterruptedException, OcelotlException {
 		dm = new DeltaManagerOcelotl();
 		dm.start();
-		monitor.subTask("Querying Database...");
+		monitorMessageDatabaseQuery(monitor);
 		eventIterator = ocelotlQueries.getVariableIterator(eventProducers,
 				time, monitor);
 		if (monitor.isCanceled()) {
@@ -150,7 +150,7 @@ public class VariableDistribution extends Microscopic3DDescription {
 		setTimeSliceManager(new TimeSliceVariableManager(getOcelotlParameters()
 				.getTimeRegion(), getOcelotlParameters().getTimeSlicesNumber()));
 		final List<OcelotlThread> threadlist = new ArrayList<OcelotlThread>();
-		monitor.subTask("Loading Data From Database...");
+		monitorMessageDatabaseQuery(monitor);
 		for (int t = 0; t < getOcelotlParameters().getNumberOfThreads(); t++)
 			threadlist.add(new OcelotlThread(getOcelotlParameters()
 					.getNumberOfThreads(), t, getOcelotlParameters()
