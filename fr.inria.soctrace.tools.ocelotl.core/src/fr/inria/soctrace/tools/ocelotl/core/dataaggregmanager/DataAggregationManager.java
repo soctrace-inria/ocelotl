@@ -62,8 +62,8 @@ public abstract class DataAggregationManager {
 	public void getDichotomyValue() throws OcelotlException {
 		File dichoCache;
 
-		// If the cache is activated
-		if (ocelotlParameters.getOcelotlSettings().isDichoCacheActivated()
+		// If rebuild is not approximate && If the cache is activated
+		if (!ocelotlParameters.isApproximateRebuild() && ocelotlParameters.getOcelotlSettings().isDichoCacheActivated()
 				&& noFiltering()
 				&& (dichoCache = checkForValidCache()) != null) {
 
