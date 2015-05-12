@@ -231,7 +231,7 @@ public class OcelotlSettingsView extends Dialog {
 			btnRadioButton.setEnabled(cacheActivation);
 			btnRadioButton_1.setEnabled(cacheActivation);
 			btnRadioButton_2.setEnabled(cacheActivation);
-			btnRadioButton_3.setEnabled(cacheActivation);
+			btnRadioButton_3.setEnabled(false);
 			cacheTimeSliceValue.setEnabled(cacheActivation);
 		}
 	}
@@ -438,14 +438,14 @@ public class OcelotlSettingsView extends Dialog {
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
 		btnNormalize.setFont(cantarell8);
 		btnNormalize.setSelection(settings.isNormalizedCurve());
-		btnNormalize.setText("Normalize Qualities");
+		btnNormalize.setText("Normalize Qualities (May be Ignored by Certain Operators");
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnIncreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnIncreasingQualities.setFont(cantarell8);
-		btnIncreasingQualities.setText("Complexity gain (green)\nInformation gain (red)");
+		btnIncreasingQualities.setText("Complexity gain (green)\nInformation gain (red)\nRelative to the Macroscopic Partition (p=1)");
 		btnIncreasingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
 		btnIncreasingQualities.setSelection(settings.getIncreasingQualities());
 		new Label(groupQualityCurveSettings, SWT.NONE);
@@ -453,7 +453,7 @@ public class OcelotlSettingsView extends Dialog {
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
-		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)");
+		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)\nRelative to the Microscopic Partition (p=0)");
 		btnDecreasingQualities.setFont(cantarell8);
 		btnDecreasingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
 		btnDecreasingQualities.setSelection(!settings.getIncreasingQualities());
@@ -528,12 +528,12 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Group groupDataCacheSettings = new Group(sashFormSettings, SWT.NONE);
 		groupDataCacheSettings.setFont(cantarell8);
-		groupDataCacheSettings.setText("Caches Settings");
+		groupDataCacheSettings.setText("Cache Settings");
 		groupDataCacheSettings.setLayout(new GridLayout(3, false));
 
 		final Label lblDataCacheSize = new Label(groupDataCacheSettings, SWT.NONE);
 		lblDataCacheSize.setFont(cantarell8);
-		lblDataCacheSize.setText("MB Caches Size (-1=unlimited):");
+		lblDataCacheSize.setText("MB Cache Size (-1=unlimited):");
 		
 		dataCacheSize = new Spinner(groupDataCacheSettings, SWT.BORDER);
 		dataCacheSize.setValues(0, -1, 99999999, 0, 1, 10);
@@ -545,7 +545,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
 		lblDataCacheDirectory.setFont(cantarell8);
-		lblDataCacheDirectory.setText("Caches directory:");
+		lblDataCacheDirectory.setText("Cache directory:");
 
 		final GridData gd_dataCacheDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_dataCacheDir.widthHint = 100;
@@ -574,7 +574,7 @@ public class OcelotlSettingsView extends Dialog {
 		
 		btnDataCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
 		btnDataCacheEnabled.setFont(cantarell8);
-		btnDataCacheEnabled.setText("Data Cache Enabled");
+		btnDataCacheEnabled.setText("Trace Abstraction Cache Enabled");
 		btnDataCacheEnabled.setSelection(settings.isDataCacheActivated());
 		btnDataCacheEnabled.addSelectionListener(new EnableCacheListener());
 		new Label(groupDataCacheSettings, SWT.NONE);
@@ -587,7 +587,7 @@ public class OcelotlSettingsView extends Dialog {
 		}
 
 		Label lblCacheTimeSlices = new Label(groupDataCacheSettings, SWT.NONE);
-		lblCacheTimeSlices.setText("Data Cache time slices:");
+		lblCacheTimeSlices.setText("Optimal Time Slice Number:");
 		lblCacheTimeSlices.setFont(cantarell8);
 		lblCacheTimeSlices.setToolTipText("Number of Time Slices Used When Generating Data Cache");
 
@@ -601,7 +601,7 @@ public class OcelotlSettingsView extends Dialog {
 		new Label(groupDataCacheSettings, SWT.NONE);
 
 		Label lblCachePolicy = new Label(groupDataCacheSettings, SWT.NONE);
-		lblCachePolicy.setText("Data Cache policy");
+		lblCachePolicy.setText("Policy");
 		lblCachePolicy.setFont(cantarell8);
 		new Label(groupDataCacheSettings, SWT.NONE);
 		new Label(groupDataCacheSettings, SWT.NONE);
@@ -624,7 +624,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		btnRadioButton_3 = new Button(groupDataCacheSettings, SWT.RADIO);
 		btnRadioButton_3.addSelectionListener(new cachePolicyListener());
-		btnRadioButton_3.setText("Auto.");
+		btnRadioButton_3.setText("Auto (not available)");
 		btnRadioButton_3.setFont(cantarell8);
 		new Label(groupDataCacheSettings, SWT.NONE);
 
@@ -638,7 +638,7 @@ public class OcelotlSettingsView extends Dialog {
 		
 		btnDichoCacheEnabled = new Button(groupDataCacheSettings, SWT.CHECK);
 		btnDichoCacheEnabled.setFont(cantarell8);
-		btnDichoCacheEnabled.setText("Dichotomy Cache Enabled");
+		btnDichoCacheEnabled.setText("Partition Cache Enabled");
 		btnDichoCacheEnabled.setSelection(settings.isDichoCacheActivated());
 
 		// Advanced settings
@@ -654,7 +654,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Label lblPageSize = new Label(grpCacheManagement, SWT.NONE);
 		lblPageSize.setFont(cantarell8);
-		lblPageSize.setText("Event Number Retrieved by Threads");
+		lblPageSize.setText("Event Bunch Size");
 
 		spinnerEventSize = new Spinner(grpCacheManagement, SWT.BORDER);
 		spinnerEventSize.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -670,7 +670,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Label lblDivideDbQueries = new Label(grpDivideDbQuery, SWT.NONE);
 		lblDivideDbQueries.setFont(cantarell8);
-		lblDivideDbQueries.setText("Event Producers per Query (0=All)");
+		lblDivideDbQueries.setText("Event Producers per Query (0=all)");
 
 		spinnerDivideDbQuery = new Spinner(grpDivideDbQuery, SWT.BORDER);
 		spinnerDivideDbQuery.setFont(cantarell8);
@@ -681,7 +681,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Group grpMultiThread = new Group(advancedSettingsSashForm, SWT.NONE);
 		grpMultiThread.setFont(cantarell8);
-		grpMultiThread.setText("Multi Threading");
+		grpMultiThread.setText("Multithreading");
 		grpMultiThread.setLayout(new GridLayout(2, false));
 
 		final Label lblThread = new Label(grpMultiThread, SWT.NONE);
@@ -697,19 +697,19 @@ public class OcelotlSettingsView extends Dialog {
 		
 		final Group grpAggregateLeaves = new Group(advancedSettingsSashForm, SWT.NONE);
 		grpAggregateLeaves.setFont(cantarell8);
-		grpAggregateLeaves.setText("Leaves Aggregation");
+		grpAggregateLeaves.setText("Aggregation of Event Producer Hierarchy Leaves");
 		grpAggregateLeaves.setLayout(new GridLayout(2, false));
 		
 		btnEnableLeavesAgg = new Button(grpAggregateLeaves, SWT.CHECK);
 		btnEnableLeavesAgg.setFont(cantarell8);
 		btnEnableLeavesAgg.setSelection(settings.isAggregateLeaves());
-		btnEnableLeavesAgg.setText("Enable Leaves Aggregation");
+		btnEnableLeavesAgg.setText("Enable");
 		btnEnableLeavesAgg.addSelectionListener(new PreAggregListener());
 		new Label(grpAggregateLeaves, SWT.NONE);
 
 		final Label lblAggLeaves = new Label(grpAggregateLeaves, SWT.NONE);
 		lblAggLeaves.setFont(cantarell8);
-		lblAggLeaves.setText("Max. Number of Leaves");
+		lblAggLeaves.setText("Maximal Number of Leaves");
 
 		spinnerMaxAggLeaves = new Spinner(grpAggregateLeaves, SWT.BORDER);
 		spinnerMaxAggLeaves.setFont(cantarell8);
@@ -889,13 +889,13 @@ public class OcelotlSettingsView extends Dialog {
 		btnOverviewEnableLeavesAgg = new Button(groupOverviewSettings, SWT.CHECK);
 		btnOverviewEnableLeavesAgg.setFont(cantarell8);
 		btnOverviewEnableLeavesAgg.setSelection(settings.isOverviewAggregateLeaves());
-		btnOverviewEnableLeavesAgg.setText("Enable Leaves Aggregation for Overview");
+		btnOverviewEnableLeavesAgg.setText("Enable Aggregation of Leaves for Overview");
 		btnOverviewEnableLeavesAgg.addSelectionListener(new OverviewPreAggregListener());
 		new Label(groupOverviewSettings, SWT.NONE);
 		
 		final Label lblOverviewAggLeaves = new Label(groupOverviewSettings, SWT.NONE);
 		lblOverviewAggLeaves.setFont(cantarell8);
-		lblOverviewAggLeaves.setText("Max. Number of Leaves");
+		lblOverviewAggLeaves.setText("Maximal Number of Leaves");
 
 		spinnerOverviewMaxAggLeaves = new Spinner(groupOverviewSettings, SWT.BORDER);
 		spinnerOverviewMaxAggLeaves.setFont(cantarell8);
