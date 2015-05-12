@@ -62,8 +62,10 @@ public abstract class DataAggregationManager {
 	public void getDichotomyValue() throws OcelotlException {
 		File dichoCache;
 
+		if (!ocelotlParameters.isApproximateRebuild() && !ocelotlParameters.isAggregatedLeaveEnable()){
+		
 		// If rebuild is not approximate && if there is no leaf aggregation && If the cache is activated
-		if (!ocelotlParameters.isApproximateRebuild() && !ocelotlParameters.isAggregatedLeaveEnable() && ocelotlParameters.getOcelotlSettings().isDichoCacheActivated()
+		if (ocelotlParameters.getOcelotlSettings().isDichoCacheActivated()
 				&& noFiltering()
 				&& (dichoCache = checkForValidCache()) != null) {
 
@@ -72,6 +74,9 @@ public abstract class DataAggregationManager {
 		} else {
 			computeDichotomy();
 			saveDichotomyValues();
+		}
+		}else{
+		computeDichotomy();
 		}
 	}
 	
