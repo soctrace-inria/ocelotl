@@ -17,7 +17,7 @@
 # Adaptation to Ocelotl : Damien Dosimont
 #####################################################################
 
-SCRIPT="../../soctrace-inria.github.io/updatesite/change_version.sh"
+SCRIPT="./change_version.sh"
 MASTER="."
 FEATURE="../fr.inria.soctrace.tools.ocelotl.feature/feature.xml"
 CATEGORY="../fr.inria.soctrace.tools.ocelotl.maven.repository/category.xml"
