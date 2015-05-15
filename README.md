@@ -25,13 +25,13 @@ Then, install Ocelotl in Eclipse using the following procedure:
 - Press _Next_ and follow the wizard (accept the license and finish the installation).
 - At the end of the installation, Eclipse will ask for restart.
 
-# Setup
+### Quick Setup
 - After the restart following a fresh installation, a configuration wizard will automatically pop up to perform the initial configuration.
 - If no wizard is shown (because, for example, you already had a `soctrace.conf` configuration file in your Eclipse installation directory), do the following:
   - Launch the Framesoc perspective: _Windows > Open Perspective > Other... > Framesoc_
   - Launch the wizard: _Framesoc > Management > Initialize System_
 
-## Java Heap Issue
+### Java Heap Issue
 In order to be able to use Ocelotl you might need to increase the maximum amount of memory available for the JVM, setting it to at least 4096 MB for best performance. To do this, you need to:
 - Open the `eclipse.ini` file in the root directory of your eclipse installation
 - Look for a line containing the -Xmx variable, like the following:
