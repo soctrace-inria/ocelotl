@@ -1,43 +1,40 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Ocelotl Analysis Tool : Multidimensional Overviews for Huge Trace Analysis">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-    <title>Ocelotl Analysis Tool</title>
+    <title>Ocelotl Analysis Tool by soctrace-inria</title>
   </head>
 
   <body>
+    <header>
+      <div class="inner">
+        <h1>Ocelotl Analysis Tool</h1>
+        <h2>Multidimensional Overviews for Huge Trace Analysis</h2>
+        <a href="https://github.com/soctrace-inria/ocelotl" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/soctrace-inria/ocelotl">View on GitHub</a>
-
-          <h1 id="project_title">Ocelotl Analysis Tool</h1>
-          <h2 id="project_tagline">Multidimensional Overviews for Huge Trace Analysis</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/soctrace-inria/ocelotl/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/soctrace-inria/ocelotl/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <p>Ocelotl is an innovative visualization tool, which provides overviews for execution trace analysis by using a data aggregation technique. This technique enables to find anomalies in huge traces containing up to several billions of events, while keeping a fast computation time and providing a simple representation that does not overload the user.</p>
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <p>Ocelotl is an innovative visualization tool, which provides overviews for execution trace analysis by using a data aggregation technique. This technique enables to find anomalies in huge traces containing up to several billions of events, while keeping a fast computation time and providing a simple representation that does not overload the user.</p>
 
 <p>Ocelotl is integrated into <a href="http://soctrace-inria.github.io/framesoc/">Framesoc</a>, a generic trace management and analysis infrastructure. You can take advantage of the tool bunch provided by Framesoc, and switch from an Ocelotl's overview to more detailed representations once you know where to focus.</p>
 
 <p><img src="http://soctrace-inria.github.io/ocelotl/images/screenshots/ocelotl_spatiotemporal.png" alt="Ocelotl Screenshot"></p>
 
-<p>You will find here a video showing Ocelotl functionalities :</p>
+<p>You will find here a video showing Ocelotl functionalities:</p>
 
 <p><a href="https://www.youtube.com/watch?v=3cbLM0rUu78"><img src="http://soctrace-inria.github.io/ocelotl/images/play.png" alt="Ocelotl Analysis Tool"></a></p>
 
@@ -48,12 +45,56 @@
 <a id="update-site" class="anchor" href="#update-site" aria-hidden="true"><span class="octicon octicon-link"></span></a>Update Site</h3>
 
 <p>This is the easiest way to start with Ocelotl.
-First, <a href="https://www.eclipse.org/">download</a> a version of Eclipse. We recommand <a href="http://www.eclipse.org/downloads/packages/release/Kepler/SR2">Eclipse Kepler</a>.
-Then, install Ocelotl in Eclipse using the following procedure: Go to <em>Help &gt; Install New Software</em>. In the new window, put the following URL in the field <em>Work with:</em> </p>
+First, <a href="https://www.eclipse.org/">download</a> a version of Eclipse. We recommand <a href="http://www.eclipse.org/downloads/packages/release/Luna/SR2">Eclipse Luna</a>.
+Then, install Ocelotl in Eclipse using the following procedure: </p>
 
-<p><a href="http://soctrace-inria.github.io/updatesite/">http://soctrace-inria.github.io/updatesite/</a></p>
+<ul>
+<li>Go to <em>Help &gt; Install New Software</em>. </li>
+<li>Type the following address in the text field <em>Work with:</em>
 
-<p>and press Enter. Select all the available tools. Then click on <em>Next</em>, <em>Next</em>, accept the license agreement and click on <em>Finish</em>.</p>
+<ul>
+<li><a href="http://soctrace-inria.github.io/updatesite/">http://soctrace-inria.github.io/updatesite/</a></li>
+</ul>
+</li>
+<li>Select the feature(s) you want to install</li>
+<li>Press <em>Next</em> and follow the wizard (accept the license and finish the installation).</li>
+<li>At the end of the installation, Eclipse will ask for restart.</li>
+</ul>
+
+<h3>
+<a id="quick-setup" class="anchor" href="#quick-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick Setup</h3>
+
+<ul>
+<li>After the restart following a fresh installation, a configuration wizard will automatically pop up to perform the initial configuration.</li>
+<li>If no wizard is shown (because, for example, you already had a <code>soctrace.conf</code> configuration file in your Eclipse installation directory), do the following:
+
+<ul>
+<li>Launch the Framesoc perspective: <em>Windows &gt; Open Perspective &gt; Other... &gt; Framesoc</em>
+</li>
+<li>Launch the wizard: <em>Framesoc &gt; Management &gt; Initialize System</em>
+</li>
+</ul>
+</li>
+</ul>
+
+<h3>
+<a id="java-heap-issue" class="anchor" href="#java-heap-issue" aria-hidden="true"><span class="octicon octicon-link"></span></a>Java Heap Issue</h3>
+
+<p>In order to be able to use Ocelotl you might need to increase the maximum amount of memory available for the JVM, setting it to at least 4096 MB for best performance. To do this, you need to:</p>
+
+<ul>
+<li>Open the <code>eclipse.ini</code> file in the root directory of your eclipse installation</li>
+<li>
+<p>Look for a line containing the -Xmx variable, like the following:</p>
+
+<p><code>-Xmx####m</code> (#### is the current value of maximal memory in MB)</p>
+</li>
+<li>
+<p>Replace #### with at least 4096, in order to get the following line:</p>
+
+<p><code>-Xmx4096m</code> </p>
+</li>
+</ul>
 
 <h3>
 <a id="download-the-sources" class="anchor" href="#download-the-sources" aria-hidden="true"><span class="octicon octicon-link"></span></a>Download the Sources</h3>
@@ -68,7 +109,7 @@ Then, install Ocelotl in Eclipse using the following procedure: Go to <em>Help &
 <a id="wiki-and-user-guide" class="anchor" href="#wiki-and-user-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Wiki and User Guide</h2>
 
 <p>Check our <a href="https://github.com/soctrace-inria/ocelotl/wiki/User-Guide">wiki</a> to install, configure and use Ocelotl.
-A detailed <a href="https://github.com/soctrace-inria/ocelotl/raw/master/docs/OCELOTL_userguide.pdf">user guide</a> is also available for more details.</p>
+A detailed <a href="https://github.com/soctrace-inria/ocelotl/raw/master/docs/ocelotl_userguide.pdf">user guide</a> is also available for more details.</p>
 
 <h2>
 <a id="licence" class="anchor" href="#licence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licence</h2>
@@ -92,18 +133,26 @@ A detailed <a href="https://github.com/soctrace-inria/ocelotl/raw/master/docs/OC
 <p>You can subscribe to the Ocelotl user list using this <a href="http://lists.gforge.inria.fr/cgi-bin/mailman/listinfo/ocelotl-users">form</a>
 and post a message to the list members by sending an email to
 <a href="mailto:ocelotl-users-at-lists.gforge.inria.fr">ocelotl-users-at-lists.gforge.inria.fr</a></p>
-      </section>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/soctrace-inria/ocelotl/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/soctrace-inria/ocelotl/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/soctrace-inria/ocelotl"></a> is maintained by <a href="https://github.com/soctrace-inria">soctrace-inria</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
     </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Ocelotl Analysis Tool maintained by <a href="https://github.com/soctrace-inria">soctrace-inria</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-              <script type="text/javascript">
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -113,7 +162,6 @@ and post a message to the list members by sending an email to
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
-
 
   </body>
 </html>
