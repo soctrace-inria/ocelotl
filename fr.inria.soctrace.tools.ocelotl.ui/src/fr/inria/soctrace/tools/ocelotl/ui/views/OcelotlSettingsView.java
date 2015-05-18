@@ -438,14 +438,14 @@ public class OcelotlSettingsView extends Dialog {
 		btnNormalize = new Button(groupQualityCurveSettings, SWT.CHECK);
 		btnNormalize.setFont(cantarell8);
 		btnNormalize.setSelection(settings.isNormalizedCurve());
-		btnNormalize.setText("Normalize Qualities (May be Ignored by Certain Operators");
+		btnNormalize.setText("Normalize Qualities (May be ignored by certain operators)");
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnIncreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
 		btnIncreasingQualities.setFont(cantarell8);
-		btnIncreasingQualities.setText("Complexity gain (green)\nInformation gain (red)\nRelative to the Macroscopic Partition (p=1)");
+		btnIncreasingQualities.setText("Complexity Gain (Green)\nInformation Gain (Red)\nRelative to the Macroscopic Partition (p=1)");
 		btnIncreasingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
 		btnIncreasingQualities.setSelection(settings.getIncreasingQualities());
 		new Label(groupQualityCurveSettings, SWT.NONE);
@@ -453,7 +453,7 @@ public class OcelotlSettingsView extends Dialog {
 		new Label(groupQualityCurveSettings, SWT.NONE);
 
 		btnDecreasingQualities = new Button(groupQualityCurveSettings, SWT.RADIO);
-		btnDecreasingQualities.setText("Complexity reduction (green)\nInformation loss (red)\nRelative to the Microscopic Partition (p=0)");
+		btnDecreasingQualities.setText("Complexity Reduction (Green)\nInformation Loss (Red)\nRelative to the Microscopic Partition (p=0)");
 		btnDecreasingQualities.setFont(cantarell8);
 		btnDecreasingQualities.addSelectionListener(new IncreasingQualityRadioSelectionAdapter());
 		btnDecreasingQualities.setSelection(!settings.getIncreasingQualities());
@@ -545,7 +545,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		final Label lblDataCacheDirectory = new Label(groupDataCacheSettings, SWT.NONE);
 		lblDataCacheDirectory.setFont(cantarell8);
-		lblDataCacheDirectory.setText("Cache directory:");
+		lblDataCacheDirectory.setText("Cache Directory:");
 
 		final GridData gd_dataCacheDir = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
 		gd_dataCacheDir.widthHint = 100;
