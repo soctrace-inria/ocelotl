@@ -351,7 +351,7 @@ public class OcelotlView extends FramesocPart {
 
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
-					monitor.beginTask(title, 4 * ocelotlParameters.getTrace().getNumberOfEvents());
+					monitor.beginTask(title, 5 * ocelotlParameters.getTrace().getNumberOfEvents());
 					try {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
@@ -435,10 +435,13 @@ public class OcelotlView extends FramesocPart {
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							textRun.setText(String.valueOf(getOcelotlParameters().getParameter()));
 							monitor.subTask(MonitorMessages.subCurves);
+							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
 							qualityView.createDiagram();
 							monitor.subTask(MonitorMessages.subStats);
+							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
 							statView.createDiagram();
 							monitor.subTask(MonitorMessages.subY);
+							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
 							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
 							snapshotAction.setEnabled(true);
 							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
@@ -449,22 +452,11 @@ public class OcelotlView extends FramesocPart {
 							visuDisplayed = true;
 							
 							monitor.subTask(MonitorMessages.subOverview);
-							
-							if (ocelotlParameters.isOvervieweEnable()) {
-								try {
-									overView.updateDiagram(ocelotlParameters.getTimeRegion());
-									// Do we need to compute everything
-									if (overView.isRedrawOverview())
-										overView.getOverviewThread().start();
-								} catch (OcelotlException e) {
-									MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
-								}
-							}
-							
+							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/5);
 							history.saveHistory();
 							timestampHasChanged = false;
-
 							monitor.done();
+
 						}
 					});
 					
@@ -474,6 +466,28 @@ public class OcelotlView extends FramesocPart {
 			};
 			job.setUser(true);
 			job.schedule();
+			new Thread(
+				new Runnable() {
+				public void run() {
+					Display.getDefault().asyncExec(new Runnable() {
+					
+
+					@Override
+					public void run() {
+						if (ocelotlParameters.isOvervieweEnable()) {
+							try {
+								overView.updateDiagram(ocelotlParameters.getTimeRegion());
+								// Do we need to compute everything
+								if (overView.isRedrawOverview())
+									overView.getOverviewThread().start();
+							} catch (OcelotlException e) {
+								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+							}
+						}
+						
+					}
+					});
+				}}).start();		
 		}
 
 		/**
@@ -927,7 +941,20 @@ public class OcelotlView extends FramesocPart {
 			trace = traceMap.get(comboTraces.getSelectionIndex());
 			final String title = "Loading Trace";
 			btnRun.setEnabled(false);
-			overView.reset();
+			new Thread(
+					new Runnable() {
+					public void run() {
+						Display.getDefault().syncExec(new Runnable() {
+						
+
+						@Override
+						public void run() {
+							if (ocelotlParameters.isOvervieweEnable()) {
+									overView.reset();
+								}
+							}
+						});
+					}}).start();
 			cancelSelection();
 			currentShownTrace = trace;
 			setFocus();

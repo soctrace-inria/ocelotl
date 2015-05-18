@@ -166,10 +166,9 @@ public class TemporalMouseListener extends OcelotlMouseListener {
 			// Get time slice numbers from the time slice manager
 			Point timeslices = getTimeSlices(aggregatedView.getSelectTime());
 			aggregatedView.setSelectTime(setTemporalSelection(timeslices.x(), timeslices.y()));
-			
+			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, -1);
 			aggregatedView.getOcelotlView().getTimeAxisView().select(aggregatedView.getSelectTime(), true);
 			aggregatedView.getOcelotlView().setTimeRegion(aggregatedView.getSelectTime());
-			aggregatedView.getSelectFigure().draw(aggregatedView.getSelectTime(), true, -1, -1);
 			aggregatedView.getOcelotlView().getOverView().updateSelection(aggregatedView.getSelectTime());
 			aggregatedView.getOcelotlView().getStatView().updateData();
 		} else {
