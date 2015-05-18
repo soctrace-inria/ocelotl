@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -89,6 +90,26 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 		createPartControl(ocelotlView.getStatComposite());
 	}
 	
+	public class StatTableViewThread extends Thread {
+		  public StatTableViewThread(){
+		    super();
+		  }
+		  public void run(){
+		            Display.getDefault().asyncExec(new Runnable() {
+		               public void run() {
+		     			  if (statProvider.getMicroMode() != null) {
+		  					statProvider.computeData();
+		  					updateTableData();
+		  					// Needed for correct redraw of the table
+		  					compositeTable.layout();
+		  				}
+		               }
+		            });
+		         
+
+		  }       
+		}
+	
 	@Override
 	public void handle(FramesocBusTopic topic, Object data) {
 		// If color has changed
@@ -143,13 +164,9 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 	
 	@Override
 	public void updateData() {
-		if (statProvider.getMicroMode() != null) {
-			statProvider.computeData();
-			updateTableData();
-			// Needed for correct redraw of the table
-			compositeTable.layout();
-		}
-	}
+		StatTableViewThread thread= new StatTableViewThread();
+		thread.start();
+	}//TODO make a thread 
 
 	@Override
 	public void resizeDiagram() {

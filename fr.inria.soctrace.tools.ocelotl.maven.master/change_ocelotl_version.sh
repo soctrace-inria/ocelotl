@@ -17,12 +17,13 @@
 # Adaptation to Ocelotl : Damien Dosimont
 #####################################################################
 
-SCRIPT="../../soctrace-inria.github.io/updatesite/change_version.sh"
+SCRIPT="./change_version.sh"
 MASTER="."
-FEATURE="../fr.inria.soctrace.tools.ocelotl/feature/feature.xml"
+FEATURE="../fr.inria.soctrace.tools.ocelotl.feature/feature.xml"
 CATEGORY="../fr.inria.soctrace.tools.ocelotl.maven.repository/category.xml"
 
 # parameter check is done in the change_version.sh script
 NEW=$1
+QUALIFIER=$2
 $SCRIPT $MASTER $FEATURE $CATEGORY $NEW
 

@@ -24,8 +24,13 @@ public class StatContentProvider implements IStructuredContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		StatisticsProvider statProvider = (StatisticsProvider) inputElement;
-
-		return statProvider.getTableData().toArray();
+		Object[] result = new Object[1];
+		try{
+		result = statProvider.getTableData().toArray();
+		}
+		catch(NullPointerException e){
+		}
+		return result;
 	}
 
 	@Override
