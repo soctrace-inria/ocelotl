@@ -29,6 +29,11 @@ public class OcelotlStatisticsTableRowLabelProvider extends
 	 */
 	@Override
 	public String getToolTipText(Object element) {
+		// If empty or only white space(s)
+		if(toolTip.trim().isEmpty())
+			// Do not show anything
+			return null;
+		
 		return toolTip;
 	}
 
@@ -37,6 +42,6 @@ public class OcelotlStatisticsTableRowLabelProvider extends
 	}
 
 	public void setToolTip(String toolTip) {
-		this.toolTip = toolTip;
+		this.toolTip = toolTip.toString();
 	}
 }

@@ -217,6 +217,8 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 				.values()) {
 			TableViewerColumn elemsViewerCol = new TableViewerColumn(
 					tableViewer, SWT.NONE);
+			
+			// Text alignment in the column
 			int alignment;
 
 			// If it is the column name
