@@ -77,11 +77,11 @@ function main() {
     find .. -wholename "*META-INF/MANIFEST.MF" | xargs sed -i s/"$BV"/"$NBV"/
 
     echo "Updating ocelotl feature.xml"
-    sed -i s/"version=\".*.*.*\""/"version=\"${NEW}\""/ $FEATURE 
+    sed -i /xml/!s/"version=\".*.*.*\""/"version=\"${NEW}\""/ $FEATURE 
 
     echo "Updating repository category.xml"
     sed -i s/"\_.*.*.*.jar"/"\_${NEW}.jar"/ $CATEGORY
-    sed -i s/"version=\".*.*.*\""/"version=\"${NEW}\""/ $CATEGORY
+    sed -i /xml/!s/"version=\".*.*.*\""/"version=\"${NEW}\""/ $CATEGORY
 
     echo "Update pom.xml in all modules"
     mvn versions:set -DnewVersion="${NEW}" -DgenerateBackupPoms=false
