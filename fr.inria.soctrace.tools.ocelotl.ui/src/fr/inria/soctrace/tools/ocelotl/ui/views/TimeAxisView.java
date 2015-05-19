@@ -156,14 +156,14 @@ public class TimeAxisView {
 			final String text = timeFormatter.format(value);
 			final Label label = new Label(text);
 			label.setLabelAlignment(SWT.CENTER);
-			label.setToolTip(new Label(text));
+			label.setToolTip(new Label(" "+text+" "));
 			label.setForegroundColor(SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			label.setFont(SWTResourceManager.getFont("Cantarell", TextHeight / 2, SWT.NORMAL));
 			final ToolbarLayout layout = new ToolbarLayout();
 			layout.setMinorAlignment(OrderedLayout.ALIGN_CENTER);
 			
 			if (i != (int) GradNumber)
-				root.add(label, new Rectangle(new Point((int) (i * GradWidth), linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
+				root.add(label, new Rectangle(new Point((int) (i * GradWidth) - Border, linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
 			else
 				root.add(label, new Rectangle(new Point((int) (i * GradWidth) - Border * 3, linePosition + TextPositionOffset), new Point(new Point((int) (i * GradWidth) + TimeAxisWidth + TextWidth, linePosition + TextPositionOffset + TextHeight))));
 

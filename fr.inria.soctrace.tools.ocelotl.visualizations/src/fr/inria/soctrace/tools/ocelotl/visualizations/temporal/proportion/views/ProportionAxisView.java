@@ -151,7 +151,7 @@ public class ProportionAxisView extends UnitAxisView {
 					.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 			label.setFont(SWTResourceManager.getFont("Cantarell",
 					8, SWT.NORMAL));
-			label.setToolTip(new Label(text));
+			label.setToolTip(new Label(" "+text+" "));
 			label.setSize(textWidth, TextHeight);
 			
 			// Compute label width
@@ -217,7 +217,7 @@ public class ProportionAxisView extends UnitAxisView {
 		
 		// Add legend
 		String unit = ocelotlView.getOcelotlParameters().getCurrentYAxisUnit();
-		final Label label = new Label(" " + unit + " ");
+		final Label label = new Label("  " + unit + "  ");
 		label.setLabelAlignment(PositionConstants.RIGHT);
 		label.setForegroundColor(SWTResourceManager
 				.getColor(SWT.COLOR_WIDGET_FOREGROUND));

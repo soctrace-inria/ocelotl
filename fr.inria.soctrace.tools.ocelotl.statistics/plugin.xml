@@ -20,7 +20,7 @@
         class="fr.inria.soctrace.tools.ocelotl.statistics.operators.StateSummaryStat"
         leave_aggregation_compatiblity="true"
         metric_compatibility="STATE_SUM"
-        operator="Total State Duration"
+        operator="State Total Duration"
         selection_priority="3"
         unit="%TIME"
         view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
@@ -30,7 +30,7 @@
         class="fr.inria.soctrace.tools.ocelotl.statistics.operators.StateLeaveSummaryStat"
         leave_aggregation_compatiblity="true"
         metric_compatibility="STATE_SUM"
-        operator="Total State Duration (only Leaves) - Temporal"
+        operator="State Total Duration (only Leaves) - Temporal"
         selection_priority="2"
         unit="%TIME"
         view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
@@ -40,7 +40,7 @@
         class="fr.inria.soctrace.tools.ocelotl.statistics.operators.StateLeaveSummaryStatST"
         leave_aggregation_compatiblity="true"
         metric_compatibility="STATE_SUM"
-        operator="Total State Duration (only Leaves) - Spatiotemporal)"
+        operator="State Total Duration (only Leaves) - Spatiotemporal)"
         selection_priority="2"
         unit="%TIME"
         view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">
@@ -50,7 +50,7 @@
         class="fr.inria.soctrace.tools.ocelotl.statistics.operators.StateActiveProducerSummaryStat"
         leave_aggregation_compatiblity="false"
         metric_compatibility="STATE_SUM"
-        operator="Total State Duration (only Active Producers)"
+        operator="State Total Duration (only Active Producers)"
         selection_priority="4"
         unit="%TIME"
         view="fr.inria.soctrace.tools.ocelotl.statistics.view.StatTableView">

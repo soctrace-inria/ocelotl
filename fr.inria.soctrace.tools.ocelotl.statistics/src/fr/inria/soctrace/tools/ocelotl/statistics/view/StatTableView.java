@@ -252,10 +252,6 @@ public class StatTableView extends StatView {
 			} else {
 				OcelotlStatisticsTableRowLabelProvider labelProvider = new OcelotlStatisticsTableRowLabelProvider(
 						col);
-				if (col.equals(OcelotlStatisticsTableColumn.VALUE))
-					labelProvider.setToolTip(ocelotlView.getOcelotlParameters()
-							.getCurrentStatsUnit());
-
 				elemsViewerCol.setLabelProvider(labelProvider);
 				alignment = SWT.RIGHT;
 			}
