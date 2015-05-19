@@ -54,11 +54,12 @@ public class StatisticOperatorManager {
 	private static final String OP_CLASS = "class"; //$NON-NLS-1$
 	private static final String OP_VIEW = "view"; //$NON-NLS-1$
 	private static final String OP_PARAM_WIN = "param_win"; //$NON-NLS-1$
-	private static final String OP_PARAM_CONFIG = "param_config";//$NON-NLS-1$							
+	private static final String OP_PARAM_CONFIG = "param_config";//$NON-NLS-1$		
+	private static final String OP_UNIT = "unit";//$NON-NLS-1$	
 	private static final String OP_METRIC_COMPATIBILITY = "metric_compatibility"; //$NON-NLS-1$
 	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
 	private static final String OP_AGGREGATOR_COMPATIBILITY = "aggregator_compatibility"; //$NON-NLS-1$
-	private static final String OP_LEAVE_AGGREGATION_COMPATIBILITY = "leave_aggregation_compatiblity";
+	private static final String OP_LEAVE_AGGREGATION_COMPATIBILITY = "leave_aggregation_compatiblity"; //$NON-NLS-1$
 
 	public StatisticOperatorManager(final OcelotlCore ocelotlCore) {
 		super();
@@ -196,6 +197,7 @@ public class StatisticOperatorManager {
 					.getAttribute(OP_SELECTION_PRIORITY)));
 			resource.setLeaveAggregationCompatiblity(Boolean.valueOf(e
 					.getAttribute(OP_LEAVE_AGGREGATION_COMPATIBILITY)));
+			resource.setUnit(e.getAttribute(OP_UNIT));
 			resource.setBundle(e.getContributor().getName());
 			operatorList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
@@ -211,7 +213,7 @@ public class StatisticOperatorManager {
 		String paramClassName = operatorList.get(selectedOperatorName).getParamConfig();
 		
 		// Check if a configuration class was provided
-		if(paramClassName.isEmpty())
+		if(paramClassName==null)
 			return;
 		
 		try {

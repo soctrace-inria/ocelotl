@@ -216,7 +216,7 @@ public class ProportionAxisView extends UnitAxisView {
 		}
 		
 		// Add legend
-		String unit = ocelotlView.getCore().getMicromodelTypes().getSelectedOperatorResource().getUnitDescription();
+		String unit = ocelotlView.getOcelotlParameters().getCurrentYAxisUnit();
 		final Label label = new Label(" " + unit + " ");
 		label.setLabelAlignment(PositionConstants.RIGHT);
 		label.setForegroundColor(SWTResourceManager

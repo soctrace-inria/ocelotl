@@ -31,6 +31,10 @@ public interface IStatView {
 	public void init(StatViewWrapper wrapper);
 
 	public void resizeDiagram();
+	
+	public void removeDiagram();
+	
+	public boolean isDisposed();
 
 	public void updateData();
 	

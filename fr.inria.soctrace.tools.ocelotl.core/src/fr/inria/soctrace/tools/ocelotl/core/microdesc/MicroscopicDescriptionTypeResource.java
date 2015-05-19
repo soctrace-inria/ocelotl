@@ -28,6 +28,7 @@ public class MicroscopicDescriptionTypeResource {
 	List<String> traceFormats = new ArrayList<String>();
 	List<String> eventCategory = new ArrayList<String>();
 	List<String> visuCompatibility = new ArrayList<String>();
+	List<String> statsCompatibility = new ArrayList<String>();
 	String unitDescription;
 
 	public MicroscopicDescriptionTypeResource() {
@@ -142,6 +143,14 @@ public class MicroscopicDescriptionTypeResource {
 		for (final String s : tmp)
 			list.add(s);
 		return list;
+	}
+
+	public List<String> getStatsCompatibility() {
+		return statsCompatibility;
+	}
+	
+	public void setStatsCompatibility(final String statsCompatibility) {
+		decompose(this.statsCompatibility, statsCompatibility);
 	}
 	
 }

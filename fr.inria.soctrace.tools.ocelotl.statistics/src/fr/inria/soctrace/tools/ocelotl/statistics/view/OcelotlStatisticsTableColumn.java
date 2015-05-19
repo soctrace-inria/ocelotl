@@ -15,7 +15,7 @@ import fr.inria.soctrace.framesoc.ui.model.ITableColumn;
 
 public enum OcelotlStatisticsTableColumn implements ITableColumn {
 
-	NAME("Name", 120), PERCENTAGE("Percentage", 120), OCCURRENCES("Value", 120);
+	NAME("Name", 120), PERCENTAGE("Percentage", 120), VALUE("Value", 120);
 
 	private String name;
 	private int width;

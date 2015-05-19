@@ -11,29 +11,25 @@
  ******************************************************************************/
 package fr.inria.soctrace.tools.ocelotl.ui.views.statview;
 
+import fr.inria.soctrace.framesoc.core.bus.IFramesocBusListener;
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
-public abstract class StatView implements IStatView {
+public abstract class StatView implements IStatView,IFramesocBusListener{
 
 	protected OcelotlView	ocelotlView;
+	protected StatViewWrapper wrapper;
+	protected boolean	dispose;
 
 	public StatView(OcelotlView ocelotlView) {
 		super();
 		this.ocelotlView = ocelotlView;
+		dispose=false;
 	}
 
-	@Override
-	public void createDiagram() {
-
-	}
-
-	@Override
-	public void deleteDiagram() {
-	}
 
 	@Override
 	public void init(StatViewWrapper wrapper) {
-
+		this.wrapper=wrapper;
 	}
 
 	@Override

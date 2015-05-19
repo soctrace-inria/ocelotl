@@ -34,6 +34,7 @@ public class StatisticOperatorResource {
 	String paramConfig;
 	String visualization;
 	String bundle;
+	String unit;
 	int selectionPriority;
 	boolean leaveAggregationCompatiblity;
 
@@ -45,7 +46,7 @@ public class StatisticOperatorResource {
 			final String name, final List<String> timeCompatibility,
 			final String visualization, String paramWinClass,
 			String paramConfig, final int selectionPriority,
-			final boolean leaveAggregationCompatiblity, final String bundle) {
+			final boolean leaveAggregationCompatiblity, final String bundle, final String unit) {
 	super();
 		this.operatorClass = operatorClass;
 		this.name = name;
@@ -56,6 +57,7 @@ public class StatisticOperatorResource {
 		this.selectionPriority = selectionPriority;
 		this.leaveAggregationCompatiblity = leaveAggregationCompatiblity;
 		this.bundle = bundle;
+		this.unit=unit;
 	}
 
 	public String getBundle() {
@@ -140,6 +142,14 @@ public class StatisticOperatorResource {
 
 	public void setLeaveAggregationCompatiblity(boolean leaveAggregationCompatiblity) {
 		this.leaveAggregationCompatiblity = leaveAggregationCompatiblity;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
 	}
 	
 }

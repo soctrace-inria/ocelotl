@@ -115,6 +115,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="stats_compatibility" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

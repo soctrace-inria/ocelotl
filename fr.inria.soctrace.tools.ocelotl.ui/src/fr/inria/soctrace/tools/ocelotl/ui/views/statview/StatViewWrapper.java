@@ -19,7 +19,10 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.statview;
 
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 /**
@@ -31,6 +34,7 @@ public class StatViewWrapper {
 
 	private final OcelotlView				ocelotlView;
 	private IStatView						statView;
+	private Composite parent;
 
 	public StatViewWrapper(final OcelotlView ocelotlView) {
 		super();
@@ -46,11 +50,24 @@ public class StatViewWrapper {
 	}
 
 	public void init(final Composite parent) {
+		this.setParent(parent);
+	}
+	
+	public void reset(){
+		parent.dispose();
 	}
 
 	public void setView(final IStatView view) {
 		this.statView = view;
 		statView.init(this);
+	}
+
+	public Composite getParent() {
+		return parent;
+	}
+
+	public void setParent(Composite parent) {
+		this.parent = parent;
 	}
 
 }

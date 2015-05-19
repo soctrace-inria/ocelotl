@@ -179,8 +179,8 @@ public class SummaryStat extends StatisticsProvider {
 			// Set the maximum number of digit to 3 to get the engineering
 			// notation
 			occurenceFormatter.setMaximumIntegerDigits(3);
-			this.fields.put(OcelotlStatisticsTableColumn.OCCURRENCES,
-					occurenceFormatter.format(aValue));
+			this.fields.put(OcelotlStatisticsTableColumn.VALUE,
+					occurenceFormatter.format(aValue)+" "+microModel.getOcelotlParameters().getCurrentStatsUnit());
 
 			NumberFormat percentFormatter = new DecimalFormat("#0.000");
 			this.fields.put(OcelotlStatisticsTableColumn.PERCENTAGE,

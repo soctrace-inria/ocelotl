@@ -50,7 +50,7 @@ import fr.inria.soctrace.tools.ocelotl.statistics.operators.SummaryStat.SummaryS
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.statview.StatView;
 
-public class StatTableView extends StatView implements IFramesocBusListener {
+public class StatTableView extends StatView {
 
 	/**
 	 * Followed topics
@@ -252,9 +252,9 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			} else {
 				OcelotlStatisticsTableRowLabelProvider labelProvider = new OcelotlStatisticsTableRowLabelProvider(
 						col);
-				if (col.equals(OcelotlStatisticsTableColumn.OCCURRENCES))
+				if (col.equals(OcelotlStatisticsTableColumn.VALUE))
 					labelProvider.setToolTip(ocelotlView.getOcelotlParameters()
-							.getCurrentUnit());
+							.getCurrentStatsUnit());
 
 				elemsViewerCol.setLabelProvider(labelProvider);
 				alignment = SWT.RIGHT;
@@ -402,7 +402,7 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 
 			int rc = 0;
 			try {
-				if (this.col.equals(OcelotlStatisticsTableColumn.OCCURRENCES)) {
+				if (this.col.equals(OcelotlStatisticsTableColumn.VALUE)) {
 					// Number comparison
 					// If using a decimal separator, then parse with the local
 					// separator (dot or comma)
@@ -439,6 +439,16 @@ public class StatTableView extends StatView implements IFramesocBusListener {
 			}
 			return rc;
 		}
+	}
+
+	@Override
+	public void removeDiagram() {
+		dispose();
+		dispose=true;	
+	}
+	
+	public boolean isDisposed(){
+		return dispose;
 	}
 
 }

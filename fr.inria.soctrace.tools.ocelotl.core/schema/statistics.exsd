@@ -124,6 +124,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="unit" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

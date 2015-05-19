@@ -432,23 +432,61 @@ public class OcelotlView extends FramesocPart {
 							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion(), ocelotlCore.getVisuOperator());
-							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							textRun.setText(String.valueOf(getOcelotlParameters().getParameter()));
 							monitor.subTask(MonitorMessages.subCurves);
 							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
 							qualityView.createDiagram();
-							monitor.subTask(MonitorMessages.subStats);
-							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
-							statView.createDiagram();
 							monitor.subTask(MonitorMessages.subY);
 							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
-							ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
-							snapshotAction.setEnabled(true);
-							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
-							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							unitAxisView.deleteDiagram();
 							unitAxisView.createDiagram(ocelotlCore.getVisuOperator());
 							updateStatus();
+							if (ocelotlParameters.isOvervieweEnable()){
+							new Thread(
+									new Runnable() {
+									public void run() {
+										Display.getDefault().asyncExec(new Runnable() {
+										@Override
+										public void run() {
+												try {
+													ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
+													overView.updateDiagram(ocelotlParameters.getTimeRegion());
+													// Do we need to compute everything
+													if (overView.isRedrawOverview())
+														overView.getOverviewThread().start();
+												} catch (OcelotlException e) {
+													MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+												}
+											}
+											
+										}
+										);
+									}}).start();
+							}
+
+							snapshotAction.setEnabled(true);
+							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
+							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
+							new Thread(
+									new Runnable() {
+									public void run() {
+										Display.getDefault().asyncExec(new Runnable() {
+										@Override
+										public void run() {
+
+											}
+											
+										}
+										);
+									}}).start();
+							
+//							monitor.subTask(MonitorMessages.subStats);
+//							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
+							
+
+
+
 							visuDisplayed = true;
 							
 							monitor.subTask(MonitorMessages.subOverview);
@@ -461,33 +499,23 @@ public class OcelotlView extends FramesocPart {
 					});
 					
 					endRun();
+					new Thread(
+							new Runnable() {
+							public void run() {
+								Display.getDefault().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									statView.createDiagram();
+									}
+									
+								}
+								);
+							}}).start();
 					return Status.OK_STATUS;
 				}
 			};
 			job.setUser(true);
-			job.schedule();
-			new Thread(
-				new Runnable() {
-				public void run() {
-					Display.getDefault().asyncExec(new Runnable() {
-					
-
-					@Override
-					public void run() {
-						if (ocelotlParameters.isOvervieweEnable()) {
-							try {
-								overView.updateDiagram(ocelotlParameters.getTimeRegion());
-								// Do we need to compute everything
-								if (overView.isRedrawOverview())
-									overView.getOverviewThread().start();
-							} catch (OcelotlException e) {
-								MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
-							}
-						}
-						
-					}
-					});
-				}}).start();		
+			job.schedule();			
 		}
 
 		/**
@@ -538,6 +566,8 @@ public class OcelotlView extends FramesocPart {
 		public void widgetSelected(final SelectionEvent e) {
 			if (confDataLoader.getCurrentTrace() == null)
 				return;
+			if (statView!=null)
+				statView.removeDiagram();
 			hasChanged = HasChanged.ALL;
 			ocelotlParameters.getUnfilteredEventProducers().clear();
 
@@ -582,8 +612,8 @@ public class OcelotlView extends FramesocPart {
 			history.reset();
 			ocelotlCore.getMicromodelTypes().setSelectedMicroModel(comboType.getText());
 			ocelotlCore.getAggregOperators().setSelectedOperator(comboDimension.getText());
-			ocelotlParameters.setUnit(getCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
-			
+			ocelotlParameters.setMainViewUnit(getCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
+			ocelotlParameters.setYAxisUnit(getCore().getMicromodelTypes().getSelectedOperatorResource().getUnitDescription());
 			// Set the number of time slice
 			spinnerTSNumber.setSelection(ocelotlCore.getAggregOperators().getSelectedOperatorResource().getTs());
 			visuDisplayed = false;
@@ -593,13 +623,13 @@ public class OcelotlView extends FramesocPart {
 				unitAxisView.deleteDiagram();
 				timeAxisView.deleteDiagram();
 				qualityView.deleteDiagram();
+				if (statView!=null&&!statView.isDisposed())
 				statView.deleteDiagram();
 			}
 			
 			comboVisu.setEnabled(true);
 			String previousVisuValue = comboVisu.getText();
 			comboVisu.removeAll();
-
 			comboStatistics.setEnabled(true);
 			comboStatistics.removeAll();
 			// Get visu compatibility from both micro model and aggregation
@@ -615,7 +645,7 @@ public class OcelotlView extends FramesocPart {
 				comboVisu.add(op);
 			}
 
-			for (final String op : ocelotlCore.getStatOperators().getOperators(ocelotlCore.getMicromodelTypes().getSelectedOperatorResource().getEventCategory(), ocelotlCore.getAggregOperators().getSelectedOperatorResource().getDimension())) {
+			for (final String op : ocelotlCore.getStatOperators().getOperators(ocelotlCore.getMicromodelTypes().getSelectedOperatorResource().getStatsCompatibility(), ocelotlCore.getAggregOperators().getSelectedOperatorResource().getDimension())) {
 				comboStatistics.add(op);
 			}
 
@@ -687,10 +717,10 @@ public class OcelotlView extends FramesocPart {
 		public void widgetSelected(final SelectionEvent e) {
 			if (confDataLoader.getCurrentTrace() == null)
 				return;
-
 			ocelotlCore.getStatOperators().setSelectedOperator(comboStatistics.getText());
 			statView = statViewManager.create();
 			statViewWrapper.setView(statView);
+			ocelotlParameters.setStatsUnit(ocelotlCore.getStatOperators().getSelectedOperatorResource().getUnit());
 			
 			// If there is a diagram displayed then also update the stat table
 			if(ocelotlCore.getLpaggregManager() != null && visuDisplayed == true)
@@ -1856,7 +1886,7 @@ public class OcelotlView extends FramesocPart {
 		ocelotlParameters.setOperatorEventTypes(confDataLoader.getTypes(ocelotlCore.getMicromodelTypes().getSelectedOperatorResource().getType()));
 		// Init operator specific configuration
 		ocelotlParameters.setAllEventProducers(confDataLoader.getProducers());
-		ocelotlParameters.setUnit(getCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
+		ocelotlParameters.setMainViewUnit(getCore().getMicromodelTypes().getSelectedOperatorResource().getUnit());
 		
 		if (ocelotlParameters.getUnfilteredEventProducers().isEmpty()) {
 			ocelotlParameters.getUnfilteredEventProducers().addAll(confDataLoader.getProducers());

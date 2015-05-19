@@ -393,7 +393,7 @@ abstract public class AggregatedView implements IAggregatedView {
 		highLightAggregateFigure.setAlpha(255);
 		highLightAggregateFigure.setFill(false);
 		
-		unit = ocelotlView.getOcelotlParameters().getCurrentUnit();
+		unit = ocelotlView.getOcelotlParameters().getCurrentMainViewUnit();
 	}
 	
 	public void setBorder(final int border) {

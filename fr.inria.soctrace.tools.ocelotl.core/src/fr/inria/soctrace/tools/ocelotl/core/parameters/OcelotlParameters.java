@@ -92,7 +92,9 @@ public class OcelotlParameters {
 	private HashMap<EventProducer, Integer> aggregatedLeavesIndex = new HashMap<EventProducer, Integer>();
 	private boolean hasLeaveAggregated = false;
 	private boolean approximateRebuild = false;
-	private String currentUnit = "";
+	private String currentMainViewUnit = "";
+	private String currentYAxisUnit = "";
+	private String currentStatsUnit = "";
 	private TimeSliceManager timeSliceManager;
 	private boolean aggregatedLeaveEnable = false;
 	private int maxNumberOfLeaves;
@@ -151,7 +153,7 @@ public class OcelotlParameters {
 		this.timeSliceFactor = op.timeSliceFactor;
 		this.hasLeaveAggregated = op.hasLeaveAggregated;
 		this.approximateRebuild = op.approximateRebuild;
-		this.currentUnit = op.currentUnit;
+		this.currentMainViewUnit = op.currentMainViewUnit;
 		this.sortTableSettings = op.sortTableSettings;
 	}
 	
@@ -492,12 +494,8 @@ public class OcelotlParameters {
 		this.selectedEventProducerNodes.addAll(selectedEventProducerNodes);
 	}
 
-	public String getCurrentUnit() {
-		return currentUnit;
-	}
-
-	public void setCurrentUnit(String currentUnit) {
-		this.currentUnit = currentUnit;
+	public String getCurrentMainViewUnit() {
+		return currentMainViewUnit;
 	}
 
 	public StatisticsTableSettings getSortTableSettings() {
@@ -616,47 +614,39 @@ public class OcelotlParameters {
 	 *            the unit type provided by the extension point
 	 * @return the corresponding unit as String
 	 */
-	public String setUnit(String aUnitType) {
-		String unit = "";
-
-		String[] splitUnit = aUnitType.split(" ");
-		for (int i = 0; i < splitUnit.length; i++) {
-			String word = "";
-			if (splitUnit[i].startsWith("%"))
-				word = getUnitValue(splitUnit[i]);
-			else
-				word = splitUnit[i];
-
-			unit = unit + " " + word;
-		}
-
-		setCurrentUnit(unit);
-		return unit;
+	public void setMainViewUnit(String aUnitType) {
+		this.currentMainViewUnit=UnitManager.getUnit(this, aUnitType);
 	}
-
+	
 	/**
-	 * Replace a specialized unit token by the current value
+	 * Get the corresponding units
 	 * 
 	 * @param aUnitType
-	 *            the unit token
-	 * @return the corresponding value if found
+	 *            the unit type provided by the extension point
+	 * @return the corresponding unit as String
 	 */
-	public String getUnitValue(String aUnitType) {
-		String res = "";
-		switch (aUnitType) {
-
-		case "%TIME":
-			// Get the time unit of the trace
-			String timeUnit = TimeUnit.getLabel(getTrace().getTimeUnit());
-
-			res = timeUnit;
-			break;
-
-		case "%UNKNOWN":
-		default:
-			break;
-		}
-
-		return res;
+	public void setYAxisUnit(String aUnitType) {
+		this.currentYAxisUnit=UnitManager.getUnit(this, aUnitType);
 	}
+	
+	/**
+	 * Get the corresponding units
+	 * 
+	 * @param aUnitType
+	 *            the unit type provided by the extension point
+	 * @return the corresponding unit as String
+	 */
+	public void setStatsUnit(String aUnitType) {
+		this.currentStatsUnit=UnitManager.getUnit(this, aUnitType);
+	}
+
+	public String getCurrentYAxisUnit() {
+		return currentYAxisUnit;
+	}
+
+	public String getCurrentStatsUnit() {
+		return currentStatsUnit;
+	}
+
+	
 }

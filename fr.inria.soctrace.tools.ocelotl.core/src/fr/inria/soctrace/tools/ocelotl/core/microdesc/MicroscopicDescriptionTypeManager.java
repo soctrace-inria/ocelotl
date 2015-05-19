@@ -41,6 +41,7 @@ public class MicroscopicDescriptionTypeManager {
 	private static final String OP_EVENT_CATEGORY = "event_category"; //$NON-NLS-1$
 	private static final String OP_SELECTION_PRIORITY = "selection_priority"; //$NON-NLS-1$
 	private static final String OP_VISUALIZATION_COMPATIBILITY = "visual_compatibility"; //$NON-NLS-1$
+	private static final String OP_STATS_COMPATIBILITY = "stats_compatibility"; //$NON-NLS-1$
 	private static final String OP_TRACE_FORMATS = "trace_formats"; //$NON-NLS-1$
 	private static final String OP_GENERIC = "generic"; //$NON-NLS-1$
 	private static final String OP_UNIT = "unit"; //$NON-NLS-1$
@@ -122,6 +123,8 @@ public class MicroscopicDescriptionTypeManager {
 			resource.setUnitDescription(e.getAttribute(OP_UNIT_DESCRIPTION));
 			resource.setVisuCompatibility(e
 					.getAttribute(OP_VISUALIZATION_COMPATIBILITY));
+			resource.setStatsCompatibility(e
+					.getAttribute(OP_STATS_COMPATIBILITY));
 			typeList.put(resource.getName(), resource);
 			logger.debug("    " + resource.getName() + " "
 					+ resource.getTraceFormats() + " " + resource.getVisuCompatibility());
