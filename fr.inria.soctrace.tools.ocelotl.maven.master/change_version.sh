@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
                                                                                         
 #####################################################################
 # Change the version number to a given project, modifying both Maven
@@ -74,9 +74,9 @@ function main() {
     cd $MASTER
 
     echo "Updating MANIFEST.MF in all plugins"
-    find .. -wholename "*META-INF/MANIFEST.MF" | grep -v "linuxtools" | xargs sed -i s/"$BV"/"$NBV"/
+    find .. -wholename "*META-INF/MANIFEST.MF" | xargs sed -i s/"$BV"/"$NBV"/
 
-    echo "Updating framesoc feature.xml"
+    echo "Updating ocelotl feature.xml"
     sed -i s/"version=\".*.qualifier\""/"version=\"${NEW}.qualifier\""/ $FEATURE 
 
     echo "Updating repository category.xml"
