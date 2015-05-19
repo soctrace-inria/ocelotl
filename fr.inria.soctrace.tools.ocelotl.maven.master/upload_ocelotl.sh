@@ -17,6 +17,6 @@
 #####################################################################
 
 SCRIPT="../../soctrace-inria.github.io/updatesite/upload-site.sh"
-REPO="../fr.inria.soctrace.tools.ocelotl.maven.repository/target/repository/"
+REPO="../../ocelotl/fr.inria.soctrace.tools.ocelotl.maven.repository/target/repository/"
 PROJECT="ocelotl"
 $SCRIPT $REPO $PROJECT
