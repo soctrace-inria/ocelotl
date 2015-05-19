@@ -90,8 +90,8 @@ public class OcelotlConstants {
 	public static final double TemporalProportionDrawingMarginRatio = 0.9;
 	
 
-	public static final String DataCacheSuffix = ".octcache";
-	public static final String DichotomyCacheSuffix = ".octdicho";
+	public static final String DataCacheSuffix = ".otlcache";
+	public static final String DichotomyCacheSuffix = ".otldicho";
 	
 	/**
 	 * JSON Config constants
