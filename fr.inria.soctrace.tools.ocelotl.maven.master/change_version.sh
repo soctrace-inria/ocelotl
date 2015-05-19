@@ -67,8 +67,8 @@ function print_params() {
 
 function main() {
 
-    BV="Bundle-Version:.*.qualifier"
-    NBV="Bundle-Version: ${NEW}.qualifier"
+    BV="Bundle-Version:.*"
+    NBV="Bundle-Version: ${NEW}"
 
     OLDDIR=`pwd`
     cd $MASTER
