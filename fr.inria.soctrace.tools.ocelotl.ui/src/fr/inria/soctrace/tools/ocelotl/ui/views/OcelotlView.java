@@ -818,17 +818,20 @@ public class OcelotlView extends FramesocPart {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			cancelSelection();
+			if (!ocelotlParameters.getTimeRegion().compareTimeRegion(new TimeRegion(confDataLoader.getMinTimestamp(), confDataLoader.getMaxTimestamp()))){
 			textTimestampStart.setText(Long.toString(confDataLoader.getMinTimestamp()));
 			textTimestampEnd.setText(Long.toString(confDataLoader.getMaxTimestamp()));
 
 			if (timeLineView != null) {
-				timeLineView.resizeDiagram();
+				//timeLineView.resizeDiagram();
 
 				// Reset spatial selection
 				ocelotlParameters.setSpatialSelection(false);
 				ocelotlParameters.updateCurrentProducers();
 				
 				timestampHasChanged = true;
+				btnRun.notifyListeners(SWT.Selection, new Event());
+			}
 			}
 		}
 	}
