@@ -1445,12 +1445,15 @@ public class OcelotlView extends FramesocPart {
 		lblTSNumber.setText("Timeslice Number");
 
 		spinnerTSNumber = new Spinner(groupTime, SWT.BORDER);
-		final GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_spinnerTSNumber.widthHint = 55;
+		final GridData gd_spinnerTSNumber = new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1);
+		gd_spinnerTSNumber.minimumWidth = 70;
+		gd_spinnerTSNumber.widthHint = 100;
 		spinnerTSNumber.setLayoutData(gd_spinnerTSNumber);
 		spinnerTSNumber.setFont(cantarell8);
 		spinnerTSNumber.setMaximum(OcelotlDefaultParameterConstants.maxTimeslice);
 		spinnerTSNumber.setMinimum(OcelotlDefaultParameterConstants.minTimeslice);
+		new Label(groupTime, SWT.NONE);
+		new Label(groupTime, SWT.NONE);
 		spinnerTSNumber.addModifyListener(new TimeSliceModificationListener());
 		btnReset.addSelectionListener(new ResetListener());
 		buttonCancelSelection.addSelectionListener(new CancelSelectionListener());
