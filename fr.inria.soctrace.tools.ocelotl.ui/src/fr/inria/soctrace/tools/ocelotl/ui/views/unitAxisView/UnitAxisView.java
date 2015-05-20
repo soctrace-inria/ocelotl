@@ -53,11 +53,29 @@ abstract public class UnitAxisView {
 	protected SelectFigure							highLightSelectedProducer;
 	protected SelectFigure							selectFigure;
 	protected EventProducerNode						currentlySelectedEpn	= null;
+	protected UnitAxisViewWrapper					wrapper;
 	protected int originY;
 	protected int cornerY;
 	
 	protected HashMap<EventProducerNode, Rectangle>	eventProdToFigures;
 	protected HashMap<Rectangle, EventProducerNode>	figuresToEventProd;
+	
+	public class UnitAxisViewControlListener implements ControlListener{
+
+		@Override
+		public void controlMoved(final ControlEvent arg0) {
+			canvas.redraw();
+			root.repaint();
+			resizeDiagram();
+		}
+
+		@Override
+		public void controlResized(final ControlEvent arg0) {
+			canvas.redraw();
+			root.repaint();
+			resizeDiagram();
+		}
+	}
 
 	public UnitAxisView() {
 		eventProdToFigures = new HashMap<EventProducerNode, Rectangle>();
@@ -168,28 +186,14 @@ abstract public class UnitAxisView {
 		highLightSelectedProducer.setFill(false);
 		
 		currentlySelectedEpn = null;
+		this.wrapper=wrapper;
 		
-		wrapper.cleanMouseListeners();
-		wrapper.cleanMouseMotionListeners();
-		wrapper.addMouseListener(mouse);
-		wrapper.addMouseMotionListener(mouse);
-		wrapper.cleanControlListeners();
-		wrapper.addControlListener(new ControlListener() {
-
-			@Override
-			public void controlMoved(final ControlEvent arg0) {
-				canvas.redraw();
-				root.repaint();
-				resizeDiagram();
-			}
-
-			@Override
-			public void controlResized(final ControlEvent arg0) {
-				canvas.redraw();
-				root.repaint();
-				resizeDiagram();
-			}
-		});
+		this.wrapper.cleanMouseListeners();
+		this.wrapper.cleanMouseMotionListeners();
+		this.wrapper.addMouseListener(mouse);
+		this.wrapper.addMouseMotionListener(mouse);
+		this.wrapper.cleanControlListeners();
+		this.wrapper.addControlListener(new UnitAxisViewControlListener());
 		initDiagram();
 	}
 	
