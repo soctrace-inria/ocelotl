@@ -330,7 +330,7 @@ public class ProportionAxisView extends UnitAxisView {
 		canvas.update();
 		root.validate();
 		this.wrapper.cleanControlListeners();
-		//this.wrapper.addControlListener(new UnitAxisViewControlListener());
+		this.wrapper.addControlListener(new UnitAxisViewControlListener());
 		int minSize = labelMaxWidth + TextPositionOffset
 				+ (areaWidth - mainLineXPosition);
 
@@ -341,7 +341,7 @@ public class ProportionAxisView extends UnitAxisView {
 						minSize,
 						ocelotlView.getMainViewTopSashform().getSize().x
 								- minSize });
-		//this.wrapper.cleanControlListeners();
+		this.wrapper.cleanControlListeners();
 		this.wrapper.addControlListener(new UnitAxisViewControlListener());
 	}
 
