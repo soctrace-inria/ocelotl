@@ -153,6 +153,7 @@ public class OcelotlView extends FramesocPart {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 
+			
 			FileDialog dialog = new FileDialog(getSite().getShell(), SWT.OPEN);
 			dialog.setFilterPath(ocelotlParameters.getDataCache().getCacheDirectory());
 			loadCachefile = dialog.open();
@@ -321,6 +322,7 @@ public class OcelotlView extends FramesocPart {
 				MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
 				return;
 			}
+			
 
 			// Mutex zone
 			synchronized (lock) {
@@ -339,12 +341,18 @@ public class OcelotlView extends FramesocPart {
 				enableButton(false);
 			}
 
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER)
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER){
 				hasChanged = HasChanged.PARAMETER;
+				hasChangedOverview=HasChanged.PARAMETER;
+				hasChangedStats=HasChanged.PARAMETER;
+			}else{
+				hasChangedOverview=HasChanged.ALL;
+				hasChangedStats=HasChanged.ALL;
+			}
+				
 			
 			if(timestampHasChanged == true)
 				hasChanged = HasChanged.ALL;
-				
 			setConfiguration();
 			final String title = MonitorMessages.ComputingAggregatedView;
 			final Job job = new Job(title) {
@@ -352,8 +360,7 @@ public class OcelotlView extends FramesocPart {
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, 5 * ocelotlParameters.getTrace().getNumberOfEvents());
-					hasChangedOverview=hasChanged;
-					hasChangedStats=hasChanged;
+
 					try {
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
@@ -392,7 +399,6 @@ public class OcelotlView extends FramesocPart {
 							ocelotlParameters.setParameter(parameterPPolicy.computeInitialParameter(ocelotlCore.getLpaggregManager(), ocelotlParameters.getParameterPPolicy()));
 						}
 
-						hasChanged = HasChanged.PARAMETER;
 						if (checkMonitor(monitor))
 							return Status.CANCEL_STATUS;
 						
@@ -431,50 +437,18 @@ public class OcelotlView extends FramesocPart {
 						public void run() {
 							monitor.setTaskName(MonitorMessages.Rendering);
 							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
+							monitor.subTask(MonitorMessages.subCurves);
 							qualityView.createDiagram();
 							monitor.subTask(MonitorMessages.subDiagram);
-							hasChanged = HasChanged.NOTHING;
 							timeLineView.deleteDiagram();
 							timeLineView.createDiagram(ocelotlCore.getLpaggregManager(), ocelotlParameters.getTimeRegion(), ocelotlCore.getVisuOperator());
 							textRun.setText(String.valueOf(getOcelotlParameters().getParameter()));
-							monitor.subTask(MonitorMessages.subCurves);
 							monitor.subTask(MonitorMessages.subY);
 							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
 							timeAxisView.createDiagram(ocelotlParameters.getTimeRegion());
 							unitAxisView.deleteDiagram();
 							unitAxisView.createDiagram(ocelotlCore.getVisuOperator());
 							updateStatus();
-							if (ocelotlParameters.isOvervieweEnable()&&hasChangedOverview!=HasChanged.PARAMETER&&hasChangedOverview!=HasChanged.NOTHING){
-							new Thread(
-									new Runnable() {
-									public void run() {
-										Display.getDefault().asyncExec(new Runnable() {
-										@Override
-										public void run() {
-												try {
-													synchronized (lock){
-													if (running==false)
-														enableButton(false);
-													ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
-													overView.updateDiagram(ocelotlParameters.getTimeRegion());
-													// Do we need to compute everything
-													if (overView.isRedrawOverview())
-														overView.getOverviewThread().start();
-													}
-													if (running==false)
-														enableButton(true);
-												} catch (OcelotlException e) {
-													MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
-													if (running==false)
-														enableButton(true);
-												}
-											}
-											
-										}
-										);
-									}}).start();
-							}
-
 							snapshotAction.setEnabled(true);
 							textDisplayedStart.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampStart()));
 							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
@@ -485,36 +459,40 @@ public class OcelotlView extends FramesocPart {
 
 
 							visuDisplayed = true;
-							
-							monitor.subTask(MonitorMessages.subOverview);
 							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/5);
 							history.saveHistory();
 							timestampHasChanged = false;
-							monitor.done();
-
+							hasChanged = HasChanged.NOTHING;
 						}
 					});
-					if (hasChangedStats!=HasChanged.PARAMETER&&hasChangedStats!=HasChanged.NOTHING){
-					new Thread(
-							new Runnable() {
-							public void run() {
-								Display.getDefault().asyncExec(new Runnable() {
-								@Override
-								public void run() {
-									synchronized (lock){
-									if (running==false)
-									enableButton(false);
-									statView.createDiagram();
-									if (running==false)
-									enableButton(true);
-									}
-									}
-									
-								}
-								);
-							}}).start();
+					if (hasChangedStats==HasChanged.ALL){
+						statView.createDiagram();
 					}
+					if (ocelotlParameters.isOvervieweEnable()&&hasChangedOverview==HasChanged.ALL){
+						new Thread(
+								new Runnable() {
+								public void run() {
+									Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+											try {
+												ocelotlParameters.setTimeSliceManager(new TimeSliceManager(ocelotlParameters.getTimeRegion(), ocelotlParameters.getTimeSlicesNumber()));
+												overView.updateDiagram(ocelotlParameters.getTimeRegion());
+												// Do we need to compute everything
+												if (overView.isRedrawOverview())
+													overView.getOverviewThread().start();
+											} catch (OcelotlException e) {
+												MessageDialog.openInformation(getSite().getShell(), "Error", e.getMessage());
+											}
+										}
+										
+									}
+									);
+								}}).start();
+						}
+
 					endRun();
+					monitor.done();
 					return Status.OK_STATUS;
 				}
 				
@@ -742,6 +720,7 @@ public class OcelotlView extends FramesocPart {
 			if (ocelotlCore.getLpaggregManager() != null) {
 				for (final double f : ocelotlCore.getLpaggregManager().getParameters()) {
 					if (f > p) {
+						cancelSelection();
 						textRun.setText(Double.toString(f));
 						btnRun.notifyListeners(SWT.Selection, new Event());
 						break;
@@ -765,6 +744,7 @@ public class OcelotlView extends FramesocPart {
 			}
 			if (hasChanged == HasChanged.NOTHING)
 				hasChanged = HasChanged.PARAMETER;
+			cancelSelection();
 		}
 	}
 
@@ -776,6 +756,7 @@ public class OcelotlView extends FramesocPart {
 			if (ocelotlCore.getLpaggregManager() != null) {
 				for (int f = ocelotlCore.getLpaggregManager().getParameters().size() - 1; f >= 0; f--) {
 					if (ocelotlCore.getLpaggregManager().getParameters().get(f) < p) {
+						cancelSelection();
 						textRun.setText(Double.toString(ocelotlCore.getLpaggregManager().getParameters().get(f)));
 						btnRun.notifyListeners(SWT.Selection, new Event());
 						break;
@@ -808,6 +789,7 @@ public class OcelotlView extends FramesocPart {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			if (ocelotlCore.getLpaggregManager() != null) {
+				cancelSelection();
 				textRun.setText(Double.toString(parameterPPolicy.computeInitialParameter(ocelotlCore.getLpaggregManager(), ocelotlParameters.getParameterPPolicy())));
 				btnRun.notifyListeners(SWT.Selection, new Event());
 			}
@@ -840,6 +822,7 @@ public class OcelotlView extends FramesocPart {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			cancelSelection();
+			statView.updateData();
 		}
 	}
 	
@@ -878,7 +861,7 @@ public class OcelotlView extends FramesocPart {
 			getOcelotlParameters().setDisplayedSubselection(false);
 
 			// Update stats
-			statView.updateData();
+		//	statView.updateData();
 			
 			timestampHasChanged = false;
 		}
@@ -1114,8 +1097,8 @@ public class OcelotlView extends FramesocPart {
 	private Combo						comboTraces;
 	private final ConfDataLoader		confDataLoader	= new ConfDataLoader();
 	private HasChanged					hasChanged		= HasChanged.ALL;
-	private HasChanged					hasChangedOverview= HasChanged.NOTHING;
-	private HasChanged					hasChangedStats= HasChanged.NOTHING;
+	private HasChanged					hasChangedOverview= HasChanged.PARAMETER;
+	private HasChanged					hasChangedStats= HasChanged.PARAMETER;
 	private IAggregatedView				timeLineView;
 	private IStatView					statView;
 	private final OcelotlCore			ocelotlCore;

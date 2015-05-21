@@ -75,6 +75,8 @@ public class StatTableView extends StatView {
 
 	private Composite compositeTable;
 
+	private StatTableViewThread thread;
+
 	/**
 	 * Constructor
 	 */
@@ -164,9 +166,10 @@ public class StatTableView extends StatView {
 	
 	@Override
 	public void updateData() {
-		StatTableViewThread thread= new StatTableViewThread();
+		thread= new StatTableViewThread();
 		thread.start();
 	}//TODO make a thread 
+	
 
 	@Override
 	public void resizeDiagram() {

@@ -46,5 +46,4 @@ public interface IStatView {
 	 * @return String in csv
 	 */
 	public String getStatDataToCSV();
-
 }

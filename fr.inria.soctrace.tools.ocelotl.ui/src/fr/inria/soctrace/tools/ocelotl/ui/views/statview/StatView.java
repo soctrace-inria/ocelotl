@@ -42,4 +42,5 @@ public abstract class StatView implements IStatView,IFramesocBusListener{
            return "";                                              
 	}
 
+
 }

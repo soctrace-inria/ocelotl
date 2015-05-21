@@ -73,8 +73,9 @@ public class QualityView {
 				if (arg0.x > XBorder && arg0.x < root.getSize().width() - Border) {
 					final float param = 1 - (float) (arg0.x - XBorder) / (root.getSize().width() - XBorder - Border);
 					ocelotlView.getParam().setText(String.valueOf(param));
-					ocelotlView.setConfiguration();
 					createDiagram();
+					//ocelotlView.setConfiguration();
+					
 				}
 		}
 
@@ -82,6 +83,7 @@ public class QualityView {
 		public void mouseReleased(final MouseEvent arg0) {
 			state = State.RELEASED;
 			if (qualities != null)
+				ocelotlView.cancelSelection();
 				ocelotlView.getBtnRun().notifyListeners(SWT.Selection, new Event());
 		}
 
