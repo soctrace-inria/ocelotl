@@ -1749,7 +1749,7 @@ public class OcelotlView extends FramesocPart {
 			e.printStackTrace();
 		}
 		int index = 0;
-		if(comboTraces.isDisposed())
+		if(comboTraces == null || comboTraces.isDisposed())
 			return;
 		
 		comboTraces.removeAll();

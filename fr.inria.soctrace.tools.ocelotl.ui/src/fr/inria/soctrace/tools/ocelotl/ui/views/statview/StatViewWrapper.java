@@ -19,10 +19,7 @@
 
 package fr.inria.soctrace.tools.ocelotl.ui.views.statview;
 
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-
 import fr.inria.soctrace.tools.ocelotl.ui.views.OcelotlView;
 
 /**

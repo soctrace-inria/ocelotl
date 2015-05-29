@@ -29,14 +29,11 @@ import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView;
 import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.YAxisMouseListener;
-import fr.inria.soctrace.tools.ocelotl.ui.views.unitAxisView.UnitAxisView.UnitAxisViewControlListener;
 import fr.inria.soctrace.tools.ocelotl.visualizations.temporal.proportion.TemporalProportion;
 import fr.inria.soctrace.tools.ocelotl.core.constants.OcelotlConstants;
 import fr.inria.soctrace.tools.ocelotl.core.ivisuop.IVisuOperator;

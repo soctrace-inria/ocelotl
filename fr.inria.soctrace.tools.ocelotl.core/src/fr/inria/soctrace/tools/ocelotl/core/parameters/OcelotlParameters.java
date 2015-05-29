@@ -27,7 +27,6 @@ import java.util.List;
 import fr.inria.soctrace.lib.model.EventProducer;
 import fr.inria.soctrace.lib.model.EventType;
 import fr.inria.soctrace.lib.model.Trace;
-import fr.inria.soctrace.lib.model.utils.ModelConstants.TimeUnit;
 import fr.inria.soctrace.tools.ocelotl.core.caches.DataCache;
 import fr.inria.soctrace.tools.ocelotl.core.caches.DichotomyCache;
 import fr.inria.soctrace.tools.ocelotl.core.config.IVisuConfig;
