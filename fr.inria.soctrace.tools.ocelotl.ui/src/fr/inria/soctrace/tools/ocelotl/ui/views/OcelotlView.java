@@ -351,8 +351,11 @@ public class OcelotlView extends FramesocPart {
 			}
 				
 			
-			if(timestampHasChanged == true)
+			if(timestampHasChanged == true){
 				hasChanged = HasChanged.ALL;
+				hasChangedOverview=HasChanged.ALL;
+				hasChangedStats=HasChanged.ALL;
+			}
 			setConfiguration();
 			final String title = MonitorMessages.ComputingAggregatedView;
 			final Job job = new Job(title) {
