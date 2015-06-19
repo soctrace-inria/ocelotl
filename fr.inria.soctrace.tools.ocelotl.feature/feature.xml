@@ -2,7 +2,7 @@
 <feature
       id="fr.inria.soctrace.tools.ocelotl.feature"
       label="Ocelotl"
-      version="1.1.7"
+      version="1.1.8"
       provider-name="INRIA"
       plugin="fr.inria.soctrace.tools.ocelotl.brand"
       os="linux,win32"
@@ -78,7 +78,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <import plugin="fr.inria.soctrace.lib.storage"/>
       <import plugin="fr.inria.soctrace.lib.search"/>
       <import plugin="fr.inria.soctrace.lib.utils"/>
-      <import plugin="fr.inria.lpaggreg" version="1.1.7"/>
+      <import plugin="fr.inria.lpaggreg" version="1.1.8"/>
       <import plugin="com.google.gson"/>
       <import plugin="fr.inria.soctrace.framesoc.ui"/>
       <import plugin="org.apache.commons.io"/>
@@ -91,42 +91,42 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
       <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.slf4j.api"/>
-      <import feature="fr.inria.soctrace.features.framesoc" version="1.1.7"/>
+      <import feature="fr.inria.soctrace.features.framesoc" version="1.1.8"/>
    </requires>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.core"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.microdesc"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.ui"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.visualizations"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          unpack="false"/>
 
    <plugin
          id="fr.inria.lpaggreg"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          unpack="false"/>
 
    <plugin
@@ -135,7 +135,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          fragment="true"
          unpack="false"/>
 
@@ -145,7 +145,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          arch="x86"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          fragment="true"
          unpack="false"/>
 
@@ -155,7 +155,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          arch="x86"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          fragment="true"
          unpack="false"/>
 
@@ -163,20 +163,20 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          id="fr.inria.soctrace.tools.ocelotl.slf4j"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          unpack="false"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.brand"
          download-size="0"
          install-size="0"
-         version="1.1.7"/>
+         version="1.1.8"/>
 
    <plugin
          id="fr.inria.soctrace.tools.ocelotl.statistics"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          unpack="false"/>
 
    <plugin
@@ -185,7 +185,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="1.1.7"
+         version="1.1.8"
          fragment="true"
          unpack="false"/>
 
@@ -193,6 +193,6 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
          id="fr.inria.soctrace.tools.ocelotl.json"
          download-size="0"
          install-size="0"
-         version="1.1.7"/>
+         version="1.1.8"/>
 
 </feature>
