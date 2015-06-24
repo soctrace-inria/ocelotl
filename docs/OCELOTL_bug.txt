@@ -1,3 +1,7 @@
+==========================================================================================
+Ocelotl tool for FrameSoC - 1.1.8 - Nominal case
+==========================================================================================
+
 We are looking at the trace of a decoding video application which has some performance issues. We know that the issue comes from a process that writes to a USB drive the decoded video stream.
 
 With Ocelotl, there are two ways to visualize the perturbations coming from the USB-writing process:
@@ -10,11 +14,11 @@ Using the Statistic Pie Chart and Ocelotl
 
 	2. Then in the Ocelotl tab tool, select the ts_record trace in the trace selection interface. 
 
-	3. Select "Event distribution" as Microscopic Description. In the pop up "Settings" window, select the event producer tabs, choose "Reset" to remove all producers, then "Add" and select all the producers but the three we filtered out earlier (the easiest way to do this is to select all producers (ctrl+a), then unselect only (by pressing ctrl) the three unwanted producers).
+	3. Select "Event occurences" as Metrics, "Temporal Aggregation" as Dimensions. In the pop up "Settings" window, select the event producer tabs, choose "Reset" to remove all producers, then "Add" and select all the producers but the three we filtered out earlier (the easiest way to do this is to select all producers (ctrl+a), then unselect only (by pressing ctrl) the three unwanted producers).
 	
-	4. Select "Proportion" as Visualization
+	4. Select "Stacked Bar Chart" as Visualization
 
-	5. Then leaving the default parameters in Ocelotl (time slices: 100; threshold: 0.001), click on RUN!. By disaggregating the trace until the parameter reaches a value around 0.0488, some spikes appears, which showing some heterogeneity in the behavior of the application. By further analyzing, four different kinds of spikes can be observed:
+	5. Then leaving the default parameters in Ocelotl (time slices: 100; threshold: 0.001; normalized off), click on RUN!. By disaggregating the trace until the parameter reaches a value around 0.0488, some spikes appears, which showing some heterogeneity in the behavior of the application. By further analyzing, four different kinds of spikes can be observed:
 		1. The one at the beginning corresponds to the initialization phase.
 		2. The ones at the end correspond to the end phase.
 		3. Some spikes identified by the fact that they have more SoftIRQ events.

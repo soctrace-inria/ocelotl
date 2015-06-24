@@ -1,3 +1,8 @@
-Known Issues:
+==========================================================================================
+Ocelotl tool for FrameSoC - 1.1.8 - Known Issue
+==========================================================================================
+
 *Depending on the main window size or on the screen resolution, some components of the Ocelotl UI might not be displayed correctly or might be partially hidden.
     -Workaround: Resize the window, put Ocelotl in full screen by double-clicking on the Ocelotl tab or use the resize handles of the Ocelotl widgets to resize them accordingly
+*Resizing the window can take a while depending on the implementation of SWT. This phenomenon has been mainly encountered on Linux systems.
+*Clicking repeatedly and quickly on the quality curves may cause a incoherence between the selected parameter p and the visualization that is printed (which corresponds to a previously computed aggregation). Click again on the curves to actualize the visualization.

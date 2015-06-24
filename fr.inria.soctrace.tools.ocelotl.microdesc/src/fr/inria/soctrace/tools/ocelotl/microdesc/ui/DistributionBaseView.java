@@ -678,7 +678,7 @@ public abstract class DistributionBaseView extends Dialog implements
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Microscopic Description Settings");
+		newShell.setText("Settings");
 	}
 	
 	/**

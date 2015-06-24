@@ -1,7 +1,7 @@
 ==========================================================================================
-Ocelotl tool for FrameSoC - 0.1.0 - Nominal case
+Ocelotl tool for FrameSoC - 1.1.8 - Nominal case
 ==========================================================================================
-We assume that the Ocelotl plugin is launched within a working version of the SET V1.0 of 
+We assume that the Ocelotl plugin is launched within a working version of the SET V1.5 of 
 the FrameSoC workbench with the default parameters, and on a supported platform (Linux 32 
 or 64 bits).
  
@@ -12,44 +12,52 @@ Installation
 	- Go to the FrameSoC menu -> Trace Analysis -> Launch Analysis Tool
 		- Verify that Ocelotl is present in the list of tools
         - Select the Ocelotl tool (No argument is needed) and click OK
-	- Verify that the Ocelotl view is open and that all the elements are present (as shown 
-	in Figure 4 in the user guide). 
+	- Verify that the Ocelotl view is open and that all the elements are present (as 
+	shown In Figure 4 in the user guide). 
 
 ==========================================================================================
 Validation
 ==========================================================================================
 
 - Viewing a Trace
-	- In the Trace Overview tab, select the pjdump trace provided with FrameSoC.
-	- Select one of the two Microscopic Descriptions available:
-		- Whether Event or State distribution
-	- Select one of the two Visualizations available
-		- Whether Part or Proportion
+	- In the Trace Overview tab, select the pjdump trace provided with FrameSoC
+	- Select one of the Metrics available:
+		- State Total Duration
+		- State Average Duration
+		- Event Occurences
+	- Select one of the Aggregations available:
+		- Temporal Aggregation
+		- Spatiotemporal Aggregation
+	- Select one of the Visualizations available (depending on the selected Metrics/
+Aggregation). Select in priority stacked bar chart or mode representations
 	- Click on the RUN! button
-	- Verify that the trace is displayed (this may take a while) in a fully aggregated state.
+	- Verify that the trace is displayed (this may take a while) in a partially 
+aggregated state
 	- Verify also that the quality curves are displayed correctly
 	- Modify the level of aggregation, in one of the three possible ways (click on the 
 	curves, click on the arrows buttons or use the keyboard arrows)
 	- Verify that the change is correctly reflected on the graph
 	
 - Filter events and producers
-	- In the Microscopic Descriptions settings, Verify that the Events and Event 
+	- In the Settings, verify that the Events and Event 
 	producers filter works correctly by filtering out some of them.
 	- Update the view by clicking on RUN!
 	- Verify that the filtered settings appear correctly on the displayed graph 
 	
 - Zoom 
-	- Select a part of the graph by dragging the mouse with the left button pressed over 
-	the graph.
+	- Select a part of the graph by dragging the mouse with the left button pressed 
+over the graph.
 	- Verify that the values of the start and end timestamps are modified
 	- Click on RUN!
-	- Verify that the view is updated correctly showing only the selected parts fully aggregated
+	- Verify that the view is updated correctly showing only the selected parts fully 
+aggregated
 	- Click on the Reset button and then on RUN!
 	- Verify that the graph displays the full view again
 	
 - Modify analysis settings
 	- Change the number of time slices, and click on RUN!
-	- Verify that the change correctly appears on the graph, by disaggregating the trace.
+	- Verify that the change correctly appears on the graph, by disaggregating the 
+trace.
 
 
 

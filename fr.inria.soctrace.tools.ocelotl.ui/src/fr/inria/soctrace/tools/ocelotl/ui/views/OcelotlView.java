@@ -1270,10 +1270,10 @@ public class OcelotlView extends FramesocPart {
 		 				gd_comboType.widthHint = 150;
 		 				comboType.setLayoutData(gd_comboType);
 		 				comboType.setFont(cantarell8);
-		 				comboType.add("Metric");
-		 				comboType.setText("Metric");
+		 				comboType.add("Metrics");
+		 				comboType.setText("Metrics");
 		 				comboType.addSelectionListener(new ComboTypeSelectionAdapter());
-		 				comboType.setToolTipText("Metric Selection");
+		 				comboType.setToolTipText("Metrics Selection");
 		 		
 		 				comboDimension = new Combo(groupTraces, SWT.READ_ONLY);
 		 				final GridData gd_comboAggregationOperator = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
@@ -1283,7 +1283,7 @@ public class OcelotlView extends FramesocPart {
 		 				comboDimension.add("Dimensions");
 		 				comboDimension.setText("Dimensions");
 		 				comboDimension.addSelectionListener(new ComboDimensionSelectionAdapter());
-		 				comboDimension.setToolTipText("Dimensions Selection");
+		 				comboDimension.setToolTipText("Dimension Selection");
 		 		
 		 				btnSettings = new Button(groupTraces, SWT.NONE);
 		 				btnSettings.setToolTipText("Settings");
