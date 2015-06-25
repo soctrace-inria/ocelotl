@@ -608,7 +608,7 @@ public class OcelotlSettingsView extends Dialog {
 
 		btnRadioButton = new Button(groupDataCacheSettings, SWT.RADIO);
 		btnRadioButton.addSelectionListener(new cachePolicyListener());
-		btnRadioButton.setText("Precise (slow)");
+		btnRadioButton.setText("Accurate (slow)");
 		btnRadioButton.setFont(cantarell8);
 
 		btnRadioButton_1 = new Button(groupDataCacheSettings, SWT.RADIO);
