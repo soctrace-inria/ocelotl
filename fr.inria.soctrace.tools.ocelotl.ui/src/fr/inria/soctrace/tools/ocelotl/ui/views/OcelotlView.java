@@ -76,6 +76,7 @@ import fr.inria.soctrace.framesoc.ui.model.GanttTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.HistogramTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.PieTraceIntervalAction;
 import fr.inria.soctrace.framesoc.ui.model.TableTraceIntervalAction;
+import fr.inria.soctrace.framesoc.ui.model.TraceConfigurationDescriptor;
 import fr.inria.soctrace.framesoc.ui.model.TraceIntervalDescriptor;
 import fr.inria.soctrace.framesoc.ui.perspective.FramesocPart;
 import fr.inria.soctrace.lib.model.Trace;
@@ -1193,6 +1194,7 @@ public class OcelotlView extends FramesocPart {
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_SYNCH_TRACES_NEEDED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_REFRESH_TRACES_NEEDED);
 		topics.addTopic(FramesocBusTopic.TOPIC_UI_COLORS_CHANGED);
+		topics.addTopic(FramesocBusTopic.TOPIC_UI_SYNCH_TOOL);
 		topics.registerAll();
 	}
 
@@ -1873,6 +1875,16 @@ public class OcelotlView extends FramesocPart {
 			if (timeLineView != null)
 				timeLineView.resizeDiagram();
 		}
+		if ((topic.equals(FramesocBusTopic.TOPIC_UI_SYNCH_TOOL))) {
+			if (data instanceof TraceConfigurationDescriptor) {
+				TraceConfigurationDescriptor des = (TraceConfigurationDescriptor) data;
+
+				if(!des.getToolID().equals(PLUGIN_ID))
+					return;
+				
+				showTrace(des.getTrace(), des);
+			}
+		}
 	}
 
 	/**
@@ -2092,9 +2104,9 @@ public class OcelotlView extends FramesocPart {
 				break;
 			}
 		}
-		
+
 		comboTraces.notifyListeners(SWT.Selection, new Event());
-		
+
 		if (data != null) {
 			TraceIntervalDescriptor intDes = (TraceIntervalDescriptor) data;
 			setTimeRegion(intDes.getStartTimestamp(), intDes.getEndTimestamp());
