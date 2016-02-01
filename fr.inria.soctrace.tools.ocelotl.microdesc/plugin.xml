@@ -50,6 +50,7 @@
             stats_compatibility="VARIABLE_AVG"
             trace_formats="ALL"
             unit="%UNKNOWN"
+            unit_description="Unknown"
             visual_compatibility="PARTS, PROPORTIONS, VARIABLEMODE">
       </microscopic_model>
    </extension>
