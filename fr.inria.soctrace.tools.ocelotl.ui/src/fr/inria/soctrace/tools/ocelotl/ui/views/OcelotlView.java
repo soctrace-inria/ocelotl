@@ -254,7 +254,6 @@ public class OcelotlView extends FramesocPart {
 						return Status.OK_STATUS;
 					}
 				};
-
 				job.setUser(true);
 				job.schedule();
 			}
@@ -323,7 +322,6 @@ public class OcelotlView extends FramesocPart {
 				MessageDialog.openInformation(getSite().getShell(), "Error", exception.getMessage());
 				return;
 			}
-			
 
 			// Mutex zone
 			synchronized (lock) {
@@ -342,30 +340,32 @@ public class OcelotlView extends FramesocPart {
 				enableButton(false);
 			}
 
-			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER){
+			if (hasChanged == HasChanged.NOTHING || hasChanged == HasChanged.PARAMETER) {
 				hasChanged = HasChanged.PARAMETER;
-				hasChangedOverview=HasChanged.PARAMETER;
-				hasChangedStats=HasChanged.PARAMETER;
-			}else{
-				hasChangedOverview=HasChanged.ALL;
-				hasChangedStats=HasChanged.ALL;
+				hasChangedOverview = HasChanged.PARAMETER;
+				hasChangedStats = HasChanged.PARAMETER;
+			} else {
+				hasChangedOverview = HasChanged.ALL;
+				hasChangedStats = HasChanged.ALL;
 			}
-				
-			
-			if(timestampHasChanged == true){
+	
+			if (timestampHasChanged == true) {
 				hasChanged = HasChanged.ALL;
-				hasChangedOverview=HasChanged.ALL;
-				hasChangedStats=HasChanged.ALL;
+				hasChangedOverview = HasChanged.ALL;
+				hasChangedStats = HasChanged.ALL;
 			}
 			setConfiguration();
-			final String title = MonitorMessages.ComputingAggregatedView;
+			
+			final String title = MonitorMessages.ComputingAggregatedView;	
 			final Job job = new Job(title) {
-
 				@Override
 				protected IStatus run(final IProgressMonitor monitor) {
 					monitor.beginTask(title, 5 * ocelotlParameters.getTrace().getNumberOfEvents());
 
 					try {
+						monitor.subTask(MonitorMessages.subConfiguringProducers);
+						setProducerConfiguration();
+						
 						if (hasChanged != HasChanged.PARAMETER) {
 							if (hasChanged == HasChanged.ALL) {
 								if (checkMonitor(monitor))
@@ -458,9 +458,6 @@ public class OcelotlView extends FramesocPart {
 							textDisplayedEnd.setText(String.valueOf(ocelotlParameters.getTimeRegion().getTimeStampEnd()));
 //							monitor.subTask(MonitorMessages.subStats);
 //							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/4);
-							
-
-
 
 							visuDisplayed = true;
 							monitor.worked(ocelotlParameters.getTrace().getNumberOfEvents()/5);
@@ -1795,24 +1792,31 @@ public class OcelotlView extends FramesocPart {
 		ocelotlParameters.setAggregatedLeaveEnable(ocelotlParameters.getOcelotlSettings().isAggregateLeaves());
 		ocelotlParameters.setMaxNumberOfLeaves(ocelotlParameters.getOcelotlSettings().getMaxNumberOfLeaves());
 		
-		ocelotlParameters.updateCurrentProducers();
-		ocelotlParameters.setDisplayedSubselection(false);
-		
-		// If there are aggregated leave, then it is necessary to update the
-		// spatial selection
-		if (ocelotlParameters.isSpatialSelection())
-			ocelotlParameters.setSpatiallySelectedProducers(ocelotlParameters.getCurrentProducers());
-	
 		ocelotlParameters.setParameterPPolicy(ocelotlParameters.getOcelotlSettings().getParameterPPolicy());
 		ocelotlParameters.setOvervieweEnable(ocelotlParameters.getOcelotlSettings().isEnableOverview());
 		
 		setCachePolicy();
+		ocelotlParameters.setDisplayedSubselection(false);
+		
 		try {
 			ocelotlParameters.setParameter(Double.valueOf(textRun.getText()).floatValue());
 			ocelotlParameters.setTimeRegion(new TimeRegion(Long.valueOf(textTimestampStart.getText()), Long.valueOf(textTimestampEnd.getText())));
 		} catch (final NumberFormatException e) {
 			MessageDialog.openError(getSite().getShell(), "Exception", e.getMessage());
 		}
+	}
+
+	/**
+	 * Extracted from setConfiguration() in order to execute in a thread because
+	 * of potentially long computation times when there is a lot of producers
+	 */
+	public void setProducerConfiguration() {
+		ocelotlParameters.updateCurrentProducers();
+
+		// If there are aggregated leaves, then it is necessary to update the
+		// spatial selection
+		if (ocelotlParameters.isSpatialSelection())
+			ocelotlParameters.setSpatiallySelectedProducers(ocelotlParameters.getCurrentProducers());
 	}
 
 	/**

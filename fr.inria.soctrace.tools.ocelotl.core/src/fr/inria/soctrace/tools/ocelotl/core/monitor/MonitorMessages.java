@@ -34,4 +34,5 @@ public class MonitorMessages {
 	public final static String subLoading = "Loading";
 	public final static String subPartial = "Loading Incomplete Data from Database";
 	
+	public final static String subConfiguringProducers = "Configuring Event Producers";
 }
