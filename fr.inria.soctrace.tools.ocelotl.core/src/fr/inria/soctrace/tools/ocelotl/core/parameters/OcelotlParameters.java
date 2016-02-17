@@ -566,11 +566,11 @@ public class OcelotlParameters {
 					// If there are aggregated leaves then add them to the
 					// selection
 					if (aggregatedLeavesIndex.containsKey(anEP)) {
-						List<SimpleEventProducerNode> childNode = eventProducerHierarchy
+						List<SimpleEventProducerNode> childNodes = eventProducerHierarchy
 								.getAllChildrenNodes(eventProducerHierarchy
 										.getEventProducerNodes().get(
 												anEP.getId()));
-						for (SimpleEventProducerNode anAggregEPN : childNode) {
+						for (SimpleEventProducerNode anAggregEPN : childNodes) {
 							if (aggregatedEventProducers.contains(anAggregEPN
 									.getMe())
 									&& unfilteredEventProducers

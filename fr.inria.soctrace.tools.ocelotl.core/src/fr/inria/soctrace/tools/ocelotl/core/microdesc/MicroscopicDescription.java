@@ -832,9 +832,12 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Check whether we should aggregate the leaves of the event producers
 		// hierarchy
 		if (parameters.isHasLeaveAggregated()) {
-			aggregateLeaveHierarchy();
+			aggregateLeaveHierarchy(monitor);
 		}
 
+		if (monitor.isCanceled())
+			return;
+		
 		initMatrix();
 
 		// If the cache is enabled
@@ -1006,7 +1009,7 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	 * Aggregate the leave of an event producer in order to reduce the memory
 	 * footprint of the matrix
 	 */
-	public void aggregateLeaveHierarchy() {
+	public void aggregateLeaveHierarchy(IProgressMonitor monitor) {
 		SimpleEventProducerHierarchy fullHierarchy = parameters
 				.getEventProducerHierarchy();
 
@@ -1017,9 +1020,15 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Prevent the accepted hierarchy level to be 0 (which is just root),
 		// which would make problem in later stages of the aggregation (building
 		// the hierarchy)
-		for (int i = maxHierarchyLevel; i >= 1; i--) {
-			if (removeFilteredEP(fullHierarchy.getEventProducerNodesFromHierarchyLevel(i)).size() > parameters
-					.getOcelotlSettings().getMaxNumberOfLeaves()) {
+		for (int i = maxHierarchyLevel; i >= 1; i--) {	
+			if (monitor.isCanceled())
+				return;
+			
+			int nbProdHierarchyI = removeFilteredEP(
+					fullHierarchy.getEventProducerNodesFromHierarchyLevel(i))
+					.size();
+			if (nbProdHierarchyI > parameters.getOcelotlSettings()
+					.getMaxNumberOfLeaves() || nbProdHierarchyI == 0) {
 				continue;
 			} else {
 				acceptedHierarchyLevel = i;
@@ -1036,6 +1045,9 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 							fullHierarchy
 									.getEventProducerNodesFromHierarchyLevel(acceptedHierarchyLevel))
 							.size() + ").");
+		
+		if (monitor.isCanceled())
+			return;
 
 		for (SimpleEventProducerNode newLeafProducer : fullHierarchy
 				.getEventProducerNodesFromHierarchyLevel(acceptedHierarchyLevel)) {
