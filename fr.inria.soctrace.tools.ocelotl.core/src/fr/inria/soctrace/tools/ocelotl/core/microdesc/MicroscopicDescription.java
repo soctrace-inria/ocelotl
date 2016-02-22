@@ -1008,6 +1008,9 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 	/**
 	 * Aggregate the leave of an event producer in order to reduce the memory
 	 * footprint of the matrix
+	 * 
+	 * Note: it is assumed that the each level of the hierarchy possesses more
+	 * elements than the immediate superior level.
 	 */
 	public void aggregateLeaveHierarchy(IProgressMonitor monitor) {
 		SimpleEventProducerHierarchy fullHierarchy = parameters
@@ -1020,19 +1023,19 @@ public abstract class MicroscopicDescription implements IMicroscopicDescription 
 		// Prevent the accepted hierarchy level to be 0 (which is just root),
 		// which would make problem in later stages of the aggregation (building
 		// the hierarchy)
-		for (int i = maxHierarchyLevel; i >= 1; i--) {	
+		for (int i = 1; i <= maxHierarchyLevel; i++) {
 			if (monitor.isCanceled())
 				return;
-			
+
 			int nbProdHierarchyI = removeFilteredEP(
 					fullHierarchy.getEventProducerNodesFromHierarchyLevel(i))
 					.size();
-			if (nbProdHierarchyI > parameters.getOcelotlSettings()
-					.getMaxNumberOfLeaves() || nbProdHierarchyI == 0) {
-				continue;
-			} else {
+			if (nbProdHierarchyI < parameters.getOcelotlSettings()
+					.getMaxNumberOfLeaves() && nbProdHierarchyI != 0) {
 				acceptedHierarchyLevel = i;
 				foundASolution = true;
+			} else if (nbProdHierarchyI != 0) {
+				// Reached a level where the aggregation constraint is not met
 				break;
 			}
 		}
