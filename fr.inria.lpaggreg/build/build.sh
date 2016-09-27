@@ -5,37 +5,10 @@ BASE="buildLpaggreg"
 #Import configuration
 source config
 
-DOWNLOAD=download
 LPAGGREG_PROJECT_DIR=lpaggreg
 LPAGGREGJNI_PROJECT_DIR=lpaggregjni
-LPAGGREG_PROJECT_DIR=$DOWNLOAD/$LPAGGREG_PROJECT_DIR
-LPAGGREGJNI_PROJECT_DIR=$DOWNLOAD/$LPAGGREGJNI_PROJECT_DIR
-
-mkdir -p $DOWNLOAD
-
-#Update or clone LPAggreg
-if [ -d "$LPAGGREG_PROJECT_DIR" ]; then
-	cd $LPAGGREG_PROJECT_DIR
-	git pull
-	git checkout ocelotl
-	cd -
-else
-	cd $DOWNLOAD
-	git clone $LPAGGREG_GITHUB_DIR
-	git checkout ocelotl
-	cd -
-fi
-
-#Update or clone LPAggregjni
-if [ -d "$LPAGGREGJNI_PROJECT_DIR" ]; then
-	cd $LPAGGREGJNI_PROJECT_DIR
-	git pull
-	cd -
-else
-	cd $DOWNLOAD
-	git clone $LPAGGREGJNI_GITHUB_DIR
-	cd -
-fi
+LPAGGREGJNI_PROJECT_DIR=external/$LPAGGREGJNI_PROJECT_DIR
+LPAGGREG_PROJECT_DIR=$LPAGGREGJNI_PROJECT_DIR/external/$LPAGGREG_PROJECT_DIR
 
 cd $OCELOTL_PROJECT_DIR
 OCELOTL_PROJECT_DIR=`pwd`
