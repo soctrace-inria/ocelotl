@@ -17,10 +17,12 @@ mkdir -p $DOWNLOAD
 if [ -d "$LPAGGREG_PROJECT_DIR" ]; then
 	cd $LPAGGREG_PROJECT_DIR
 	git pull
+	git checkout ocelotl
 	cd -
 else
 	cd $DOWNLOAD
 	git clone $LPAGGREG_GITHUB_DIR
+	git checkout ocelotl
 	cd -
 fi
 
