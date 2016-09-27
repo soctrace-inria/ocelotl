@@ -1,8 +1,5 @@
 #!/bin/bash
 
-LPAGGREG_GITHUB_DIR=https://github.com/dosimont/lpaggreg.git
-LPAGGREGJNI_GITHUB_DIR=https://github.com/dosimont/lpaggregjni.git
-
 OCELOTL_PROJECT_DIR=../..
 
 

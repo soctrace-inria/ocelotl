@@ -1,0 +1,3 @@
+[submodule "fr.inria.lpaggreg/build/external/lpaggregjni"]
+	path = fr.inria.lpaggreg/build/external/lpaggregjni
+	url = https://github.com/dosimont/lpaggregjni.git
