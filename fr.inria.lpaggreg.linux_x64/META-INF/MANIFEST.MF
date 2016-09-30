@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Linux_x64
 Bundle-SymbolicName: fr.inria.lpaggreg.linux_x64
-Bundle-Version: 1.1.9
+Bundle-Version: 1.1.10
 Fragment-Host: fr.inria.lpaggreg;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Eclipse-PlatformFilter: (& (osgi.os=linux) (osgi.arch=x86_64))

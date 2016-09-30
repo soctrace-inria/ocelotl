@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Json
 Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.json;singleton:=true
-Bundle-Version: 1.1.9
+Bundle-Version: 1.1.10
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/gson-2.3.1.jar

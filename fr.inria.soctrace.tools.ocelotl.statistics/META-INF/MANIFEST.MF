@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Statistics
 Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.statistics;singleton:=true
-Bundle-Version: 1.1.9
+Bundle-Version: 1.1.10
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.statistics.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

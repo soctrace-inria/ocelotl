@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ui
 Bundle-SymbolicName: fr.inria.soctrace.tools.ocelotl.ui;singleton:=true
-Bundle-Version: 1.1.9
+Bundle-Version: 1.1.10
 Bundle-Activator: fr.inria.soctrace.tools.ocelotl.ui.Activator
 Bundle-Vendor: INRIA
 Require-Bundle: org.eclipse.ui,
