@@ -1,4 +1,4 @@
-#Ocelotl Analysis Tool
+# Ocelotl Analysis Tool
 
 Ocelotl is an innovative visualization tool, which provides overviews for execution trace analysis by using a data aggregation technique. This technique enables to find anomalies in huge traces containing up to several billions of events, while keeping a fast computation time and providing a simple representation that does not overload the user.
 
@@ -10,7 +10,7 @@ You will find here a video showing Ocelotl functionalities:
 
 [![Ocelotl Analysis Tool](http://soctrace-inria.github.io/ocelotl/images/play.png)](https://www.youtube.com/watch?v=3cbLM0rUu78)
 
-##Get Ocelotl Now!
+## Get Ocelotl Now!
 
 ### Update Site
 
@@ -55,7 +55,7 @@ Follow the [wiki](https://github.com/soctrace-inria/ocelotl/wiki/User-Guide) to 
 Check our [wiki](https://github.com/soctrace-inria/ocelotl/wiki/User-Guide) to install, configure and use Ocelotl.
 A detailed [user guide](https://github.com/soctrace-inria/ocelotl/raw/master/docs/ocelotl_userguide.pdf) is also available for more details.
 
-##Licence
+## Licence
 
 Ocelotl is based on the Eclipse framework and it is released under the [EPL (Eclipse Public License) v1.0](https://www.eclipse.org/legal/epl-v10.html). The legal documentation has been written following the guidelines specified [here](http://www.eclipse.org/legal/guidetolegaldoc.php).
 
